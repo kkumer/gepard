@@ -17,7 +17,7 @@ BINDIR = $(HOME)/.mma/Applications/gepard.exe/Linux/
 
 
 # targets
-SRCTARGETS = radcorr scaledep gepard.exe fit plotsigma
+SRCTARGETS = radcorr scaledep gepard.exe fit test
 DOCTARGETS = pdf html
 .PHONY: $(SRCTARGETS)
 
@@ -37,15 +37,10 @@ pdf: tex
 	$(MAKE) -C doc/tex pdf
 
 tex:
-	ln -s doc/robodoc.rc .
-	robodoc  --latex --singledoc --doc ./doc/tex/gepard 
-	rm robodoc.rc
+	robodoc --rc doc/robodoc.rc --latex --singledoc --nosource --toc --index --doc ./doc/tex/gepard 
 	
 html:
-	ln -s doc/robodoc.rc .
-	robodoc  --html --multidoc --index --doc ./doc/html
-	rm robodoc.rc
-	
+	robodoc --rc doc/robodoc.rc  --html --multidoc --index --doc ./doc/html
 
 .PHONY: clean
 clean:

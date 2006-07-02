@@ -52,7 +52,10 @@ C
       DOUBLE PRECISION RF2, RR2, AS0, MU20, R, ASQ2, ASQ02
       DOUBLE COMPLEX N, BIGC0(2), BIGC1(2), BIGC2(2), CDVCS(0:2,2)
       DOUBLE COMPLEX BIGC(3,2), EVOLA(3,2,2), FCM(2)
+*     Simple parametrization of a_strong used in Letter
       PARAMETER (NF=3, RF2=1.0d0, RR2=1.0d0, AS0=0.05d0, MU20=2.5d0)
+!*     a_strong of http://www-theory.lbl.gov/~ianh/alpha/alpha.html 
+!      PARAMETER (NF=3, RF2=1.0d0, RR2=1.0d0, AS0=0.0432d0, MU20=2.5d0)
 
       N = J + (1.0d0, 0.0d0)
       CALL COMMONF (N, NF)
@@ -136,12 +139,12 @@ C
       CHARACTER ANSATZ*6
       DOUBLE COMPLEX CLNGAMMA, CBETA, POCHSEA, POCHG
       DOUBLE COMPLEX NUM, DENN
-      DOUBLE PRECISION ALPHA0SEA, ALPHA0G, ALPHAPR, NSEA, NG, MSEA2, MG2
-      DOUBLE COMPLEX INTG
+      DOUBLE PRECISION NG, NSEA, MG, MSEA, ALPHA0G, ALPHA0SEA
+      DOUBLE PRECISION ALPHAPR
 
 *   Input common-blocks 
 
-      COMMON / GPD        /  NSEA, MSEA2, ALPHA0SEA, NG, MG2, ALPHA0G
+      COMMON / GPD        /  NG, NSEA, MG, MSEA, ALPHA0G, ALPHA0SEA
 
       IF (ANSATZ .EQ. 'TOY') THEN
             FCM(1) = 454760.7514415856 * EXP(CLNGAMMA(0.5d0 + J)) /
@@ -171,11 +174,11 @@ C
             ALPHAPR = 0.25d0
             POCHSEA = (8.0d0, 0.0d0)
             POCHG = (6.0d0, 0.0d0)
-            FCM(1) = NSEA / (1 - DEL2/MSEA2)**3 * CBETA(
+            FCM(1) = NSEA / (1 - DEL2/MSEA**2)**3 * CBETA(
      &            COMPLEX(1.0d0 - ALPHA0SEA - 
      &            ALPHAPR*DEL2, 0.0d0) + J, POCHSEA) / CBETA(
      &            COMPLEX(2.0d0 - ALPHA0SEA, 0.0d0), POCHSEA)
-            FCM(2) = NG / (1 - DEL2/MG2)**3 * CBETA(
+            FCM(2) = NG / (1 - DEL2/MG**2)**3 * CBETA(
      &            COMPLEX(1.0d0 - ALPHA0G - ALPHAPR*DEL2,
      &        0.0d0) + J, POCHG) / CBETA(COMPLEX(2.0d0 - ALPHA0G,
      &        0.0d0), POCHG)

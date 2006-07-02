@@ -39,6 +39,7 @@ accept files:
     erfunc.f
     evol.f
     fit.f
+    f2.f
     lambda.f
     msbar.f
     parwav.f
@@ -47,3 +48,4 @@ accept files:
     radcorr.f
     scaledep.f
     special.f
+    test.f

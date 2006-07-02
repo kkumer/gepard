@@ -8,7 +8,7 @@ C     *******
 C     ****p* fit.f/FIT
 C  NAME
 C    FIT   --  Determines parameters of GPDs (and low-energy
-C              input point Q0), by fitting to DVCS
+C              input point Q0), by fitting to DVCS and DIS
 C              experimental data.
 C            
 C  DESCRIPTION
@@ -61,7 +61,7 @@ C     DOUBLE PRECISION F, FUTIL
 C     DOUBLE PRECISION A(NPAR),GIN(NPAR)
 C    
 C  INPUTS 
-C            DATASET?  --  ? = 1, ..., 6.  (name of 8 chars exactly!!)
+C            DATASET?  --  ? = 1, ..., 9, 0.  (name of 8 chars exactly!!)
 C                          files with experimental data formatted
 C                          like:   x  y  dy_stat  dy_syst
 C  OUTPUT
@@ -77,7 +77,7 @@ C                   A  --  Array with fit parameters
 C              FITPAR  --  Equal to A
 C
 C  CHILDREN
-C      PARSIGMA, SIGMA, READDATA
+C      PARSIGMA, SIGMA, F2
 C
 C  PARENTS
 C      MINUIT, FCN (via MINUIT)
@@ -104,9 +104,12 @@ C
       DOUBLE PRECISION CHISQ, FITFN
       DOUBLE PRECISION W2, XI, DEL2, Q2, Q02
       DOUBLE PRECISION PARSIGMA, SIGMA
+      DOUBLE PRECISION F2(0:2)
+      LOGICAL INCLUDEDVCS, INCLUDEDIS
 
       COMMON / KINEMATICS /  XI, DEL2, Q2, Q02
       COMMON / FITPARAMS  /  FITPAR
+      COMMON / F2P        /  F2
 
 *     Clear output buffer
       CALL FLUSHOUT()
@@ -115,18 +118,19 @@ C
       DO 10 I = 1, NPAR
  10     FITPAR(I) = A(I)
 
-*     this subroutine does not use FUTIL
-*
-      IF (IFLAG .NE. 1)  THEN
-*      write(*,*) 'Initialization (none in this example)'
-      END IF
 
       IF (IFLAG .EQ. 3)  THEN
 *       file for writing out points of final fit
         OPEN (UNIT = 16, FILE = 'FIT.PLT', STATUS = 'UNKNOWN')
       END IF
 
+
       CHISQ = 0.0d0
+
+      INCLUDEDVCS = .FALSE.
+      INCLUDEDIS = .TRUE.
+
+      IF ( INCLUDEDVCS ) THEN
 
 *     DATASET 1  [H1,  Eur.Phys.J.C44:1-11,2005, hep-ex/0505061]
 *       X = -T,   Y = DSIG/DT   
@@ -258,6 +262,97 @@ C
       END IF
       END DO
 
+      END IF
+
+
+
+      IF ( INCLUDEDIS ) THEN
+
+*     DATASET 7  [H1,  Nucl.Phys.B470(96)3]
+*       X = Q2,   Y = F2
+*       X_BJ = 0.002
+
+      XI = 0.002d0
+      N = 9
+      CALL READDATA ('DATASET7', N, X, Y, DY)
+      DO I= 1, N
+      Q2 = X(I)
+      CALL F2F
+      FITFN = F2(1)
+      CHISQ = CHISQ + ( (FITFN - Y(I))**2 / DY(I)**2 )
+      IF (IFLAG .EQ. 3)  THEN
+        WRITE (16, *) X(I), FITFN
+      END IF
+      END DO
+
+      IF (IFLAG .EQ. 3)  THEN
+*       empty line for separation of different fit lines
+        WRITE (16, *) 
+      END IF
+
+*     DATASET 8  [H1,  Nucl.Phys.B470(96)3]
+*       X = Q2,   Y = F2
+*       X_BJ = 0.0005
+
+      XI = 0.0005d0
+      N = 8
+      CALL READDATA ('DATASET8', N, X, Y, DY)
+      DO I= 1, N
+      Q2 = X(I)
+      CALL F2F
+      FITFN = F2(1)
+      CHISQ = CHISQ + ( (FITFN - Y(I))**2 / DY(I)**2 )
+      IF (IFLAG .EQ. 3)  THEN
+        WRITE (16, *) X(I), FITFN
+      END IF
+      END DO
+
+      IF (IFLAG .EQ. 3)  THEN
+*       empty line for separation of different fit lines
+        WRITE (16, *) 
+      END IF
+
+*     DATASET 9  [H1,  Nucl.Phys.B470(96)3]
+*       X = X_BJ,   Y = F2
+*       Q2 = 8.5 GeV^2
+
+      Q2 = 8.5d0
+      N = 9
+      CALL READDATA ('DATASET9', N, X, Y, DY)
+      DO I= 1, N
+      XI = X(I)
+      CALL F2F
+      FITFN = F2(1)
+      CHISQ = CHISQ + ( (FITFN - Y(I))**2 / DY(I)**2 )
+      IF (IFLAG .EQ. 3)  THEN
+        WRITE (16, *) X(I), FITFN
+      END IF
+      END DO
+
+      IF (IFLAG .EQ. 3)  THEN
+*       empty line for separation of different fit lines
+        WRITE (16, *) 
+      END IF
+
+
+*     DATASET 0  [H1,  Nucl.Phys.B470(96)3]
+*       X = X_BJ,   Y = F2
+*       Q2 = 15 GeV^2
+
+      Q2 = 15.0d0
+      N = 9
+      CALL READDATA ('DATASET0', N, X, Y, DY)
+      DO I= 1, N
+      XI = X(I)
+      CALL F2F
+      FITFN = F2(1)
+      CHISQ = CHISQ + ( (FITFN - Y(I))**2 / DY(I)**2 )
+      IF (IFLAG .EQ. 3)  THEN
+        WRITE (16, *) X(I), FITFN
+      END IF
+      END DO
+
+      ENDIF
 
       F = CHISQ
 
@@ -270,28 +365,6 @@ C
       RETURN
       END
 C     ****
-
-C     ****s* fit.f/READDATA
-C  NAME
-C     READDATA -- read one data set
-C            
-C  DESCRIPTION
-C    Reads experimental datasets and calculates error
-C    by adding statistic and systematic errors in
-C    quadrature
-C    
-C  INPUTS 
-C            FILENAME  --  Name of the file with data set
-C                   N  --  Number of points in a given data set
-C  OUTPUT
-C                   X  --  Array with x-values of experimental points
-C                   Y  --  Array with y-values of experimental points
-C                  DY  --  Array with errors of y-values
-C  PARENTS
-C      FCN
-C
-C  SOURCE
-C
 
 
       SUBROUTINE READDATA (FILENAME, N, X, Y, DY)

@@ -1,4 +1,10 @@
 #!/bin/sh
-xmgrace -settype xydy DATASET1 DATASET2 -settype xy FIT.PLT -batch fit12.bat &
-xmgrace -settype xydy DATASET3 DATASET4 -settype xy FIT.PLT -batch fit34.bat &
-xmgrace -settype xydy DATASET5 DATASET6 -settype xy FIT.PLT -batch fit56.bat &
+
+# DVCS part
+#xmgrace -settype xydy DATASET1 DATASET2 -settype xy FIT.PLT -batch fit12.bat &
+#xmgrace -settype xydy DATASET3 DATASET4 -settype xy FIT.PLT -batch fit34.bat &
+#xmgrace -settype xydy DATASET5 DATASET6 -settype xy FIT.PLT -batch fit56.bat &
+
+# DIS part
+xmgrace -settype xydy DATASET7 DATASET8 -settype xy FIT.PLT -batch fit78.bat &
+xmgrace -settype xydy DATASET9 DATASET0 -settype xy FIT.PLT -batch fit90.bat &
