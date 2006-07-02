@@ -1,0 +1,77 @@
+
+gepard = calculating Compton form factors from moments of
+         General PARton Distributions 
+
+- Version 0.88 2006-06-26 
+
+
+
+=============================
+1. Files, and what they are:
+=============================
+
+
+Essential:
+---------
+mma/gepard.m  - Mathematica package. For basic documentation try ?CFF and ?Fcm
+mma/gepard.exe - binary FORTRAN library. (Linux and Windows versions)
+Makefile  - For compiling Fortran code (Linux only)
+
+
+Useful:
+------
+fits/  - files used for fitting
+mma/gepard.nb - Notebook with checks and timings. Section 1 and then 3 are good
+            introduction.  Section 2 of this notebook is good
+            for understanding which routines are available and 
+            for understanding correspondence with DM's CFFNNLO.nb routines.
+           
+
+=============================
+2. Instalation and usage:
+=============================
+
+===================================
+2.1 Calculating CFFs in Mathematica
+===================================
+
+
+Put gepard.m file and gepard.exe directory where Mathematica can find it, then install via:
+
+<< gepard.m
+
+Mathematica should automatically load file gepard.exe in subdirectory according to $SystemID
+
+If this doesn't work ("gepard.exe not found"), then in file gepard.m adjust line 
+    Install["gepard.exe"]
+to
+    Install["<exact path to file gepard.exe for your system>"]
+
+For usage, type ?CFF or better read gepard.nb and DM's CFFNNLO.nb which uses the same
+calling conventions for high level functions i.e. only  "eval" label there should
+be changed from as2pF(II) to either:
+
+GEP  - exact Fortran routines
+GEPI, GEPIfix  - two types of interpolations
+
+Quickest introduction is by going over 1st and 3rd section of gepard.nb, then returning
+to 2nd for details and lower level functions if needed, and only then
+use ?CFF, ?interpol, ?interpolfix, ?Fpw, ?cDVCS, ?RAope, ?Fcm, ?common, ?AS2P which
+are a bit cryptic.
+
+========================================
+2.2 Calculating and fitting with Fortran
+========================================
+
+- use provided binary 'fit' if you can
+
+- 'make fit'  creates binary for fitting that calls minuit. Commands for minuit
+are in file FIT.CMD, and output is in file FIT.PLT, where each stanza
+corresponds to one DATASET[1-6]. Output of minuit is going to terminal, so
+to save it use  'time ./fit | tee -a savefile'
+
+- plotfits creates three figures from FIT.PLT as instructed in fit??.bat
+
+- fortran documentation is in doc/html and doc/tex  (can be recreated by
+  'make tex' or 'make html' if you have robodoc installed).
+  'make pdf' compiles LaTeX if you have latex installed.

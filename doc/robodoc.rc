@@ -1,0 +1,49 @@
+# robodoc.rc for project gepard documentation
+
+items:
+    NAME
+    SYNOPSIS
+    FILE DESCRIPTION
+    DESCRIPTION
+    INPUTS
+    OUTPUT
+    RETURN VALUE
+    IDENTIFIERS
+    EXAMPLE
+    NOTES
+    BUGS
+    TODO
+    SEE ALSO
+    CHILDREN
+    PARENTS
+    SOURCE
+options:
+    --src ./src
+    --nodesc
+    --sections
+    --toc
+headertypes:
+    h "Files" files
+    p "Programs" programs
+    s "Subroutines" subroutines
+    f "Functions" functions
+accept files:
+    astrong.f
+    beta.f
+    cdvcs.f
+    cff.f
+    common.f
+    dcomplex.f
+    deriv.f
+    dvcs.f
+    erfunc.f
+    evol.f
+    fit.f
+    lambda.f
+    msbar.f
+    parwav.f
+    projectors.f
+    rnnlo.f
+    radcorr.f
+    scaledep.f
+    special.f

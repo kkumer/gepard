@@ -1,0 +1,4 @@
+FIG2A.DAT  is data from Fig. 2 from singlet Letter. After compiling
+scaledep program, consistency should be checked by
+
+diff Tests/FIG2A.DAT FIG2A.DAT
