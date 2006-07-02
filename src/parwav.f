@@ -2,7 +2,7 @@ C     ****h* gepard/parwav.f
 C  FILE DESCRIPTION
 C    calculates J-th conformal partial wave for DVCS
 C
-C    $Id: parwav.f,v 1.2 2006-05-12 19:51:34+02 kuk05260 Exp kuk05260 $
+C    $Id$
 C     *******
 
 

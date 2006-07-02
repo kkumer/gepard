@@ -2,7 +2,7 @@ C     ****h* gepard/lambda.f
 C  FILE DESCRIPTION
 C     eigenvalues of the LO singlet anomalous dimensions matrix
 C
-C    $Id: lambda.f,v 1.2 2006-05-12 19:54:53+02 kuk05260 Exp kuk05260 $
+C    $Id$
 C     *******
 
 

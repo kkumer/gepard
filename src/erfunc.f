@@ -2,7 +2,7 @@ C     ****h* gepard/erfunc.f
 C  FILE DESCRIPTION
 C    calculation of scale dependent part of the evolution operator
 C
-C    $Id: erfunc.f,v 1.2 2006-05-12 19:55:34+02 kuk05260 Exp kuk05260 $
+C    $Id$
 C     *******
 
 

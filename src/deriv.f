@@ -2,7 +2,7 @@ C     ****h* gepard/deriv.f
 C  FILE DESCRIPTION
 C    calculation of derivative of a function
 C
-C    $Id: deriv.f,v 1.1 2006-04-12 19:25:08+02 kkumer Exp kkumer $
+C    $Id$
 C  NOTES
 C    Adapted from Sect. 5.7 of Press et al., "Numerical Recipes".
 C     *******

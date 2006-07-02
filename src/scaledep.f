@@ -4,7 +4,7 @@ C    calculation of relative change of scale dependence of {\cal H}
 C    singlet DVCS form factor.
 C    Produces data files for Fig. 2. of KMPKS06 Letter
 C
-C    $Id: radcorr.f,v 1.1 2006-04-13 19:27:11+02 kkumer Exp kkumer $
+C    $Id$
 C     *******
 
 

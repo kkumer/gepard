@@ -3,7 +3,7 @@ C  FILE DESCRIPTION
 C    initialization of common blocks with anomalous dimensions
 C    and Wilson coefficients of DIS
 C
-C    $Id: common.f,v 1.1 2006-04-12 19:11:15+02 kkumer Exp kkumer $
+C    $Id$
 C     *******
 
 

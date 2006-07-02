@@ -2,7 +2,7 @@ C     ****h* gepard/astrong.f
 C  FILE DESCRIPTION
 C    running of QCD coupling constant
 C
-C    $Id: astrong.f,v 1.1 2006-04-12 18:09:27+02 kkumer Exp kkumer $
+C    $Id$
 C  NOTES
 C    This is modification of file asrgkt.f
 C    from package `QCD-Pegasus'  by  Andreas Vogt.

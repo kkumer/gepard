@@ -2,7 +2,7 @@ C     ****h* gepard/beta.f
 C  FILE DESCRIPTION
 C    coefficients of beta function of QCD
 C
-C    $Id: beta.f,v 1.1 2006-04-12 18:30:52+02 kkumer Exp kkumer $
+C    $Id$
 C  NOTES
 C    This is modification of file betafct.f
 C    from package `QCD-Pegasus'  by  Andreas Vogt.

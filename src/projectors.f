@@ -3,7 +3,7 @@ C  FILE DESCRIPTION
 C    projectors to eigenstates of the LO singlet 
 C    anomalous dimensions matrix.
 C
-C    $Id: projectors.f,v 1.2 2006-05-12 19:55:34+02 kuk05260 Exp kuk05260 $
+C    $Id$
 C     *******
 
 

@@ -4,7 +4,7 @@ C     Calculation of matrices R_1 and R_2, from my DIS-p61
 C     - combination of gamma^(n) and beta_m needed in evolution operator 
 C     - projected on +/- directions
 C
-C    $Id: rnnlo.f,v 1.2 2006-05-12 19:55:34+02 kuk05260 Exp kuk05260 $
+C    $Id$
 C     *******
 
 

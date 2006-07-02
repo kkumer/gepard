@@ -2,7 +2,7 @@ C     ****h* gepard/dcomplex.f
 C  FILE DESCRIPTION
 C    Tangent and argument of double complex number Z
 C
-C    $Id: dcomplex.f,v 1.1 2006-04-12 15:47:13+02 kkumer Exp kkumer $
+C    $Id$
 C
 C  NOTES
 C    Adapted from SLATEC routines CTAN and CARG

@@ -3,7 +3,7 @@ C  FILE DESCRIPTION
 C    calculation of  Wilson coefficients for DVCS in CSbar scheme
 C    according to KMKPS06 paper
 C
-C    $Id: cdvcs.f,v 1.1 2006-04-12 18:50:29+02 kkumer Exp kkumer $
+C    $Id$
 C     *******
 
 

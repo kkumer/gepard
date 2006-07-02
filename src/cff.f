@@ -2,7 +2,7 @@ C     ****h* gepard/cff.f
 C  FILE DESCRIPTION
 C    calculation of Compton form factors
 C
-C    $Id: cff.f,v 1.1 2006-04-12 15:46:02+02 kkumer Exp kkumer $
+C    $Id$
 C  BUGS
 C     Some complex arithmetic (REALPART, COMPLEX, ...) could be
 C     specific to GNU G77 compiler.

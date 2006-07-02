@@ -4,7 +4,7 @@ C    calculation of relative radiative corrections to {\cal H} singlet
 C    DVCS form factor
 C    Produces data files for Fig. 1. of  KMPKS06 Letter
 C
-C    $Id: radcorr.f,v 1.1 2006-04-13 19:27:11+02 kkumer Exp kkumer $
+C    $Id$
 C     *******
 
 

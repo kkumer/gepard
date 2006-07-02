@@ -2,7 +2,7 @@ C     ****h* gepard/fit.f
 C  FILE DESCRIPTION
 C    Fitting of DVCS (and DIS in future) experimental data.
 C
-C    $Id: fit.f,v 1.1 2006-06-26 16:31:06+02 kuk05260 Exp kuk05260 $
+C    $Id$
 C     *******
 
 C     ****p* fit.f/FIT

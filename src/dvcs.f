@@ -2,7 +2,7 @@ C     ****h* gepard/dvcs.f
 C  FILE DESCRIPTION
 C    calculation of partial and total DVCS cross sections
 C
-C    $Id: dvcs.f,v 1.1 2006-06-26 16:30:36+02 kuk05260 Exp kuk05260 $
+C    $Id$
 C     *******
 
 C     ****f* dvcs.f/PARSIGMA

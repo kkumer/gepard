@@ -2,7 +2,7 @@ C     ****h* gepard/special.f
 C  FILE DESCRIPTION
 C    Double complex special functions (Gamma and Beta)
 C
-C    $Id: special.f,v 1.1 2006-04-12 15:46:50+02 kkumer Exp kkumer $
+C    $Id$
 C  NOTES
 C     - Adapted from "Numerical recipes" Sect. 6.1
 C     *******
