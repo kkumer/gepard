@@ -39,7 +39,8 @@ ODIR = obj
 
 # common Fortran object files
 FOBJS = Fcommon.o Fbeta.o Fspecial.o Fdcomplex.o Fastrong.o Flambda.o\
-Fprojectors.o Frnnlo.o Ferfunc.o Fevol.o Fcdvcs.o Fmsbar.o Fparwav.o Fcff.o Fdvcs.o
+Fprojectors.o Frnnlo.o Ferfunc.o Fevol.o Fcdvcs.o Fmsbar.o Fparwav.o Fcff.o\
+Fdvcs.o Ff2.o
 _FOBJS = $(patsubst %,$(FODIR)/%,$(FOBJS))
 
 # rule for compiling Fortran files
@@ -61,7 +62,7 @@ msbar.tm projectors.tm rnnlo.tm
 
 # targets
 
-all: radcorr scaledep gepard.exe fit
+all: radcorr scaledep gepard.exe fit test
 
 ALLtm.c: $(TMS)
 	cat $(TMS) > ALL.tm
@@ -79,8 +80,8 @@ gepard.exe: $(_FOBJS) $(_OBJS)
 fit: $(_FOBJS) $(FODIR)/Ffit.o $(ODIR)/flushout.o
 	$(FC) -o $@ $^ $(FFLAGS) $(LIBS) -lpacklib -lkernlib
 
-plotsigma: $(_FOBJS) $(FODIR)/Fplotsigma.o 
-	$(FC) -o $@ $^ $(FFLAGS) $(LIBS) -lpacklib -lkernlib
+test: $(_FOBJS) $(FODIR)/Ftest.o 
+	$(FC) -o $@ $^ $(FFLAGS) $(LIBS)
 
 install: gepard.exe
 	$(INSTALL) -o $(OWNER) -g $(GROUP) -m 755 $< $(BINDIR)
