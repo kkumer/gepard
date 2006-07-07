@@ -41,24 +41,27 @@ C      COMMONF, AS2PF, EVOLF, CDVCSF, MSBARF, HJ
 C  SOURCE
 C
 
-      SUBROUTINE PARWAVF (J, XI, DEL2, Q2, Q02, P, SCH, ANSATZ, FPW)
+      SUBROUTINE PARWAVF (K, XI, DEL2, Q2, Q02, P, SCH, ANSATZ, FPW)
 
       IMPLICIT NONE
-      INTEGER P
+      INTEGER P, K, K1
       DOUBLE PRECISION XI, DEL2, Q2, Q02
       CHARACTER SCH*5, ANSATZ*6
       DOUBLE COMPLEX J, FPW
-      INTEGER NF, K, L
+      INTEGER NF, L
       DOUBLE PRECISION RF2, RR2, AS0, MU20, R, ASQ2, ASQ02
-      DOUBLE COMPLEX N, BIGC0(2), BIGC1(2), BIGC2(2), CDVCS(0:2,2)
+      DOUBLE COMPLEX BIGC0(2), BIGC1(2), BIGC2(2), CDVCS(0:2,2)
       DOUBLE COMPLEX BIGC(3,2), EVOLA(3,2,2), FCM(2)
+      DOUBLE COMPLEX N (32)
 *     Simple parametrization of a_strong used in Letter
       PARAMETER (NF=3, RF2=1.0d0, RR2=1.0d0, AS0=0.05d0, MU20=2.5d0)
 !*     a_strong of http://www-theory.lbl.gov/~ianh/alpha/alpha.html 
 !      PARAMETER (NF=3, RF2=1.0d0, RR2=1.0d0, AS0=0.0432d0, MU20=2.5d0)
 
-      N = J + (1.0d0, 0.0d0)
-      CALL COMMONF (N, NF)
+      COMMON / NPOINTS    /  N
+
+      J = N(K) - 1
+      CALL COMMONF (K)
       CALL AS2PF (ASQ2, Q2, AS0, MU20, NF, P)
       CALL AS2PF (ASQ02, Q02, AS0, MU20, NF, P)
       R = ASQ2/ASQ02
@@ -72,25 +75,25 @@ C
 
       CALL HJ(J, XI, DEL2, Q2, ANSATZ, FCM)
 
-      DO 5 K = 0, P
+      DO 5 K1 = 0, P
       DO 5 L = 1, 2
-  5   CDVCS(K, L) = (0.0d0, 0.0d0)
+  5   CDVCS(K1, L) = (0.0d0, 0.0d0)
 
-      DO 10 K=1,2
-      BIGC(1,K) = BIGC0(K)
-      BIGC(2,K) = BIGC1(K)
- 10   BIGC(3,K) = BIGC2(K)
+      DO 10 K1=1,2
+      BIGC(1,K1) = BIGC0(K1)
+      BIGC(2,K1) = BIGC1(K1)
+ 10   BIGC(3,K1) = BIGC2(K1)
 
       DO 20 L=0, P
-      DO 20 K=0, L
-        CDVCS(L, 1) = CDVCS(L, 1) + BIGC(L-K+1, 1) * EVOLA(K+1,1,1) + 
-     &      BIGC(L-K+1,2) * EVOLA(K+1,2,1)
- 20     CDVCS(L, 2) = CDVCS(L, 2) + BIGC(L-K+1, 1) * EVOLA(K+1,1,2) + 
-     &      BIGC(L-K+1,2) * EVOLA(K+1,2,2)
+      DO 20 K1=0, L
+        CDVCS(L, 1) = CDVCS(L, 1) + BIGC(L-K1+1, 1) * EVOLA(K1+1,1,1) + 
+     &      BIGC(L-K1+1,2) * EVOLA(K1+1,2,1)
+ 20     CDVCS(L, 2) = CDVCS(L, 2) + BIGC(L-K1+1, 1) * EVOLA(K1+1,1,2) + 
+     &      BIGC(L-K1+1,2) * EVOLA(K1+1,2,2)
 
       FPW = (0.0d0, 0.0d0)
-      DO 30 K=0, P
- 30   FPW = FPW + ASQ2**K * (CDVCS(K,1) * FCM(1) + CDVCS(K,2) * FCM(2))
+      DO 30 K1=0, P
+ 30   FPW = FPW + ASQ2**K1 * (CDVCS(K1,1)*FCM(1) + CDVCS(K1,2)*FCM(2))
 
       RETURN
       END

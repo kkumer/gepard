@@ -43,7 +43,7 @@ FODIR = Fobj
 ODIR = obj
 
 # common Fortran object files
-FOBJS = Fcommon.o Fbeta.o Fspecial.o Fdcomplex.o Fastrong.o Flambda.o\
+FOBJS = Finit.o Fcommon.o Fbeta.o Fspecial.o Fdcomplex.o Fastrong.o Flambda.o\
 Fprojectors.o Frnnlo.o Ferfunc.o Fevol.o Fcdvcs.o Fmsbar.o Fparwav.o Fcff.o\
 Fdvcs.o Ff2.o
 _FOBJS = $(patsubst %,$(FODIR)/%,$(FOBJS))
@@ -65,7 +65,7 @@ TMS = astrong.tm
 
 # targets
 
-all: radcorr scaledep gepard.exe fit test
+all: radcorr scaledep gepard.exe fit test auxtest
 
 ALLtm.c: $(TMS)
 	cat $(TMS) > ALL.tm
@@ -83,6 +83,9 @@ gepard.exe: $(_FOBJS) $(_OBJS)
 fit: $(_FOBJS) $(FODIR)/Ffit.o $(ODIR)/flushout.o
 	$(FC) -o $@ $^ $(FFLAGS) $(LIBS) -lpacklib -lkernlib
 
+auxtest: $(_FOBJS) $(FODIR)/Fauxtest.o 
+	$(FC) -o $@ $^ $(FFLAGS) $(LIBS)
+
 test: $(_FOBJS) $(FODIR)/Ftest.o 
 	$(FC) -o $@ $^ $(FFLAGS) $(LIBS)
 
@@ -91,4 +94,4 @@ install: gepard.exe
 
 .PHONY: clean
 clean:
-	-rm -f $(FODIR)/F*.o $(ODIR)/*.o FIG*DAT ALL*tm*  radcorr scaledep gepard.exe fit test
+	-rm -f $(FODIR)/F*.o $(ODIR)/*.o FIG*DAT ALL*tm*  radcorr scaledep gepard.exe fit test auxtest

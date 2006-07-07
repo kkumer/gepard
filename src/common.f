@@ -47,20 +47,23 @@ C      with fixed abscissas.
 C  SOURCE
 C
 
-      SUBROUTINE COMMONF (Z, NF)
+      SUBROUTINE COMMONF (K)
 
       IMPLICIT NONE
-      INTEGER NF, P
-      DOUBLE COMPLEX Z 
+      INTEGER K, P, NPTS
       DOUBLE COMPLEX S1, S2, S3, S4
       DOUBLE COMPLEX GAM0(2,2), GAM1(2,2), GAM2(2,2)
       DOUBLE COMPLEX C0(2), C1(2), C2(2)
-      DOUBLE COMPLEX HS1, HS2, HS3, HS4
       DOUBLE COMPLEX F2, FL
+      PARAMETER ( NPTS = 8 * 4 )
+      DOUBLE COMPLEX GAM(NPTS,0:2,2,2), CF2(NPTS,0:2,2), CFL(NPTS,0:2,2)
+      DOUBLE COMPLEX HARMS(4,NPTS), N(NPTS)
 
 *   Input common-blocks 
 
       COMMON / APPROX     /  P
+      COMMON / NPOINTS    /  N
+      COMMON / VALUES     /  HARMS, GAM, CF2, CFL
 
 *   Output common-blocks
 
@@ -70,34 +73,34 @@ C
 
 *   Harmonic sum initialization
 
-      S1 = HS1(Z)
+      S1 = HARMS(1, K)
       IF (P .GE. 1) THEN
-        S2 = HS2(Z)
+        S2 = HARMS(2, K)
         IF (P .GE. 2) THEN
-            S3 = HS3(Z)
-            S4 = HS4(Z)
+            S3 = HARMS(3, K)
+            S4 = HARMS(4, K)
         END IF
       END IF
 
 *  Initializing anomalous dimensions matrices: LO, NLO, and NNLO
 *    NB: adacf routines want double precision NF
 
-      CALL WgammaVQQ0F(DBLE(NF), Z, GAM0(1,1))
-      CALL WgammaVQG0F(DBLE(NF), Z, GAM0(1,2))
-      CALL WgammaVGQ0F(DBLE(NF), Z, GAM0(2,1))
-      CALL WgammaVGG0F(DBLE(NF), Z, GAM0(2,2))
+      GAM0(1,1) = GAM(K, 0, 1, 1)
+      GAM0(1,2) = GAM(K, 0, 1, 2)
+      GAM0(2,1) = GAM(K, 0, 2, 1)
+      GAM0(2,2) = GAM(K, 0, 2, 2)
 
       IF (P .GE. 1) THEN
-      CALL WgammaVQQ1F(DBLE(NF), Z, GAM1(1,1))
-      CALL WgammaVQG1F(DBLE(NF), Z, GAM1(1,2))
-      CALL WgammaVGQ1F(DBLE(NF), Z, GAM1(2,1))
-      CALL WgammaVGG1F(DBLE(NF), Z, GAM1(2,2))
+      GAM1(1,1) = GAM(K, 1, 1, 1)
+      GAM1(1,2) = GAM(K, 1, 1, 2)
+      GAM1(2,1) = GAM(K, 1, 2, 1)
+      GAM1(2,2) = GAM(K, 1, 2, 2)
 
       IF (P .GE. 2) THEN
-      CALL WgammaVQQ2F(DBLE(NF), Z, GAM2(1,1))
-      CALL WgammaVQG2F(DBLE(NF), Z, GAM2(1,2))
-      CALL WgammaVGQ2F(DBLE(NF), Z, GAM2(2,1))
-      CALL WgammaVGG2F(DBLE(NF), Z, GAM2(2,2))
+      GAM2(1,1) = GAM(K, 2, 1, 1)
+      GAM2(1,2) = GAM(K, 2, 1, 2)
+      GAM2(2,1) = GAM(K, 2, 2, 1)
+      GAM2(2,2) = GAM(K, 2, 2, 2)
       END IF
       END IF
 
@@ -108,19 +111,19 @@ C
       C0(2) = (0.0d0, 0.0d0)
 
       IF (P .GE. 1) THEN
-      CALL WcVF2Q1F(DBLE(NF), Z, F2)
-      CALL WcVFLQ1F(DBLE(NF), Z, FL)
+      F2 = CF2(K, 1, 1)
+      FL = CFL(K, 1, 1)
       C1(1) = F2 -  FL
-      CALL WcVF2G1F(DBLE(NF), Z, F2)
-      CALL WcVFLG1F(DBLE(NF), Z, FL)
+      F2 = CF2(K, 1, 2)
+      FL = CFL(K, 1, 2)
       C1(2) = F2 -  FL
 
       IF (P .GE. 2) THEN
-      CALL WcVF2Q2F(DBLE(NF), Z, F2)
-      CALL WcVFLQ2F(DBLE(NF), Z, FL)
+      F2 = CF2(K, 2, 1)
+      FL = CFL(K, 2, 1)
       C2(1) = F2 -  FL
-      CALL WcVF2G2F(DBLE(NF), Z, F2)
-      CALL WcVFLG2F(DBLE(NF), Z, FL)
+      F2 = CF2(K, 2, 2)
+      FL = CFL(K, 2, 2)
       C2(2) = F2 -  FL
       END IF
       END IF

@@ -18,7 +18,7 @@ BINDIR = $(HOME)/.mma/Applications/gepard.exe/Linux/
 
 
 # targets
-SRCTARGETS = radcorr scaledep gepard.exe fit test
+SRCTARGETS = radcorr scaledep gepard.exe fit test auxtest
 DOCTARGETS = pdf html
 .PHONY: $(SRCTARGETS)
 
