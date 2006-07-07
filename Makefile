@@ -11,7 +11,8 @@
 
 # Where and how gepard.exe should be installed
 OWNER = $(USER) 
-GROUP = $(USER)
+#GROUP = $(USER)
+GROUP = kern
 INSTALL = install
 BINDIR = $(HOME)/.mma/Applications/gepard.exe/Linux/
 
@@ -48,3 +49,4 @@ clean:
 	$(MAKE) -C doc/tex clean
 	-rm doc/html/*
 	-rm -f $(SRCTARGETS)
+	-rm FIG*DAT

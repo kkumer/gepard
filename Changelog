@@ -2,3 +2,6 @@ Version 0.88  (2006-07-02)
 
 - Initial version
 - Imported into subversion versioning system
+- Target gepard.exe is broken (so calling from Mathematica
+doesn't work) but "pure Fortran" targets work and produce
+data equivalent with Figs 1 and 2 of Letter
