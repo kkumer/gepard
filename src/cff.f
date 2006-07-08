@@ -81,136 +81,56 @@ C
       IMPLICIT NONE
       INTEGER P, NPTS, K
       DOUBLE PRECISION XI, DEL2, Q2, Q02, C, PHI
-      DOUBLE COMPLEX CFF(0:2)
+      DOUBLE COMPLEX CFF(0:2), EPH, PIHALF, J, FPW
+      DOUBLE COMPLEX CLNGAMMA, DCTAN
       CHARACTER SCHEME*5, ANSATZ*6
       DOUBLE PRECISION RESREAL, RESIMAG
       DOUBLE PRECISION FREAL, FIMAG
       PARAMETER (NPTS = 32)
       DOUBLE PRECISION Y(NPTS), WG(NPTS)
-
-*   Output common-blocks
-
-      COMMON / POINTS     /  Y, WG
+      DOUBLE COMPLEX N(NPTS)
 
 *   Input common-blocks 
 
-C      SCHEME -- scheme
       COMMON / APPROX     /  P
       COMMON / KINEMATICS /  XI, DEL2, Q2, Q02
       COMMON / LABELS     /  SCHEME, ANSATZ
       COMMON / CPHI       /  C, PHI
+      COMMON / POINTS     /  Y, WG
+      COMMON / NPOINTS    /  N
 
 *   Output common-blocks
 
       COMMON / CFF        /  CFF
 
-
-*   Integration ...
+      PIHALF = (1.5707963267948966d0, 0.0d0)
+      EPH = EXP ( COMPLEX(0.0d0, PHI) )
 
       RESREAL = 0.0d0
       RESIMAG = 0.0d0
+
+*   Integration ...
+
       DO 123 K = 1, NPTS
-      RESREAL = RESREAL + WG(K)*FREAL(K)
-      RESIMAG = RESIMAG + WG(K)*FIMAG(K)
+
+      J = N(K) - 1
+
+      CALL PARWAVF (K, XI, DEL2, Q2, Q02, P, SCHEME, ANSATZ, FPW)
+
+      FREAL = IMAGPART( EPH * (2.0d0/XI)**(J-C) * DCTAN(PIHALF*J) *
+     &  FPW * EXP(CLNGAMMA(2.5d0 + J)) / EXP(CLNGAMMA(3.0d0 + J)) )
+
+      FIMAG = IMAGPART(EPH * (2.0d0/XI)**(J-C) * FPW *
+     &      EXP(CLNGAMMA(2.5d0 + J)) / EXP(CLNGAMMA(3.0d0 + J)) )
+
+      RESREAL = RESREAL + WG(K)*FREAL
+      RESIMAG = RESIMAG + WG(K)*FIMAG
+
  123  CONTINUE
+
       CFF(P) = (2.0d0/XI)**(C + 1.0d0) * 
      &      COMPLEX(RESREAL, RESIMAG) / 0.886226925452758014d0
 
       RETURN
       END
 C     ***
-
-
-C     ****f* cff.f/FREAL
-C  NAME
-C    FREAL
-C  DESCRIPTION
-C    real part of the Mellin-Barnes integrand
-C  SYNOPSIS
-C    DOUBLE PRECISION FUNCTION FREAL(Y)
-C
-C    DOUBLE PRECISION Y
-C  PARENTS
-C       CFFF (via DQAGS)
-C  CHILDREN
-C       PARWAVF, CLNGAMMA, DCTAN
-C  SOURCE
-C
-
-      DOUBLE PRECISION FUNCTION FREAL(K)
-      IMPLICIT NONE
-      INTEGER K
-      INTEGER P, NPTS
-      PARAMETER ( NPTS = 32 )
-      DOUBLE PRECISION XI, DEL2, Q2, Q02, C, PHI
-      CHARACTER SCHEME*5, ANSATZ*6
-      DOUBLE COMPLEX J, FPW, PIHALF, CLNGAMMA, DCTAN, EPH
-      DOUBLE PRECISION Y(NPTS), WG(NPTS)
-      DOUBLE COMPLEX N(NPTS)
-
-      COMMON / POINTS     /  Y, WG
-      COMMON / NPOINTS    /  N
-
-      COMMON / KINEMATICS /  XI, DEL2, Q2, Q02
-      COMMON / APPROX     /  P
-      COMMON / LABELS     /  SCHEME, ANSATZ
-      COMMON / CPHI       /  C, PHI
-
-      PIHALF = (1.5707963267948966d0, 0.0d0)
-      EPH = EXP ( COMPLEX(0.0d0, PHI) )
-
-      J = N(K) - 1
-      CALL PARWAVF (K, XI, DEL2, Q2, Q02, P, SCHEME, ANSATZ, FPW)
-      FREAL = IMAGPART( EPH * (2.0d0/XI)**(J-C) * DCTAN(PIHALF*J) *
-     &  FPW * EXP(CLNGAMMA(2.5d0 + J)) / EXP(CLNGAMMA(3.0d0 + J)) )
-
-      RETURN
-      END
-C     ***
-
-
-C     ****f* cff.f/FIMAG
-C  NAME
-C    FIMAG
-C  DESCRIPTION
-C    imaginary part of the Mellin-Barnes integrand
-C  SYNOPSIS
-C    DOUBLE PRECISION FUNCTION FIMAG(Y)
-C
-C    DOUBLE PRECISION Y
-C  PARENTS
-C       CFFF (via DQAGS)
-C  CHILDREN
-C       PARWAVF, CLNGAMMA
-C  SOURCE
-C
-      DOUBLE PRECISION FUNCTION FIMAG(K)
-      IMPLICIT NONE
-      INTEGER K
-      INTEGER P, NPTS
-      PARAMETER ( NPTS = 32 )
-      DOUBLE PRECISION XI, DEL2, Q2, Q02, C, PHI
-      CHARACTER SCHEME*5, ANSATZ*6
-      DOUBLE COMPLEX J, FPW, CLNGAMMA, EPH
-      DOUBLE PRECISION Y(NPTS), WG(NPTS)
-      DOUBLE COMPLEX N(NPTS)
-
-
-      COMMON / POINTS     /  Y, WG
-      COMMON / NPOINTS    /  N
-
-      COMMON / KINEMATICS /  XI, DEL2, Q2, Q02
-      COMMON / APPROX     /  P
-      COMMON / LABELS     /  SCHEME, ANSATZ
-      COMMON / CPHI       /  C, PHI
-
-      EPH = EXP ( COMPLEX(0.0d0, PHI) )
-      J = N(K) - 1
-      CALL PARWAVF (K, XI, DEL2, Q2, Q02, P, SCHEME, ANSATZ, FPW)
-      FIMAG = IMAGPART(EPH * (2.0d0/XI)**(J-C) * FPW *
-     &      EXP(CLNGAMMA(2.5d0 + J)) / EXP(CLNGAMMA(3.0d0 + J)) )
-
-      RETURN
-      END
-C     ***
-

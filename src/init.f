@@ -5,7 +5,7 @@
       INTEGER NGAUSS, NINTG, NPTS, K, K2, K3, NF, P
       DOUBLE PRECISION PI, C, PHI, SUMM, DIFF, YI
       DOUBLE COMPLEX Z, EPH
-      DOUBLE COMPLEX HS1, HS2, HS3, HS4
+      DOUBLE COMPLEX HS1, HS2, HS3, HS4, S1, S2, S3, S4
       PARAMETER ( NGAUSS = 8, NINTG = 4, NPTS = NGAUSS*NINTG )
       PARAMETER ( PI = 3.1415 92653 58979 D0 )
 *
@@ -21,6 +21,7 @@
       COMMON / NPOINTS    /  N
       COMMON / VALUES     /  HARMS, GAM, CF2, CFL
       COMMON / CPHI       /  C, PHI
+      COMMON / HARMONIC   /  S1, S2, S3, S4
 
 
 *   Abscissas and weights for 8 point Gauss quadrature 
@@ -85,13 +86,18 @@
       Z = N(K)
 
 *   Harmonic sum initialization
+*   S1-4 in common block /Harmonic/ needed by adacf!
 
       HARMS(1,K) = HS1(Z)
+      S1 = HARMS(1,K)
       IF (P .GE. 1) THEN
         HARMS(2,K) = HS2(Z)
+        S2 = HARMS(2,K)
         IF (P .GE. 2) THEN
             HARMS(3,K) = HS3(Z)
+            S3 = HARMS(3,K)
             HARMS(4,K) = HS4(Z)
+            S4 = HARMS(4,K)
         END IF
       END IF
 

@@ -76,6 +76,8 @@ C
       COMMON / LABELS     /  SCHEME, ANSATZ
       COMMON / CFF        /  CFF
 
+      CALL INIT
+
 *     Files that will hold results
 
       OPEN (UNIT = 11, FILE = "FIG2A.DAT", STATUS = "NEW")
