@@ -48,31 +48,26 @@ C
       DOUBLE PRECISION XI, DEL2, Q2, Q02
       CHARACTER SCH*5, ANSATZ*6
       DOUBLE COMPLEX J, FPW
-      INTEGER NF, L
+      INTEGER NF, L, NPTS
       DOUBLE PRECISION RF2, RR2, AS0, MU20, R, ASQ2, ASQ02
       DOUBLE COMPLEX BIGC0(2), BIGC1(2), BIGC2(2), CDVCS(0:2,2)
       DOUBLE COMPLEX BIGC(3,2), EVOLA(3,2,2), FCM(2)
-      DOUBLE COMPLEX N (32)
+      PARAMETER (NPTS = 32)
+      DOUBLE COMPLEX N (NPTS)
+      DOUBLE COMPLEX BIGCNEW(NPTS,0:2,2)
 *     Simple parametrization of a_strong used in Letter
       PARAMETER (NF=3, RF2=1.0d0, RR2=1.0d0, AS0=0.05d0, MU20=2.5d0)
 !*     a_strong of http://www-theory.lbl.gov/~ianh/alpha/alpha.html 
 !      PARAMETER (NF=3, RF2=1.0d0, RR2=1.0d0, AS0=0.0432d0, MU20=2.5d0)
 
       COMMON / NPOINTS    /  N
+      COMMON / BIGC     /  BIGCNEW
 
       J = N(K) - 1
-      CALL COMMONF (K)
       CALL AS2PF (ASQ2, Q2, AS0, MU20, NF, P)
       CALL AS2PF (ASQ02, Q02, AS0, MU20, NF, P)
       R = ASQ2/ASQ02
-      CALL EVOLF (NF, R, EVOLA)
-
-      IF (SCH .EQ. 'CSBAR') THEN
-         CALL CDVCSF (NF, J, RF2, RR2, BIGC0, BIGC1, BIGC2)
-      ELSE IF (SCH .EQ. 'MSBAR') THEN
-         CALL MSBARF (NF, J, RF2, RR2, BIGC0, BIGC1)
-      END IF
-
+      CALL EVOLF (K, NF, R, EVOLA)
       CALL HJ(J, XI, DEL2, Q2, ANSATZ, FCM)
 
       DO 5 K1 = 0, P
@@ -80,9 +75,9 @@ C
   5   CDVCS(K1, L) = (0.0d0, 0.0d0)
 
       DO 10 K1=1,2
-      BIGC(1,K1) = BIGC0(K1)
-      BIGC(2,K1) = BIGC1(K1)
- 10   BIGC(3,K1) = BIGC2(K1)
+      BIGC(1,K1) = BIGCNEW(K, 0, K1)
+      BIGC(2,K1) = BIGCNEW(K, 1, K1)
+ 10   BIGC(3,K1) = BIGCNEW(K, 2, K1)
 
       DO 20 L=0, P
       DO 20 K1=0, L

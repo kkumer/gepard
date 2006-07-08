@@ -34,13 +34,13 @@ C      ERFUNCF, RNNLOF, KRONECKER
 C  SOURCE
 C
 
-      SUBROUTINE EVOLF (NF, R, EVOLA)
+      SUBROUTINE EVOLF (K, NF, R, EVOLA)
 
       IMPLICIT NONE
-      INTEGER NF
+      INTEGER K, NF
       DOUBLE PRECISION R
       DOUBLE COMPLEX EVOLA(3,2,2)
-      INTEGER A, B, C, I, J, K, ORD, P
+      INTEGER A, B, C, I, J, K1, ORD, P
       DOUBLE PRECISION RINV
       DOUBLE COMPLEX LAMB(2), PR(2,2,2)
       DOUBLE COMPLEX ERFUNC1(2,2), ERFUNC2(2,2)
@@ -53,8 +53,8 @@ C
       COMMON / APPROX     /  P
 
 
-      CALL ERFUNCF (NF, R, LAMB, ERFUNC1, ERFUNC2)
-      CALL RNNLOF (NF, PR, R1PROJ, R2PROJ)
+      CALL ERFUNCF (K, NF, R, LAMB, ERFUNC1, ERFUNC2)
+      CALL RNNLOF (K, NF, PR, R1PROJ, R2PROJ)
 
       RINV = 1.0d0 / R
 
@@ -77,8 +77,8 @@ C
          DO 20 C = 1, 2
             DINV = 1.0d0 + LAMB(C) - LAMB(B)
             R1R1(I,J) = (0.0d0, 0.0d0)
-            DO 17 K = 1, 2
- 17         R1R1(I,J) = R1R1(I,J) + R1PROJ(A,C,I,K) * R1PROJ(C,B,K,J)
+            DO 17 K1 = 1, 2
+ 17         R1R1(I,J) = R1R1(I,J) + R1PROJ(A,C,I,K1) * R1PROJ(C,B,K1,J)
  20         AUX = AUX + (ERFUNC2(A,B) - ERFUNC1(A,C) * RINV**DINV)/DINV
      &            * R1R1(I,J)
          IJAUX(3) = IJAUX(3) + AUX - ERFUNC2(A,B) * R2PROJ(A,B,I,J)

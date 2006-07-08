@@ -43,6 +43,10 @@ tex:
 html:
 	robodoc --rc doc/robodoc.rc  --html --multidoc --index --doc ./doc/html
 
+.PHONY: rmfig
+rmfig:
+	-rm FIG*DAT
+
 .PHONY: clean
 clean:
 	$(MAKE) -C src clean

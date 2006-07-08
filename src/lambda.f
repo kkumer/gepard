@@ -31,26 +31,27 @@ C      common block WGAMMA
 C  SOURCE
 C
 
-      SUBROUTINE LAMBDAF (NF, LAM)
+      SUBROUTINE LAMBDAF (K, NF, LAM)
 
       IMPLICIT NONE
-      INTEGER NF
+      INTEGER K, NF
       DOUBLE COMPLEX LAM(2)
-      DOUBLE COMPLEX GAM0(2,2), GAM1(2,2), GAM2(2,2)
+      INTEGER NPTS
+      PARAMETER (NPTS = 32)
+      DOUBLE COMPLEX NGAM(NPTS,0:2,2,2)
       DOUBLE COMPLEX AUX
 
 *   Input common-block
 
-      COMMON / WGAMMA  /  GAM0, GAM1, GAM2
+      COMMON / NGAM     /  NGAM
 
 *  Eigenvalues. Expression is adjusted to avoid the crossing
 *    of the SQRT cut on the negative real axis
 
-!      AUX = SQRT ((GAM0(1,1) - GAM0(2,2))**2  + 
-!     &          4.0d0 * GAM0(1,2)*GAM0(2,1))
-      AUX = (GAM0(1,1) - GAM0(2,2)) * SQRT (1.0d0 + 
-     &          4.0d0 * GAM0(1,2)*GAM0(2,1)/(GAM0(1,1) - GAM0(2,2))**2)
-      LAM(1) = 0.5d0 * (GAM0(1,1) + GAM0(2,2) - AUX)
+      AUX = (NGAM(K,0,1,1) - NGAM(K,0,2,2)) * SQRT (1.0d0 + 
+     &          4.0d0 * NGAM(K,0,1,2)*NGAM(K,0,2,1)/(NGAM(K,0,1,1) 
+     &          - NGAM(K,0,2,2))**2)
+      LAM(1) = 0.5d0 * (NGAM(K,0,1,1) + NGAM(K,0,2,2) - AUX)
       LAM(2) = LAM(1) + AUX
 
       RETURN

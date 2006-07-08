@@ -54,7 +54,7 @@ C
       PROGRAM SCALEDEP
 
       IMPLICIT NONE
-      INTEGER P, PT, NPOINTS, LN, NDEL
+      INTEGER P, PMAX, PT, NPOINTS, LN, NDEL
       DOUBLE PRECISION XI, DEL2, Q2, Q02, QVAR2
       DOUBLE COMPLEX CFF(0:2)
       CHARACTER SCHEME*5, ANSATZ*6
@@ -71,12 +71,13 @@ C
 
 *     Output common-blocks 
 
+      COMMON / INITPAR    /  PMAX
       COMMON / KINEMATICS /  XI, DEL2, Q2, Q02
       COMMON / APPROX     /  P
       COMMON / LABELS     /  SCHEME, ANSATZ
       COMMON / CFF        /  CFF
 
-      CALL INIT
+      PMAX = 2
 
 *     Files that will hold results
 
@@ -87,14 +88,17 @@ C
   5         WRITE (10 + NDEL, *) '# Output of scaledep.f. See prolog of 
      & that program'
 
+      SCHEME = 'CSBAR'
+      CALL INIT
+
 *     Scales 
 
       QVAR2 = 4.0d0
       Q02 = 1.0d0
 
+
 *     Looping over NPOINTS points for each line
 
-      SCHEME = 'CSBAR'
       LOGXI = LOGXISTART
       DO 20 PT = 1, NPOINTS
       XI = 10**LOGXI
@@ -121,6 +125,7 @@ C
       ELSE
             ANSATZ = 'SOFT'
       END IF
+
 
 *     Calculating derivatives of CFFs needed for present line and point ...
 *     ... and saving them to array (note that P changes value)

@@ -1,3 +1,1 @@
-2006-03-20 Don't calculate NNLO evolution (and other?) when called for NLO only
-2006-03-22 Make C-MathLink communication function that recognizes input type
-2006-03-24 Make interpolations for MSbar scheme
+-  Make C-MathLink communication function that recognizes input type

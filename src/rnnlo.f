@@ -43,35 +43,38 @@ C      common blocks BETABLK and WGAMMA
 C  SOURCE
 C
 
-      SUBROUTINE RNNLOF (NF, PR, R1PROJ, R2PROJ)
+      SUBROUTINE RNNLOF (K, NF, PR, R1PROJ, R2PROJ)
 
       IMPLICIT NONE
-      INTEGER NF
+      INTEGER K, NF, NPTS
       DOUBLE COMPLEX PR(2,2,2), R1PROJ(2,2,2,2), R2PROJ(2,2,2,2)
-      INTEGER NFMIN, NFMAX, K, J, P
+      INTEGER NFMIN, NFMAX, K1, J, P
       DOUBLE PRECISION BETA0, BETA1, BETA2, BETA3, INV
-      DOUBLE COMPLEX GAM0(2,2), GAM1(2,2), GAM2(2,2)
       DOUBLE COMPLEX R1(2,2), R2(2,2)
-      PARAMETER (NFMIN = 3, NFMAX = 6)
+      PARAMETER (NFMIN = 3, NFMAX = 6, NPTS = 32)
+      DOUBLE COMPLEX NGAM(NPTS,0:2,2,2)
 
 *   Input common-blocks
 
       COMMON / BETABLK / BETA0 (NFMIN:NFMAX), BETA1 (NFMIN:NFMAX),
      &                   BETA2 (NFMIN:NFMAX), BETA3 (NFMIN:NFMAX)
-      COMMON / WGAMMA  / GAM0, GAM1, GAM2
-      COMMON / APPROX     /  P
+      COMMON / NGAM    /  NGAM
+      COMMON / APPROX  /  P
 
-      CALL PROJECTORSF(NF, PR)
+      CALL PROJECTORSF(K, NF, PR)
 
 *     Inverse beta_0 is often needed below
       INV = 1.0d0 / BETA0(NF)
 
-      DO 10 K = 1,2
+      DO 10 K1 = 1,2
       DO 10 J = 1,2
-      R1(K,J) = INV * (GAM1(K,J) - 0.5d0 * INV * BETA1(NF) * GAM0(K,J))
+      R1(K1,J) = INV * (NGAM(K,1,K1,J) 
+     &            - 0.5d0 * INV * BETA1(NF) * NGAM(K,0,K1,J))
       IF (P. GE. 2) THEN
-      R2(K,J) = INV * (GAM2(K,J) - 0.5d0 * INV * BETA1(NF) * GAM1(K,J) 
-     &   - 0.25d0 * INV * (BETA2(NF) - INV * BETA1(NF)**2) * GAM0(K,J))
+      R2(K1,J) = INV * (NGAM(K,2,K1,J) 
+     &            - 0.5d0 * INV * BETA1(NF) * NGAM(K,1,K1,J) 
+     &            - 0.25d0 * INV * (BETA2(NF) 
+     &            - INV * BETA1(NF)**2) * NGAM(K,0,K1,J))
       END IF
  10   CONTINUE
 

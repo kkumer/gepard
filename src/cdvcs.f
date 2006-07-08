@@ -52,7 +52,7 @@ C
       INTEGER NF
       DOUBLE PRECISION RF2, RR2
       DOUBLE COMPLEX J, BIGC0(2), BIGC1(2), BIGC2(2)
-      INTEGER NFMIN, NFMAX, K, P
+      INTEGER NFMIN, NFMAX, K, PMAX
       DOUBLE PRECISION LRF2, LRR2
       DOUBLE PRECISION BETA0, BETA1, BETA2, BETA3
       DOUBLE COMPLEX GAM0(2,2), GAM1(2,2), GAM2(2,2)
@@ -68,7 +68,7 @@ C
      &                   BETA2 (NFMIN:NFMAX), BETA3 (NFMIN:NFMAX)
       COMMON / WGAMMA  /  GAM0, GAM1, GAM2
       COMMON / WC      /  C0, C1, C2
-      COMMON / APPROX     /  P
+      COMMON / INITPAR    /  PMAX
 
 
       LRR2 = LOG(RR2)
@@ -79,7 +79,7 @@ C
       S2 = S1*S1 - HS2(J + 1.5d0) + HS2(J + 2.0d0)
 
       CALL VECMAT(C0, GAM0, VM00)
-      IF (P .GE. 2) THEN
+      IF (PMAX .GE. 2) THEN
       CALL VECMAT(C0, GAM1, VM01)
       CALL VECMAT(C1, GAM0, VM10)
       CALL VECMAT(VM00, GAM0, VM000)
@@ -89,7 +89,7 @@ C
       BIGC0(2) = (0.0d0,0.0d0)
       DO 10 K = 1, 2
       BIGC1(K) = C1(K) + 0.5d0 * S1 * VM00(K)
-      IF (P .GE. 2) THEN
+      IF (PMAX .GE. 2) THEN
       BIGC2(K) = C2(K) + 0.5d0 * S1 * (VM01(K) + VM10(K)) +
      &      0.125d0 * S2 * VM000(K) + 0.5d0 * BETA0(NF) * (
      &      BIGC1(K) * LRR2 + 0.25d0 * VM00(K) * LRF2**2 )
