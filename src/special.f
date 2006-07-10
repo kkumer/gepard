@@ -11,6 +11,8 @@ C     *******
 C     ****f* special.f/CLNGAMMA
 C  NAME
 C     CLNGAMMA  --  logarithm of gamma function of complex argument
+C  DESCRIPTION
+C     Uses Lanczos algorithm
 C  SYNOPSIS
 C     DOUBLE COMPLEX FUNCTION CLNGAMMA(Z)
 C
@@ -52,8 +54,6 @@ C
 C     ***
 
 
-* =====================================================================
-*
 C     ****f* special.f/CBETA
 C  NAME
 C     CBETA  --  beta function of complex argument
@@ -78,6 +78,36 @@ C
       DOUBLE COMPLEX Z, W, CLNGAMMA
 
       CBETA = EXP( CLNGAMMA(Z) + CLNGAMMA(W) - CLNGAMMA(Z + W) )
+
+      RETURN
+      END
+C     ***
+      
+C     ****f* special.f/POCHHAMMER
+C  NAME
+C     POCHHAMMER  --  Pochhammer symbol
+C  SYNOPSIS
+C     DOUBLE COMPLEX FUNCTION POCHHAMMER(Z, M)
+C
+C     INTEGER M
+C     DOUBLE COMPLEX Z
+C  INPUTS
+C     Z, M -- arguments
+C  RETURN VALUE
+C     POCHAMMER -- (Z)_M
+C  PARENTS
+C     HJ
+C  SOURCE
+C
+
+      DOUBLE COMPLEX FUNCTION POCHHAMMER(Z, M)
+
+      INTEGER M, K
+      DOUBLE COMPLEX Z
+
+      POCHHAMMER = Z
+      DO 10 K = 1, M - 1
+ 10     POCHHAMMER = POCHHAMMER * (Z + K)  
 
       RETURN
       END

@@ -54,7 +54,7 @@ C
       PROGRAM SCALEDEP
 
       IMPLICIT NONE
-      INTEGER P, PMAX, PT, NPOINTS, LN, NDEL
+      INTEGER P, PMAX, PT, NPOINTS, LN, NDEL, SPEED
       DOUBLE PRECISION XI, DEL2, Q2, Q02, QVAR2
       DOUBLE COMPLEX CFF(0:2)
       CHARACTER SCHEME*5, ANSATZ*6
@@ -71,18 +71,16 @@ C
 
 *     Output common-blocks 
 
-      COMMON / INITPAR    /  PMAX
+      COMMON / INITPAR    /  SPEED, PMAX
       COMMON / KINEMATICS /  XI, DEL2, Q2, Q02
       COMMON / APPROX     /  P
       COMMON / LABELS     /  SCHEME, ANSATZ
       COMMON / CFF        /  CFF
 
-      PMAX = 2
-
 *     Files that will hold results
 
-      OPEN (UNIT = 11, FILE = "FIG2A.DAT", STATUS = "NEW")
-      OPEN (UNIT = 12, FILE = "FIG2B.DAT", STATUS = "NEW")
+      OPEN (UNIT = 11, FILE = "FIG2A.DAT", STATUS = "UNKNOWN")
+      OPEN (UNIT = 12, FILE = "FIG2B.DAT", STATUS = "UNKNOWN")
 
       DO 5 NDEL = 1, 2
   5         WRITE (10 + NDEL, *) '# Output of scaledep.f. See prolog of 

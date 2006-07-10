@@ -53,4 +53,5 @@ clean:
 	$(MAKE) -C doc/tex clean
 	-rm doc/html/*
 	-rm -f $(SRCTARGETS)
-	-rm FIG*DAT
+	-rm fits/FIT.PLT fits/gmon.out
+	-rm FIG*DAT gmon.out

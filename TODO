@@ -1,1 +1,4 @@
 -  Make C-MathLink communication function that recognizes input type
+
+-  Transfer adacf Fortran routines to gepard to make it independent
+   of adacf library.

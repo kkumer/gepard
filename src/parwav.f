@@ -48,13 +48,13 @@ C
       DOUBLE PRECISION XI, DEL2, Q2, Q02
       CHARACTER SCH*5, ANSATZ*6
       DOUBLE COMPLEX J, FPW
-      INTEGER NF, L, NPTS
+      INTEGER NF, L, NPTSMAX
       DOUBLE PRECISION RF2, RR2, AS0, MU20, R, ASQ2, ASQ02
       DOUBLE COMPLEX BIGC0(2), BIGC1(2), BIGC2(2), CDVCS(0:2,2)
       DOUBLE COMPLEX BIGC(3,2), EVOLA(3,2,2), FCM(2)
-      PARAMETER (NPTS = 32)
-      DOUBLE COMPLEX N (NPTS)
-      DOUBLE COMPLEX BIGCNEW(NPTS,0:2,2)
+      PARAMETER (NPTSMAX = 64)
+      DOUBLE COMPLEX N (NPTSMAX)
+      DOUBLE COMPLEX BIGCNEW(NPTSMAX,0:2,2)
 *     Simple parametrization of a_strong used in Letter
       PARAMETER (NF=3, RF2=1.0d0, RR2=1.0d0, AS0=0.05d0, MU20=2.5d0)
 !*     a_strong of http://www-theory.lbl.gov/~ianh/alpha/alpha.html 
@@ -125,7 +125,7 @@ C         FCM -- input scale singlet GPD H_{J}
 C  PARENTS
 C     PARWAVF
 C  CHILDREN
-C     CLNGAMMA, CBETA
+C     CLNGAMMA, CBETA, POCHHAMMER
 C  SOURCE
 C
 
@@ -135,7 +135,7 @@ C
       DOUBLE PRECISION XI, DEL2, Q2
       DOUBLE COMPLEX J, FCM(2) 
       CHARACTER ANSATZ*6
-      DOUBLE COMPLEX CLNGAMMA, CBETA, POCHSEA, POCHG
+      DOUBLE COMPLEX CLNGAMMA, CBETA, POCHSEA, POCHG, POCHHAMMER
       DOUBLE COMPLEX NUM, DENN
       DOUBLE PRECISION NG, NSEA, MG, MSEA, ALPHA0G, ALPHA0SEA
       DOUBLE PRECISION ALPHAPR
@@ -168,34 +168,28 @@ C
             FCM(2) = NG * CBETA(COMPLEX(1.0d0 - ALPHA0G - ALPHAPR*DEL2,
      &        0.0d0) + J, POCHG) / CBETA(COMPLEX(2.0d0 - ALPHA0G,
      &        0.0d0), POCHG)
-      ELSE IF (ANSATZ .EQ. 'FIT') THEN
-            ALPHAPR = 0.25d0
-            POCHSEA = (8.0d0, 0.0d0)
-            POCHG = (6.0d0, 0.0d0)
-            FCM(1) = NSEA / (1 - DEL2/MSEA**2)**3 * CBETA(
-     &            COMPLEX(1.0d0 - ALPHA0SEA - 
-     &            ALPHAPR*DEL2, 0.0d0) + J, POCHSEA) / CBETA(
-     &            COMPLEX(2.0d0 - ALPHA0SEA, 0.0d0), POCHSEA)
-            FCM(2) = NG / (1 - DEL2/MG**2)**3 * CBETA(
-     &            COMPLEX(1.0d0 - ALPHA0G - ALPHAPR*DEL2,
-     &        0.0d0) + J, POCHG) / CBETA(COMPLEX(2.0d0 - ALPHA0G,
-     &        0.0d0), POCHG)
-!      ELSE IF (ANSATZ .EQ. 'NEWFIT') THEN
+!      ELSE IF (ANSATZ .EQ. 'FIT') THEN
 !            ALPHAPR = 0.25d0
 !            POCHSEA = (8.0d0, 0.0d0)
 !            POCHG = (6.0d0, 0.0d0)
-!            FCM(1) = NSEA / (1 - DEL2/MSEA2)**3 * CBETA(
-!     &            COMPLEX(1.0d0 - ALPHA0SEA, 
-!     &            0.0d0) + J, POCHSEA) / CBETA(
-!     &            COMPLEX(2.0d0 - ALPHA0SEA, 0.0d0), POCHSEA) *
-!     &          (1.0d0 + J - ALPHA0SEA) / (1.0d0 + J - ALPHA0SEA -
-!     &           ALPHAPR*DEL2)
-!            FCM(2) = NG / (1 - DEL2/MG2)**3 * CBETA(
-!     &            COMPLEX(1.0d0 - ALPHA0G,
+!            FCM(1) = NSEA / (1 - DEL2/MSEA**2)**3 * CBETA(
+!     &            COMPLEX(1.0d0 - ALPHA0SEA - 
+!     &            ALPHAPR*DEL2, 0.0d0) + J, POCHSEA) / CBETA(
+!     &            COMPLEX(2.0d0 - ALPHA0SEA, 0.0d0), POCHSEA)
+!            FCM(2) = NG / (1 - DEL2/MG**2)**3 * CBETA(
+!     &            COMPLEX(1.0d0 - ALPHA0G - ALPHAPR*DEL2,
 !     &        0.0d0) + J, POCHG) / CBETA(COMPLEX(2.0d0 - ALPHA0G,
-!     &        0.0d0), POCHG) *
-!     &          (1.0d0 + J - ALPHA0G) / (1.0d0 + J - ALPHA0G -
-!     &           ALPHAPR*DEL2)
+!     &        0.0d0), POCHG)
+      ELSE IF (ANSATZ .EQ. 'FIT') THEN
+            ALPHAPR = 0.25d0
+            FCM(1) = NSEA / (1 - DEL2/MSEA**2)**3 / POCHHAMMER(
+     &            COMPLEX(1.0d0 - ALPHA0SEA - 
+     &            ALPHAPR*DEL2, 0.0d0) + J, 8) * POCHHAMMER(
+     &            COMPLEX(2.0d0 - ALPHA0SEA, 0.0d0), 8)
+            FCM(2) = NG / (1 - DEL2/MG**2)**3 / POCHHAMMER(
+     &            COMPLEX(1.0d0 - ALPHA0G - ALPHAPR*DEL2,
+     &        0.0d0) + J, 6) * POCHHAMMER(COMPLEX(2.0d0 - ALPHA0G,
+     &        0.0d0), 6)
       END IF
 
       RETURN

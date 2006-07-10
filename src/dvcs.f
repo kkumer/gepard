@@ -50,7 +50,6 @@ C
       DOUBLE PRECISION NG, NSEA, MG, MSEA, ALPHA0G, ALPHA0SEA
       DOUBLE COMPLEX CFF(0:2)
       CHARACTER SCHEME*5, ANSATZ*6
-      DOUBLE PRECISION DCARG
 
 *     Input common-blocks 
 
@@ -70,7 +69,6 @@ C
 
       ANSATZ = 'FIT'
       P = 1
-      SCHEME = 'CSBAR'
 
 *     Scales and kinematics
 

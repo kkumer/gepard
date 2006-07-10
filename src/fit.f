@@ -33,9 +33,19 @@ C
 
       PROGRAM FIT
 
+      INTEGER PMAX, SPEED
+      CHARACTER SCHEME*5, ANSATZ*6
       EXTERNAL FCN
 
+      COMMON / INITPAR    /  SPEED, PMAX
+      COMMON / LABELS   /  SCHEME, ANSATZ
+
       OPEN (UNIT=5,FILE='FIT.CMD',STATUS='OLD')
+
+      PMAX = 1
+      SCHEME = 'CSBAR'
+
+      CALL INIT
 
       CALL MINUIT(FCN,0)  
 
@@ -127,8 +137,8 @@ C
 
       CHISQ = 0.0d0
 
-      INCLUDEDVCS = .FALSE.
-      INCLUDEDIS = .TRUE.
+      INCLUDEDVCS = .TRUE.
+      INCLUDEDIS = .FALSE.
 
       IF ( INCLUDEDVCS ) THEN
 

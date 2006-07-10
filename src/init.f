@@ -2,7 +2,8 @@
       SUBROUTINE INIT
 * 
       IMPLICIT NONE
-      INTEGER NGAUSS, NINTG, NPTS, K, K1, K2, K3, NF, PMAX
+      INTEGER NGAUSS, NINTG, NPTS, K, K1, K2, K3, NF, PMAX, SPEED
+      INTEGER NPTSMAX
       DOUBLE PRECISION NFD, PI, C, PHI, SUMM, DIFF, YI
       DOUBLE PRECISION RF2, RR2
       DOUBLE COMPLEX J, Z, EPH
@@ -12,18 +13,20 @@
       DOUBLE COMPLEX GAM0(2,2), GAM1(2,2), GAM2(2,2)
       DOUBLE COMPLEX C0(2), C1(2), C2(2)
       DOUBLE COMPLEX BIGC0(2), BIGC1(2), BIGC2(2)
-      PARAMETER ( NGAUSS = 8, NINTG = 4, NPTS = NGAUSS*NINTG )
+      DOUBLE COMPLEX CLNGAMMA
+      PARAMETER ( NGAUSS = 8, NINTG = 8, NPTSMAX = 64 )
       PARAMETER ( PI = 3.1415 92653 58979 D0 )
       CHARACTER SCHEME*5, ANSATZ*6
 *
       DOUBLE PRECISION ABSCISSAS(NGAUSS), WEIGHTS(NGAUSS)
       DOUBLE PRECISION DOWN(NINTG+1), UP(NINTG)
-      DOUBLE PRECISION Y(NPTS), WG(NPTS)
-      DOUBLE COMPLEX N(NPTS), BIGC(NPTS,0:2,2), NGAM(NPTS,0:2,2,2)
+      DOUBLE PRECISION Y(NPTSMAX), WG(NPTSMAX)
+      DOUBLE COMPLEX N(NPTSMAX)
+      DOUBLE COMPLEX BIGC(NPTSMAX,0:2,2), NGAM(NPTSMAX,0:2,2,2)
 
 *   Input common-blocks
       COMMON / LABELS   /  SCHEME, ANSATZ
-      COMMON / INITPAR  /  PMAX
+      COMMON / INITPAR  /  SPEED, PMAX
 
 *   Output common-blocks
 
@@ -58,10 +61,24 @@
      &    0.22238 10344 53374 D0,  0.10122 85362 90376 D0/
 
 *   NGAUSS = 8 point integration is to be performed on each
-*   of NINTGS = 4 intervals between following points
+*   interval defined by taking points (1, 1 + SPEED,
+*   1 + 2*SPEED, ...) from the list DOWN
 
-      DATA DOWN / 0.D0, 0.18D0, 0.5D0, 1.34D0, 3.6D0 /
+      DATA DOWN 
+     & / 0.D0, 0.01D0, 0.025D0, 0.067D0, 0.18D0, 
+     &         0.5D0, 1.3D0, 3.7D0, 10.D0 /
 
+*   For fast calculation it's better to compress integration region
+*   The value 1.3 below is optimized for small xi of cca. 10^-4
+      IF ( SPEED .GE. 4) THEN
+        DOWN (NINTG + 1) = 1.3d0
+      END IF
+
+*   Read fixed initialization parameters
+      OPEN (UNIT = 61, FILE = "INIT.DAT", STATUS = "OLD")
+      READ (61, *) SPEED
+      READ (61, *) PMAX
+      CLOSE (61)
 
 *    (FIXME: Should be determined elsewhere and propagated here!)
       RF2 = 1.0d0
@@ -79,14 +96,14 @@
 
 *   Setting up upper limits of integration intervals
 
-      DO 10 K = 1, NINTG
- 10     UP(K) = DOWN(K+1)
+      DO 10 K = 1, NINTG, SPEED
+ 10     UP(K) = DOWN(K+SPEED)
 
 *   Abscissas N(K) and weights WG(K) for the whole contour. Note that
 *   the factor (upper limit - lower limit)/2 is put into the weights
 
       K = 0
-      DO 20 K2 = 1, NINTG
+      DO 20 K2 = 1, NINTG, SPEED
         SUMM = UP(K2) + DOWN(K2) 
         DIFF = UP(K2) - DOWN(K2) 
       DO 20 K3 = 1, NGAUSS
@@ -95,6 +112,11 @@
         N(K) = (C + 1) + YI * EPH
         WG(K) = 0.5D0 * DIFF * WEIGHTS(K3) 
  20   CONTINUE
+
+*    After the above loop, total number of points on the contour is
+*    (NB: Integer division!)
+
+      NPTS = NPTSMAX / SPEED
 
 
 *   1. Initialization of QCD beta function coefficients
@@ -183,9 +205,13 @@
       END IF
 
       DO 40 K1 = 1,2
-        BIGC(K, 0, K1) = BIGC0(K1)
-        BIGC(K, 1, K1) = BIGC1(K1)
- 40     BIGC(K, 2, K1) = BIGC2(K1)
+        BIGC(K, 0, K1) = BIGC0(K1) *
+     &       EXP(CLNGAMMA(2.5d0 + J)) / EXP(CLNGAMMA(3.0d0 + J))
+        BIGC(K, 1, K1) = BIGC1(K1) *
+     &       EXP(CLNGAMMA(2.5d0 + J)) / EXP(CLNGAMMA(3.0d0 + J))
+        BIGC(K, 2, K1) = BIGC2(K1) *
+     &       EXP(CLNGAMMA(2.5d0 + J)) / EXP(CLNGAMMA(3.0d0 + J))
+ 40   CONTINUE
 
 100   CONTINUE
 
