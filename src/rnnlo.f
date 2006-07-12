@@ -16,14 +16,13 @@ C     Calculation of matrices R_1 and R_2, from my DIS-p61
 C     - combination of gamma^(n) and beta_m needed in evolution operator 
 C     - projected on +/- directions
 C  SYNOPSIS
-C     SUBROUTINE RNNLOF (NF, PR, R1PROJ, R2PROJ)
+C     SUBROUTINE RNNLOF (K, PR, R1PROJ, R2PROJ)
 C
-C     INTEGER NF
+C     INTEGER K
 C     DOUBLE COMPLEX PR(2,2,2), R1PROJ(2,2,2,2), R2PROJ(2,2,2,2)
 C  INPUTS
-C          NF -- number of active flavours
+C           K -- Mellin-Barnes integration point index
 C  OUTPUT
-C           P -- approximation order, which is N^{P}LO
 C          PR -- Two projector matrices PR(1,a,b)=P^+
 C                and PR(2,a,b)=P^-
 C      R1PROJ -- R1PROJ(a,b,i,j) = P_a . R_1(i,j) . P_b
@@ -43,12 +42,13 @@ C      common blocks BETABLK and WGAMMA
 C  SOURCE
 C
 
-      SUBROUTINE RNNLOF (K, NF, PR, R1PROJ, R2PROJ)
+      SUBROUTINE RNNLOF (K, PR, R1PROJ, R2PROJ)
 
       IMPLICIT NONE
-      INTEGER K, NF, NPTSMAX
+      INTEGER K
       DOUBLE COMPLEX PR(2,2,2), R1PROJ(2,2,2,2), R2PROJ(2,2,2,2)
-      INTEGER NFMIN, NFMAX, K1, J, P
+      INTEGER SPEED, P, NF
+      INTEGER NPTSMAX, NFMIN, NFMAX, K1, L
       DOUBLE PRECISION BETA0, BETA1, BETA2, BETA3, INV
       DOUBLE COMPLEX R1(2,2), R2(2,2)
       PARAMETER (NFMIN = 3, NFMAX = 6, NPTSMAX = 64)
@@ -56,25 +56,26 @@ C
 
 *   Input common-blocks
 
+      COMMON / PARINT /  SPEED, P, NF
+
       COMMON / BETABLK / BETA0 (NFMIN:NFMAX), BETA1 (NFMIN:NFMAX),
      &                   BETA2 (NFMIN:NFMAX), BETA3 (NFMIN:NFMAX)
       COMMON / NGAM    /  NGAM
-      COMMON / APPROX  /  P
 
-      CALL PROJECTORSF(K, NF, PR)
+      CALL PROJECTORSF(K, PR)
 
 *     Inverse beta_0 is often needed below
       INV = 1.0d0 / BETA0(NF)
 
       DO 10 K1 = 1,2
-      DO 10 J = 1,2
-      R1(K1,J) = INV * (NGAM(K,1,K1,J) 
-     &            - 0.5d0 * INV * BETA1(NF) * NGAM(K,0,K1,J))
+      DO 10 L = 1,2
+      R1(K1,L) = INV * (NGAM(K,1,K1,L) 
+     &            - 0.5d0 * INV * BETA1(NF) * NGAM(K,0,K1,L))
       IF (P. GE. 2) THEN
-      R2(K1,J) = INV * (NGAM(K,2,K1,J) 
-     &            - 0.5d0 * INV * BETA1(NF) * NGAM(K,1,K1,J) 
+      R2(K1,L) = INV * (NGAM(K,2,K1,L) 
+     &            - 0.5d0 * INV * BETA1(NF) * NGAM(K,1,K1,L) 
      &            - 0.25d0 * INV * (BETA2(NF) 
-     &            - INV * BETA1(NF)**2) * NGAM(K,0,K1,J))
+     &            - INV * BETA1(NF)**2) * NGAM(K,0,K1,L))
       END IF
  10   CONTINUE
 

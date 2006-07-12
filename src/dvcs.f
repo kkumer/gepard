@@ -44,31 +44,26 @@ C
 
       IMPLICIT NONE
       DOUBLE PRECISION MT
-      INTEGER P
+      INTEGER SPEED, P, NF
+      CHARACTER SCHEME*5, ANSATZ*6
       DOUBLE PRECISION NGIN, FITPAR(10)
       DOUBLE PRECISION XI, DEL2, Q2, Q02, W2
       DOUBLE PRECISION NG, NSEA, MG, MSEA, ALPHA0G, ALPHA0SEA
       DOUBLE COMPLEX CFF(0:2)
-      CHARACTER SCHEME*5, ANSATZ*6
 
 *     Input common-blocks 
 
+      COMMON / PARINT /  SPEED, P, NF
+      COMMON / PARCHR /  SCHEME, ANSATZ
+      
       COMMON / FITPARAMS  /  FITPAR
 
 *     Output common-blocks 
 
       COMMON / KINEMATICS /  XI, DEL2, Q2, Q02
-      COMMON / APPROX     /  P
-      COMMON / LABELS     /  SCHEME, ANSATZ
       COMMON / GPD        /  NG, NSEA, MG, MSEA, ALPHA0G, ALPHA0SEA
       COMMON / CFF        /  CFF
 
-
-*     We do fitting at NLO in CSBAR scheme. It is here that this
-*     is specified and written in common blocks.
-
-      ANSATZ = 'FIT'
-      P = 1
 
 *     Scales and kinematics
 
@@ -126,24 +121,62 @@ C
       DOUBLE PRECISION FUNCTION SIGMA ()
 
       IMPLICIT NONE
+      INTEGER SPEED, P, NF
+      INTEGER K3
       DOUBLE PRECISION FITPAR(10)
-*   Integration parameters:
-      INTEGER IER, IWORK, LAST, LENW, LIMIT, NEVAL
-      DOUBLE PRECISION A, TCUT, LAM, ABSERR, EPSABS, EPSREL, WORK
-      DOUBLE PRECISION RES
-      PARAMETER (LIMIT = 400, LENW = 4 * LIMIT)
-      DIMENSION IWORK(LIMIT), WORK(LENW)
-      DOUBLE PRECISION PARSIGMA
+      DOUBLE PRECISION ABSCISSAS(8), WEIGHTS(8), ABS2, WGH2
+      DOUBLE PRECISION PARSIGMA, ABS4(2), WGH4(2)
 
 *   Input common-blocks 
 
+      COMMON / PARINT /  SPEED, P, NF
+
       COMMON / FITPARAMS  /  FITPAR
 
-*   Integration using Bode formula
+*   Abscissas and weights for 8 point Gauss quadrature 
+*   according to Abramowitz and Stegun Eq. (25.4.30)
 
-      SIGMA = (14.0d0 * PARSIGMA(0.0d0) + 64.0d0 * PARSIGMA(0.25d0) +
-     &  24.0d0 * PARSIGMA(0.5d0) + 64.0d0 * PARSIGMA(75.0d0) +
-     &  14.0d0 * PARSIGMA(1.0d0)) / 180d0
+       DATA ABSCISSAS
+     &  /-0.96028 98564 97536 D0, -0.79666 64774 13627 D0, 
+     &   -0.52553 24099 16329 D0, -0.18343 46424 95650 D0, 
+     &    0.18343 46424 95650 D0,  0.52553 24099 16329 D0,
+     &    0.79666 64774 13627 D0,  0.96028 98564 97536 D0/
+
+       DATA WEIGHTS
+     &  / 0.10122 85362 90376 D0,  0.22238 10344 53374 D0, 
+     &    0.31370 66458 77887 D0,  0.36268 37833 78362 D0, 
+     &    0.36268 37833 78362 D0,  0.31370 66458 77887 D0,
+     &    0.22238 10344 53374 D0,  0.10122 85362 90376 D0/
+
+*   Abscissas and weights for 4 point Gauss quadrature
+
+       ABS4(1) = 0.86113 63115 94052 D0
+       ABS4(2) = 0.33998 10435 84856 D0
+       WGH4(1) = 0.34785 48451 37453 D0
+       WGH4(2) = 0.65214 51548 62546 D0
+
+*   Abscissas and weights for 2 point Gauss quadrature
+
+      ABS2 = 0.57735 02691 89625 D0
+      WGH2 = 1.00 D0
+
+      IF ( SPEED .EQ. 1) THEN
+        SIGMA = 0.D0
+        DO 20 K3 = 1, 8
+          SIGMA = SIGMA + WEIGHTS(K3) * 
+     &            PARSIGMA( 0.5D0 * ABSCISSAS(K3) + 0.5D0 )
+ 20     CONTINUE
+      ELSEIF ( SPEED .EQ. 2) THEN
+        SIGMA = ( WGH4(1) * ( PARSIGMA(- 0.5D0 * ABS4(1) + 0.5D0) +
+     &              PARSIGMA(0.5D0 * ABS4(1) + 0.5D0) ) +
+     &            WGH4(2) * ( PARSIGMA(- 0.5D0 * ABS4(2) + 0.5D0) +
+     &              PARSIGMA(0.5D0 * ABS4(2) + 0.5D0) ) )
+      ELSE
+        SIGMA = WGH2 * ( PARSIGMA(- 0.5D0 * ABS2 + 0.5D0) +
+     &            PARSIGMA(0.5D0 * ABS2 + 0.5D0) )
+      END IF
+
+      SIGMA = 0.5D0 * SIGMA
 
       RETURN
       END

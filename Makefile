@@ -1,24 +1,22 @@
-# $Id$
 # Master Makefile for gepard project
-# 2006-04-15 
 
 # Interesting targets:
 # 	radcorr  -  program for producing Fig. 1 in letter
 # 	scaledep -  program for producing Fig. 2 in letter
-# 	gepard.exe - Mathematica-installable package
-# 	install - putting gepard.exe in Mathematica path
+# 	test     -  tests both DVCS and DIS routines
+# 	fit      -  fitting GPD ansatz to DVCS and DIS data
+# 	html     -  HTML documentation
+# 	pdf      -  LaTeX -> PDF documentation
+#
+# For debugging/profiling call like this:
+#  make DEBUG='-g -pg' and change -ladacf -> -ladacf_prof
+# For optimization call like this:
+#  make DEBUG='-O2'
 
-
-# Where and how gepard.exe should be installed
-OWNER = $(USER) 
-#GROUP = $(USER)
-GROUP = kern
-INSTALL = install
-BINDIR = $(HOME)/.mma/Applications/gepard.exe/Linux/
 
 
 # targets
-SRCTARGETS = radcorr scaledep gepard.exe fit test auxtest
+SRCTARGETS = radcorr scaledep fit test auxtest
 DOCTARGETS = pdf html
 .PHONY: $(SRCTARGETS)
 
@@ -27,9 +25,6 @@ all: $(SRCTARGETS) $(DOCTARGETS)
 $(SRCTARGETS):
 	$(MAKE) -C src $@
 	mv src/$@ .
-
-install: gepard.exe
-	$(INSTALL) -o $(OWNER) -g $(GROUP) -m 755 $< $(BINDIR)
 
 
 doc: html pdf

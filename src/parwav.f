@@ -5,7 +5,6 @@ C
 C    $Id$
 C     *******
 
-
 C     ****s* parwav.f/PARWAVF
 C  NAME
 C     PARWAVF  --  J-th conformal partial wave for DVCS
@@ -41,43 +40,55 @@ C      COMMONF, AS2PF, EVOLF, CDVCSF, MSBARF, HJ
 C  SOURCE
 C
 
-      SUBROUTINE PARWAVF (K, XI, DEL2, Q2, Q02, P, SCH, ANSATZ, FPW)
+      SUBROUTINE PARWAVF (K, FPW, PROCESS)
 
       IMPLICIT NONE
-      INTEGER P, K, K1
+      INTEGER K
+      DOUBLE COMPLEX FPW
+      CHARACTER PROCESS*4
+      INTEGER SPEED, P, NF
+      DOUBLE PRECISION AS0, RF2, RR2
       DOUBLE PRECISION XI, DEL2, Q2, Q02
-      CHARACTER SCH*5, ANSATZ*6
-      DOUBLE COMPLEX J, FPW
-      INTEGER NF, L, NPTSMAX
-      DOUBLE PRECISION RF2, RR2, AS0, MU20, R, ASQ2, ASQ02
+      INTEGER L, NPTSMAX, K1
+      DOUBLE PRECISION MU20, R, ASQ2, ASQ02
       DOUBLE COMPLEX BIGC0(2), BIGC1(2), BIGC2(2), CDVCS(0:2,2)
       DOUBLE COMPLEX BIGC(3,2), EVOLA(3,2,2), FCM(2)
       PARAMETER (NPTSMAX = 64)
-      DOUBLE COMPLEX N (NPTSMAX)
-      DOUBLE COMPLEX BIGCNEW(NPTSMAX,0:2,2)
-*     Simple parametrization of a_strong used in Letter
-      PARAMETER (NF=3, RF2=1.0d0, RR2=1.0d0, AS0=0.05d0, MU20=2.5d0)
-!*     a_strong of http://www-theory.lbl.gov/~ianh/alpha/alpha.html 
-!      PARAMETER (NF=3, RF2=1.0d0, RR2=1.0d0, AS0=0.0432d0, MU20=2.5d0)
+      DOUBLE COMPLEX J, N(NPTSMAX)
+      DOUBLE COMPLEX BIGCDVCS(NPTSMAX,0:2,2), BIGCF2(NPTSMAX,0:2,2)
 
+      PARAMETER (MU20=2.5d0)
+
+      COMMON / PARINT /  SPEED, P, NF
+      COMMON / PARFLT /  AS0, RF2, RR2
+
+      COMMON / KINEMATICS /  XI, DEL2, Q2, Q02
       COMMON / NPOINTS    /  N
-      COMMON / BIGC     /  BIGCNEW
+      COMMON / BIGC       /  BIGCDVCS
+      COMMON / BIGCF2     /  BIGCF2
 
       J = N(K) - 1
       CALL AS2PF (ASQ2, Q2, AS0, MU20, NF, P)
       CALL AS2PF (ASQ02, Q02, AS0, MU20, NF, P)
       R = ASQ2/ASQ02
-      CALL EVOLF (K, NF, R, EVOLA)
-      CALL HJ(J, XI, DEL2, Q2, ANSATZ, FCM)
+      CALL EVOLF (K, R, EVOLA)
+      CALL HJ(J, FCM)
 
       DO 5 K1 = 0, P
       DO 5 L = 1, 2
   5   CDVCS(K1, L) = (0.0d0, 0.0d0)
 
-      DO 10 K1=1,2
-      BIGC(1,K1) = BIGCNEW(K, 0, K1)
-      BIGC(2,K1) = BIGCNEW(K, 1, K1)
- 10   BIGC(3,K1) = BIGCNEW(K, 2, K1)
+      IF ( PROCESS .EQ. 'DVCS' ) THEN
+      DO 7 K1=1,2
+      BIGC(1,K1) = BIGCDVCS(K, 0, K1)
+      BIGC(2,K1) = BIGCDVCS(K, 1, K1)
+  7   BIGC(3,K1) = BIGCDVCS(K, 2, K1)
+      ELSE
+      DO 9 K1=1,2
+      BIGC(1,K1) = BIGCF2(K, 0, K1)
+      BIGC(2,K1) = BIGCF2(K, 1, K1)
+  9   BIGC(3,K1) = BIGCF2(K, 2, K1)
+      END IF
 
       DO 20 L=0, P
       DO 20 K1=0, L
@@ -107,12 +118,7 @@ C     DOUBLE PRECISION XI, DEL2, Q2
 C     DOUBLE COMPLEX J, FCM(2) 
 C     CHARACTER ANSATZ*6
 C  INPUTS
-C           J -- conformal (Mellin) moment
-C          XI -- DVCS scaling parameter
-C        DEL2 -- DVCS asymmetry parameter (P2-P1)^2
-C          Q2 -- photon virtuality squared
-C      ANSATZ -- label for ansatz for GPDs on input scale. At the
-C                moment, implemented ansaetze are TOY, HARD and SOFT
+C           J -- conformal moment
 C
 C    (Following parameters are inputs only for ANSATZ='FIT')
 C
@@ -129,12 +135,12 @@ C     CLNGAMMA, CBETA, POCHHAMMER
 C  SOURCE
 C
 
-      SUBROUTINE HJ(J, XI, DEL2, Q2, ANSATZ, FCM)
+      SUBROUTINE HJ(J, FCM)
 
       IMPLICIT NONE
-      DOUBLE PRECISION XI, DEL2, Q2
       DOUBLE COMPLEX J, FCM(2) 
-      CHARACTER ANSATZ*6
+      CHARACTER SCHEME*5, ANSATZ*6
+      DOUBLE PRECISION XI, DEL2, Q2, Q02
       DOUBLE COMPLEX CLNGAMMA, CBETA, POCHSEA, POCHG, POCHHAMMER
       DOUBLE COMPLEX NUM, DENN
       DOUBLE PRECISION NG, NSEA, MG, MSEA, ALPHA0G, ALPHA0SEA
@@ -142,6 +148,9 @@ C
 
 *   Input common-blocks 
 
+      COMMON / PARCHR /  SCHEME, ANSATZ
+
+      COMMON / KINEMATICS /  XI, DEL2, Q2, Q02
       COMMON / GPD        /  NG, NSEA, MG, MSEA, ALPHA0G, ALPHA0SEA
 
       IF (ANSATZ .EQ. 'TOY') THEN

@@ -14,18 +14,11 @@ C  DESCRIPTION
 C    calculates Wilson coefficients for DVCS in MSbar scheme
 C    according to KMKPS06 paper
 C  SYNOPSIS
-C     SUBROUTINE MSBARF (NF, J, RF2, RR2, BIGC0, BIGC1)
+C     SUBROUTINE MSBARF (J, BIGC0, BIGC1)
 C
-C     INTEGER NF
-C     DOUBLE PRECISION RF2, RR2
 C     DOUBLE COMPLEX J, BIGC0(2), BIGC1(2)
 C  INPUTS
-C          NF -- number of active flavours
 C           J -- conformal moment
-C         RF2 -- ratio {\cal Q}^2/{\mu_{f}^2} of photon
-C                virtuality over factorization scale
-C         RR2 -- ratio {\cal Q}^2/{\mu_{r}^2} of photon
-C                virtuality over renormalization scale
 C  OUTPUT
 C       BIGC0 -- vector of two C^{(0)} (quark and gluon) Wilson 
 C                coefficients (trivially equal to (1,0))
@@ -41,17 +34,22 @@ C      One needs to call COMMONF first, to initialize common block WGAMMA
 C  SOURCE
 C
 
-      SUBROUTINE MSBARF (NF, J, RF2, RR2, BIGC0, BIGC1)
+      SUBROUTINE MSBARF (J, BIGC0, BIGC1)
 
       IMPLICIT NONE
-      INTEGER NF, NFMIN, NFMAX, K
-      DOUBLE PRECISION RF2, LRF2, RR2, CF
+      INTEGER SPEED, P, NF
+      DOUBLE PRECISION AS0, RF2, RR2
+      INTEGER NFMIN, NFMAX, K
+      DOUBLE PRECISION LRF2, CF
       DOUBLE COMPLEX J, GAM0(2,2), GAM1(2,2), GAM2(2,2)
       DOUBLE COMPLEX BIGC0(2), BIGC1(2)
       DOUBLE COMPLEX HS1
       PARAMETER (NFMIN = 3, NFMAX = 6)
 
-*   Input common-block
+*   Input common-blocks
+
+      COMMON / PARINT /  SPEED, P, NF
+      COMMON / PARFLT /  AS0, RF2, RR2
 
       COMMON / WGAMMA  /  GAM0, GAM1, GAM2
 

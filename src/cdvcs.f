@@ -46,13 +46,15 @@ C      common blocks BETABLK, WGAMMA, and WC
 C  SOURCE
 C
 
-      SUBROUTINE CDVCSF (NF, J, RF2, RR2, BIGC0, BIGC1, BIGC2)
+      SUBROUTINE CDVCSF (J, BIGC0, BIGC1, BIGC2, PROCESS)
 
       IMPLICIT NONE
-      INTEGER NF
-      DOUBLE PRECISION RF2, RR2
+      INTEGER SPEED, P, NF
+      DOUBLE PRECISION AS0, RF2, RR2
+      CHARACTER SCHEME*5, ANSATZ*6
       DOUBLE COMPLEX J, BIGC0(2), BIGC1(2), BIGC2(2)
-      INTEGER NFMIN, NFMAX, K, PMAX, SPEED
+      CHARACTER PROCESS*4
+      INTEGER NFMIN, NFMAX, K
       DOUBLE PRECISION LRF2, LRR2
       DOUBLE PRECISION BETA0, BETA1, BETA2, BETA3
       DOUBLE COMPLEX GAM0(2,2), GAM1(2,2), GAM2(2,2)
@@ -64,22 +66,30 @@ C
 
 *   Input common-blocks
 
+      COMMON / PARINT /  SPEED, P, NF
+      COMMON / PARFLT /  AS0, RF2, RR2
+      COMMON / PARCHR /  SCHEME, ANSATZ
+
       COMMON / BETABLK / BETA0 (NFMIN:NFMAX), BETA1 (NFMIN:NFMAX),
      &                   BETA2 (NFMIN:NFMAX), BETA3 (NFMIN:NFMAX)
       COMMON / WGAMMA  /  GAM0, GAM1, GAM2
       COMMON / WC      /  C0, C1, C2
-      COMMON / INITPAR    /  SPEED, PMAX
 
 
       LRR2 = LOG(RR2)
       LRF2 = LOG(RF2)
 
-      S1 = HS1(J + 1.5d0) - HS1(J + 2.0d0) + 2.0d0 * LOG(2.0d0)
-     &      - LRF2
-      S2 = S1*S1 - HS2(J + 1.5d0) + HS2(J + 2.0d0)
+      IF ( PROCESS .EQ. 'DVCS') THEN
+        S1 = HS1(J + 1.5d0) - HS1(J + 2.0d0) + 2.0d0 * LOG(2.0d0)
+     &        - LRF2
+        S2 = S1*S1 - HS2(J + 1.5d0) + HS2(J + 2.0d0)
+      ELSE
+        S1 =  - LRF2
+        S2 = S1*S1
+      END IF
 
       CALL VECMAT(C0, GAM0, VM00)
-      IF (PMAX .GE. 2) THEN
+      IF (P .GE. 2) THEN
       CALL VECMAT(C0, GAM1, VM01)
       CALL VECMAT(C1, GAM0, VM10)
       CALL VECMAT(VM00, GAM0, VM000)
@@ -89,7 +99,7 @@ C
       BIGC0(2) = (0.0d0,0.0d0)
       DO 10 K = 1, 2
       BIGC1(K) = C1(K) + 0.5d0 * S1 * VM00(K)
-      IF (PMAX .GE. 2) THEN
+      IF (P .GE. 2) THEN
       BIGC2(K) = C2(K) + 0.5d0 * S1 * (VM01(K) + VM10(K)) +
      &      0.125d0 * S2 * VM000(K) + 0.5d0 * BETA0(NF) * (
      &      BIGC1(K) * LRR2 + 0.25d0 * VM00(K) * LRF2**2 )

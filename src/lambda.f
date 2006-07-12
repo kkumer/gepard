@@ -14,12 +14,12 @@ C    calculates eigenvalues of the LO singlet anomalous dimensions
 C    matrix using Dieter's trick for treating the square-root cut
 C    in complex plane
 C  SYNOPSIS
-C     SUBROUTINE LAMBDAF (NF, LAM)
+C     SUBROUTINE LAMBDAF (K, LAM)
 C
-C     INTEGER NF
+C     INTEGER K
 C     DOUBLE COMPLEX LAM(2)
 C  INPUTS
-C          NF -- number of active flavours
+C           K -- Mellin-Barnes integration point index
 C  OUTPUT
 C         LAM -- eigenvalues (LAM(1) is "+" and LAM(2) 
 C                 is "-" eigenvalue)
@@ -31,17 +31,20 @@ C      common block WGAMMA
 C  SOURCE
 C
 
-      SUBROUTINE LAMBDAF (K, NF, LAM)
+      SUBROUTINE LAMBDAF (K, LAM)
 
       IMPLICIT NONE
-      INTEGER K, NF
+      INTEGER K
       DOUBLE COMPLEX LAM(2)
+      INTEGER SPEED, P, NF
       INTEGER NPTSMAX
       PARAMETER (NPTSMAX = 64)
       DOUBLE COMPLEX NGAM(NPTSMAX,0:2,2,2)
       DOUBLE COMPLEX AUX
 
-*   Input common-block
+*   Input common-blocks
+
+      COMMON / PARINT /  SPEED, P, NF
 
       COMMON / NGAM     /  NGAM
 

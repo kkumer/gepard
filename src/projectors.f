@@ -14,12 +14,12 @@ C  DESCRIPTION
 C    projectors to eigenstates of the LO singlet 
 C    anomalous dimensions matrix.
 C  SYNOPSIS
-C     SUBROUTINE PROJECTORSF (NF, PR)
+C     SUBROUTINE PROJECTORSF (K, PR)
 C
-C     INTEGER NF
+C     INTEGER K
 C     DOUBLE COMPLEX PR(2,2,2)
 C  INPUTS
-C          NF -- number of active flavours
+C           K -- Mellin-Barnes integration point index
 C  OUTPUT
 C          PR -- Two projector matrices PR(1,a,b)=P^+
 C                and PR(2,a,b)=P^-
@@ -32,10 +32,10 @@ C      LAMBDAF
 C  SOURCE
 C
 
-      SUBROUTINE PROJECTORSF (K, NF, PR)
+      SUBROUTINE PROJECTORSF (K, PR)
 
       IMPLICIT NONE
-      INTEGER K, NF
+      INTEGER K
       DOUBLE COMPLEX PR(2,2,2)
       DOUBLE COMPLEX LAM(2)
       DOUBLE COMPLEX DEN
@@ -47,7 +47,7 @@ C
 
       COMMON / NGAM     /  NGAM
 
-      CALL LAMBDAF (K, NF, LAM)
+      CALL LAMBDAF (K, LAM)
 
       DEN = 1.0d0 / (LAM(1) - LAM(2)) 
 

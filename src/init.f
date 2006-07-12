@@ -2,31 +2,35 @@
       SUBROUTINE INIT
 * 
       IMPLICIT NONE
-      INTEGER NGAUSS, NINTG, NPTS, K, K1, K2, K3, NF, PMAX, SPEED
+      INTEGER SPEED, P, NF
+      DOUBLE PRECISION AS0, RF2, RR2
+      CHARACTER SCHEME*5, ANSATZ*6
+      INTEGER NGAUSS, NINTG, NPTS, K, K1, K2, K3
       INTEGER NPTSMAX
       DOUBLE PRECISION NFD, PI, C, PHI, SUMM, DIFF, YI
-      DOUBLE PRECISION RF2, RR2
       DOUBLE COMPLEX J, Z, EPH
       DOUBLE COMPLEX S1, S2, S3, S4
       DOUBLE COMPLEX HS1, HS2, HS3, HS4
       DOUBLE COMPLEX F2, FL
       DOUBLE COMPLEX GAM0(2,2), GAM1(2,2), GAM2(2,2)
       DOUBLE COMPLEX C0(2), C1(2), C2(2)
+      DOUBLE COMPLEX C1F2(2)
       DOUBLE COMPLEX BIGC0(2), BIGC1(2), BIGC2(2)
-      DOUBLE COMPLEX CLNGAMMA
+      DOUBLE COMPLEX CLNGAMMA, PREFACT
       PARAMETER ( NGAUSS = 8, NINTG = 8, NPTSMAX = 64 )
       PARAMETER ( PI = 3.1415 92653 58979 D0 )
-      CHARACTER SCHEME*5, ANSATZ*6
 *
       DOUBLE PRECISION ABSCISSAS(NGAUSS), WEIGHTS(NGAUSS)
       DOUBLE PRECISION DOWN(NINTG+1), UP(NINTG)
       DOUBLE PRECISION Y(NPTSMAX), WG(NPTSMAX)
       DOUBLE COMPLEX N(NPTSMAX)
       DOUBLE COMPLEX BIGC(NPTSMAX,0:2,2), NGAM(NPTSMAX,0:2,2,2)
+      DOUBLE COMPLEX BIGCF2(NPTSMAX,0:2,2)
 
 *   Input common-blocks
-      COMMON / LABELS   /  SCHEME, ANSATZ
-      COMMON / INITPAR  /  SPEED, PMAX
+      COMMON / PARINT /  SPEED, P, NF
+      COMMON / PARFLT /  AS0, RF2, RR2
+      COMMON / PARCHR /  SCHEME, ANSATZ
 
 *   Output common-blocks
 
@@ -43,6 +47,7 @@
 *     - Values on the whole contour
       COMMON / BIGC     /  BIGC
       COMMON / NGAM     /  NGAM
+      COMMON / BIGCF2   /  BIGCF2
 
 
 *   Abscissas and weights for 8 point Gauss quadrature 
@@ -73,17 +78,6 @@
       IF ( SPEED .GE. 4) THEN
         DOWN (NINTG + 1) = 1.3d0
       END IF
-
-*   Read fixed initialization parameters
-      OPEN (UNIT = 61, FILE = "INIT.DAT", STATUS = "OLD")
-      READ (61, *) SPEED
-      READ (61, *) PMAX
-      CLOSE (61)
-
-*    (FIXME: Should be determined elsewhere and propagated here!)
-      RF2 = 1.0d0
-      RR2 = 1.0d0
-      NF = 3
 
 *    NB: adacf routines want double precision NF
       NFD = DBLE(NF)
@@ -135,9 +129,9 @@
 *   2.a Harmonic sums
 
       S1 =  HS1(Z)
-      IF (PMAX .GE. 1) THEN
+      IF (P .GE. 1) THEN
         S2 =  HS2(Z)
-        IF (PMAX .GE. 2) THEN
+        IF (P .GE. 2) THEN
             S3 = HS3(Z)
             S4 = HS4(Z)
         END IF
@@ -150,13 +144,13 @@
       CALL WgammaVGQ0F(NFD, Z, GAM0(2,1))
       CALL WgammaVGG0F(NFD, Z, GAM0(2,2))
 
-      IF (PMAX .GE. 1) THEN
+      IF (P .GE. 1) THEN
         CALL WgammaVQQ1F(NFD, Z, GAM1(1,1))
         CALL WgammaVQG1F(NFD, Z, GAM1(1,2))
         CALL WgammaVGQ1F(NFD, Z, GAM1(2,1))
         CALL WgammaVGG1F(NFD, Z, GAM1(2,2))
 
-        IF (PMAX .GE. 2) THEN
+        IF (P .GE. 2) THEN
           CALL WgammaVQQ2F(NFD, Z, GAM2(1,1))
           CALL WgammaVQG2F(NFD, Z, GAM2(1,2))
           CALL WgammaVGQ2F(NFD, Z, GAM2(2,1))
@@ -169,15 +163,17 @@
       C0(1) = (1.0d0, 0.0d0)
       C0(2) = (0.0d0, 0.0d0)
 
-      IF (PMAX .GE. 1) THEN
+      IF (P .GE. 1) THEN
         CALL WcVF2Q1F(NFD, Z, F2)
         CALL WcVFLQ1F(NFD, Z, FL)
         C1(1) = F2 -  FL
+        C1F2(1) = F2
         CALL WcVF2G1F(NFD, Z, F2)
         CALL WcVFLG1F(NFD, Z, FL)
         C1(2) = F2 -  FL
+        C1F2(2) = F2
 
-        IF (PMAX .GE. 2) THEN
+        IF (P .GE. 2) THEN
           CALL WcVF2Q2F(NFD, Z, F2)
           CALL WcVFLQ2F(NFD, Z, FL)
           C2(1) = F2 -  FL
@@ -196,22 +192,34 @@
         NGAM(K, 1, K1, K2) = GAM1(K1, K2)
  30     NGAM(K, 2, K1, K2) = GAM2(K1, K2)
 
-*   3.b "Big C" Wilson coefficients of DVCS
+*   3.b "Big C" Wilson coefficients of DVCS [multiplied by
+*           PREFACT = Gamma(5/2+J) / Gamma(3+J)]
 
       IF (SCHEME .EQ. 'CSBAR') THEN
-          CALL CDVCSF (NF, J, RF2, RR2, BIGC0, BIGC1, BIGC2)
+          CALL CDVCSF (J, BIGC0, BIGC1, BIGC2, 'DVCS')
       ELSE IF (SCHEME .EQ. 'MSBAR') THEN
-          CALL MSBARF (NF, J, RF2, RR2, BIGC0, BIGC1)
+          CALL MSBARF (J, BIGC0, BIGC1)
       END IF
 
+      PREFACT = EXP(CLNGAMMA(2.5d0 + J)) / EXP(CLNGAMMA(3.0d0 + J))
+
       DO 40 K1 = 1,2
-        BIGC(K, 0, K1) = BIGC0(K1) *
-     &       EXP(CLNGAMMA(2.5d0 + J)) / EXP(CLNGAMMA(3.0d0 + J))
-        BIGC(K, 1, K1) = BIGC1(K1) *
-     &       EXP(CLNGAMMA(2.5d0 + J)) / EXP(CLNGAMMA(3.0d0 + J))
-        BIGC(K, 2, K1) = BIGC2(K1) *
-     &       EXP(CLNGAMMA(2.5d0 + J)) / EXP(CLNGAMMA(3.0d0 + J))
+        BIGC(K, 0, K1) = BIGC0(K1) * PREFACT
+        BIGC(K, 1, K1) = BIGC1(K1) * PREFACT
+        BIGC(K, 2, K1) = BIGC2(K1) * PREFACT
  40   CONTINUE
+
+*   3.c "Big C" Wilson coefficients of DIS 
+
+*     First put C_1->C_2 on WC block
+      DO 50 K1 = 1,2
+ 50     C1(K1) = C1F2(K1)
+      
+      CALL CDVCSF (J, BIGC0, BIGC1, BIGC2, 'DIS')
+
+      DO 60 K1 = 1,2
+        BIGCF2(K, 0, K1) = BIGC0(K1)
+ 60     BIGCF2(K, 1, K1) = BIGC1(K1)
 
 100   CONTINUE
 

@@ -75,3 +75,7 @@ to save it use  'time ./fit | tee -a savefile'
 - fortran documentation is in doc/html and doc/tex  (can be recreated by
   'make tex' or 'make html' if you have robodoc installed).
   'make pdf' compiles LaTeX if you have latex installed.
+
+
+- parameters are specified in INIT.DAT which is self-documenting
+  (only first item on the line there is important, other are just for convenience)

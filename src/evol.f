@@ -19,8 +19,7 @@ C     INTEGER NF
 C     DOUBLE PRECISION R
 C     DOUBLE COMPLEX EVOLA(3,2,2), 
 C  INPUTS
-C           P -- approximation order, which is N^{P}LO
-C          NF -- number of active flavours
+C           K -- Mellin-Barnes integration point index
 C           R -- ratio of astrong(mu)/astrong(mu0)
 C  OUTPUT
 C       EVOLA -- three 2x2 matrices representing three coefficients 
@@ -34,13 +33,14 @@ C      ERFUNCF, RNNLOF, KRONECKER
 C  SOURCE
 C
 
-      SUBROUTINE EVOLF (K, NF, R, EVOLA)
+      SUBROUTINE EVOLF (K, R, EVOLA)
 
       IMPLICIT NONE
-      INTEGER K, NF
+      INTEGER K
       DOUBLE PRECISION R
       DOUBLE COMPLEX EVOLA(3,2,2)
-      INTEGER A, B, C, I, J, K1, ORD, P
+      INTEGER SPEED, P, NF
+      INTEGER A, B, C, I, J, K1, ORD
       DOUBLE PRECISION RINV
       DOUBLE COMPLEX LAMB(2), PR(2,2,2)
       DOUBLE COMPLEX ERFUNC1(2,2), ERFUNC2(2,2)
@@ -50,11 +50,11 @@ C
 
 *   Input common-blocks 
 
-      COMMON / APPROX     /  P
+      COMMON / PARINT /  SPEED, P, NF
 
 
-      CALL ERFUNCF (K, NF, R, LAMB, ERFUNC1, ERFUNC2)
-      CALL RNNLOF (K, NF, PR, R1PROJ, R2PROJ)
+      CALL ERFUNCF (K, R, LAMB, ERFUNC1, ERFUNC2)
+      CALL RNNLOF (K, PR, R1PROJ, R2PROJ)
 
       RINV = 1.0d0 / R
 
