@@ -30,7 +30,7 @@ C      and the numerical coefficients are truncated to six digits.
 C  SYNOPSIS
 C     SUBROUTINE BETAF
 C  PARENTS
-C     CFFF
+C     INIT
 C  SOURCE
 C
 

@@ -13,11 +13,9 @@
 
 
 # Compiler options
-# DEBUG = -g -pg
 FFLAGS =  $(DEBUG)
-CFLAGS =  $(DEBUG)
 
-# Where is CERNLIB
+# Where are CERNLIB's kernlib and packlib
 LIBS =  -L$(HOME)/local/lib
 
 # Directories for storing object files
@@ -59,7 +57,13 @@ $(ODIR)/%.o: %.c
 
 # targets
 
-all: radcorr scaledep fit test auxtest
+all: auxtest test radcorr scaledep fit
+
+auxtest: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Fauxtest.o 
+	$(FC) -o $@ $^ $(FFLAGS) $(LIBS)
+
+test: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Ftest.o 
+	$(FC) -o $@ $^ $(FFLAGS) $(LIBS)
 
 radcorr: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Fradcorr.o
 	$(FC) -o $@ $^ $(FFLAGS) $(LIBS) 
@@ -70,13 +74,8 @@ scaledep: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Fscaledep.o $(FODIR)/Fderiv.o
 fit: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Ffit.o $(ODIR)/flushout.o
 	$(FC) -o $@ $^ $(FFLAGS) $(LIBS) -lpacklib -lkernlib
 
-auxtest: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Fauxtest.o 
-	$(FC) -o $@ $^ $(FFLAGS) $(LIBS)
-
-test: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Ftest.o 
-	$(FC) -o $@ $^ $(FFLAGS) $(LIBS)
 
 .PHONY: clean
 clean:
-	-rm -f $(ADACFODIR)/F*.o $(FODIR)/F*.o $(ODIR)/*.o\
-		   	FIG*DAT radcorr scaledep fit test auxtest
+	-rm -f $(ADACFODIR)/*.o $(FODIR)/F*.o $(ODIR)/*.o\
+		   	auxtest test radcorr scaledep fit

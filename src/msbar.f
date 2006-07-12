@@ -26,11 +26,9 @@ C       BIGC1 -- vector  C^{(1)}
 C  IDENTIFIERS
 C       WGAMMA -- common block with moments of anomalous dimensions of DIS
 C  PARENTS
-C      PARWAVF
+C      INIT
 C  CHILDREN
 C      HS1
-C  NOTES
-C      One needs to call COMMONF first, to initialize common block WGAMMA
 C  SOURCE
 C
 

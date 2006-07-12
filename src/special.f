@@ -25,7 +25,7 @@ C  NOTES
 C     Error is strictly smaller than 2x10^(-10), and in practice is often
 C     less then 10^(-14)
 C  PARENTS
-C     FREAL, FIMAG, CBETA, PARWAVF
+C     INIT, PARWAVF
 C  SOURCE
 C
 

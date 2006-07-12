@@ -30,15 +30,12 @@ C                a,b \in {+,-};  i,j \in {Q, G}
 C      R2PROJ -- R2PROJ(a,b,i,j) = P_a . R_2(i,j) . P_b
 C                a,b \in {+,-};  i,j \in {Q, G}
 C  IDENTIFIERS
-C       BETABLK, WGAMMA -- common blocks with beta function coefficients
+C       BETABLK, NGAM -- common blocks with beta function coefficients
 C       of QCD, and moments of anomalous dimensions of DIS
 C  PARENTS
 C      EVOLF
 C  CHILDREN
 C      PROJECTORSF, PROJECTION
-C  NOTES
-C      One needs to call BETAF and COMMONF first, to initialize
-C      common blocks BETABLK and WGAMMA
 C  SOURCE
 C
 

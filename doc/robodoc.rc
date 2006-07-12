@@ -32,20 +32,22 @@ accept files:
     beta.f
     cdvcs.f
     cff.f
-    common.f
     dcomplex.f
     deriv.f
     dvcs.f
     erfunc.f
     evol.f
+    error.f
     fit.f
     f2.f
+    init.f
     lambda.f
     msbar.f
     parwav.f
     projectors.f
     rnnlo.f
     radcorr.f
+    readpar.f
     scaledep.f
     special.f
     test.f

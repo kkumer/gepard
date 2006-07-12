@@ -38,26 +38,6 @@ C    |latex  convergence.
 C    All INPUTS and OUTPUT below is via common blocks!
 C  SYNOPSIS
 C     SUBROUTINE CFFF
-C
-C     INTEGER P
-C     DOUBLE PRECISION XI, DEL2, Q2, Q02, C
-C     DOUBLE COMPLEX CFF(0:2)
-C     CHARACTER SCHEME*5, ANSATZ*6
-C
-C     COMMON / KINEMATICS /  XI, DEL2, Q2, Q02
-C     COMMON / LABELS     /  SCHEME, ANSATZ
-C     COMMON / C          /  C
-C     COMMON / CFF        /  CFF
-C  INPUTS
-C          XI -- DVCS scaling parameter
-C        DEL2 -- DVCS asymmetry parameter (P2-P1)^2
-C          Q2 -- photon virtuality squared
-C         Q02 -- initial scale squared
-C           P -- approximation order, which is N^{P}LO
-C      SCHEME -- scheme
-C      ANSATZ -- label for ansatz for GPDs on input scale
-C           C -- intersection point of Mellin- Barnes integration 
-C                path with real axis
 C  OUTPUT
 C    CFF(0:2) --  Compton form factor in LO, NLO and NNLO approximations 
 C                 (for ANSATZ='CSBAA'; for ANSATZ= 'MSBAR' only LO and
@@ -65,13 +45,15 @@ C                 NLO exists and CFF(3) is garbage)
 C                 NB!! - only one of three CFF(3) array elements, CFF(P)
 C                 is changed by single call to CFFF!
 C  IDENTIFIERS
-C     A,B,LAM -- Integration path is divided in two segments: [A, B] and [B, LAM]
+C          XI -- DVCS scaling parameter
+C           K -- Mellin-Barnes integration point index
+C           J -- conformal moment
+C          XI -- DVCS scaling parameter
+C           C -- intersection point of Mellin- Barnes integration 
+C                path with real axis
+C         PHI -- angle between Mellin-Barnes contour and Re(J) axis
 C  CHILDREN
-C     DQAGS    -- subroutine for adaptive numerical Gauss-Kronrod integration
-C                 available in SLATEC library
-C     FIMAG    -- (via DQAGS) integrand for imaginary part
-C     FREAL    -- (via DQAGS) integrand for real part
-C     BETAF
+C    PARWAV, DCTAN
 C  SOURCE
 C
 

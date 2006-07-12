@@ -1,0 +1,107 @@
+%% $Id$
+
+\documentclass[12pt]{article}
+
+\usepackage{a4wide}
+
+
+\begin{document}
+
+\title{\texttt{gepard}: calculating Compton form factors from moments of General PARton Distributions } 
+\author{Version: 0.89}
+\date{\today}
+\maketitle
+
+\begin{abstract}
+Fortran package \texttt{gepard} calculates singlet Compton form factor
+$\mathcal{H}$ and corresponding Compton cross-sections, as well as
+DIS form factor $F_2$ by evolving GPDs from a given ansatz shape.  Together
+with \texttt{minuit} minimization subroutine GPD parameters can be fitted to
+small-$\xi$ experimental DVCS and DIS data. For installation instructions and
+basic usage, see README file coming with the package.
+\end{abstract}
+
+\section{Formula for $\mathcal{H}$}  
+
+\begin{eqnarray*}
+{{\cal H}^{\rm S}}(\xi,\Delta^2,{\cal Q}^2)
+&\!\!\!=\!\!\!& \frac{1}{2i}\int_{c-i \infty}^{c+ i \infty}\!
+dj\,\xi^{-j-1} \left[i + \tan \left(\frac{\pi j}{2}\right) \right]
+\mbox{\boldmath $C$}_{j}({\cal Q}^2/\mu^2,\alpha_s(\mu)) 
+\mbox{\boldmath $H$}_{j} (\xi,\Delta^2,\mu^2) \\[2ex]
+&\!\!\!=\!\!\!& \frac{(\xi/2)^{-c-1}}{\Gamma(3/2)}\Big\{i \Im\! m\: e^{i\phi} 
+\int_{0}^{\infty} dy  (\xi/2)^{- y e^{i\phi}} 
+\frac{\Gamma(5/2 + c + y e^{i\phi})}{\Gamma(3 + c + y e^{i\phi})}
+\texttt{FPW}(j) \\[2ex]
+& & + \Im\! m\:  e^{i\phi} 
+\int_{0}^{\infty} dy  (\xi/2)^{- y e^{i\phi}}
+\frac{\Gamma(5/2 + c + y e^{i\phi})}{\Gamma(3 + c + y e^{i\phi})}
+\tan\big(\frac{\pi(c + y e^{i\phi})}{2}\big)
+\texttt{FPW}(j)
+\label{<Hformula>}
+\end{eqnarray*} 
+where $j=c+ye^{i\phi}$, and Schwartz reflection principle is
+used.
+The usual textbook Mellin-Barnes contour is obtained by
+using $\phi = \pi/2$, but, say, $\phi = 3\pi /4$ gives faster
+convergence. Parameter of Mellin-Barnes contour are specified
+via parameters \texttt{C} and \texttt{PHI} in \texttt{INIT.DAT}.
+
+DVCS Wilson coefficients $\mbox{\boldmath $C$}_{j}({\cal Q}^2/\mu^2,\alpha_s(\mu))$
+are given in Eq. (18) of \cite{Kumericki:2006xx}. 
+
+\section{Formula for $F_2$}  
+
+\begin{eqnarray*}
+{{F_2}^{\rm S}}(\xi,{\cal Q}^2)
+&\!\!\!=\!\!\!& \frac{Q_{S}^2}{2 \pi i}\int_{c-i \infty}^{c+ i \infty}\!
+dj\,\xi^{-j}
+\mbox{\boldmath $C$}^{\rm DIS}_{2,j}(Q^2/\mu^2,\alpha_s(\mu))
+\mbox{\boldmath $H$}_{j} (\xi=0,\Delta^2=0,\mu^2) \\[2ex]
+&\!\!\!=\!\!\!& \frac{Q_{S}^2}{\pi} \xi^{-c}
+\int_{0}^{\infty} dy\: \Im\! m\: e^{i\phi} \xi^{- y e^{i\phi}}
+\texttt{FPW}(j)
+\label{<F2formula>}
+\end{eqnarray*}
+
+DIS Wilson coefficients $\mbox{\boldmath $C$}^{\rm DIS}_{2,j}(Q^2/\mu^2,\alpha_s(\mu))$
+are given e.g. in \cite{vanNeerven:2000uj}. They are equal to those in
+ Eq. (18) of \cite{Kumericki:2006xx} without prefactor in front of square brackets there.
+
+\section{Numerical Mellin-Barnes Integration}  
+
+Numerical integration is performed in a way very similar to the one described in
+\cite{Vogt:2004ns}: Integrand is largest and
+fluctuates most rapidly around zero, mostly due to the factor $\xi^-j$. As we
+move away from real axis, both
+amplitude (for $\phi > \pi/2$) and oscillation frequency decrease exponentially.
+Thus we divide integration region in exponentially expanding intervals
+defined by points.
+
+\begin{equation}
+ \{0, 0.01, 0.025, 0.067, 0.18, 0.5, 1.3, 3.7, 10\}
+\label{<intervals>}
+\end{equation}
+
+Between each two points standard 8-point Gaussian integration is employed, according
+to Eq. (25.4.30) from \cite{AbS}.
+
+This is for \texttt{SPEED}=1. Otherwise integration intervals are defined by using
+only points with indices
+
+\begin{equation}
+ \{ 1, 1 + \texttt{SPEED}, 1 + 2 \texttt{SPEED}, \ldots \}
+\label{<speedintervals>}
+\end{equation}
+
+from the above list. Thus for \texttt{SPEED}=1,2, and 4 we use in total 64, 32, and 16
+integration points, respectively.
+
+%\bibliographystyle{h-physrev4}
+\bibliographystyle{$HOME/tex/inputs/JHEP-2}
+%\bibliographystyle{mynatbib}
+\bibliography{$HOME/Lit/kkumer}
+
+
+\end{document}
+

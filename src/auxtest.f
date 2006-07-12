@@ -1,3 +1,25 @@
+C     ****h* gepard/auxtest.f
+C  FILE DESCRIPTION
+C    Simple program for intermediate testing.
+C
+C    $Id: test.f 12 2006-07-12 08:36:24Z kuk05260 $
+C     *******
+
+C     ****p* auxtest.f/AUXTEST
+C  NAME
+C    AUXTEST  --  Tests routine
+C            
+C  DESCRIPTION
+C             Calculates LO and NLO CFFs corresponding
+C             to testpoints A and B from letter-num.nb
+C             and gepard_devel.nb
+C
+C  CHILDREN
+C      READPAR, INIT, CFF
+C
+C  SOURCE
+C
+
 
       PROGRAM AUXTEST
 
@@ -15,6 +37,7 @@
      &       LOGXISTEP = (LOGXIEND - LOGXISTART) / (NPOINTS - 1)  )
 
 *     Input common-blocks 
+
       COMMON / PARINT /  SPEED, P, NF
       COMMON / PARCHR /  SCHEME, ANSATZ
 
@@ -29,7 +52,6 @@
 
       Q2 = 2.5d0
       Q02 = 2.5d0
-
 
 *     1. Point "A"
       WRITE (*,*) " --- Point A  (MSBAR) ----- "

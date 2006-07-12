@@ -5,7 +5,7 @@ C
 C    $Id$
 C     *******
 
-C     ****p* plotsigma.f/PLOTSIGMA
+C     ****p* test.f/TEST
 C  NAME
 C    TEST  --  Tests routines
 C            

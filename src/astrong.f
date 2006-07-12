@@ -34,6 +34,8 @@ C  PARENTS
 C     PARWAVF
 C  NOTES
 C     Requires a previous call of BETAF to initialize common block !
+C  BUGS
+C     - Should get values of P and NF via common block
 C  SOURCE
 C
 

@@ -25,9 +25,6 @@ C         LAM -- eigenvalues (LAM(1) is "+" and LAM(2)
 C                 is "-" eigenvalue)
 C  PARENTS
 C      PROJECTORSF, ERFUNCF
-C  NOTES
-C      One needs to call COMMONF first, to initialize
-C      common block WGAMMA
 C  SOURCE
 C
 

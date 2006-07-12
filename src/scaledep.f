@@ -45,9 +45,6 @@ C  BUGS
 C    - Numerical derivation routine DERIV is not perfect. One needs to
 C      be careful with choice of NEVALS and H parameters, and check
 C      the errors returned in ERR
-C    - One should probably control numerical integration
-C      parameters (errors, limits, ...) from here (or in some input file), 
-C      instead of hard-wiring them in CFFF.
 C  SOURCE
 C
 

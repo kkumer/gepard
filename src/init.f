@@ -1,4 +1,41 @@
-*
+C     ****h* gepard/init.f
+C  FILE DESCRIPTION
+C    initialization routine
+C
+C    $Id: dvcs.f 11 2006-07-12 07:50:28Z kuk05260 $
+C     *******
+
+C     ****s* init.f/INIT
+C  NAME
+C        INIT  --  initialization
+C  DESCRIPTION
+C     Puts values of abscissas and weights of Mellin-Barnes
+C     integration contour on common blocks, as well as
+C     corresponding value of Wilson coefficients and
+C     anomalous dimensions
+C  SYNOPSIS
+C     SUBROUTINE INIT
+C  OUTPUT
+C     BIGC  -- values of DVCS Wilson coefficients for
+C              singlet CFF form factor \mathcal{H}
+C     NGAM  -- anomalous dimensions
+C   BIGCF2  -- values of DIS Wilson coefficients for
+C              singlet form factor F2
+C  IDENTIFIERS
+C       SPEED -- speed of evaluations
+C           P -- approximation order, which is N^{P}LO
+C           C -- intersection point of Mellin- Barnes integration 
+C                path with real axis
+C         PHI -- angle between Mellin-Barnes contour and Re(J) axis
+C        GAM? -- ?=0,1,2  Anomalous dimensions
+C          C? -- ?=0,1,2  DIS Wilson coefficients
+C  CHILDREN
+C      BETAF, WgammaV*F, WcV*F, CDVCSF, MSBARF
+C  PARENTS
+C      AUXTEST, TEST, RADCORR, SCALEDEP, FIT
+C  SOURCE
+C
+
       SUBROUTINE INIT
 * 
       IMPLICIT NONE
@@ -225,3 +262,4 @@
 
       RETURN
       END 
+C     ***

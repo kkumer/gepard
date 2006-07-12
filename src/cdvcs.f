@@ -14,19 +14,12 @@ C  DESCRIPTION
 C    calculates Wilson coefficients for DVCS in CSbar scheme
 C    according to KMKPS06 paper
 C  SYNOPSIS
-C     SUBROUTINE CDVCSF (NF, J, RF2, RR2, BIGC0, BIGC1, BIGC2)
+C     SUBROUTINE CDVCSF (J, BIGC0, BIGC1, BIGC2)
 C
-C     INTEGER NF
-C     DOUBLE PRECISION RF2, RR2
 C     DOUBLE COMPLEX J, BIGC0(2), BIGC1(2), BIGC2(2)
+C     CHARACTER PROCESS*4
 C  INPUTS
-C           P -- approximation order, which is N^{P}LO
-C          NF -- number of active flavours
 C           J -- conformal moment
-C         RF2 -- ratio {\cal Q}^2/{\mu_{f}^2} of photon
-C                virtuality over factorization scale
-C         RR2 -- ratio {\cal Q}^2/{\mu_{r}^2} of photon
-C                virtuality over renormalization scale
 C  OUTPUT
 C       BIGC0 -- vector of two C^{(0)} (quark and gluon) Wilson 
 C                coefficients (trivially equal to (1,0))
@@ -35,9 +28,9 @@ C       BIGC2 -- vector  C^{(2)}
 C  IDENTIFIERS
 C       BETABLK, WGAMMA, WC -- common blocks with beta function coefficients
 C       of QCD, and J-th moments of anomalous dimensions and Wilson 
-C       coefficients of DIS
+C       coefficients of DIS, initialized by subroutine INIT
 C  PARENTS
-C      PARWAVF
+C      INIT
 C  CHILDREN
 C      VECMAT, HS1, HS2
 C  NOTES
@@ -49,11 +42,11 @@ C
       SUBROUTINE CDVCSF (J, BIGC0, BIGC1, BIGC2, PROCESS)
 
       IMPLICIT NONE
+      DOUBLE COMPLEX J, BIGC0(2), BIGC1(2), BIGC2(2)
+      CHARACTER PROCESS*4
       INTEGER SPEED, P, NF
       DOUBLE PRECISION AS0, RF2, RR2
       CHARACTER SCHEME*5, ANSATZ*6
-      DOUBLE COMPLEX J, BIGC0(2), BIGC1(2), BIGC2(2)
-      CHARACTER PROCESS*4
       INTEGER NFMIN, NFMAX, K
       DOUBLE PRECISION LRF2, LRR2
       DOUBLE PRECISION BETA0, BETA1, BETA2, BETA3

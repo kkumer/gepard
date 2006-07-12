@@ -7,36 +7,28 @@ C     *******
 
 C     ****s* parwav.f/PARWAVF
 C  NAME
-C     PARWAVF  --  J-th conformal partial wave for DVCS
+C     PARWAVF  --  J-th conformal partial wave for DVCS and DIS
 C  DESCRIPTION
 C    calculates J-th conformal partial wave FPW i.e. 
 C    |latex $\vec{C}_j \cdot \vec{H}_j$
 C    |html  &nbsp; &nbsp;&nbsp;&nbsp;&nbsp; <b><i>C</i></b><sub>j</sub> <b>. <i>H</i></b><sub>j</sub>
-C    (together with evolution), but without prefactors of C, 
-C    i.e. C is normalized to (1,0).  
-C    These prefactors are added by FREAL, FIMAG and CFF.
+C    (together with evolution), and in DVCS case together with
+C    prefactor Gamma(5/2+J) / Gamma(3+J)
 C  SYNOPSIS
-C     SUBROUTINE PARWAVF (J, XI, DEL2, Q2, Q02, P, SCH, ANSATZ, FPW)
+C     SUBROUTINE PARWAVF (K, FPW, PROCESS)
 C
-C     INTEGER P
-C     DOUBLE PRECISION XI, DEL2, Q2, Q02
-C     CHARACTER SCH*5, ANSATZ*6
-C     DOUBLE COMPLEX J, FPW
+C     INTEGER K
+C     DOUBLE COMPLEX FPW
+C     CHARACTER PROCESS*4
 C  INPUTS
-C           J -- complex conformal moment
-C          XI -- DVCS scaling parameter
-C        DEL2 -- DVCS asymmetry parameter (P2-P1)^2
-C          Q2 -- photon virtuality squared
-C         Q02 -- initial scale squared
-C           P -- approximation order (0,1,2 is LO, NLO, NNLO)
-C         SCH -- scheme
-C      ANSATZ -- label for ansatz for GPDs on input scale
+C           K -- Mellin-Barnes integration point index
+C     PROCESS -- 'DVCS' or 'DIS'
 C  OUTPUT
 C         FPW -- partial wave
 C  PARENTS
-C      FREAL, FIMAG
+C      CFF, F2
 C  CHILDREN
-C      COMMONF, AS2PF, EVOLF, CDVCSF, MSBARF, HJ
+C      AS2PF, EVOLF, HJ
 C  SOURCE
 C
 
@@ -112,11 +104,9 @@ C     HJ  --  conformal moment of input-scale singlet GPD  H_{J}
 C  DESCRIPTION
 C     returns H_{J} for various ansaetze
 C  SYNOPSIS
-C     SUBROUTINE HJ(J, XI, DEL2, Q2, ANSATZ, FCM)
+C     SUBROUTINE HJ(J, FCM)
 C
-C     DOUBLE PRECISION XI, DEL2, Q2
 C     DOUBLE COMPLEX J, FCM(2) 
-C     CHARACTER ANSATZ*6
 C  INPUTS
 C           J -- conformal moment
 C
@@ -177,18 +167,6 @@ C
             FCM(2) = NG * CBETA(COMPLEX(1.0d0 - ALPHA0G - ALPHAPR*DEL2,
      &        0.0d0) + J, POCHG) / CBETA(COMPLEX(2.0d0 - ALPHA0G,
      &        0.0d0), POCHG)
-!      ELSE IF (ANSATZ .EQ. 'FIT') THEN
-!            ALPHAPR = 0.25d0
-!            POCHSEA = (8.0d0, 0.0d0)
-!            POCHG = (6.0d0, 0.0d0)
-!            FCM(1) = NSEA / (1 - DEL2/MSEA**2)**3 * CBETA(
-!     &            COMPLEX(1.0d0 - ALPHA0SEA - 
-!     &            ALPHAPR*DEL2, 0.0d0) + J, POCHSEA) / CBETA(
-!     &            COMPLEX(2.0d0 - ALPHA0SEA, 0.0d0), POCHSEA)
-!            FCM(2) = NG / (1 - DEL2/MG**2)**3 * CBETA(
-!     &            COMPLEX(1.0d0 - ALPHA0G - ALPHAPR*DEL2,
-!     &        0.0d0) + J, POCHG) / CBETA(COMPLEX(2.0d0 - ALPHA0G,
-!     &        0.0d0), POCHG)
       ELSE IF (ANSATZ .EQ. 'FIT') THEN
             ALPHAPR = 0.25d0
             FCM(1) = NSEA / (1 - DEL2/MSEA**2)**3 / POCHHAMMER(
@@ -204,4 +182,3 @@ C
       RETURN
       END
 C     ****
-

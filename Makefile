@@ -33,7 +33,7 @@ pdf: tex
 	$(MAKE) -C doc/tex pdf
 
 tex:
-	robodoc --rc doc/robodoc.rc --latex --singledoc --nosource --toc --index --doc ./doc/tex/gepard 
+	robodoc --rc doc/robodoc.rc --latex --singledoc --toc --index --doc ./doc/tex/gepard-api
 	
 html:
 	robodoc --rc doc/robodoc.rc  --html --multidoc --index --doc ./doc/html

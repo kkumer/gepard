@@ -1,3 +1,21 @@
+C     ****h* gepard/readpar.f
+C  FILE DESCRIPTION
+C    initial reading of parameters
+C
+C    $Id: dvcs.f 11 2006-07-12 07:50:28Z kuk05260 $
+C     *******
+
+C     ****s* readpar.f/READPAR
+C  NAME
+C        READPAR -- reads parameters from file INIT.DAT
+C  SYNOPSIS
+C     SUBROUTINE READPAR
+C  IDENTIFIERS
+C     (see provided self-documented INIT.DAT)
+C  PARENTS
+C      AUXTEST, TEST, RADCORR, SCALEDEP, FIT
+C  SOURCE
+C
 
       SUBROUTINE READPAR
 
@@ -28,3 +46,4 @@
 
       RETURN
       END
+C     ***

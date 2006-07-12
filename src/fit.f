@@ -73,19 +73,23 @@ C            DATASET?  --  ? = 1, ..., 9, 0.  (name of 8 chars exactly!!)
 C                          files with experimental data formatted
 C                          like:   x  y  dy_stat  dy_syst
 C  OUTPUT
-C             FIT.PLT  --  Files with fit results formatted like:
+C             FIT.PLT  --  File with fit results formatted like:
 C                          x  y(x)_theor
 C                          (with empty lines separating graphs)
 C  IDENTIFIERS
-C                   N  --  Number of points in a given data set
-C                   X  --  Array with x-values of experimental points
-C                   Y  --  Array with y-values of experimental points
-C                  DY  --  Array with errors of y-values
-C                   A  --  Array with fit parameters
-C              FITPAR  --  Equal to A
+C          N  --  Number of points in a given data set
+C          X  --  Array with x-values of experimental points
+C          Y  --  Array with y-values of experimental points
+C         DY  --  Array with errors of y-values
+C          A  --  Array with fit parameters
+C     FITPAR  --  Equal to A
+C          W2 -- (gamma*-proton) invariant mass squared
+C          XI -- DVCS scaling parameter or Bjorken x
+C        DEL2 -- DVCS asymmetry parameter (P2-P1)^2
+C          Q2 -- photon virtuality squared
 C
 C  CHILDREN
-C      PARSIGMA, SIGMA, F2
+C      PARSIGMA, SIGMA, F2F
 C
 C  PARENTS
 C      MINUIT, FCN (via MINUIT)
@@ -375,13 +379,32 @@ C
 C     ****
 
 
+C     ****s* fit.f/READDATA
+C  NAME
+C    READDATA   --  Reads in data set.
+C  SYNOPSIS
+C     SUBROUTINE READDATA (FILENAME, N, X, Y, DY)
+C
+C     CHARACTER  FILENAME*8
+C     INTEGER N
+C     DOUBLE PRECISION X(NMAX), Y(NMAX), DY(NMAX)
+C  INPUTS
+C   FILENAME  --  Name of the file containing data
+C          N  --  Number of points i.e. lines in the file
+C  OUTPUT
+C          X  --  Array with x-values of experimental points
+C          Y  --  Array with y-values of experimental points
+C         DY  --  Array with errors of y-values
+C  SOURCE
+C
       SUBROUTINE READDATA (FILENAME, N, X, Y, DY)
 
       CHARACTER  FILENAME*8
-      INTEGER I, N, NMAX
+      INTEGER N
+      INTEGER I, NMAX
       PARAMETER (NMAX=40)
-      DOUBLE PRECISION STAT, SYST
       DOUBLE PRECISION X(NMAX), Y(NMAX), DY(NMAX)
+      DOUBLE PRECISION STAT, SYST
 
       OPEN (UNIT = 15, FILE = FILENAME, STATUS = 'OLD')
       DO 11 I=1,N

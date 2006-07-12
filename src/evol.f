@@ -10,12 +10,12 @@ C     ****s* evol.f/EVOLF
 C  NAME
 C     EVOLF  --   evolution operator
 C  DESCRIPTION
-C    calculates evolution operator in CSbar scheme
+C    calculates evolution operator
 C    according to KMKPS06 paper
 C  SYNOPSIS
-C     SUBROUTINE EVOLF (NF, R, EVOLA)
+C     SUBROUTINE EVOLF (K, R, EVOLA)
 C
-C     INTEGER NF
+C     INTEGER K
 C     DOUBLE PRECISION R
 C     DOUBLE COMPLEX EVOLA(3,2,2), 
 C  INPUTS
@@ -95,7 +95,7 @@ C     *****
 
 C     ****f* evol.f/KRONECKER
 C  NAME
-C    KRONECKER
+C    KRONECKER -- kronecker delta symbol
 C  SYNOPSIS
 C    INTEGER FUNCTION KRONECKER (A, B)
 C

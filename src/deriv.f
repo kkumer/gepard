@@ -33,6 +33,8 @@ C         ERR -- estimated error
 C  IDENTIFIERS
 C         CON -- how much is scale H decreased each step
 C        SAFE -- return when error is SAFE worse than the best so far
+C  PARENTS
+C       SCALEDEP
 C  SOURCE
 C
 

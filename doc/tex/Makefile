@@ -1,15 +1,18 @@
-pdf: dvi
-	dvipdf gepard.dvi
-
-ps: gepard.dvi
-	dvips -o gepard.ps gepard.dvi
-
 dvi: gepard.tex
 	latex gepard.tex
-	latex gepard.tex
-	makeindex gepard.idx
-	latex gepard.tex
+
+pdf: apidvi
+	dvipdf gepard-api.dvi
+
+apips: gepard-api.dvi
+	dvips -o gepard-api.ps gepard-api.dvi
+
+apidvi: gepard-api.tex
+	latex gepard-api.tex
+	latex gepard-api.tex
+	makeindex gepard-api.idx
+	latex gepard-api.tex
 
 .PHONY: clean
 clean:
-	-rm -f gepard.*
+	-rm -f gepard-api.* gepard.{log,aux,dvi,pdf,ps,blg,bbl}

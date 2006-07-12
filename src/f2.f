@@ -13,7 +13,7 @@ C  DESCRIPTION
 C    calculates singlet F2 DIS form factor by numerical Mellin-Barnes 
 C    integration of conformal partial waves provided by subroutine PARWAV. 
 C    |latex  \begin{eqnarray*}
-C    |latex  {{\cal F}^{\rm S}}(\xi,{\cal Q}^2)
+C    |latex  {{F_2}^{\rm S}}(\xi,{\cal Q}^2)
 C    |latex  &\!\!\!=\!\!\!& \frac{Q_{S}^2}{2 \pi i}\int_{c-i \infty}^{c+ i \infty}\!
 C    |latex  dj\,\xi^{-j} 
 C    |latex  \mbox{\boldmath $C$}^{\rm DIS}_{j}(Q^2/\mu^2,\alpha_s(\mu)) 
@@ -27,18 +27,13 @@ C    Unlike CFF, this is defined with the singlet charge factor 2/9 !
 C    All INPUTS and OUTPUT below is via common blocks!
 C  SYNOPSIS
 C     SUBROUTINE F2F
-C
-C     INTEGER P
-C     DOUBLE PRECISION XI, DEL2, Q2, Q02, C
-C     DOUBLE PRECISION F2(0:2)
-C     CHARACTER SCHEME*5, ANSATZ*6
-C
-C     COMMON / KINEMATICS /  XI, DEL2, Q2, Q02
-C     COMMON / APPROX     /  P
-C     COMMON / LABELS     /  SCHEME, ANSATZ
-C     COMMON / C          /  C
-C     COMMON / F2         /  F2 
-C  INPUTS
+C  OUTPUT
+C     F2(0:2) --  F2(x,Q^2) in LO, NLO and NNLO approximations 
+C                 (for SCHEME='CSBAA'; for SCHEME= 'MSBAR' only LO and
+C                 NLO exists and CFF(3) is garbage) 
+C                 NB!! - only one of three F2(3) array elements, F2(P)
+C                 is changed by single call to F2F!
+C  IDENTIFIERS
 C          XI -- Bjorken x
 C        DEL2 -- asymmetry parameter (P2-P1)^2. Set equal to 0 below!
 C          Q2 -- photon virtuality squared
@@ -48,19 +43,9 @@ C      SCHEME -- scheme
 C      ANSATZ -- label for ansatz for GPDs on input scale
 C           C -- intersection point of Mellin- Barnes integration 
 C                path with real axis
-C  OUTPUT
-C     F2(0:2) --  F2(x,Q^2) in LO, NLO and NNLO approximations 
-C                 (for SCHEME='CSBAA'; for SCHEME= 'MSBAR' only LO and
-C                 NLO exists and CFF(3) is garbage) 
-C                 NB!! - only one of three F2(3) array elements, F2(P)
-C                 is changed by single call to F2F!
-C  IDENTIFIERS
-C     A,B,LAM -- Integration path is divided in two segments: [A, B] and [B, LAM]
+C         PHI -- angle between Mellin-Barnes contour and Re(J) axis
 C  CHILDREN
-C     DQAGS    -- subroutine for adaptive numerical Gauss-Kronrod integration
-C                 available in SLATEC library
-C     F2IMAG    -- (via DQAGS) Mellin-Barnes integrand 
-C     BETAF
+C     PARWAVF
 C  SOURCE
 C
 

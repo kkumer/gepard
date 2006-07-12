@@ -26,17 +26,17 @@ C              FITPAR  --  Array with fit parameters, see FIT.CMD
 C                          for description (via common block)
 C  OUTPUT
 C            PARSIGMA  --  partial cross section d sigma / d t
-C
 C  IDENTIFIERS
 C
-C                   W2 -- (gamma*-proton) invariant mass squared
-C
+C          W2 -- (gamma*-proton) invariant mass squared
+C          XI -- DVCS scaling parameter
+C        DEL2 -- DVCS asymmetry parameter (P2-P1)^2
+C          Q2 -- photon virtuality squared
+C         Q02 -- initial scale squared
 C  CHILDREN
 C      CFFF
-C
 C  BUGS
 C       dimension of FITPAR is hardcoded 
-C
 C  SOURCE
 C
 
@@ -104,8 +104,7 @@ C  SYNOPSIS
 C     DOUBLE PRECISION FUNCTION SIGMA ()
 C  DESCRIPTION
 C    Calls PARSIGMA for calculation of partial cross section
-C    and integrates over t numerically, using simple Bode 
-C    formula. Seems to be accurate to 5 percent.
+C    and integrates over t numerically, using Gauss method
 C
 C  INPUTS 
 C              FITPAR  --  Array with fit parameters, see FIT.CMD

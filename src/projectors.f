@@ -24,7 +24,7 @@ C  OUTPUT
 C          PR -- Two projector matrices PR(1,a,b)=P^+
 C                and PR(2,a,b)=P^-
 C  IDENTIFIERS
-C      WGAMMA -- common block with anomalous dimensions of DIS
+C        NGAM -- common block with anomalous dimensions of DIS
 C  PARENTS
 C      RNNLOF
 C  CHILDREN

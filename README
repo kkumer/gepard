@@ -2,80 +2,121 @@
 gepard = calculating Compton form factors from moments of
          General PARton Distributions 
 
-- Version 0.88 2006-06-26 
+- Version 0.89 2006-07-12 
 
 
 
-=============================
+========================================================================
 1. Files, and what they are:
-=============================
+========================================================================
+
+Makefile - use this if needed to compile Fortran and create documentation.
+           See section 2 of this README.
+
+1.1 Documentation
+-----------------
+
+README - this file
+doc/tex/gepard.pdf  -  simple manual for gepard
+doc/tex/gepard-api.pdf  - extensive description of subroutines
+doc/html/masterindex.html - HTML equivalent of gepard-api.pdf
 
 
-Essential:
----------
+1.2 Fortran part
+----------------
+
+src/ - Fortran sources
+src/adacf/  - sources for DIS anomal. dimensions and Wilson coeffs.
+Tests/  - some numbers from Letter, useful for testing. See README.
+fits/ - everything needed for fitting and plotting fits
+
+
+1.3 Mathematica part
+--------------------
 mma/gepard.m  - Mathematica package. For basic documentation try ?CFF and ?Fcm
-mma/gepard.exe - binary FORTRAN library. (Linux and Windows versions)
-Makefile  - For compiling Fortran code (Linux only)
-
-
-Useful:
-------
-fits/  - files used for fitting
 mma/gepard.nb - Notebook with checks and timings. Section 1 and then 3 are good
             introduction.  Section 2 of this notebook is good
             for understanding which routines are available and 
             for understanding correspondence with DM's CFFNNLO.nb routines.
+mma/gepard.exe - binary FORTRAN library. (Linux and Windows versions)
+
+Note that present version of gepard is considered Fortran-only. These mathematica
+packages and notebook are old (but should be correct) version, which can be
+used for checking and investigation of Fotran algorithms, but is much slower.
            
 
-=============================
-2. Instalation and usage:
-=============================
+
+====================================================================
+2. Installation and usage
+====================================================================
+
+You need to "make" stuff only if you want to recreate executables and
+documentation (they should be originally provided in gepard.tgz):
+
+make test  - creates simple executable for testing
+make fit   - creates executable for fitting (you should specify position of
+             CERNLIB's kernlib and packlib libraries in src/Makefile)
+make radcorr - executable for Fig 1 of Letter
+make scaledep - executable for Fig 2 of Letter
+make hmtl  - creates HTML documentation (needs robodoc software)
+make pdf   - create LaTeX documentation (needs robodoc software)
+make all   - makes everything above and maybe more
+make clean - removes everything which is easily recreatable
+
+========================================
+2.1 Calculating and fitting with Fortran
+========================================
+
+- First try to run executable './test' (Not 'test' which is a built-in
+  Unix shell command!)  and see if numbers come out right.
+  Try increasing SPEED in INIT.DAT and see how numbers get worse.
+
+For fitting with minuit:
+
+- use provided binary 'fit' if you can, or create it by 'make fit'
+
+- Commands for driving minuit and for specifying initial values of
+  fitting parameters are in file FIT.CMD (see minuit manual for their
+  meaning!), and final fit result goes to file FIT.PLT, where each stanza
+  corresponds to one input DATASET. Output of minuit itself is going to terminal,
+  so to save it use e.g.  './fit | tee -a savefile'
+
+- plotfits creates figures from FIT.PLT as instructed in fit??.bat
+  This uses grace (xmgrace) software so is possible only on Linux at the moment.
+
+- parameters (not for fit but for everything else) are specified in INIT.DAT
+  which is self-documented (only the first item on each line there is
+  important, other are just documentation for users convenience)
+
+- In particular, note that you can fit only to DVCS or to DIS data or to both
+  by changing last two lines in INIT.DAT
 
 ===================================
-2.1 Calculating CFFs in Mathematica
+2.2 Calculating CFFs in Mathematica
 ===================================
 
-
-Put gepard.m file and gepard.exe directory where Mathematica can find it, then install via:
+Put gepard.m file and gepard.exe directory where Mathematica can find it, then
+install via:
 
 << gepard.m
 
-Mathematica should automatically load file gepard.exe in subdirectory according to $SystemID
+Mathematica should automatically load file gepard.exe in subdirectory according
+to $SystemID
 
 If this doesn't work ("gepard.exe not found"), then in file gepard.m adjust line 
     Install["gepard.exe"]
 to
     Install["<exact path to file gepard.exe for your system>"]
 
-For usage, type ?CFF or better read gepard.nb and DM's CFFNNLO.nb which uses the same
-calling conventions for high level functions i.e. only  "eval" label there should
-be changed from as2pF(II) to either:
+For usage, type ?CFF or better read gepard.nb and DM's CFFNNLO.nb which uses
+the same calling conventions for high level functions i.e. only  "eval" label
+there should be changed from as2pF(II) to either:
 
 GEP  - exact Fortran routines
 GEPI, GEPIfix  - two types of interpolations
 
-Quickest introduction is by going over 1st and 3rd section of gepard.nb, then returning
-to 2nd for details and lower level functions if needed, and only then
-use ?CFF, ?interpol, ?interpolfix, ?Fpw, ?cDVCS, ?RAope, ?Fcm, ?common, ?AS2P which
-are a bit cryptic.
+Quickest introduction is by going over 1st and 3rd section of gepard.nb, then
+returning to 2nd for details and lower level functions if needed, and only then
+use ?CFF, ?interpol, ?interpolfix, ?Fpw, ?cDVCS, ?RAope, ?Fcm, ?common, ?AS2P
+which are a bit cryptic.
 
-========================================
-2.2 Calculating and fitting with Fortran
-========================================
-
-- use provided binary 'fit' if you can
-
-- 'make fit'  creates binary for fitting that calls minuit. Commands for minuit
-are in file FIT.CMD, and output is in file FIT.PLT, where each stanza
-corresponds to one DATASET[1-6]. Output of minuit is going to terminal, so
-to save it use  'time ./fit | tee -a savefile'
-
-- plotfits creates three figures from FIT.PLT as instructed in fit??.bat
-
-- fortran documentation is in doc/html and doc/tex  (can be recreated by
-  'make tex' or 'make html' if you have robodoc installed).
-  'make pdf' compiles LaTeX if you have latex installed.
-
-
-- parameters are specified in INIT.DAT which is self-documenting
-  (only first item on the line there is important, other are just for convenience)

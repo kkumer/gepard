@@ -38,11 +38,6 @@ C                P -- approximation order N^{P}LO P=0,1,2
 C
 C  CHILDREN
 C      CFFF, DCARG
-C  BUGS
-C      One should probably control numerical integration
-C      parameters (errors, limits, ...) from here (or in some input file), 
-C      instead of hard-wiring them in CFFF.
-C      - Very suboptimal now. Too many calls to init!
 C  SOURCE
 C
 
