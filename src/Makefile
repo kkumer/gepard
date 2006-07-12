@@ -18,8 +18,8 @@ FFLAGS =  $(DEBUG)
 CFLAGS =  $(DEBUG)
 
 # Libraries and include files that are used
-#LIBS =  -L/home/kkumer/local/lib -ladacf -lslatec -L$(MATHLINKDIR) -lML  -lpthread
-LIBS =  -L$(HOME)/local/lib -ladacf -lslatec 
+#LIBS =  -L/home/kkumer/local/lib -ladacf -L$(MATHLINKDIR) -lML  -lpthread
+LIBS =  -L$(HOME)/local/lib -ladacf 
 
 # Directories for storing object files
 FODIR = Fobj
@@ -28,7 +28,7 @@ ODIR = obj
 # common Fortran object files
 FOBJS = Finit.o Fbeta.o Fspecial.o Fdcomplex.o Fastrong.o Flambda.o\
 Fprojectors.o Frnnlo.o Ferfunc.o Fevol.o Fcdvcs.o Fmsbar.o Fparwav.o Fcff.o\
-Fdvcs.o Ff2.o Freadpar.o
+Fdvcs.o Ff2.o Freadpar.o Ferror.o
 _FOBJS = $(patsubst %,$(FODIR)/%,$(FOBJS))
 
 # rule for compiling Fortran files

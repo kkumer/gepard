@@ -26,7 +26,7 @@ C
       INTEGER SPEED, P, NF
       DOUBLE PRECISION NG, NSEA, MG, MSEA, ALPHA0G, ALPHA0SEA
       DOUBLE PRECISION FITPAR(10)
-      DOUBLE PRECISION W2, XI, DEL2, Q2, Q02
+      DOUBLE PRECISION W2, XI, DEL2, Q2, Q02, AUX
       DOUBLE PRECISION F2(0:2)
       DOUBLE PRECISION PARSIGMA, SIGMA
 
@@ -69,7 +69,8 @@ C
       Q2 = 1.0d0
       XI = Q2 / ( 2.0d0 * W2 + Q2)
       WRITE (*, *) " 113570.49343 is result from gepard_devel.nb"
-      WRITE (*, *) PARSIGMA(0.d0)
+      AUX = PARSIGMA(0.d0)
+      WRITE (*, *) AUX
 
       P = 1
 
@@ -78,23 +79,27 @@ C
       Q2 = 3.0d0
       XI = Q2 / ( 2.0d0 * W2 + Q2)
       WRITE (*, *) " 6676.08735 is t=0 result from gepard_devel.nb"
-      WRITE (*, *) PARSIGMA(0.d0)
+      AUX = PARSIGMA(0.d0)
+      WRITE (*, *) AUX
       WRITE (*, *) " 97.346871 is t=-0.5 result from gepard_devel.nb"
-      WRITE (*, *) PARSIGMA(0.5d0)
+      AUX = PARSIGMA(0.5d0)
+      WRITE (*, *) AUX
 
       WRITE (*, *) " ---  Test 4: NLO sigma, 1->3 GeV^2, xi~1e-4  --- "
       W2 = 82.0d0**2
       Q2 = 3.0d0
       XI = Q2 / ( 2.0d0 * W2 + Q2)
       WRITE (*, *) " 745.02480514 is result from gepard_devel.nb"
-      WRITE (*, *) SIGMA()
+      AUX = SIGMA ()
+      WRITE (*, *) AUX
 
       WRITE (*, *) " ---  Test 5: NLO sigma, 1->3 GeV^2, xi~1e-1  --- "
       W2 = 3.5d0**2
       Q2 = 3.d0
       XI = Q2 / ( 2.0d0 * W2 + Q2)
       WRITE (*, *) " 138.94079 is result from gepard_devel.nb"
-      WRITE (*, *) SIGMA()
+      AUX = SIGMA ()
+      WRITE (*, *) AUX
 
 
       STOP

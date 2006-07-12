@@ -27,27 +27,24 @@ C
 
       IMPLICIT NONE
       DOUBLE COMPLEX Z
-      DOUBLE PRECISION D1MACH, SQEPS, X2, Y2, SN2X, DEN
-      SAVE SQEPS
-      DATA SQEPS /0.0d0/
-      IF (SQEPS.EQ.0.0d0) SQEPS = SQRT (D1MACH(4))
+      DOUBLE PRECISION SMALL, X2, Y2, SN2X, DEN
+      DATA SMALL /1.0D-8/
 
-      X2 = 2.0d0*DBLE(Z)
-      Y2 = 2.0d0*DIMAG(Z)
+
+      X2 = 2.0d0 * DBLE(Z)
+      Y2 = 2.0d0 * DIMAG(Z)
 
       SN2X = SIN (X2)
-      CALL XERCLR
 
       DEN = COS(X2) + COSH(Y2)
-      IF (DEN .EQ. 0.0d0) CALL XERMSG ('SLATEC', 'DCTAN',
+      IF (DEN .EQ. 0.0d0) CALL ERROR ('GeParD', 'DCTAN',
      &   'TAN IS SINGULAR FOR INPUT Z (X IS PI/2 OR 3*PI/2 AND Y IS 0)',
      &   2, 2)
 
-      IF (ABS(DEN).GT.MAX(ABS(X2),1.)*SQEPS) GO TO 10
-      CALL XERCLR
-      CALL XERMSG ('SLATEC', 'DCTAN',
-     &   'ANSWER LT HALF PRECISION, ABS(X) TOO BIG OR X TOO NEAR ' //
-     &   'PI/2 OR 3*PI/2', 1, 1)
+      IF (ABS(DEN).GT.MAX(ABS(X2),1.)*SMALL) GO TO 10
+      CALL ERROR ('GeParD', 'DCTAN',
+     &   'ABS(X) TOO BIG OR X TOO NEAR PI/2 OR 3*PI/2                 ',
+     &   1, 1)
 
  10   DCTAN = COMPLEX (SN2X/DEN, SINH(Y2)/DEN)
 
