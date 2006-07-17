@@ -48,5 +48,17 @@ clean:
 	$(MAKE) -C doc/tex clean
 	-rm doc/html/*
 	-rm -f $(SRCTARGETS)
-	-rm fits/FIT.PLT fits/gmon.out
+	-rm fits/FIT.OUT fits/gmon.out fits/*.ps
 	-rm FIG*DAT gmon.out
+
+.PHONY: distclean
+distclean:
+	$(MAKE) -C src clean
+	$(MAKE) -C doc/tex clean
+	-rm fits/FIT.OUT fits/gmon.out fits/*.ps
+	-rm FIG*DAT gmon.out
+	-rm -rf .svn Tests/.svn doc/.svn doc/html/.svn doc/tex/.svn \
+		   	fits/.svn mma/.svn mma/.svn mma/gepard.exe/.svn \
+		mma/gepard.exe/Linux/.svn mma/gepard.exe/Windows/.svn \
+		src/.svn src/Fobj/.svn src/adacf/.svn  src/adacf/obj/.svn \
+		src/obj/.svn

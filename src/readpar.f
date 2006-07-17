@@ -7,11 +7,11 @@ C     *******
 
 C     ****s* readpar.f/READPAR
 C  NAME
-C        READPAR -- reads parameters from file INIT.DAT
+C        READPAR -- reads parameters from file GEPARD.INI
 C  SYNOPSIS
 C     SUBROUTINE READPAR
 C  IDENTIFIERS
-C     (see provided self-documented INIT.DAT)
+C     (see provided self-documented GEPARD.INI)
 C  PARENTS
 C      AUXTEST, TEST, RADCORR, SCALEDEP, FIT
 C  SOURCE
@@ -28,10 +28,9 @@ C
       COMMON / PARINT /  SPEED, P, NF
       COMMON / PARFLT /  AS0, RF2, RR2
       COMMON / PARCHR /  SCHEME, ANSATZ
-      COMMON / PARLOG /  INCLUDEDVCS, INCLUDEDIS
 
 *   Read fixed initialization parameters
-      OPEN (UNIT = 61, FILE = "INIT.DAT", STATUS = "OLD")
+      OPEN (UNIT = 61, FILE = "GEPARD.INI", STATUS = "OLD")
       READ (61, *) SPEED
       READ (61, *) P
       READ (61, *) NF
@@ -40,8 +39,6 @@ C
       READ (61, *) RR2
       READ (61, *) SCHEME
       READ (61, *) ANSATZ
-      READ (61, *) INCLUDEDVCS
-      READ (61, *) INCLUDEDIS
       CLOSE (61)
 
       RETURN

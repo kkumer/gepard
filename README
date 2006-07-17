@@ -69,27 +69,29 @@ make clean - removes everything which is easily recreatable
 
 - First try to run executable './test' (Not 'test' which is a built-in
   Unix shell command!)  and see if numbers come out right.
-  Try increasing SPEED in INIT.DAT and see how numbers get worse.
+  Try increasing SPEED in GEPARD.INI and see how numbers get worse.
 
 For fitting with minuit:
 
 - use provided binary 'fit' if you can, or create it by 'make fit'
 
 - Commands for driving minuit and for specifying initial values of
-  fitting parameters are in file FIT.CMD (see minuit manual for their
-  meaning!), and final fit result goes to file FIT.PLT, where each stanza
-  corresponds to one input DATASET. Output of minuit itself is going to terminal,
+  fitting parameters are in file MINUIT.CMD (see minuit manual for their
+  meaning!), and final fit result goes to file FIT.OUT, where each stanza
+  corresponds to one input data set. Output of minuit itself is going to terminal,
   so to save it use e.g.  './fit | tee -a savefile'
 
-- plotfits creates figures from FIT.PLT as instructed in fit??.bat
-  This uses grace (xmgrace) software so is possible only on Linux at the moment.
-
-- parameters (not for fit but for everything else) are specified in INIT.DAT
+- parameters (not for fit but for everything else) are specified in GEPARD.INI
   which is self-documented (only the first item on each line there is
   important, other are just documentation for users convenience)
 
-- In particular, note that you can fit only to DVCS or to DIS data or to both
-  by changing last two lines in INIT.DAT
+- To select which experimental data will be used for fit, edit file FIT.INI.
+  Only sets between strings 'START' and 'STOP' will be used.
+
+- First line of file FIT.INI specifies graphical output:
+    'filename.ps/CPS'  will get output into PS file
+    '/XSERVE'   will get output in X window (may not work on MS Windows)
+
 
 ===================================
 2.2 Calculating CFFs in Mathematica

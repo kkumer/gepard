@@ -38,7 +38,7 @@ C
 
       COMMON / LABELS   /  SCHEME, ANSATZ
 
-      OPEN (UNIT=5,FILE='FIT.CMD',STATUS='OLD')
+      OPEN (UNIT=5,FILE='MINUIT.CMD',STATUS='OLD')
 
       SCHEME = 'CSBAR'
 
@@ -50,7 +50,6 @@ C
       STOP
       END
 C     ****
-
 
 C     ****s* fit.f/FCN
 C  NAME
@@ -103,315 +102,258 @@ C  SOURCE
 C
 
 
-      SUBROUTINE FCN(NPAR,GIN,F,A,IFLAG,FUTIL)
+      SUBROUTINE FCN(NPAR,GIN,CHISQ,A,IFLAG,FUTIL)
 
       IMPLICIT NONE
       INTEGER NPAR, IFLAG
-      DOUBLE PRECISION F, FUTIL
+      DOUBLE PRECISION CHISQ, FUTIL
       DOUBLE PRECISION A(NPAR),GIN(NPAR)
-      LOGICAL INCLUDEDVCS, INCLUDEDIS
-      INTEGER N, NMAX, I
-      PARAMETER (NMAX=40)
+      INTEGER K, IER, PGBEG
       DOUBLE PRECISION FITPAR(10)
-      DOUBLE PRECISION X(NMAX), Y(NMAX), DY(NMAX)
-      DOUBLE PRECISION CHISQ, FITFN
-      DOUBLE PRECISION W2, XI, DEL2, Q2, Q02
-      DOUBLE PRECISION PARSIGMA, SIGMA
-      DOUBLE PRECISION F2(0:2)
+      DOUBLE PRECISION CHISQPART
+      CHARACTER DATAFNAME*15
+      CHARACTER OUTFILE*15
 
-      COMMON / PARLOG /  INCLUDEDVCS, INCLUDEDIS
-
-      COMMON / KINEMATICS /  XI, DEL2, Q2, Q02
       COMMON / FITPARAMS  /  FITPAR
-      COMMON / F2P        /  F2
 
 *     Clear output buffer
+
       CALL FLUSHOUT()
       
 *     Transfer parameters to common block
-      DO 10 I = 1, NPAR
- 10     FITPAR(I) = A(I)
 
+      DO 10 K = 1, NPAR
+ 10     FITPAR(K) = A(K)
+
+
+*     Initialization of printing the results
 
       IF (IFLAG .EQ. 3)  THEN
-*       file for writing out points of final fit
-        OPEN (UNIT = 16, FILE = 'FIT.PLT', STATUS = 'UNKNOWN')
+*       File for writing out points of final fit
+        OPEN (UNIT = 21, FILE = 'FIT.OUT', STATUS = 'UNKNOWN')
       END IF
-
 
       CHISQ = 0.0d0
 
+      OPEN (UNIT = 11, FILE = 'FIT.INI', STATUS = 'OLD')
+      READ (11, *) OUTFILE
+*    Initailization of plotting on 2x2 grid of panels
+      IER = PGBEG(0, OUTFILE, 2, 2)
+      IF (IER.NE.1) STOP
+      CALL PGSCH(1.5)
 
-      IF ( INCLUDEDVCS ) THEN
+*     Process only files specified in FIT.INI between
+*      'START' and 'STOP'
 
-*     DATASET 1  [H1,  Eur.Phys.J.C44:1-11,2005, hep-ex/0505061]
-*       X = -T,   Y = DSIG/DT   
-*       W = 71 GeV, Q2 = 4 GeV
-
-      W2 = 71.0d0**2
-      Q2 = 4.0d0
-      XI = Q2 / (2.0d0 * W2 + Q2)
-      N = 4
-      CALL READDATA ('DATASET1', N, X, Y, DY)
-      DO I= 1, N
-      FITFN = PARSIGMA ( X(I) )
-      CHISQ = CHISQ + ( (FITFN - Y(I))**2 / DY(I)**2 )
-      IF (IFLAG .EQ. 3)  THEN
-        WRITE (16, *) X(I), FITFN
+ 15   READ (11, *) DATAFNAME
+      IF (DATAFNAME(:5) .NE. 'START') GOTO 15
+ 18   READ (11, *) DATAFNAME
+      IF (DATAFNAME(:4) .EQ. 'STOP') THEN
+        GOTO 20
+      ELSE
+        CALL PROCDATA (DATAFNAME, IFLAG, CHISQPART)
+        CHISQ = CHISQ + CHISQPART
+        IF (IFLAG .EQ. 3) WRITE (21, *)
       END IF
-      END DO
+      GOTO 18
+ 20   CLOSE(11)
 
-      IF (IFLAG .EQ. 3)  THEN
-*       empty line for separation of different fit lines
-        WRITE (16, *) 
-      END IF
-
-*     DATASET 2  [H1,  Eur.Phys.J.C44:1-11,2005, hep-ex/0505061]
-*       X = -T,   Y = DSIG/DT   
-*       W = 82 GeV, Q2 = 8 GeV
-
-      W2 = 82.0d0**2
-      Q2 = 8.2d0
-      XI = Q2 / ( 2.0d0 * W2 + Q2)
-      N = 4
-      CALL READDATA ('DATASET2', N, X, Y, DY)
-      DO I= 1, N
-      FITFN = PARSIGMA ( X(I) )
-      CHISQ = CHISQ + ( (FITFN - Y(I))**2 / DY(I)**2 )
-      IF (IFLAG .EQ. 3)  THEN
-        WRITE (16, *) X(I), FITFN
-      END IF
-      END DO
-
-      IF (IFLAG .EQ. 3)  THEN
-*       empty line for separation of different fit lines
-        WRITE (16, *) 
-      END IF
-
-*     DATASET 3  [H1,  Eur.Phys.J.C44:1-11,2005, hep-ex/0505061]
-*       X = Q2,   Y = SIG   (TCUT = - 1 GeV)
-*       W = 82 GeV
-
-      W2 = 82.0d0**2
-      N = 6
-      CALL READDATA ('DATASET3', N, X, Y, DY)
-      DO I= 1, N
-      Q2 = X(I)
-      XI = Q2 / ( 2.0d0 * W2 + Q2)
-      FITFN = SIGMA()
-      CHISQ = CHISQ + ( (FITFN - Y(I))**2 / DY(I)**2 )
-      IF (IFLAG .EQ. 3)  THEN
-        WRITE (16, *) X(I), FITFN
-      END IF
-      END DO
-
-      IF (IFLAG .EQ. 3)  THEN
-*       empty line for separation of different fit lines
-        WRITE (16, *) 
-      END IF
-
-
-*     DATASET 4  [ZEUS, Phys.Lett.B573:46-62,2003, hep-ex/0305028]
-*       X = Q2,   Y = SIG   (TCUT = - \inf GeV ???)
-*       W = 89 GeV
-
-      W2 = 89.0d0**2
-      N = 6
-      CALL READDATA ('DATASET4', N, X, Y, DY)
-      DO I= 1, N
-      Q2 = X(I)
-      XI = Q2 / ( 2.0d0 * W2 + Q2)
-      FITFN = SIGMA()
-      CHISQ = CHISQ + ( (FITFN - Y(I))**2 / DY(I)**2 )
-      IF (IFLAG .EQ. 3)  THEN
-        WRITE (16, *) X(I), FITFN
-      END IF
-      END DO
-
-      IF (IFLAG .EQ. 3)  THEN
-*       empty line for separation of different fit lines
-        WRITE (16, *) 
-      END IF
-
-
-*     DATASET 5  [H1,  Eur.Phys.J.C44:1-11,2005, hep-ex/0505061]
-*       X = W,   Y = SIG   (TCUT = - 1 GeV)
-*       Q2 = 8 GeV^2
-
-      Q2 = 8.0d0
-      N = 5
-      CALL READDATA ('DATASET5', N, X, Y, DY)
-      DO I= 1, N
-      W2 = X(I)**2
-      XI = Q2 / ( 2.0d0 * W2 + Q2)
-      FITFN = SIGMA()
-      CHISQ = CHISQ + ( (FITFN - Y(I))**2 / DY(I)**2 )
-      IF (IFLAG .EQ. 3)  THEN
-        WRITE (16, *) X(I), FITFN
-      END IF
-      END DO
-
-      IF (IFLAG .EQ. 3)  THEN
-*       empty line for separation of different fit lines
-        WRITE (16, *) 
-      END IF
-
-
-*     DATASET 6  [ZEUS, Phys.Lett.B573:46-62,2003, hep-ex/0305028]
-*       X = W,   Y = SIG   (TCUT = - \inf GeV ???)
-*       Q2 = 9.6 GeV
-
-      Q2 = 9.6d0
-      N = 10
-      CALL READDATA ('DATASET6', N, X, Y, DY)
-      DO I= 1, N
-      W2 = X(I)**2
-      XI = Q2 / ( 2.0d0 * W2 + Q2)
-      FITFN = SIGMA()
-      CHISQ = CHISQ + ( (FITFN - Y(I))**2 / DY(I)**2 )
-      IF (IFLAG .EQ. 3)  THEN
-        WRITE (16, *) X(I), FITFN
-      END IF
-      END DO
-
-      END IF
-
-
-
-      IF ( INCLUDEDIS ) THEN
-
-*     DATASET 7  [H1,  Nucl.Phys.B470(96)3]
-*       X = Q2,   Y = F2
-*       X_BJ = 0.002
-
-      XI = 0.002d0
-      N = 9
-      CALL READDATA ('DATASET7', N, X, Y, DY)
-      DO I= 1, N
-      Q2 = X(I)
-      CALL F2F
-      FITFN = F2(1)
-      CHISQ = CHISQ + ( (FITFN - Y(I))**2 / DY(I)**2 )
-      IF (IFLAG .EQ. 3)  THEN
-        WRITE (16, *) X(I), FITFN
-      END IF
-      END DO
-
-      IF (IFLAG .EQ. 3)  THEN
-*       empty line for separation of different fit lines
-        WRITE (16, *) 
-      END IF
-
-*     DATASET 8  [H1,  Nucl.Phys.B470(96)3]
-*       X = Q2,   Y = F2
-*       X_BJ = 0.0005
-
-      XI = 0.0005d0
-      N = 8
-      CALL READDATA ('DATASET8', N, X, Y, DY)
-      DO I= 1, N
-      Q2 = X(I)
-      CALL F2F
-      FITFN = F2(1)
-      CHISQ = CHISQ + ( (FITFN - Y(I))**2 / DY(I)**2 )
-      IF (IFLAG .EQ. 3)  THEN
-        WRITE (16, *) X(I), FITFN
-      END IF
-      END DO
-
-      IF (IFLAG .EQ. 3)  THEN
-*       empty line for separation of different fit lines
-        WRITE (16, *) 
-      END IF
-
-*     DATASET 9  [H1,  Nucl.Phys.B470(96)3]
-*       X = X_BJ,   Y = F2
-*       Q2 = 8.5 GeV^2
-
-      Q2 = 8.5d0
-      N = 9
-      CALL READDATA ('DATASET9', N, X, Y, DY)
-      DO I= 1, N
-      XI = X(I)
-      CALL F2F
-      FITFN = F2(1)
-      CHISQ = CHISQ + ( (FITFN - Y(I))**2 / DY(I)**2 )
-      IF (IFLAG .EQ. 3)  THEN
-        WRITE (16, *) X(I), FITFN
-      END IF
-      END DO
-
-      IF (IFLAG .EQ. 3)  THEN
-*       empty line for separation of different fit lines
-        WRITE (16, *) 
-      END IF
-
-
-*     DATASET 0  [H1,  Nucl.Phys.B470(96)3]
-*       X = X_BJ,   Y = F2
-*       Q2 = 15 GeV^2
-
-      Q2 = 15.0d0
-      N = 9
-      CALL READDATA ('DATASET0', N, X, Y, DY)
-      DO I= 1, N
-      XI = X(I)
-      CALL F2F
-      FITFN = F2(1)
-      CHISQ = CHISQ + ( (FITFN - Y(I))**2 / DY(I)**2 )
-      IF (IFLAG .EQ. 3)  THEN
-        WRITE (16, *) X(I), FITFN
-      END IF
-      END DO
-
-      ENDIF
-
-      F = CHISQ
-
-*  Final commands executed after fit is done
       IF (IFLAG .EQ. 3)  THEN
          WRITE (*,*) 'CHISQ = ', CHISQ
-         CLOSE (16)
+         CLOSE (21)
+         CALL PGEND
       END IF
+
 
       RETURN
       END
 C     ****
 
 
-C     ****s* fit.f/READDATA
+C     ****s* fit.f/PROCDATA
 C  NAME
-C    READDATA   --  Reads in data set.
+C    PROCDATA   --  Process a single data set
+C  DESCRIPTION
+C    Reads experimental datasets and calculates chi-square by
+C    comparing to theoretical prediction functions.
+C    Writes out theoretical line points for fit plotting.
 C  SYNOPSIS
-C     SUBROUTINE READDATA (FILENAME, N, X, Y, DY)
+C     SUBROUTINE PROCDATA (FNAME, IFLAG, CHISQPART)
 C
-C     CHARACTER  FILENAME*8
-C     INTEGER N
-C     DOUBLE PRECISION X(NMAX), Y(NMAX), DY(NMAX)
+C     CHARACTER  FNAME*15
+C     INTEGER IFLAG
+C     DOUBLE PRECISION CHISQPART
 C  INPUTS
-C   FILENAME  --  Name of the file containing data
-C          N  --  Number of points i.e. lines in the file
+C      FNAME  --  Name of the file containing data
+C      IFLAG  --  If .EQ. 3 then print results out, see minuit doc
 C  OUTPUT
-C          X  --  Array with x-values of experimental points
-C          Y  --  Array with y-values of experimental points
-C         DY  --  Array with errors of y-values
+C   CHISQPART --  contribution to chi-square from processed data set
 C  SOURCE
 C
-      SUBROUTINE READDATA (FILENAME, N, X, Y, DY)
+      SUBROUTINE PROCDATA (FNAME, IFLAG, CHISQPART)
 
-      CHARACTER  FILENAME*8
-      INTEGER N
-      INTEGER I, NMAX
-      PARAMETER (NMAX=40)
-      DOUBLE PRECISION X(NMAX), Y(NMAX), DY(NMAX)
-      DOUBLE PRECISION STAT, SYST
+      IMPLICIT NONE
+      CHARACTER  FNAME*15
+      INTEGER IFLAG
+      DOUBLE PRECISION CHISQPART
+      CHARACTER YOBS*8
+      INTEGER N, K
+      DOUBLE PRECISION X, Y, DY, THY, DIFSG
+      DOUBLE PRECISION STAT, SYS
+      DOUBLE PRECISION XI, DEL2, Q2, Q02,  W
+      DOUBLE PRECISION WIN, Q2IN
+      DOUBLE PRECISION XBJ, XBJIN
+      DOUBLE PRECISION PARSIGMA, SIGMA
+      DOUBLE PRECISION F2(0:2)
 
-      OPEN (UNIT = 15, FILE = FILENAME, STATUS = 'OLD')
-      DO 11 I=1,N
-      READ (15, *) X(I), Y(I), STAT, SYS
-*      Adding stat. i syst. errors in quadrature:
- 11   DY(I) = SQRT( STAT*STAT + SYS*SYS )
-      CLOSE (15)
+      COMMON / KINEMATICS /  XI, DEL2, Q2, Q02
+      COMMON / F2P        /  F2
+
+      CHISQPART = 0.d0
+
+      IF (IFLAG .EQ. 3) THEN
+        CALL PGPAGE
+        CALL PGVSTD
+      END IF
+
+      OPEN (UNIT = 12, FILE = FNAME, STATUS = 'OLD')
+
+      READ (12,*) YOBS
+
+      IF (YOBS(:2) .EQ. 'PA') THEN
+
+        READ (12,*) W
+        READ (12,*) Q2
+        READ (12,*) N
+
+        XI = Q2 / ( 2.0d0 * W**2 + Q2)
+        IF (IFLAG .EQ. 3) THEN
+          CALL PGSWIN (0., 1., -1.3, 2.)
+          CALL PGBOX ('BCNST1', 0.0, 0, 'BCLNST', 0.0, 0)
+          CALL PGLAB("-t", 'd\\gs/dt', FNAME)
+        END IF
+
+        DO 110 K = 1, N
+        READ (12, *) X, Y, STAT, SYS
+        DY = SQRT( STAT*STAT + SYS*SYS )
+        THY = PARSIGMA(X)
+        CHISQPART = CHISQPART + ( (THY - Y)**2 / DY**2 )
+        IF (IFLAG .EQ. 3)  THEN
+          DIFSG = (THY - Y) / DY
+          WRITE (21, 901) X, THY, Y, DY, DIFSG
+          CALL PGERRY(1, SNGL(X), LOG10(SNGL(Y-DY)), LOG10(SNGL(Y+DY)),
+     &           3.0)
+          CALL PGSCI(2)
+          CALL PGPT1(SNGL(X), LOG10(SNGL(THY)), 17)
+          CALL PGSCI(1)
+        END IF
+110     CONTINUE
+
+      ELSE IF (YOBS(:2) .EQ. 'SI') THEN
+
+        READ (12,*) WIN
+        READ (12,*) Q2IN
+        READ (12,*) N
+
+        DO 120 K = 1, N
+        READ (12, *) X, Y, STAT, SYS
+        DY = SQRT( STAT*STAT + SYS*SYS )
+*   Which of W or Q2 is on x-axis?
+        IF (WIN .LT. 0.) THEN
+          W = X
+          Q2 = Q2IN
+          IF (IFLAG .EQ. 3) THEN
+            CALL PGSWIN (30., 140., 0., 12.)
+            CALL PGBOX ('BCNST1', 0.0, 0, 'BCNST', 0.0, 0)
+            CALL PGLAB("W", '\\gs', FNAME)
+          END IF
+        ELSE IF (Q2IN .LT. 0) THEN
+          Q2 = X
+          W = WIN
+          IF (IFLAG .EQ. 3) THEN
+            CALL PGSWIN (0., 90., -1.7, 1.4)
+            CALL PGBOX ('BCNST1', 0.0, 0, 'BCLNST', 0.0, 0)
+            CALL PGLAB("Q\\u2\\d", '\\gs', FNAME)
+          END IF
+        ELSE
+          CALL ERROR ('GeParD', 'PROCDATA',
+     &    'Either W or Q2 in ' // FNAME // ' should be negative!',
+     &    4, 2)
+        END IF
+        XI = Q2 / (2.0d0 * W**2 + Q2)
+        THY = SIGMA()
+        CHISQPART = CHISQPART + ( (THY - Y)**2 / DY**2 )
+        IF (IFLAG .EQ. 3)  THEN
+          DIFSG = (THY - Y) / DY
+          WRITE (21, 901) X, THY, Y, DY, DIFSG
+          IF (WIN .LT. 0.) THEN
+            CALL PGERRY(1, SNGL(X), SNGL(Y-DY), SNGL(Y+DY), 3.0)
+            CALL PGSCI(2)
+            CALL PGPT1(SNGL(X), SNGL(THY), 17)
+          ELSE
+          CALL PGERRY(1, SNGL(X), LOG10(SNGL(Y-DY)), LOG10(SNGL(Y+DY)),
+     &           3.0)
+          CALL PGSCI(2)
+          CALL PGPT1(SNGL(X), LOG10(SNGL(THY)), 17)
+        END IF
+        CALL PGSCI(1)
+        END IF
+120     CONTINUE
+
+      ELSE IF (YOBS(:2) .EQ. 'F2') THEN
+
+        READ (12,*) XBJIN
+        READ (12,*) Q2IN
+        READ (12,*) N
+
+        DO 130 K = 1, N
+        READ (12, *) X, Y, STAT, SYS
+        DY = SQRT( STAT*STAT + SYS*SYS )
+*   Which of X_BJ or Q2 is on x-axis?
+        IF (XBJIN .LT. 0.) THEN
+          XBJ = X
+          Q2 = Q2IN
+          IF (IFLAG .EQ. 3) THEN
+            CALL PGSWIN (0., 0.01, 0., 1.5)
+            CALL PGBOX ('BCNST1', 0.0, 0, 'BCNST', 0.0, 0)
+            CALL PGLAB("x\\dBJ\\u", 'F\\d2\\u(x\\dBJ\\u)', FNAME)
+          END IF
+        ELSE IF (Q2IN .LT. 0) THEN
+          Q2 = X
+          XBJ = XBJIN
+          IF (IFLAG .EQ. 3) THEN
+            CALL PGSWIN (0., 70., 0., 1.5)
+            CALL PGBOX ('BCNST1', 0.0, 0, 'BCNST', 0.0, 0)
+            CALL PGLAB("Q\\u2\\d", 'F\\d2\\u(Q\\u2\\d)', FNAME)
+          END IF
+        ELSE
+          CALL ERROR ('GeParD', 'PROCDATA',
+     &    'Either XBJ or Q2 in ' // FNAME // ' should be negative!',
+     &    4, 2)
+        END IF
+        XI = XBJ
+        CALL F2F
+        THY = F2(1)
+        CHISQPART = CHISQPART + ( (THY - Y)**2 / DY**2 )
+        IF (IFLAG .EQ. 3)  THEN
+          DIFSG = (THY - Y) / DY
+          WRITE (21, 901) X, THY, Y, DY, DIFSG
+          CALL PGERR1(6, SNGL(X), SNGL(Y), SNGL(DY), 3.0)
+          CALL PGSCI(2)
+          CALL PGPT1(SNGL(X), SNGL(THY), 17)
+          CALL PGSCI(1)
+        END IF
+130     CONTINUE
+      ELSE
+
+        CALL ERROR ('GeParD', 'PROCDATA',
+     &  'Record ' // YOBS // ' in ' // FNAME // ' unrecognized',
+     &  3, 2)
+
+      END IF
+
+      CLOSE (12)
+901   FORMAT (1X, F10.6, 5X, F9.4, 5X, F9.4, 3X, F7.2, 4X, F5.1)
 
       RETURN
       END

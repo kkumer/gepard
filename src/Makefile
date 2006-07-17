@@ -17,6 +17,8 @@ FFLAGS =  $(DEBUG)
 
 # Where are CERNLIB's kernlib and packlib
 LIBS =  -L$(HOME)/local/lib
+# Where are pgplot and X11 libs
+PGLIBS = -L$(HOME)/local/lib/pgplot -L/usr/X11R6/lib
 
 # Directories for storing object files
 FODIR = Fobj
@@ -72,7 +74,7 @@ scaledep: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Fscaledep.o $(FODIR)/Fderiv.o
 	$(FC) -o $@ $^ $(FFLAGS) $(LIBS) 
 
 fit: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Ffit.o $(ODIR)/flushout.o
-	$(FC) -o $@ $^ $(FFLAGS) $(LIBS) -lpacklib -lkernlib
+	$(FC) -o $@ $^ $(FFLAGS) $(LIBS) -lpacklib -lkernlib $(PGLIBS) -lpgplot -lX11
 
 
 .PHONY: clean
