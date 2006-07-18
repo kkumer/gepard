@@ -10,3 +10,10 @@
 -  Check plotting of error-bars (Implement stat-syst as in 
    original papers and Dieter's femtoholographic paper?)
    It seems that grace is doing this wrong for log-y axis!
+
+-  Remove unused variables (specially in adacf, or specially
+   not there)?
+
+-  Verbatim \ref in robodoc TeX?
+
+-  Beautify Robodoc output.

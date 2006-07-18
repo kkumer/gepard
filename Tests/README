@@ -1,9 +1,9 @@
-FIG2A.DAT (FIG1A.DAT) is part of data from Fig. 2 (1) from our Letter. 
-After compiling with make scaledep (radcorr) and running scaledep (radcorr) program, 
-consistency should be checked by
+FIG2A.DAT (FIG1A.DAT) is part of data from Fig. 2 (1) from the letter
+hep-ph/0605237.  After compiling with make scaledep (radcorr) and running
+scaledep (radcorr) program, consistency should be checked by
 
 diff Tests/FIG2A.DAT FIG2A.DAT
 
-(diff Tests/FIG2A.DAT FIG2A.DAT)
+(diff Tests/FIG1A.DAT FIG1A.DAT)
 
 Or, better, diff -> vimdiff

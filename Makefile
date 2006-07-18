@@ -16,9 +16,9 @@
 
 
 # targets
-SRCTARGETS = radcorr scaledep fit test auxtest
-DOCTARGETS = pdf html
+SRCTARGETS = radcorr scaledep fit test auxtest fit_noplot
 .PHONY: $(SRCTARGETS)
+DOCTARGETS = pdf html
 
 all: $(SRCTARGETS) $(DOCTARGETS)
 
@@ -30,7 +30,7 @@ $(SRCTARGETS):
 doc: html pdf
 
 pdf: tex
-	$(MAKE) -C doc/tex pdf
+	$(MAKE) -C doc/tex apipdf
 
 tex:
 	robodoc --rc doc/robodoc.rc --latex --singledoc --toc --index --doc ./doc/tex/gepard-api
@@ -48,6 +48,7 @@ clean:
 	$(MAKE) -C doc/tex clean
 	-rm doc/html/*
 	-rm -f $(SRCTARGETS)
+	-rm -f $(patsubst %,%.exe,$(SRCTARGETS))
 	-rm fits/FIT.OUT fits/gmon.out fits/*.ps
 	-rm FIG*DAT gmon.out
 

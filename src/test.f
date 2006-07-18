@@ -7,11 +7,13 @@ C     *******
 
 C     ****p* test.f/TEST
 C  NAME
-C    TEST  --  Tests routines
+C    TEST  --  Testing gepard routines
 C            
 C  DESCRIPTION
 C             Calculates various stuff for fixed 
-C             paramterers.
+C             parameters and prints out together
+C             with confirmed results from old
+C             Mathematica version of gepard
 C
 C  CHILDREN
 C      SIGMA

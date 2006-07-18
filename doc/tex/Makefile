@@ -1,10 +1,13 @@
+pdf: dvi
+	dvipdf gepard.dvi
+
 dvi: gepard.tex
 	latex gepard.tex
 
-pdf: apidvi
+apipdf: apidvi
 	dvipdf gepard-api.dvi
 
-apips: gepard-api.dvi
+apips: apidvi
 	dvips -o gepard-api.ps gepard-api.dvi
 
 apidvi: gepard-api.tex

@@ -1,8 +1,8 @@
 
 gepard = calculating Compton form factors from moments of
-         General PARton Distributions 
+         GEneral PARton Distributions 
 
-- Version 0.89 2006-07-12 
+- Version 0.9b1 2006-07-18 
 
 
 
@@ -42,7 +42,7 @@ mma/gepard.exe - binary FORTRAN library. (Linux and Windows versions)
 
 Note that present version of gepard is considered Fortran-only. These mathematica
 packages and notebook are old (but should be correct) version, which can be
-used for checking and investigation of Fotran algorithms, but is much slower.
+used for checking and investigation of Fortran algorithms, but is much slower.
            
 
 
@@ -55,7 +55,11 @@ documentation (they should be originally provided in gepard.tgz):
 
 make test  - creates simple executable for testing
 make fit   - creates executable for fitting (you should specify position of
-             CERNLIB's kernlib and packlib libraries in src/Makefile)
+             CERNLIB's kernlib and packlib libraries as well as PGPLOT
+             library in src/Makefile)
+make fit_noplot - creates executable for fitting without plotting (you 
+             should specify position of CERNLIB's kernlib and packlib 
+             libraries in src/Makefile)
 make radcorr - executable for Fig 1 of Letter
 make scaledep - executable for Fig 2 of Letter
 make hmtl  - creates HTML documentation (needs robodoc software)
@@ -71,14 +75,14 @@ make clean - removes everything which is easily recreatable
   Unix shell command!)  and see if numbers come out right.
   Try increasing SPEED in GEPARD.INI and see how numbers get worse.
 
-For fitting with minuit:
+For fitting with Minuit:
 
 - use provided binary 'fit' if you can, or create it by 'make fit'
 
-- Commands for driving minuit and for specifying initial values of
-  fitting parameters are in file MINUIT.CMD (see minuit manual for their
+- Commands for driving Minuit and for specifying initial values of
+  fitting parameters are in file MINUIT.CMD (see Minuit manual for their
   meaning!), and final fit result goes to file FIT.OUT, where each stanza
-  corresponds to one input data set. Output of minuit itself is going to terminal,
+  corresponds to one input data set. Output of Minuit itself is going to terminal,
   so to save it use e.g.  './fit | tee -a savefile'
 
 - parameters (not for fit but for everything else) are specified in GEPARD.INI
@@ -122,3 +126,32 @@ returning to 2nd for details and lower level functions if needed, and only then
 use ?CFF, ?interpol, ?interpolfix, ?Fpw, ?cDVCS, ?RAope, ?Fcm, ?common, ?AS2P
 which are a bit cryptic.
 
+====================================================================
+2. Installation of PGPLOT library
+====================================================================
+
+PGPLOT is Fortran 77 library for plotting diagrams. It can be found at
+http://www.astro.caltech.edu/~tjp/pgplot/
+Gepard's fitting program 'fit' uses this library to plot final
+results for easy inspection.
+
+2.1 Installation under Linux
+
+It's straightforward. Just follow the instructions at
+http://www.astro.caltech.edu/~tjp/pgplot/install-unix.html
+
+
+2.2. Installation under Windows
+
+As with the whole of gepard, only usage inside cygwin environment
+is supported. I have tried only Postscript PGPLOT driver /PSDRIV, but
+also /XWINDOW should work (I have cygwin without X-Windows).
+For PS-only version, I successfully compiled PGPLOT library using
+configuration file on top of page
+http://www.astro.caltech.edu/~tjp/pgplot/install-gnuwin.html
+This I put into file sys_cygwin/g77_gcc.conf (instead of what's there
+by default), and then I followed Unix installation instructions on
+http://www.astro.caltech.edu/~tjp/pgplot/install-unix.html
+
+My "makemake" command was
+<...>/pgplot/makemake <...>/pgplot  cygwin  g77_gcc

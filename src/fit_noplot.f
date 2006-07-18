@@ -2,7 +2,7 @@ C     ****h* gepard/fit.f
 C  FILE DESCRIPTION
 C    Fitting of DVCS (and DIS in future) experimental data.
 C
-C    $Id$
+C    $Id: fit.f 17 2006-07-17 14:44:31Z kuk05260 $
 C     *******
 
 C     ****p* fit.f/FIT
@@ -114,7 +114,8 @@ C
       INTEGER NPAR, IFLAG
       DOUBLE PRECISION CHISQ, FUTIL
       DOUBLE PRECISION A(NPAR),GIN(NPAR)
-      INTEGER K, IER, PGBEG
+      INTEGER K, IER
+C     INTEGER PGBEG
       DOUBLE PRECISION FITPAR(10)
       DOUBLE PRECISION CHISQPART
       CHARACTER DATAFNAME*15
@@ -144,11 +145,9 @@ C
       OPEN (UNIT = 11, FILE = 'FIT.INI', STATUS = 'OLD')
       READ (11, *) OUTFILE
 *    Initailization of plotting on 2x2 grid of panels
-      IF (IFLAG .EQ. 3)  THEN
-        IER = PGBEG(0, OUTFILE, 2, 2)
-        IF (IER.NE.1) STOP
-        CALL PGSCH(1.5)
-      END IF
+C     IER = PGBEG(0, OUTFILE, 2, 2)
+C     IF (IER.NE.1) STOP
+C     CALL PGSCH(1.5)
 
 *     Process only files specified in FIT.INI between
 *      'START' and 'STOP'
@@ -169,7 +168,7 @@ C
       IF (IFLAG .EQ. 3)  THEN
          WRITE (*,*) 'CHISQ = ', CHISQ
          CLOSE (21)
-         CALL PGEND
+C        CALL PGEND
       END IF
 
 
@@ -219,10 +218,10 @@ C
 
       CHISQPART = 0.d0
 
-      IF (IFLAG .EQ. 3) THEN
-        CALL PGPAGE
-        CALL PGVSTD
-      END IF
+C     IF (IFLAG .EQ. 3) THEN
+C       CALL PGPAGE
+C       CALL PGVSTD
+C     END IF
 
       OPEN (UNIT = 12, FILE = FNAME, STATUS = 'OLD')
 
@@ -235,12 +234,11 @@ C
         READ (12,*) N
 
         XI = Q2 / ( 2.0d0 * W**2 + Q2)
-        IF (IFLAG .EQ. 3) THEN
-          CALL PGSWIN (0., 1., -1.3, 2.)
-          CALL PGBOX ('BCNST1', 0.0, 0, 'BCLNST', 0.0, 0)
-          CALL PGLAB("-t", 'd\\gs/dt', FNAME)
-          WRITE (21, 902) FNAME
-        END IF
+C       IF (IFLAG .EQ. 3) THEN
+C         CALL PGSWIN (0., 1., -1.3, 2.)
+C         CALL PGBOX ('BCNST1', 0.0, 0, 'BCLNST', 0.0, 0)
+C         CALL PGLAB("-t", 'd\\gs/dt', FNAME)
+C       END IF
 
         DO 110 K = 1, N
         READ (12, *) X, Y, STAT, SYS
@@ -250,11 +248,11 @@ C
         IF (IFLAG .EQ. 3)  THEN
           DIFSG = (THY - Y) / DY
           WRITE (21, 901) X, THY, Y, DY, DIFSG
-          CALL PGERRY(1, SNGL(X), LOG10(SNGL(Y-DY)), LOG10(SNGL(Y+DY)),
-     &           3.0)
-          CALL PGSCI(2)
-          CALL PGPT1(SNGL(X), LOG10(SNGL(THY)), 17)
-          CALL PGSCI(1)
+C         CALL PGERRY(1, SNGL(X), LOG10(SNGL(Y-DY)), LOG10(SNGL(Y+DY)),
+C    &           3.0)
+C         CALL PGSCI(2)
+C         CALL PGPT1(SNGL(X), LOG10(SNGL(THY)), 17)
+C         CALL PGSCI(1)
         END IF
 110     CONTINUE
 
@@ -271,20 +269,19 @@ C
         IF (WIN .LT. 0.) THEN
           W = X
           Q2 = Q2IN
-          IF (IFLAG .EQ. 3) THEN
-            CALL PGSWIN (30., 140., 0., 12.)
-            CALL PGBOX ('BCNST1', 0.0, 0, 'BCNST', 0.0, 0)
-            CALL PGLAB("W", '\\gs', FNAME)
-            WRITE (21, 902) FNAME
-          END IF
+C         IF (IFLAG .EQ. 3) THEN
+C           CALL PGSWIN (30., 140., 0., 12.)
+C           CALL PGBOX ('BCNST1', 0.0, 0, 'BCNST', 0.0, 0)
+C           CALL PGLAB("W", '\\gs', FNAME)
+C         END IF
         ELSE IF (Q2IN .LT. 0) THEN
           Q2 = X
           W = WIN
-          IF (IFLAG .EQ. 3) THEN
-            CALL PGSWIN (0., 90., -1.7, 1.4)
-            CALL PGBOX ('BCNST1', 0.0, 0, 'BCLNST', 0.0, 0)
-            CALL PGLAB("Q\\u2\\d", '\\gs', FNAME)
-          END IF
+C         IF (IFLAG .EQ. 3) THEN
+C           CALL PGSWIN (0., 90., -1.7, 1.4)
+C           CALL PGBOX ('BCNST1', 0.0, 0, 'BCLNST', 0.0, 0)
+C           CALL PGLAB("Q\\u2\\d", '\\gs', FNAME)
+C         END IF
         ELSE
           CALL ERROR ('GeParD', 'PROCDATA',
      &    'Either W or Q2 in ' // FNAME // ' should be negative!',
@@ -296,17 +293,17 @@ C
         IF (IFLAG .EQ. 3)  THEN
           DIFSG = (THY - Y) / DY
           WRITE (21, 901) X, THY, Y, DY, DIFSG
-          IF (WIN .LT. 0.) THEN
-            CALL PGERRY(1, SNGL(X), SNGL(Y-DY), SNGL(Y+DY), 3.0)
-            CALL PGSCI(2)
-            CALL PGPT1(SNGL(X), SNGL(THY), 17)
-          ELSE
-          CALL PGERRY(1, SNGL(X), LOG10(SNGL(Y-DY)), LOG10(SNGL(Y+DY)),
-     &           3.0)
-          CALL PGSCI(2)
-          CALL PGPT1(SNGL(X), LOG10(SNGL(THY)), 17)
-        END IF
-        CALL PGSCI(1)
+C         IF (WIN .LT. 0.) THEN
+C           CALL PGERRY(1, SNGL(X), SNGL(Y-DY), SNGL(Y+DY), 3.0)
+C           CALL PGSCI(2)
+C           CALL PGPT1(SNGL(X), SNGL(THY), 17)
+C         ELSE
+C         CALL PGERRY(1, SNGL(X), LOG10(SNGL(Y-DY)), LOG10(SNGL(Y+DY)),
+C    &           3.0)
+C         CALL PGSCI(2)
+C         CALL PGPT1(SNGL(X), LOG10(SNGL(THY)), 17)
+C         END IF
+C       CALL PGSCI(1)
         END IF
 120     CONTINUE
 
@@ -323,19 +320,19 @@ C
         IF (XBJIN .LT. 0.) THEN
           XBJ = X
           Q2 = Q2IN
-          IF (IFLAG .EQ. 3) THEN
-            CALL PGSWIN (0., 0.01, 0., 1.5)
-            CALL PGBOX ('BCNST1', 0.0, 0, 'BCNST', 0.0, 0)
-            CALL PGLAB("x\\dBJ\\u", 'F\\d2\\u(x\\dBJ\\u)', FNAME)
-          END IF
+C         IF (IFLAG .EQ. 3) THEN
+C           CALL PGSWIN (0., 0.01, 0., 1.5)
+C           CALL PGBOX ('BCNST1', 0.0, 0, 'BCNST', 0.0, 0)
+C           CALL PGLAB("x\\dBJ\\u", 'F\\d2\\u(x\\dBJ\\u)', FNAME)
+C         END IF
         ELSE IF (Q2IN .LT. 0) THEN
           Q2 = X
           XBJ = XBJIN
-          IF (IFLAG .EQ. 3) THEN
-            CALL PGSWIN (0., 70., 0., 1.5)
-            CALL PGBOX ('BCNST1', 0.0, 0, 'BCNST', 0.0, 0)
-            CALL PGLAB("Q\\u2\\d", 'F\\d2\\u(Q\\u2\\d)', FNAME)
-          END IF
+C         IF (IFLAG .EQ. 3) THEN
+C           CALL PGSWIN (0., 70., 0., 1.5)
+C           CALL PGBOX ('BCNST1', 0.0, 0, 'BCNST', 0.0, 0)
+C           CALL PGLAB("Q\\u2\\d", 'F\\d2\\u(Q\\u2\\d)', FNAME)
+C         END IF
         ELSE
           CALL ERROR ('GeParD', 'PROCDATA',
      &    'Either XBJ or Q2 in ' // FNAME // ' should be negative!',
@@ -348,10 +345,10 @@ C
         IF (IFLAG .EQ. 3)  THEN
           DIFSG = (THY - Y) / DY
           WRITE (21, 901) X, THY, Y, DY, DIFSG
-          CALL PGERR1(6, SNGL(X), SNGL(Y), SNGL(DY), 3.0)
-          CALL PGSCI(2)
-          CALL PGPT1(SNGL(X), SNGL(THY), 17)
-          CALL PGSCI(1)
+C         CALL PGERR1(6, SNGL(X), SNGL(Y), SNGL(DY), 3.0)
+C         CALL PGSCI(2)
+C         CALL PGPT1(SNGL(X), SNGL(THY), 17)
+C         CALL PGSCI(1)
         END IF
 130     CONTINUE
       ELSE
@@ -363,13 +360,7 @@ C
       END IF
 
       CLOSE (12)
-901   FORMAT (1X, F10.6, 5X, F9.4, 5X, F9.4, 3X, F7.2, 7X, F5.1)
-902   FORMAT (1X, 72('-') / 1X, '|', 30(' '), A, 26(' '), '|', // 
-     &  1X, "|     X", 4X, 
-     &"     Y(X)_THEOR", 4X, "Y(X)_EXP",
-     &  3X, "  DY_EXP", 2X, "(THEOR-EXP)/DY_EXP  |" / 1X, 72('-'))
-!          WRITE (21, 902) "X", "Y(X)_THEOR", "Y(X)_EXP", "SIGMA",
-!     &      "(THEOR-EXP)/SIGMA"
+901   FORMAT (1X, F10.6, 5X, F9.4, 5X, F9.4, 3X, F7.2, 4X, F5.1)
 
       RETURN
       END
