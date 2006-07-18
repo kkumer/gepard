@@ -1,7 +1,15 @@
 Version 0.88  (2006-07-02)
 
-- Initial version
-- Imported into subversion versioning system
-- Target gepard.exe is broken (so calling from Mathematica
-doesn't work) but "pure Fortran" targets work and produce
-data equivalent with Figs 1 and 2 of Letter
+	- Initial version
+	- Imported into subversion versioning system
+	- Target gepard.exe is broken (so calling from Mathematica
+		doesn't work) but "pure Fortran" targets work and produce
+		data equivalent with Figs 1 and 2 of Letter
+
+- Version 0.82 (2006-04-06)
+	-Numerical integration improved by subdivision of path:
+	-LAM..-1/2..1/2..LAM 
+
+- Version 0.8 2006-03-24                                                                                                       
+
+- Version 0.7 2006-03-20                                                                                                       

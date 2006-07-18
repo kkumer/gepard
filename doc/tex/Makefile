@@ -1,21 +1,26 @@
-pdf: dvi
-	dvipdf gepard.dvi
+view: gepard.dvi
+	xdvi $^
 
-dvi: gepard.tex
-	latex gepard.tex
+allpdfs: gepard.pdf gepard-api.pdf
 
-apipdf: apidvi
-	dvipdf gepard-api.dvi
+%.pdf: %.dvi
+	dvipdf $^
 
-apips: apidvi
-	dvips -o gepard-api.ps gepard-api.dvi
+%.ps: %.dvi
+	dvips -o $@ $^
 
-apidvi: gepard-api.tex
-	latex gepard-api.tex
-	latex gepard-api.tex
-	makeindex gepard-api.idx
-	latex gepard-api.tex
+# FIXME: write/find more sophisticated rule
+%.dvi: %.tex
+	latex $^
+	-bibtex $*
+	latex $^
+	latex $^
+	-makeindex $*.idx
+	latex $^
 
 .PHONY: clean
 clean:
+	-rm -f gepard-api.* gepard.{log,aux,dvi,pdf,ps,blg}
+
+realclean:
 	-rm -f gepard-api.* gepard.{log,aux,dvi,pdf,ps,blg,bbl}

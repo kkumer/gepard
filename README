@@ -2,77 +2,38 @@
 gepard = calculating Compton form factors from moments of
          GEneral PARton Distributions 
 
-- Version 0.9b1 2006-07-18 
+
+- Version 0.9b2 2006-07-18 
 
 
+Contents of this README
+-----------------------
 
-========================================================================
-1. Files, and what they are:
-========================================================================
+1. Basic usage
+        1.1 Fitting with Fortran executables
+        1.2 Calculating CFFs in Mathematica
 
-Makefile - use this if needed to compile Fortran and create documentation.
-           See section 2 of this README.
+2. Compilation and installation
+        2.1 Unix requirements
+        2.2 Microsoft Windows requirements
+        2.3 Compilation targets
+        2.4 Installation of PGPLOT library
+                2.4.1 Linux
+                2.4.2. Microsoft Windows
 
-1.1 Documentation
------------------
+3. Files, and what they are
+        3.1 Documentation
+        3.2 Fortran part
+        3.3 Mathematica part
 
-README - this file
-doc/tex/gepard.pdf  -  simple manual for gepard
-doc/tex/gepard-api.pdf  - extensive description of subroutines
-doc/html/masterindex.html - HTML equivalent of gepard-api.pdf
-
-
-1.2 Fortran part
-----------------
-
-src/ - Fortran sources
-src/adacf/  - sources for DIS anomal. dimensions and Wilson coeffs.
-Tests/  - some numbers from Letter, useful for testing. See README.
-fits/ - everything needed for fitting and plotting fits
-
-
-1.3 Mathematica part
---------------------
-
-Note that present version of gepard is considered Fortran-only. Mathematica
-packages and notebooks correspond to older version gepard-0.8* (which was
-used also for hep-ph/0605237 letter numerics). They are not needed but are
-useful for checking and investigation of Fortran algorithms. (They are slow.)
-
-Test/mma-check/gepard.m  - Mathematica package. For basic documentation try ?CFF and ?Fcm
-Test/mma-check/gepard.nb - Notebook with checks and timings. Section 1 and then 3 are good
-            introduction.  Section 2 of this notebook is good
-            for understanding which routines are available and 
-            for understanding correspondence with DM's CFFNNLO.nb routines.
-Test/mma-check/gepard.exe - binary FORTRAN library. (Linux and Windows versions)
-Test/mma-check/CFFNNLO_KK.nb - Notebook needed if one wants to recalculate referent
-                               results in gepard.nb
-
-
-====================================================================
-2. Installation and usage
-====================================================================
-
-You need to "make" stuff only if you want to recreate executables and
-documentation (they should be originally provided in gepard.tgz):
-
-make test  - creates simple executable for testing
-make fit   - creates executable for fitting (you should specify position of
-             CERNLIB's kernlib and packlib libraries as well as PGPLOT
-             library in src/Makefile)
-make fit_noplot - creates executable for fitting without plotting (you 
-             should specify position of CERNLIB's kernlib and packlib 
-             libraries in src/Makefile)
-make radcorr - executable for Fig 1 of Letter
-make scaledep - executable for Fig 2 of Letter
-make hmtl  - creates HTML documentation (needs robodoc software)
-make pdf   - create LaTeX documentation (needs robodoc software)
-make all   - makes everything above and maybe more
-make clean - removes everything which is easily recreatable
 
 ========================================
-2.1 Calculating and fitting with Fortran
+1. Basic usage
 ========================================
+
+
+1.1 Fitting with Fortran executables
+--------------------------------------
 
 - First try to run executable './test' (Not 'test' which is a built-in
   Unix shell command!)  and see if numbers come out right.
@@ -80,29 +41,38 @@ make clean - removes everything which is easily recreatable
 
 For fitting with Minuit:
 
-- use provided binary 'fit' if you can, or create it by 'make fit'
+- Use provided binary 'fit' (or fit.exe in MS Windows), if you can, 
+  or create it by 'make fit'. It needs to be started from directory 
+  fits/ where input files are.
 
 - Commands for driving Minuit and for specifying initial values of
-  fitting parameters are in file MINUIT.CMD (see Minuit manual for their
-  meaning!), and final fit result goes to file FIT.OUT, where each stanza
-  corresponds to one input data set. Output of Minuit itself is going to terminal,
-  so to save it use e.g.  './fit | tee -a savefile'
+  fitting parameters are in file MINUIT.CMD (see Minuit manual for their exact
+  meaning!), and final fit result goes to file FIT.OUT. 
+  Output of Minuit itself is going to terminal, so to save it use e.g.  
+  './fit | tee -a savefile'
 
-- parameters (not for fit but for everything else) are specified in GEPARD.INI
+- Parameters (not for fit but for everything else) are specified in GEPARD.INI
   which is self-documented (only the first item on each line there is
-  important, other are just documentation for users convenience)
+  read by program, other are just documentation for users convenience)
 
 - To select which experimental data will be used for fit, edit file FIT.INI.
   Only sets between strings 'START' and 'STOP' will be used.
 
-- First line of file FIT.INI specifies graphical output:
-    'filename.ps/CPS'  will get output into PS file
+- First two lines of file FIT.INI specify graphical output:
+   1) First line specifies driver
+    'filename.ps/CPS'  will get output into PS file (landscape)
+    'filename.ps/VCPS'  will get output into PS file (portrait)
     '/XSERVE'   will get output in X window (may not work on MS Windows)
+   2) second line are two integers specifying number of graphs on
+      one physical page: XPANELS x YPANELS
+
+More detailed description can be found in doc/tex/gepard.pdf
 
 
-===================================
-2.2 Calculating CFFs in Mathematica
-===================================
+1.2 Calculating CFFs in Mathematica
+-----------------------------------
+
+[Note that this is obsolete! See section 3.3 below.]
 
 Put gepard.m file and gepard.exe directory where Mathematica can find it, then
 install via:
@@ -129,32 +99,138 @@ returning to 2nd for details and lower level functions if needed, and only then
 use ?CFF, ?interpol, ?interpolfix, ?Fpw, ?cDVCS, ?RAope, ?Fcm, ?common, ?AS2P
 which are a bit cryptic.
 
+
 ====================================================================
-2.3 Installation of PGPLOT library
+2. Compilation and installation
 ====================================================================
 
-PGPLOT is Fortran 77 library for plotting diagrams. It can be found at
-http://www.astro.caltech.edu/~tjp/pgplot/
-Gepard's fitting program 'fit' uses this library to plot final
-results for easy inspection.
+You need information in this section only if you want to recreate executables
+and documentation (ideally, they should be provided in distributed gepard.tgz).
 
-2.3.1 Installation under Linux
+
+2.1 Unix requirements
+---------------------
+- 'test', 'radcorr' and  'scaledep' programs can be compiled using just GNU GCC
+
+- 'fit' program needs CERNLIB's Minuit routine, usually contained in libraries
+  'kernlib' and 'packlib', distributed by CERN at
+      http://cernlib.web.cern.ch/cernlib/
+  Location of these libraries should be specified in Makefile.
+
+- For plotting feature, 'fit' program also needs PGPLOT graphic library.
+      http://www.astro.caltech.edu/~tjp/pgplot/
+  Location of this library should be specified in Makefile.
+  See section 2.4 for more details about installing PGPLOT.
+  If PGPLOT is not available, fit program should be compiled by:
+    'make  NOPGPLOT=1 fit'
+
+- For recreating documentation, robodoc and LaTeX softwares are needed
+
+
+2.2 Microsoft Windows requirements
+----------------------------------
+
+Requirements are same as for Unix. I tested this only under cygwin
+environment which is easy to install: http://www.cygwin.com/
+After installing basic setup.exe, and choosing some cygwin
+server, one needs to choose packages which he wants installed
+(by klicking on small "Skip" icons shown by setup.exe).
+I guess that packages Devel/gcc-core, Devel/gcc-g77 and
+Devel/make should be minimally enough but note that lot of Unix
+utilities, editors etc. are available including the whole
+of X Window System.
+
+
+Compiled Minuit and PGPLOT libraries for both platforms can be obtained from
+me, but if one wants to compile himself, there are some instructions in 
+Section 2.4 below.
+
+
+2.3 Compilation targets
+-----------------------
+
+Following make commands can be issued in top gepard/ directory, where
+main Makefile is located:
+
+make test  - creates simple executable for testing
+make fit   - creates executable for fitting. It needs to be started
+             from directory fits/ where input files are.
+make NOPGPLOT=1 fit - creates executable for fitting, but without plotting 
+make radcorr - executable for Fig 1 of Letter  (only two points per plot
+            by default. Change NPOINTS in radcorr.f for more)
+make scaledep - executable for Fig 2 of Letter (also only two points.)
+make hmtl  - creates HTML documentation (needs robodoc software)
+make pdf   - create LaTeX documentation (needs robodoc software)
+make all   - makes everything above and maybe more
+make clean - removes everything which is easily recreatable
+
+
+
+2.4 Installation of PGPLOT library
+----------------------------------
+
+2.4.1 Linux
 
 It's straightforward. Just follow the instructions at
 http://www.astro.caltech.edu/~tjp/pgplot/install-unix.html
 
 
-2.3.2. Installation under Windows
+2.4.2. Microsoft Windows
 
 As with the whole of gepard, only usage inside cygwin environment
-is supported. I have tried only Postscript PGPLOT driver /PSDRIV, but
-also /XWINDOW should work (I have cygwin without X-Windows).
-For PS-only version, I successfully compiled PGPLOT library using
-configuration file on top of page
+is supported. I have sucessfully compiled PGPLOT with Postscript driver 
+/PSDRIV, but not with /XSERVE driver.
+For this, I used configuration file shown on top of the WWW page
 http://www.astro.caltech.edu/~tjp/pgplot/install-gnuwin.html
 This I put into file sys_cygwin/g77_gcc.conf (instead of what's there
 by default), and then I followed Unix installation instructions on
-http://www.astro.caltech.edu/~tjp/pgplot/install-unix.html
+http://www.astro.caltech.edu/~tjp/pgplot/install-unix.html.
 
-My "makemake" command was
-<...>/pgplot/makemake <...>/pgplot  cygwin  g77_gcc
+
+
+========================================================================
+3. Files, and what they are
+========================================================================
+
+
+Makefile - use this if needed to compile Fortran and create documentation.
+           See section 2.3 of this README.
+GEPARD.INI - file controling behaviour of routines
+
+
+3.1 Documentation
+-----------------
+
+README - this file
+doc/tex/gepard.pdf  -  simple manual for gepard
+doc/tex/gepard-api.pdf  - extensive description of subroutines
+doc/html/masterindex.html - HTML equivalent of gepard-api.pdf
+
+
+3.2 Fortran part
+----------------
+
+src/ - Fortran sources
+src/adacf/  - sources for DIS anomal. dimensions and Wilson coeffs.
+Tests/  - some numbers from Letter, useful for testing. See README
+          there.
+fits/ - inputs needed for fitting to DVCS and DIS data
+
+
+3.3 Mathematica part
+--------------------
+
+Note that present version of gepard is considered Fortran-only. Mathematica
+packages and notebooks correspond to older version gepard-0.8* (which was
+used also for hep-ph/0605237 letter numerics). They are not needed but are
+useful for checking and investigation of Fortran algorithms. (They are slow.)
+
+Test/mma-check/gepard.m  - Mathematica package. For basic documentation try ?CFF and ?Fcm
+Test/mma-check/gepard.nb - Notebook with checks and timings. Section 1 and then 3 are good
+            introduction.  Section 2 of this notebook is good
+            for understanding which routines are available and 
+            for understanding correspondence with DM's CFFNNLO.nb routines.
+Test/mma-check/gepard.exe - binary FORTRAN library. (Linux and Windows versions)
+Test/mma-check/CFFNNLO_KK.nb - Notebook needed if one wants to recalculate referent
+                               results in gepard.nb to which gepard results are compared
+Test/mma-check/gepard_devel.nb - Notebook used for development. Not so easy to follow.

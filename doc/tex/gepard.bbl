@@ -1,0 +1,27 @@
+\providecommand{\href}[2]{#2}\begingroup\raggedright\begin{thebibliography}{1}
+
+\bibitem{Kumericki:2006xx}
+K.~Kumeri\v{c}ki, D.~M{\"{u}}ller, K.~Passek-Kumeri\v{c}ki and
+  A.~Sch{\"{a}}fer, {\it Deeply virtual compton scattering beyond
+  next-to-leading order: The flavor singlet case},
+  \href{http://arXiv.org/abs/hep-ph/0605237}{{\tt hep-ph/0605237}}.
+%%CITATION = HEP-PH 0605237;%%
+
+\bibitem{vanNeerven:2000uj}
+W.~L. van Neerven and A.~Vogt, {\it {NNLO} evolution of deep-inelastic
+  structure functions: The singlet case},  {\em Nucl. Phys.} {\bf B588} (2000)
+  345--373 [\href{http://arXiv.org/abs/hep-ph/0006154}{{\tt hep-ph/0006154}}].
+%%CITATION = HEP-PH 0006154;%%
+
+\bibitem{Vogt:2004ns}
+A.~Vogt, {\it Efficient evolution of unpolarized and polarized parton
+  distributions with qcd-pegasus},  {\em Comput. Phys. Commun.} {\bf 170}
+  (2005) 65--92 [\href{http://arXiv.org/abs/hep-ph/0408244}{{\tt
+  hep-ph/0408244}}].
+%%CITATION = HEP-PH 0408244;%%
+
+\bibitem{AbS}
+M.~Abramowitz and I.~A. Stegun, {\em Handbook of Mathematical Functions}.
+\newblock 1964.
+
+\end{thebibliography}\endgroup

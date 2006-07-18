@@ -5,22 +5,21 @@
 # 	scaledep   -  program for producing Fig. 2 in letter
 # 	test       -  tests both DVCS and DIS routines
 # 	fit        -  fitting GPD ansatz to DVCS and DIS data
-# 	fit_noplot -  fitting GPD ansatz to DVCS and DIS data
-# 	                (without PGPLOT plotting)
+#
+# To remove PGPLOT (plotting) compile with
+# 	make NOPGPLOT=1 fit 
 #
 
+ifndef NOPGPLOT
+ALLPGPLOTLIBS = $(PGPLOTLIBS) $(X11LIBS)
+else
+CPPFLAGS = '-D NOPGPLOT'
+endif
 
 # Compiler options
 FFLAGS =  -O
 CFLAGS =  -O2
 
-# For debugging/profiling:
-#FFLAGS = '-Wall -g -pg'
-
-# Where are CERNLIB's kernlib and packlib
-LIBS =  -L$(HOME)/local/lib
-# Where are pgplot and X11 libs
-PGLIBS = -L$(HOME)/local/lib/pgplot -L/usr/X11R6/lib
 
 # Directories for storing object files
 FODIR = Fobj
@@ -33,7 +32,11 @@ Fprojectors.o Frnnlo.o Ferfunc.o Fevol.o Fcdvcs.o Fmsbar.o Fparwav.o Fcff.o\
 Fdvcs.o Ff2.o Freadpar.o Ferror.o
 _FOBJS = $(patsubst %,$(FODIR)/%,$(FOBJS))
 
-# rule for compiling Fortran files
+# rule for compiling fit.F
+$(FODIR)/Ffit.o: fit.F
+	$(FC) -c -o $@ $< $(FFLAGS) $(CPPFLAGS)
+
+# rule for compiling Fortran .f  files
 $(FODIR)/F%.o: %.f
 	$(FC) -c -o $@ $< $(FFLAGS)
 
@@ -60,27 +63,24 @@ $(ODIR)/%.o: %.c
 	$(CC) -c -o $@ $< $(CFLAGS) $(INCS)
 
 # targets
-SRCTARGETS = radcorr scaledep fit test auxtest fit_noplot
+#SRCTARGETS = radcorr scaledep fit test auxtest fit_noplot
 
-all: $(SRCTARGETS)
+#all: $(SRCTARGETS)
 
 auxtest: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Fauxtest.o 
-	$(FC) -o $@ $^ $(FFLAGS) $(LIBS)
+	$(FC) -o $@ $^ $(FFLAGS)
 
 test: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Ftest.o 
-	$(FC) -o $@ $^ $(FFLAGS) $(LIBS)
+	$(FC) -o $@ $^ $(FFLAGS)
 
 radcorr: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Fradcorr.o
-	$(FC) -o $@ $^ $(FFLAGS) $(LIBS) 
+	$(FC) -o $@ $^ $(FFLAGS)
 
 scaledep: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Fscaledep.o $(FODIR)/Fderiv.o
-	$(FC) -o $@ $^ $(FFLAGS) $(LIBS) 
+	$(FC) -o $@ $^ $(FFLAGS)
 
 fit: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Ffit.o $(ODIR)/flushout.o
-	$(FC) -o $@ $^ $(FFLAGS) $(LIBS) -lpacklib -lkernlib $(PGLIBS) -lpgplot -lX11
-
-fit_noplot: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Ffit_noplot.o $(ODIR)/flushout.o
-	$(FC) -o $@ $^ $(FFLAGS) $(LIBS) -lpacklib -lkernlib 
+	$(FC) -o $@ $^ $(FFLAGS) $(CERNLIBS) $(ALLPGPLOTLIBS)
 
 
 .PHONY: clean

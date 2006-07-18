@@ -8,12 +8,29 @@
 # 	html     -  HTML documentation
 # 	pdf      -  LaTeX -> PDF documentation
 #
+# For compiling 'fit' without PGPLOT (no plotting) do
+# 	  make NOPGPLOT=1 fit
+#
 # For debugging/profiling call like this:
-#  make DEBUG='-g -pg' and change -ladacf -> -ladacf_prof
-# For optimization call like this:
-#  make DEBUG='-O2'
+#     make FFLAGS='-g -pg' 
+#
+# For compiling without cygwin.dll dependency
+# 	  make FFLAGS='-O -mno-cygwin' CFLAGS='-O2 -mno-cygwin' test
+#
 
 
+# Location and links to CERNLIB's kernlib and packlib
+export CERNLIBS =  -L$(HOME)/local/lib -lpacklib -lkernlib
+
+# Location and links to pgplot libs (if you have them. 
+# If not, compile with 'make NOPGPLOT=1 fit'.)
+export PGPLOTLIBS = -L$(HOME)/local/lib/pgplot -lpgplot
+# If you have pgplot libs, but without /XSERVE driver, comment 
+# out the next three lines (should be automatic on Windows,
+# but it's an ugly hack)
+ifndef WINDIR
+export X11LIBS = -L/usr/X11R6/lib -lX11
+endif
 
 # targets
 SRCTARGETS = radcorr scaledep fit test auxtest fit_noplot
@@ -24,13 +41,12 @@ all: $(SRCTARGETS) $(DOCTARGETS)
 
 $(SRCTARGETS):
 	$(MAKE) -C src $@
-	mv src/$@ .
-
+	ln -sf src/$@ .
 
 doc: html pdf
 
 pdf: tex
-	$(MAKE) -C doc/tex apipdf
+	$(MAKE) -C doc/tex allpdfs
 
 tex:
 	robodoc --rc doc/robodoc.rc --latex --singledoc --toc --index --doc ./doc/tex/gepard-api
@@ -48,18 +64,8 @@ clean:
 	$(MAKE) -C doc/tex clean
 	-rm doc/html/*
 	-rm -f $(SRCTARGETS)
+	-rm -f $(patsubst %,src/%,$(SRCTARGETS))
 	-rm -f $(patsubst %,%.exe,$(SRCTARGETS))
+	-rm -f $(patsubst %,src/%.exe,$(SRCTARGETS))
 	-rm fits/FIT.OUT fits/gmon.out fits/*.ps
 	-rm FIG*DAT gmon.out
-
-.PHONY: distclean
-distclean:
-	$(MAKE) -C src clean
-	$(MAKE) -C doc/tex clean
-	-rm fits/FIT.OUT fits/gmon.out fits/*.ps
-	-rm FIG*DAT gmon.out
-	-rm -rf .svn Tests/.svn doc/.svn doc/html/.svn doc/tex/.svn \
-		   	fits/.svn mma/.svn mma/.svn mma/gepard.exe/.svn \
-		mma/gepard.exe/Linux/.svn mma/gepard.exe/Windows/.svn \
-		src/.svn src/Fobj/.svn src/adacf/.svn  src/adacf/obj/.svn \
-		src/obj/.svn

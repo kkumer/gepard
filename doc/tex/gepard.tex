@@ -4,11 +4,39 @@
 
 \usepackage{a4wide}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Macros for comments
+\usepackage{amssymb}
+\newcounter{comment}
+
+\newcommand{\comminline}[1]{{%
+\refstepcounter{comment}%
+\ttfamily\small[$\blacksquare$ \textbf{\underline{Comment}
+$\sharp$\thecomment:} #1]}}
+
+\newenvironment{commblock}%
+{\refstepcounter{comment}%
+\begin{quote}\renewcommand{\baselinestretch}{1}
+\ttfamily\small$\blacksquare$ \textbf{\underline{Comment} $\sharp$\thecomment:}}%
+{\end{quote}}
+
+
+\newcommand{\replline}[1]{{
+%\refstepcounter{comment}%
+\ttfamily\small[$\blacktriangleright$ \textbf{\underline{Reply}
+$\sharp$\thecomment:} #1]}}
+
+\newenvironment{replblock}%
+{%\refstepcounter{comment}
+\begin{quote}\renewcommand{\baselinestretch}{1}
+\ttfamily\small$\blacktriangleright$ \textbf{\underline{Reply} $\sharp$\thecomment:}}%
+{\end{quote}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{document}
 
 \title{\texttt{gepard}: calculating Compton form factors from moments of GEneral PARton Distributions } 
-\author{Version: 0.9b1}
+\author{Version: 0.9b2}
 \date{\today}
 \maketitle
 
@@ -16,7 +44,7 @@
 Fortran package \texttt{gepard} calculates singlet Compton form factor
 $\mathcal{H}$ and corresponding Compton cross-sections, as well as
 DIS form factor $F_2$ by evolving GPDs from a given ansatz shape.  Together
-with \texttt{minuit} minimization subroutine GPD parameters can be fitted to
+with \texttt{Minuit} minimization subroutine GPD parameters can be fitted to
 small-$\xi$ experimental DVCS and DIS data. For installation instructions and
 basic usage, see README file coming with the package.
 \end{abstract}
@@ -45,7 +73,8 @@ used.
 The usual textbook Mellin-Barnes contour is obtained by
 using $\phi = \pi/2$, but, say, $\phi = 3\pi /4$ gives faster
 convergence. Parameter of Mellin-Barnes contour are specified
-via parameters \texttt{C} and \texttt{PHI} in \texttt{INIT.DAT}.
+via parameters \texttt{C} and \texttt{PHI} in \texttt{init.f},
+and by default they are equal to 0.5 and $3\pi/4$, respectively.
 
 DVCS Wilson coefficients $\mbox{\boldmath $C$}_{j}({\cal Q}^2/\mu^2,\alpha_s(\mu))$
 are given in Eq. (18) of \cite{Kumericki:2006xx}. 
@@ -69,10 +98,10 @@ are given e.g. in \cite{vanNeerven:2000uj}. They are equal to those in
  Eq. (18) of \cite{Kumericki:2006xx} without prefactor in front of square brackets there.
 
 \section{Numerical Mellin-Barnes Integration}  
-
+\label{sect:Integration}
 Numerical integration is performed in a way very similar to the one described in
 \cite{Vogt:2004ns}: Integrand is largest and
-fluctuates most rapidly around zero, mostly due to the factor $\xi^-j$. As we
+fluctuates most rapidly around zero, mostly due to the factor $\xi^{-j}$. As we
 move away from real axis, both
 amplitude (for $\phi > \pi/2$) and oscillation frequency decrease exponentially.
 Thus we divide integration region in exponentially expanding intervals
@@ -97,10 +126,82 @@ only points with indices
 from the above list. Thus for \texttt{SPEED}=1,2, and 4 we use in total 64, 32, and 16
 integration points, respectively.
 
+\section{Initialization files}
+
+Execution of basic gepard routines depends on initialization parameters specified in
+file \texttt{GEPARD.INI}, and Minuit fitting depends on additional two initialization files
+\texttt{FIT.INI} and \texttt{MINUIT.CMD}, as well as experimental data files, specified
+in  \texttt{FIT.INI}. The contents of these files is explained in following subsections.
+
+\textbf{NB:} Character constants (i.e. strings) in these files should be enclosed in
+single quotation marks, as required by Fortran 77 standard!
+
+\subsection{\texttt{GEPARD.INI}}
+
+File has structure:
+
+\begin{verbatim}
+2          SPEED        1(most accurate), 2 or 4(fastest)
+1          P            N^{P}LO order (0, 1 or 2)
+3          NF           number of active flavours
+0.05d0     AS0          value of astrong/(2 Pi) at 2.5 GeV
+1.D0       RF2          ratio {\cal Q}^2/{\mu_{f}^2}
+1.D0       RR2          ratio {\cal Q}^2/{\mu_{r}^2}
+'CSBAR'    SCHEME       
+'FIT'      ANSATZ       GPD ansatz (see parwav.f subroutine HJ)
+\end{verbatim}
+
+Only the first column is read by the program and it contains
+values of Fortran variables specified in second column and described
+in third one. Columns two and three are just convenient reminders for the user. 
+
+\begin{itemize}
+\item
+\texttt{SPEED} --- Controls the speed and accuracy of the execution. Values can
+presently be only 1, 2, and 4, where 1 is slowest, and most accurate case.
+This is described in more detail in section \ref{sect:Integration}.
+
+\item
+\texttt{P} --- Perturbation theory approximation level. 0 = LO, 1 = NLO, and
+  2 = NNLO.
+
+\item
+\texttt{NF} --- Number of active quark flavours
+
+\item
+\texttt{AS0} --- Value of $\alpha_{\rm s}(2.5 \textrm{GeV})/(2 \pi)$. For various
+test, as well as in \cite{Kumericki:2006xx} value 0.05 vas used. More realistic
+value is 0.0432, which corresponds to $\alpha(M_Z) = 0.117$ \comminline{Check this!}
+
+\item
+\texttt{RF2} --- Ratio of photon momentum and factorization scales squared
+ $ {\cal Q}^2/{\mu_{f}^2}$
+
+\item
+\texttt{RR2} --- Ratio of photon momentum and factorization scales squared
+ $ {\cal Q}^2/{\mu_{r}^2}$
+
+\item
+\texttt{SCHEME} --- Renormalization scheme. Can presently be \texttt{'CSBAR'} or
+\texttt{'MSBAR'} corresponding to $\bar{CS}$ and $\bar{MS}$ schemes, respectively,
+but note that evolution is at the moment implemented only for \texttt{'CSBAR'} scheme.
+
+\item
+\texttt{ANSATZ} --- Name of ansatz for conformal moments of GPD on input scale. It
+should correspond to a  \texttt{IF\ldots ELSE IF \ldots END IF} stanza in subroutine
+\texttt{HJ} in file \texttt{parwav.f}. By default, implemented ansaetze are
+\texttt{TOY} (used in some old development notebooks), \texttt{SOFT} and \texttt{HARD},
+corresponding to ansaetze from \cite{Kumericki:2006xx}, and \texttt{FIT}, corresponding
+to ansatz with six free parameters used for fitting, see description of 
+\texttt{MINUIT.CMD} below.
+
+\end{itemize}
+
 %\bibliographystyle{h-physrev4}
 \bibliographystyle{$HOME/tex/inputs/JHEP-2}
 %\bibliographystyle{mynatbib}
 \bibliography{$HOME/Lit/kkumer}
+
 
 
 \end{document}
