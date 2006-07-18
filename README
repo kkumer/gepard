@@ -33,17 +33,20 @@ fits/ - everything needed for fitting and plotting fits
 
 1.3 Mathematica part
 --------------------
-mma/gepard.m  - Mathematica package. For basic documentation try ?CFF and ?Fcm
-mma/gepard.nb - Notebook with checks and timings. Section 1 and then 3 are good
+
+Note that present version of gepard is considered Fortran-only. Mathematica
+packages and notebooks correspond to older version gepard-0.8* (which was
+used also for hep-ph/0605237 letter numerics). They are not needed but are
+useful for checking and investigation of Fortran algorithms. (They are slow.)
+
+Test/mma-check/gepard.m  - Mathematica package. For basic documentation try ?CFF and ?Fcm
+Test/mma-check/gepard.nb - Notebook with checks and timings. Section 1 and then 3 are good
             introduction.  Section 2 of this notebook is good
             for understanding which routines are available and 
             for understanding correspondence with DM's CFFNNLO.nb routines.
-mma/gepard.exe - binary FORTRAN library. (Linux and Windows versions)
-
-Note that present version of gepard is considered Fortran-only. These mathematica
-packages and notebook are old (but should be correct) version, which can be
-used for checking and investigation of Fortran algorithms, but is much slower.
-           
+Test/mma-check/gepard.exe - binary FORTRAN library. (Linux and Windows versions)
+Test/mma-check/CFFNNLO_KK.nb - Notebook needed if one wants to recalculate referent
+                               results in gepard.nb
 
 
 ====================================================================
@@ -127,7 +130,7 @@ use ?CFF, ?interpol, ?interpolfix, ?Fpw, ?cDVCS, ?RAope, ?Fcm, ?common, ?AS2P
 which are a bit cryptic.
 
 ====================================================================
-2. Installation of PGPLOT library
+2.3 Installation of PGPLOT library
 ====================================================================
 
 PGPLOT is Fortran 77 library for plotting diagrams. It can be found at
@@ -135,13 +138,13 @@ http://www.astro.caltech.edu/~tjp/pgplot/
 Gepard's fitting program 'fit' uses this library to plot final
 results for easy inspection.
 
-2.1 Installation under Linux
+2.3.1 Installation under Linux
 
 It's straightforward. Just follow the instructions at
 http://www.astro.caltech.edu/~tjp/pgplot/install-unix.html
 
 
-2.2. Installation under Windows
+2.3.2. Installation under Windows
 
 As with the whole of gepard, only usage inside cygwin environment
 is supported. I have tried only Postscript PGPLOT driver /PSDRIV, but
