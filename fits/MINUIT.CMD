@@ -1,7 +1,8 @@
+1    1=INTERACTIVE 0=BATCH
 SET TITLE
   ---->  Fitting to H1/ZEUS DVCS and DIS data  <-----
 PARAMETERS
-1  'NG        '   0.3d0     .1d0
+1  'NG        '   0.5d0     .1d0
 2  'NSEA      '   0.2d0     .1d0
 3  'MG        '   1.0d0     .1d0 
 4  'MSEA      '   1.0d0     .1d0
@@ -9,6 +10,5 @@ PARAMETERS
 6  'ALPHA0SEA '   1.0d0     .1d0
 7  'Q20       '   1.0d0     .1d0
 
-fixed 3 4 7
+fixed 3 4 5 6 7
 migrad
-stop

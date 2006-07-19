@@ -3,6 +3,7 @@
 \documentclass[12pt]{article}
 
 \usepackage{a4wide}
+\usepackage{graphicx}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Macros for comments
@@ -43,13 +44,18 @@ $\sharp$\thecomment:} #1]}}
 \begin{abstract}
 Fortran package \texttt{gepard} calculates singlet Compton form factor
 $\mathcal{H}$ and corresponding Compton cross-sections, as well as
-DIS form factor $F_2$ by evolving GPDs from a given ansatz shape.  Together
+DIS form factor $F_2$ by evolving GPDs in conformal moment space from an ansatz shape
+specified at some input scale.  Together
 with \texttt{Minuit} minimization subroutine GPD parameters can be fitted to
-small-$\xi$ experimental DVCS and DIS data. For installation instructions and
+experimental DVCS and DIS data. For installation instructions and
 basic usage, see README file coming with the package.
 \end{abstract}
 
-\section{Formula for $\mathcal{H}$}  
+\tableofcontents
+
+\section{Mellin-Barnes representation of relevant observables}
+
+\subsection{Formula for $\mathcal{H}$}  
 
 \begin{eqnarray*}
 {{\cal H}^{\rm S}}(\xi,\Delta^2,{\cal Q}^2)
@@ -79,7 +85,7 @@ and by default they are equal to 0.5 and $3\pi/4$, respectively.
 DVCS Wilson coefficients $\mbox{\boldmath $C$}_{j}({\cal Q}^2/\mu^2,\alpha_s(\mu))$
 are given in Eq. (18) of \cite{Kumericki:2006xx}. 
 
-\section{Formula for $F_2$}  
+\subsection{Formula for $F_2$}  
 
 \begin{eqnarray*}
 {{F_2}^{\rm S}}(\xi,{\cal Q}^2)
@@ -113,7 +119,7 @@ defined by points.
 \end{equation}
 
 Between each two points standard 8-point Gaussian integration is employed, according
-to Eq. (25.4.30) from \cite{AbS}.
+to Eq. (25.4.30) from \cite{AbS65}.
 
 This is for \texttt{SPEED}=1. Otherwise integration intervals are defined by using
 only points with indices
@@ -124,78 +130,324 @@ only points with indices
 \end{equation}
 
 from the above list. Thus for \texttt{SPEED}=1,2, and 4 we use in total 64, 32, and 16
-integration points, respectively.
+integration points, respectively. 
+
+During the initialization phase, coordinates of points on Mellin-Barnes contour and 
+their Gaussian-integration weights
+are put on the Fortran common blocks, together with corresponding values of
+the moments of Wilson coefficients and anomalous dimensions. Thus these
+time-demanding evaluations are performed only once.
+
+\begin{commblock}
+It would be good to calculate also evolution operator during the initialization phase.
+This would be reasonably easy to implement for fits with fixed $\mathcal{Q}_{0}^2$, 
+where evolution is needed only for small number of fixed ratios 
+$\alpha_{s}(\mathcal{Q})/\alpha_{s}(\mathcal{Q}_0)$. (In the general case, one could
+maybe make interpolation function for evolution operator.)
+Looking at the execution profile of the present code, i.e. how much is spent
+in particular subroutines, it seems to me that by such improvements one can hope
+for a speed-up of about factor 5-8. This could be the next step if the present
+speed turns out to be insufficient.
+\end{commblock}
 
 \section{Initialization files}
 
 Execution of basic gepard routines depends on initialization parameters specified in
-file \texttt{GEPARD.INI}, and Minuit fitting depends on additional two initialization files
+file \texttt{GEPARD.INI}, and Minuit fitting depends on two additional initialization files
 \texttt{FIT.INI} and \texttt{MINUIT.CMD}, as well as experimental data files, specified
 in  \texttt{FIT.INI}. The contents of these files is explained in following subsections.
 
-\textbf{NB:} Character constants (i.e. strings) in these files should be enclosed in
-single quotation marks, as required by Fortran 77 standard!
+\textbf{NB:} Note that various constants in these files should be specified
+according to Fortran 77 standard! Thus, integers should be without dot, double precision values
+with dot and \texttt{'D'}, while character constants (i.e. strings) should be enclosed in
+single quotation marks.
 
 \subsection{\texttt{GEPARD.INI}}
 
-File has structure:
-
-\begin{verbatim}
-2          SPEED        1(most accurate), 2 or 4(fastest)
-1          P            N^{P}LO order (0, 1 or 2)
-3          NF           number of active flavours
-0.05d0     AS0          value of astrong/(2 Pi) at 2.5 GeV
-1.D0       RF2          ratio {\cal Q}^2/{\mu_{f}^2}
-1.D0       RR2          ratio {\cal Q}^2/{\mu_{r}^2}
-'CSBAR'    SCHEME       
-'FIT'      ANSATZ       GPD ansatz (see parwav.f subroutine HJ)
-\end{verbatim}
-
+File has the structure displayed on Fig.~\ref{fig:GEPARD.INI}.
 Only the first column is read by the program and it contains
-values of Fortran variables specified in second column and described
-in third one. Columns two and three are just convenient reminders for the user. 
+values of internal Fortran variables specified in the second column and
+shortly described in the third one. 
+Columns two and three are just convenient reminders for the user. 
+
+\begin{figure}[t]
+\begin{center}
+\hrule
+\begin{verbatim}
+
+    2          SPEED        1(most accurate), 2 or 4(fastest)
+    1          P            N^{P}LO order (0, 1 or 2)
+    3          NF           number of active flavours
+    0.05D0     AS0          value of astrong/(2 Pi) at 2.5 GeV
+    1.D0       RF2          ratio {\cal Q}^2/{\mu_{f}^2}
+    1.D0       RR2          ratio {\cal Q}^2/{\mu_{r}^2}
+    'CSBAR'    SCHEME       
+    'FIT'      ANSATZ       GPD ansatz (see parwav.f subroutine HJ)
+
+\end{verbatim}
+\hrule
+\end{center}
+\caption{Example of initialization file \texttt{GEPARD.INI}}
+\label{fig:GEPARD.INI}
+\end{figure}
+
 
 \begin{itemize}
 \item
-\texttt{SPEED} --- Controls the speed and accuracy of the execution. Values can
-presently be only 1, 2, and 4, where 1 is slowest, and most accurate case.
-This is described in more detail in section \ref{sect:Integration}.
+\texttt{SPEED} --- \emph{Integer}. Controls the speed and accuracy of the execution. Values can
+presently be only 1, 2, and 4, where 1 is the most accurate and at the
+same time the slowest case.
+As described in Section \ref{sect:Integration}, \texttt{SPEED} controls the number
+of segments in which Mellin-Barnes integration contour is divided before 8-point
+Gaussian integration is performed on each segment. It also controls number of
+points used for Gaussian integration of partial Compton cross-section. This
+number is 8/\texttt{SPEED}.  Thus, the total speed of fitting is approximately
+proportional to the
+value of \texttt{SPEED}. 
+
+The choice \texttt{SPEED} = 1 guarantees cca. four
+correct significant digits for observables for $10^{-6} \le \xi \le 10^{-1}$,
+\texttt{SPEED} = 2 gives cca. two correct digits, while \texttt{SPEED} = 4
+can produce inacuraccies of up to 40-50 \%, but can also give 2-3 correct
+digits, depending on what is calculated.
+\comminline{This is just a first asessment based on few tries. One should at
+some point make extensive analysis of accuraccy of routines.}.
 
 \item
-\texttt{P} --- Perturbation theory approximation level. 0 = LO, 1 = NLO, and
-  2 = NNLO.
+\texttt{P} --- \emph{Integer}. Perturbation theory approximation level. 0 = LO, 1 = NLO, and
+  2 = NNLO. Because most of the costly evaluations are performed just once,
+  during the intialization phase, NLO and NNLO fits take approximatelly the
+  same time, while LO is cca. four times faster. \comminline{This is based
+  on just one test, with \texttt{SPEED} = 2.}
 
 \item
-\texttt{NF} --- Number of active quark flavours
+\texttt{NF} --- \emph{Integer}. Number of active quark flavours
 
 \item
-\texttt{AS0} --- Value of $\alpha_{\rm s}(2.5 \textrm{GeV})/(2 \pi)$. For various
+\texttt{AS0} --- \emph{Double precision}. Value of $\alpha_{\rm s}(2.5 \textrm{GeV})/(2 \pi)$. For various
 test, as well as in \cite{Kumericki:2006xx} value 0.05 vas used. More realistic
-value is 0.0432, which corresponds to $\alpha(M_Z) = 0.117$ \comminline{Check this!}
+value is 0.0536, which corresponds to $\alpha(M_Z) = 0.117$. \comminline{Check this value!} 
 
 \item
-\texttt{RF2} --- Ratio of photon momentum and factorization scales squared
- $ {\cal Q}^2/{\mu_{f}^2}$
+\texttt{RF2} --- \emph{Double precision}. $ {\cal Q}^2/{\mu_{f}^2}$ i.e. ratio of photon virtuality and 
+                 factorization scales squared
 
 \item
-\texttt{RR2} --- Ratio of photon momentum and factorization scales squared
- $ {\cal Q}^2/{\mu_{r}^2}$
+\texttt{RR2} --- \emph{Double precision}. $ {\cal Q}^2/{\mu_{r}^2}$ i.e. ratio of photon virtuality and 
+                 renormalization scales squared
 
 \item
-\texttt{SCHEME} --- Renormalization scheme. Can presently be \texttt{'CSBAR'} or
-\texttt{'MSBAR'} corresponding to $\bar{CS}$ and $\bar{MS}$ schemes, respectively,
+\texttt{SCHEME} --- \emph{Character*5}. Renormalization scheme label. Can presently be \texttt{'CSBAR'} or
+\texttt{'MSBAR'} corresponding to $\overline{CS}$ and $\overline{MS}$ schemes, respectively,
 but note that evolution is at the moment implemented only for \texttt{'CSBAR'} scheme.
 
 \item
-\texttt{ANSATZ} --- Name of ansatz for conformal moments of GPD on input scale. It
-should correspond to a  \texttt{IF\ldots ELSE IF \ldots END IF} stanza in subroutine
-\texttt{HJ} in file \texttt{parwav.f}. By default, implemented ansaetze are
-\texttt{TOY} (used in some old development notebooks), \texttt{SOFT} and \texttt{HARD},
+\texttt{ANSATZ} --- \emph{Character*6}. Label of ansatz for conformal moments of GPDs on input scale. 
+It should correspond to one  \texttt{IF\ldots ELSE IF} stanza in subroutine
+\texttt{HJ} in file \texttt{parwav.f}. Defaultly implemented ansaetze are
+\texttt{TOY} (used in some old development Mathematica notebooks), \texttt{SOFT} and \texttt{HARD},
 corresponding to ansaetze from \cite{Kumericki:2006xx}, and \texttt{FIT}, corresponding
-to ansatz with six free parameters used for fitting, see description of 
-\texttt{MINUIT.CMD} below.
+to ansatz used for fitting, see description of \texttt{MINUIT.CMD} below.
 
 \end{itemize}
+
+\subsection{\texttt{MINUIT.CMD}}
+
+\begin{figure}[t]
+\begin{center}
+\hrule
+\begin{verbatim}
+
+        SET TITLE
+           Fitting to H1/ZEUS DVCS and DIS data
+        PARAMETERS
+        1  'NG        '   0.3d0     .1d0
+        2  'NSEA      '   0.2d0     .1d0
+        3  'MG        '   1.0d0     .1d0 
+        4  'MSEA      '   1.0d0     .1d0
+        5  'ALPHA0G   '   1.0d0     .1d0
+        6  'ALPHA0SEA '   1.0d0     .1d0
+        7  'Q20       '   1.0d0     .1d0
+
+        fixed 3 4 7
+        migrad
+        stop
+
+\end{verbatim}
+\hrule
+\end{center}
+\caption{Example of Minuit batch file \texttt{MINUIT.CMD}}
+\label{fig:MINUIT.CMD}
+\end{figure}
+
+\texttt{MINUIT.CMD} is a file containing Minuit batch commands. Its format is explained in
+Minuit manual \cite{Minuit}, Section 3.2.1.  If one uses default \texttt{ANSATZ = 'FIT'} in
+\texttt{GEPARD.INI}, then part of this file which defines fit parameters should look like on
+Fig.~\ref{fig:MINUIT.CMD}. One should than only change initial values of parameters
+(column 3), and maybe their starting step size (column 4). Last part of this file
+contains Minuit command instructions. E. g. in the example on Fig.~\ref{fig:MINUIT.CMD}
+one first fixes parameters number 3, 4, and 7 (i.e. \texttt{MG}, \texttt{MSEA} and \texttt{Q20}
+are held at 1.0), and than performs minimization using \texttt{migrad} algorithm.
+
+
+\subsection{\texttt{FIT.INI}}
+
+\begin{figure}[t]
+\begin{center}
+\hrule
+\begin{verbatim}
+
+      'fit.ps/VCPS'
+      2 3
+      'START'
+      'DVCS1.DAT'
+      'DVCS2.DAT'
+      'DVCS3.DAT'
+      'DVCS4.DAT'
+      'DVCS5.DAT'
+      'DVCS6.DAT'
+      'STOP'
+      'DIS1.DAT'
+      'DIS2.DAT'
+      'DIS3.DAT'
+      'DIS4.DAT'
+
+\end{verbatim}
+\hrule
+\end{center}
+\caption{Example of initialization file \texttt{FIT.INI}}
+\label{fig:FIT.INI}
+\end{figure}
+
+File has the structure displayed on Fig.~\ref{fig:FIT.INI}.
+All strings can have at most 15 characters.
+First two lines specify graphical output, if PGPLOT graphical
+library is used for printing the results of fits. If PGPLOT
+is not used, they are ignored but have to be formatted correctly,
+as specified below.
+
+\begin{itemize}
+
+\item 
+First line specifies graphics driver
+  \begin{itemize}
+  \item \texttt{'filename.ps/CPS'}  will get output into landscape color Postscript file 
+             \emph{filename.ps}.
+  \item \texttt{'filename.ps/VCPS'}  will get output into portrait color Postscript file 
+             \emph{filename.ps}.
+  \item \texttt{'/XSERVE'} will get output in an X window (may not work on MS Windows, and
+   on Linux there could be problems when there are more than one page of graphs)
+  \end{itemize}
+
+\item
+In second line there should be two \emph{integers}, \texttt{XPANELS} and \texttt{YPANELS}
+which specify number of graphs on one physical page by defining grid \texttt{XPANELS} 
+$\times$ \texttt{YPANELS}.
+
+\item
+Other lines contain the names of files containing the experimental data to be fitted to (see next
+section for the format of these data files), or strings \texttt{'START'} and \texttt{'STOP'}. 
+Only files between \texttt{'START'}
+and \texttt{'STOP'} rows will be included in actual fits, while everything beyond
+\texttt{'STOP'} is ignored, see example on Fig.~\ref{fig:FIT.INI}.
+This facilitates easy selection of data for different fits.
+\end{itemize}
+
+
+\subsection{Data files}
+
+\begin{figure}[t]
+\begin{center}
+\hrule
+\begin{verbatim}
+
+        'SIGMA'                    YOBS
+        89.d0                      W
+        -1.                        Q2
+        6                          N
+        7.5   5.42  0.33  0.32 
+        12.5  2.64  0.22  0.12 
+        20    1.23  0.14  0.06 
+        32.5  0.59  0.12  0.04 
+        55    0.2   0.08  0.025 
+        85    0.16  0.09  0.03
+
+
+        *     DVCS4  [ZEUS, Phys.Lett.B573:46-62,2003, hep-ex/0305028]
+        *       X = Q2,   Y = SIG   (TCUT = - \inf GeV ???)
+        *       W = 89 GeV
+
+\end{verbatim}
+\hrule
+\end{center}
+\caption{Example of an experimental data file \texttt{DVCS4.DAT}.}
+\label{fig:DVCS4.DAT}
+\end{figure}
+
+File has the structure displayed on Fig.~\ref{fig:DVCS4.DAT}. In the first
+four rows only the first item is read by the program and the second one
+(corresponding to internal Fortran variable) is just convenient user
+documentation.
+
+\begin{itemize}
+\item 
+1$^{\rm st}$ row (\texttt{YOBS}) --- \emph{Character*8}. Label of the observable
+corresponding to the ``y--axis'' of data. Implemented are labels
+  \begin{itemize}
+  \item \texttt{'PARSIGMA'} --- Partial Compton cross section $d\sigma/d t$  
+  \item \texttt{'SIGMA'} --- Total Compton cross section $\sigma$  
+  \item \texttt{'F2'} --- Deeply inelastic scattering form-factor $F_2$  
+  \end{itemize} 
+(By the way, only first two characters of label strings are significant.)
+
+
+\item 
+2$^{\rm nd}$ row (\texttt{W} or \texttt{X\_BJ}) --- \emph{Double precision}.
+In the case of Compton scattering (i.e. \texttt{YOBS} = \texttt{'PARSIGMA'} or
+\texttt{YOBS} = \texttt{'SIGMA'}) here is $\gamma^*$ -- proton invariant mass
+$W$ (not squared!). In the DIS case (i.e. \texttt{YOBS} = \texttt{'F2'})
+here is Bjorken $x$.
+
+\item 
+3$^{\rm rd}$ row (\texttt{Q2}) --- \emph{Double precision}. $\mathcal{Q}^2$
+for Compton scattering or $Q^2$ for DIS.
+
+Note the following important convention: If one of the quantites that should
+be specified in rows 2 or 3 is actually ``x--axis'' of data, this fact
+should be specified by putting the \emph{negative number} in this row!
+Thus, the example data on Fig.~\ref{fig:DVCS4.DAT} corresponds to
+measurements of total Compton cross section $\sigma(W, \mathcal{Q}^2)$, with
+fixed $W = 89\, \textrm{GeV}$, and variable $\mathcal{Q}^2$.
+For partial Compton cross section, ``x--axis'' variable is 
+always $-t = - \Delta^2$
+
+\item 
+4$^{\rm th}$ row (\texttt{N}) --- \emph{Integer}. Number of measurements that
+follow. Only \texttt{N} next lines will be taken into account, and the
+rest of the file is ignored and can be used for comments.
+
+\item
+Measurement rows. They consist of four floating point numbers each,
+standing for 
+\[
+ x \qquad y(x) \qquad \Delta y_{\rm stat} \qquad
+\Delta y_{\rm syst} \;.
+\]
+Statistical and systematical errors are combined in quadrature for fitting.
+
+\end{itemize}
+
+\section{Main \texttt{gepard} functions}
+
+\begin{figure}[h]
+\begin{center}
+\includegraphics[scale=0.52]{callgraph}
+\end{center}
+\caption{Calling graph}
+\label{fig:callgraph}
+\end{figure}
+
+
 
 %\bibliographystyle{h-physrev4}
 \bibliographystyle{$HOME/tex/inputs/JHEP-2}

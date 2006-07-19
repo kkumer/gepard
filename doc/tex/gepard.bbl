@@ -2,7 +2,7 @@
 
 \bibitem{Kumericki:2006xx}
 K.~Kumeri\v{c}ki, D.~M{\"{u}}ller, K.~Passek-Kumeri\v{c}ki and
-  A.~Sch{\"{a}}fer, {\it Deeply virtual compton scattering beyond
+  A.~Sch{\"{a}}fer, {\it Deeply virtual {C}ompton scattering beyond
   next-to-leading order: The flavor singlet case},
   \href{http://arXiv.org/abs/hep-ph/0605237}{{\tt hep-ph/0605237}}.
 %%CITATION = HEP-PH 0605237;%%
@@ -15,13 +15,17 @@ W.~L. van Neerven and A.~Vogt, {\it {NNLO} evolution of deep-inelastic
 
 \bibitem{Vogt:2004ns}
 A.~Vogt, {\it Efficient evolution of unpolarized and polarized parton
-  distributions with qcd-pegasus},  {\em Comput. Phys. Commun.} {\bf 170}
+  distributions with {QCD-PEGASUS}},  {\em Comput. Phys. Commun.} {\bf 170}
   (2005) 65--92 [\href{http://arXiv.org/abs/hep-ph/0408244}{{\tt
   hep-ph/0408244}}].
 %%CITATION = HEP-PH 0408244;%%
 
-\bibitem{AbS}
+\bibitem{AbS65}
 M.~Abramowitz and I.~A. Stegun, {\em Handbook of Mathematical Functions}.
-\newblock 1964.
+\newblock Dover, 1965.
+
+\bibitem{Minuit}
+F.~James, {\em Minuit reference manual, version 94.1}.
+\newblock CERN, 1994.
 
 \end{thebibliography}\endgroup

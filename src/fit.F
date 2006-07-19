@@ -33,26 +33,36 @@ C
 
       PROGRAM FIT
 
+      IMPLICIT NONE
       INTEGER ISINTER
       CHARACTER SCHEME*5, ANSATZ*6
+      CHARACTER COMFILE*10
       EXTERNAL FCN
+      DATA COMFILE /'MINUIT.CMD'/
 
       COMMON /INTERACTIVE/ ISINTER
       COMMON / LABELS    /  SCHEME, ANSATZ
 
-*   Do we want interactive Minuit session?
-      ISINTER = 0
+*   Reading from first line do we want interactive Minuit session.
+      OPEN (UNIT = 17, FILE = COMFILE, STATUS = 'OLD')
+      READ (17, *) ISINTER
+      CLOSE (17)
 
       SCHEME = 'CSBAR'
       CALL READPAR
       CALL INIT
 
       IF (ISINTER .NE. 1) THEN
-        OPEN (UNIT=5,FILE='MINUIT.CMD',STATUS='OLD')
+        OPEN (UNIT = 5, FILE = COMFILE, STATUS = 'OLD')
+      ELSE
+        WRITE (*, 801) COMFILE
       END IF
 
       CALL MINUIT(FCN,0)  
 
+801   FORMAT (1X, / 1X, 72('-') / 1X, "Interactive mode" / 1X,
+     &  "Answer 'SET INPUT 18 ", A, "' to the next querry." / 1X,
+     &  "(Rewinding the unit is irrelevant, I guess.)" / 1X, 72('-') //)
       STOP
       END
 C     ****

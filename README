@@ -17,9 +17,12 @@ Contents of this README
         2.1 Unix requirements
         2.2 Microsoft Windows requirements
         2.3 Compilation targets
-        2.4 Installation of PGPLOT library
+        2.4 Installation of Minuit library
                 2.4.1 Linux
-                2.4.2. Microsoft Windows
+                2.4.2 Microsoft Windows
+        2.5 Installation of PGPLOT library
+                2.5.1 Linux
+                2.5.2 Microsoft Windows
 
 3. Files, and what they are
         3.1 Documentation
@@ -115,35 +118,41 @@ and documentation (ideally, they should be provided in distributed gepard.tgz).
 - 'fit' program needs CERNLIB's Minuit routine, usually contained in libraries
   'kernlib' and 'packlib', distributed by CERN at
       http://cernlib.web.cern.ch/cernlib/
+  See section 2.4 for more details about installing Minuit.
   Location of these libraries should be specified in Makefile.
 
 - For plotting feature, 'fit' program also needs PGPLOT graphic library.
       http://www.astro.caltech.edu/~tjp/pgplot/
   Location of this library should be specified in Makefile.
-  See section 2.4 for more details about installing PGPLOT.
+  See section 2.5 for more details about installing PGPLOT.
   If PGPLOT is not available, fit program should be compiled by:
     'make  NOPGPLOT=1 fit'
 
 - For recreating documentation, robodoc and LaTeX softwares are needed
+  Robodoc homepage is  http://www.xs4all.nl/~rfsber/Robo/robodoc.html
 
+Precompiled Minuit and PGPLOT libraries for Linux can be obtained from
+me, but if one wants to compile them himself, there are some instructions in 
+Sections  2.4 and 2.5  below.
 
 2.2 Microsoft Windows requirements
 ----------------------------------
 
 Requirements are same as for Unix. I tested this only under cygwin
-environment which is easy to install: http://www.cygwin.com/
-After installing basic setup.exe, and choosing some cygwin
+environment. Cygwin is easy to install: http://www.cygwin.com/
+After installing basic setup.exe, and choosing some cygwin packages
 server, one needs to choose packages which he wants installed
-(by klicking on small "Skip" icons shown by setup.exe).
+(by klicking on a small "Skip" icons shown by setup.exe; this wasn't
+intuitive for me).
 I guess that packages Devel/gcc-core, Devel/gcc-g77 and
-Devel/make should be minimally enough but note that lot of Unix
-utilities, editors etc. are available including the whole
+Devel/make should be minimally enough but note that a lot of useful 
+Unix utilities, editors etc. are available including the whole
 of X Window System.
 
 
-Compiled Minuit and PGPLOT libraries for both platforms can be obtained from
-me, but if one wants to compile himself, there are some instructions in 
-Section 2.4 below.
+Precompiled Minuit and PGPLOT libraries for Windows can be obtained from
+me, but if one wants to compile them himself, there are some instructions in 
+Sections  2.4 and 2.5  below.
 
 
 2.3 Compilation targets
@@ -165,17 +174,47 @@ make all   - makes everything above and maybe more
 make clean - removes everything which is easily recreatable
 
 
-
-2.4 Installation of PGPLOT library
+2.4 Installation of Minuit library
 ----------------------------------
 
 2.4.1 Linux
 
+For some Linux distributions precompiled binaries are available at
+http://cernlib.web.cern.ch/cernlib/. For Debian, there are packages
+libpacklib1-dev libkernlib1-dev available in the usual repositories.
+
+2.4.2. Microsoft Windows
+
+One can compile just a Minuit part of packlib from sources available at
+http://cernlib.web.cern.ch/cernlib/download/2001_wnt/src/packlib/minuit/code/
+Then one additionally needs just INTRAC routine from kernlib. As explained
+in Minuit manual, this can be just a simple routine like
+
+      LOGICAL FUNCTION INTRAC ()
+      INTRAC = .FALSE.
+      RETURN
+      END
+
+I haven't succeded yet in making Minuit work interactively under Windows.
+(Works only as a batch job reading command from file MINUIT.CMD)
+
+
+2.5 Installation of PGPLOT library
+----------------------------------
+
+2.5.1 Linux
+
 It's straightforward. Just follow the instructions at
 http://www.astro.caltech.edu/~tjp/pgplot/install-unix.html
 
+Dont forget to define shell environment variables, e.g. for
+bash/zsh/sh :
 
-2.4.2. Microsoft Windows
+export PGPLOT_DIR="${HOME}/local/lib/pgplot/"
+export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:$HOME/local/lib/pgplot"
+
+
+2.5.2. Microsoft Windows
 
 As with the whole of gepard, only usage inside cygwin environment
 is supported. I have sucessfully compiled PGPLOT with Postscript driver 
@@ -185,6 +224,8 @@ http://www.astro.caltech.edu/~tjp/pgplot/install-gnuwin.html
 This I put into file sys_cygwin/g77_gcc.conf (instead of what's there
 by default), and then I followed Unix installation instructions on
 http://www.astro.caltech.edu/~tjp/pgplot/install-unix.html.
+
+You may have to define evironment variables as in Linux case.
 
 
 
@@ -220,7 +261,7 @@ fits/ - inputs needed for fitting to DVCS and DIS data
 3.3 Mathematica part
 --------------------
 
-Note that present version of gepard is considered Fortran-only. Mathematica
+Note that the present version of gepard is considered Fortran-only. Mathematica
 packages and notebooks correspond to older version gepard-0.8* (which was
 used also for hep-ph/0605237 letter numerics). They are not needed but are
 useful for checking and investigation of Fortran algorithms. (They are slow.)
