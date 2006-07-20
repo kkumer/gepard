@@ -81,7 +81,7 @@ C
 C     IMPLICIT NONE
 C     INTEGER NPAR, IFLAG
 C     DOUBLE PRECISION F, FUTIL
-C     DOUBLE PRECISION A(NPAR),GIN(NPAR)
+C     DOUBLE PRECISION A(*),GIN(*)
 C    
 C  INPUTS 
 C            DATASET?  --  ? = 1, ..., 9, 0.  (name of 8 chars exactly!!)
@@ -109,11 +109,6 @@ C
 C  PARENTS
 C      MINUIT, FCN (via MINUIT)
 C
-C  BUGS
-C    - dimension of FITPAR is hardcoded 
-C    - processing of datasets should be done
-C      by subroutine
-C
 C  SOURCE
 C
 
@@ -121,11 +116,12 @@ C
       SUBROUTINE FCN(NPAR,GIN,CHISQ,A,IFLAG,FUTIL)
 
       IMPLICIT NONE
-      INTEGER NPAR, IFLAG
+      INTEGER NPAR, IFLAG, NPARMAX
+      PARAMETER (NPARMAX = 10)
       DOUBLE PRECISION CHISQ, FUTIL
-      DOUBLE PRECISION A(NPAR),GIN(NPAR)
+      DOUBLE PRECISION A(NPARMAX),GIN(NPARMAX)
       INTEGER K, IER, XPANELS, YPANELS
-      DOUBLE PRECISION FITPAR(10)
+      DOUBLE PRECISION FITPAR(NPARMAX)
       DOUBLE PRECISION CHISQPART
       CHARACTER DATAFNAME*15
       CHARACTER OUTFILE*15
@@ -141,9 +137,8 @@ C
       
 *     Transfer parameters to common block
 
-      DO 10 K = 1, NPAR
+      DO 10 K = 1, NPARMAX
  10     FITPAR(K) = A(K)
-
 
 *     Initialization of printing the results
 
@@ -231,6 +226,10 @@ C
       DOUBLE PRECISION XBJ, XBJIN
       DOUBLE PRECISION PARSIGMA, SIGMA
       DOUBLE PRECISION F2(0:2)
+#ifndef NOPGPLOT
+      LOGICAL DRAW
+      REAL LASTX, LASTY
+#endif
 
       COMMON / KINEMATICS /  XI, DEL2, Q2, Q02
       COMMON / F2P        /  F2
@@ -242,6 +241,7 @@ C
 #ifndef NOPGPLOT
         CALL PGPAGE
         CALL PGVSTD
+        DRAW = .FALSE.
 #endif
       END IF
 
@@ -276,7 +276,14 @@ C
           CALL PGERRY(1, SNGL(X), LOG10(SNGL(Y-DY)), LOG10(SNGL(Y+DY)),
      &           3.0)
           CALL PGSCI(2)
+          IF (DRAW) THEN
+            CALL PGMOVE(LASTX, LASTY)
+            CALL PGDRAW(SNGL(X), LOG10(SNGL(THY)))
+          END IF
           CALL PGPT1(SNGL(X), LOG10(SNGL(THY)), 17)
+          LASTX = SNGL(X)
+          LASTY = LOG10(SNGL(THY)) 
+          DRAW = .TRUE.
           CALL PGSCI(1)
 #endif
         END IF
@@ -327,12 +334,26 @@ C
           IF (WIN .LT. 0.) THEN
             CALL PGERRY(1, SNGL(X), SNGL(Y-DY), SNGL(Y+DY), 3.0)
             CALL PGSCI(2)
+            IF (DRAW) THEN
+              CALL PGMOVE(LASTX, LASTY)
+              CALL PGDRAW(SNGL(X), SNGL(THY))
+            END IF
             CALL PGPT1(SNGL(X), SNGL(THY), 17)
+            LASTX = SNGL(X)
+            LASTY = SNGL(THY)
+            DRAW = .TRUE.
           ELSE
-          CALL PGERRY(1, SNGL(X), LOG10(SNGL(Y-DY)), LOG10(SNGL(Y+DY)),
-     &           3.0)
-          CALL PGSCI(2)
-          CALL PGPT1(SNGL(X), LOG10(SNGL(THY)), 17)
+            CALL PGERRY(1,SNGL(X), LOG10(SNGL(Y-DY)), LOG10(SNGL(Y+DY)),
+     &             3.0)
+            CALL PGSCI(2)
+            IF (DRAW) THEN
+              CALL PGMOVE(LASTX, LASTY)
+              CALL PGDRAW(SNGL(X), LOG10(SNGL(THY)))
+            END IF
+            CALL PGPT1(SNGL(X), LOG10(SNGL(THY)), 17)
+            LASTX = SNGL(X)
+            LASTY = LOG10(SNGL(THY)) 
+            DRAW = .TRUE.
           END IF
           CALL PGSCI(1)
 #endif
@@ -384,7 +405,14 @@ C
 #ifndef NOPGPLOT
           CALL PGERR1(6, SNGL(X), SNGL(Y), SNGL(DY), 3.0)
           CALL PGSCI(2)
+          IF (DRAW) THEN
+            CALL PGMOVE(LASTX, LASTY)
+            CALL PGDRAW(SNGL(X), SNGL(THY))
+          END IF
           CALL PGPT1(SNGL(X), SNGL(THY), 17)
+          LASTX = SNGL(X)
+          LASTY = SNGL(THY) 
+          DRAW = .TRUE.
           CALL PGSCI(1)
 #endif
         END IF

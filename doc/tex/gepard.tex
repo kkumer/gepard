@@ -4,6 +4,7 @@
 
 \usepackage{a4wide}
 \usepackage{graphicx}
+\usepackage{amsmath}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Macros for comments
@@ -52,84 +53,114 @@ basic usage, see README file coming with the package.
 \end{abstract}
 
 \tableofcontents
+\clearpage
 
 \section{Mellin-Barnes representation of relevant observables}
 
-\subsection{Formula for $\mathcal{H}$}  
+\subsection{DVCS formulas}  
 
-\begin{eqnarray*}
-{{\cal H}^{\rm S}}(\xi,\Delta^2,{\cal Q}^2)
-&\!\!\!=\!\!\!& \frac{1}{2i}\int_{c-i \infty}^{c+ i \infty}\!
+For small $\xi$ DVCS cross section can be approximated by 
+\begin{equation}
+\frac{d \sigma_{\rm T}}{d t} = \frac{4 \pi \alpha^2 W^2}{(W^2 + \mathcal{Q}^2)
+(2 W^2 + \mathcal{Q}^2)^2} | ^{\rm S}\mathcal{H}(\xi, t, \mathcal{Q}^2)|^2 \Bigg|_{\xi
+= \frac{\mathcal{Q}^2}{2 W^2 + \mathcal{Q}^2}} \;,
+\label{eq:parsigma}
+\end{equation}
+where singlet Compton form factor $^{\rm S}\mathcal{H}$ is given by
+\begin{equation}
+{^{\rm S}{\cal H}}(\xi,\Delta^2,{\cal Q}^2)
+= \frac{1}{2i}\int_{c-i \infty}^{c+ i \infty}\!
 dj\,\xi^{-j-1} \left[i + \tan \left(\frac{\pi j}{2}\right) \right]
 \mbox{\boldmath $C$}_{j}({\cal Q}^2/\mu^2,\alpha_s(\mu)) 
-\mbox{\boldmath $H$}_{j} (\xi,\Delta^2,\mu^2) \\[2ex]
-&\!\!\!=\!\!\!& \frac{(\xi/2)^{-c-1}}{\Gamma(3/2)}\Big\{i \Im\! m\: e^{i\phi} 
-\int_{0}^{\infty} dy  (\xi/2)^{- y e^{i\phi}} 
-\frac{\Gamma(5/2 + c + y e^{i\phi})}{\Gamma(3 + c + y e^{i\phi})}
-\texttt{FPW}(j) \\[2ex]
-& & + \Im\! m\:  e^{i\phi} 
-\int_{0}^{\infty} dy  (\xi/2)^{- y e^{i\phi}}
-\frac{\Gamma(5/2 + c + y e^{i\phi})}{\Gamma(3 + c + y e^{i\phi})}
-\tan\big(\frac{\pi(c + y e^{i\phi})}{2}\big)
-\texttt{FPW}(j)
-\label{<Hformula>}
-\end{eqnarray*} 
-where $j=c+ye^{i\phi}$, and Schwartz reflection principle is
-used.
+\mbox{\boldmath $H$}_{j} (\xi,\Delta^2,\mu^2) \;.
+\label{eq:CFF}
+\end{equation}
+DVCS Wilson coefficients $\mbox{\boldmath $C$}_{j}({\cal Q}^2/\mu^2,\alpha_s(\mu))$
+are given in Eq. (18) of \cite{Kumericki:2006xx}, while moments of
+GPD $\mbox{\boldmath $H$}_{j} (\xi,\Delta^2,\mu^2)$ should be specified
+by the user in subroutine \texttt{HJ}, as described in subsection \ref{ssect:ansatz}.
+
+In practice it is good to use Mellin-Barnes contour of the form displayed
+on Fig.~\ref{fig:MellinBarnes}, with point on the contour given
+by $j=c+ye^{i\phi}$, with real parameters $c$ and $\phi$.
 The usual textbook Mellin-Barnes contour is obtained by
 using $\phi = \pi/2$, but, say, $\phi = 3\pi /4$ gives faster
-convergence. Parameter of Mellin-Barnes contour are specified
-via parameters \texttt{C} and \texttt{PHI} in \texttt{init.f},
-and by default they are equal to 0.5 and $3\pi/4$, respectively.
+convergence. As long as no poles are crossed value of the
+integral should not depend on the value of $c$. One can
+try different values of $c$ and $\phi$ to get best numerical
+properties. 
+By default, in \texttt{init.f} it is set $c$ = 0.5 and $\phi = 3\pi/4$.
 
-DVCS Wilson coefficients $\mbox{\boldmath $C$}_{j}({\cal Q}^2/\mu^2,\alpha_s(\mu))$
-are given in Eq. (18) of \cite{Kumericki:2006xx}. 
+\begin{figure}[h]
+\begin{center}
+\includegraphics[scale=1.0]{MellinBarnes}
+\end{center}
+\caption{Contour of the Mellin-Barnes integration.}
+\label{fig:MellinBarnes}
+\end{figure}
 
-\subsection{Formula for $F_2$}  
 
-\begin{eqnarray*}
-{{F_2}^{\rm S}}(\xi,{\cal Q}^2)
+To write the Mellin-Barnes integral in (\ref{eq:CFF}) as an integral
+over real variable $y$, one can employ Schwartz reflection principle to
+actually integrate over only one of two legs on Fig.~\ref{fig:MellinBarnes}
+and write
+\begin{multline}
+{^{\rm S}{\cal H}}(\xi,\Delta^2,{\cal Q}^2) =
+\Im\! m\:  e^{i\phi} 
+\int_{0}^{\infty} dy \, \xi^{-j-1}
+\tan\big(\frac{\pi j}{2}\big)
+\mbox{\boldmath $C$}_{j}({\cal Q}^2/\mu^2,\alpha_s(\mu)) 
+\mbox{\boldmath $H$}_{j} (\xi,\Delta^2,\mu^2) \\
++ i\: \Im\! m\:  e^{i\phi} 
+\int_{0}^{\infty} dy \, \xi^{-j-1}
+\mbox{\boldmath $C$}_{j}({\cal Q}^2/\mu^2,\alpha_s(\mu)) 
+\mbox{\boldmath $H$}_{j} (\xi,\Delta^2,\mu^2) 
+\Bigg|_{j = c + y e^{i\phi}}
+\label{<Hformula>}
+\end{multline}
+
+\subsection{DIS formulas}  
+
+Similarly, deeply inelastic scattering singlet form-factor ${^{\rm S}\!{F_2}}$ is given by
+\begin{eqnarray}
+{^{\rm S}\!{F_2}}(\xi,{\cal Q}^2)
 &\!\!\!=\!\!\!& \frac{Q_{S}^2}{2 \pi i}\int_{c-i \infty}^{c+ i \infty}\!
 dj\,\xi^{-j}
 \mbox{\boldmath $C$}^{\rm DIS}_{2,j}(Q^2/\mu^2,\alpha_s(\mu))
-\mbox{\boldmath $H$}_{j} (\xi=0,\Delta^2=0,\mu^2) \\[2ex]
-&\!\!\!=\!\!\!& \frac{Q_{S}^2}{\pi} \xi^{-c}
-\int_{0}^{\infty} dy\: \Im\! m\: e^{i\phi} \xi^{- y e^{i\phi}}
-\texttt{FPW}(j)
+\mbox{\boldmath $H$}_{j} (\xi=0,\Delta^2=0,\mu^2) \nonumber \\[2ex]
+&\!\!\!=\!\!\!& \frac{Q_{S}^2}{\pi}\, \Im\! m\: e^{i\phi}
+\int_{0}^{\infty} dy\:  \xi^{-j}
+\mbox{\boldmath $C$}^{\rm DIS}_{2,j}(Q^2/\mu^2,\alpha_s(\mu))
+\mbox{\boldmath $H$}_{j} (\xi=0,\Delta^2=0,\mu^2) 
+\Bigg|_{j = c + y e^{i\phi}}
 \label{<F2formula>}
-\end{eqnarray*}
-
+\end{eqnarray}
 DIS Wilson coefficients $\mbox{\boldmath $C$}^{\rm DIS}_{2,j}(Q^2/\mu^2,\alpha_s(\mu))$
-are given e.g. in \cite{vanNeerven:2000uj}. They are equal to those in
- Eq. (18) of \cite{Kumericki:2006xx} without prefactor in front of square brackets there.
+are given e.g. in \cite{vanNeerven:2000uj}.
 
-\section{Numerical Mellin-Barnes Integration}  
-\label{sect:Integration}
+\subsection{Numerical Mellin-Barnes Integration}  
+\label{ssect:Integration}
 Numerical integration is performed in a way very similar to the one described in
 \cite{Vogt:2004ns}: Integrand is largest and
 fluctuates most rapidly around zero, mostly due to the factor $\xi^{-j}$. As we
 move away from real axis, both
-amplitude (for $\phi > \pi/2$) and oscillation frequency decrease exponentially.
-Thus we divide integration region in exponentially expanding intervals
-defined by points.
-
-\begin{equation}
- \{0, 0.01, 0.025, 0.067, 0.18, 0.5, 1.3, 3.7, 10\}
+amplitude and oscillation frequency decrease exponentially.
+This leads us to divide integration region in exponentially expanding intervals
+defined by points:
+\begin{align*}
+0 \,\ldots\, 0.01 \,\ldots\, 0.025\,\ldots\, 0.067\,\ldots\,& 0.18\,\ldots\, 0.5\,\ldots\, 1.3\,\ldots\, 3.7\,\ldots\, 10&
+\qquad \text{(for \texttt{SPEED=1})} \\
+0  \,\ldots\, 0.025\,\ldots\,& 0.18\,\ldots\, 1.3 \,\ldots\, 10&
+\qquad \text{(for \texttt{SPEED=2})} \\
+0  \,\ldots\,& 0.18 \,\ldots\, 3.7&
+\qquad \text{(for \texttt{SPEED=4})} \\
 \label{<intervals>}
-\end{equation}
-
-Between each two points standard 8-point Gaussian integration is employed, according
+\end{align*}
+Here \texttt{SPEED} is one of \texttt{gepard}'s initialization parameters which
+controls speed and accuracy of evaluations, see Section \ref{ssect:GEPARD.INI}.
+On each segment, standard 8-point Gaussian integration is employed, according
 to Eq. (25.4.30) from \cite{AbS65}.
-
-This is for \texttt{SPEED}=1. Otherwise integration intervals are defined by using
-only points with indices
-
-\begin{equation}
- \{ 1, 1 + \texttt{SPEED}, 1 + 2 \texttt{SPEED}, \ldots \}
-\label{<speedintervals>}
-\end{equation}
-
-from the above list. Thus for \texttt{SPEED}=1,2, and 4 we use in total 64, 32, and 16
+Thus for \texttt{SPEED}=1,2, and 4 we use in total 64, 32, and 16
 integration points, respectively. 
 
 During the initialization phase, coordinates of points on Mellin-Barnes contour and 
@@ -144,25 +175,74 @@ This would be reasonably easy to implement for fits with fixed $\mathcal{Q}_{0}^
 where evolution is needed only for small number of fixed ratios 
 $\alpha_{s}(\mathcal{Q})/\alpha_{s}(\mathcal{Q}_0)$. (In the general case, one could
 maybe make interpolation function for evolution operator.)
-Looking at the execution profile of the present code, i.e. how much is spent
+Looking at the execution profile of the present code, i.e. how much time is spent
 in particular subroutines, it seems to me that by such improvements one can hope
 for a speed-up of about factor 5-8. This could be the next step if the present
 speed turns out to be insufficient.
 \end{commblock}
 
-\section{Initialization files}
 
-Execution of basic gepard routines depends on initialization parameters specified in
-file \texttt{GEPARD.INI}, and Minuit fitting depends on two additional initialization files
-\texttt{FIT.INI} and \texttt{MINUIT.CMD}, as well as experimental data files, specified
-in  \texttt{FIT.INI}. The contents of these files is explained in following subsections.
+\subsection{Ansatz for GPD $\mbox{\boldmath $H$}_{j} (\xi,\Delta^2,\mathcal{Q}_{0}^2)$}
+\label{ssect:ansatz}
+
+User has to provide values of moments of GPDs $\mbox{\boldmath $H$}_{j} 
+(\xi,\Delta^2,\mathcal{Q}_{0}^2)$
+on an input scale by defining subroutine \texttt{HJ} which has the synopsis
+\begin{verbatim}
+      SUBROUTINE HJ(J, FCM)
+
+      DOUBLE COMPLEX J, FCM(2)
+      DOUBLE PRECISION XI, DEL2, Q2, Q02
+      COMMON / KINEMATICS /  XI, DEL2, Q2, Q02
+\end{verbatim}
+Input to the subroutine is the complex conformal moment \texttt{J} (i.e. coordinates of a point
+on the Melin-Barnes contour), and kinematical parameters $\xi$, $t=\Delta^2$, $\mathcal{Q}^2$
+(not used), and $\mathcal{Q}_{0}^2$ (these last four via common block), while output should 
+be corresponding values
+\begin{align}
+\texttt{FCM(1)}& =\, ^{\Sigma}\!H_{j} (\xi,\Delta^2,\mathcal{Q}_{0}^2)  \\
+\texttt{FCM(2)}& =\, ^{G}\!H_{j}(\xi,\Delta^2,\mathcal{Q}_{0}^2) \,.
+\label{eq:FCM}
+\end{align}
+In the subroutine \texttt{HJ} provided by default, there is already implemented ansatz
+\begin{equation}
+^{a}\!H_{j}(\xi,\Delta^2,\mathcal{Q}_{0}^2) = 
+N_a F_{a} (\Delta^2) \frac{ {\rm B}\big(1+j-\alpha_{a}(\Delta^2), \mathcal{P}_a\big)}{
+{\rm B}\big(2-\alpha_{a}(0),\mathcal{P}_a\big)}\;, \qquad a = \Sigma, G \,
+\label{eq:ansatzFIT}
+\end{equation}
+where $\mathcal{P}_\Sigma$ = 8,  $\mathcal{P}_G$ = 6, $\alpha_{a}(\Delta^2) =
+\alpha_{a}(0) + 0.25 \Delta^2$  and 
+\begin{equation}
+F_{a} (\Delta^2) = \left(1 - \frac{\Delta^2}{m_{a}^2}\right)^{-3} \,.
+\label{eq:F}
+\end{equation}
+Six free parameters of this ansatz ($N_a$, $m_a$ and $\alpha_{a}(0)$, for  $a = \Sigma, G$),
+can either be fixed, or provided by the minimization routine for fitting, see
+Fig.~\ref{fig:MINUIT.CMD}.
+
+\section{Initialization files}
+\label{sec:init}
+
+Execution of \texttt{gepard} routines depends on the initialization parameters specified in
+the following files
+\begin{itemize}
+\item  \texttt{GEPARD.INI} --- main initialization for all routines
+\item  \texttt{FIT.INI} --- which sets of data are used in fits
+\item \texttt{MINUIT.CMD} --- Minuit minimization batch file
+\item \emph{data files} --- as specified in \texttt{FIT.INI}
+\end{itemize}
+The format and contents of these files should be mostly clear by looking at provided
+examples, and detailed explanations follow in the next subsections.
 
 \textbf{NB:} Note that various constants in these files should be specified
-according to Fortran 77 standard! Thus, integers should be without dot, double precision values
-with dot and \texttt{'D'}, while character constants (i.e. strings) should be enclosed in
+according to Fortran 77 standard! Thus, integers should be without dot (e.g.
+\texttt{1}), double precision values with dot and \texttt{'D'} (e.g.
+\texttt{1.D0}), while character constants (i.e. strings) should be enclosed in
 single quotation marks.
 
 \subsection{\texttt{GEPARD.INI}}
+\label{ssect:GEPARD.INI}
 
 File has the structure displayed on Fig.~\ref{fig:GEPARD.INI}.
 Only the first column is read by the program and it contains
@@ -178,7 +258,7 @@ Columns two and three are just convenient reminders for the user.
     2          SPEED        1(most accurate), 2 or 4(fastest)
     1          P            N^{P}LO order (0, 1 or 2)
     3          NF           number of active flavours
-    0.05D0     AS0          value of astrong/(2 Pi) at 2.5 GeV
+    0.05D0     AS0          value of astrong/(2 Pi) at 2.5 GeV^2
     1.D0       RF2          ratio {\cal Q}^2/{\mu_{f}^2}
     1.D0       RR2          ratio {\cal Q}^2/{\mu_{r}^2}
     'CSBAR'    SCHEME       
@@ -197,7 +277,7 @@ Columns two and three are just convenient reminders for the user.
 \texttt{SPEED} --- \emph{Integer}. Controls the speed and accuracy of the execution. Values can
 presently be only 1, 2, and 4, where 1 is the most accurate and at the
 same time the slowest case.
-As described in Section \ref{sect:Integration}, \texttt{SPEED} controls the number
+As described in Section \ref{ssect:Integration}, \texttt{SPEED} controls the number
 of segments in which Mellin-Barnes integration contour is divided before 8-point
 Gaussian integration is performed on each segment. It also controls number of
 points used for Gaussian integration of partial Compton cross-section. This
@@ -224,7 +304,7 @@ some point make extensive analysis of accuraccy of routines.}.
 \texttt{NF} --- \emph{Integer}. Number of active quark flavours
 
 \item
-\texttt{AS0} --- \emph{Double precision}. Value of $\alpha_{\rm s}(2.5 \textrm{GeV})/(2 \pi)$. For various
+\texttt{AS0} --- \emph{Double precision}. Value of $\alpha_{\rm s}(2.5 \textrm{GeV}^2)/(2 \pi)$. For various
 test, as well as in \cite{Kumericki:2006xx} value 0.05 vas used. More realistic
 value is 0.0536, which corresponds to $\alpha(M_Z) = 0.117$. \comminline{Check this value!} 
 
@@ -251,43 +331,11 @@ to ansatz used for fitting, see description of \texttt{MINUIT.CMD} below.
 
 \end{itemize}
 
-\subsection{\texttt{MINUIT.CMD}}
-
-\begin{figure}[t]
-\begin{center}
-\hrule
-\begin{verbatim}
-
-        SET TITLE
-           Fitting to H1/ZEUS DVCS and DIS data
-        PARAMETERS
-        1  'NG        '   0.3d0     .1d0
-        2  'NSEA      '   0.2d0     .1d0
-        3  'MG        '   1.0d0     .1d0 
-        4  'MSEA      '   1.0d0     .1d0
-        5  'ALPHA0G   '   1.0d0     .1d0
-        6  'ALPHA0SEA '   1.0d0     .1d0
-        7  'Q20       '   1.0d0     .1d0
-
-        fixed 3 4 7
-        migrad
-        stop
-
-\end{verbatim}
-\hrule
-\end{center}
-\caption{Example of Minuit batch file \texttt{MINUIT.CMD}}
-\label{fig:MINUIT.CMD}
-\end{figure}
-
-\texttt{MINUIT.CMD} is a file containing Minuit batch commands. Its format is explained in
-Minuit manual \cite{Minuit}, Section 3.2.1.  If one uses default \texttt{ANSATZ = 'FIT'} in
-\texttt{GEPARD.INI}, then part of this file which defines fit parameters should look like on
-Fig.~\ref{fig:MINUIT.CMD}. One should than only change initial values of parameters
-(column 3), and maybe their starting step size (column 4). Last part of this file
-contains Minuit command instructions. E. g. in the example on Fig.~\ref{fig:MINUIT.CMD}
-one first fixes parameters number 3, 4, and 7 (i.e. \texttt{MG}, \texttt{MSEA} and \texttt{Q20}
-are held at 1.0), and than performs minimization using \texttt{migrad} algorithm.
+Note that \texttt{GEPARD.INI} is meant to be read at the very beginning of the
+program execution, and values specified inside can be overriden later. For
+example, provided program \texttt{radcorr}, which calculates ratio of NNLO to NLO
+radiative corrections, ignores values of \texttt{P}, \texttt{SCHEME} and
+\texttt{ANSATZ} in \texttt{GEPARD.INI}, and sets them itself.
 
 
 \subsection{\texttt{FIT.INI}}
@@ -354,6 +402,60 @@ This facilitates easy selection of data for different fits.
 \end{itemize}
 
 
+\subsection{\texttt{MINUIT.CMD}}
+
+\begin{figure}[t]
+\begin{center}
+\hrule
+\begin{verbatim}
+
+        0    1=INTERACTIVE 0=BATCH 
+        SET TITLE
+           Fitting to H1/ZEUS DVCS and DIS data
+        PARAMETERS
+        1  'NG        '   0.3d0     .1d0
+        2  'NSEA      '   0.2d0     .1d0
+        3  'MG        '   1.0d0     .1d0 
+        4  'MSEA      '   1.0d0     .1d0
+        5  'ALPHA0G   '   1.0d0     .1d0
+        6  'ALPHA0SEA '   1.0d0     .1d0
+        7  'Q20       '   1.0d0     .1d0
+
+        fixed 3 4 7
+        migrad
+        cali 3
+
+\end{verbatim}
+\hrule
+\end{center}
+\caption{Example of Minuit batch file \texttt{MINUIT.CMD}}
+\label{fig:MINUIT.CMD}
+\end{figure}
+
+\texttt{MINUIT.CMD} is a file containing Minuit batch commands. Its format is explained in
+Minuit manual \cite{Minuit}, Section 3.2.1. The only difference with respect to the
+standard Minuit batch file is that first line has to contain integer 1 or 0 as a first
+item. This controls whether one will do an interactive Minuit session, or not.
+\comminline{At the beginning of the interactive part, one must issue two user-unfriendly
+command, as instructed by the program. This will be made more elegant one day.}
+Interactive Minuit session can be very powerful, after one carefully reads Minuit manual.
+
+Second and third line are just giving some label to Minuit session.
+
+Then comes the part where fit parameters are specified.
+If one uses default \texttt{ANSATZ = 'FIT'} in
+\texttt{GEPARD.INI}, then this part should look like on
+Fig.~\ref{fig:MINUIT.CMD}. One could than only change initial values of parameters
+(column 3), and maybe their starting step size (column 4). This \texttt{ANSATZ = 'FIT'} 
+corresponds to ansatz described in Section \ref{ssect:ansatz}.  
+
+Last part of this file contains Minuit command instructions. E. g. in the
+example on Fig.~\ref{fig:MINUIT.CMD} one first fixes parameters number 3, 4,
+and 7 (i.e. \texttt{MG}, \texttt{MSEA} and \texttt{Q20} are held at 1.0),
+than performs minimization using \texttt{migrad} algorithm,
+and finally prints (to the file \texttt{FIT.OUT}), and maybe plots (to the file specified in
+\texttt{FIT.INI}) the results of the fit.
+
 \subsection{Data files}
 
 \begin{figure}[t]
@@ -384,7 +486,8 @@ This facilitates easy selection of data for different fits.
 \label{fig:DVCS4.DAT}
 \end{figure}
 
-File has the structure displayed on Fig.~\ref{fig:DVCS4.DAT}. In the first
+Names of these files should be specified in \texttt{FIT.INI}.
+Each data file has the structure displayed on Fig.~\ref{fig:DVCS4.DAT}. In the first
 four rows only the first item is read by the program and the second one
 (corresponding to internal Fortran variable) is just convenient user
 documentation.
@@ -437,7 +540,63 @@ Statistical and systematical errors are combined in quadrature for fitting.
 
 \end{itemize}
 
-\section{Main \texttt{gepard} functions}
+
+\section{An example run}
+
+In the directory where all initialization files named in Section~\ref{sec:init} are
+placed one runs executable \texttt{fit}. When minimization is over, and results
+printed out (e.g. by Minuit command \texttt{cali 3}), one gets two new files.
+One is \texttt{FIT.OUT}, containing the numbers from each data file, together with
+resulting fit value \texttt{Y(X)\_FIT},
+and last column says how many sigmas is fit value different from experiment.
+One stanza from such file is displayed on Fig.~\ref{fig:fitout}.
+
+\begin{figure}[h]
+\begin{center}
+\hrule
+\small
+\begin{verbatim}
+
+ ------------------------------------------------------------------------
+                                    DIS3.DAT                         
+      X           Y(X)_FIT      Y(X)_EXP   DY_EXP    (FIT-EXP)/DY_EXP 
+ ------------------------------------------------------------------------ 
+   0.000200        1.2578        1.2150      0.08         0.5
+   0.000320        1.1293        1.0890      0.06         0.7
+   0.000500        1.0178        1.0330      0.07        -0.2
+   0.000800        0.9110        0.9230      0.05        -0.2
+   0.001300        0.8118        0.8110      0.06         0.0
+   0.002000        0.7330        0.7700      0.06        -0.6
+   0.003200        0.6567        0.5620      0.05         1.8
+   0.005000        0.5934        0.6480      0.06        -0.9
+   0.008000        0.5359        0.5640      0.06        -0.5 
+
+\end{verbatim}
+\hrule
+\end{center}
+\caption{Example of a part of resulting fit file \texttt{FIT.OUT}}
+\label{fig:fitout}
+\end{figure}
+
+If one has PGPLOT library compiled in, than this fits are also graphed,
+as specified at the beginning of the file \texttt{FIT.INI}. Example
+graph is shown on Fig.~\ref{fig:fitps}
+
+\begin{figure}[t]
+\begin{center}
+\includegraphics[scale=0.52]{examplefit}
+\end{center}
+\caption{Example of a fit to DIS data.}
+\label{fig:fitps}
+\end{figure}
+
+
+\section{Algorithmic structure of \texttt{gepard} and its subroutines}
+
+Calling graph of subroutines is displayed on Fig.~\ref{fig:callgraph}. Each subroutine,
+function and main program is described in the extended \texttt{gepard-api.pdf} documentation,
+as well as hyperlinked HTML documentation produced by \texttt{robodoc} automatic
+documentation generator.
 
 \begin{figure}[h]
 \begin{center}
@@ -446,6 +605,7 @@ Statistical and systematical errors are combined in quadrature for fitting.
 \caption{Calling graph}
 \label{fig:callgraph}
 \end{figure}
+
 
 
 
