@@ -1,19 +1,26 @@
+
+Physics: 
+-  Include MS-bar evolution
+-  t_cut of ZEUS data is infinity? DVCS[46].DAT
+
+Computing:
 -  Restore MathLink communication
-
 -  Make C-MathLink communication function that recognizes input type
+-  Remove unused variables (specially in adacf, or specially
+   not there)?
 
-+  Transfer adacf Fortran routines to gepard to make it independent
-   of adacf library.  (Done in ver. 0.89)
-
+Checks:
 -  Check NLO DIS evolution against Les Houches table 3 or 4
-
 -  Check plotting of error-bars (Implement stat-syst as in 
    original papers and Dieter's femtoholographic paper?)
    It seems that grace is doing this wrong for log-y axis!
 
--  Remove unused variables (specially in adacf, or specially
-   not there)?
-
+Design:
 -  Verbatim \ref in robodoc TeX?
-
 -  Beautify Robodoc output.
+
+DONE:
++  Transfer adacf Fortran routines to gepard to make it independent
+   of adacf library.  (Done in ver. 0.89)
+
+

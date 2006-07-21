@@ -58,6 +58,8 @@ C
       CALL INIT
 
       P = 0
+      WRITE (*, *) "For values of test parameters see src/test.f"
+      WRITE (*, *) 
 
       WRITE (*, *) " ---  Test 1: Naive parton model F2 ---- "
       XI = 0.002d0

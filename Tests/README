@@ -1,9 +1,32 @@
-FIG2A.DAT (FIG1A.DAT) is part of data from Fig. 2 (1) from the letter
-hep-ph/0605237.  After compiling with make scaledep (radcorr) and running
-scaledep (radcorr) program, consistency should be checked by
 
-diff Tests/FIG2A.DAT FIG2A.DAT
+Accuracy and dependance on SPEED (from GEPARD.INI) can be studied by
+the following test programs.
 
-(diff Tests/FIG1A.DAT FIG1A.DAT)
+Make sure to use AS0=0.05 in GEPARD.INI. Best agreement should be
+obtained by SPEED=1.
+
+First test
+----------
+For testing the DVCS and DIS observables for some test values of
+parameters, use executable 'test'.
+
+Second test
+-----------
+Testing the intermediate values of CFFs can be done using
+executable 'auxtest'. (Note that this is useful mostly for
+debugging, if the first test comes out right, this one is
+certain to come out right as well.)
+
+
+Third test
+----------
+lett/FIG2A-LETT.DAT (FIG1A-LETT.DAT) is part of data from Fig. 2 (1) from the letter
+hep-ph/0605237.  After running scaledep (radcorr) program, consistency should
+be checked by
+
+diff lett/FIG2A-LETT.DAT FIG2A.DAT
+
+(diff lett/FIG1A-LETT.DAT FIG1A.DAT)
 
 Or, better, diff -> vimdiff
+

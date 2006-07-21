@@ -8,6 +8,8 @@
 #
 # To remove PGPLOT (plotting) compile with
 # 	make NOPGPLOT=1 fit 
+#      or
+#   make fit_nopgplot
 #
 
 ifndef NOPGPLOT
@@ -35,6 +37,8 @@ _FOBJS = $(patsubst %,$(FODIR)/%,$(FOBJS))
 # rule for compiling fit.F
 $(FODIR)/Ffit.o: fit.F
 	$(FC) -c -o $@ $< $(FFLAGS) $(CPPFLAGS)
+$(FODIR)/Ffit_nopgplot.o: fit.F
+	$(FC) -c -o $@ $< $(FFLAGS) '-D NOPGPLOT'
 
 # rule for compiling Fortran .f  files
 $(FODIR)/F%.o: %.f
@@ -63,9 +67,6 @@ $(ODIR)/%.o: %.c
 	$(CC) -c -o $@ $< $(CFLAGS) $(INCS)
 
 # targets
-#SRCTARGETS = radcorr scaledep fit test auxtest fit_noplot
-
-#all: $(SRCTARGETS)
 
 auxtest: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Fauxtest.o 
 	$(FC) -o $@ $^ $(FFLAGS)
@@ -81,6 +82,9 @@ scaledep: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Fscaledep.o $(FODIR)/Fderiv.o
 
 fit: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Ffit.o $(ODIR)/flushout.o
 	$(FC) -o $@ $^ $(FFLAGS) $(CERNLIBS) $(ALLPGPLOTLIBS)
+
+fit_nopgplot: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Ffit_nopgplot.o $(ODIR)/flushout.o
+	$(FC) -o $@ $^ $(FFLAGS) $(CERNLIBS)
 
 
 .PHONY: clean

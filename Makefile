@@ -4,12 +4,16 @@
 # 	radcorr  -  program for producing Fig. 1 in letter
 # 	scaledep -  program for producing Fig. 2 in letter
 # 	test     -  tests both DVCS and DIS routines
+# 	auxtest  -  tests DVCS \mathcal{H} calculation
 # 	fit      -  fitting GPD ansatz to DVCS and DIS data
+# 	fit_nopgplot -  same as fit, but without plotting
 # 	html     -  HTML documentation
 # 	pdf      -  LaTeX -> PDF documentation
 #
 # For compiling 'fit' without PGPLOT (no plotting) do
 # 	  make NOPGPLOT=1 fit
+# 	(This is what fit_nopgplot target does, but with
+# 	 different name for executable.)
 #
 # For debugging/profiling call like this:
 #     make FFLAGS='-g -pg' 
@@ -33,7 +37,7 @@ export X11LIBS = -L/usr/X11R6/lib -lX11
 endif
 
 # targets
-SRCTARGETS = radcorr scaledep fit test auxtest fit_noplot
+SRCTARGETS = radcorr scaledep fit test auxtest fit_nopgplot
 .PHONY: $(SRCTARGETS)
 DOCTARGETS = pdf html
 
@@ -41,7 +45,6 @@ all: $(SRCTARGETS) $(DOCTARGETS)
 
 $(SRCTARGETS):
 	$(MAKE) -C src $@
-	ln -sf src/$@ .
 
 doc: html pdf
 
@@ -67,5 +70,5 @@ clean:
 	-rm -f $(patsubst %,src/%,$(SRCTARGETS))
 	-rm -f $(patsubst %,%.exe,$(SRCTARGETS))
 	-rm -f $(patsubst %,src/%.exe,$(SRCTARGETS))
-	-rm fits/FIT.OUT fits/gmon.out fits/*.ps
+	-rm fits/*.{out,ps}
 	-rm FIG*DAT gmon.out

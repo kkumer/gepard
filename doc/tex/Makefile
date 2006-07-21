@@ -1,6 +1,3 @@
-view: gepard.dvi
-	xdvi $^
-
 allpdfs: gepard.pdf gepard-api.pdf
 
 %.pdf: %.dvi
@@ -11,8 +8,6 @@ allpdfs: gepard.pdf gepard-api.pdf
 
 # FIXME: write/find more sophisticated rule
 %.dvi: %.tex
-	latex $^
-	-bibtex $*
 	latex $^
 	latex $^
 	-makeindex $*.idx

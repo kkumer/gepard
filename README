@@ -1,17 +1,17 @@
 
-gepard = calculating Compton form factors from moments of
-         GEneral PARton Distributions 
+gepard - Package for calculation of DVCS form factors and observables
+         by evolving moments of GEneral PARton Distributions 
 
 
-- Version 0.9b2 2006-07-18 
+- Version 0.9b3 2006-07-20 
 
 
 Contents of this README
 -----------------------
 
 1. Basic usage
-        1.1 Fitting with Fortran executables
-        1.2 Calculating CFFs in Mathematica
+        1.1 Calculating with Fortran executables
+        1.2 Fitting using Minuit
 
 2. Compilation and installation
         2.1 Unix requirements
@@ -28,6 +28,7 @@ Contents of this README
         3.1 Documentation
         3.2 Fortran part
         3.3 Mathematica part
+                3.3.1 Calculating CFFs in Mathematica
 
 
 ========================================
@@ -35,72 +36,49 @@ Contents of this README
 ========================================
 
 
-1.1 Fitting with Fortran executables
---------------------------------------
+1.1 Calculating with Fortran executables
+----------------------------------------
 
-- First try to run executable './test' (Not 'test' which is a built-in
-  Unix shell command!)  and see if numbers come out right.
+- First go to directory Tests/ and try to run executable '../src/test' from 
+  there, and see if numbers come out right. (By the way, one always needs to 
+  start executables from directory where relevant input files are placed.)
   Try increasing SPEED in GEPARD.INI and see how numbers get worse.
 
-For fitting with Minuit:
+- For additional tests, see Tests/README
 
-- Use provided binary 'fit' (or fit.exe in MS Windows), if you can, 
-  or create it by 'make fit'. It needs to be started from directory 
-  fits/ where input files are.
+1.2 Fitting using Minuit
+------------------------
 
-- Commands for driving Minuit and for specifying initial values of
-  fitting parameters are in file MINUIT.CMD (see Minuit manual for their exact
-  meaning!), and final fit result goes to file FIT.OUT. 
-  Output of Minuit itself is going to terminal, so to save it use e.g.  
-  './fit | tee -a savefile'
+- Use provided executable '../src/fit', if you can, or create it by 'make fit'.
+  It needs to be started from directory fits/ where input files are.
 
-- Parameters (not for fit but for everything else) are specified in GEPARD.INI
-  which is self-documented (only the first item on each line there is
-  read by program, other are just documentation for users convenience)
+- Parameters (not for fit ansatz but for everything else) are specified in
+  GEPARD.INI which is self-documented.
 
 - To select which experimental data will be used for fit, edit file FIT.INI.
   Only sets between strings 'START' and 'STOP' will be used.
 
-- First two lines of file FIT.INI specify graphical output:
-   1) First line specifies driver
-    'filename.ps/CPS'  will get output into PS file (landscape)
-    'filename.ps/VCPS'  will get output into PS file (portrait)
+- First line of FIT.INI specifies filename for output, both tabular (.out)
+  and graphical (.ps)
+
+- Second line of FIT.INI specifies type of graphical output:
+   1) First comes a string specifying PGPLOT driver:
+    '/CPS'  will get output into PS file (landscape)
+    '/VCPS'  will get output into PS file (portrait)
     '/XSERVE'   will get output in X window (may not work on MS Windows)
-   2) second line are two integers specifying number of graphs on
+   2,3) then come two integers specifying number of graphs on
       one physical page: XPANELS x YPANELS
+
+- Commands for driving Minuit and for specifying initial values of
+  fitting parameters are in file MINUIT.CMD (see Minuit manual for their exact
+  meaning!).
+  Output of Minuit itself is going to terminal, so to save it use e.g.  
+  'fit | tee -a savefile' (on Unix, on Windows just redirect output
+  to file somehow. Maybe 'fit > savefile'.)
+
 
 More detailed description can be found in doc/tex/gepard.pdf
 
-
-1.2 Calculating CFFs in Mathematica
------------------------------------
-
-[Note that this is obsolete! See section 3.3 below.]
-
-Put gepard.m file and gepard.exe directory where Mathematica can find it, then
-install via:
-
-<< gepard.m
-
-Mathematica should automatically load file gepard.exe in subdirectory according
-to $SystemID
-
-If this doesn't work ("gepard.exe not found"), then in file gepard.m adjust line 
-    Install["gepard.exe"]
-to
-    Install["<exact path to file gepard.exe for your system>"]
-
-For usage, type ?CFF or better read gepard.nb and DM's CFFNNLO.nb which uses
-the same calling conventions for high level functions i.e. only  "eval" label
-there should be changed from as2pF(II) to either:
-
-GEP  - exact Fortran routines
-GEPI, GEPIfix  - two types of interpolations
-
-Quickest introduction is by going over 1st and 3rd section of gepard.nb, then
-returning to 2nd for details and lower level functions if needed, and only then
-use ?CFF, ?interpol, ?interpolfix, ?Fpw, ?cDVCS, ?RAope, ?Fcm, ?common, ?AS2P
-which are a bit cryptic.
 
 
 ====================================================================
@@ -108,12 +86,14 @@ which are a bit cryptic.
 ====================================================================
 
 You need information in this section only if you want to recreate executables
-and documentation (ideally, they should be provided in distributed gepard.tgz).
+and documentation (ideally, they should be provided in distributed gepard.tgz
+in src/ directory).
 
 
 2.1 Unix requirements
 ---------------------
-- 'test', 'radcorr' and  'scaledep' programs can be compiled using just GNU GCC
+- 'test', 'radcorr' and  'scaledep' programs can be compiled using just GNU gcc
+   compiler
 
 - 'fit' program needs CERNLIB's Minuit routine, usually contained in libraries
   'kernlib' and 'packlib', distributed by CERN at
@@ -158,10 +138,13 @@ Sections  2.4 and 2.5  below.
 2.3 Compilation targets
 -----------------------
 
-Following make commands can be issued in top gepard/ directory, where
+Following make commands should be issued in top gepard/ directory, where
 main Makefile is located:
 
 make test  - creates simple executable for testing
+make auxtest  - creates simple executable for testing (this tests values
+             of \mathcal{H} in two points corresponding to points "A" and "B"
+             in notebook lett-num.nb)
 make fit   - creates executable for fitting. It needs to be started
              from directory fits/ where input files are.
 make NOPGPLOT=1 fit - creates executable for fitting, but without plotting 
@@ -263,8 +246,9 @@ fits/ - inputs needed for fitting to DVCS and DIS data
 
 Note that the present version of gepard is considered Fortran-only. Mathematica
 packages and notebooks correspond to older version gepard-0.8* (which was
-used also for hep-ph/0605237 letter numerics). They are not needed but are
-useful for checking and investigation of Fortran algorithms. (They are slow.)
+used also for hep-ph/0605237 letter numerics). They are slow and actually not 
+needed here but are useful for checking and debugging of Fortran algorithms.
+(New Mathematica interface will hopefully be made in the future.)
 
 Test/mma-check/gepard.m  - Mathematica package. For basic documentation try ?CFF and ?Fcm
 Test/mma-check/gepard.nb - Notebook with checks and timings. Section 1 and then 3 are good
@@ -275,3 +259,35 @@ Test/mma-check/gepard.exe - binary FORTRAN library. (Linux and Windows versions)
 Test/mma-check/CFFNNLO_KK.nb - Notebook needed if one wants to recalculate referent
                                results in gepard.nb to which gepard results are compared
 Test/mma-check/gepard_devel.nb - Notebook used for development. Not so easy to follow.
+
+
+3.3.1 Calculating CFFs in Mathematica
+
+Put gepard.m file and gepard.exe directory where Mathematica can find it, then
+install via:
+
+<< gepard.m
+
+Mathematica should automatically load file gepard.exe in subdirectory according
+to $SystemID
+
+If this doesn't work ("gepard.exe not found"), then in file gepard.m adjust line 
+    Install["gepard.exe"]
+to
+    Install["<exact path to file gepard.exe for your system>"]
+
+Alternatively, for Linux systems with $SystemID not equal to "Linux" make a link 
+   ln -s Linux [$SystemID]
+
+For usage, type ?CFF or better read gepard.nb and DM's CFFNNLO.nb which uses
+the same calling conventions for high level functions i.e. only  "eval" label
+there should be changed from as2pF(II) to either:
+
+GEP  - exact Fortran routines
+GEPI, GEPIfix  - two types of interpolations
+
+Quickest introduction is by going over 1st and 3rd section of gepard.nb, then
+returning to 2nd for details and lower level functions if needed, and only then
+use ?CFF, ?interpol, ?interpolfix, ?Fpw, ?cDVCS, ?RAope, ?Fcm, ?common, ?AS2P
+which are a bit cryptic.
+

@@ -35,20 +35,17 @@ C
 
       IMPLICIT NONE
       INTEGER ISINTER
-      CHARACTER SCHEME*5, ANSATZ*6
       CHARACTER COMFILE*10
       EXTERNAL FCN
       DATA COMFILE /'MINUIT.CMD'/
 
       COMMON /INTERACTIVE/ ISINTER
-      COMMON / LABELS    /  SCHEME, ANSATZ
 
 *   Reading from first line do we want interactive Minuit session.
       OPEN (UNIT = 17, FILE = COMFILE, STATUS = 'OLD')
       READ (17, *) ISINTER
       CLOSE (17)
 
-      SCHEME = 'CSBAR'
       CALL READPAR
       CALL INIT
 
@@ -123,8 +120,9 @@ C
       INTEGER K, IER, XPANELS, YPANELS
       DOUBLE PRECISION FITPAR(NPARMAX)
       DOUBLE PRECISION CHISQPART
-      CHARACTER DATAFNAME*15
-      CHARACTER OUTFILE*15
+      CHARACTER DATAFNAME*20
+      CHARACTER OUTFILE*20
+      CHARACTER OUTFORMAT*20
 #ifndef NOPGPLOT
       INTEGER PGBEG
 #endif
@@ -140,26 +138,38 @@ C
       DO 10 K = 1, NPARMAX
  10     FITPAR(K) = A(K)
 
-*     Initialization of printing the results
-
-      IF (IFLAG .EQ. 3)  THEN
-*       File for writing out points of final fit
-        OPEN (UNIT = 21, FILE = 'FIT.OUT', STATUS = 'UNKNOWN')
-      END IF
 
       CHISQ = 0.0d0
 
       OPEN (UNIT = 11, FILE = 'FIT.INI', STATUS = 'OLD')
       READ (11, *) OUTFILE
-      READ (11, *) XPANELS, YPANELS
+      READ (11, *) OUTFORMAT, XPANELS, YPANELS
 #ifndef NOPGPLOT
 *    Initailization of plotting on 2x2 grid of panels
       IF (IFLAG .EQ. 3)  THEN
-        IER = PGBEG(0, OUTFILE, XPANELS, YPANELS)
+        IF (OUTFORMAT(:2) .EQ. '/X') THEN
+*         Ploting to /XSERVE
+          IER = PGBEG(0, "/XSERVE", XPANELS, YPANELS)
+        ELSE
+*         Ploting to /PSDRIV
+        IER = PGBEG(0, 
+     &  OUTFILE(1:MAX(1,INDEX(OUTFILE//' ',' ')-1)) // '.ps' //
+     &  OUTFORMAT(1:MAX(1,INDEX(OUTFORMAT//' ',' ')-1)),
+     &  XPANELS, YPANELS)
+        END IF
         IF (IER.NE.1) STOP
         CALL PGSCH(1.8)
       END IF
 #endif
+
+*     Initialization of printing the results tables
+
+      IF (IFLAG .EQ. 3)  THEN
+*       File for writing out points of final fit
+        OPEN (UNIT = 21, FILE = 
+     &  OUTFILE(1:MAX(1,INDEX(OUTFILE//' ',' ')-1)) // '.out',
+     &  STATUS = 'UNKNOWN')
+      END IF
 
 *     Process only files specified in FIT.INI between
 *      'START' and 'STOP'
@@ -434,4 +444,3 @@ C
       RETURN
       END
 C     ****
-

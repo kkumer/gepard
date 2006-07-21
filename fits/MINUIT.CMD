@@ -1,6 +1,6 @@
-0    1=INTERACTIVE 0=BATCH
+0   <--   1=INTERACTIVE   0=BATCH
 SET TITLE
-  ---->  Fitting to H1/ZEUS DVCS and DIS data  <-----
+       Fitting to H1/ZEUS DVCS and DIS data
 PARAMETERS
 1  'NG        '   0.6d0     .1d0
 2  'NSEA      '   0.1d0     .1d0
