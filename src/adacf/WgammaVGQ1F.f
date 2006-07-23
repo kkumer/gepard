@@ -6,12 +6,12 @@
        DOUBLE COMPLEX S1, S2, S3, S4
        DOUBLE COMPLEX HS1, HS2, HS3, HS4
        DOUBLE COMPLEX PSI, DPSI
-       DOUBLE PRECISION NF, CF, CG, TF
+       DOUBLE PRECISION NF, CF, CA, TF
        DOUBLE PRECISION EMC, ZETA2, ZETA3, ZETA4, LOG2
        PARAMETER ( EMC  = 0.57721 56649D0, ZETA2 = 1.64493 40668D0,
      ,            ZETA3 = 1.20205 69032D0, ZETA4 = 1.08232 32337D0,
      ,            LOG2 = 0.69314 71806D0 )
-       PARAMETER ( CF=4./3.d0, CG=3.d0, TF=0.5d0 )
+       PARAMETER ( CF=4./3.d0, CA=3.d0, TF=0.5d0 )
 *
 *      ... Harmonic sum initialization ...
 *
@@ -24,7 +24,7 @@
      &  -1.2d1*n+2.8000000000000003d1*n**3+4.3d1*n**4+3.d1*n**5+
      &  1.2d1*n**6-n*n)/((-1.d0+n)*n**3*(1.d0+n)**3)+((2.d0+n+n*
      &  n)*(1.d1*S1-2.d0*S2-2.d0*(S1*S1)))/((-1.d0+n)*n*(1.d0+n)
-     &  ))-8.d0*CF*CG*((1.1111111111111112d-1*(1.44d2+4.32d2*n-1
+     &  ))-8.d0*CF*CA*((1.1111111111111112d-1*(1.44d2+4.32d2*n-1
      &  .3039999999999998d3*n**3-1.031d3*n**4+6.949999999999999d
      &  2*n**5+1.678d3*n**6+1.4000000000000001d3*n**7+6.21d2*n**
      &  8+1.09d2*n**9-1.52d2*(n*n)))/((-1.d0+n)**2*n**3*(1.d0+n)
