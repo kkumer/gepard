@@ -35,13 +35,13 @@ C
 
       IMPLICIT NONE
       INTEGER ISINTER
-      CHARACTER COMFILE*10
+      CHARACTER COMFILE*10, OUTFILE*20
       EXTERNAL FCN
       DATA COMFILE /'MINUIT.CMD'/
 
       COMMON /INTERACTIVE/ ISINTER
 
-*   Reading from first line do we want interactive Minuit session.
+*   Reading from first line whether we want interactive Minuit session.
       OPEN (UNIT = 17, FILE = COMFILE, STATUS = 'OLD')
       READ (17, *) ISINTER
       CLOSE (17)
@@ -50,16 +50,27 @@ C
       CALL INIT
 
       IF (ISINTER .NE. 1) THEN
+*   We work in batch mode
+*     File where Minuit batch commands are
         OPEN (UNIT = 5, FILE = COMFILE, STATUS = 'OLD')
+        OPEN (UNIT = 11, FILE = 'FIT.INI', STATUS = 'OLD')
+        READ (11, *) OUTFILE
+        CLOSE (11)
+*     File for writing out Minuit output
+        OPEN (UNIT = 6, FILE = 
+     &    OUTFILE(1:MAX(1,INDEX(OUTFILE//' ',' ')-1)) // '.min',
+     &    STATUS = 'UNKNOWN')
       ELSE
+*   We work in interactive mode
         WRITE (*, 801) COMFILE
       END IF
 
       CALL MINUIT(FCN,0)  
 
-801   FORMAT (1X, / 1X, 72('-') / 1X, "Interactive mode" / 1X,
-     &  "Answer 'SET INPUT 18 ", A, "' to the next querry." / 1X,
-     &  "(Rewinding the unit is irrelevant, I guess.)" / 1X, 72('-') //)
+801   FORMAT (1X, // 1X, 72('-') / 1X, " -- Interactive mode ! --" / 1X,
+     & "You can answer 'SET INPUT 18 ", A, "' to the querry below" / 1X,
+     & "(Second question about rewinding the unit is irrelevant.)" / 1X,
+     & 72('-') //)
       STOP
       END
 C     ****
@@ -75,36 +86,26 @@ C    Writes out theoretical line points for fit plotting.
 C  SYNOPSIS
 C     SUBROUTINE FCN(NPAR,GIN,F,A,IFLAG,FUTIL)
 C
-C     IMPLICIT NONE
-C     INTEGER NPAR, IFLAG
-C     DOUBLE PRECISION F, FUTIL
-C     DOUBLE PRECISION A(*),GIN(*)
+C     INTEGER NPAR, IFLAG, NPARMAX
+C     PARAMETER (NPARMAX = 10)
+C     DOUBLE PRECISION CHISQ, FUTIL
+C     DOUBLE PRECISION A(NPARMAX),GIN(NPARMAX)
 C    
 C  INPUTS 
-C            DATASET?  --  ? = 1, ..., 9, 0.  (name of 8 chars exactly!!)
-C                          files with experimental data formatted
-C                          like:   x  y  dy_stat  dy_syst
+C                NPAR  --  Number of variable parameters
+C                   A  --  Values of all parameters
+C               IFLAG  --  If .EQ. 3 then print results out, see minuit doc
 C  OUTPUT
-C             FIT.PLT  --  File with fit results formatted like:
-C                          x  y(x)_theor
-C                          (with empty lines separating graphs)
+C                   F  --  Value of chi-square
 C  IDENTIFIERS
-C          N  --  Number of points in a given data set
-C          X  --  Array with x-values of experimental points
-C          Y  --  Array with y-values of experimental points
-C         DY  --  Array with errors of y-values
-C          A  --  Array with fit parameters
 C     FITPAR  --  Equal to A
-C          W2 -- (gamma*-proton) invariant mass squared
-C          XI -- DVCS scaling parameter or Bjorken x
-C        DEL2 -- DVCS asymmetry parameter (P2-P1)^2
-C          Q2 -- photon virtuality squared
+C  CHISQPART  --  chi-square produced by single data set
 C
 C  CHILDREN
-C      PARSIGMA, SIGMA, F2F
+C      PROCDATA
 C
 C  PARENTS
-C      MINUIT, FCN (via MINUIT)
+C      MINUIT
 C
 C  SOURCE
 C
@@ -117,17 +118,27 @@ C
       PARAMETER (NPARMAX = 10)
       DOUBLE PRECISION CHISQ, FUTIL
       DOUBLE PRECISION A(NPARMAX),GIN(NPARMAX)
-      INTEGER K, IER, XPANELS, YPANELS
+      INTEGER N, NTOT, K, IER, XPANELS, YPANELS
       DOUBLE PRECISION FITPAR(NPARMAX)
       DOUBLE PRECISION CHISQPART
-      CHARACTER DATAFNAME*20
-      CHARACTER OUTFILE*20
-      CHARACTER OUTFORMAT*20
+      CHARACTER*20 DATAFNAME, OUTFILE, OUTFORMAT
+      CHARACTER TXT*45
+      INTEGER SPEED, P, NF
+      DOUBLE PRECISION AS0, RF2, RR2
+      CHARACTER SCHEME*5, ANSATZ*6
+      CHARACTER*9 FITNM
+      DIMENSION FITNM(7)
+      DATA FITNM /'NG', 'NSEA', 'MG', 'MSEA',
+     & 'ALPHA0G', 'ALPHA0SEA', 'Q20'/
+
 #ifndef NOPGPLOT
       INTEGER PGBEG
 #endif
 
       COMMON / FITPARAMS  /  FITPAR
+      COMMON / PARINT /  SPEED, P, NF
+      COMMON / PARFLT /  AS0, RF2, RR2
+      COMMON / PARCHR /  SCHEME, ANSATZ
 
 *     Clear output buffer
 
@@ -138,7 +149,7 @@ C
       DO 10 K = 1, NPARMAX
  10     FITPAR(K) = A(K)
 
-
+      NTOT = 0
       CHISQ = 0.0d0
 
       OPEN (UNIT = 11, FILE = 'FIT.INI', STATUS = 'OLD')
@@ -162,13 +173,28 @@ C
       END IF
 #endif
 
-*     Initialization of printing the results tables
+*     Initialization of printing of the results tables to .out
 
       IF (IFLAG .EQ. 3)  THEN
-*       File for writing out points of final fit
         OPEN (UNIT = 21, FILE = 
      &  OUTFILE(1:MAX(1,INDEX(OUTFILE//' ',' ')-1)) // '.out',
      &  STATUS = 'UNKNOWN')
+        WRITE (21, 803) "Gepard parameters:"
+        WRITE (21, 804) SPEED, P, NF
+        WRITE (21, 805) AS0, RF2, RR2
+        WRITE (21, 806) SCHEME, ANSATZ
+        IF ( ANSATZ .EQ. 'FIT' ) THEN
+          WRITE (21, 803) "Final fit parameters:"
+          DO 13 K = 1, 7
+ 13       WRITE (21, 807) FITNM(K), A(K)
+        END IF
+        WRITE (21, *) 
+*     Same goes to .min
+        WRITE (6, 803) "Gepard parameters:"
+        WRITE (6, 804) SPEED, P, NF
+        WRITE (6, 805) AS0, RF2, RR2
+        WRITE (6, 806) SCHEME, ANSATZ
+        WRITE (6, *) 
       END IF
 
 *     Process only files specified in FIT.INI between
@@ -180,21 +206,53 @@ C
       IF (DATAFNAME(:4) .EQ. 'STOP') THEN
         GOTO 20
       ELSE
-        CALL PROCDATA (DATAFNAME, IFLAG, CHISQPART)
+        CALL PROCDATA (DATAFNAME, IFLAG, N, CHISQPART)
         CHISQ = CHISQ + CHISQPART
+        NTOT = NTOT + N
         IF (IFLAG .EQ. 3) WRITE (21, *)
       END IF
       GOTO 18
  20   CLOSE(11)
 
       IF (IFLAG .EQ. 3)  THEN
-         WRITE (*,*) 'CHISQ = ', CHISQ
+         WRITE (21, *) 'FREE PARAMS = ', NPAR
+         WRITE (21, *) 'D.O.F = ', NTOT - NPAR
+         WRITE (21, *) 'CHISQ = ', CHISQ
          CLOSE (21)
 #ifndef NOPGPLOT
+*     Draw last plot containing just parameter values
+        CALL PGSCH(1.3)
+        CALL PGPAGE
+        CALL PGVSTD
+        CALL PGSWIN (0., 12., 0., 12.)
+        CALL PGTEXT (-1., 12., "Gepard parameters:")
+        WRITE(TXT, 804) SPEED, P, NF
+        CALL PGTEXT (1., 11., TXT)
+        WRITE(TXT, 805) AS0, RF2, RR2
+        CALL PGTEXT (1., 10., TXT)
+        WRITE(TXT, 806) SCHEME, ANSATZ
+        CALL PGTEXT (1., 9., TXT)
+        IF ( ANSATZ .EQ. 'FIT' ) THEN
+          CALL PGTEXT (-1., 8., "Final fit parameters:")
+          DO 30 K = 1, 7
+          WRITE (TXT, 807) FITNM(K), A(K)
+ 30       CALL PGTEXT (-1., REAL(8-K), TXT)
+          WRITE (TXT, 808) NTOT, NPAR, NTOT-NPAR
+          CALL PGTEXT (-1., 0., TXT)
+          WRITE (TXT, 809) CHISQ
+          CALL PGTEXT (-1., -1., TXT)
+        END IF
          CALL PGEND
 #endif
       END IF
 
+803   FORMAT (1X, /, 1X, '-----    ', A, '    -----', /)
+804   FORMAT (1X, 'SPEED = ', I1, 5X, 'P = ', I1, 5X, 'NF = ', I1)
+805   FORMAT (1X, 'AS0 = ', F6.4,2X, 'RF2 = ', F3.1,2X, 'RR2 = ', F3.1)
+806   FORMAT (1X, 'SCHEME = ', A, 3X, 'ANSATZ = ', A)
+807   FORMAT (1X,  A15, ' = ', 3X, G9.3)
+808   FORMAT (1X, 'd.o.f = ', I3, ' - ', I1, ' = ', I3)
+809   FORMAT (1X, '\\gx\\u2\\d = ', F8.1)
 
       RETURN
       END
@@ -209,26 +267,39 @@ C    Reads experimental datasets and calculates chi-square by
 C    comparing to theoretical prediction functions.
 C    Writes out theoretical line points for fit plotting.
 C  SYNOPSIS
-C     SUBROUTINE PROCDATA (FNAME, IFLAG, CHISQPART)
+C     SUBROUTINE PROCDATA (FNAME, IFLAG, N, CHISQPART)
 C
 C     CHARACTER  FNAME*15
-C     INTEGER IFLAG
+C     INTEGER IFLAG, N
 C     DOUBLE PRECISION CHISQPART
 C  INPUTS
 C      FNAME  --  Name of the file containing data
 C      IFLAG  --  If .EQ. 3 then print results out, see minuit doc
 C  OUTPUT
 C   CHISQPART --  contribution to chi-square from processed data set
+C          N  --  Number of points in a given data set
+C  IDENTIFIERS
+C          X  --  Array with x-values of experimental points
+C          Y  --  Array with y-values of experimental points
+C         DY  --  Array with errors of y-values
+C         W2  -- (gamma*-proton) invariant mass squared
+C         XI  -- DVCS scaling parameter or Bjorken x
+C       DEL2  -- DVCS asymmetry parameter (P2-P1)^2
+C         Q2  -- photon virtuality squared
+C  PARENTS
+C      FCN
+C  CHILDREN
+C      PARSIGMA, SIGMA, F2F
 C  SOURCE
 C
-      SUBROUTINE PROCDATA (FNAME, IFLAG, CHISQPART)
+      SUBROUTINE PROCDATA (FNAME, IFLAG, N, CHISQPART)
 
       IMPLICIT NONE
       CHARACTER  FNAME*15
-      INTEGER IFLAG
+      INTEGER IFLAG, N
       DOUBLE PRECISION CHISQPART
       CHARACTER YOBS*8
-      INTEGER N, K
+      INTEGER K
       DOUBLE PRECISION X, Y, DY, THY, DIFSG
       DOUBLE PRECISION STAT, SYS
       DOUBLE PRECISION XI, DEL2, Q2, Q02,  W
@@ -436,6 +507,7 @@ C
       END IF
 
       CLOSE (12)
+
 901   FORMAT (1X, F10.6, 5X, F9.4, 5X, F9.4, 3X, F7.2, 7X, F5.1)
 902   FORMAT (1X, 72('-') / 1X, 35(' '), A, 21(' '), / 
      &  6X, "X", 11X, "Y(X)_FIT", 6X, "Y(X)_EXP",

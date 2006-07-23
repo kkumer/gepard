@@ -1,2 +1,4 @@
 -  Code taken from Vogt/Vermasseren may not be pure double precison.
   (Although maybe it behaves as double precision.)
+
+-  Interactive mode freezes on MS Windows

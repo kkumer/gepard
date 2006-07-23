@@ -3,7 +3,7 @@ gepard - Package for calculation of DVCS form factors and observables
          by evolving moments of GEneral PARton Distributions 
 
 
-- Version 0.9b3 2006-07-20 
+- Version 0.9b4 2006-07-23 
 
 
 Contents of this README
@@ -58,15 +58,20 @@ Contents of this README
 - To select which experimental data will be used for fit, edit file FIT.INI.
   Only sets between strings 'START' and 'STOP' will be used.
 
-- First line of FIT.INI specifies filename for output, both tabular (.out)
-  and graphical (.ps)
+- First line of FIT.INI specifies filename for output. There are usually three
+  output files:
+    <filename>.min   -  Output of Minuit routines
+    <filename>.out   -  Final fit results in tabular form
+    <filename>.ps    -  Same as .out but in graphical form (This works only
+                        if you have PGPLOT library. If not, use executable
+                        '../src/fit_nopgplot'.)
 
-- Second line of FIT.INI specifies type of graphical output:
-   1) First comes a string specifying PGPLOT driver:
+- Second line of FIT.INI specifies type of graphical output to <filename>.ps
+   *) first comes a string specifying PGPLOT driver:
     '/CPS'  will get output into PS file (landscape)
     '/VCPS'  will get output into PS file (portrait)
     '/XSERVE'   will get output in X window (may not work on MS Windows)
-   2,3) then come two integers specifying number of graphs on
+   *) then come two integers specifying number of graphs on
       one physical page: XPANELS x YPANELS
 
 - Commands for driving Minuit and for specifying initial values of
@@ -105,8 +110,8 @@ in src/ directory).
       http://www.astro.caltech.edu/~tjp/pgplot/
   Location of this library should be specified in Makefile.
   See section 2.5 for more details about installing PGPLOT.
-  If PGPLOT is not available, fit program should be compiled by:
-    'make  NOPGPLOT=1 fit'
+  If PGPLOT is not available, there is an alternative program fit_nopgplot
+  that produces only tabular output.
 
 - For recreating documentation, robodoc and LaTeX softwares are needed
   Robodoc homepage is  http://www.xs4all.nl/~rfsber/Robo/robodoc.html
@@ -122,7 +127,7 @@ Requirements are same as for Unix. I tested this only under cygwin
 environment. Cygwin is easy to install: http://www.cygwin.com/
 After installing basic setup.exe, and choosing some cygwin packages
 server, one needs to choose packages which he wants installed
-(by klicking on a small "Skip" icons shown by setup.exe; this wasn't
+(by clicking on a small "Skip" icons shown by setup.exe; this wasn't
 intuitive for me).
 I guess that packages Devel/gcc-core, Devel/gcc-g77 and
 Devel/make should be minimally enough but note that a lot of useful 
@@ -147,7 +152,7 @@ make auxtest  - creates simple executable for testing (this tests values
              in notebook lett-num.nb)
 make fit   - creates executable for fitting. It needs to be started
              from directory fits/ where input files are.
-make NOPGPLOT=1 fit - creates executable for fitting, but without plotting 
+make fit_nopgplot - creates executable for fitting, but without plotting 
 make radcorr - executable for Fig 1 of Letter  (only two points per plot
             by default. Change NPOINTS in radcorr.f for more)
 make scaledep - executable for Fig 2 of Letter (also only two points.)
@@ -178,7 +183,7 @@ in Minuit manual, this can be just a simple routine like
       RETURN
       END
 
-I haven't succeded yet in making Minuit work interactively under Windows.
+I haven't succeeded yet in making Minuit work interactively under Windows.
 (Works only as a batch job reading command from file MINUIT.CMD)
 
 
@@ -200,7 +205,7 @@ export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:$HOME/local/lib/pgplot"
 2.5.2. Microsoft Windows
 
 As with the whole of gepard, only usage inside cygwin environment
-is supported. I have sucessfully compiled PGPLOT with Postscript driver 
+is supported. I have successfully compiled PGPLOT with Postscript driver 
 /PSDRIV, but not with /XSERVE driver.
 For this, I used configuration file shown on top of the WWW page
 http://www.astro.caltech.edu/~tjp/pgplot/install-gnuwin.html
@@ -208,7 +213,7 @@ This I put into file sys_cygwin/g77_gcc.conf (instead of what's there
 by default), and then I followed Unix installation instructions on
 http://www.astro.caltech.edu/~tjp/pgplot/install-unix.html.
 
-You may have to define evironment variables as in Linux case.
+You may have to define environment variables as in Linux case.
 
 
 
@@ -219,7 +224,7 @@ You may have to define evironment variables as in Linux case.
 
 Makefile - use this if needed to compile Fortran and create documentation.
            See section 2.3 of this README.
-GEPARD.INI - file controling behaviour of routines
+GEPARD.INI - file controlling behavior of routines
 
 
 3.1 Documentation
@@ -235,7 +240,7 @@ doc/html/masterindex.html - HTML equivalent of gepard-api.pdf
 ----------------
 
 src/ - Fortran sources
-src/adacf/  - sources for DIS anomal. dimensions and Wilson coeffs.
+src/adacf/  - sources for DIS anomalous dimensions and Wilson coeffs.
 Tests/  - some numbers from Letter, useful for testing. See README
           there.
 fits/ - inputs needed for fitting to DVCS and DIS data
@@ -250,15 +255,15 @@ used also for hep-ph/0605237 letter numerics). They are slow and actually not
 needed here but are useful for checking and debugging of Fortran algorithms.
 (New Mathematica interface will hopefully be made in the future.)
 
-Test/mma-check/gepard.m  - Mathematica package. For basic documentation try ?CFF and ?Fcm
-Test/mma-check/gepard.nb - Notebook with checks and timings. Section 1 and then 3 are good
+Test/mma/gepard.m  - Mathematica package. For basic documentation try ?CFF and ?Fcm
+Test/mma/gepard.nb - Notebook with checks and timings. Section 1 and then 3 are good
             introduction.  Section 2 of this notebook is good
             for understanding which routines are available and 
             for understanding correspondence with DM's CFFNNLO.nb routines.
-Test/mma-check/gepard.exe - binary FORTRAN library. (Linux and Windows versions)
-Test/mma-check/CFFNNLO_KK.nb - Notebook needed if one wants to recalculate referent
+Test/mma/gepard.exe - binary FORTRAN library. (Linux and Windows versions)
+Test/mma/CFFNNLO_KK.nb - Notebook needed if one wants to recalculate referent
                                results in gepard.nb to which gepard results are compared
-Test/mma-check/gepard_devel.nb - Notebook used for development. Not so easy to follow.
+Test/mma/gepard_devel.nb - Notebook used for development. Not so easy to follow.
 
 
 3.3.1 Calculating CFFs in Mathematica

@@ -37,8 +37,9 @@ $\sharp$\thecomment:} #1]}}
 
 \begin{document}
 
-\title{\texttt{gepard}: calculating Compton form factors from moments of GEneral PARton Distributions } 
-\author{Version: 0.9b2}
+\title{\texttt{gepard} --- Package for calculation of DVCS form factors and observables
+                            by evolving moments of GEneral PARton Distributions}
+\author{Version: 0.9b3}
 \date{\today}
 \maketitle
 
@@ -66,7 +67,7 @@ For small $\xi$ DVCS cross section can be approximated by
 = \frac{\mathcal{Q}^2}{2 W^2 + \mathcal{Q}^2}} \;,
 \label{eq:parsigma}
 \end{equation}
-where singlet Compton form factor $^{\rm S}\mathcal{H}$ is given by
+where singlet Compton form factor $^{\rm S}\mathcal{H}$ in Mellin-Barnes representation is given by
 \begin{equation}
 {^{\rm S}{\cal H}}(\xi,\Delta^2,{\cal Q}^2)
 = \frac{1}{2i}\int_{c-i \infty}^{c+ i \infty}\!
@@ -91,7 +92,7 @@ try different values of $c$ and $\phi$ to get best numerical
 properties. 
 By default, in \texttt{init.f} it is set $c$ = 0.5 and $\phi = 3\pi/4$.
 
-\begin{figure}[h]
+\begin{figure}[ht]
 \begin{center}
 \includegraphics[scale=1.0]{MellinBarnes}
 \end{center}
@@ -221,6 +222,32 @@ Six free parameters of this ansatz ($N_a$, $m_a$ and $\alpha_{a}(0)$, for  $a = 
 can either be fixed, or provided by the minimization routine for fitting, see
 Fig.~\ref{fig:MINUIT.CMD}.
 
+
+\section{\texttt{gepard} ingredients}
+
+\begin{itemize}
+\item Collection of QCD anomalous dimensions and Wilson coefficients for
+unpolarized DIS up to NNLO which can be used for calculating DVCS form factors
+in $\overline{CS}$ scheme. For detailed description of (Mathematica) version of
+corresponding functions and sources, see the document \texttt{adacf.pdf}.
+Collection of QCD anomalous dimensions and Wilson coefficients for singlet DVCS form factors
+in $\overline{MS}$ up to NLO.
+
+\item
+The evolution of GPDs up to NLO in $\overline{CS}$ scheme. $\overline{MS}$
+evolution to be included.
+
+\item 
+Mellin-Barnes representation for DVCS form-factors.
+\end{itemize}
+
+For calculating and testing DVCS form factors and observables the programs \texttt{test},
+\texttt{auxtest}, \texttt{radcorr}, and \texttt{scaledep} are provided at the
+moment.
+
+For fitting the GPD parameters using Minuit, as well as for calculating observables (by
+fixing all parameters to desired value), the program \texttt{fit} is provided.
+
 \section{Initialization files}
 \label{sec:init}
 
@@ -288,33 +315,34 @@ value of \texttt{SPEED}.
 The choice \texttt{SPEED} = 1 guarantees cca. four
 correct significant digits for observables for $10^{-6} \le \xi \le 10^{-1}$,
 \texttt{SPEED} = 2 gives cca. two correct digits, while \texttt{SPEED} = 4
-can produce inacuraccies of up to 40-50 \%, but can also give 2-3 correct
+can produce inaccuracies of up to 40-50 \%, but can also give 2-3 correct
 digits, depending on what is calculated.
-\comminline{This is just a first asessment based on few tries. One should at
-some point make extensive analysis of accuraccy of routines.}.
+\comminline{This is just a first assessment based on few tries. One should at
+some point make extensive analysis of accuracy of routines.}.
 
 \item
 \texttt{P} --- \emph{Integer}. Perturbation theory approximation level. 0 = LO, 1 = NLO, and
   2 = NNLO. Because most of the costly evaluations are performed just once,
-  during the intialization phase, NLO and NNLO fits take approximatelly the
+  during the initialization phase, NLO and NNLO fits take approximately the
   same time, while LO is cca. four times faster. \comminline{This is based
   on just one test, with \texttt{SPEED} = 2.}
 
 \item
-\texttt{NF} --- \emph{Integer}. Number of active quark flavours
+\texttt{NF} --- \emph{Integer}. Number of active quark flavors
 
 \item
-\texttt{AS0} --- \emph{Double precision}. Value of $\alpha_{\rm s}(2.5 \textrm{GeV}^2)/(2 \pi)$. For various
-test, as well as in \cite{Kumericki:2006xx} value 0.05 vas used. More realistic
-value is 0.0536, which corresponds to $\alpha(M_Z) = 0.117$. \comminline{Check this value!} 
+\texttt{AS0} --- \emph{Double precision}. Value of $\alpha_{\rm s}(2.5
+\textrm{GeV}^2)/(2 \pi)$. For various test, as well as in
+\cite{Kumericki:2006xx} value 0.05 vas used. More realistic value is 0.0536,
+which corresponds to $\alpha(M_Z) = 0.117$. \comminline{Check this value!} 
 
 \item
-\texttt{RF2} --- \emph{Double precision}. $ {\cal Q}^2/{\mu_{f}^2}$ i.e. ratio of photon virtuality and 
-                 factorization scales squared
+\texttt{RF2} --- \emph{Double precision}. $ {\cal Q}^2/{\mu_{f}^2}$ i.e. ratio
+of photon virtuality and factorization scales squared
 
 \item
-\texttt{RR2} --- \emph{Double precision}. $ {\cal Q}^2/{\mu_{r}^2}$ i.e. ratio of photon virtuality and 
-                 renormalization scales squared
+\texttt{RR2} --- \emph{Double precision}. $ {\cal Q}^2/{\mu_{r}^2}$ i.e. ratio
+of photon virtuality and renormalization scales squared
 
 \item
 \texttt{SCHEME} --- \emph{Character*5}. Renormalization scheme label. Can presently be \texttt{'CSBAR'} or
@@ -332,7 +360,7 @@ to ansatz used for fitting, see description of \texttt{MINUIT.CMD} below.
 \end{itemize}
 
 Note that \texttt{GEPARD.INI} is meant to be read at the very beginning of the
-program execution, and values specified inside can be overriden later. For
+program execution, and values specified inside can be overridden later. For
 example, provided program \texttt{radcorr}, which calculates ratio of NNLO to NLO
 radiative corrections, ignores values of \texttt{P}, \texttt{SCHEME} and
 \texttt{ANSATZ} in \texttt{GEPARD.INI}, and sets them itself.
@@ -345,8 +373,8 @@ radiative corrections, ignores values of \texttt{P}, \texttt{SCHEME} and
 \hrule
 \begin{verbatim}
 
-      'fit.ps/VCPS'
-      2 3
+      'testfit'
+      '/VCPS'  2  3
       'START'
       'DVCS1.DAT'
       'DVCS2.DAT'
@@ -368,32 +396,43 @@ radiative corrections, ignores values of \texttt{P}, \texttt{SCHEME} and
 \end{figure}
 
 File has the structure displayed on Fig.~\ref{fig:FIT.INI}.
-All strings can have at most 15 characters.
-First two lines specify graphical output, if PGPLOT graphical
-library is used for printing the results of fits. If PGPLOT
-is not used, they are ignored but have to be formatted correctly,
-as specified below.
+
 
 \begin{itemize}
 
+\item
+1$^{\rm st}$ line (\texttt{OUTFILE}) --- \emph{Character*20}. Name of the file(s) used for output.
+There are usually three output files:
+\begin{itemize}
+\item \texttt{OUTFILE.min}  ---  Output of Minuit routines (When run in batch mode. When
+run in the interactive mode one can somehow log the terminal output. For example,
+on Linux, by issuing command \texttt{script filename} before the run, and
+\texttt{exit})
+\item \texttt{OUTFILE.out}   ---  Final fit results in tabular form, as shown on
+Fig.~\ref{fig:fitout}
+\item \texttt{OUTFILE.ps}    ---  Same information as in \texttt{OUTFILE}.out but 
+in graphical form, as shown on
+Fig.~\ref{fig:fitps}  (This works only if you have PGPLOT library. If not, use
+executable \texttt{fit\_nopgplot}.)
+\end{itemize}
+
 \item 
-First line specifies graphics driver
+2$^{\rm nd}$ line (\texttt{OUTFORMAT, XPANELS, YPANELS}) ---  \emph{Character*20, Integer, Integer}.
+\texttt{OUTFORMAT} specifies which graphical driver should be used according to PGPLOT conventions. Possible
+values depend on your installation of PGPLOT. Some useful values are
   \begin{itemize}
-  \item \texttt{'filename.ps/CPS'}  will get output into landscape color Postscript file 
-             \emph{filename.ps}.
-  \item \texttt{'filename.ps/VCPS'}  will get output into portrait color Postscript file 
-             \emph{filename.ps}.
+  \item \texttt{'/CPS'}  will get output into landscape color Postscript file 
+  \item \texttt{'/VCPS'}  will get output into portrait color Postscript file 
   \item \texttt{'/XSERVE'} will get output in an X window (may not work on MS Windows, and
    on Linux there could be problems when there are more than one page of graphs)
   \end{itemize}
-
-\item
-In second line there should be two \emph{integers}, \texttt{XPANELS} and \texttt{YPANELS}
-which specify number of graphs on one physical page by defining grid \texttt{XPANELS} 
+On one physical page graphs will be arranged on a grid \texttt{XPANELS} 
 $\times$ \texttt{YPANELS}.
+If PGPLOT is not used, this line is ignored but have to be present and formatted correctly.
 
 \item
-Other lines contain the names of files containing the experimental data to be fitted to (see next
+Other lines (\texttt{DATAFNAME}) --- \emph{Character*20}. Names of
+files containing the experimental data to be fitted to (see next
 section for the format of these data files), or strings \texttt{'START'} and \texttt{'STOP'}. 
 Only files between \texttt{'START'}
 and \texttt{'STOP'} rows will be included in actual fits, while everything beyond
@@ -409,7 +448,7 @@ This facilitates easy selection of data for different fits.
 \hrule
 \begin{verbatim}
 
-        0    1=INTERACTIVE 0=BATCH 
+        0   <--  1=INTERACTIVE   0=BATCH 
         SET TITLE
            Fitting to H1/ZEUS DVCS and DIS data
         PARAMETERS
@@ -515,14 +554,24 @@ here is Bjorken $x$.
 3$^{\rm rd}$ row (\texttt{Q2}) --- \emph{Double precision}. $\mathcal{Q}^2$
 for Compton scattering or $Q^2$ for DIS.
 
-Note the following important convention: If one of the quantites that should
+Note the following important convention: If one of the quantities that should
 be specified in rows 2 or 3 is actually ``x--axis'' of data, this fact
-should be specified by putting the \emph{negative number} in this row!
+should be specified by putting the \emph{negative number} in the corresponding row!
+In other words:
+\begin{itemize}
+\item 
+For \texttt{YOBS} = \texttt{PARSIGMA}, ``x--axis'' variable is 
+always $-t = - \Delta^2$, so there are no negative values.
+\item 
+For \texttt{YOBS} = \texttt{SIGMA}, ``x--axis'' variable is 
+either $W$ or $\mathcal{Q}^2$ and corresponding row should have negative number.
+\item 
+For \texttt{YOBS} = \texttt{F2}, ``x--axis'' variable is 
+either Bjorken $x$ or $Q^2$ and corresponding row should have negative number.
+\end{itemize}
 Thus, the example data on Fig.~\ref{fig:DVCS4.DAT} corresponds to
 measurements of total Compton cross section $\sigma(W, \mathcal{Q}^2)$, with
 fixed $W = 89\, \textrm{GeV}$, and variable $\mathcal{Q}^2$.
-For partial Compton cross section, ``x--axis'' variable is 
-always $-t = - \Delta^2$
 
 \item 
 4$^{\rm th}$ row (\texttt{N}) --- \emph{Integer}. Number of measurements that
@@ -545,13 +594,17 @@ Statistical and systematical errors are combined in quadrature for fitting.
 
 In the directory where all initialization files named in Section~\ref{sec:init} are
 placed one runs executable \texttt{fit}. When minimization is over, and results
-printed out (e.g. by Minuit command \texttt{cali 3}), one gets two new files.
-One is \texttt{FIT.OUT}, containing the numbers from each data file, together with
+printed out (e.g. by Minuit commands \texttt{stop, return, cali 3, \dots}), one gets two or 
+three new files: \texttt{OUTFILE.min},
+\texttt{OUTFILE.out} and possibly \texttt{OUTFILE.ps}, where \texttt{OUTFILE}
+is specified in the first line of \texttt{FIT.INI}.
+The file \texttt{OUTFILE.min} contains the standard output of Minuit routines.
+The file \texttt{OUTFILE.out} contains the numbers from each data file, together with
 resulting fit value \texttt{Y(X)\_FIT},
 and last column says how many sigmas is fit value different from experiment.
 One stanza from such file is displayed on Fig.~\ref{fig:fitout}.
 
-\begin{figure}[h]
+\begin{figure}[ht]
 \begin{center}
 \hrule
 \small
@@ -574,13 +627,12 @@ One stanza from such file is displayed on Fig.~\ref{fig:fitout}.
 \end{verbatim}
 \hrule
 \end{center}
-\caption{Example of a part of resulting fit file \texttt{FIT.OUT}}
+\caption{Example of a part of resulting fit file \texttt{example.out}}
 \label{fig:fitout}
 \end{figure}
 
 If one has PGPLOT library compiled in, than this fits are also graphed,
-as specified at the beginning of the file \texttt{FIT.INI}. Example
-graph is shown on Fig.~\ref{fig:fitps}
+in the file \texttt{OUTFILE.ps}. Example graph is shown on Fig.~\ref{fig:fitps}.
 
 \begin{figure}[t]
 \begin{center}
@@ -591,14 +643,27 @@ graph is shown on Fig.~\ref{fig:fitps}
 \end{figure}
 
 
+\section{Advanced usage and modifications}
+
+\begin{itemize}
+\item If one wants to introduce the relations between fitting parameters, they
+can be entered in Fortran programs \texttt{dvcs.f} and \texttt{f2.f}.
+The number of parameters will decrease and some fitting parameters 
+will be ``dummies'' (their value will not be used at all). 
+Although they are irrelevant now, they should be made as
+``fixed'' in \texttt{MINUIT.CMD}
+\end{itemize}
+
+
 \section{Algorithmic structure of \texttt{gepard} and its subroutines}
 
-Calling graph of subroutines is displayed on Fig.~\ref{fig:callgraph}. Each subroutine,
+Calling graph of subroutines for executable \texttt{fit} is displayed on
+Fig.~\ref{fig:callgraph}. Each subroutine,
 function and main program is described in the extended \texttt{gepard-api.pdf} documentation,
 as well as hyperlinked HTML documentation produced by \texttt{robodoc} automatic
 documentation generator.
 
-\begin{figure}[h]
+\begin{figure}[ht]
 \begin{center}
 \includegraphics[scale=0.52]{callgraph}
 \end{center}

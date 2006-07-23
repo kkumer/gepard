@@ -30,3 +30,8 @@ diff lett/FIG2A-LETT.DAT FIG2A.DAT
 
 Or, better, diff -> vimdiff
 
+------------------------------------------------------------------------  
+
+The role of Mathematica part (in directory mma/) is explained in main README.
+
+

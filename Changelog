@@ -1,3 +1,13 @@
+Version 0.9  (2006-07-23 )
+
+	- Wilson coefficients calculated in intialization phase and
+	  together with anomalous dimensions put into common block
+	- Integration moved from slatec to 8-point Gaussian
+	- Adacf part integrated into source
+	- PGPLOT support added
+	- Compiles cleanly on both Linux and Cygwin
+	- Additional user-friendly documentation in gepard.pdf
+
 Version 0.88  (2006-07-02)
 
 	- Initial version
