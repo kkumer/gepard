@@ -14,7 +14,7 @@ C  DESCRIPTION
 C    calculates Wilson coefficients for DVCS in CSbar scheme
 C    according to KMKPS06 paper
 C  SYNOPSIS
-C     SUBROUTINE CDVCSF (J, BIGC0, BIGC1, BIGC2)
+C     SUBROUTINE CDVCSF (J, BIGC0, BIGC1, BIGC2, PROCESS)
 C
 C     DOUBLE COMPLEX J, BIGC0(2), BIGC1(2), BIGC2(2)
 C     CHARACTER PROCESS*4
@@ -33,9 +33,6 @@ C  PARENTS
 C      INIT
 C  CHILDREN
 C      VECMAT, HS1, HS2
-C  NOTES
-C      One needs to call BETAF and COMMONF first, to initialize
-C      common blocks BETABLK, WGAMMA, and WC
 C  SOURCE
 C
 

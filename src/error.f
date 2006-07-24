@@ -22,7 +22,7 @@ C         MSG -- message itself
 C        NERR -- unique error number
 C       LEVEL -- severity level of error
 C  PARENTS
-C      DCTAN
+C      PROCDATA, DCTAN
 C  SOURCE
 C
       SUBROUTINE ERROR (LIB, SUBR, MSG, NERR, LEVEL)

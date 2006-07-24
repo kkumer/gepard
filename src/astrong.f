@@ -35,7 +35,8 @@ C     PARWAVF
 C  NOTES
 C     Requires a previous call of BETAF to initialize common block !
 C  BUGS
-C     - Should get values of P and NF via common block
+C     Should get values of P and NF via common block to be consistent
+C     with rest of the gepard
 C  SOURCE
 C
 

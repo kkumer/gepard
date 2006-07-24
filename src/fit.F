@@ -12,20 +12,22 @@ C              input point Q0), by fitting to DVCS and DIS
 C              experimental data.
 C            
 C  DESCRIPTION
-C             Just a driver. Calls minuit subroutine
-C             which does everything else.
+C             Calls minuit subroutine for minimization and
+C             prints results in various ways.
 C
 C  INPUTS
-C          FIT.CMD -- file with specification of fit parameters
+C          FIT.INI -- file with names of files with experimental
+C                     data to be fitted to
+C       MINUIT.CMD -- file with specification of fit parameters
 C                     and with minuit commands.
 C
 C  OUTPUT
-C          Goes to standard output. Good way to both observe
-C          progress and save results is to use:
-C            time ./fit | tee -a savefile
+C          Goes to files with extensions .out (tabular representation
+C          of fit), .ps (graphical representation of fit), and .min
+C          (Minuit output)
 C
 C  CHILDREN
-C      MINUIT, FCN (via MINUIT)
+C      READPAR, INIT, MINUIT, FCN (via MINUIT)
 C
 C  SOURCE
 C
@@ -102,10 +104,10 @@ C     FITPAR  --  Equal to A
 C  CHISQPART  --  chi-square produced by single data set
 C
 C  CHILDREN
-C      PROCDATA
+C      PROCDATA, PGPLOT routines
 C
 C  PARENTS
-C      MINUIT
+C      MINUIT, FIT (via MINUIT)
 C
 C  SOURCE
 C
@@ -289,7 +291,7 @@ C         Q2  -- photon virtuality squared
 C  PARENTS
 C      FCN
 C  CHILDREN
-C      PARSIGMA, SIGMA, F2F
+C      PARSIGMA, SIGMA, F2F, PGPLOT routines
 C  SOURCE
 C
       SUBROUTINE PROCDATA (FNAME, IFLAG, N, CHISQPART)

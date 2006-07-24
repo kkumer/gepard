@@ -33,6 +33,8 @@ C          XI -- DVCS scaling parameter
 C        DEL2 -- DVCS asymmetry parameter (P2-P1)^2
 C          Q2 -- photon virtuality squared
 C         Q02 -- initial scale squared
+C  PARENTS
+C      SIGMA, PROCDATA
 C  CHILDREN
 C      CFFF
 C  BUGS
@@ -112,6 +114,8 @@ C                          for description
 C  OUTPUT
 C               SIGMA  --  total cross section sigma
 C
+C  PARENTS
+C     PROCDATA
 C  CHILDREN
 C     PARSIGMA   -- integrand, partial cross section  d sigma / d |t|
 C  SOURCE

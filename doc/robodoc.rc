@@ -38,7 +38,7 @@ accept files:
     erfunc.f
     evol.f
     error.f
-    fit.f
+    fit.F
     f2.f
     init.f
     lambda.f

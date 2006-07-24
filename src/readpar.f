@@ -11,7 +11,7 @@ C        READPAR -- reads parameters from file GEPARD.INI
 C  SYNOPSIS
 C     SUBROUTINE READPAR
 C  IDENTIFIERS
-C     (see provided self-documented GEPARD.INI)
+C     (see gepard.pdf or provided self-documented GEPARD.INI)
 C  PARENTS
 C      AUXTEST, TEST, RADCORR, SCALEDEP, FIT
 C  SOURCE

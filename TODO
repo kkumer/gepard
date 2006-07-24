@@ -18,6 +18,7 @@ Checks:
 Design:
 -  Verbatim \ref in robodoc TeX?
 -  Beautify Robodoc output.
+-  Improve /XSERVE output.
 
 DONE:
 +  Transfer adacf Fortran routines to gepard to make it independent

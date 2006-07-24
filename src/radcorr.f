@@ -37,7 +37,7 @@ C
 C                P -- approximation order N^{P}LO P=0,1,2
 C
 C  CHILDREN
-C      CFFF, DCARG
+C      READPAR, INIT, CFFF, DCARG
 C  SOURCE
 C
 

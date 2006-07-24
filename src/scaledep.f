@@ -40,7 +40,7 @@ C                P -- approximation order N^{P}LO P=0,1,2
 C             DRVU -- derivative of CFF for given P
 C             DRVD -- derivative of CFF for P-1
 C  CHILDREN
-C      LOGABSH, ARGH, DERIV
+C      READPAR, INIT, LOGABSH, ARGH, DERIV
 C  BUGS
 C    - Numerical derivation routine DERIV is not perfect. One needs to
 C      be careful with choice of NEVALS and H parameters, and check

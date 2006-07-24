@@ -37,9 +37,9 @@ $\sharp$\thecomment:} #1]}}
 
 \begin{document}
 
-\title{\texttt{gepard} --- Package for calculation of DVCS form factors and observables
+\title{\texttt{gepard} --- Compton form factors and observables
                             by evolving moments of GEneral PARton Distributions}
-\author{Version: 0.9b3}
+\author{Version: 0.9}
 \date{\today}
 \maketitle
 
@@ -60,7 +60,7 @@ basic usage, see README file coming with the package.
 
 \subsection{DVCS formulas}  
 
-For small $\xi$ DVCS cross section can be approximated by 
+For small $\xi$, DVCS cross section can be approximated by 
 \begin{equation}
 \frac{d \sigma_{\rm T}}{d t} = \frac{4 \pi \alpha^2 W^2}{(W^2 + \mathcal{Q}^2)
 (2 W^2 + \mathcal{Q}^2)^2} | ^{\rm S}\mathcal{H}(\xi, t, \mathcal{Q}^2)|^2 \Bigg|_{\xi
@@ -594,9 +594,9 @@ Statistical and systematical errors are combined in quadrature for fitting.
 
 In the directory where all initialization files named in Section~\ref{sec:init} are
 placed one runs executable \texttt{fit}. When minimization is over, and results
-printed out (e.g. by Minuit commands \texttt{stop, return, cali 3, \dots}), one gets two or 
-three new files: \texttt{OUTFILE.min},
-\texttt{OUTFILE.out} and possibly \texttt{OUTFILE.ps}, where \texttt{OUTFILE}
+printed out (e.g. by Minuit commands \texttt{stop, return, cali 3, \dots}), one gets
+files: \texttt{OUTFILE.min} (if in batch mode),
+\texttt{OUTFILE.out}, and \texttt{OUTFILE.ps} (if PGPLOT is used), where \texttt{OUTFILE}
 is specified in the first line of \texttt{FIT.INI}.
 The file \texttt{OUTFILE.min} contains the standard output of Minuit routines.
 The file \texttt{OUTFILE.out} contains the numbers from each data file, together with

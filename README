@@ -51,6 +51,7 @@ Contents of this README
 
 - Use provided executable '../src/fit', if you can, or create it by 'make fit'.
   It needs to be started from directory fits/ where input files are.
+  If you don't have Cygwin and PGPLOT, use '../src/fit_nopgplot' instead!
 
 - Parameters (not for fit ansatz but for everything else) are specified in
   GEPARD.INI which is self-documented.
@@ -60,13 +61,14 @@ Contents of this README
 
 - First line of FIT.INI specifies filename for output. There are usually three
   output files:
-    <filename>.min   -  Output of Minuit routines
+    <filename>.min   -  Output of Minuit routines (when in batch mode)
     <filename>.out   -  Final fit results in tabular form
     <filename>.ps    -  Same as .out but in graphical form (This works only
                         if you have PGPLOT library. If not, use executable
                         '../src/fit_nopgplot'.)
 
 - Second line of FIT.INI specifies type of graphical output to <filename>.ps
+  (fit_nopgplot ignores this line, but it has to be present)
    *) first comes a string specifying PGPLOT driver:
     '/CPS'  will get output into PS file (landscape)
     '/VCPS'  will get output into PS file (portrait)
@@ -77,9 +79,6 @@ Contents of this README
 - Commands for driving Minuit and for specifying initial values of
   fitting parameters are in file MINUIT.CMD (see Minuit manual for their exact
   meaning!).
-  Output of Minuit itself is going to terminal, so to save it use e.g.  
-  'fit | tee -a savefile' (on Unix, on Windows just redirect output
-  to file somehow. Maybe 'fit > savefile'.)
 
 
 More detailed description can be found in doc/tex/gepard.pdf
@@ -157,7 +156,7 @@ make radcorr - executable for Fig 1 of Letter  (only two points per plot
             by default. Change NPOINTS in radcorr.f for more)
 make scaledep - executable for Fig 2 of Letter (also only two points.)
 make hmtl  - creates HTML documentation (needs robodoc software)
-make pdf   - create LaTeX documentation (needs robodoc software)
+make pdf   - creates LaTeX documentation (needs robodoc software)
 make all   - makes everything above and maybe more
 make clean - removes everything which is easily recreatable
 
@@ -232,6 +231,8 @@ GEPARD.INI - file controlling behavior of routines
 
 README - this file
 doc/tex/gepard.pdf  -  simple manual for gepard
+doc/tex/adacf.pdf  -  explanation of routines providing anomalous
+ dimensions and Wilson coefficients (from older Mathematica package adacf)
 doc/tex/gepard-api.pdf  - extensive description of subroutines
 doc/html/masterindex.html - HTML equivalent of gepard-api.pdf
 

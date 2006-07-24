@@ -7,7 +7,7 @@ C     *******
 
 C     ****p* auxtest.f/AUXTEST
 C  NAME
-C    AUXTEST  --  Tests routine
+C    AUXTEST  --  Test routine
 C            
 C  DESCRIPTION
 C             Calculates LO and NLO CFFs corresponding

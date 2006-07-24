@@ -16,7 +16,7 @@ C             with confirmed results from old
 C             Mathematica version of gepard
 C
 C  CHILDREN
-C      SIGMA
+C      READPAR, INIT, SIGMA, PARSIGMA, F2F
 C
 C  SOURCE
 C

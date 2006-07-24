@@ -44,6 +44,8 @@ C      ANSATZ -- label for ansatz for GPDs on input scale
 C           C -- intersection point of Mellin- Barnes integration 
 C                path with real axis
 C         PHI -- angle between Mellin-Barnes contour and Re(J) axis
+C  PARENTS
+C     PROCDATA, TEST
 C  CHILDREN
 C     PARWAVF
 C  SOURCE
