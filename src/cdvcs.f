@@ -12,9 +12,10 @@ C  NAME
 C     CDVCSF  --   Wilson coefficients (in CSbar scheme)
 C  DESCRIPTION
 C    calculates Wilson coefficients for DVCS in CSbar scheme
-C    according to KMKPS06 paper
+C    according to KMKPS06 paper. Also used for DIS where
+C    CSbar=MSbar, and for special SCHEME='UNITC'.
 C  SYNOPSIS
-C     SUBROUTINE CDVCSF (J, BIGC0, BIGC1, BIGC2, PROCESS)
+C     SUBROUTINE CDVCSF (J, BIGC0, BIGC1, BIGC2)
 C
 C     DOUBLE COMPLEX J, BIGC0(2), BIGC1(2), BIGC2(2)
 C     CHARACTER PROCESS*4
@@ -41,7 +42,7 @@ C
       IMPLICIT NONE
       DOUBLE COMPLEX J, BIGC0(2), BIGC1(2), BIGC2(2)
       CHARACTER PROCESS*4
-      INTEGER SPEED, P, NF
+      INTEGER SPEED, ACC, P, NF
       DOUBLE PRECISION AS0, RF2, RR2
       CHARACTER SCHEME*5, ANSATZ*6
       INTEGER NFMIN, NFMAX, K
@@ -56,7 +57,7 @@ C
 
 *   Input common-blocks
 
-      COMMON / PARINT /  SPEED, P, NF
+      COMMON / PARINT /  SPEED, ACC, P, NF
       COMMON / PARFLT /  AS0, RF2, RR2
       COMMON / PARCHR /  SCHEME, ANSATZ
 
@@ -85,8 +86,25 @@ C
       CALL VECMAT(VM00, GAM0, VM000)
       END IF
 
+      IF (SCHEME .EQ. 'EVOLQ') THEN
+        BIGC0(1) = (1.0d0,0.0d0)
+        BIGC0(2) = (0.0d0,0.0d0)
+        DO 8 K = 1, 2
+        BIGC1(K) = (0.0d0, 0.0d0)
+  8     BIGC2(K) = (0.0d0, 0.0d0)
+        RETURN
+      ELSE IF (SCHEME .EQ. 'EVOLG') THEN
+        BIGC0(1) = (0.0d0,0.0d0)
+        BIGC0(2) = (1.0d0,0.0d0)
+        DO 9 K = 1, 2
+        BIGC1(K) = (0.0d0, 0.0d0)
+  9     BIGC2(K) = (0.0d0, 0.0d0)
+        RETURN
+      END IF
+
       BIGC0(1) = (1.0d0,0.0d0)
       BIGC0(2) = (0.0d0,0.0d0)
+
       DO 10 K = 1, 2
       BIGC1(K) = C1(K) + 0.5d0 * S1 * VM00(K)
       IF (P .GE. 2) THEN
@@ -95,6 +113,7 @@ C
      &      BIGC1(K) * LRR2 + 0.25d0 * VM00(K) * LRF2**2 )
       END IF
  10   CONTINUE
+
 
       RETURN
       END

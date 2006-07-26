@@ -11,7 +11,7 @@ C        INIT  --  initialization
 C  DESCRIPTION
 C     Puts values of abscissas and weights of Mellin-Barnes
 C     integration contour on common blocks, as well as
-C     corresponding value of Wilson coefficients and
+C     corresponding values of Wilson coefficients and
 C     anomalous dimensions
 C  SYNOPSIS
 C     SUBROUTINE INIT
@@ -33,17 +33,19 @@ C  CHILDREN
 C      BETAF, WgammaV*F, WcV*F, CDVCSF, MSBARF
 C  PARENTS
 C      AUXTEST, TEST, RADCORR, SCALEDEP, FIT
+C  BUGS
+C       For large xi>0.7 integration should be extended to larger Y
 C  SOURCE
 C
 
       SUBROUTINE INIT
 * 
       IMPLICIT NONE
-      INTEGER SPEED, P, NF
+      INTEGER SPEED, ACC, P, NF
       DOUBLE PRECISION AS0, RF2, RR2
       CHARACTER SCHEME*5, ANSATZ*6
-      INTEGER NGAUSS, NINTG, NPTS, K, K1, K2, K3
-      INTEGER NPTSMAX
+      INTEGER NGAUSSMAX, NGAUSS, NINTG, NPTS, K, K1, K2, K3
+      INTEGER NPTSMAX, ACCMAX
       DOUBLE PRECISION NFD, PI, C, PHI, SUMM, DIFF, YI
       DOUBLE COMPLEX J, Z, EPH
       DOUBLE COMPLEX S1, S2, S3, S4
@@ -54,10 +56,12 @@ C
       DOUBLE COMPLEX C1F2(2)
       DOUBLE COMPLEX BIGC0(2), BIGC1(2), BIGC2(2)
       DOUBLE COMPLEX CLNGAMMA, PREFACT
-      PARAMETER ( NGAUSS = 8, NINTG = 8, NPTSMAX = 64 )
+      PARAMETER ( NGAUSSMAX = 64, ACCMAX = 6, NINTG = 8,  
+     &             NPTSMAX = 512 )
       PARAMETER ( PI = 3.1415 92653 58979 D0 )
 *
-      DOUBLE PRECISION ABSCISSAS(NGAUSS), WEIGHTS(NGAUSS)
+!      DOUBLE PRECISION ABSCISSAS(NGAUSS), WEIGHTS(NGAUSS)
+      DOUBLE PRECISION ABSC(ACCMAX,NGAUSSMAX), WGHT(ACCMAX,NGAUSSMAX)
       DOUBLE PRECISION DOWN(NINTG+1), UP(NINTG)
       DOUBLE PRECISION Y(NPTSMAX), WG(NPTSMAX)
       DOUBLE COMPLEX N(NPTSMAX)
@@ -65,13 +69,16 @@ C
       DOUBLE COMPLEX BIGCF2(NPTSMAX,0:2,2)
 
 *   Input common-blocks
-      COMMON / PARINT /  SPEED, P, NF
+      
+*     - Loaded by call to READPAR
+      COMMON / PARINT /  SPEED, ACC, P, NF
       COMMON / PARFLT /  AS0, RF2, RR2
       COMMON / PARCHR /  SCHEME, ANSATZ
 
 *   Output common-blocks
 
 *     - Mellin-Barnes integration contour points
+      COMMON / CONTOUR  /  NPTS
       COMMON / POINTS   /  Y, WG
       COMMON / CPHI     /  C, PHI
       COMMON / NPOINTS  /  N
@@ -87,28 +94,22 @@ C
       COMMON / BIGCF2   /  BIGCF2
 
 
-*   Abscissas and weights for 8 point Gauss quadrature 
-*   according to Abramowitz and Stegun Eq. (25.4.30)
-
-       DATA ABSCISSAS
-     &  /-0.96028 98564 97536 D0, -0.79666 64774 13627 D0, 
-     &   -0.52553 24099 16329 D0, -0.18343 46424 95650 D0, 
-     &    0.18343 46424 95650 D0,  0.52553 24099 16329 D0,
-     &    0.79666 64774 13627 D0,  0.96028 98564 97536 D0/
-
-       DATA WEIGHTS
-     &  / 0.10122 85362 90376 D0,  0.22238 10344 53374 D0, 
-     &    0.31370 66458 77887 D0,  0.36268 37833 78362 D0, 
-     &    0.36268 37833 78362 D0,  0.31370 66458 77887 D0,
-     &    0.22238 10344 53374 D0,  0.10122 85362 90376 D0/
-
-*   NGAUSS = 8 point integration is to be performed on each
+*   NGAUSS-point integration is to be performed on each
 *   interval defined by taking points (1, 1 + SPEED,
 *   1 + 2*SPEED, ...) from the list DOWN
+      
+      NGAUSS = 2**ACC
 
       DATA DOWN 
      & / 0.D0, 0.01D0, 0.025D0, 0.067D0, 0.18D0, 
      &         0.5D0, 1.3D0, 3.7D0, 10.D0 /
+
+      CALL GAUSS (ABSC, WGHT)
+
+!      DO 5 K1 = 1, 64
+!        ABSCISSAS(K1) = ABSC(6, K1)
+!        WEIGHTS(K1) = WGHT(6, K1)
+! 5    CONTINUE
 
 *   For fast calculation it's better to compress integration region
 *   The value 1.3 below is optimized for small xi of cca. 10^-4
@@ -139,15 +140,14 @@ C
         DIFF = UP(K2) - DOWN(K2) 
       DO 20 K3 = 1, NGAUSS
         K = K + 1
-        YI = (DIFF * ABSCISSAS(K3) + SUMM) * 0.5D0
+        YI = (DIFF * ABSC(ACC, K3) + SUMM) * 0.5D0
         N(K) = (C + 1) + YI * EPH
-        WG(K) = 0.5D0 * DIFF * WEIGHTS(K3) 
+        WG(K) = 0.5D0 * DIFF * WGHT(ACC, K3) 
  20   CONTINUE
 
 *    After the above loop, total number of points on the contour is
-*    (NB: Integer division!)
 
-      NPTS = NPTSMAX / SPEED
+      NPTS = NGAUSS * NINTG / SPEED
 
 
 *   1. Initialization of QCD beta function coefficients

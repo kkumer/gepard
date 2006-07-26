@@ -39,7 +39,7 @@ C
       INTEGER K
       DOUBLE PRECISION R
       DOUBLE COMPLEX EVOLA(3,2,2)
-      INTEGER SPEED, P, NF
+      INTEGER SPEED, ACC, P, NF
       INTEGER A, B, C, I, J, K1, ORD
       DOUBLE PRECISION RINV
       DOUBLE COMPLEX LAMB(2), PR(2,2,2)
@@ -50,7 +50,7 @@ C
 
 *   Input common-blocks 
 
-      COMMON / PARINT /  SPEED, P, NF
+      COMMON / PARINT /  SPEED, ACC, P, NF
 
 
       CALL ERFUNCF (K, R, LAMB, ERFUNC1, ERFUNC2)

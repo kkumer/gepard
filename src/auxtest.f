@@ -24,7 +24,7 @@ C
       PROGRAM AUXTEST
 
       IMPLICIT NONE
-      INTEGER SPEED, P, NF
+      INTEGER SPEED, ACC, P, NF
       CHARACTER SCHEME*5, ANSATZ*6
       INTEGER PT, NPOINTS, LN, NDEL
       DOUBLE PRECISION XI, DEL2, Q2, Q02
@@ -38,7 +38,7 @@ C
 
 *     Input common-blocks 
 
-      COMMON / PARINT /  SPEED, P, NF
+      COMMON / PARINT /  SPEED, ACC, P, NF
       COMMON / PARCHR /  SCHEME, ANSATZ
 
 *     Output common-blocks 
@@ -47,7 +47,7 @@ C
       COMMON / CFF        /  CFF
 
       CALL READPAR
-
+      ACC = 6
 *     Scales 
 
       Q2 = 2.5d0

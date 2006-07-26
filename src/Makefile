@@ -31,7 +31,7 @@ ADACFODIR = adacf/obj
 # Fortran object files
 FOBJS = Finit.o Fbeta.o Fspecial.o Fdcomplex.o Fastrong.o Flambda.o\
 Fprojectors.o Frnnlo.o Ferfunc.o Fevol.o Fcdvcs.o Fmsbar.o Fparwav.o Fcff.o\
-Fdvcs.o Ff2.o Freadpar.o Ferror.o
+Fdvcs.o Ff2.o Freadpar.o Ferror.o Fgauss.o
 _FOBJS = $(patsubst %,$(FODIR)/%,$(FOBJS))
 
 # rule for compiling fit.F
@@ -86,6 +86,11 @@ fit: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Ffit.o $(ODIR)/flushout.o
 fit_nopgplot: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Ffit_nopgplot.o $(ODIR)/flushout.o
 	$(FC) -o $@ $^ $(FFLAGS) $(CERNLIBS)
 
+houches: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Fhouches.o 
+	$(FC) -o $@ $^ $(FFLAGS)
+
+accuracy: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Faccuracy.o 
+	$(FC) -o $@ $^ $(FFLAGS)
 
 .PHONY: clean
 clean:

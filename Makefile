@@ -10,6 +10,9 @@
 # 	html     -  HTML documentation
 # 	pdf      -  LaTeX -> PDF documentation
 #
+# 	houches  -  comparison to Les Houches benchmark
+# 	accuracy -  Analysis of accuracy and SPEED
+#
 # For compiling 'fit' without PGPLOT (no plotting) do
 # 	  make NOPGPLOT=1 fit
 # 	(This is what fit_nopgplot target does, but with
@@ -37,7 +40,7 @@ export X11LIBS = -L/usr/X11R6/lib -lX11
 endif
 
 # targets
-SRCTARGETS = radcorr scaledep fit test auxtest fit_nopgplot
+SRCTARGETS = radcorr scaledep fit test auxtest fit_nopgplot houches accuracy
 .PHONY: $(SRCTARGETS)
 DOCTARGETS = pdf html
 
