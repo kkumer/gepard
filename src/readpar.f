@@ -41,6 +41,9 @@ C
       READ (61, *) ANSATZ
       CLOSE (61)
 
+*   Default accuracy. Can be overriden later
+      ACC = 3
+
       RETURN
       END
 C     ***

@@ -47,7 +47,6 @@ C
       COMMON / CFF        /  CFF
 
       CALL READPAR
-      ACC = 6
 *     Scales 
 
       Q2 = 2.5d0

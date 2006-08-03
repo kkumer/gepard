@@ -2,3 +2,9 @@
   (Although maybe it behaves as double precision.)
 
 -  Interactive mode freezes on MS Windows
+
+
+Fixed:
+------
+
+02.08. - parameter P not used in the DIS part of fit.F 

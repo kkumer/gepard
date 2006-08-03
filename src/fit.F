@@ -304,6 +304,7 @@ C
       INTEGER K
       DOUBLE PRECISION X, Y, DY, THY, DIFSG
       DOUBLE PRECISION STAT, SYS
+      INTEGER SPEED, ACC, P, NF
       DOUBLE PRECISION XI, DEL2, Q2, Q02,  W
       DOUBLE PRECISION WIN, Q2IN
       DOUBLE PRECISION XBJ, XBJIN
@@ -314,6 +315,7 @@ C
       REAL LASTX, LASTY
 #endif
 
+      COMMON / PARINT /  SPEED, ACC, P, NF
       COMMON / KINEMATICS /  XI, DEL2, Q2, Q02
       COMMON / F2P        /  F2
 
@@ -480,7 +482,7 @@ C
         END IF
         XI = XBJ
         CALL F2F
-        THY = F2(1)
+        THY = F2(P)
         CHISQPART = CHISQPART + ( (THY - Y)**2 / DY**2 )
         IF (IFLAG .EQ. 3)  THEN
           DIFSG = (THY - Y) / DY

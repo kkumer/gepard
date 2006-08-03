@@ -74,4 +74,4 @@ clean:
 	-rm -f $(patsubst %,%.exe,$(SRCTARGETS))
 	-rm -f $(patsubst %,src/%.exe,$(SRCTARGETS))
 	-rm fits/*.{min,out,ps} fits/gmon.out
-	-rm Tests/FIG*DAT Tests/gmon.out
+	-rm Tests/*DAT Tests/gmon.out Tests/*dat

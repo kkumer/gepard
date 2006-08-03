@@ -30,6 +30,24 @@ diff lett/FIG2A-LETT.DAT FIG2A.DAT
 
 Or, better, diff -> vimdiff
 
+
+Fourth test
+-----------
+run ../src/houches and resulting files show relative difference with
+respect to evolution of Les Houches benchmark gluon PDF, as evaluated
+by QCD-Pegasus package. Plot it by
+xmgrace NLOACC.dat -batch acc.bat
+xmgrace NNLOACC.dat -batch acc.bat
+
+
+Fifth test
+-----------
+run ../src/accuracy and resulting file shows relative difference with
+respect to the most precise gepard DVCS result available (SPEED=1, ACC=6).
+Good for testing influence of SPEED parameter. Plot it by
+xmgrace acc.dat -batch acc.bat
+
+
 ------------------------------------------------------------------------  
 
 The role of Mathematica part (in directory mma/) is explained in main README.
