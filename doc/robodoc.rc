@@ -28,6 +28,7 @@ headertypes:
     s "Subroutines" subroutines
     f "Functions" functions
 accept files:
+    accuracy.f
     astrong.f
     beta.f
     cdvcs.f
@@ -36,18 +37,22 @@ accept files:
     deriv.f
     dvcs.f
     erfunc.f
-    evol.f
     error.f
-    fit.F
+    evol.f
+    evoldep.f
     f2.f
+    fit.F
+    gauss.f
+    houches.f
     init.f
     lambda.f
     msbar.f
+    nd.f
     parwav.f
     projectors.f
-    rnnlo.f
     radcorr.f
     readpar.f
+    rnnlo.f
     scaledep.f
     special.f
     test.f

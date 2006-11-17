@@ -1,10 +1,23 @@
 -  Code taken from Vogt/Vermasseren may not be pure double precison.
   (Although maybe it behaves as double precision.)
 
+-  Complex tangent DCTAN may be problematic
+
 -  Interactive mode freezes on MS Windows
+
+-  Because of ND evolution all MB integrations go 0..50
+   now which is overkill for "outer" integration and makes
+   everything unnessarty 30% slower
+
 
 
 Fixed:
 ------
 
-02.08. - parameter P not used in the DIS part of fit.F 
+2006-08-02 - parameter P not used in the DIS part of fit.F 
+ 
+2006-09-22 - charge factors corrected (were missing from DVCS), 
+             and are now OK for NF = 3 or 4
+
+2006-11-17 -  PS figures drawn by fit.exe at Dieter's notebook, have no text, just lines
+             (Path to PGPLOT libs had to be put in shell's environment.)

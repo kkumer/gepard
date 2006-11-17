@@ -3,6 +3,7 @@
 # Interesting targets:
 # 	radcorr  -  program for producing Fig. 1 in letter
 # 	scaledep -  program for producing Fig. 2 in letter
+# 	schemedep -  comparing MSBAR and CSBAR schemes
 # 	test     -  tests both DVCS and DIS routines
 # 	auxtest  -  tests DVCS \mathcal{H} calculation
 # 	fit      -  fitting GPD ansatz to DVCS and DIS data
@@ -40,7 +41,7 @@ export X11LIBS = -L/usr/X11R6/lib -lX11
 endif
 
 # targets
-SRCTARGETS = radcorr scaledep fit test auxtest fit_nopgplot houches accuracy
+SRCTARGETS = radcorr scaledep fit test auxtest fit_nopgplot houches accuracy schemedep evoldep
 .PHONY: $(SRCTARGETS)
 DOCTARGETS = pdf html
 

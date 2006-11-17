@@ -1,3 +1,21 @@
+Version 0.9.3  (2006-??-??)
+
+    - ADD: non-singlet evolution subroutines EVOLNSF, ERFUNCNSF, RNNLONSF
+    - ADD: MSbar non-diagonal evolution subroutines NDNSF, CB1F
+	- ADD: CZERO parameter which can be used to put LO (a_strong^0) term
+	       to zero for investigation of NLO effects
+	- ADD: inteligent choice of y-range for drawing of PDF(x)
+
+    {Merged from 0.9-fix2:}
+    - FIX: charge-factor bugs (not NF-dependent, and altogher
+           missing from DVCS)
+    - ADD: PDF(x), resulting from fit, are also drawn now
+
+Version 0.9.2  (2006-08-03)
+
+    {Merged from 0.9-fix1:}
+	- Fixed F2(P) bug that forced P=1 in DIS case
+
 Version 0.9.1  (2006-07-26)
 
 	- Added possibility of Gaussian integration on 2**ACC points
