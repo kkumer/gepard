@@ -40,7 +40,7 @@ C  SYNOPSIS
 C     SUBROUTINE CFFF
 C  OUTPUT
 C    CFF(0:2) --  Compton form factor in LO, NLO and NNLO approximations 
-C                 (for ANSATZ='CSBAA'; for ANSATZ= 'MSBAR' only LO and
+C                 (for SCHEME='CSBAA'; for SCHEME= 'MSBAR' only LO and
 C                 NLO exists and CFF(3) is garbage) 
 C                 NB!! - only one of three CFF(3) array elements, CFF(P)
 C                 is changed by single call to CFFF!
@@ -68,7 +68,7 @@ C
       DOUBLE COMPLEX DCTAN
       DOUBLE PRECISION RESREAL, RESIMAG
       DOUBLE PRECISION FREAL, FIMAG
-      PARAMETER (NPTSMAX = 512)
+      PARAMETER (NPTSMAX = 768)
       DOUBLE PRECISION Y(NPTSMAX), WG(NPTSMAX)
       DOUBLE COMPLEX N(NPTSMAX)
 
@@ -109,6 +109,8 @@ C
       RESIMAG = RESIMAG + WG(K)*FIMAG
 
  123  CONTINUE
+      
+*   Gamma(3/2) = 0.8862....
 
       CFF(P) = (2.0d0/XI)**(C + 1.0d0) * 
      &      COMPLEX(RESREAL, RESIMAG) / 0.886226925452758014d0

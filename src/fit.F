@@ -128,6 +128,7 @@ C
       INTEGER SPEED, ACC, P, NF
       DOUBLE PRECISION AS0, RF2, RR2
       CHARACTER SCHEME*5, ANSATZ*6
+      DOUBLE COMPLEX CBETA
       CHARACTER*9 FITNM
       DIMENSION FITNM(7)
       DATA FITNM /'NG', 'NSEA', 'MG', 'MSEA',
@@ -135,6 +136,9 @@ C
 
 #ifndef NOPGPLOT
       INTEGER PGBEG
+      LOGICAL DRAW
+      REAL NORMG, NORMSEA
+      REAL XB, LGXB, LASTLGXB, YG, YS, LASTYG, LASTYS
 #endif
 
       COMMON / FITPARAMS  /  FITPAR
@@ -158,7 +162,7 @@ C
       READ (11, *) OUTFILE
       READ (11, *) OUTFORMAT, XPANELS, YPANELS
 #ifndef NOPGPLOT
-*    Initailization of plotting on 2x2 grid of panels
+*    Initailization of plotting on a grid of panels
       IF (IFLAG .EQ. 3)  THEN
         IF (OUTFORMAT(:2) .EQ. '/X') THEN
 *         Ploting to /XSERVE
@@ -222,7 +226,7 @@ C
          WRITE (21, *) 'CHISQ = ', CHISQ
          CLOSE (21)
 #ifndef NOPGPLOT
-*     Draw last plot containing just parameter values
+*     Draw next-to-last plot containing just parameter values
         CALL PGSCH(1.3)
         CALL PGPAGE
         CALL PGVSTD
@@ -244,7 +248,46 @@ C
           WRITE (TXT, 809) CHISQ
           CALL PGTEXT (-1., -1., TXT)
         END IF
-         CALL PGEND
+*     Draw last plot containing PDFs
+        CALL PGSCH(1.8)
+        CALL PGPAGE
+        CALL PGVSTD
+        DRAW = .FALSE.
+        IF (FITPAR(7) .LT. 3.0d0) THEN
+            CALL PGSWIN (-4., -1., -2., 5.)
+        ELSEIF (FITPAR(7) .LT. 8.0d0) THEN
+            CALL PGSWIN (-4., -1., 0., 12.)
+        ELSEIF (FITPAR(7) .LT. 22.0d0) THEN
+            CALL PGSWIN (-4., -1., 0., 24.)
+        ELSE
+            CALL PGSWIN (-4., -1., 0., 50.)
+        ENDIF
+        CALL PGBOX ('BCLNST', 0.0, 0, 'BCNST1', 0.0, 0)
+        CALL PGLAB('x\\dBJ\\u', 'x\\gS(x)(blue), xg(x)(red)', 
+     &       'Resulting PDFs')
+*  FITNM /'NG', 'NSEA', 'MG', 'MSEA', 'ALPHA0G', 'ALPHA0SEA', 'Q20'/
+        NORMG = A(1) / CBETA(COMPLEX(2.0D0-A(5),0.0d0), (6.0d0,0.0d0))
+        NORMSEA = A(2) / CBETA(COMPLEX(2.0D0-A(6),0.0d0), (8.0d0,0.0d0))
+        DO 40 LGXB = -4., -1., 0.02
+          XB = 10**(LGXB)
+          YG = NORMG * XB**(1.0d0-A(5)) * (1.0d0-XB)**5.0
+          YS = NORMSEA * XB**(1.0d0-A(6)) * (1.0d0-XB)**7.0
+          IF (DRAW) THEN
+            CALL PGSCI(2)
+            CALL PGSLS(2)
+            CALL PGMOVE(LASTLGXB, LASTYG)
+            CALL PGDRAW(LGXB, YG)
+            CALL PGSCI(4)
+            CALL PGSLS(1)
+            CALL PGMOVE(LASTLGXB, LASTYS)
+            CALL PGDRAW(LGXB, YS)
+          END IF
+          LASTLGXB = LGXB
+          LASTYG = YG
+          LASTYS = YS
+          DRAW = .TRUE.
+ 40     CONTINUE
+        CALL PGEND
 #endif
       END IF
 

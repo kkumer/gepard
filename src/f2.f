@@ -57,12 +57,13 @@ C
       INTEGER SPEED, ACC, P, NF
       CHARACTER SCHEME*5, ANSATZ*6
       INTEGER NPTS, NPTSMAX, K
-      DOUBLE PRECISION XI, DEL2, Q2, Q02, C, PHI
+      DOUBLE PRECISION XI, DEL2, Q2, Q02, C, PHI, PI
       DOUBLE PRECISION F2(0:2)
       DOUBLE PRECISION NG, NSEA, MG, MSEA, ALPHA0G, ALPHA0SEA
       DOUBLE PRECISION FITPAR(10), RES, F2IMAG
       DOUBLE COMPLEX EPH, FPW, J
-      PARAMETER (NPTSMAX = 512)
+      PARAMETER (NPTSMAX = 768)
+      PARAMETER ( PI = 3.1415 92653 58979 D0 )
       DOUBLE PRECISION Y(NPTSMAX), WG(NPTSMAX)
       DOUBLE COMPLEX N(NPTSMAX)
 
@@ -109,9 +110,15 @@ C
       RES = RES + WG(K)*F2IMAG
  123  CONTINUE
 
-*     0.0707... = (2/9) / (Pi)
-
-      F2(P) = (1.0d0/XI)**(C) * RES * 0.07073553026306459d0
+      IF (NF .EQ. 3) THEN
+         F2(P) = (1.0d0/XI)**(C) * RES * 2.0D0 / 9.0D0 / PI
+      ELSE IF (NF .EQ. 4) THEN
+         F2(P) = (1.0d0/XI)**(C) * RES * 5.0D0 / 18.0D0 / PI
+      ELSE
+         CALL ERROR ('GeParD', '  CFF',
+     &   'NF is not integer equal to 3 or 4!                          ',
+     &   5, 3)
+      END IF
 
       RETURN
       END

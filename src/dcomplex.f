@@ -32,7 +32,14 @@ C
       X2 = 2.0d0 * DBLE(Z)
       Y2 = 2.0d0 * DIMAG(Z)
 
+C     FIXME: This is a kludge
+      IF ( ABS(Y2) .GT. 3.0D2 ) THEN
+         DCTAN = COMPLEX(0.0d0, SIGN(1.0d0, Y2))
+         RETURN
+      END IF
+
       SN2X = SIN (X2)
+
 
       DEN = COS(X2) + COSH(Y2)
       IF (DEN .EQ. 0.0d0) CALL ERROR ('GeParD', 'DCTAN',

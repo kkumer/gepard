@@ -23,11 +23,13 @@ C
       INTEGER SPEED, ACC, P, NF
       DOUBLE PRECISION AS0, RF2, RR2
       CHARACTER SCHEME*5, ANSATZ*6
-      LOGICAL INCLUDEDVCS, INCLUDEDIS
+      INTEGER CZERO
 
       COMMON / PARINT /  SPEED, ACC, P, NF
       COMMON / PARFLT /  AS0, RF2, RR2
       COMMON / PARCHR /  SCHEME, ANSATZ
+
+      COMMON / SWITCH /  CZERO
 
 *   Read fixed initialization parameters
       OPEN (UNIT = 61, FILE = "GEPARD.INI", STATUS = "OLD")
@@ -41,8 +43,13 @@ C
       READ (61, *) ANSATZ
       CLOSE (61)
 
-*   Default accuracy. Can be overriden later
+*   Some defaults that can be overriden later:
+
+*   Gauss integration accuracy.
       ACC = 3
+
+*   This can be put to zero later to put astrong^0 term to zero for investigating NLO effects
+      CZERO = 1
 
       RETURN
       END

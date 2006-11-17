@@ -7,6 +7,60 @@ C
 C    $Id$
 C     *******
 
+C     ****s* rnnlo.f/RNNLONSF
+C  NAME
+C     RNNLONSF  --   R_1
+C  DESCRIPTION
+C     Calculation non-singlet R_1  (cf. my DIS-p61  for singlet case)
+C     - combination of gamma^(n) and beta_m needed in evolution operator 
+C  SYNOPSIS
+C     SUBROUTINE RNNLONSF (K, R1)
+C
+C     INTEGER K
+C     DOUBLE COMPLEX R1
+C  INPUTS
+C           K -- Mellin-Barnes integration point index
+C  OUTPUT
+C          R1
+C  IDENTIFIERS
+C       BETABLK, NGAM -- common blocks with beta function coefficients
+C       of QCD, and moments of anomalous dimensions of DIS
+C  PARENTS
+C      EVOLNSF
+C  BUGS
+C      Invalid because gamma^NS != gamma^QQ
+C  SOURCE
+C
+
+      SUBROUTINE RNNLONSF (K, R1)
+
+      IMPLICIT NONE
+      INTEGER K
+      DOUBLE COMPLEX R1
+      INTEGER SPEED, ACC, P, NF
+      INTEGER NPTSMAX, NFMIN, NFMAX, K1, L
+      DOUBLE PRECISION BETA0, BETA1, BETA2, BETA3, INV
+      PARAMETER (NFMIN = 3, NFMAX = 6, NPTSMAX = 768)
+      DOUBLE COMPLEX NGAMNS(NPTSMAX,0:2)
+
+*   Input common-blocks
+
+      COMMON / PARINT /  SPEED, ACC, P, NF
+
+      COMMON / BETABLK / BETA0 (NFMIN:NFMAX), BETA1 (NFMIN:NFMAX),
+     &                   BETA2 (NFMIN:NFMAX), BETA3 (NFMIN:NFMAX)
+      COMMON / NGAMNS  /  NGAMNS
+
+*     Inverse beta_0 is often needed below
+      INV = 1.0d0 / BETA0(NF)
+
+      R1 = INV * (NGAMNS(K,1) 
+     &            - 0.5d0 * INV * BETA1(NF) * NGAMNS(K,0))
+
+      RETURN
+      END
+C     ****
+
 
 C     ****s* rnnlo.f/RNNLOF
 C  NAME
@@ -48,7 +102,7 @@ C
       INTEGER NPTSMAX, NFMIN, NFMAX, K1, L
       DOUBLE PRECISION BETA0, BETA1, BETA2, BETA3, INV
       DOUBLE COMPLEX R1(2,2), R2(2,2)
-      PARAMETER (NFMIN = 3, NFMAX = 6, NPTSMAX = 512)
+      PARAMETER (NFMIN = 3, NFMAX = 6, NPTSMAX = 768)
       DOUBLE COMPLEX NGAM(NPTSMAX,0:2,2,2)
 
 *   Input common-blocks

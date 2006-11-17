@@ -18,7 +18,8 @@ C     SUBROUTINE INIT
 C  OUTPUT
 C     BIGC  -- values of DVCS Wilson coefficients for
 C              singlet CFF form factor \mathcal{H}
-C     NGAM  -- anomalous dimensions
+C     NGAM  -- singlet anomalous dimensions
+C   NGAMNS  -- non-singlet anomalous dimensions
 C   BIGCF2  -- values of DIS Wilson coefficients for
 C              singlet form factor F2
 C  IDENTIFIERS
@@ -27,7 +28,8 @@ C           P -- approximation order, which is N^{P}LO
 C           C -- intersection point of Mellin- Barnes integration 
 C                path with real axis
 C         PHI -- angle between Mellin-Barnes contour and Re(J) axis
-C        GAM? -- ?=0,1,2  Anomalous dimensions
+C        GAM? -- ?=0,1,2  singlet anomalous dimensions
+C      GAMNS? -- ?=0,1,2  non-singlet anomalous dimensions
 C          C? -- ?=0,1,2  DIS Wilson coefficients
 C  CHILDREN
 C      BETAF, WgammaV*F, WcV*F, CDVCSF, MSBARF
@@ -52,12 +54,13 @@ C
       DOUBLE COMPLEX HS1, HS2, HS3, HS4
       DOUBLE COMPLEX F2, FL
       DOUBLE COMPLEX GAM0(2,2), GAM1(2,2), GAM2(2,2)
+      DOUBLE COMPLEX GAMNS0, GAMNS1, GAMNS2
       DOUBLE COMPLEX C0(2), C1(2), C2(2)
       DOUBLE COMPLEX C1F2(2)
       DOUBLE COMPLEX BIGC0(2), BIGC1(2), BIGC2(2)
       DOUBLE COMPLEX CLNGAMMA, PREFACT
-      PARAMETER ( NGAUSSMAX = 64, ACCMAX = 6, NINTG = 8,  
-     &             NPTSMAX = 512 )
+      PARAMETER ( NGAUSSMAX = 64, ACCMAX = 6, NINTG = 12,  
+     &             NPTSMAX = 768 )
       PARAMETER ( PI = 3.1415 92653 58979 D0 )
 *
 !      DOUBLE PRECISION ABSCISSAS(NGAUSS), WEIGHTS(NGAUSS)
@@ -66,6 +69,7 @@ C
       DOUBLE PRECISION Y(NPTSMAX), WG(NPTSMAX)
       DOUBLE COMPLEX N(NPTSMAX)
       DOUBLE COMPLEX BIGC(NPTSMAX,0:2,2), NGAM(NPTSMAX,0:2,2,2)
+      DOUBLE COMPLEX NGAMNS(NPTSMAX,0:2)
       DOUBLE COMPLEX BIGCF2(NPTSMAX,0:2,2)
 
 *   Input common-blocks
@@ -86,11 +90,13 @@ C
 *     - Values on a particular contour point
       COMMON / HARMONIC /  S1, S2, S3, S4
       COMMON / WGAMMA   /  GAM0, GAM1, GAM2
+      COMMON / WGAMMANS /  GAMNS0, GAMNS1, GAMNS2
       COMMON / WC       /  C0, C1, C2
 
 *     - Values on the whole contour
       COMMON / BIGC     /  BIGC
       COMMON / NGAM     /  NGAM
+      COMMON / NGAMNS   /  NGAMNS
       COMMON / BIGCF2   /  BIGCF2
 
 
@@ -102,14 +108,11 @@ C
 
       DATA DOWN 
      & / 0.D0, 0.01D0, 0.025D0, 0.067D0, 0.18D0, 
-     &         0.5D0, 1.3D0, 3.7D0, 10.D0 /
+     &         0.5D0, 1.3D0, 3.7D0, 10.D0, 
+     &         20.D0, 50.D0,  1.0D2,  5.0D2 /
 
       CALL GAUSS (ABSC, WGHT)
 
-!      DO 5 K1 = 1, 64
-!        ABSCISSAS(K1) = ABSC(6, K1)
-!        WEIGHTS(K1) = WGHT(6, K1)
-! 5    CONTINUE
 
 *   For fast calculation it's better to compress integration region
 *   The value 1.3 below is optimized for small xi of cca. 10^-4
@@ -123,7 +126,7 @@ C
 *   Parameters of the Mellin-Barnes contour
 
       C   = 0.5D0
-      PHI = 3.D0/4.D0 * PI
+      PHI = 3.0D0/4.D0 * PI
       EPH = EXP ( COMPLEX(0.D0, PHI) )
 
 *   Setting up upper limits of integration intervals
@@ -141,13 +144,14 @@ C
       DO 20 K3 = 1, NGAUSS
         K = K + 1
         YI = (DIFF * ABSC(ACC, K3) + SUMM) * 0.5D0
-        N(K) = (C + 1) + YI * EPH
+        N(K) = (C + 1.0D0) + YI * EPH
         WG(K) = 0.5D0 * DIFF * WGHT(ACC, K3) 
  20   CONTINUE
 
-*    After the above loop, total number of points on the contour is
+*   For everything apart from ND evolution one should use 0->4 below
+*   and increase speed by 30 %
 
-      NPTS = NGAUSS * NINTG / SPEED
+      NPTS = NGAUSS * (NINTG-0) / SPEED
 
 
 *   1. Initialization of QCD beta function coefficients
@@ -195,6 +199,13 @@ C
         END IF
       END IF
 
+      IF ( ANSATZ(:2) .EQ. 'NS' ) THEN
+        CALL WgammaVNSP0F(NFD, Z, GAMNS0)
+        CALL WgammaVNSP1F(NFD, Z, GAMNS1)
+!        CALL WgammaVNS2PF(NFD, Z, GAMNS2)
+      END IF
+
+
 *   2.c DIS Wilson coefficients
 
       C0(1) = (1.0d0, 0.0d0)
@@ -229,16 +240,22 @@ C
         NGAM(K, 1, K1, K2) = GAM1(K1, K2)
  30     NGAM(K, 2, K1, K2) = GAM2(K1, K2)
 
+      IF ( ANSATZ(:2) .EQ. 'NS' ) THEN
+        NGAMNS(K, 0) = GAMNS0
+        NGAMNS(K, 1) = GAMNS1
+!        NGAMNS(K, 2) = GAMNS2
+      END IF
+
 *   3.b "Big C" Wilson coefficients of DVCS [multiplied by
 *           PREFACT = Gamma(5/2+J) / Gamma(3+J)]
 
       IF (SCHEME .EQ. 'CSBAR') THEN
           CALL CDVCSF (J, BIGC0, BIGC1, BIGC2, 'DVCS')
-      ELSE IF (SCHEME .EQ. 'MSBAR') THEN
+      ELSE IF (SCHEME(:3) .EQ. 'MSB') THEN
           CALL MSBARF (J, BIGC0, BIGC1)
       END IF
 
-      PREFACT = EXP(CLNGAMMA(2.5d0 + J)) / EXP(CLNGAMMA(3.0d0 + J))
+      PREFACT = EXP(CLNGAMMA(2.5d0 + J) - CLNGAMMA(3.0d0 + J))
 
       DO 40 K1 = 1,2
         BIGC(K, 0, K1) = BIGC0(K1) * PREFACT

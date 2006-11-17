@@ -32,7 +32,7 @@ C
       DOUBLE PRECISION F2(0:2)
       DOUBLE PRECISION PARSIGMA, SIGMA
 
-      COMMON / PARINT /  SPEED, ACC, P, NF
+      COMMON / PARINT     /  SPEED, ACC, P, NF
 
       COMMON / FITPARAMS  /  FITPAR
       COMMON / KINEMATICS /  XI, DEL2, Q2, Q02
@@ -72,7 +72,7 @@ C
       W2 = 82.0d0**2
       Q2 = 1.0d0
       XI = Q2 / ( 2.0d0 * W2 + Q2)
-      WRITE (*, *) " 113570.49343 is result from gepard_devel.nb"
+      WRITE (*, *) " 5608.4194288225 is result from gepard_devel.nb"
       AUX = PARSIGMA(0.d0)
       WRITE (*, *) AUX
 
@@ -82,10 +82,10 @@ C
       W2 = 82.0d0**2
       Q2 = 3.0d0
       XI = Q2 / ( 2.0d0 * W2 + Q2)
-      WRITE (*, *) " 6676.08735 is t=0 result from gepard_devel.nb"
+      WRITE (*, *) " 329.68332610735 is t=0 result from gepard_devel.nb"
       AUX = PARSIGMA(0.d0)
       WRITE (*, *) AUX
-      WRITE (*, *) " 97.346871 is t=-0.5 result from gepard_devel.nb"
+      WRITE (*, *) " 4.807252903 is t=-0.5 result from gepard_devel.nb"
       AUX = PARSIGMA(0.5d0)
       WRITE (*, *) AUX
 
@@ -93,7 +93,7 @@ C
       W2 = 82.0d0**2
       Q2 = 3.0d0
       XI = Q2 / ( 2.0d0 * W2 + Q2)
-      WRITE (*, *) " 745.02480514 is result from gepard_devel.nb"
+      WRITE (*, *) " 36.7913484 is result from gepard_devel.nb"
       AUX = SIGMA ()
       WRITE (*, *) AUX
 
@@ -101,7 +101,7 @@ C
       W2 = 3.5d0**2
       Q2 = 3.d0
       XI = Q2 / ( 2.0d0 * W2 + Q2)
-      WRITE (*, *) " 138.94079 is result from gepard_devel.nb"
+      WRITE (*, *) " 6.8612738 is result from gepard_devel.nb"
       AUX = SIGMA ()
       WRITE (*, *) AUX
 

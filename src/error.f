@@ -29,7 +29,7 @@ C
 
       IMPLICIT NONE
       INTEGER NERR, LEVEL
-      CHARACTER LIB*6, SUBR*5, MSG*60
+      CHARACTER LIB*6, SUBR*8, MSG*60
 
       WRITE (*,*) LIB, ": ", SUBR, " ERROR !!", MSG
       WRITE (*,*) " --> ERROR NUMBER: ", NERR
