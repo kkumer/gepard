@@ -1,0 +1,14 @@
+---- THIS FILE CANNOT BE PROCESSED YET !! -------
+'SIGMA'                   YOBS
+TBC                        W
+-1.                        Q2
+0.0018                     X
+3                          N
+5.25  6.74
+8.75  
+15.5   ......
+
+
+*     DVCS_H1_4  [H1,  Eur.Phys.J.C44:1-11,2005, hep-ex/0505061]
+*       X = Q2,   Y = SIG   (TCUT = - 1 GeV)
+*       XB = 0.0018  .... FIXME: TO BE IMPLEMENTED .....
