@@ -23,19 +23,13 @@ C
       PROGRAM HOUCHES
 
       IMPLICIT NONE
-      INTEGER SPEED, ACC, P, NF
-      DOUBLE PRECISION AS0, RF2, RR2
-      CHARACTER SCHEME*5, ANSATZ*6
-      DOUBLE PRECISION XI, DEL2, Q2, Q02
-      INTEGER NPTS, NPTSMAX, K,  K1, K2
+      INTEGER K,  K1, K2
       DOUBLE COMPLEX EPH, J, FPW
-      DOUBLE PRECISION PHI, C, F2IMAG, RES, XG(4)
-      PARAMETER (NPTSMAX = 768)
-      DOUBLE PRECISION Y(NPTSMAX), WG(NPTSMAX), PI, AS
-      DOUBLE COMPLEX N(NPTSMAX)
+      DOUBLE PRECISION F2IMAG, RES, XG(4)
+      DOUBLE PRECISION AS
       DOUBLE PRECISION LHXGINP(11), LHXGLO(11), LHXGNLO(11)
       DOUBLE PRECISION LHXGNNLO(11), XIA(11), REF(11)
-      PARAMETER (PI = 3.14159265358979 D0)
+      INCLUDE 'header.f'
 
       DATA XIA /1.D-7, 1.D-6, 1.D-5, 1.D-4, 1.D-3,
      &  1.D-2, 1.D-1, 3.D-1, 5.D-1, 7.D-1, 9.D-1 /
@@ -68,28 +62,14 @@ C
      &  0.392036567E-03, 0.124277587E-05 /
 
 
-*   Input common-blocks 
-
-      COMMON / CONTOUR    /  NPTS
-      COMMON / CPHI       /  C, PHI
-      COMMON / POINTS     /  Y, WG
-      COMMON / NPOINTS    /  N
-
-*   Output common-blocks 
-
-      COMMON / PARINT /  SPEED, ACC, P, NF
-      COMMON / PARFLT /  AS0, RF2, RR2
-      COMMON / PARCHR /  SCHEME, ANSATZ
-
-      COMMON / KINEMATICS /  XI, DEL2, Q2, Q02
+      CALL READPAR
 
 *   Parameters of Les Houches benchmark
 
       NF = 4
-      RF2 = 1.0D0
-      RR2 = 1.0D0
+      PAR(1) = 2.0D0
+      PAR(3) = 2.5D0
       ANSATZ = 'HOUCHE'
-      Q02 = 2.0D0
 
 *   Following artifical renorm. scheme has C = (0, 1) at
 *   all orders, thus effectively putting F_2 -> Q_s^2 x g(x)
@@ -99,8 +79,6 @@ C
       OPEN (UNIT = 11, FILE = 'NLOACC.dat', STATUS = 'UNKNOWN') 
       OPEN (UNIT = 12, FILE = 'NNLOACC.dat', STATUS = 'UNKNOWN') 
 
-
-      ACC = 3
 
       DO 210 SPEED = 1, 4
       WRITE (11, *) '# SPEED = ', SPEED
@@ -113,7 +91,7 @@ C
         RES = 0.0D0
         P = 1
         Q2 = 1.0D4
-        AS0 = 0.0525303832D0
+        PAR(2) = 0.0525303832D0
         CALL INIT
         EPH = EXP ( COMPLEX(0.0d0, PHI) )
         DO 30 K = 1, NPTS
@@ -126,7 +104,7 @@ C
 !        WRITE (11, 803) XI, ABS((XG(3)-LHXGNLO(K1))/LHXGNLO(K1))
         WRITE (11, 803) XI, ABS((XG(3)-REF(K1))/REF(K1))
  35   CONTINUE
-      CALL AS2PF (AS, Q2, AS0, 2.5D0, NF, P)  
+      CALL AS2PF (AS, Q2, PAR(2), 2.5D0, NF, P)  
       WRITE (*,904) Q2, AS * 2.0D0 * PI
 
 *  Gluon part - NNLO evolution
@@ -135,7 +113,7 @@ C
         RES = 0.0D0
         P = 2
         Q2 = 1.0D4
-        AS0 = 0.0524395701
+        PAR(2) = 0.0524395701
         CALL INIT
         EPH = EXP ( COMPLEX(0.0d0, PHI) )
         DO 40 K = 1, NPTS
@@ -147,7 +125,7 @@ C
         XG(4) = (1.0d0/XI)**(C) * RES / 3.1415926535897932
         WRITE (12, 803) XI, ABS((XG(4)-LHXGNNLO(K1))/LHXGNNLO(K1))
  45   CONTINUE
-      CALL AS2PF (AS, Q2, AS0, 2.5D0, NF, P)  
+      CALL AS2PF (AS, Q2, PAR(2), 2.5D0, NF, P)  
       WRITE (*,904) Q2, AS * 2.0D0 * PI
 
       WRITE (11, *)

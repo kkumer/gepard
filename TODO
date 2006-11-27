@@ -1,4 +1,3 @@
-
 Physics: 
 -  Include MS-bar evolution
 -  t_cut of ZEUS data is infinity? DVCS[46].DAT
@@ -11,6 +10,7 @@ Computing:
 -  Remove unused variables (specially in adacf, or specially
    not there)?
 -  Put evolution operators on common block when Q0 is fixed
+-  Move all gaussian points to gauss.f  (from dvcs.f e.g.)
 
 Checks:
 -  Check NNLO DIS evolution against Les Houches table 3 or 4

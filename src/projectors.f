@@ -39,13 +39,8 @@ C
       DOUBLE COMPLEX PR(2,2,2)
       DOUBLE COMPLEX LAM(2)
       DOUBLE COMPLEX DEN
-      INTEGER NPTSMAX
-      PARAMETER (NPTSMAX = 768)
-      DOUBLE COMPLEX NGAM(NPTSMAX,0:2,2,2)
+      INCLUDE 'header.f'
 
-*     Input common-block
-
-      COMMON / NGAM     /  NGAM
 
       CALL LAMBDAF (K, LAM)
 

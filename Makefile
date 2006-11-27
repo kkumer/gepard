@@ -41,7 +41,8 @@ export X11LIBS = -L/usr/X11R6/lib -lX11
 endif
 
 # targets
-SRCTARGETS = radcorr scaledep fit test auxtest fit_nopgplot houches accuracy schemedep evoldep
+SRCTARGETS = radcorr scaledep fit test auxtest fit_nopgplot houches accuracy \
+			 schemedep evoldep radcorr2 scaledep2
 .PHONY: $(SRCTARGETS)
 DOCTARGETS = pdf html
 

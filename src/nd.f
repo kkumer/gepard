@@ -35,38 +35,25 @@ C
       INTEGER K
       DOUBLE PRECISION R
       DOUBLE COMPLEX CNDNS
-      INTEGER NPTS, NPTSMAX, L
-      PARAMETER (NPTSMAX = 768)
+      INTEGER L
       DOUBLE COMPLEX PIHALF, EPH, EPHND
-      DOUBLE PRECISION C, PHI, CND, PHIND
-      DOUBLE PRECISION Y(NPTSMAX), WG(NPTSMAX)
-      DOUBLE COMPLEX N(NPTSMAX)
       DOUBLE COMPLEX J, ZK, CB1, CB1C
       DOUBLE COMPLEX DCTAN
+      INCLUDE 'header.f'
 
-*   Mellin-Barnes contour
 
-      COMMON / CONTOUR    /  NPTS
-      COMMON / CPHI       /  C, PHI
-      COMMON / POINTS     /  Y, WG
-      COMMON / NPOINTS    /  N
-
-      PIHALF = (1.5707963267948966d0, 0.0d0)
-*   Mellin-Barnes angle different from the one used for COPE !
-      PHIND = PIHALF
       EPHND = EXP ( COMPLEX(0.D0, PHIND) )
       EPH = EXP ( COMPLEX(0.D0, PHI) )
-*   Mellin-Barnes contour for ND evolution intersects real axis at
-      CND = - 0.25d0
-*   so contour saved in common blocks needs to be shifted by CNEW-C
 
 
 *   Integrating over L->ZK, with fixed K->J
-*   Note that N(L)-1-C = Y*EPH
 
       J = N(K) - 1.0d0
       CNDNS = (0.0d0, 0.0d0)
       DO 100 L = 1, NPTS
+*   Mellin-Barnes contour for ND evolution intersects real axis at CND
+*   so contour saved in common blocks needs to be shifted by CND-C.
+*   Note that N(L)-1-C = Y*EPH
         ZK = (N(L) - 1.0d0 - C)*CONJG(EPH)*EPHND + CND
         CALL CB1F (J + ZK + 2.0d0, J, R, CB1)
 !        CNDNS = CNDNS + WG(L)*IMAGPART(EPH*CB1/DCTAN(PIHALF*ZK))
@@ -115,23 +102,11 @@ C
       IMPLICIT NONE
       DOUBLE COMPLEX ZN, ZK, CB1
       DOUBLE PRECISION R
-      INTEGER SPEED, ACC, P, NF
-      INTEGER NFMIN, NFMAX
-      PARAMETER (NFMIN = 3, NFMAX = 6)
-      DOUBLE PRECISION BETA0, BETA1, BETA2, BETA3, NFD
-      DOUBLE COMPLEX S1, S2, S3, S4, S1ORIG
+      DOUBLE PRECISION NFD
+      DOUBLE COMPLEX S1ORIG
       DOUBLE COMPLEX R1, A, GOD
       DOUBLE COMPLEX HS1, GAMN, GAMK
-
-*   Input common-blocks
-
-      COMMON / PARINT /  SPEED, ACC, P, NF
-
-      COMMON / BETABLK / BETA0 (NFMIN:NFMAX), BETA1 (NFMIN:NFMAX),
-     &                   BETA2 (NFMIN:NFMAX), BETA3 (NFMIN:NFMAX)
-
-*   Input/output common block
-      COMMON / HARMONIC /  S1, S2, S3, S4
+      INCLUDE 'header.f'
 
       NFD = DBLE(NF)
 

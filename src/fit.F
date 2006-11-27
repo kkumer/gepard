@@ -116,23 +116,19 @@ C
       SUBROUTINE FCN(NPAR,GIN,CHISQ,A,IFLAG,FUTIL)
 
       IMPLICIT NONE
-      INTEGER NPAR, IFLAG, NPARMAX
-      PARAMETER (NPARMAX = 10)
+      INTEGER NPAR, IFLAG
       DOUBLE PRECISION CHISQ, FUTIL
-      DOUBLE PRECISION A(NPARMAX),GIN(NPARMAX)
-      INTEGER N, NTOT, K, IER, XPANELS, YPANELS
-      DOUBLE PRECISION FITPAR(NPARMAX)
+      INTEGER NN, NTOT, K, IER, XPANELS, YPANELS
       DOUBLE PRECISION CHISQPART
       CHARACTER*20 DATAFNAME, OUTFILE, OUTFORMAT
       CHARACTER TXT*45
-      INTEGER SPEED, ACC, P, NF
-      DOUBLE PRECISION AS0, RF2, RR2
-      CHARACTER SCHEME*5, ANSATZ*6
       DOUBLE COMPLEX CBETA
       CHARACTER*9 FITNM
-      DIMENSION FITNM(7)
-      DATA FITNM /'NG', 'NSEA', 'MG', 'MSEA',
-     & 'ALPHA0G', 'ALPHA0SEA', 'Q20'/
+      DIMENSION FITNM(8)
+      INCLUDE 'header.f'
+      DOUBLE PRECISION A(NPARMAX),GIN(NPARMAX)
+      DATA FITNM /'NS', 'AL0S', 'ALPS', 'M02S',
+     & 'NG', 'AL0G', 'ALPG', 'M02G'/
 
 #ifndef NOPGPLOT
       INTEGER PGBEG
@@ -141,10 +137,6 @@ C
       REAL XB, LGXB, LASTLGXB, YG, YS, LASTYG, LASTYS
 #endif
 
-      COMMON / FITPARAMS  /  FITPAR
-      COMMON / PARINT /  SPEED, ACC, P, NF
-      COMMON / PARFLT /  AS0, RF2, RR2
-      COMMON / PARCHR /  SCHEME, ANSATZ
 
 *     Clear output buffer
 
@@ -153,7 +145,8 @@ C
 *     Transfer parameters to common block
 
       DO 10 K = 1, NPARMAX
- 10     FITPAR(K) = A(K)
+        PAR(K) = A(K)
+ 10   CONTINUE
 
       NTOT = 0
       CHISQ = 0.0d0
@@ -187,18 +180,17 @@ C
      &  STATUS = 'UNKNOWN')
         WRITE (21, 803) "Gepard parameters:"
         WRITE (21, 804) SPEED, P, NF
-        WRITE (21, 805) AS0, RF2, RR2
         WRITE (21, 806) SCHEME, ANSATZ
-        IF ( ANSATZ .EQ. 'FIT' ) THEN
+        IF ( ANSATZ(:3) .EQ. 'FIT' ) THEN
           WRITE (21, 803) "Final fit parameters:"
-          DO 13 K = 1, 7
- 13       WRITE (21, 807) FITNM(K), A(K)
+          DO 13 K = 1, 4
+          WRITE (21, 807) FITNM(K), PAR(10+K)
+ 13       WRITE (21, 807) FITNM(4+K), PAR(20+K)
         END IF
         WRITE (21, *) 
 *     Same goes to .min
         WRITE (6, 803) "Gepard parameters:"
         WRITE (6, 804) SPEED, P, NF
-        WRITE (6, 805) AS0, RF2, RR2
         WRITE (6, 806) SCHEME, ANSATZ
         WRITE (6, *) 
       END IF
@@ -212,9 +204,9 @@ C
       IF (DATAFNAME(:4) .EQ. 'STOP') THEN
         GOTO 20
       ELSE
-        CALL PROCDATA (DATAFNAME, IFLAG, N, CHISQPART)
+        CALL PROCDATA (DATAFNAME, IFLAG, NN, CHISQPART)
         CHISQ = CHISQ + CHISQPART
-        NTOT = NTOT + N
+        NTOT = NTOT + NN
         IF (IFLAG .EQ. 3) WRITE (21, *)
       END IF
       GOTO 18
@@ -233,31 +225,31 @@ C
         CALL PGSWIN (0., 12., 0., 12.)
         CALL PGTEXT (-1., 12., "Gepard parameters:")
         WRITE(TXT, 804) SPEED, P, NF
-        CALL PGTEXT (1., 11., TXT)
-        WRITE(TXT, 805) AS0, RF2, RR2
         CALL PGTEXT (1., 10., TXT)
         WRITE(TXT, 806) SCHEME, ANSATZ
         CALL PGTEXT (1., 9., TXT)
-        IF ( ANSATZ .EQ. 'FIT' ) THEN
+        IF ( ANSATZ(:3) .EQ. 'FIT' ) THEN
           CALL PGTEXT (-1., 8., "Final fit parameters:")
-          DO 30 K = 1, 7
-          WRITE (TXT, 807) FITNM(K), A(K)
- 30       CALL PGTEXT (-1., REAL(8-K), TXT)
+          DO 30 K = 1, 4
+          WRITE (TXT, 807) FITNM(K), PAR(10+K)
+          CALL PGTEXT (-1., REAL(8-K), TXT)
+          WRITE (TXT, 807) FITNM(4+K), PAR(20+K)
+ 30       CALL PGTEXT (-1., REAL(4-K), TXT)
           WRITE (TXT, 808) NTOT, NPAR, NTOT-NPAR
-          CALL PGTEXT (-1., 0., TXT)
-          WRITE (TXT, 809) CHISQ
           CALL PGTEXT (-1., -1., TXT)
+          WRITE (TXT, 809) CHISQ
+          CALL PGTEXT (-1., -2., TXT)
         END IF
 *     Draw last plot containing PDFs
         CALL PGSCH(1.8)
         CALL PGPAGE
         CALL PGVSTD
         DRAW = .FALSE.
-        IF (FITPAR(7) .LT. 3.0d0) THEN
+        IF (PAR(1) .LT. 3.0d0) THEN
             CALL PGSWIN (-4., -1., -2., 5.)
-        ELSEIF (FITPAR(7) .LT. 8.0d0) THEN
+        ELSEIF (PAR(1) .LT. 8.0d0) THEN
             CALL PGSWIN (-4., -1., 0., 12.)
-        ELSEIF (FITPAR(7) .LT. 22.0d0) THEN
+        ELSEIF (PAR(1) .LT. 22.0d0) THEN
             CALL PGSWIN (-4., -1., 0., 24.)
         ELSE
             CALL PGSWIN (-4., -1., 0., 50.)
@@ -265,13 +257,14 @@ C
         CALL PGBOX ('BCLNST', 0.0, 0, 'BCNST1', 0.0, 0)
         CALL PGLAB('x\\dBJ\\u', 'x\\gS(x)(blue), xg(x)(red)', 
      &       'Resulting PDFs')
-*  FITNM /'NG', 'NSEA', 'MG', 'MSEA', 'ALPHA0G', 'ALPHA0SEA', 'Q20'/
-        NORMG = A(1) / CBETA(COMPLEX(2.0D0-A(5),0.0d0), (6.0d0,0.0d0))
-        NORMSEA = A(2) / CBETA(COMPLEX(2.0D0-A(6),0.0d0), (8.0d0,0.0d0))
+        NORMSEA = PAR(11) / 
+     &              CBETA(COMPLEX(2.0D0-PAR(12),0.0d0), (8.0d0,0.0d0))
+        NORMG = PAR(21) / 
+     &              CBETA(COMPLEX(2.0D0-PAR(22),0.0d0), (6.0d0,0.0d0))
         DO 40 LGXB = -4., -1., 0.02
           XB = 10**(LGXB)
-          YG = NORMG * XB**(1.0d0-A(5)) * (1.0d0-XB)**5.0
-          YS = NORMSEA * XB**(1.0d0-A(6)) * (1.0d0-XB)**7.0
+          YS = NORMSEA * XB**(1.0d0-PAR(12)) * (1.0d0-XB)**7.0
+          YG = NORMG * XB**(1.0d0-PAR(22)) * (1.0d0-XB)**5.0
           IF (DRAW) THEN
             CALL PGSCI(2)
             CALL PGSLS(2)
@@ -293,7 +286,7 @@ C
 
 803   FORMAT (1X, /, 1X, '-----    ', A, '    -----', /)
 804   FORMAT (1X, 'SPEED = ', I1, 5X, 'P = ', I1, 5X, 'NF = ', I1)
-805   FORMAT (1X, 'AS0 = ', F6.4,2X, 'RF2 = ', F3.1,2X, 'RR2 = ', F3.1)
+!805   FORMAT (1X, 'AS0 = ', F6.4,2X, 'RF2 = ', F3.1,2X, 'RR2 = ', F3.1)
 806   FORMAT (1X, 'SCHEME = ', A, 3X, 'ANSATZ = ', A)
 807   FORMAT (1X,  A15, ' = ', 3X, G9.3)
 808   FORMAT (1X, 'd.o.f = ', I3, ' - ', I1, ' = ', I3)
@@ -337,30 +330,25 @@ C  CHILDREN
 C      PARSIGMA, SIGMA, F2F, PGPLOT routines
 C  SOURCE
 C
-      SUBROUTINE PROCDATA (FNAME, IFLAG, N, CHISQPART)
+      SUBROUTINE PROCDATA (FNAME, IFLAG, NN, CHISQPART)
 
       IMPLICIT NONE
       CHARACTER  FNAME*15
-      INTEGER IFLAG, N
+      INTEGER IFLAG, NN
       DOUBLE PRECISION CHISQPART
       CHARACTER YOBS*8
       INTEGER K
-      DOUBLE PRECISION X, Y, DY, THY, DIFSG
+      DOUBLE PRECISION X, YY, DY, THY, DIFSG
       DOUBLE PRECISION STAT, SYS
-      INTEGER SPEED, ACC, P, NF
-      DOUBLE PRECISION XI, DEL2, Q2, Q02,  W
+      DOUBLE PRECISION W
       DOUBLE PRECISION WIN, Q2IN
       DOUBLE PRECISION XBJ, XBJIN
       DOUBLE PRECISION PARSIGMA, SIGMA
-      DOUBLE PRECISION F2(0:2)
 #ifndef NOPGPLOT
       LOGICAL DRAW
       REAL LASTX, LASTY
 #endif
-
-      COMMON / PARINT /  SPEED, ACC, P, NF
-      COMMON / KINEMATICS /  XI, DEL2, Q2, Q02
-      COMMON / F2P        /  F2
+      INCLUDE 'header.f'
 
       CHISQPART = 0.d0
 
@@ -381,7 +369,7 @@ C
 
         READ (12,*) W
         READ (12,*) Q2
-        READ (12,*) N
+        READ (12,*) NN
 
         XI = Q2 / ( 2.0d0 * W**2 + Q2)
 #ifndef NOPGPLOT
@@ -392,17 +380,17 @@ C
         END IF
 #endif
 
-        DO 110 K = 1, N
-        READ (12, *) X, Y, STAT, SYS
+        DO 110 K = 1, NN
+        READ (12, *) X, YY, STAT, SYS
         DY = SQRT( STAT*STAT + SYS*SYS )
         THY = PARSIGMA(X)
-        CHISQPART = CHISQPART + ( (THY - Y)**2 / DY**2 )
+        CHISQPART = CHISQPART + ( (THY - YY)**2 / DY**2 )
         IF (IFLAG .EQ. 3)  THEN
-          DIFSG = (THY - Y) / DY
-          WRITE (21, 901) X, THY, Y, DY, DIFSG
+          DIFSG = (THY - YY) / DY
+          WRITE (21, 901) X, THY, YY, DY, DIFSG
 #ifndef NOPGPLOT
-          CALL PGERRY(1, SNGL(X), LOG10(SNGL(Y-DY)), LOG10(SNGL(Y+DY)),
-     &           3.0)
+          CALL PGERRY(1, SNGL(X), LOG10(SNGL(YY-DY)), 
+     &                  LOG10(SNGL(YY+DY)), 3.0)
           CALL PGSCI(2)
           IF (DRAW) THEN
             CALL PGMOVE(LASTX, LASTY)
@@ -421,10 +409,10 @@ C
 
         READ (12,*) WIN
         READ (12,*) Q2IN
-        READ (12,*) N
+        READ (12,*) NN
 
-        DO 120 K = 1, N
-        READ (12, *) X, Y, STAT, SYS
+        DO 120 K = 1, NN
+        READ (12, *) X, YY, STAT, SYS
         DY = SQRT( STAT*STAT + SYS*SYS )
 *   Which of W or Q2 is on x-axis?
         IF (WIN .LT. 0.) THEN
@@ -454,13 +442,13 @@ C
         END IF
         XI = Q2 / (2.0d0 * W**2 + Q2)
         THY = SIGMA()
-        CHISQPART = CHISQPART + ( (THY - Y)**2 / DY**2 )
+        CHISQPART = CHISQPART + ( (THY - YY)**2 / DY**2 )
         IF (IFLAG .EQ. 3)  THEN
-          DIFSG = (THY - Y) / DY
-          WRITE (21, 901) X, THY, Y, DY, DIFSG
+          DIFSG = (THY - YY) / DY
+          WRITE (21, 901) X, THY, YY, DY, DIFSG
 #ifndef NOPGPLOT
           IF (WIN .LT. 0.) THEN
-            CALL PGERRY(1, SNGL(X), SNGL(Y-DY), SNGL(Y+DY), 3.0)
+            CALL PGERRY(1, SNGL(X), SNGL(YY-DY), SNGL(YY+DY), 3.0)
             CALL PGSCI(2)
             IF (DRAW) THEN
               CALL PGMOVE(LASTX, LASTY)
@@ -471,8 +459,8 @@ C
             LASTY = SNGL(THY)
             DRAW = .TRUE.
           ELSE
-            CALL PGERRY(1,SNGL(X), LOG10(SNGL(Y-DY)), LOG10(SNGL(Y+DY)),
-     &             3.0)
+            CALL PGERRY(1,SNGL(X), LOG10(SNGL(YY-DY)), 
+     &              LOG10(SNGL(YY+DY)), 3.0)
             CALL PGSCI(2)
             IF (DRAW) THEN
               CALL PGMOVE(LASTX, LASTY)
@@ -492,10 +480,10 @@ C
 
         READ (12,*) XBJIN
         READ (12,*) Q2IN
-        READ (12,*) N
+        READ (12,*) NN
 
-        DO 130 K = 1, N
-        READ (12, *) X, Y, STAT, SYS
+        DO 130 K = 1, NN
+        READ (12, *) X, YY, STAT, SYS
         DY = SQRT( STAT*STAT + SYS*SYS )
 *   Which of X_BJ or Q2 is on x-axis?
         IF (XBJIN .LT. 0.) THEN
@@ -526,12 +514,12 @@ C
         XI = XBJ
         CALL F2F
         THY = F2(P)
-        CHISQPART = CHISQPART + ( (THY - Y)**2 / DY**2 )
+        CHISQPART = CHISQPART + ( (THY - YY)**2 / DY**2 )
         IF (IFLAG .EQ. 3)  THEN
-          DIFSG = (THY - Y) / DY
-          WRITE (21, 901) X, THY, Y, DY, DIFSG
+          DIFSG = (THY - YY) / DY
+          WRITE (21, 901) X, THY, YY, DY, DIFSG
 #ifndef NOPGPLOT
-          CALL PGERR1(6, SNGL(X), SNGL(Y), SNGL(DY), 3.0)
+          CALL PGERR1(6, SNGL(X), SNGL(YY), SNGL(DY), 3.0)
           CALL PGSCI(2)
           IF (DRAW) THEN
             CALL PGMOVE(LASTX, LASTY)

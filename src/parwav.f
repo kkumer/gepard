@@ -38,35 +38,16 @@ C
       INTEGER K
       DOUBLE COMPLEX FPW
       CHARACTER PROCESS*4
-      INTEGER SPEED, ACC, P, NF
-      DOUBLE PRECISION AS0, RF2, RR2
-      CHARACTER SCHEME*5, ANSATZ*6
-      DOUBLE PRECISION XI, DEL2, Q2, Q02
-      INTEGER ORD, L, NPTSMAX, K1, CZERO
-      DOUBLE PRECISION MU20, R, ASQ2, ASQ02
+      INTEGER ORD, L, K1
+      DOUBLE PRECISION R, ASQ2, ASQ02
       DOUBLE COMPLEX CDVCS(0:2,2), CNDNS
       DOUBLE COMPLEX EVOLNSA(0:2)
-      DOUBLE COMPLEX BIGC(0:2,2), EVOLA(0:2,2,2), FCM(2)
-      PARAMETER (NPTSMAX = 768)
-      DOUBLE COMPLEX J, N(NPTSMAX)
-      DOUBLE COMPLEX BIGCDVCS(NPTSMAX,0:2,2), BIGCF2(NPTSMAX,0:2,2)
-
-      PARAMETER (MU20=2.5d0)
-
-      COMMON / PARINT /  SPEED, ACC, P, NF
-      COMMON / PARFLT /  AS0, RF2, RR2
-      COMMON / PARCHR /  SCHEME, ANSATZ
-
-      COMMON / SWITCH /  CZERO
-
-      COMMON / KINEMATICS /  XI, DEL2, Q2, Q02
-      COMMON / NPOINTS    /  N
-      COMMON / BIGC       /  BIGCDVCS
-      COMMON / BIGCF2     /  BIGCF2
+      DOUBLE COMPLEX J, BIGCL(0:2,2), EVOLA(0:2,2,2), FCM(2)
+      INCLUDE 'header.f'
 
       J = N(K) - 1
-      CALL AS2PF (ASQ2, Q2, AS0, MU20, NF, P)
-      CALL AS2PF (ASQ02, Q02, AS0, MU20, NF, P)
+      CALL AS2PF (ASQ2, Q2, PAR(2), PAR(3))
+      CALL AS2PF (ASQ02, PAR(1), PAR(2), PAR(3))
       R = ASQ2/ASQ02
       CALL HJ(J, FCM)
 
@@ -77,9 +58,9 @@ C
       DO 10 L = 1, 2
         CDVCS(ORD, L) = (0.0d0, 0.0d0)
         IF ( PROCESS .EQ. 'DVCS' ) THEN
-          BIGC(ORD, L) = BIGCDVCS(K, ORD, L)
+          BIGCL(ORD, L) = BIGC(K, ORD, L)
         ELSE IF ( PROCESS(:3) .EQ. 'DIS' ) THEN
-          BIGC(ORD, L) = BIGCF2(K, ORD, L)
+          BIGCL(ORD, L) = BIGCF2(K, ORD, L)
         ELSE 
           CALL ERROR ('GeParD', 'PARWAVF',
      &    'Process ' // PROCESS // ' is unknown! (Need DVCS or DIS)   ',
@@ -108,7 +89,7 @@ C
 
       DO 15 ORD = 0, P
       DO 15 K1 = 0, ORD
-        CDVCS(ORD, 1) = CDVCS(ORD, 1) + BIGC(ORD-K1, 1) * EVOLNSA(K1)
+        CDVCS(ORD, 1) = CDVCS(ORD, 1) + BIGCL(ORD-K1, 1) * EVOLNSA(K1)
  15   CONTINUE
 
 *   Put astrong^0 term to zero if investigating NLO effects
@@ -125,10 +106,10 @@ C
 
       DO 20 ORD = 0, P
       DO 20 K1 = 0, ORD
-        CDVCS(ORD, 1) = CDVCS(ORD, 1) + BIGC(ORD-K1, 1) * EVOLA(K1,1,1)
-     &      + BIGC(ORD-K1,2) * EVOLA(K1,2,1)
-        CDVCS(ORD, 2) = CDVCS(ORD, 2) + BIGC(ORD-K1, 1) * EVOLA(K1,1,2)
-     &      + BIGC(ORD-K1,2) * EVOLA(K1,2,2)
+        CDVCS(ORD, 1) = CDVCS(ORD, 1) + BIGCL(ORD-K1, 1) * EVOLA(K1,1,1)
+     &      + BIGCL(ORD-K1,2) * EVOLA(K1,2,1)
+        CDVCS(ORD, 2) = CDVCS(ORD, 2) + BIGCL(ORD-K1, 1) * EVOLA(K1,1,2)
+     &      + BIGCL(ORD-K1,2) * EVOLA(K1,2,2)
  20   CONTINUE
 
       FPW = (0.0d0, 0.0d0)
@@ -173,25 +154,17 @@ C
 
       IMPLICIT NONE
       DOUBLE COMPLEX J, FCM(2) 
-      CHARACTER SCHEME*5, ANSATZ*6
-      DOUBLE PRECISION XI, DEL2, Q2, Q02
+      DOUBLE COMPLEX HSEA, HU, HD
+      DOUBLE PRECISION NORMS
       DOUBLE COMPLEX CLNGAMMA, CBETA, POCHSEA, POCHG, POCHHAMMER
       DOUBLE COMPLEX NUM, DENN
-      DOUBLE PRECISION NG, NSEA, MG, MSEA, ALPHA0G, ALPHA0SEA
-      DOUBLE PRECISION ALPHAPR
       INTEGER LHBETA(4), LHBETAF(4)
       DOUBLE PRECISION LHA(4), LHLAM(4)
+      INCLUDE 'header.f'
       DATA LHBETA / 3, 4, 6, 5 /
       DATA LHBETAF / 6, 24, 720, 120 /
       DATA LHA / 5.1072D0, 3.06432D0, 0.1939875D0, 1.7D0 /
       DATA LHLAM / -0.8D0, -0.8D0, 0.1D0, 0.1D0 /
-
-*   Input common-blocks 
-
-      COMMON / PARCHR /  SCHEME, ANSATZ
-
-      COMMON / KINEMATICS /  XI, DEL2, Q2, Q02
-      COMMON / GPD        /  NG, NSEA, MG, MSEA, ALPHA0G, ALPHA0SEA
 
 *      'Toy' singlet ansatz
       IF (ANSATZ .EQ. 'TOY') THEN
@@ -206,44 +179,63 @@ C
 *          'Dummy' gluonic, not used:
             FCM(2) = (0.0d0, 0.0d0)
       ELSE IF ((ANSATZ .EQ. 'HARD') .OR. (ANSATZ .EQ. 'SOFT')) THEN
-            ALPHA0SEA = 1.1d0
-            ALPHAPR = 0.25d0
+            PAR(12) = 1.1d0
+            PAR(13) = 0.25d0
+            PAR(23) = 0.25d0
             POCHSEA = (8.0d0, 0.0d0)
             POCHG = (6.0d0, 0.0d0)
             IF (ANSATZ .EQ. 'HARD') THEN
-                  NG = 0.4d0
-                  ALPHA0G = ALPHA0SEA + 0.1d0
+                  PAR(21) = 0.4d0
+                  PAR(22) = PAR(12) + 0.1d0
             ELSE IF (ANSATZ .EQ. 'SOFT') THEN
-                  NG = 0.3d0
-                  ALPHA0G = ALPHA0SEA
+                  PAR(21) = 0.3d0
+                  PAR(22) = PAR(12)
             END IF
-            NSEA = (2.0d0/3.0d0) - NG
-            FCM(1) = NSEA * CBETA(COMPLEX(1.0d0 - ALPHA0SEA - 
-     &            ALPHAPR*DEL2, 0.0d0) + J, POCHSEA) / CBETA(
-     &            COMPLEX(2.0d0 - ALPHA0SEA, 0.0d0), POCHSEA)
-            FCM(2) = NG * CBETA(COMPLEX(1.0d0 - ALPHA0G - ALPHAPR*DEL2,
-     &        0.0d0) + J, POCHG) / CBETA(COMPLEX(2.0d0 - ALPHA0G,
+            PAR(11) = (2.0d0/3.0d0) - PAR(21)
+            FCM(1) = PAR(11) * CBETA(COMPLEX(1.0d0 - PAR(12) - 
+     &            PAR(13)*DEL2, 0.0d0) + J, POCHSEA) / CBETA(
+     &            COMPLEX(2.0d0 - PAR(12), 0.0d0), POCHSEA)
+            FCM(2) = PAR(21) * CBETA(COMPLEX(1.0d0-PAR(22)-PAR(23)*DEL2,
+     &        0.0d0) + J, POCHG) / CBETA(COMPLEX(2.0d0 - PAR(22),
      &        0.0d0), POCHG)
+      ELSE IF (ANSATZ .EQ. 'FITOLD') THEN
+            FCM(1) = PAR(11) / (1 - DEL2/PAR(14)**2)**3 / POCHHAMMER(
+     &            COMPLEX(1.0d0 - PAR(12) - 
+     &            PAR(13)*DEL2, 0.0d0) + J, 8) * POCHHAMMER(
+     &            COMPLEX(2.0d0 - PAR(12), 0.0d0), 8)
+            FCM(2) = PAR(21) / (1 - DEL2/PAR(24)**2)**3 / POCHHAMMER(
+     &            COMPLEX(1.0d0 - PAR(22) - PAR(23)*DEL2,
+     &        0.0d0) + J, 6) * POCHHAMMER(COMPLEX(2.0d0 - PAR(22),
+     &        0.0d0), 6)
       ELSE IF (ANSATZ .EQ. 'FIT') THEN
-            ALPHAPR = 0.25d0
-            FCM(1) = NSEA / (1 - DEL2/MSEA**2)**3 / POCHHAMMER(
-     &            COMPLEX(1.0d0 - ALPHA0SEA - 
-     &            ALPHAPR*DEL2, 0.0d0) + J, 8) * POCHHAMMER(
-     &            COMPLEX(2.0d0 - ALPHA0SEA, 0.0d0), 8)
-            FCM(2) = NG / (1 - DEL2/MG**2)**3 / POCHHAMMER(
-     &            COMPLEX(1.0d0 - ALPHA0G - ALPHAPR*DEL2,
-     &        0.0d0) + J, 6) * POCHHAMMER(COMPLEX(2.0d0 - ALPHA0G,
-     &        0.0d0), 6)
-      ELSE IF (ANSATZ .EQ. 'FIT2') THEN
-            ALPHAPR = 0.25d0
-            FCM(1) = NSEA / (1 - DEL2/MSEA**2)**2 / POCHHAMMER(
-     &            COMPLEX(1.0d0 - ALPHA0SEA - 
-     &            ALPHAPR*DEL2, 0.0d0) + J, 8) * POCHHAMMER(
-     &            COMPLEX(2.0d0 - ALPHA0SEA, 0.0d0), 8)
-            FCM(2) = NG / (1 - DEL2/MG**2)**2 / POCHHAMMER(
-     &            COMPLEX(1.0d0 - ALPHA0G - ALPHAPR*DEL2,
-     &        0.0d0) + J, 6) * POCHHAMMER(COMPLEX(2.0d0 - ALPHA0G,
-     &        0.0d0), 6)
+            HU = PAR(31) * POCHHAMMER(COMPLEX(1.0d0 - PAR(32), 0.0d0) 
+     &              , 4) / POCHHAMMER(COMPLEX(1.0d0 - PAR(32), 0.0d0)
+     &          + J , 4) * (COMPLEX(1.0d0 - PAR(32), 0.0d0) + J) /
+     &           (COMPLEX(1.0d0 - PAR(32) - PAR(33)*DEL2, 0.0d0) + J) /
+     &           (1.0d0 - DEL2/(PAR(34)+PAR(35)*J))**PAR(36)
+            HD = PAR(41) * POCHHAMMER(COMPLEX(1.0d0 - PAR(42), 0.0d0) 
+     &              , 4) / POCHHAMMER(COMPLEX(1.0d0 - PAR(42), 0.0d0)
+     &          + J , 4) * (COMPLEX(1.0d0 - PAR(42), 0.0d0) + J) /
+     &           (COMPLEX(1.0d0 - PAR(42) - PAR(43)*DEL2, 0.0d0) + J) /
+     &           (1.0d0 - DEL2/(PAR(44)+PAR(45)*J))**PAR(46)
+* Two options, uncomment only one!
+*    1. Take sea normalization as free parameter
+            NORMS = PAR(11)
+*    2. Constrain sea normalization by momentum sum-rule (it has to
+*           be declared as fixed in MINUIT.CMD then).
+!            NORMS = 1.0d0 - PAR(21) - 2.0d0*(1.0d0-PAR(32))/(5.0d0 -
+!     &               PAR(32)) - (1.0d0-PAR(42))/(5.0d0-PAR(42))
+            HSEA = NORMS * POCHHAMMER(COMPLEX(2.0d0 - PAR(12), 0.0d0) 
+     &              , 8) / POCHHAMMER(COMPLEX(1.0d0 - PAR(12), 0.0d0)
+     &          + J , 8) * (COMPLEX(1.0d0 - PAR(12), 0.0d0) + J) /
+     &           (COMPLEX(1.0d0 - PAR(12) - PAR(13)*DEL2, 0.0d0) + J) /
+     &           (1.0d0 - DEL2/(PAR(14)+PAR(15)*J))**PAR(16)
+          FCM(1) = HSEA + HU + HD
+          FCM(2) = PAR(21) * POCHHAMMER(COMPLEX(2.0d0 - PAR(22), 0.0d0) 
+     &              , 6) / POCHHAMMER(COMPLEX(1.0d0 - PAR(22), 0.0d0)
+     &          + J , 6) * (COMPLEX(1.0d0 - PAR(22), 0.0d0) + J) /
+     &           (COMPLEX(1.0d0 - PAR(22) - PAR(23)*DEL2, 0.0d0) + J) /
+     &           (1.0d0 - DEL2/(PAR(24)+PAR(25)*J))**PAR(26)
       ELSE IF (ANSATZ .EQ. 'HOUCHE') THEN
         FCM(1) =
      &      LHA(1)*LHBETAF(1) / POCHHAMMER(J-COMPLEX(LHLAM(1), 0.0D0),

@@ -18,7 +18,7 @@ C    equation for a fixed number of massless flavours  NF.  Except at
 C    leading order (LO), result is obtained using a fourth-order
 C    Runge-Kutta integration. 
 C  SYNOPSIS
-C     SUBROUTINE AS2PF (AS, R2, AS0, R20, NF, P)
+C     SUBROUTINE AS2PF (AS, R2, AS0, R20)
 C     
 C     INTEGER NF, P
 C     DOUBLE PRECISION AS, R2, AS0, R20
@@ -40,24 +40,17 @@ C     with rest of the gepard
 C  SOURCE
 C
 
-      SUBROUTINE AS2PF (AS, R2, AS0, R20, NF, P)
+      SUBROUTINE AS2PF (AS, R2, AS0, R20)
       
       IMPLICIT NONE
-      INTEGER NF, P
       DOUBLE PRECISION AS, R2, AS0, R20
       DOUBLE PRECISION LRRAT, DLR, SXTH, A
-      INTEGER NFMIN, NFMAX, NASTPS, K1
-      DOUBLE PRECISION BETA0, BETA1, BETA2, BETA3
+      INTEGER NASTPS, K1
       DOUBLE PRECISION FBETA1, FBETA2, FBETA3
       DOUBLE PRECISION XK0, XK1, XK2, XK3
-      PARAMETER (NFMIN = 3, NFMAX = 6)
       PARAMETER (NASTPS = 20)
       PARAMETER ( SXTH = 0.16666 66666 66666 D0 )
-
-*   Input common-block with beta function 
-
-      COMMON / BETABLK / BETA0 (NFMIN:NFMAX), BETA1 (NFMIN:NFMAX),
-     &                   BETA2 (NFMIN:NFMAX), BETA3 (NFMIN:NFMAX)
+      INCLUDE 'header.f'
 
 *   The beta functions FBETAn at N^nLO for n = 1, 2, and 3
 

@@ -37,15 +37,10 @@ C
       INTEGER K
       DOUBLE PRECISION R
       DOUBLE COMPLEX EVOLNSA(0:2), CNDNS
-      INTEGER SPEED, ACC, P, NF
-      CHARACTER SCHEME*5, ANSATZ*6
       INTEGER ORD
       DOUBLE COMPLEX GAMB, ERFUNCNS1, R1, AUX(0:2)
+      INCLUDE 'header.f'
 
-*   Input common-blocks 
-
-      COMMON / PARINT /  SPEED, ACC, P, NF
-      COMMON / PARCHR /  SCHEME, ANSATZ
 
 
       CALL ERFUNCNSF (K, R, GAMB, ERFUNCNS1)
@@ -110,19 +105,14 @@ C
       INTEGER K
       DOUBLE PRECISION R
       DOUBLE COMPLEX EVOLA(0:2,2,2)
-      INTEGER SPEED, ACC, P, NF
-      INTEGER A, B, C, I, J, K1, ORD
+      INTEGER A, B, CE, I, J, K1, ORD
       DOUBLE PRECISION RINV
       DOUBLE COMPLEX LAMB(2), PR(2,2,2)
       DOUBLE COMPLEX ERFUNC1(2,2), ERFUNC2(2,2)
       DOUBLE COMPLEX R1PROJ(2,2,2,2), R2PROJ(2,2,2,2)
       DOUBLE COMPLEX AUX, DINV, IJAUX(0:2), R1R1(2,2)
       INTEGER KRONECKER
-
-*   Input common-blocks 
-
-      COMMON / PARINT /  SPEED, ACC, P, NF
-
+      INCLUDE 'header.f'
 
       CALL ERFUNCF (K, R, LAMB, ERFUNC1, ERFUNC2)
       CALL RNNLOF (K, PR, R1PROJ, R2PROJ)
@@ -145,12 +135,12 @@ C
          IJAUX(1) = IJAUX(1) - ERFUNC1(A,B) * R1PROJ(A,B,I,J)
       IF (P. GE. 2) THEN
          AUX = (0.0d0, 0.0d0)
-         DO 20 C = 1, 2
-            DINV = 1.0d0 + LAMB(C) - LAMB(B)
+         DO 20 CE = 1, 2
+            DINV = 1.0d0 + LAMB(CE) - LAMB(B)
             R1R1(I,J) = (0.0d0, 0.0d0)
             DO 17 K1 = 1, 2
- 17         R1R1(I,J) = R1R1(I,J) + R1PROJ(A,C,I,K1) * R1PROJ(C,B,K1,J)
- 20         AUX = AUX + (ERFUNC2(A,B) - ERFUNC1(A,C) * RINV**DINV)/DINV
+ 17         R1R1(I,J) = R1R1(I,J) + R1PROJ(A,CE,I,K1)*R1PROJ(CE,B,K1,J)
+ 20         AUX = AUX + (ERFUNC2(A,B) - ERFUNC1(A,CE) * RINV**DINV)/DINV
      &            * R1R1(I,J)
          IJAUX(2) = IJAUX(2) + AUX - ERFUNC2(A,B) * R2PROJ(A,B,I,J)
       END IF

@@ -54,51 +54,15 @@ C
       SUBROUTINE F2F
 
       IMPLICIT NONE
-      INTEGER SPEED, ACC, P, NF
-      CHARACTER SCHEME*5, ANSATZ*6
-      INTEGER NPTS, NPTSMAX, K
-      DOUBLE PRECISION XI, DEL2, Q2, Q02, C, PHI, PI
-      DOUBLE PRECISION F2(0:2)
-      DOUBLE PRECISION NG, NSEA, MG, MSEA, ALPHA0G, ALPHA0SEA
-      DOUBLE PRECISION FITPAR(10), RES, F2IMAG
+      INTEGER K
+      DOUBLE PRECISION RES, F2IMAG
       DOUBLE COMPLEX EPH, FPW, J
-      PARAMETER (NPTSMAX = 768)
-      PARAMETER ( PI = 3.1415 92653 58979 D0 )
-      DOUBLE PRECISION Y(NPTSMAX), WG(NPTSMAX)
-      DOUBLE COMPLEX N(NPTSMAX)
-
-*   Input common-blocks 
-
-      COMMON / PARINT /  SPEED, ACC, P, NF
-      COMMON / PARCHR /  SCHEME, ANSATZ
-
-      COMMON / FITPARAMS  /  FITPAR
-      COMMON / CONTOUR    /  NPTS
-      COMMON / CPHI       /  C, PHI
-      COMMON / POINTS     /  Y, WG
-      COMMON / NPOINTS    /  N
-
-*   Output common-blocks
-
-      COMMON / KINEMATICS /  XI, DEL2, Q2, Q02
-      COMMON / GPD        /  NG, NSEA, MG, MSEA, ALPHA0G, ALPHA0SEA
-      COMMON / F2P        /  F2
+      INCLUDE 'header.f'
 
 
-*     Scales and kinematics
 
-      Q02 = FITPAR(7)
-*      (Fixing forward kinematics:)
+*     Fixing forward kinematics:
       DEL2 = 0.0d0
-
-*     GPD parameters
-
-      NG = FITPAR(1)
-      NSEA = FITPAR(2)
-      MG = FITPAR(3)
-      MSEA = FITPAR(4)
-      ALPHA0G = FITPAR(5)
-      ALPHA0SEA = FITPAR(6)
 
       EPH = EXP ( COMPLEX(0.0d0, PHI) )
       RES = 0.0d0

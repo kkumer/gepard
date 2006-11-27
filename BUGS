@@ -5,9 +5,11 @@
 
 -  Interactive mode freezes on MS Windows
 
--  Because of ND evolution all MB integrations go 0..50
+-  Because of ND evolution all MB integrations go 0..500
    now which is overkill for "outer" integration and makes
    everything unnessarty 30% slower
+
+-  SPEED=4 is unreliable
 
 
 

@@ -1,15 +1,41 @@
 0   <--   1=INTERACTIVE   0=BATCH  (Must be 0 on Windows!)
 SET TITLE
-       Fitting to H1/ZEUS DVCS and DIS data
+       Fitting to ansatz: FIT
 PARAMETERS
-1  'NG        '   0.5d0     .1d0
-2  'NSEA      '   0.2d0     .1d0
-3  'MG        '   1.0d0     .1d0 
-4  'MSEA      '   1.0d0     .1d0
-5  'ALPHA0G   '   1.0d0     .1d0
-6  'ALPHA0SEA '   1.1d0     .1d0
-7  'Q20       '   7.0d0     .1d0
+1  'Q02       '   7.0       .1  
+2  'AS0       '   0.0536    .1  
+3  'MU02      '   2.5       .1  
+11 'NS        '   0.179     .1  
+12 'AL0S      '   1.1       .1   
+13 'ALPS      '   0.25      .1  
+14 'M02S      '   3.53      .1  
+15 'DELM2S    '   0.88      .1  
+16 'PS        '   3.0       .1  
+21 'NG        '   0.5       .1  
+22 'AL0G      '   1.0       .1   
+23 'ALPG      '   0.25      .1  
+24 'M02G      '   3.53      .1  
+25 'DELM2G    '   0.88      .1  
+26 'PG        '   2.0       .1  
+31 'NU        '   0.0       .1  
+32 'AL0U      '   0.5       .1   
+33 'ALPU      '   1.0       .1  
+34 'M02U      '   3.53      .1  
+35 'DELM2U    '   0.88      .1  
+36 'PU        '   1.0       .1  
+41 'ND        '   0.0       .1  
+42 'AL0D      '   0.5       .1   
+43 'ALPD      '   1.0       .1  
+44 'M02D      '   3.53      .1  
+45 'DELM2D    '   0.88      .1  
+46 'PD        '   1.0       .1  
 
-fix  7
+
+fix  1 2 3 
+fix  13 15 16
+fix  23 25 26
+fix  31 32 33 34 35 36
+fix  41 42 43 44 45 46
+
 migrad
 cali 3

@@ -43,61 +43,20 @@ C
       SUBROUTINE INIT
 * 
       IMPLICIT NONE
-      INTEGER SPEED, ACC, P, NF
-      DOUBLE PRECISION AS0, RF2, RR2
-      CHARACTER SCHEME*5, ANSATZ*6
-      INTEGER NGAUSSMAX, NGAUSS, NINTG, NPTS, K, K1, K2, K3
-      INTEGER NPTSMAX, ACCMAX
-      DOUBLE PRECISION NFD, PI, C, PHI, SUMM, DIFF, YI
+      INTEGER ACCMAX, NGAUSSMAX, NGAUSS, NINTG, K, K1, K2, K3
+      DOUBLE PRECISION NFD, SUMM, DIFF, YI
       DOUBLE COMPLEX J, Z, EPH
-      DOUBLE COMPLEX S1, S2, S3, S4
       DOUBLE COMPLEX HS1, HS2, HS3, HS4
-      DOUBLE COMPLEX F2, FL
-      DOUBLE COMPLEX GAM0(2,2), GAM1(2,2), GAM2(2,2)
-      DOUBLE COMPLEX GAMNS0, GAMNS1, GAMNS2
-      DOUBLE COMPLEX C0(2), C1(2), C2(2)
+      DOUBLE COMPLEX CF2, CFL
       DOUBLE COMPLEX C1F2(2)
       DOUBLE COMPLEX BIGC0(2), BIGC1(2), BIGC2(2)
       DOUBLE COMPLEX CLNGAMMA, PREFACT
-      PARAMETER ( NGAUSSMAX = 64, ACCMAX = 6, NINTG = 12,  
-     &             NPTSMAX = 768 )
-      PARAMETER ( PI = 3.1415 92653 58979 D0 )
-*
-!      DOUBLE PRECISION ABSCISSAS(NGAUSS), WEIGHTS(NGAUSS)
+      PARAMETER ( NGAUSSMAX = 64, ACCMAX = 6, NINTG = 12 )
       DOUBLE PRECISION ABSC(ACCMAX,NGAUSSMAX), WGHT(ACCMAX,NGAUSSMAX)
       DOUBLE PRECISION DOWN(NINTG+1), UP(NINTG)
-      DOUBLE PRECISION Y(NPTSMAX), WG(NPTSMAX)
-      DOUBLE COMPLEX N(NPTSMAX)
-      DOUBLE COMPLEX BIGC(NPTSMAX,0:2,2), NGAM(NPTSMAX,0:2,2,2)
-      DOUBLE COMPLEX NGAMNS(NPTSMAX,0:2)
-      DOUBLE COMPLEX BIGCF2(NPTSMAX,0:2,2)
-
-*   Input common-blocks
-      
-*     - Loaded by call to READPAR
-      COMMON / PARINT /  SPEED, ACC, P, NF
-      COMMON / PARFLT /  AS0, RF2, RR2
-      COMMON / PARCHR /  SCHEME, ANSATZ
+      INCLUDE 'header.f'
 
 *   Output common-blocks
-
-*     - Mellin-Barnes integration contour points
-      COMMON / CONTOUR  /  NPTS
-      COMMON / POINTS   /  Y, WG
-      COMMON / CPHI     /  C, PHI
-      COMMON / NPOINTS  /  N
-      
-*     - Values on a particular contour point
-      COMMON / HARMONIC /  S1, S2, S3, S4
-      COMMON / WGAMMA   /  GAM0, GAM1, GAM2
-      COMMON / WGAMMANS /  GAMNS0, GAMNS1, GAMNS2
-      COMMON / WC       /  C0, C1, C2
-
-*     - Values on the whole contour
-      COMMON / BIGC     /  BIGC
-      COMMON / NGAM     /  NGAM
-      COMMON / NGAMNS   /  NGAMNS
-      COMMON / BIGCF2   /  BIGCF2
 
 
 *   NGAUSS-point integration is to be performed on each
@@ -116,17 +75,16 @@ C
 
 *   For fast calculation it's better to compress integration region
 *   The value 1.3 below is optimized for small xi of cca. 10^-4
-      IF ( SPEED .GE. 4) THEN
-        DOWN (NINTG + 1) = 1.3d0
-      END IF
+! (but this was OK and needed when NINTG was 8, and integration went to
+!  10. It should be changed, if it's needed at all. FIXME)
+!      IF ( SPEED .GE. 4) THEN
+!        DOWN (NINTG + 1) = 1.3d0
+!      END IF
 
 *    NB: adacf routines want double precision NF
       NFD = DBLE(NF)
 
-*   Parameters of the Mellin-Barnes contour
-
-      C   = 0.5D0
-      PHI = 3.0D0/4.D0 * PI
+*   Mellin-Barnes contour points are C + YI * EPH
       EPH = EXP ( COMPLEX(0.D0, PHI) )
 
 *   Setting up upper limits of integration intervals
@@ -212,22 +170,22 @@ C
       C0(2) = (0.0d0, 0.0d0)
 
       IF (P .GE. 1) THEN
-        CALL WcVF2Q1F(NFD, Z, F2)
-        CALL WcVFLQ1F(NFD, Z, FL)
-        C1(1) = F2 -  FL
-        C1F2(1) = F2
-        CALL WcVF2G1F(NFD, Z, F2)
-        CALL WcVFLG1F(NFD, Z, FL)
-        C1(2) = F2 -  FL
-        C1F2(2) = F2
+        CALL WcVF2Q1F(NFD, Z, CF2)
+        CALL WcVFLQ1F(NFD, Z, CFL)
+        C1(1) = CF2 -  CFL
+        C1F2(1) = CF2
+        CALL WcVF2G1F(NFD, Z, CF2)
+        CALL WcVFLG1F(NFD, Z, CFL)
+        C1(2) = CF2 -  CFL
+        C1F2(2) = CF2
 
         IF (P .GE. 2) THEN
-          CALL WcVF2Q2F(NFD, Z, F2)
-          CALL WcVFLQ2F(NFD, Z, FL)
-          C2(1) = F2 -  FL
-          CALL WcVF2G2F(NFD, Z, F2)
-          CALL WcVFLG2F(NFD, Z, FL)
-          C2(2) = F2 -  FL
+          CALL WcVF2Q2F(NFD, Z, CF2)
+          CALL WcVFLQ2F(NFD, Z, CFL)
+          C2(1) = CF2 -  CFL
+          CALL WcVF2G2F(NFD, Z, CF2)
+          CALL WcVFLG2F(NFD, Z, CFL)
+          C2(2) = CF2 -  CFL
         END IF
       END IF
 

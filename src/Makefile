@@ -98,6 +98,14 @@ evoldep: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Fevoldep.o
 schemedep: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Fschemedep.o
 	$(FC) -o $@ $^ $(FFLAGS)
 
+radcorr2: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Fradcorr2.o
+	$(FC) -o $@ $^ $(FFLAGS)
+
+scaledep2: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Fscaledep2.o $(FODIR)/Fderiv.o
+	$(FC) -o $@ $^ $(FFLAGS)
+
+
+
 .PHONY: clean
 clean:
 	-rm -f $(SRCTARGETS)

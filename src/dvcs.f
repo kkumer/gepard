@@ -45,43 +45,13 @@ C
       DOUBLE PRECISION FUNCTION PARSIGMA (MT)
 
       IMPLICIT NONE
-      DOUBLE PRECISION MT
-      INTEGER SPEED, ACC, P, NF
-      CHARACTER SCHEME*5, ANSATZ*6
-      DOUBLE PRECISION NGIN, FITPAR(10)
-      DOUBLE PRECISION XI, DEL2, Q2, Q02, W2
-      DOUBLE PRECISION NG, NSEA, MG, MSEA, ALPHA0G, ALPHA0SEA
-      DOUBLE COMPLEX CFF(0:2)
-
-*     Input common-blocks 
-
-      COMMON / PARINT /  SPEED, ACC, P, NF
-      COMMON / PARCHR /  SCHEME, ANSATZ
-      
-      COMMON / FITPARAMS  /  FITPAR
-
-*     Output common-blocks 
-
-      COMMON / KINEMATICS /  XI, DEL2, Q2, Q02
-      COMMON / GPD        /  NG, NSEA, MG, MSEA, ALPHA0G, ALPHA0SEA
-      COMMON / CFF        /  CFF
-
+      DOUBLE PRECISION MT, NGIN, W2
+      INCLUDE 'header.f'
 
 *     Scales and kinematics
 
-      Q02 = FITPAR(7)
-
       DEL2 = - MT
       W2 = (Q2 - XI * Q2) / (2.0d0 * XI)
-
-*     GPD parameters
-
-      NG = FITPAR(1)
-      NSEA = FITPAR(2)
-      MG = FITPAR(3)
-      MSEA = FITPAR(4)
-      ALPHA0G = FITPAR(5)
-      ALPHA0SEA = FITPAR(6)
 
 *     Calculating CFF
 
@@ -137,17 +107,11 @@ C
       DOUBLE PRECISION FUNCTION SIGMA ()
 
       IMPLICIT NONE
-      INTEGER SPEED, ACC, P, NF
       INTEGER K3
-      DOUBLE PRECISION FITPAR(10)
       DOUBLE PRECISION ABSCISSAS(8), WEIGHTS(8), ABS2, WGH2
       DOUBLE PRECISION PARSIGMA, ABS4(2), WGH4(2)
+      INCLUDE 'header.f'
 
-*   Input common-blocks 
-
-      COMMON / PARINT /  SPEED, ACC, P, NF
-
-      COMMON / FITPARAMS  /  FITPAR
 
 *   Abscissas and weights for 8 point Gauss quadrature 
 *   according to Abramowitz and Stegun Eq. (25.4.30)

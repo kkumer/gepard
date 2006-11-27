@@ -24,33 +24,24 @@ C
       PROGRAM AUXTEST
 
       IMPLICIT NONE
-      INTEGER SPEED, ACC, P, NF
-      CHARACTER SCHEME*5, ANSATZ*6
       INTEGER PT, NPOINTS, LN, NDEL
-      DOUBLE PRECISION XI, DEL2, Q2, Q02
-      DOUBLE COMPLEX CFF(0:2)
       DOUBLE PRECISION LOGXI, LOGXISTART, LOGXIEND, LOGXISTEP
       PARAMETER ( NPOINTS = 2 )
       DOUBLE PRECISION POINTS(4, 6, NPOINTS)
       DOUBLE PRECISION XIS(NPOINTS)
       PARAMETER ( LOGXISTART = -5.0d0, LOGXIEND = -1.30103d0,
      &       LOGXISTEP = (LOGXIEND - LOGXISTART) / (NPOINTS - 1)  )
+      INCLUDE 'header.f'
 
-*     Input common-blocks 
-
-      COMMON / PARINT /  SPEED, ACC, P, NF
-      COMMON / PARCHR /  SCHEME, ANSATZ
-
-*     Output common-blocks 
-
-      COMMON / KINEMATICS /  XI, DEL2, Q2, Q02
-      COMMON / CFF        /  CFF
 
       CALL READPAR
 *     Scales 
 
       Q2 = 2.5d0
-      Q02 = 2.5d0
+
+      PAR(1) = 2.5d0
+      PAR(2) = 0.05d0
+      PAR(3) = 2.5d0
 
 *     1. Point "A"
       WRITE (*,*) " --- Point A  (MSBAR) ----- "

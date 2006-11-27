@@ -25,36 +25,25 @@ C
       PROGRAM TEST
 
       IMPLICIT NONE
-      INTEGER SPEED, ACC, P, NF
-      DOUBLE PRECISION NG, NSEA, MG, MSEA, ALPHA0G, ALPHA0SEA
-      DOUBLE PRECISION FITPAR(10)
-      DOUBLE PRECISION W2, XI, DEL2, Q2, Q02, AUX
-      DOUBLE PRECISION F2(0:2)
+      DOUBLE PRECISION W2, AUX
       DOUBLE PRECISION PARSIGMA, SIGMA
-
-      COMMON / PARINT     /  SPEED, ACC, P, NF
-
-      COMMON / FITPARAMS  /  FITPAR
-      COMMON / KINEMATICS /  XI, DEL2, Q2, Q02
-      COMMON / F2P        /  F2
-
-      NG = 0.4
-      NSEA = 2./3. - NG
-      MG = 1.2
-      MSEA = 1.1
-      ALPHA0G = 1.2
-      ALPHA0SEA = 1.1
-      Q02 = 1.0
-
-      FITPAR(1) = NG 
-      FITPAR(2) = NSEA 
-      FITPAR(3) = MG 
-      FITPAR(4) = MSEA 
-      FITPAR(5) = ALPHA0G 
-      FITPAR(6) = ALPHA0SEA 
-      FITPAR(7) = Q02 
+      INCLUDE 'header.f'
 
       CALL READPAR
+
+      PAR(21) = 0.4d0
+      PAR(11) = 2./3. - PAR(21)
+      PAR(12) = 1.1d0
+      PAR(13) = 0.25d0
+      PAR(14) = 1.1d0
+      PAR(22) = 1.2d0
+      PAR(23) = 0.25d0
+      PAR(24) = 1.2d0
+
+      PAR(1) = 1.0d0
+      PAR(2) = 0.05d0
+      PAR(3) = 2.5d0
+
       CALL INIT
 
       P = 0

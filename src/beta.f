@@ -23,7 +23,7 @@ C
 C     NB: This normalization is different then Vogt's: BETAx -> -BETAx !!
 C
 C     The MSbar coefficients are written to the common-block  BETA  for 
-C     NF = 3...6  (parameters NFMIN, NFMAX) quark flavours.
+C     NFL = 3...6  (parameters NFMIN, NFMAX) quark flavours.
 C
 C      Beyond NLO the QCD colour factors are hard-wired in this routine,
 C      and the numerical coefficients are truncated to six digits.
@@ -37,17 +37,12 @@ C
       SUBROUTINE BETAF
 
       IMPLICIT NONE
-      INTEGER NFMIN, NFMAX, NF
+      INTEGER NFL
       DOUBLE PRECISION CF, CA, TR
-      DOUBLE PRECISION BETA0, BETA1, BETA2, BETA3
       DOUBLE PRECISION B00, B01, B10, B11
-      PARAMETER (NFMIN = 3, NFMAX = 6)
       PARAMETER (CA = 3.D0, CF = 4./3.D0, TR = 0.5 D0)
+      INCLUDE 'header.f'
 
-*   Output common-block
-
-       COMMON / BETABLK / BETA0 (NFMIN:NFMAX), BETA1 (NFMIN:NFMAX),
-     &                    BETA2 (NFMIN:NFMAX), BETA3 (NFMIN:NFMAX)
 
 *   Colour factors
 * ..The full LO and NLO coefficients 
@@ -59,14 +54,14 @@ C
 
 * ..Flavour-number loop and output to the array
 
-       DO 1 NF = NFMIN, NFMAX
+       DO 1 NFL = NFMIN, NFMAX
 
-       BETA0(NF) = - B00 - B01 * NF
-       BETA1(NF) = - B10 - B11 * NF
+       BETA0(NFL) = - B00 - B01 * NFL
+       BETA1(NFL) = - B10 - B11 * NFL
 
-       BETA2(NF) = - 1428.50 + 279.611 * NF - 6.01852 * NF**2
-       BETA3(NF) = - 29243.0 + 6946.30 * NF - 405.089 * NF**2 
-     &             - 1.49931 * NF**3
+       BETA2(NFL) = - 1428.50 + 279.611 * NFL - 6.01852 * NFL**2
+       BETA3(NFL) = - 29243.0 + 6946.30 * NFL - 405.089 * NFL**2 
+     &             - 1.49931 * NFL**3
 
   1    CONTINUE
        RETURN

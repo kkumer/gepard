@@ -20,36 +20,25 @@ C
       SUBROUTINE READPAR
 
       IMPLICIT NONE
-      INTEGER SPEED, ACC, P, NF
-      DOUBLE PRECISION AS0, RF2, RR2
-      CHARACTER SCHEME*5, ANSATZ*6
-      INTEGER CZERO
+      INCLUDE 'header.f'
 
-      COMMON / PARINT /  SPEED, ACC, P, NF
-      COMMON / PARFLT /  AS0, RF2, RR2
-      COMMON / PARCHR /  SCHEME, ANSATZ
-
-      COMMON / SWITCH /  CZERO
 
 *   Read fixed initialization parameters
       OPEN (UNIT = 61, FILE = "GEPARD.INI", STATUS = "OLD")
       READ (61, *) SPEED
+      READ (61, *) ACC
       READ (61, *) P
       READ (61, *) NF
-      READ (61, *) AS0
+      READ (61, *) CZERO
       READ (61, *) RF2
       READ (61, *) RR2
+      READ (61, *) C
+      READ (61, *) PHI
+      READ (61, *) CND
+      READ (61, *) PHIND
       READ (61, *) SCHEME
       READ (61, *) ANSATZ
       CLOSE (61)
-
-*   Some defaults that can be overriden later:
-
-*   Gauss integration accuracy.
-      ACC = 3
-
-*   This can be put to zero later to put astrong^0 term to zero for investigating NLO effects
-      CZERO = 1
 
       RETURN
       END

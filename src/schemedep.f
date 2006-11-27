@@ -24,35 +24,22 @@ C
       PROGRAM SCHEMEDEP
 
       IMPLICIT NONE
-      INTEGER SPEED, ACC, P, NF
-      CHARACTER SCHEME*5, ANSATZ*6
-      INTEGER PT, NPOINTS, LN, NDEL, CZERO
-      DOUBLE PRECISION XI, DEL2, Q2, Q02
-      DOUBLE COMPLEX CFF(0:2), TMP
+      INTEGER PT, NPOINTS, LN, NDEL
+      DOUBLE COMPLEX TMP
       DOUBLE PRECISION LOGXI, LOGXISTART, LOGXIEND, LOGXISTEP
       PARAMETER ( NPOINTS = 2 )
       DOUBLE PRECISION POINTS(4, 6, NPOINTS)
       DOUBLE PRECISION XIS(NPOINTS)
       PARAMETER ( LOGXISTART = -5.0d0, LOGXIEND = -1.30103d0,
      &       LOGXISTEP = (LOGXIEND - LOGXISTART) / (NPOINTS - 1)  )
+      INCLUDE 'header.f'
 
-*     Input common-blocks 
-
-      COMMON / PARINT /  SPEED, ACC, P, NF
-      COMMON / PARCHR /  SCHEME, ANSATZ
-
-      COMMON / SWITCH /  CZERO
-
-*     Output common-blocks 
-
-      COMMON / KINEMATICS /  XI, DEL2, Q2, Q02
-      COMMON / CFF        /  CFF
 
       CALL READPAR
 *     Scales 
 
       Q2 = 10.0d0
-      Q02 = 10.0d0
+      PAR(1) = 10.0d0
 *   Values below are for XI = 0.001
       XI = 0.001
       DEL2 = 0.0d0
@@ -67,7 +54,7 @@ C
       WRITE (*,*) 
 
       WRITE (*,*) "Expect LO (evol): -133.895 + 160.002 I"
-      Q02 = 1.0d0
+      PAR(1) = 1.0d0
       CALL INIT
       CALL CFFF 
       WRITE (*,*) CFF(0)
@@ -75,7 +62,7 @@ C
 
       P = 1
       CZERO = 0
-      Q02 = 10.0d0
+      PAR(1) = 10.0d0
       CALL INIT
       CALL CFFF 
 !      WRITE (*,*) "Expect NLO (noevol): -102.333 + 121.323 I"
@@ -84,7 +71,7 @@ C
       WRITE (*,*) 
 
       SCHEME = 'MSBLO'
-      Q02 = 1.0d0
+      PAR(1) = 1.0d0
 !      WRITE (*,*) "Expect NLO (LO evol): -118.827 + 152.101 I"
       WRITE (*,*) "Expect NLO (LO evol): 18.0721 - 13.6474 I"
       CALL INIT
@@ -111,7 +98,7 @@ C
       WRITE (*,*) CFF(1) - TMP
       WRITE (*,*) 
 
-!      Q02 = 1.0d0
+!      PAR(1) = 1.0d0
 !      XI = 0.1
 !      CALL INIT
 !      CALL CFFF 

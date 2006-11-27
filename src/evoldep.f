@@ -39,27 +39,14 @@ C
       PROGRAM EVOLDEP
 
       IMPLICIT NONE
-      INTEGER SPEED, ACC, P, NF
-      CHARACTER SCHEME*5, ANSATZ*6
-      DOUBLE PRECISION XI, DEL2, Q2, Q02
-      DOUBLE COMPLEX CFF(0:2)
-      INTEGER PT, NPOINTS, LN, NDEL, CZERO
+      INTEGER PT, NPOINTS, LN, NDEL
       DOUBLE PRECISION LOGXI, LOGXISTART, LOGXIEND, LOGXISTEP
       PARAMETER ( NPOINTS = 40 )
       DOUBLE COMPLEX PREDS(6, NPOINTS)
-      DOUBLE PRECISION XIS(NPOINTS), RES, TOT, C0
+      DOUBLE PRECISION XIS(NPOINTS), RES, TOT, CLO, Q02
       PARAMETER ( LOGXISTART = -5.0d0, LOGXIEND = -0.30103d0,
      &       LOGXISTEP = (LOGXIEND - LOGXISTART) / (NPOINTS - 1)  )
-
-*     Output common-blocks 
-
-      COMMON / PARINT /  SPEED, ACC, P, NF
-      COMMON / PARCHR /  SCHEME, ANSATZ
-
-      COMMON / SWITCH /  CZERO
-
-      COMMON / KINEMATICS /  XI, DEL2, Q2, Q02
-      COMMON / CFF        /  CFF
+      INCLUDE 'header.f'
 
       CALL READPAR
 
@@ -111,9 +98,10 @@ C
           P = 1
           SCHEME = 'MSBND'
       ENDIF
+      PAR(1) = Q02
 
 *   Doing calculation ...
-
+  
       CALL INIT
       CALL CFFF 
 
@@ -129,16 +117,16 @@ C
 
       DO 40 LN = 2, 6
       DO 30 PT = 1, NPOINTS
-        C0 =  ABS(PREDS(2, PT))
+        CLO =  ABS(PREDS(2, PT))
         TOT =  ABS(PREDS(1, PT))
         IF (LN .EQ. 2) THEN
-          RES = TOT / C0
+          RES = TOT / CLO
         ELSE IF (LN .EQ. 3) THEN
-          RES = ABS(PREDS(LN,PT)) / C0
+          RES = ABS(PREDS(LN,PT)) / CLO
         ELSE IF (LN .EQ. 4) THEN
-          RES = ABS(PREDS(LN,PT)) / C0
+          RES = ABS(PREDS(LN,PT)) / CLO
         ELSE
-          RES = ABS(PREDS(LN,PT)-PREDS(LN-1,PT)) / C0
+          RES = ABS(PREDS(LN,PT)-PREDS(LN-1,PT)) / CLO
         ENDIF
         WRITE (UNIT=11, FMT=998) XIS(PT), RES
         IF (LN .EQ. 5) THEN

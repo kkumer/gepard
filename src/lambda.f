@@ -33,17 +33,9 @@ C
       IMPLICIT NONE
       INTEGER K
       DOUBLE COMPLEX LAM(2)
-      INTEGER SPEED, ACC, P, NF
-      INTEGER NPTSMAX
-      PARAMETER (NPTSMAX = 768)
-      DOUBLE COMPLEX NGAM(NPTSMAX,0:2,2,2)
       DOUBLE COMPLEX AUX
+      INCLUDE 'header.f'
 
-*   Input common-blocks
-
-      COMMON / PARINT /  SPEED, ACC, P, NF
-
-      COMMON / NGAM     /  NGAM
 
 *  Eigenvalues. Expression is adjusted to avoid the crossing
 *    of the SQRT cut on the negative real axis
