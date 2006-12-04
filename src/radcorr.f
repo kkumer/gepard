@@ -59,10 +59,10 @@ C
 
 *     Files that will hold results
 
-      OPEN (UNIT = 11, FILE = "FIG1A.DAT", STATUS = "UNKNOWN")
-      OPEN (UNIT = 12, FILE = "FIG1B.DAT", STATUS = "UNKNOWN")
-      OPEN (UNIT = 13, FILE = "FIG1C.DAT", STATUS = "UNKNOWN")
-      OPEN (UNIT = 14, FILE = "FIG1D.DAT", STATUS = "UNKNOWN")
+      OPEN (UNIT = 11, FILE = "FIG1A.dat", STATUS = "UNKNOWN")
+      OPEN (UNIT = 12, FILE = "FIG1B.dat", STATUS = "UNKNOWN")
+      OPEN (UNIT = 13, FILE = "FIG1C.dat", STATUS = "UNKNOWN")
+      OPEN (UNIT = 14, FILE = "FIG1D.dat", STATUS = "UNKNOWN")
 
       DO 5 NDEL = 1, 4
   5         WRITE (10 + NDEL, *) '# Output of radcorr.f. See prolog of 

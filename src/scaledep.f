@@ -70,8 +70,8 @@ C
 
 *     Files that will hold results
 
-      OPEN (UNIT = 11, FILE = "FIG2A.DAT", STATUS = "UNKNOWN")
-      OPEN (UNIT = 12, FILE = "FIG2B.DAT", STATUS = "UNKNOWN")
+      OPEN (UNIT = 11, FILE = "FIG2A.dat", STATUS = "UNKNOWN")
+      OPEN (UNIT = 12, FILE = "FIG2B.dat", STATUS = "UNKNOWN")
 
       DO 5 NDEL = 1, 2
   5         WRITE (10 + NDEL, *) '# Output of scaledep.f. See prolog of 

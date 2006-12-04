@@ -41,14 +41,19 @@ export X11LIBS = -L/usr/X11R6/lib -lX11
 endif
 
 # targets
-SRCTARGETS = radcorr scaledep fit test auxtest fit_nopgplot houches accuracy \
-			 schemedep evoldep radcorr2 scaledep2
-.PHONY: $(SRCTARGETS)
+export SRCTARGETS = radcorr scaledep fit test auxtest fit_nopgplot houches accuracy \
+			 schemedep evoldep aux
+export EXTARGETS = radNLO radQ radNNLO
+
+.PHONY: $(SRCTARGETS) $(EXTARGETS)
 DOCTARGETS = pdf html
 
-all: $(SRCTARGETS) $(DOCTARGETS)
+all: $(SRCTARGETS) $(EXTARGETS) $(DOCTARGETS)
 
 $(SRCTARGETS):
+	$(MAKE) -C src $@
+
+$(EXTARGETS):
 	$(MAKE) -C src $@
 
 doc: html pdf
@@ -64,16 +69,14 @@ html:
 
 .PHONY: rmfig
 rmfig:
-	-rm FIG*DAT
+	-rm -f Tests/*dat
+	-rm -f ex/*dat
 
 .PHONY: clean
 clean:
 	$(MAKE) -C src clean
 	$(MAKE) -C doc/tex clean
-	-rm doc/html/*
-	-rm -f $(SRCTARGETS)
-	-rm -f $(patsubst %,src/%,$(SRCTARGETS))
-	-rm -f $(patsubst %,%.exe,$(SRCTARGETS))
-	-rm -f $(patsubst %,src/%.exe,$(SRCTARGETS))
-	-rm fits/*.{min,out,ps} fits/gmon.out
-	-rm Tests/*DAT Tests/gmon.out Tests/*dat
+	-rm -f doc/html/*
+	-rm -f fits/*.{min,out,ps} fits/gmon.out
+	-rm -f Tests/*dat Tests/gmon.out
+	-rm -f ex/*dat ex/*eps

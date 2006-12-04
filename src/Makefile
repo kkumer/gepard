@@ -22,17 +22,24 @@ endif
 FFLAGS =  -O
 CFLAGS =  -O2
 
+# Subdirectories for storing source files
+EXDIR = ex
 
 # Directories for storing object files
 FODIR = Fobj
 ODIR = obj
 ADACFODIR = adacf/obj
+EXFODIR = ex/obj
 
 # Fortran object files
 FOBJS = Finit.o Fbeta.o Fspecial.o Fdcomplex.o Fastrong.o Flambda.o\
 Fprojectors.o Frnnlo.o Ferfunc.o Fevol.o Fcdvcs.o Fmsbar.o Fparwav.o Fcff.o\
 Fdvcs.o Ff2.o Freadpar.o Ferror.o Fgauss.o Fnd.o
 _FOBJS = $(patsubst %,$(FODIR)/%,$(FOBJS))
+
+# rule for compiling example Fortran programs
+$(EXFODIR)/%.o: $(EXDIR)/%.f
+	$(FC) -c -o $@ $< $(FFLAGS)
 
 # rule for compiling fit.F
 $(FODIR)/Ffit.o: fit.F
@@ -41,6 +48,8 @@ $(FODIR)/Ffit_nopgplot.o: fit.F
 	$(FC) -c -o $@ $< $(FFLAGS) '-D NOPGPLOT'
 
 # rule for compiling Fortran .f  files
+# (prefix "F" is used to avoid possible future clashes with
+#  C-wrappers with the same name)
 $(FODIR)/F%.o: %.f
 	$(FC) -c -o $@ $< $(FFLAGS)
 
@@ -68,10 +77,10 @@ $(ODIR)/%.o: %.c
 
 # targets
 
-auxtest: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Fauxtest.o 
+auxtest: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Fauxtest.o
 	$(FC) -o $@ $^ $(FFLAGS)
 
-test: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Ftest.o 
+test: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Ftest.o
 	$(FC) -o $@ $^ $(FFLAGS)
 
 radcorr: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Fradcorr.o
@@ -98,16 +107,23 @@ evoldep: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Fevoldep.o
 schemedep: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Fschemedep.o
 	$(FC) -o $@ $^ $(FFLAGS)
 
-radcorr2: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Fradcorr2.o
+aux: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Faux.o
 	$(FC) -o $@ $^ $(FFLAGS)
 
-scaledep2: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Fscaledep2.o $(FODIR)/Fderiv.o
-	$(FC) -o $@ $^ $(FFLAGS)
+# targets for examples
+radNLO: $(_FOBJS) $(_ADACFOBJS) $(EXFODIR)/radNLO.o
+	$(FC) -o ../ex/$@ $^ $(FFLAGS)
 
+radQ: $(_FOBJS) $(_ADACFOBJS) $(EXFODIR)/radQ.o
+	$(FC) -o ../ex/$@ $^ $(FFLAGS)
 
+radNNLO: $(_FOBJS) $(_ADACFOBJS) $(EXFODIR)/radNNLO.o
+	$(FC) -o ../ex/$@ $^ $(FFLAGS)
 
 .PHONY: clean
 clean:
 	-rm -f $(SRCTARGETS)
 	-rm -f $(patsubst %,%.exe,$(SRCTARGETS))
-	-rm -f $(ADACFODIR)/*.o $(FODIR)/F*.o $(ODIR)/*.o
+	-rm -f $(ADACFODIR)/*.o $(FODIR)/F*.o $(ODIR)/*.o $(EXFODIR)/*.o 
+	-rm -f $(patsubst %,../ex/%,$(EXTARGETS))
+	-rm -f $(patsubst %,../ex/%.exe,$(EXTARGETS))

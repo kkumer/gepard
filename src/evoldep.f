@@ -52,7 +52,7 @@ C
 
 *   File that will hold results
 
-      OPEN (UNIT = 11, FILE = "EVOL.DAT", STATUS = "UNKNOWN")
+      OPEN (UNIT = 11, FILE = "evol.dat", STATUS = "UNKNOWN")
 
       DO 5 NDEL = 1, 1
   5         WRITE (10 + NDEL, *) '# Output of evoldep.f. See prolog of 

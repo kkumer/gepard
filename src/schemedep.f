@@ -40,8 +40,13 @@ C
 
       Q2 = 10.0d0
       PAR(1) = 10.0d0
+
+*     alpha_strong 
+      PAR(2) = 0.05d0
+      PAR(3) = 2.5d0
+
 *   Values below are for XI = 0.001
-      XI = 0.001
+      XI = 1.0e-3
       DEL2 = 0.0d0
       SCHEME = 'MSBAR'
       ANSATZ = 'NSTOY'
@@ -50,10 +55,12 @@ C
       CALL INIT
       CALL CFFF 
       WRITE (*,*) "Expect LO (noevol): -116.731 + 130.145 I"
+      WRITE (*,*) "MSBAR LO (noevol)"
       WRITE (*,*) CFF(0)
       WRITE (*,*) 
 
       WRITE (*,*) "Expect LO (evol): -133.895 + 160.002 I"
+      WRITE (*,*) "MSBAR LO (evol):"
       PAR(1) = 1.0d0
       CALL INIT
       CALL CFFF 
@@ -65,15 +72,15 @@ C
       PAR(1) = 10.0d0
       CALL INIT
       CALL CFFF 
-!      WRITE (*,*) "Expect NLO (noevol): -102.333 + 121.323 I"
       WRITE (*,*) "Expect NLO (noevol): 14.3975 - 8.8217 I"
+      WRITE (*,*) "MSBAR NLO (noevol):"
       WRITE (*,*) CFF(1)
       WRITE (*,*) 
 
       SCHEME = 'MSBLO'
       PAR(1) = 1.0d0
-!      WRITE (*,*) "Expect NLO (LO evol): -118.827 + 152.101 I"
       WRITE (*,*) "Expect NLO (LO evol): 18.0721 - 13.6474 I"
+      WRITE (*,*) "MSBAR NLO (LO evol)"
       CALL INIT
       CALL CFFF 
       WRITE (*,*) CFF(1)
@@ -82,8 +89,8 @@ C
 
 
       SCHEME = 'MSBAR'
-!      WRITE (*,*) "Expect NLO (evolD): -120.421 + 158.681 I"
       WRITE (*,*) "Expect NLO (evolD): -1.59391 + 6.58042 I"
+      WRITE (*,*) "MSBAR NLO (evolD):"
       CALL INIT
       CALL CFFF 
       WRITE (*,*) CFF(1) - TMP
@@ -91,34 +98,30 @@ C
       WRITE (*,*) 
 
       SCHEME = 'MSBND'
-!      WRITE (*,*) "Expect NLO (evolD + evolND): -120.924 + 159.565 I"
       WRITE (*,*) "Expect NLO (evolND): -0.503399 + 0.883417 I"
+      WRITE (*,*) "MSBAR NLO (evolND):"
       CALL INIT
       CALL CFFF 
       WRITE (*,*) CFF(1) - TMP
       WRITE (*,*) 
 
-!      PAR(1) = 1.0d0
-!      XI = 0.1
-!      CALL INIT
-!      CALL CFFF 
-!      WRITE (*,*) XI, CFF(1)
-!      XI = 0.01
-!      CALL INIT
-!      CALL CFFF 
-!      WRITE (*,*) XI, CFF(1)
-!      XI = 0.001
-!      CALL INIT
-!      CALL CFFF 
-!      WRITE (*,*) XI, CFF(1)
-!      XI = 0.0001
-!      CALL INIT
-!      CALL CFFF 
-!      WRITE (*,*) XI, CFF(1)
-!      XI = 0.00001
-!      CALL INIT
-!      CALL CFFF 
-!      WRITE (*,*) XI, CFF(1)
+      SCHEME = 'CSBAR'
+
+      P = 1
+      CZERO = 0
+      Q2 = 2.5d0
+      PAR(1) = 2.5d0
+      CALL INIT
+      CALL CFFF 
+      WRITE (*,*) "CSBAR NLO (noevol):"
+      WRITE (*,*) CFF(1)
+      WRITE (*,*) 
+
+      PAR(1) = 1.0d0
+      CALL INIT
+      CALL CFFF 
+      WRITE (*,*) "CSBAR NLO (evol):"
+      WRITE (*,*) CFF(1)
       WRITE (*,*) 
 
       STOP

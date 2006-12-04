@@ -20,13 +20,13 @@ certain to come out right as well.)
 
 Third test
 ----------
-lett/FIG2A-LETT.DAT (FIG1A-LETT.DAT) is part of data from Fig. 2 (1) from the letter
+lett/FIG2A-LETT.dat (FIG1A-LETT.dat) is part of data from Fig. 2 (1) from the letter
 hep-ph/0605237.  After running scaledep (radcorr) program, consistency should
 be checked by
 
-diff lett/FIG2A-LETT.DAT FIG2A.DAT
+diff lett/FIG2A-LETT.dat FIG2A.dat
 
-(diff lett/FIG1A-LETT.DAT FIG1A.DAT)
+(diff lett/FIG1A-LETT.dat FIG1A.dat)
 
 Or, better, diff -> vimdiff
 

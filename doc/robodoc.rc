@@ -30,6 +30,7 @@ headertypes:
 accept files:
     accuracy.f
     astrong.f
+    aux.f
     beta.f
     cdvcs.f
     cff.f
@@ -51,10 +52,8 @@ accept files:
     parwav.f
     projectors.f
     radcorr.f
-    radcorr2.f
     readpar.f
     rnnlo.f
     scaledep.f
-    scaledep2.f
     special.f
     test.f
