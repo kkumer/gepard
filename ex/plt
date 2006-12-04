@@ -1,0 +1,54 @@
+#! /bin/sh
+
+usage () {
+    cat <<EOF
+Usage: plt [-bh] [-n num] prefix 
+
+Plots data from files prefix0, prefix1, ..., prefixnum using
+grace and grace parameters file prefix.bat.
+
+ -b  batch plot + fragmaster (using prefix.fm) to prefix.{eps,pdf}
+ -h  this help message
+
+kkumer 2006-11-29 
+EOF
+}
+
+# Parsing arguments
+batch="no"
+num=3
+while getopts bhn: opt
+do  
+    case "$opt" in
+      h)  usage; exit 0;;
+      b)  batch="yes";;
+      n)  num="$OPTARG";;
+      \?) usage; exit 1;;               # unknown flag
+    esac 
+done
+shift `expr $OPTIND - 1`
+prefix=$@
+
+# Blanking if needed
+prog=xmgrace
+if [ $batch = "yes" ]; then
+    prog="gracebat -hdevice EPS -printfile ${prefix}_fm.eps"
+fi
+
+grf=0
+arg=""
+while [ $grf -le $num ]; do
+   arg="${arg} -graph $grf ${prefix}${grf}.dat"
+   let grf=$grf+1
+done
+
+prog="$prog $arg -batch $prefix.bat"
+
+echo $prog
+
+$prog
+if [ $batch = "yes" ]; then
+   ln -s figs.fm ${prefix}_fm
+   fragmaster
+   rm ${prefix}_fm ${prefix}.pdf ${prefix}_fm.eps
+fi

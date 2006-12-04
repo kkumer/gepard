@@ -1,0 +1,42 @@
+
+Examples of the usage of gepard
+===============================
+
+Producing Figures for KMPK06b:
+-----------------------------
+
+Step 1: 
+
+In base directory (so cd .. from here):
+
+make <target>
+
+where possible targets are: 
+
+radNLO   - singlet radiative corr., NLO in both schemes
+radQ     - singlet radiative corr., Q^2 dependence
+radNNLO. - singlet radiative corr., NNLO
+
+
+Step 2:
+
+Execute program <target>. This produces data
+files <target>[0,1,...].dat
+
+
+Step 3.
+
+Look at plots of data (must have grace installed) by
+
+plt <target>
+
+To have nicer view in grace window, comment out the second line
+in <target>.bat (page size 500 350).
+
+Alternatively, have <target>.eps created (must have fragmaster installed) by
+
+plt -b <target>
+
+To fine-tune bounding box of resulting EPS files, change it like this:
+%%BoundingBox: 0 * * 8??   ->  5 * * 795 
+
