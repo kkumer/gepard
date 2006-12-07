@@ -41,6 +41,7 @@ C
       DOUBLE COMPLEX DCTAN
       INCLUDE 'header.f'
 
+      PIHALF = (1.5707963267948966d0, 0.0d0)
 
       EPHND = EXP ( COMPLEX(0.D0, PHIND) )
       EPH = EXP ( COMPLEX(0.D0, PHI) )

@@ -27,8 +27,6 @@ C       BETABLK, NGAM -- common blocks with beta function coefficients
 C       of QCD, and moments of anomalous dimensions of DIS
 C  PARENTS
 C      EVOLNSF
-C  BUGS
-C      Invalid because gamma^NS != gamma^QQ
 C  SOURCE
 C
 

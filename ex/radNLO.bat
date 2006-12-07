@@ -1,5 +1,6 @@
 # grace batch file for figNLO
 page size 500 350
+page background fill off
 arrange(2, 2, .1, .2, .1)
 with string
 string on
@@ -52,12 +53,12 @@ s1 line color 4
 s1 line linewidth 1.5
 #
 s2 line linestyle 5
-s2 line color 9
+s2 line color 15
 s2 line linewidth 2.5
 s2 legend  "NLO, \oMS\O"
 #
 s3 line linestyle 5
-s3 line color 9
+s3 line color 15
 s3 line linewidth 1.5
 #
 ##############################################
@@ -91,11 +92,11 @@ s1 line color 4
 s1 line linewidth 1.5
 #
 s2 line linestyle 5
-s2 line color 9
+s2 line color 15
 s2 line linewidth 2.5
 #
 s3 line linestyle 5
-s3 line color 9
+s3 line color 15
 s3 line linewidth 1.5
 #
 ##############################################
@@ -144,11 +145,11 @@ s1 line color 4
 s1 line linewidth 1.5
 #
 s2 line linestyle 5
-s2 line color 9
+s2 line color 15
 s2 line linewidth 2.5
 #
 s3 line linestyle 5
-s3 line color 9
+s3 line color 15
 s3 line linewidth 1.5
 #
 ##############################################
@@ -190,10 +191,10 @@ s1 line color 4
 s1 line linewidth 1.5
 #
 s2 line linestyle 5
-s2 line color 9
+s2 line color 15
 s2 line linewidth 2.5
 #
 s3 line linestyle 5
-s3 line color 9
+s3 line color 15
 s3 line linewidth 1.5
 #

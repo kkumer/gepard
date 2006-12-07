@@ -111,6 +111,9 @@ aux: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Faux.o
 	$(FC) -o $@ $^ $(FFLAGS)
 
 # targets for examples
+radNLONS: $(_FOBJS) $(_ADACFOBJS) $(EXFODIR)/radNLONS.o
+	$(FC) -o ../ex/$@ $^ $(FFLAGS)
+
 radNLO: $(_FOBJS) $(_ADACFOBJS) $(EXFODIR)/radNLO.o
 	$(FC) -o ../ex/$@ $^ $(FFLAGS)
 

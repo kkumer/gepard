@@ -236,6 +236,27 @@ C
      &          + J , 6) * (COMPLEX(1.0d0 - PAR(22), 0.0d0) + J) /
      &           (COMPLEX(1.0d0 - PAR(22) - PAR(23)*DEL2, 0.0d0) + J) /
      &           (1.0d0 - DEL2/(PAR(24)+PAR(25)*J))**PAR(26)
+      ELSE IF (ANSATZ .EQ. 'NSFIT') THEN
+            HU = PAR(31) * POCHHAMMER(COMPLEX(1.0d0 - PAR(32), 0.0d0) 
+     &              , 4) / POCHHAMMER(COMPLEX(1.0d0 - PAR(32), 0.0d0)
+     &          + J , 4) * (COMPLEX(1.0d0 - PAR(32), 0.0d0) + J) /
+     &           (COMPLEX(1.0d0 - PAR(32) - PAR(33)*DEL2, 0.0d0) + J) /
+     &           (1.0d0 - DEL2/(PAR(34)+PAR(35)*J))**PAR(36)
+            HD = PAR(41) * POCHHAMMER(COMPLEX(1.0d0 - PAR(42), 0.0d0) 
+     &              , 4) / POCHHAMMER(COMPLEX(1.0d0 - PAR(42), 0.0d0)
+     &          + J , 4) * (COMPLEX(1.0d0 - PAR(42), 0.0d0) + J) /
+     &           (COMPLEX(1.0d0 - PAR(42) - PAR(43)*DEL2, 0.0d0) + J) /
+     &           (1.0d0 - DEL2/(PAR(44)+PAR(45)*J))**PAR(46)
+            NORMS = PAR(11)
+            HSEA = NORMS * POCHHAMMER(COMPLEX(2.0d0 - PAR(12), 0.0d0) 
+     &              , 8) / POCHHAMMER(COMPLEX(1.0d0 - PAR(12), 0.0d0)
+     &          + J , 8) * (COMPLEX(1.0d0 - PAR(12), 0.0d0) + J) /
+     &           (COMPLEX(1.0d0 - PAR(12) - PAR(13)*DEL2, 0.0d0) + J) /
+     &           (1.0d0 - DEL2/(PAR(14)+PAR(15)*J))**PAR(16)
+*    Ugly kludge: NS valence = down
+          FCM(1) = HD - (0.5d0 / 2.0d0 + 0.5d0) * HSEA
+*    'Dummy' gluonic, not used:
+          FCM(2) = (0.0d0, 0.0d0)
       ELSE IF (ANSATZ .EQ. 'HOUCHE') THEN
         FCM(1) =
      &      LHA(1)*LHBETAF(1) / POCHHAMMER(J-COMPLEX(LHLAM(1), 0.0D0),

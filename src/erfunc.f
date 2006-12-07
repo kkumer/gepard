@@ -41,8 +41,7 @@ C
 
       RINV = 1.0d0 / R
 
-*   gamma^NS = gamma^QQ  (valid only up to LO!)
-      GAMB = NGAM(K,0,1,1) / BETA0(NF)
+      GAMB = NGAMNS(K,0) / BETA0(NF)
 
       ERFUNCNS1 = ( 1.0d0 - RINV )
 

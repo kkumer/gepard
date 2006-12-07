@@ -43,7 +43,7 @@ endif
 # targets
 export SRCTARGETS = radcorr scaledep fit test auxtest fit_nopgplot houches accuracy \
 			 schemedep evoldep aux
-export EXTARGETS = radNLO radQ radNNLO
+export EXTARGETS = radNLONS radNLO radQ radNNLO
 
 .PHONY: $(SRCTARGETS) $(EXTARGETS)
 DOCTARGETS = pdf html

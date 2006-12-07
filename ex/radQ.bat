@@ -1,5 +1,6 @@
 # grace batch file for figQ
 page size 500 350
+page background fill off
 arrange(1, 2, .1, .2, .1)
 with string
 string on
