@@ -39,16 +39,17 @@ C
       DOUBLE COMPLEX FPW
       CHARACTER PROCESS*4
       INTEGER ORD, L, K1
-      DOUBLE PRECISION R, ASQ2, ASQ02
+      DOUBLE PRECISION R, ASQ2, ASQ02, ASMUR2, ASMUF2
       DOUBLE COMPLEX CDVCS(0:2,2), CNDNS
       DOUBLE COMPLEX EVOLNSA(0:2)
       DOUBLE COMPLEX J, BIGCL(0:2,2), EVOLA(0:2,2,2), FCM(2)
       INCLUDE 'header.f'
 
       J = N(K) - 1
-      CALL AS2PF (ASQ2, Q2, PAR(2), PAR(3))
+      CALL AS2PF (ASMUF2, Q2/RF2, PAR(2), PAR(3))
+      CALL AS2PF (ASMUR2, Q2/RR2, PAR(2), PAR(3))
       CALL AS2PF (ASQ02, PAR(1), PAR(2), PAR(3))
-      R = ASQ2/ASQ02
+      R = ASMUF2/ASQ02
       CALL HJ(J, FCM)
 
 *  "Big C" Wilson coefficients depending on process type:
@@ -97,7 +98,7 @@ C
 
       FPW = (0.0d0, 0.0d0)
       DO 18 ORD=0, P
- 18   FPW = FPW + ASQ2**ORD * (CDVCS(ORD,1)*FCM(1))
+ 18   FPW = FPW + ASMUR2**ORD * (CDVCS(ORD,1)*FCM(1))
 
       ELSE
 *   singlet case
@@ -114,7 +115,7 @@ C
 
       FPW = (0.0d0, 0.0d0)
       DO 30 ORD=0, P
- 30   FPW = FPW + ASQ2**ORD * (CDVCS(ORD,1)*FCM(1)+CDVCS(ORD,2)*FCM(2))
+ 30   FPW = FPW + ASMUR2**ORD*(CDVCS(ORD,1)*FCM(1)+CDVCS(ORD,2)*FCM(2))
 
       END IF
 
@@ -237,11 +238,7 @@ C
      &           (COMPLEX(1.0d0 - PAR(22) - PAR(23)*DEL2, 0.0d0) + J) /
      &           (1.0d0 - DEL2/(PAR(24)+PAR(25)*J))**PAR(26)
       ELSE IF (ANSATZ .EQ. 'NSFIT') THEN
-            HU = PAR(31) * POCHHAMMER(COMPLEX(1.0d0 - PAR(32), 0.0d0) 
-     &              , 4) / POCHHAMMER(COMPLEX(1.0d0 - PAR(32), 0.0d0)
-     &          + J , 4) * (COMPLEX(1.0d0 - PAR(32), 0.0d0) + J) /
-     &           (COMPLEX(1.0d0 - PAR(32) - PAR(33)*DEL2, 0.0d0) + J) /
-     &           (1.0d0 - DEL2/(PAR(34)+PAR(35)*J))**PAR(36)
+*    Ugly kludge: NS valence = down
             HD = PAR(41) * POCHHAMMER(COMPLEX(1.0d0 - PAR(42), 0.0d0) 
      &              , 4) / POCHHAMMER(COMPLEX(1.0d0 - PAR(42), 0.0d0)
      &          + J , 4) * (COMPLEX(1.0d0 - PAR(42), 0.0d0) + J) /
@@ -253,8 +250,7 @@ C
      &          + J , 8) * (COMPLEX(1.0d0 - PAR(12), 0.0d0) + J) /
      &           (COMPLEX(1.0d0 - PAR(12) - PAR(13)*DEL2, 0.0d0) + J) /
      &           (1.0d0 - DEL2/(PAR(14)+PAR(15)*J))**PAR(16)
-*    Ugly kludge: NS valence = down
-          FCM(1) = HD - (0.5d0 / 2.0d0 + 0.5d0) * HSEA
+          FCM(1) = HD - 0.5d0 / (2.0d0 + 0.5d0) * HSEA
 *    'Dummy' gluonic, not used:
           FCM(2) = (0.0d0, 0.0d0)
       ELSE IF (ANSATZ .EQ. 'HOUCHE') THEN

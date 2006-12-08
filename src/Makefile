@@ -104,7 +104,7 @@ accuracy: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Faccuracy.o
 evoldep: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Fevoldep.o
 	$(FC) -o $@ $^ $(FFLAGS)
 
-schemedep: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Fschemedep.o
+auxns: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Fauxns.o
 	$(FC) -o $@ $^ $(FFLAGS)
 
 aux: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Faux.o
@@ -120,7 +120,13 @@ radNLO: $(_FOBJS) $(_ADACFOBJS) $(EXFODIR)/radNLO.o
 radQ: $(_FOBJS) $(_ADACFOBJS) $(EXFODIR)/radQ.o
 	$(FC) -o ../ex/$@ $^ $(FFLAGS)
 
+radQNS: $(_FOBJS) $(_ADACFOBJS) $(EXFODIR)/radQNS.o
+	$(FC) -o ../ex/$@ $^ $(FFLAGS)
+
 radNNLO: $(_FOBJS) $(_ADACFOBJS) $(EXFODIR)/radNNLO.o
+	$(FC) -o ../ex/$@ $^ $(FFLAGS)
+
+scalesNS: $(_FOBJS) $(_ADACFOBJS) $(EXFODIR)/scalesNS.o
 	$(FC) -o ../ex/$@ $^ $(FFLAGS)
 
 .PHONY: clean

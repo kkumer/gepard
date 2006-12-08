@@ -3,7 +3,7 @@
 # Interesting targets:
 # 	radcorr  -  program for producing Fig. 1 in letter
 # 	scaledep -  program for producing Fig. 2 in letter
-# 	schemedep -  comparing MSBAR and CSBAR schemes
+# 	auxns    -  comparing MSBAR and CSBAR schemes
 # 	test     -  tests both DVCS and DIS routines
 # 	auxtest  -  tests DVCS \mathcal{H} calculation
 # 	fit      -  fitting GPD ansatz to DVCS and DIS data
@@ -42,8 +42,8 @@ endif
 
 # targets
 export SRCTARGETS = radcorr scaledep fit test auxtest fit_nopgplot houches accuracy \
-			 schemedep evoldep aux
-export EXTARGETS = radNLONS radNLO radQ radNNLO
+			 auxns evoldep aux
+export EXTARGETS = radNLONS radNLO radQ radQNS radNNLO scalesNS
 
 .PHONY: $(SRCTARGETS) $(EXTARGETS)
 DOCTARGETS = pdf html
@@ -76,7 +76,7 @@ rmfig:
 clean:
 	$(MAKE) -C src clean
 	$(MAKE) -C doc/tex clean
-	-rm -f doc/html/*
+	-rm -rf doc/html/*
 	-rm -f fits/*.{min,out,ps} fits/gmon.out
 	-rm -f Tests/*dat Tests/gmon.out
 	-rm -f ex/*dat ex/*eps

@@ -18,8 +18,8 @@ items:
     PARENTS
     SOURCE
 options:
-    --src ./src
-    --nodesc
+    --src ./src 
+#    --nodesc
     --sections
     --toc
 headertypes:
@@ -28,32 +28,37 @@ headertypes:
     s "Subroutines" subroutines
     f "Functions" functions
 accept files:
-    accuracy.f
-    astrong.f
-    aux.f
-    beta.f
-    cdvcs.f
-    cff.f
-    dcomplex.f
-    deriv.f
-    dvcs.f
-    erfunc.f
-    error.f
-    evol.f
-    evoldep.f
-    f2.f
-    fit.F
-    gauss.f
-    houches.f
-    init.f
-    lambda.f
-    msbar.f
-    nd.f
-    parwav.f
-    projectors.f
-    radcorr.f
-    readpar.f
-    rnnlo.f
-    scaledep.f
-    special.f
-    test.f
+   headers.h
+   accuracy.f
+   astrong.f
+   aux.f
+   beta.f
+   cdvcs.f
+   cff.f
+   dcomplex.f
+   deriv.f
+   dvcs.f
+   erfunc.f
+   error.f
+   evol.f
+   evoldep.f
+   f2.f
+   fit.F
+   gauss.f
+   houches.f
+   init.f
+   lambda.f
+   msbar.f
+   nd.f
+   parwav.f
+   projectors.f
+   radcorr.f
+   readpar.f
+   rnnlo.f
+   scaledep.f
+   special.f
+   test.f
+   radNLO.f
+   radQ.f
+   radNNLO.f
+   scalesNS.f

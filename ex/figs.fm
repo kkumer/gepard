@@ -3,8 +3,10 @@
 % psfrag commands:
 \psfrag{D1K}[tc]{$\delta^{1}K(\mathcal{Q}_{0}^2)\; [\%]$}
 \psfrag{DPK}[tc]{$\delta^{P}K\; [\%]$}
+\psfrag{DDK}[tc]{$\Delta K(\mathcal{Q}^2)\; [\%]$}
 \psfrag{D1P}[tc]{$\delta^{1}\varphi(\mathcal{Q}_{0}^2)$}
 \psfrag{DPP}[tc]{$\delta^{P}\varphi$}
+\psfrag{DDP}[tc]{$\Delta\varphi(\mathcal{Q}^2)$}
 \psfrag{XIH}[tc][Bc]{$\xi\big|\mathcal{H}(\xi,\mathcal{Q}^2)\big|$}
 \psfrag{ARGH}[tc][Bc]{$\mbox{arg}\big(\mathcal{H}(\xi,\mathcal{Q}^2)\big)$}
 \psfrag{calQ2}{$\mathcal{Q}^2$}
@@ -16,5 +18,7 @@
 \psfrag{xi3a}{\scriptsize $\xi = 10^{-3}$}
 \psfrag{xi2a}{\scriptsize $\xi = 5\cdot 10^{-2}$}
 \psfrag{xi1a}{\scriptsize $\xi = 5\cdot 10^{-1}\:\; (+ 0.45)$}
+\psfrag{Q21}{\scriptsize$\mathcal{Q}^2 = 1 \,\mbox{GeV}^2$}
 \psfrag{Q225}{\scriptsize$\mathcal{Q}^2 = 2.5 \,\mbox{GeV}^2$}
+\psfrag{Q210}{\scriptsize$\mathcal{Q}^2 = 10 \,\mbox{GeV}^2$}
 \psfrag{Q2100}{\scriptsize$\mathcal{Q}^2 = 100 \,\mbox{GeV}^2$}
