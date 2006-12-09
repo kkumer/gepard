@@ -39,25 +39,30 @@ C
       DOUBLE COMPLEX FPW
       CHARACTER PROCESS*4
       INTEGER ORD, L, K1
-      DOUBLE PRECISION R, ASQ2, ASQ02, ASMUR2, ASMUF2
-      DOUBLE COMPLEX CDVCS(0:2,2), CNDNS
+      DOUBLE PRECISION R, ASQ02, ASMUR2, ASMUF2
+      DOUBLE COMPLEX CEVNS, CNDNS, CEV(2)
       DOUBLE COMPLEX EVOLNSA(0:2)
       DOUBLE COMPLEX J, BIGCL(0:2,2), EVOLA(0:2,2,2), FCM(2)
       INCLUDE 'header.f'
 
       J = N(K) - 1
+
+* ASMUF2 = alpha_s/(2 pi) at factorization scale
       CALL AS2PF (ASMUF2, Q2/RF2, PAR(2), PAR(3))
+* ASMUR2 = alpha_s/(2 pi) at renormalization scale
       CALL AS2PF (ASMUR2, Q2/RR2, PAR(2), PAR(3))
+* ASQ02 = alpha_s/(2 pi) at input scale
       CALL AS2PF (ASQ02, PAR(1), PAR(2), PAR(3))
+
       R = ASMUF2/ASQ02
+
       CALL HJ(J, FCM)
 
-*  "Big C" Wilson coefficients depending on process type:
-*  (They also depend on scheme, but this is taken care of by INIT.)
+*       "Big C^(0,1,...,P)" Wilson coefficients depending on process type:
+*       (They also depend on scheme, but this is taken care of by INIT.)
 
       DO 10 ORD = 0, P
       DO 10 L = 1, 2
-        CDVCS(ORD, L) = (0.0d0, 0.0d0)
         IF ( PROCESS .EQ. 'DVCS' ) THEN
           BIGCL(ORD, L) = BIGC(K, ORD, L)
         ELSE IF ( PROCESS(:3) .EQ. 'DIS' ) THEN
@@ -70,52 +75,74 @@ C
  10   CONTINUE
 
 
-*  Evolution operators and partial wave depending on whether we do
-*  non-singlet or singlet case. This is specified by naming non-singlet
-*  ansaetze starting with 'NS...'.
+*        Evolution operators and partial wave depending on whether we do
+*        non-singlet or singlet case. This is specified by using non-singlet
+*        ansaetz name that starts 'NS...'.
 
       IF ( ANSATZ(:2) .EQ. 'NS' ) THEN
-*   non-singlet case
+*     non-singlet case implemented only to NLO using equality with singlet-QQ
 
-*     FIXME: In the non-singlet case NNLO Wilson coeffs. are not implemented
-*     Also, ND evolution is not treated correctly (ND NLO evol. operator assumes
-*     it will multiply C^(0)!)
-      IF ( P .GE. 2 ) THEN
-          CALL ERROR ('GeParD', 'PARWAVF',
-     &    'P>1, which is not implemented in the non-singlet case! ',
-     &    7, 2)
-      END IF
+        IF ( P .GE. 2 ) THEN
+            CALL ERROR ('GeParD', 'PARWAVF',
+     &      'P>1, which is not implemented in the non-singlet case! ',
+     &      7, 2)
+        END IF
 
-      CALL EVOLNSF (K, R, EVOLNSA)
+        CALL EVOLNSF (K, R, EVOLNSA)
 
-      DO 15 ORD = 0, P
-      DO 15 K1 = 0, ORD
-        CDVCS(ORD, 1) = CDVCS(ORD, 1) + BIGCL(ORD-K1, 1) * EVOLNSA(K1)
- 15   CONTINUE
+*       CZERO puts astrong^0 term to zero for investigation of NLO effects
 
-*   Put astrong^0 term to zero if investigating NLO effects
-      CDVCS(0, 1) = CZERO * CDVCS(0, 1)
+        CEVNS = BIGCL(0, 1) * EVOLNSA(0) * CZERO
+        IF (P .GE. 1) THEN
+          CEVNS = CEVNS + ASMUR2 * BIGCL(1, 1) * EVOLNSA(0) +
+     &                  + ASMUF2 * BIGCL(0, 1) * EVOLNSA(1) 
+        ENDIF
 
-      FPW = (0.0d0, 0.0d0)
-      DO 18 ORD=0, P
- 18   FPW = FPW + ASMUR2**ORD * (CDVCS(ORD,1)*FCM(1))
+        FPW = CEVNS * FCM(1)
 
       ELSE
-*   singlet case
+*     singlet case
 
-      CALL EVOLF (K, R, EVOLA)
+        CALL EVOLF (K, R, EVOLA)
 
-      DO 20 ORD = 0, P
-      DO 20 K1 = 0, ORD
-        CDVCS(ORD, 1) = CDVCS(ORD, 1) + BIGCL(ORD-K1, 1) * EVOLA(K1,1,1)
-     &      + BIGCL(ORD-K1,2) * EVOLA(K1,2,1)
-        CDVCS(ORD, 2) = CDVCS(ORD, 2) + BIGCL(ORD-K1, 1) * EVOLA(K1,1,2)
-     &      + BIGCL(ORD-K1,2) * EVOLA(K1,2,2)
- 20   CONTINUE
+        CEV(1) = ( BIGCL(0,1) * EVOLA(0,1,1) + 
+     &             BIGCL(0,2) * EVOLA(0,2,1) ) * CZERO
+        CEV(2) = ( BIGCL(0,1) * EVOLA(0,1,2) + 
+     &             BIGCL(0,2) * EVOLA(0,2,2) ) * CZERO
 
-      FPW = (0.0d0, 0.0d0)
-      DO 30 ORD=0, P
- 30   FPW = FPW + ASMUR2**ORD*(CDVCS(ORD,1)*FCM(1)+CDVCS(ORD,2)*FCM(2))
+        IF (P .GE. 1) THEN
+
+          CEV(1) = CEV(1) + ASMUR2 * ( BIGCL(1,1) * EVOLA(0,1,1) + 
+     &                                 BIGCL(1,2) * EVOLA(0,2,1) )
+     &                    + ASMUF2 * ( BIGCL(0,1) * EVOLA(1,1,1) + 
+     &                                 BIGCL(0,2) * EVOLA(1,2,1) )
+
+          CEV(2) = CEV(2) + ASMUR2 * ( BIGCL(1,1) * EVOLA(0,1,2) + 
+     &                                 BIGCL(1,2) * EVOLA(0,2,2) )
+     &                    + ASMUF2 * ( BIGCL(0,1) * EVOLA(1,1,2) + 
+     &                                 BIGCL(0,2) * EVOLA(1,2,2) )
+
+        ENDIF
+
+        IF (P .GE. 2) THEN
+
+          CEV(1) = CEV(1) + ASMUR2**2 * ( BIGCL(2,1) * EVOLA(0,1,1) + 
+     &                                    BIGCL(2,2) * EVOLA(0,2,1) )
+     &        + ASMUR2 * ASMUF2 * ( BIGCL(1,1) * EVOLA(1,1,1) + 
+     &                              BIGCL(1,2) * EVOLA(1,2,1) )
+     &                    + ASMUF2**2 * ( BIGCL(0,1) * EVOLA(2,1,1) + 
+     &                                    BIGCL(0,2) * EVOLA(2,2,1) )
+
+          CEV(2) = CEV(2) + ASMUR2**2 * ( BIGCL(2,1) * EVOLA(0,1,2) + 
+     &                                    BIGCL(2,2) * EVOLA(0,2,2) )
+     &        + ASMUR2 * ASMUF2 * ( BIGCL(1,1) * EVOLA(1,1,2) + 
+     &                              BIGCL(1,2) * EVOLA(1,2,2) )
+     &                    + ASMUF2**2 * ( BIGCL(0,1) * EVOLA(2,1,2) + 
+     &                                    BIGCL(0,2) * EVOLA(2,2,2) )
+
+        ENDIF
+
+        FPW = CEV(1) * FCM(1) + CEV(2) * FCM(2)
 
       END IF
 

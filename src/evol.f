@@ -50,14 +50,14 @@ C
       AUX(0) = (1.0d0, 0.0d0)
 
       IF (SCHEME(4:5) .EQ. 'LO') THEN 
-*   Just LO evolution ...
+*       Just LO evolution ...
         AUX(1) = (0.0d0, 0.0d0)
       ELSE
-*   ... or normal NLO one (diagonal)
+*       ... or normal NLO one (diagonal only!)
         AUX(1) = - ERFUNCNS1 * R1
       ENDIF
 
-*   Adding non-diagonal NLO evolution (time consuming)
+*   Adding MSBAR non-diagonal NLO evolution (time consuming)
       IF ( (P .EQ. 1) .AND. (SCHEME .EQ. 'MSBND') ) THEN
         CALL NDNSF(K, R, CNDNS)
         AUX(1) = AUX(1) + CNDNS

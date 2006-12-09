@@ -1,4 +1,4 @@
--  Code taken from Vogt/Vermasseren may not be pure double precison.
+-  Code taken from Vogt/Vermasseren may not be pure double precision.
   (Although maybe it behaves as double precision.)
 
 -  Complex tangent DCTAN may be problematic
@@ -7,10 +7,9 @@
 
 -  Because of ND evolution all MB integrations go 0..500
    now which is overkill for "outer" integration and makes
-   everything unnessarty 30% slower
+   everything unnecessary 30% slower
 
 -  SPEED=4 is unreliable
-
 
 
 Fixed:
@@ -23,3 +22,5 @@ Fixed:
 
 2006-11-17 -  PS figures drawn by fit.exe at Dieter's notebook, have no text, just lines
              (Path to PGPLOT libs had to be put in shell's environment.)
+
+2006-12-09 -  Expansion of evol. operator is in \mu_r, and should be \mu_f

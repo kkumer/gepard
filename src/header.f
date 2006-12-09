@@ -49,7 +49,7 @@
       DOUBLE COMPLEX NGAMNS(NPTSMAX,0:2)
       DOUBLE COMPLEX BIGCF2(NPTSMAX,0:2,2)
 
-*     - FInal observables
+*     - Final observables
       DOUBLE PRECISION F2(0:2)
       DOUBLE COMPLEX CFF(0:2)
         
