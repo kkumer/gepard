@@ -101,16 +101,20 @@ houches: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Fhouches.o
 accuracy: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Faccuracy.o 
 	$(FC) -o $@ $^ $(FFLAGS)
 
-evoldep: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Fevoldep.o
-	$(FC) -o $@ $^ $(FFLAGS)
-
-auxns: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Fauxns.o
-	$(FC) -o $@ $^ $(FFLAGS)
-
-aux: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Faux.o
-	$(FC) -o $@ $^ $(FFLAGS)
-
 # targets for examples
+#
+auxns: $(_FOBJS) $(_ADACFOBJS) $(EXFODIR)/auxns.o
+	$(FC) -o ../ex/$@ $^ $(FFLAGS)
+
+aux: $(_FOBJS) $(_ADACFOBJS) $(EXFODIR)/aux.o
+	$(FC) -o ../ex/$@ $^ $(FFLAGS)
+
+evoldep: $(_FOBJS) $(_ADACFOBJS) $(EXFODIR)/evoldep.o
+	$(FC) -o ../ex/$@ $^ $(FFLAGS)
+
+anatomy: $(_FOBJS) $(_ADACFOBJS) $(EXFODIR)/anatomy.o
+	$(FC) -o ../ex/$@ $^ $(FFLAGS)
+
 radNLONS: $(_FOBJS) $(_ADACFOBJS) $(EXFODIR)/radNLONS.o
 	$(FC) -o ../ex/$@ $^ $(FFLAGS)
 

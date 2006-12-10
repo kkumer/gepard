@@ -38,9 +38,7 @@ C
 
       IMPLICIT NONE
       INTEGER NFL
-      DOUBLE PRECISION CF, CA, TR
       DOUBLE PRECISION B00, B01, B10, B11
-      PARAMETER (CA = 3.D0, CF = 4./3.D0, TR = 0.5 D0)
       INCLUDE 'header.f'
 
 
@@ -48,9 +46,9 @@ C
 * ..The full LO and NLO coefficients 
 
        B00 =  11./3.D0 * CA
-       B01 =  -4./3.D0 * TR
+       B01 =  -4./3.D0 * TF
        B10 =  34./3.D0 * CA**2
-       B11 = -20./3.D0 * CA*TR - 4.* CF*TR
+       B11 = -20./3.D0 * CA*TF - 4.* CF*TF
 
 * ..Flavour-number loop and output to the array
 

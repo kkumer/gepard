@@ -1,0 +1,207 @@
+C     ****h* gepard/evoldep.f
+C  FILE DESCRIPTION
+C    calculation of relative effects of various evolutions
+C
+C    $Id: radcorr.f 33 2006-07-26 18:42:37Z kuk05260 $
+C     *******
+
+
+C     ****p* evoldep.f/EVOLDEP
+C  NAME
+C     EVOLDEP -- Main program
+C  DESCRIPTION
+C    calculation of relative effects of various evolutions
+C    in MSBAR scheme: LO, NLO, NLO non-diagonal, ...
+C  OUTPUT
+C        EVOL.dat  --  file with 2 sets of point coordinates
+C                      corresponding to 2 lines on a graph
+C  IDENTIFIERS
+C          NPOINTS -- number of points on each line
+C       LOGXISTART -- log(\xi) where line begins
+C         LOGXIEND -- log(\xi) where line ends
+C              XIS -- array(NPOINTS), values of XI
+C            PREDS -- array(6, NPOINTS), holds results for
+C                     each prediction calculated
+C                 Order is:  1.  TOTAL predicition (NLO with NLO ND evol.)
+C                            2.  LO prediction
+C                            3.  LO prediction with LO evolution
+C                            4.  NLO correction  with LO evolution
+C                            5.  NLO corr.  with LO+NLO diagonal evolution
+C                            6.  NLO corr.  with LO+NLO diag.+ NLO non-diagonal evolution
+C
+C                P -- approximation order N^{P}LO P=0,1,2
+C
+C  CHILDREN
+C      READPAR, INIT, CFFF
+C  SOURCE
+C
+
+      PROGRAM EVOLDEP
+
+      IMPLICIT NONE
+      INTEGER PT, NPOINTS, LN, NDEL
+      DOUBLE PRECISION LOGXI, LOGXISTART, LOGXIEND, LOGXISTEP
+      PARAMETER ( NPOINTS = 12 )
+      DOUBLE COMPLEX PREDS(6, NPOINTS)
+      DOUBLE PRECISION XIS(NPOINTS), RES, TOT, CLO, Q02, Q2EXP, MP
+      PARAMETER ( LOGXISTART = -5.0d0, LOGXIEND = -0.30103d0,
+     &       LOGXISTEP = (LOGXIEND - LOGXISTART) / (NPOINTS - 1)  )
+      PARAMETER (MP = 0.938272d0 )
+      INCLUDE '../header.f'
+
+      CALL READPAR
+
+*   File that will hold results
+
+      OPEN (UNIT = 11, FILE = "evol.dat", STATUS = "UNKNOWN")
+
+      DO 5 NDEL = 1, 1
+  5         WRITE (10 + NDEL, *) '# Output of evoldep.f. See prolog of 
+     & that program'
+
+      ANSATZ = 'NSFIT'
+
+*       1  Q02       
+        PAR(1) =   2.5d0    
+*       2  AS0       
+        PAR(2) =   0.05d0
+*       3  MU02      
+        PAR(3) =   2.5d0 
+
+* ------------ ANSATZ  -------------
+* ----  11 NS   --------------------
+!        PAR(11) =  see below
+*       12 AL0S      
+        PAR(12) =  1.1d0 
+*       13 ALPS      
+        PAR(13) =  0.15d0
+*       14 M02S      
+        PAR(14) =  (2.0d0 * MP)**2
+*       15 DELM2S    
+        PAR(15) =  MP**2
+*       16 PS        
+        PAR(16) =  3.0d0
+* ----  21 NG  (irrelevant for NS !)-----
+!        PAR(21) =  0.5d0
+*       22 AL0G      
+!        PAR(22) =  1.0d0 
+*       23 ALPG      
+        PAR(23) =  0.15d0
+*       24 M02G      
+        PAR(24) =  (2.0d0 * MP)**2
+*       25 DELM2G    
+        PAR(25) =  MP**2
+*       26 PG        
+        PAR(26) =  2.0d0
+* ----  31 NU  ( irrelevant, see D)-
+        PAR(31) =  2.0d0 
+*       32 AL0U      
+        PAR(32) =  0.5d0 
+*       33 ALPU      
+        PAR(33) =  1.0d0 
+*       34 M02U      
+        PAR(34) =  (2.0d0 * MP)**2
+*       35 DELM2U    
+        PAR(35) =  MP**2
+*       36 PU        
+        PAR(36) =  1.0d0 
+* ----  41 ND   (fakes whole val.) -
+        PAR(41) =  1.0d0 
+*       42 AL0D      
+        PAR(42) =  0.5d0 
+*       43 ALPD      
+        PAR(43) =  1.0d0 
+*       44 M02D      
+        PAR(44) =  (2.0d0 * MP)**2
+*       45 DELM2D    
+        PAR(45) =  MP**2
+*       46 PD        
+        PAR(46) =  1.0d0    
+
+      Q02 = 2.5d0
+      Q2EXP = 10.0d0
+      DEL2 =  0.0d0
+
+*   sea or not?
+      PAR(11) = 0.0d0
+!      PAR(11) = 4.0d0 / 15.0d0
+
+*   Looping over points (XI's) on each line
+
+      LOGXI = LOGXISTART
+      DO 20 PT = 1, NPOINTS
+      XI = 10**LOGXI
+      XIS(PT) = XI
+
+*   Looping over five predictions calculated for each XI
+
+      DO 10 LN = 1, 6
+
+*   Recognizing parameters for each line
+
+* 1st line is the default total result:
+      P = 1
+      PAR(1) = Q02
+      Q2 = Q2EXP
+      SCHEME = 'MSBND'
+      CZERO = 1
+      IF (LN .EQ. 2) THEN
+          P = 0
+          PAR(1) = Q2
+      ELSEIF (LN .EQ. 3) THEN
+          P = 0
+      ELSEIF (LN .EQ. 4) THEN
+          CZERO = 0
+          SCHEME = 'MSBLO'
+      ELSEIF (LN .EQ. 5) THEN
+          CZERO = 0
+          SCHEME = 'MSBAR'
+      ELSEIF (LN .EQ. 6) THEN
+          CZERO = 0
+          SCHEME = 'MSBND'
+      ENDIF
+
+*   Doing calculation ...
+  
+      CALL INIT
+      CALL CFFF 
+
+*   ... and saving it to arrray
+
+      PREDS(LN, PT) = CFF(P)
+
+ 10   CONTINUE
+
+ 20   LOGXI = LOGXI + LOGXISTEP
+
+*     Calculating plot points from results in PREDS and printing to files
+
+      DO 40 LN = 2, 6
+      DO 30 PT = 1, NPOINTS
+        CLO =  ABS(PREDS(2, PT))
+        TOT =  ABS(PREDS(1, PT))
+        IF (LN .EQ. 2) THEN
+          RES = TOT / CLO
+        ELSE IF (LN .EQ. 3) THEN
+          RES = ABS(PREDS(LN,PT)) / CLO
+        ELSE IF (LN .EQ. 4) THEN
+          RES = ABS(PREDS(LN,PT)) / CLO
+        ELSE
+          RES = ABS(PREDS(LN,PT)-PREDS(LN-1,PT)) / CLO
+        ENDIF
+        WRITE (UNIT=11, FMT=998) XIS(PT), RES
+        IF (LN .EQ. 5) THEN
+          WRITE (17, *) XIS(PT), PREDS(1, PT), PREDS(2,PT), PREDS(3, PT)
+          WRITE (17, *) '   ', PREDS(4, PT), PREDS(5,PT), PREDS(6,PT)
+        ENDIF
+ 30   CONTINUE
+*     Empty line is put between the sets
+      WRITE (UNIT=11, FMT=999)
+ 40   CONTINUE
+
+998   FORMAT (F12.7,5X,F22.7)
+999   FORMAT (1X)
+
+      STOP
+      END
+C     ****

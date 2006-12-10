@@ -23,8 +23,9 @@
 
 *   4. Other
 
-      DOUBLE PRECISION PI
+      DOUBLE PRECISION PI, CF, CA, TF
       PARAMETER ( PI = 3.1415 92653 58979 D0 )
+      PARAMETER ( CF = 4.0d0 / 3.0d0, CA = 3.0d0, TF = 0.5d0 )
 
 *     - QCD beta function
       INTEGER NFMIN, NFMAX

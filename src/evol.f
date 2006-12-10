@@ -36,7 +36,7 @@ C
       IMPLICIT NONE
       INTEGER K
       DOUBLE PRECISION R
-      DOUBLE COMPLEX EVOLNSA(0:2), CNDNS
+      DOUBLE COMPLEX EVOLNSA(0:2), NDINT
       INTEGER ORD
       DOUBLE COMPLEX GAMB, ERFUNCNS1, R1, AUX(0:2)
       INCLUDE 'header.f'
@@ -57,15 +57,15 @@ C
         AUX(1) = - ERFUNCNS1 * R1
       ENDIF
 
-*   Adding MSBAR non-diagonal NLO evolution (time consuming)
-      IF ( (P .EQ. 1) .AND. (SCHEME .EQ. 'MSBND') ) THEN
-        CALL NDNSF(K, R, CNDNS)
-        AUX(1) = AUX(1) + CNDNS
-      ENDIF
-
-
       DO 10 ORD = 0, P
  10   EVOLNSA(ORD) = AUX(ORD) * R**(-GAMB)
+
+*   Adding MSBAR non-diagonal NLO evolution (time consuming)
+      IF ( (P .EQ. 1) .AND. (SCHEME .EQ. 'MSBND') ) THEN
+        CALL NDINTF(K, R, NDINT, 0, 0)
+        EVOLNSA(1) = EVOLNSA(1) + NDINT
+      ENDIF
+
 
       RETURN
       END
@@ -107,15 +107,16 @@ C
       DOUBLE COMPLEX EVOLA(0:2,2,2)
       INTEGER A, B, CE, I, J, K1, ORD
       DOUBLE PRECISION RINV
-      DOUBLE COMPLEX LAMB(2), PR(2,2,2)
+      DOUBLE COMPLEX LAM(2), PR(2,2,2)
       DOUBLE COMPLEX ERFUNC1(2,2), ERFUNC2(2,2)
       DOUBLE COMPLEX R1PROJ(2,2,2,2), R2PROJ(2,2,2,2)
-      DOUBLE COMPLEX AUX, DINV, IJAUX(0:2), R1R1(2,2)
+      DOUBLE COMPLEX AUX, DINV, IJAUX(0:2), R1R1(2,2), NDINT
       INTEGER KRONECKER
       INCLUDE 'header.f'
 
-      CALL ERFUNCF (K, R, LAMB, ERFUNC1, ERFUNC2)
-      CALL RNNLOF (K, PR, R1PROJ, R2PROJ)
+      CALL LAMBDAF(K, LAM)
+      CALL ERFUNCF (R, LAM, LAM, ERFUNC1, ERFUNC2)
+      CALL RNNLOF (K, LAM, PR, R1PROJ, R2PROJ)
 
       RINV = 1.0d0 / R
 
@@ -136,7 +137,7 @@ C
       IF (P. GE. 2) THEN
          AUX = (0.0d0, 0.0d0)
          DO 20 CE = 1, 2
-            DINV = 1.0d0 + LAMB(CE) - LAMB(B)
+            DINV = 1.0d0 + (LAM(CE) - LAM(B)) / BETA0(NF)
             R1R1(I,J) = (0.0d0, 0.0d0)
             DO 17 K1 = 1, 2
  17         R1R1(I,J) = R1R1(I,J) + R1PROJ(A,CE,I,K1)*R1PROJ(CE,B,K1,J)
@@ -146,8 +147,23 @@ C
       END IF
  30   CONTINUE
       DO 35 ORD = 0, P
- 35   EVOLA(ORD,I,J) = EVOLA(ORD,I,J) + IJAUX(ORD) * R**(-LAMB(B))
+        IF (SCHEME(4:5) .EQ. 'LO') THEN 
+*         Just LO evolution ...
+          IJAUX(1) = (0.0d0, 0.0d0)
+          IJAUX(2) = (0.0d0, 0.0d0)
+        ENDIF
+ 35   EVOLA(ORD,I,J) = EVOLA(ORD,I,J) 
+     &                 + IJAUX(ORD) * R**( -LAM(B) / BETA0(NF) )
  40   CONTINUE
+
+*   Adding MSBAR non-diagonal NLO evolution (time consuming)
+      IF ( (P .EQ. 1) .AND. (SCHEME .EQ. 'MSBND') ) THEN
+        DO 50 I = 1, 2
+        DO 50 J = 1, 2
+          CALL NDINTF(K, R, NDINT, I, J)
+          EVOLA(1,I,J) = EVOLA(1,I,J) + NDINT
+ 50     CONTINUE
+      ENDIF
 
       RETURN
       END

@@ -65,6 +65,7 @@ C     INTEGER K
 C     DOUBLE COMPLEX PR(2,2,2), R1PROJ(2,2,2,2), R2PROJ(2,2,2,2)
 C  INPUTS
 C           K -- Mellin-Barnes integration point index
+C         LAM -- eigenvalues of LO evolution operator
 C  OUTPUT
 C          PR -- Two projector matrices PR(1,a,b)=P^+
 C                and PR(2,a,b)=P^-
@@ -82,17 +83,18 @@ C      PROJECTORSF, PROJECTION
 C  SOURCE
 C
 
-      SUBROUTINE RNNLOF (K, PR, R1PROJ, R2PROJ)
+      SUBROUTINE RNNLOF (K, LAM, PR, R1PROJ, R2PROJ)
 
       IMPLICIT NONE
       INTEGER K
+      DOUBLE COMPLEX LAM(2)
       DOUBLE COMPLEX PR(2,2,2), R1PROJ(2,2,2,2), R2PROJ(2,2,2,2)
       INTEGER K1, L
       DOUBLE PRECISION INV
       DOUBLE COMPLEX R1(2,2), R2(2,2)
       INCLUDE 'header.f'
 
-      CALL PROJECTORSF(K, PR)
+      CALL PROJECTORSF(K, LAM, PR)
 
 *     Inverse beta_0 is often needed below
       INV = 1.0d0 / BETA0(NF)
@@ -109,9 +111,9 @@ C
       END IF
  10   CONTINUE
 
-      CALL PROJECTION(PR, R1, R1PROJ)
+      CALL PROJECTION(PR, R1, PR, R1PROJ)
       IF (P. GE. 2) THEN
-      CALL PROJECTION(PR, R2, R2PROJ)
+      CALL PROJECTION(PR, R2, PR, R2PROJ)
       END IF
 
       RETURN
@@ -120,13 +122,13 @@ C     ****
 
 C     ****s* rnnlo.f/PROJECTION
 C  NAME
-C     PROJECTION  --  matrix multiplication  PR . M . PR
+C     PROJECTION  --  matrix multiplication  PL . M . PR
 C  DESCRIPTION
 C     Auxilliary subroutine
 C  SYNOPSIS
-C     SUBROUTINE PROJECTION (PR, M, PROJ)
+C     SUBROUTINE PROJECTION (PL, M, PR, PROJ)
 C
-C     DOUBLE COMPLEX PR(2,2,2), M(2,2)
+C     DOUBLE COMPLEX PL(2,2,2), M(2,2), PR(2,2,2)
 C     DOUBLE COMPLEX PROJ(2,2,2,2)
 C  INPUTS
 C          PR -- projection matrices P(1)=P^+, P(2)=P^-
@@ -139,10 +141,10 @@ C     RNNLOF
 C  SOURCE
 C
 
-      SUBROUTINE PROJECTION (PR, M, PROJ)
+      SUBROUTINE PROJECTION (PL, M, PR, PROJ)
 
       IMPLICIT NONE
-      DOUBLE COMPLEX PR(2,2,2), M(2,2)
+      DOUBLE COMPLEX PL(2,2,2), M(2,2), PR(2,2,2)
       DOUBLE COMPLEX PROJ(2,2,2,2)
       INTEGER A, B, C, D, L, R
       DOUBLE COMPLEX AUX(2,2)
@@ -154,7 +156,7 @@ C
       DO 15 C = 1,2
       AUX(A,C) = (0.0d0, 0.0d0)
       DO 15 B = 1,2
- 15   AUX(A,C) = AUX(A,C) + PR(L,A,B) * M(B,C) 
+ 15   AUX(A,C) = AUX(A,C) + PL(L,A,B) * M(B,C) 
 
       DO 25 A = 1,2
       DO 25 D = 1,2

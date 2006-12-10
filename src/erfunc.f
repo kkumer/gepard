@@ -63,20 +63,15 @@ C    |latex 1- \left(\frac{\alpha_s(\mu_0)}{\alpha_s(\mu)}\right)^{\frac{n
 C    |latex \beta_0+{^{a}\! \lambda}_j-{^{b}\! \lambda}_j}{\beta_0}}
 C    |latex \right]
 C    |latex \end{eqnarray*}
-C    For convenience, also eigenvalues of LO evolution operator
-C    divided by beta_0 are returned.
 C  SYNOPSIS
-C     SUBROUTINE ERFUNCF (K, R, LAMB, ERFUNC1, ERFUNC2)
+C     SUBROUTINE ERFUNCF (R, LAM, ERFUNC1, ERFUNC2)
 C
-C     INTEGER K
 C     DOUBLE PRECISION R
 C     DOUBLE COMPLEX LAMB(2), ERFUNC1(2,2), ERFUNC2(2,2)
 C  INPUTS
-C           K -- Mellin-Barnes integration point index
 C           R -- ratio of astrong(mu)/astrong(mu0)
+C         LAM -- eigenvalues of LO evolution operator
 C  OUTPUT
-C        LAMB -- \lambda/\beta_0 where \lambda is eigenvalue
-C                of LO evolution operator
 C     ERFUNC1 -- matrix {\mathcal R}(mu, mu0 | 1}_{ab}
 C     ERFUNC2 -- matrix {\mathcal R}(mu, mu0 | 2}_{ab}
 C  PARENTS
@@ -86,31 +81,31 @@ C      LAMBDAF
 C  SOURCE
 C
 
-      SUBROUTINE ERFUNCF (K, R, LAMB, ERFUNC1, ERFUNC2)
+      SUBROUTINE ERFUNCF (R, LAMN, LAMK, ERFUNC1, ERFUNC2)
 
       IMPLICIT NONE
-      INTEGER K
       DOUBLE PRECISION R
-      DOUBLE COMPLEX LAMB(2), ERFUNC1(2,2), ERFUNC2(2,2)
-      INTEGER I, J
+      DOUBLE COMPLEX LAMN(2), LAMK(2), ERFUNC1(2,2), ERFUNC2(2,2)
+      INTEGER A, B
       DOUBLE PRECISION RINV
-      DOUBLE COMPLEX LAM(2)
+      DOUBLE COMPLEX LAMNB(2), LAMKB(2)
       INCLUDE 'header.f'
 
 
       RINV = 1.0d0 / R
-      CALL LAMBDAF (K, LAM)
 
-      DO 10 I = 1, 2
- 10   LAMB(I) = LAM(I) / BETA0(NF)
+      DO 10 A = 1, 2
+        LAMNB(A) = LAMN(A) / BETA0(NF)
+        LAMKB(A) = LAMK(A) / BETA0(NF)
+ 10   CONTINUE
 
-      DO 20 I = 1, 2
-      DO 20 J = 1, 2
-      ERFUNC1(I,J)=( 1.0d0 - RINV**(1.0d0 + LAMB(I) - LAMB(J)) )/
-     &      (1.0d0 + LAMB(I) - LAMB(J))
+      DO 20 A = 1, 2
+      DO 20 B = 1, 2
+      ERFUNC1(A,B)=( 1.0d0 - RINV**(1.0d0 + LAMNB(A) - LAMKB(B)) )/
+     &      (1.0d0 + LAMNB(A) - LAMKB(B))
       IF (P. GE. 2) THEN
-      ERFUNC2(I,J)=( 1.0d0 - RINV**(2.0d0 + LAMB(I) - LAMB(J)) )/
-     &      (2.0d0 + LAMB(I) - LAMB(J))
+      ERFUNC2(A,B)=( 1.0d0 - RINV**(2.0d0 + LAMNB(A) - LAMKB(B)) )/
+     &      (2.0d0 + LAMNB(A) - LAMKB(B))
       END IF
  20   CONTINUE
 

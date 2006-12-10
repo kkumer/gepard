@@ -29,12 +29,12 @@ C
       DOUBLE PRECISION Q02, Q2EXP, MP
       PARAMETER (MP = 0.938272d0 )
 
-      INCLUDE 'header.f'
+      INCLUDE '../header.f'
 
       CALL READPAR
       NF = 4
       ANSATZ = 'NSFIT'
-      CZ = 1
+      CZ = 0
 
 *       1  Q02       
 !       PAR(1) =   2.5d0    
@@ -95,9 +95,9 @@ C
 
 
       Q02 = 2.5d0
-      Q2EXP = 4.0d0
-      XI = 0.04d0
-      DEL2 = -0.25d0
+      Q2EXP = 10.0d0
+      XI = 0.001d0
+      DEL2 = -0.5d0
       SCHEME = 'MSBAR'
 *   sea or not?
       PAR(11) = 0.0d0
@@ -106,51 +106,50 @@ C
       WRITE (*,901) ANSATZ, DEL2, XI
       WRITE (*,903) Q02, Q2EXP
 
-      PAR(1) = Q02
-      Q2 = Q02
+      Q2 = Q2EXP
+      PAR(1) = Q2EXP
       P = 0
       CALL INIT
       CALL CFFF 
       WRITE (*,902) "LO (no evol)", CFF(0)
 
-      Q2 = Q2EXP
+      PAR(1) = Q02
       CALL INIT
       CALL CFFF 
       WRITE (*,902) "LO (LO evol)", CFF(0)
 
       P = 1
       CZERO = CZ
-      Q2 = Q02
+      PAR(1) = Q2EXP
       CALL INIT
       CALL CFFF 
       WRITE (*,902) "MS NLO (no evol)", CFF(1)
 
       SCHEME = 'MSBLO'
-      Q2 = Q2EXP
+      PAR(1) = Q02
       CALL INIT
       CALL CFFF 
       WRITE (*,902) "MS NLO (LO evol)", CFF(1)
-*      TMP = CFF(1)
+      TMP = CFF(1)
 
       SCHEME = 'MSBAR'
       CALL INIT
       CALL CFFF 
-*     WRITE (*,902) "MS NLO (evol D)", CFF(1) - TMP
-      WRITE (*,902) "MS NLO (evol D)", CFF(1)
+      WRITE (*,902) "MS NLO (evol D)", CFF(1) - TMP
+      TMP = CFF(1)
 
       SCHEME = 'MSBND'
       CALL INIT
       CALL CFFF 
-*     WRITE (*,902) "MS NLO (evol ND)", CFF(1) - TMP
-      WRITE (*,902) "MS NLO (evol ND)", CFF(1)
+      WRITE (*,902) "MS NLO (evol ND)", CFF(1) - TMP
 
       SCHEME = 'CSBAR'
-      Q2 = Q02
+      PAR(1) = Q2EXP
       CALL INIT
       CALL CFFF 
       WRITE (*,902) "CS NLO (no evol)", CFF(1)
 
-      Q2 = Q2EXP
+      PAR(1) = Q02
       CALL INIT
       CALL CFFF 
       WRITE (*,902) "CS NLO (evol)", CFF(1)

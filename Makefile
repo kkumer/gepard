@@ -41,9 +41,8 @@ export X11LIBS = -L/usr/X11R6/lib -lX11
 endif
 
 # targets
-export SRCTARGETS = radcorr scaledep fit test auxtest fit_nopgplot houches accuracy \
-			 auxns evoldep aux
-export EXTARGETS = radNLONS radNLO radQ radQNS radNNLO scalesNS
+export SRCTARGETS = radcorr scaledep fit test auxtest fit_nopgplot houches accuracy
+export EXTARGETS = aux auxns anatomy evoldep radNLONS radNLO radQ radQNS radNNLO scalesNS
 
 .PHONY: $(SRCTARGETS) $(EXTARGETS)
 DOCTARGETS = pdf html

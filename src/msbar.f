@@ -36,12 +36,11 @@ C
 
       IMPLICIT NONE
       INTEGER K
-      DOUBLE PRECISION LRF2, CF
+      DOUBLE PRECISION LRF2
       DOUBLE COMPLEX J, HS1, BIGC0(2), BIGC1(2)
       INCLUDE 'header.f'
 
       LRF2 = LOG(RF2)
-      CF = 4.0d0/3.0d0
 
       BIGC0(1) = (1.0d0,0.0d0)
       BIGC0(2) = (0.0d0,0.0d0)
