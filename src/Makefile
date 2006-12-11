@@ -127,7 +127,13 @@ radNLO: $(_FOBJS) $(_ADACFOBJS) $(EXFODIR)/radNLO.o
 radQ: $(_FOBJS) $(_ADACFOBJS) $(EXFODIR)/radQ.o
 	$(FC) -o ../ex/$@ $^ $(FFLAGS)
 
-radQNS: $(_FOBJS) $(_ADACFOBJS) $(EXFODIR)/radQNS.o
+evolutNS: $(_FOBJS) $(_ADACFOBJS) $(EXFODIR)/evolutNS.o
+	$(FC) -o ../ex/$@ $^ $(FFLAGS)
+
+evolut: $(_FOBJS) $(_ADACFOBJS) $(EXFODIR)/evolut.o
+	$(FC) -o ../ex/$@ $^ $(FFLAGS)
+
+radNNLONS: $(_FOBJS) $(_ADACFOBJS) $(EXFODIR)/radNNLONS.o
 	$(FC) -o ../ex/$@ $^ $(FFLAGS)
 
 radNNLO: $(_FOBJS) $(_ADACFOBJS) $(EXFODIR)/radNNLO.o
