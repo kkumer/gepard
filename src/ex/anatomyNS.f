@@ -1,4 +1,4 @@
-C     ****h* gepard/evoldep.f
+C     ****h* gepard/anatomyNS.f
 C  FILE DESCRIPTION
 C    calculation of relative effects of various evolutions
 C
@@ -6,12 +6,12 @@ C    $Id: radcorr.f 33 2006-07-26 18:42:37Z kuk05260 $
 C     *******
 
 
-C     ****p* evoldep.f/EVOLDEP
+C     ****p* anatomyNS.f/ANATOMYNS
 C  NAME
-C     EVOLDEP -- Main program
+C     ANATOMYNS -- Main program
 C  DESCRIPTION
 C    calculation of relative effects of various evolutions
-C    in MSBAR scheme: LO, NLO, NLO non-diagonal, ...
+C    in MSBAR scheme: LO, NLO, NLO non-diagonal, ... (non-singlet)
 C  OUTPUT
 C        EVOL.dat  --  file with 2 sets of point coordinates
 C                      corresponding to 2 lines on a graph
@@ -36,14 +36,15 @@ C      READPAR, INIT, CFFF
 C  SOURCE
 C
 
-      PROGRAM EVOLDEP
+      PROGRAM ANATOMYNS
 
       IMPLICIT NONE
       INTEGER PT, NPOINTS, LN, NDEL
       DOUBLE PRECISION LOGXI, LOGXISTART, LOGXIEND, LOGXISTEP
-      PARAMETER ( NPOINTS = 12 )
-      DOUBLE COMPLEX PREDS(6, NPOINTS)
-      DOUBLE PRECISION XIS(NPOINTS), RES, TOT, CLO, Q02, Q2EXP, MP
+      PARAMETER ( NPOINTS = 60 )
+      DOUBLE COMPLEX PREDS(6, NPOINTS), TOT
+      DOUBLE PRECISION XIS(NPOINTS), MODUL, PHASE, Q02, Q2EXP, MP
+      DOUBLE PRECISION DCARG
       PARAMETER ( LOGXISTART = -5.0d0, LOGXIEND = -0.30103d0,
      &       LOGXISTEP = (LOGXIEND - LOGXISTART) / (NPOINTS - 1)  )
       PARAMETER (MP = 0.938272d0 )
@@ -53,10 +54,13 @@ C
 
 *   File that will hold results
 
-      OPEN (UNIT = 11, FILE = "evol.dat", STATUS = "UNKNOWN")
+      OPEN (UNIT = 10, FILE = "anatomyNS0.dat", STATUS = "UNKNOWN")
+      OPEN (UNIT = 11, FILE = "anatomyNS1.dat", STATUS = "UNKNOWN")
+      OPEN (UNIT = 12, FILE = "anatomyNS2.dat", STATUS = "UNKNOWN")
+      OPEN (UNIT = 13, FILE = "anatomyNS3.dat", STATUS = "UNKNOWN")
 
-      DO 5 NDEL = 1, 1
-  5         WRITE (10 + NDEL, *) '# Output of evoldep.f. See prolog of 
+      DO 5 NDEL = 0, 3
+  5         WRITE (10 + NDEL, *) '# Output of anatomyNS.f. See prolog of 
      & that program'
 
       ANSATZ = 'NSFIT'
@@ -120,18 +124,20 @@ C
 
       Q02 = 2.5d0
       Q2EXP = 10.0d0
-      DEL2 =  0.0d0
+      DEL2 =  -0.25d0
 
-*   sea or not?
-      PAR(11) = 0.0d0
-!      PAR(11) = 4.0d0 / 15.0d0
+*     Looping over two different ansaetze
+
+      DO 40 NDEL = 0, 1
+          PAR(11) = 4.0d0 / 15.0d0
+          IF (NDEL .EQ. 0)  PAR(11) = 0.0d0
 
 *   Looping over points (XI's) on each line
 
       LOGXI = LOGXISTART
       DO 20 PT = 1, NPOINTS
-      XI = 10**LOGXI
-      XIS(PT) = XI
+          XI = 10**LOGXI
+          XIS(PT) = XI
 
 *   Looping over five predictions calculated for each XI
 
@@ -158,7 +164,6 @@ C
           SCHEME = 'MSBAR'
       ELSEIF (LN .EQ. 6) THEN
           CZERO = 0
-          SCHEME = 'MSBND'
       ENDIF
 
 *   Doing calculation ...
@@ -176,27 +181,25 @@ C
 
 *     Calculating plot points from results in PREDS and printing to files
 
-      DO 40 LN = 2, 6
+      DO 40 LN = 1, 3
       DO 30 PT = 1, NPOINTS
-        CLO =  ABS(PREDS(2, PT))
-        TOT =  ABS(PREDS(1, PT))
-        IF (LN .EQ. 2) THEN
-          RES = TOT / CLO
-        ELSE IF (LN .EQ. 3) THEN
-          RES = ABS(PREDS(LN,PT)) / CLO
-        ELSE IF (LN .EQ. 4) THEN
-          RES = ABS(PREDS(LN,PT)) / CLO
-        ELSE
-          RES = ABS(PREDS(LN,PT)-PREDS(LN-1,PT)) / CLO
+        TOT = PREDS(1, PT)
+        IF (LN .EQ. 1) THEN
+          MODUL = ABS( PREDS(4,PT) ) / ABS( TOT )
+          PHASE = DCARG( PREDS(4,PT) ) / DCARG( TOT )
+        ELSEIF (LN .EQ. 2) THEN
+          MODUL = ABS( PREDS(5,PT) ) / ABS( TOT )
+          PHASE = DCARG( PREDS(5,PT) )  / DCARG( TOT )
+        ELSEIF (LN .EQ. 3) THEN
+          MODUL = ABS( PREDS(6,PT) - PREDS(5,PT) ) / ABS( TOT )
+          PHASE = DCARG( PREDS(6,PT) - PREDS(5,PT) ) / DCARG( TOT )
         ENDIF
-        WRITE (UNIT=11, FMT=998) XIS(PT), RES
-        IF (LN .EQ. 5) THEN
-          WRITE (17, *) XIS(PT), PREDS(1, PT), PREDS(2,PT), PREDS(3, PT)
-          WRITE (17, *) '   ', PREDS(4, PT), PREDS(5,PT), PREDS(6,PT)
-        ENDIF
+        WRITE (UNIT=10+NDEL, FMT=998) XIS(PT), MODUL
+        WRITE (UNIT=12+NDEL, FMT=998) XIS(PT), PHASE
  30   CONTINUE
 *     Empty line is put between the sets
-      WRITE (UNIT=11, FMT=999)
+      WRITE (UNIT=10+NDEL, FMT=999)
+      WRITE (UNIT=12+NDEL, FMT=999)
  40   CONTINUE
 
 998   FORMAT (F12.7,5X,F22.7)

@@ -1,4 +1,4 @@
-C     ****h* gepard/scalesNS.f
+C     ****h* gepard/scales.f
 C  FILE DESCRIPTION
 C    calculation of dependance on \mu_f and \mu_r of {\cal H} non-singlet
 C    DVCS form factor
@@ -8,15 +8,15 @@ C    $Id$
 C     *******
 
 
-C     ****p* scalesNS.f/SCALESNS
+C     ****p* scales.f/SCALES
 C  NAME
-C     SCALESNS  --  Program producing data for Figure scalesNS
+C     SCALES  --  Program producing data for Figure scales
 C  DESCRIPTION
 C    calculation of dependance on \mu_f and \mu_r of {\cal H} non-singlet
 C    DVCS form factor
 C    Produces data files for Table 1. of  KMPKS06b
 C  OUTPUT
-C       scalesNS.dat  --  percent variations of H_NS
+C       scales.dat  --  percent variations of H_S
 C
 C  IDENTIFIERS
 C
@@ -25,12 +25,12 @@ C      READPAR, INIT, CFFF, DCARG
 C  SOURCE
 C
 
-      PROGRAM SCALESNS
+      PROGRAM SCALES
 
       IMPLICIT NONE
       INTEGER PT, NPOINTS, LN, NDEL
       DOUBLE PRECISION DCARG, MP, FACF, FACR
-      PARAMETER ( NPOINTS = 4 )
+      PARAMETER ( NPOINTS = 5 )
       DOUBLE PRECISION XIS(NPOINTS), POINTS(0:1, 5, NPOINTS)
       DOUBLE COMPLEX CFFD, CFFM, CFFU
 *     Proton mass:
@@ -38,12 +38,13 @@ C
 
       INCLUDE '../header.f'
 
-      DATA XIS / 0.05D0, 0.1D0, 0.25D0, 0.5D0 /
+      DATA XIS / 1.0D-5, 1.0D-3, 0.1D0, 0.25D0, 0.5D0 /
 
       CALL READPAR
     
       NF = 4
-      ANSATZ = 'NSFIT'
+      ANSATZ = 'FIT'
+
 
 *       1  Q02       
         PAR(1) =   4.0d0    
@@ -54,7 +55,7 @@ C
 
 * ------------ ANSATZ  -------------
 * ----  11 NS   --------------------
-!        PAR(11) =  see below
+!        PAR(11) =  0.2d0 
 *       12 AL0S      
         PAR(12) =  1.1d0 
 *       13 ALPS      
@@ -65,7 +66,31 @@ C
         PAR(15) =  MP**2
 *       16 PS        
         PAR(16) =  3.0d0
-* ----  41 ND    (valence) --
+* ----  21 NG   --------------------
+!        PAR(21) =  0.5d0
+*       22 AL0G      
+!        PAR(22) =  1.0d0 
+*       23 ALPG      
+        PAR(23) =  0.15d0
+*       24 M02G      
+        PAR(24) =  (2.0d0 * MP)**2
+*       25 DELM2G    
+        PAR(25) =  MP**2
+*       26 PG        
+        PAR(26) =  2.0d0
+* ----  31 NU   --------------------
+        PAR(31) =  2.0d0 
+*       32 AL0U      
+        PAR(32) =  0.5d0 
+*       33 ALPU      
+        PAR(33) =  1.0d0 
+*       34 M02U      
+        PAR(34) =  (2.0d0 * MP)**2
+*       35 DELM2U    
+        PAR(35) =  MP**2
+*       36 PU        
+        PAR(36) =  1.0d0 
+* ----  41 ND   --------------------
         PAR(41) =  1.0d0 
 *       42 AL0D      
         PAR(42) =  0.5d0 
@@ -79,11 +104,14 @@ C
         PAR(46) =  1.0d0    
 
 
+
+
+
 *     File that will hold results
 
-      OPEN (UNIT = 10, FILE = "scalesNS.dat", STATUS = "UNKNOWN")
+      OPEN (UNIT = 10, FILE = "scales.dat", STATUS = "UNKNOWN")
 
-      WRITE (10, *) '# Output of scalesNS.f. See prolog of that program'
+      WRITE (10, *) '# Output of scales.f. See prolog of that program'
 
 *     Scales 
 
@@ -93,14 +121,16 @@ C
 *     Looping over two different ansaetze
 
       DO 20 NDEL = 0, 1
-
-      IF (NDEL .EQ. 0) THEN
-*     "soft"
-            PAR(11) = 0.0d0
-      ELSE
-*     "hard"
-            PAR(11) = 4.0d0 / 15.0d0
-      END IF
+        IF ( NDEL .EQ.  1 ) THEN
+!         'HARD'
+           PAR(21) = 0.4d0
+           PAR(22) = PAR(12) + 0.05d0
+        ELSE
+!         'SOFT'
+          PAR(21) = 0.3d0
+          PAR(22) = PAR(12) - 0.2d0
+        END IF
+        PAR(11) = (2.0d0/3.0d0) - PAR(21)
 
       DO 10 PT = 1, NPOINTS
         XI = XIS(PT)

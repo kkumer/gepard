@@ -35,7 +35,7 @@ C
       CALL READPAR
       NF = 4
       ANSATZ = 'FIT'
-      CZ = 0
+      CZ = 1
 
 *       1  Q02       
         PAR(1) =   2.5d0    
@@ -103,9 +103,9 @@ C
 
 
       Q02 = 2.5d0
-      Q2EXP = 10.0d0
-      XI = 0.1d0
-      DEL2 = -0.5d0
+      Q2EXP = 4.0d0
+      XI = 0.001d0
+      DEL2 = -0.25d0
       SCHEME = 'MSBAR'
 
       SUBANSATZ = 'HARD'

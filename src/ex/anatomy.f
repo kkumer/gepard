@@ -41,9 +41,10 @@ C
       IMPLICIT NONE
       INTEGER PT, NPOINTS, LN, NDEL
       DOUBLE PRECISION LOGXI, LOGXISTART, LOGXIEND, LOGXISTEP
-      PARAMETER ( NPOINTS = 12 )
-      DOUBLE COMPLEX PREDS(6, NPOINTS)
-      DOUBLE PRECISION XIS(NPOINTS), RES, TOT, CLO, Q02, Q2EXP, MP
+      PARAMETER ( NPOINTS = 40 )
+      DOUBLE COMPLEX PREDS(6, NPOINTS), TOT
+      DOUBLE PRECISION XIS(NPOINTS), MODUL, PHASE, Q02, Q2EXP, MP
+      DOUBLE PRECISION DCARG
       CHARACTER SUBANSATZ*4
       PARAMETER ( LOGXISTART = -5.0d0, LOGXIEND = -0.30103d0,
      &       LOGXISTEP = (LOGXIEND - LOGXISTART) / (NPOINTS - 1)  )
@@ -52,11 +53,12 @@ C
 
       CALL READPAR
 
-*   File that will hold results
+      OPEN (UNIT = 10, FILE = "anatomy0.dat", STATUS = "UNKNOWN")
+      OPEN (UNIT = 11, FILE = "anatomy1.dat", STATUS = "UNKNOWN")
+      OPEN (UNIT = 12, FILE = "anatomy2.dat", STATUS = "UNKNOWN")
+      OPEN (UNIT = 13, FILE = "anatomy3.dat", STATUS = "UNKNOWN")
 
-      OPEN (UNIT = 11, FILE = "anatomy.dat", STATUS = "UNKNOWN")
-
-      DO 5 NDEL = 1, 1
+      DO 5 NDEL = 0, 3
   5         WRITE (10 + NDEL, *) '# Output of anatomy.f. See prolog of 
      & that program'
 
@@ -119,31 +121,26 @@ C
 *       46 PD        
         PAR(46) =  1.0d0    
 
-*       1  Q02       
-!       PAR(1) =   2.5d0    
-*       2  AS0       
-        PAR(2) =   0.05d0
-*       3  MU02      
-        PAR(3) =   2.5d0 
-
 
 
       Q02 = 2.5d0
       Q2EXP = 10.0d0
-      DEL2 =  0.0d0
+      DEL2 =  -0.25d0
 
-      SUBANSATZ = 'HARD'
 
-      IF ( SUBANSATZ .EQ.  'HARD' ) THEN
-!          'HARD'
-            PAR(21) = 0.4d0
-            PAR(22) = PAR(12) + 0.05d0
-      ELSE
-!           'SOFT'
-            PAR(21) = 0.3d0
-            PAR(22) = PAR(12) - 0.2d0
-      END IF
-      PAR(11) = (2.0d0/3.0d0) - PAR(21)
+*     Looping over two different ansaetze
+
+      DO 40 NDEL = 0, 1
+        IF ( NDEL .EQ.  1 ) THEN
+!         'HARD'
+           PAR(21) = 0.4d0
+           PAR(22) = PAR(12) + 0.05d0
+        ELSE
+!         'SOFT'
+          PAR(21) = 0.3d0
+          PAR(22) = PAR(12) - 0.2d0
+        END IF
+        PAR(11) = (2.0d0/3.0d0) - PAR(21)
 
 
 *   Looping over points (XI's) on each line
@@ -196,27 +193,25 @@ C
 
 *     Calculating plot points from results in PREDS and printing to files
 
-      DO 40 LN = 2, 6
+      DO 40 LN = 1, 3
       DO 30 PT = 1, NPOINTS
-        CLO =  ABS(PREDS(2, PT))
-        TOT =  ABS(PREDS(1, PT))
-        IF (LN .EQ. 2) THEN
-          RES = TOT / CLO
-        ELSE IF (LN .EQ. 3) THEN
-          RES = ABS(PREDS(LN,PT)) / CLO
-        ELSE IF (LN .EQ. 4) THEN
-          RES = ABS(PREDS(LN,PT)) / CLO
-        ELSE
-          RES = ABS(PREDS(LN,PT)-PREDS(LN-1,PT)) / CLO
+        TOT = PREDS(1, PT)
+        IF (LN .EQ. 1) THEN
+          MODUL = ABS( PREDS(4,PT) ) / ABS( TOT )
+          PHASE = DCARG( PREDS(4,PT) ) / DCARG( TOT )
+        ELSEIF (LN .EQ. 2) THEN
+          MODUL = ABS( PREDS(5,PT) ) / ABS( TOT )
+          PHASE = DCARG( PREDS(5,PT) )  / DCARG( TOT )
+        ELSEIF (LN .EQ. 3) THEN
+          MODUL = ABS( PREDS(6,PT) - PREDS(5,PT) ) / ABS( TOT )
+          PHASE = DCARG( PREDS(6,PT) - PREDS(5,PT) ) / DCARG( TOT )
         ENDIF
-        WRITE (UNIT=11, FMT=998) XIS(PT), RES
-        IF (LN .EQ. 5) THEN
-          WRITE (17, *) XIS(PT), PREDS(1, PT), PREDS(2,PT), PREDS(3, PT)
-          WRITE (17, *) '   ', PREDS(4, PT), PREDS(5,PT), PREDS(6,PT)
-        ENDIF
+        WRITE (UNIT=10+NDEL, FMT=998) XIS(PT), MODUL
+        WRITE (UNIT=12+NDEL, FMT=998) XIS(PT), PHASE
  30   CONTINUE
 *     Empty line is put between the sets
-      WRITE (UNIT=11, FMT=999)
+      WRITE (UNIT=10+NDEL, FMT=999)
+      WRITE (UNIT=12+NDEL, FMT=999)
  40   CONTINUE
 
 998   FORMAT (F12.7,5X,F22.7)

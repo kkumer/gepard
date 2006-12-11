@@ -112,6 +112,9 @@ aux: $(_FOBJS) $(_ADACFOBJS) $(EXFODIR)/aux.o
 evoldep: $(_FOBJS) $(_ADACFOBJS) $(EXFODIR)/evoldep.o
 	$(FC) -o ../ex/$@ $^ $(FFLAGS)
 
+anatomyNS: $(_FOBJS) $(_ADACFOBJS) $(EXFODIR)/anatomyNS.o
+	$(FC) -o ../ex/$@ $^ $(FFLAGS)
+
 anatomy: $(_FOBJS) $(_ADACFOBJS) $(EXFODIR)/anatomy.o
 	$(FC) -o ../ex/$@ $^ $(FFLAGS)
 
@@ -131,6 +134,12 @@ radNNLO: $(_FOBJS) $(_ADACFOBJS) $(EXFODIR)/radNNLO.o
 	$(FC) -o ../ex/$@ $^ $(FFLAGS)
 
 scalesNS: $(_FOBJS) $(_ADACFOBJS) $(EXFODIR)/scalesNS.o
+	$(FC) -o ../ex/$@ $^ $(FFLAGS)
+
+scales: $(_FOBJS) $(_ADACFOBJS) $(EXFODIR)/scales.o
+	$(FC) -o ../ex/$@ $^ $(FFLAGS)
+
+scalesNNLO: $(_FOBJS) $(_ADACFOBJS) $(EXFODIR)/scalesNNLO.o
 	$(FC) -o ../ex/$@ $^ $(FFLAGS)
 
 .PHONY: clean

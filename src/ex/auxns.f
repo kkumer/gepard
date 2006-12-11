@@ -97,7 +97,7 @@ C
       Q02 = 2.5d0
       Q2EXP = 10.0d0
       XI = 0.001d0
-      DEL2 = -0.5d0
+      DEL2 = -0.25d0
       SCHEME = 'MSBAR'
 *   sea or not?
       PAR(11) = 0.0d0
