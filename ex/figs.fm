@@ -22,7 +22,9 @@
 \psfrag{xi1a}{\scriptsize $\xi = 5\cdot 10^{-1}\:\; (+ 0.45)$}
 \psfrag{Q21}{\scriptsize$\mathcal{Q}^2 = 1 \,\mbox{GeV}^2$}
 \psfrag{Q225}{\scriptsize$\mathcal{Q}^2 = 2.5 \,\mbox{GeV}^2$}
+\psfrag{Q25}{\scriptsize$\mathcal{Q}^2 = 5 \,\mbox{GeV}^2$}
 \psfrag{Q210}{\scriptsize$\mathcal{Q}^2 = 10 \,\mbox{GeV}^2$}
+\psfrag{Q2205}{\scriptsize$\mathcal{Q}^2 = 25 \,\mbox{GeV}^2$}
 \psfrag{Q2100}{\scriptsize$\mathcal{Q}^2 = 100 \,\mbox{GeV}^2$}
 \psfrag{DELWcoe}{\scriptsize$\Delta^{\rm (Wcoe)}$}
 \psfrag{DELevoD}{\scriptsize$\Delta^{\rm (evoD)}$}

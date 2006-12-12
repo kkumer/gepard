@@ -34,77 +34,15 @@ C
 
       CALL READPAR
       NF = 4
-      ANSATZ = 'FIT'
       CZ = 1
 
-*       1  Q02       
-        PAR(1) =   2.5d0    
-*       2  AS0       
-        PAR(2) =   0.05d0
-*       3  MU02      
-        PAR(3) =   2.5d0 
-
-* ------------ ANSATZ  -------------
-* ----  11 NS   --------------------
-!        PAR(11) =  0.2d0 
-*       12 AL0S      
-        PAR(12) =  1.1d0 
-*       13 ALPS      
-        PAR(13) =  0.15d0
-*       14 M02S      
-        PAR(14) =  (2.0d0 * MP)**2
-*       15 DELM2S    
-        PAR(15) =  MP**2
-*       16 PS        
-        PAR(16) =  3.0d0
-* ----  21 NG   --------------------
-!        PAR(21) =  0.5d0
-*       22 AL0G      
-!        PAR(22) =  1.0d0 
-*       23 ALPG      
-        PAR(23) =  0.15d0
-*       24 M02G      
-        PAR(24) =  (2.0d0 * MP)**2
-*       25 DELM2G    
-        PAR(25) =  MP**2
-*       26 PG        
-        PAR(26) =  2.0d0
-* ----  31 NU   --------------------
-        PAR(31) =  2.0d0 
-*       32 AL0U      
-        PAR(32) =  0.5d0 
-*       33 ALPU      
-        PAR(33) =  1.0d0 
-*       34 M02U      
-        PAR(34) =  (2.0d0 * MP)**2
-*       35 DELM2U    
-        PAR(35) =  MP**2
-*       36 PU        
-        PAR(36) =  1.0d0 
-* ----  41 ND   --------------------
-        PAR(41) =  1.0d0 
-*       42 AL0D      
-        PAR(42) =  0.5d0 
-*       43 ALPD      
-        PAR(43) =  1.0d0 
-*       44 M02D      
-        PAR(44) =  (2.0d0 * MP)**2
-*       45 DELM2D    
-        PAR(45) =  MP**2
-*       46 PD        
-        PAR(46) =  1.0d0    
-
-*       1  Q02       
-!       PAR(1) =   2.5d0    
-*       2  AS0       
-        PAR(2) =   0.05d0
-*       3  MU02      
-        PAR(3) =   2.5d0 
+      ANSATZ = 'FIT'
+      INCLUDE 'ansatz.f'
 
 
       Q02 = 2.5d0
-      Q2EXP = 4.0d0
-      XI = 0.001d0
+      Q2EXP = 25.0d0
+      XI = 0.1d0
       DEL2 = -0.25d0
       SCHEME = 'MSBAR'
 
@@ -122,60 +60,62 @@ C
       PAR(11) = (2.0d0/3.0d0) - PAR(21)
 
 
-      WRITE (*,901) ANSATZ, DEL2, XI
-      WRITE (*,903) Q02, Q2EXP
+!     WRITE (*,901) ANSATZ, DEL2, XI
+!     WRITE (*,903) Q02, Q2EXP
 
 !      DO 10 CND = -0.9, 1.3, 0.2
 
-      WRITE (*,904) CND
+!     WRITE (*,904) CND
 
-      Q2 = Q2EXP
-      PAR(1) = Q2EXP
+      Q2 = Q02
+      PAR(1) = Q02
       P = 0
       CALL INIT
       CALL CFFF 
-      WRITE (*,902) "LO (no evol)", CFF(0)
+!     WRITE (*,902) "LO (no evol)", CFF(0)
 
-      PAR(1) = Q02
+      Q2 = Q2EXP
       CALL INIT
       CALL CFFF 
-      WRITE (*,902) "LO (LO evol)", CFF(0)
+!     WRITE (*,902) "LO (LO evol)", CFF(0)
 
       P = 1
       CZERO = CZ
-      PAR(1) = Q2EXP
+      Q2 = Q02
       CALL INIT
       CALL CFFF 
-      WRITE (*,902) "MS NLO (no evol)", CFF(1)
+!     WRITE (*,902) "MS NLO (no evol)", CFF(1)
 
       SCHEME = 'MSBLO'
-      PAR(1) = Q02
+      Q2 = Q2EXP
       CALL INIT
       CALL CFFF 
-      WRITE (*,902) "MS NLO (LO evol)", CFF(1)
+!     WRITE (*,902) "MS NLO (LO evol)", CFF(1)
       TMP = CFF(1)
 
       SCHEME = 'MSBAR'
       CALL INIT
       CALL CFFF 
       WRITE (*,902) "MS NLO (evol D)", CFF(1) - TMP
+!     WRITE (*,902) "MS NLO (evol D)", CFF(1)
       TMP = CFF(1)
 
       SCHEME = 'MSBND'
       CALL INIT
       CALL CFFF 
       WRITE (*,902) "MS NLO (evol ND)", CFF(1) - TMP
+!     WRITE (*,902) "MS NLO (evol ND)", CFF(1)
 
-      SCHEME = 'CSBAR'
-      PAR(1) = Q2EXP
-      CALL INIT
-      CALL CFFF 
-      WRITE (*,902) "CS NLO (no evol)", CFF(1)
-
-      PAR(1) = Q02
-      CALL INIT
-      CALL CFFF 
-      WRITE (*,902) "CS NLO (evol)", CFF(1)
+!      SCHEME = 'CSBAR'
+!      Q2 = Q02
+!      CALL INIT
+!      CALL CFFF 
+!      WRITE (*,902) "CS NLO (no evol)", CFF(1)
+!
+!      Q2 = Q2EXP
+!      CALL INIT
+!      CALL CFFF 
+!      WRITE (*,902) "CS NLO (evol)", CFF(1)
 
  10   CONTINUE
 
