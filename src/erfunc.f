@@ -5,50 +5,6 @@ C
 C    $Id$
 C     *******
 
-C     ****s* erfunc.f/ERFUNCNSF
-C  NAME
-C     ERFUNCNSF  --   scale dependent part of the non-singlet evolution operator
-C  DESCRIPTION
-C    calculates scale dependent part of the non-singlet evolution operator
-C    i.e.  {\cal R}^{(n)} - functions
-C    For convenience, also \gamma_{NS}^{(0)}
-C    divided by beta_0 is returned.
-C  SYNOPSIS
-C     SUBROUTINE ERFUNCF (K, R, GAMB, ERFUNCNS1)
-C
-C     INTEGER K
-C     DOUBLE PRECISION R
-C     DOUBLE COMPLEX GAMB, ERFUNCNS1
-C  INPUTS
-C           K -- Mellin-Barnes integration point index
-C           R -- ratio of astrong(mu)/astrong(mu0)
-C  OUTPUT
-C        GAMB -- \gamma/\beta_0
-C     ERFUNCNS1 --  {\mathcal R}(mu, mu0 | 1}
-C  PARENTS
-C      EVOLNSF
-C  SOURCE
-C
-
-      SUBROUTINE ERFUNCNSF (K, R, GAMB, ERFUNCNS1)
-
-      IMPLICIT NONE
-      INTEGER K
-      DOUBLE PRECISION R
-      DOUBLE COMPLEX GAMB, ERFUNCNS1
-      DOUBLE PRECISION RINV
-      INCLUDE 'header.f'
-
-      RINV = 1.0d0 / R
-
-      GAMB = NGAMNS(K,0) / BETA0(NF)
-
-      ERFUNCNS1 = ( 1.0d0 - RINV )
-
-      RETURN
-      END
-C     *****
-
 C     ****s* erfunc.f/ERFUNCF
 C  NAME
 C     ERFUNCF  --   scale dependent part of the singlet evolution operator

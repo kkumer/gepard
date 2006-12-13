@@ -70,6 +70,7 @@ C
       PAR(1) = 2.0D0
       PAR(3) = 2.5D0
       ANSATZ = 'HOUCHE'
+      PROCESS = 'SIDIS'
 
 *   Following artifical renorm. scheme has C = (0, 1) at
 *   all orders, thus effectively putting F_2 -> Q_s^2 x g(x)
@@ -96,7 +97,7 @@ C
         EPH = EXP ( COMPLEX(0.0d0, PHI) )
         DO 30 K = 1, NPTS
           J = N(K) - 1
-          CALL PARWAVF (K, FPW, 'DIS')
+          CALL PARWAVF (K, FPW)
           F2IMAG = IMAGPART(EPH * (1.0d0/XI)**(J-C) * FPW )
           RES = RES + WG(K)*F2IMAG
  30     CONTINUE
@@ -118,7 +119,7 @@ C
         EPH = EXP ( COMPLEX(0.0d0, PHI) )
         DO 40 K = 1, NPTS
           J = N(K) - 1
-          CALL PARWAVF (K, FPW, 'DIS')
+          CALL PARWAVF (K, FPW)
           F2IMAG = IMAGPART(EPH * (1.0d0/XI)**(J-C) * FPW )
           RES = RES + WG(K)*F2IMAG
  40     CONTINUE

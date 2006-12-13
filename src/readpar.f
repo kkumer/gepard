@@ -38,6 +38,7 @@ C
       READ (61, *) PHIND
       READ (61, *) SCHEME
       READ (61, *) ANSATZ
+      READ (61, *) PROCESS
       CLOSE (61)
 
       RETURN

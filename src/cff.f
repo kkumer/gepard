@@ -78,7 +78,7 @@ C
 
       J = N(K) - 1
 
-      CALL PARWAVF(K, FPW, 'DVCS')
+      CALL PARWAVF(K, FPW)
 
       PIHALF = (1.5707963267948966d0, 0.0d0)
       FREAL = IMAGPART(EPH * (2.0d0/XI)**(J-C) * DCTAN(PIHALF*J) * FPW)

@@ -46,10 +46,10 @@ C
 
 *     P(+)
 
-      PR(1,1,1) = DEN * (NGAM(K,0,1,1) - LAM(2)) 
-      PR(1,1,2) = DEN *  NGAM(K,0,1,2)
-      PR(1,2,1) = DEN *  NGAM(K,0,2,1)
-      PR(1,2,2) = DEN * (NGAM(K,0,2,2) - LAM(2)) 
+      PR(1,1,1) = DEN * (GAM(K,0,1,1) - LAM(2)) 
+      PR(1,1,2) = DEN *  GAM(K,0,1,2)
+      PR(1,2,1) = DEN *  GAM(K,0,2,1)
+      PR(1,2,2) = DEN * (GAM(K,0,2,2) - LAM(2)) 
 
 *     Using P(-) = 1 - P(+) 
 

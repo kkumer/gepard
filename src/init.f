@@ -7,7 +7,7 @@ C     *******
 
 C     ****s* init.f/INIT
 C  NAME
-C        INIT  --  initialization
+C        INIT  --  initialization (singlet)
 C  DESCRIPTION
 C     Puts values of abscissas and weights of Mellin-Barnes
 C     integration contour on common blocks, as well as
@@ -44,6 +44,7 @@ C
 * 
       IMPLICIT NONE
       INTEGER ACCMAX, NGAUSSMAX, NGAUSS, NINTG, K, K1, K2, K3
+      INTEGER L, ORD
       DOUBLE PRECISION NFD, SUMM, DIFF, YI
       DOUBLE COMPLEX J, Z, EPH
       DOUBLE COMPLEX HS1, HS2, HS3, HS4
@@ -81,8 +82,6 @@ C
 !        DOWN (NINTG + 1) = 1.3d0
 !      END IF
 
-*    NB: adacf routines want double precision NF
-      NFD = DBLE(NF)
 
 *   Mellin-Barnes contour points are C + YI * EPH
       EPH = EXP ( COMPLEX(0.D0, PHI) )
@@ -123,7 +122,10 @@ C
       Z = N(K)
       J = N(K) - 1
 
-*   2. Auxilliary stuff not needed outside of this subroutine
+*   2. ADACF initialization
+
+*    NB: adacf routines want double precision NF
+      NFD = DBLE(NF)
 
 *   2.a Harmonic sums
 
@@ -136,102 +138,121 @@ C
         END IF
       END IF
 
+
+      IF ( PROCESS(:2) .EQ. 'SI' ) THEN
+
+*****************  SINGLET  *****************
+              
 *   2.b Anomalous dimensions matrices: LO, NLO, and NNLO
 
-      CALL WgammaVQQ0F(NFD, Z, GAM0(1,1))
-      CALL WgammaVQG0F(NFD, Z, GAM0(1,2))
-      CALL WgammaVGQ0F(NFD, Z, GAM0(2,1))
-      CALL WgammaVGG0F(NFD, Z, GAM0(2,2))
+      CALL WgammaVQQ0F(NFD, Z, GAM(K, 0, 1, 1))
+      CALL WgammaVQG0F(NFD, Z, GAM(K, 0, 1, 2))
+      CALL WgammaVGQ0F(NFD, Z, GAM(K, 0, 2, 1))
+      CALL WgammaVGG0F(NFD, Z, GAM(K, 0, 2, 2))
 
       IF (P .GE. 1) THEN
-        CALL WgammaVQQ1F(NFD, Z, GAM1(1,1))
-        CALL WgammaVQG1F(NFD, Z, GAM1(1,2))
-        CALL WgammaVGQ1F(NFD, Z, GAM1(2,1))
-        CALL WgammaVGG1F(NFD, Z, GAM1(2,2))
+        CALL WgammaVQQ1F(NFD, Z, GAM(K, 1, 1, 1))
+        CALL WgammaVQG1F(NFD, Z, GAM(K, 1, 1, 2))
+        CALL WgammaVGQ1F(NFD, Z, GAM(K, 1, 2, 1))
+        CALL WgammaVGG1F(NFD, Z, GAM(K, 1, 2, 2))
 
         IF (P .GE. 2) THEN
-          CALL WgammaVQQ2F(NFD, Z, GAM2(1,1))
-          CALL WgammaVQG2F(NFD, Z, GAM2(1,2))
-          CALL WgammaVGQ2F(NFD, Z, GAM2(2,1))
-          CALL WgammaVGG2F(NFD, Z, GAM2(2,2))
+          CALL WgammaVQQ2F(NFD, Z, GAM(K, 2, 1, 1))
+          CALL WgammaVQG2F(NFD, Z, GAM(K, 2, 1, 2))
+          CALL WgammaVGQ2F(NFD, Z, GAM(K, 2, 2, 1))
+          CALL WgammaVGG2F(NFD, Z, GAM(K, 2, 2, 2))
         END IF
       END IF
 
-      IF ( ANSATZ(:2) .EQ. 'NS' ) THEN
-        CALL WgammaVNSP0F(NFD, Z, GAMNS0)
-        CALL WgammaVNSP1F(NFD, Z, GAMNS1)
-!        CALL WgammaVNS2PF(NFD, Z, GAMNS2)
-      END IF
 
+*   2.c DIS Wilson coefficients ("small" c)
 
-*   2.c DIS Wilson coefficients
-
-      C0(1) = (1.0d0, 0.0d0)
-      C0(2) = (0.0d0, 0.0d0)
+      CDIS1(K, 0, 1) = (1.0d0, 0.0d0)
+      CDIS1(K, 0, 2) = (0.0d0, 0.0d0)
+      CDIS2(K, 0, 1) = (1.0d0, 0.0d0)
+      CDIS2(K, 0, 2) = (0.0d0, 0.0d0)
 
       IF (P .GE. 1) THEN
         CALL WcVF2Q1F(NFD, Z, CF2)
         CALL WcVFLQ1F(NFD, Z, CFL)
-        C1(1) = CF2 -  CFL
-        C1F2(1) = CF2
+        CDIS1(K, 1, 1) = CF2 -  CFL
+        CDIS2(K, 1, 1) = CF2
         CALL WcVF2G1F(NFD, Z, CF2)
         CALL WcVFLG1F(NFD, Z, CFL)
-        C1(2) = CF2 -  CFL
-        C1F2(2) = CF2
+        CDIS1(K, 1, 2) = CF2 -  CFL
+        CDIS2(K, 1, 2) = CF2
 
         IF (P .GE. 2) THEN
           CALL WcVF2Q2F(NFD, Z, CF2)
           CALL WcVFLQ2F(NFD, Z, CFL)
-          C2(1) = CF2 -  CFL
+          CDIS1(K, 2, 1) = CF2 -  CFL
           CALL WcVF2G2F(NFD, Z, CF2)
           CALL WcVFLG2F(NFD, Z, CFL)
-          C2(2) = CF2 -  CFL
+          CDIS1(K, 2, 2) = CF2 -  CFL
         END IF
       END IF
 
-*   3. Stuff used also outside
-
-*   3.a Anomalous dimensions
-      DO 30 K1 = 1,2
-      DO 30 K2 = 1,2
-        NGAM(K, 0, K1, K2) = GAM0(K1, K2)
-        NGAM(K, 1, K1, K2) = GAM1(K1, K2)
- 30     NGAM(K, 2, K1, K2) = GAM2(K1, K2)
-
-      IF ( ANSATZ(:2) .EQ. 'NS' ) THEN
-        NGAMNS(K, 0) = GAMNS0
-        NGAMNS(K, 1) = GAMNS1
-!        NGAMNS(K, 2) = GAMNS2
-      END IF
-
-*   3.b "Big C" Wilson coefficients of DVCS [multiplied by
-*           PREFACT = Gamma(5/2+J) / Gamma(3+J)]
+*   3. "Big C' Wilson coefficients
 
       IF (SCHEME .EQ. 'CSBAR') THEN
-          CALL CDVCSF (J, BIGC0, BIGC1, BIGC2, 'DVCS')
+          CALL CDVCSF(K)
       ELSE IF (SCHEME(:3) .EQ. 'MSB') THEN
-          CALL MSBARF (J, BIGC0, BIGC1)
+          CALL MSBARF(K)
       END IF
 
-      PREFACT = EXP(CLNGAMMA(2.5d0 + J) - CLNGAMMA(3.0d0 + J))
+*     "Big C" Wilson coefficients of DVCS have to be multiplied by
+*     Gamma(5/2+J) / Gamma(3+J)
 
-      DO 40 K1 = 1,2
-        BIGC(K, 0, K1) = BIGC0(K1) * PREFACT
-        BIGC(K, 1, K1) = BIGC1(K1) * PREFACT
-        BIGC(K, 2, K1) = BIGC2(K1) * PREFACT
- 40   CONTINUE
+      IF ( PROCESS(3:) .EQ. 'DVCS' ) THEN
+        DO 30 L = 1,2
+        DO 30 ORD = 0, P
+          BIGC(K, ORD, L) = BIGC(K, ORD, L) * 
+     &             EXP(CLNGAMMA(2.5d0 + J) - CLNGAMMA(3.0d0 + J))
+ 30     CONTINUE
+      END IF
 
-*   3.c "Big C" Wilson coefficients of DIS 
+      ELSE
+*****************  NON - SINGLET  *****************
 
-*     First put C_1->C_2 on WC block
-      DO 50 K1 = 1,2
- 50     C1(K1) = C1F2(K1)
-      
-      CALL CDVCSF (J, BIGC0, BIGC1, BIGC2, 'DIS')
+*   2.bNS Anomalous dimensions matrices: LO, NLO, and NNLO
 
-      DO 60 K1 = 1,2
-        BIGCF2(K, 0, K1) = BIGC0(K1)
- 60     BIGCF2(K, 1, K1) = BIGC1(K1)
+      CALL WgammaVNSP0F(NFD, Z, GAMNS(K, 0))
+      IF (P .GE. 1) THEN
+        CALL WgammaVNSP1F(NFD, Z, GAMNS(K, 1))
+        IF (P .GE. 2) THEN
+          CALL WgammaVNSP2F(NFD, Z, GAMNS(K, 2))
+        END IF
+      END IF
+
+*   2.cNS DIS Wilson coefficients ("small" c)
+
+      CDISNS1(K, 0) = (1.0d0, 0.0d0)
+      IF (P .GE. 1) THEN
+        CALL WcVF2NSP1F(NFD, Z, CF2)
+        CALL WcVFLNSP1F(NFD, Z, CFL)
+        CDISNS1(K, 1) = CF2 -  CFL
+        IF (P .GE. 2) THEN
+          CALL WcVF2NSP2F(NFD, Z, CF2)
+          CALL WcVFLNSP2F(NFD, Z, CFL)
+          CDISNS1(K, 2) = CF2 -  CFL
+        END IF
+      END IF
+
+*   3.NS "Big C' Wilson coefficients
+
+      CALL BIGCNSF(K)
+
+*     "Big C" Wilson coefficients of DVCS have to be multiplied by
+*     Gamma(5/2+J) / Gamma(3+J)
+
+      IF ( PROCESS(3:) .EQ. 'DVCS' ) THEN
+        DO 40 ORD = 0, P
+          BIGCNS(K, ORD) = BIGCNS(K, ORD) * 
+     &             EXP(CLNGAMMA(2.5d0 + J) - CLNGAMMA(3.0d0 + J))
+ 40     CONTINUE
+      END IF
+
+      END IF
 
 100   CONTINUE
 

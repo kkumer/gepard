@@ -1,5 +1,5 @@
 C     ****h* gepard/rnnlo.f
-C  FILE DESCRIPTION
+C  FILE DESCRIPTION  - THIS FILE IS NOT USED
 C     Calculation of matrices R_1 and R_2, from my DIS-p61 
 C     - combination of gamma^(n) and beta_m needed in evolution operator 
 C     - projected on +/- directions
@@ -30,11 +30,11 @@ C      EVOLNSF
 C  SOURCE
 C
 
-      SUBROUTINE RNNLONSF (K, R1)
+      SUBROUTINE RNNLONSF (K, R1, R2)
 
       IMPLICIT NONE
       INTEGER K
-      DOUBLE COMPLEX R1
+      DOUBLE COMPLEX R1, R2
       INTEGER K1, L
       DOUBLE PRECISION INV
       INCLUDE 'header.f'
@@ -43,8 +43,16 @@ C
 *     Inverse beta_0 is often needed below
       INV = 1.0d0 / BETA0(NF)
 
-      R1 = INV * (NGAMNS(K,1) 
-     &            - 0.5d0 * INV * BETA1(NF) * NGAMNS(K,0))
+      R1 = INV * (GAMNS(K,1) 
+     &            - 0.5d0 * INV * BETA1(NF) * GAMNS(K,0))
+
+      IF (P. GE. 2) THEN
+
+        R2 = INV * ( GAMNS(K, 2) - 0.5d0 * INV * BETA1(NF) * 
+     &     GAMNS(K, 1) - 0.25d0 * INV * BETA2(NF) * GAMNS(K, 0) +
+     &     0.25d0 * INV**2 * BETA1(NF)**2 * GAMNS(K, 0) )
+
+      END IF
 
       RETURN
       END
@@ -101,13 +109,13 @@ C
 
       DO 10 K1 = 1,2
       DO 10 L = 1,2
-      R1(K1,L) = INV * (NGAM(K,1,K1,L) 
-     &            - 0.5d0 * INV * BETA1(NF) * NGAM(K,0,K1,L))
+      R1(K1,L) = INV * (GAM(K,1,K1,L) 
+     &            - 0.5d0 * INV * BETA1(NF) * GAM(K,0,K1,L))
       IF (P. GE. 2) THEN
-      R2(K1,L) = INV * (NGAM(K,2,K1,L) 
-     &            - 0.5d0 * INV * BETA1(NF) * NGAM(K,1,K1,L) 
+        R2(K1,L) = INV * (GAM(K,2,K1,L) 
+     &            - 0.5d0 * INV * BETA1(NF) * GAM(K,1,K1,L) 
      &            - 0.25d0 * INV * (BETA2(NF) 
-     &            - INV * BETA1(NF)**2) * NGAM(K,0,K1,L))
+     &            - INV * BETA1(NF)**2) * GAM(K,0,K1,L))
       END IF
  10   CONTINUE
 

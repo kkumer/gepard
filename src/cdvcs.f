@@ -37,23 +37,40 @@ C      VECMAT, HS1, HS2
 C  SOURCE
 C
 
-      SUBROUTINE CDVCSF (J, BIGC0, BIGC1, BIGC2, PROCESS)
+      SUBROUTINE CDVCSF ( K )
 
       IMPLICIT NONE
-      DOUBLE COMPLEX J, BIGC0(2), BIGC1(2), BIGC2(2)
-      CHARACTER PROCESS*4
       INTEGER K
+      INTEGER L
       DOUBLE PRECISION LRF2, LRR2
-      DOUBLE COMPLEX HS1, HS2
+      DOUBLE COMPLEX J, HS1, HS2
       DOUBLE COMPLEX SHIFT1, SHIFT2
+      DOUBLE COMPLEX C0(2), C1(2), C2(2)
       DOUBLE COMPLEX VM00(2), VM01(2), VM10(2), VM000(2)
       INCLUDE 'header.f'
 
+      J = N(K) - 1
 
       LRF2 = LOG(RF2)
       LRR2 = LOG(RR2)
 
-      IF ( PROCESS .EQ. 'DVCS') THEN
+      IF (SCHEME .EQ. 'EVOLQ') THEN
+        BIGC(K, 0, 1) = (1.0d0,0.0d0)
+        BIGC(K, 0, 2) = (0.0d0,0.0d0)
+        DO 10 L = 1, 2
+        BIGC(K, 1, L) = (0.0d0, 0.0d0)
+ 10     BIGC(K, 2, L) = (0.0d0, 0.0d0)
+        RETURN
+      ELSE IF (SCHEME .EQ. 'EVOLG') THEN
+        BIGC(K, 0, 1) = (0.0d0,0.0d0)
+        BIGC(K, 0, 2) = (1.0d0,0.0d0)
+        DO 20 L = 1, 2
+        BIGC(K, 1, L) = (0.0d0, 0.0d0)
+ 20     BIGC(K, 2, L) = (0.0d0, 0.0d0)
+        RETURN
+      END IF
+
+      IF ( PROCESS(3:) .EQ. 'DVCS' ) THEN
         SHIFT1 = HS1(J + 1.5d0) - HS1(J + 2.0d0) + 2.0d0 * LOG(2.0d0)
      &        - LRF2
         SHIFT2 = SHIFT1*SHIFT1 - HS2(J + 1.5d0) + HS2(J + 2.0d0)
@@ -62,40 +79,40 @@ C
         SHIFT2 = SHIFT1*SHIFT1
       END IF
 
-      CALL VECMAT(C0, GAM0, VM00)
+*     auxilliary W-coeffs "small C" at given point K
+      IF ( PROCESS(3:) .EQ. 'DVCS' ) THEN
+        DO 30 L = 1, 2
+          C0(L) = CDIS1(K, 0, L) 
+          C1(L) = CDIS1(K, 1, L) 
+          C2(L) = CDIS1(K, 2, L) 
+ 30     CONTINUE
+      ELSE
+        DO 40 L = 1, 2
+          C0(L) = CDIS2(K, 0, L) 
+          C1(L) = CDIS2(K, 1, L) 
+          C2(L) = CDIS2(K, 2, L) 
+ 40     CONTINUE
+      END IF
+
+      CALL VECMAT(C0, 0, K, VM00)
       IF (P .GE. 2) THEN
-      CALL VECMAT(C0, GAM1, VM01)
-      CALL VECMAT(C1, GAM0, VM10)
-      CALL VECMAT(VM00, GAM0, VM000)
+      CALL VECMAT(C0, 1, K, VM01)
+      CALL VECMAT(C1, 0, K, VM10)
+      CALL VECMAT(VM00, 0, K, VM000)
       END IF
 
-      IF (SCHEME .EQ. 'EVOLQ') THEN
-        BIGC0(1) = (1.0d0,0.0d0)
-        BIGC0(2) = (0.0d0,0.0d0)
-        DO 8 K = 1, 2
-        BIGC1(K) = (0.0d0, 0.0d0)
-  8     BIGC2(K) = (0.0d0, 0.0d0)
-        RETURN
-      ELSE IF (SCHEME .EQ. 'EVOLG') THEN
-        BIGC0(1) = (0.0d0,0.0d0)
-        BIGC0(2) = (1.0d0,0.0d0)
-        DO 9 K = 1, 2
-        BIGC1(K) = (0.0d0, 0.0d0)
-  9     BIGC2(K) = (0.0d0, 0.0d0)
-        RETURN
-      END IF
 
-      BIGC0(1) = (1.0d0,0.0d0)
-      BIGC0(2) = (0.0d0,0.0d0)
+      BIGC(K, 0, 1) = (1.0d0,0.0d0)
+      BIGC(K, 0, 2) = (0.0d0,0.0d0)
 
-      DO 10 K = 1, 2
-      BIGC1(K) = C1(K) + 0.5d0 * SHIFT1 * VM00(K)
+      DO 50 L = 1, 2
+      BIGC(K, 1, L) = C1(L) + 0.5d0 * SHIFT1 * VM00(L)
       IF (P .GE. 2) THEN
-      BIGC2(K) = C2(K) + 0.5d0 * SHIFT1 * (VM01(K) + VM10(K)) +
-     &      0.125d0 * SHIFT2 * VM000(K) + 0.5d0 * BETA0(NF) * (
-     &      BIGC1(K) * LRR2 + 0.25d0 * VM00(K) * LRF2**2 )
+      BIGC(K, 2, L) = C2(L) + 0.5d0 * SHIFT1 * (VM01(L) + VM10(L)) +
+     &      0.125d0 * SHIFT2 * VM000(L) + 0.5d0 * BETA0(NF) * (
+     &      BIGC(K, 1, L) * LRR2 + 0.25d0 * VM00(L) * LRF2**2 )
       END IF
- 10   CONTINUE
+ 50   CONTINUE
 
 
       RETURN
@@ -105,28 +122,29 @@ C     *******
 
 C     ****s* cdvcs.f/VECMAT
 C  NAME
-C     VECMAT  --   multiplies row vector with matrix
+C     VECMAT  --   multiplies row vector with anomalous matrix
 C  SYNOPSIS
-C     SUBROUTINE VECMAT (VEC, MAT, VM)
+C     SUBROUTINE VECMAT (VEC, ORD, VM)
 C
-C     DOUBLE COMPLEX MAT(2,2), VEC(2), VM(2)
+C     DOUBLE COMPLEX VEC(2), VM(2)
 C  INPUTS
 C         VEC -- row vector
-C         MAT -- 2x2 matrix
 C  OUTPUT
-C          VM -- resulting vector VM = VEC . MAT
+C          VM -- resulting vector VM = VEC . GAMMA^(ORD)_J(K)
 C  PARENTS
 C     CDVCSF
 C  SOURCE
 C
 
-      SUBROUTINE VECMAT (VEC, MAT, VM)
+      SUBROUTINE VECMAT (VEC, ORD, K, VM)
 
       IMPLICIT NONE
-      DOUBLE COMPLEX MAT(2,2), VEC(2), VM(2)
+      INTEGER K, ORD
+      DOUBLE COMPLEX VEC(2), VM(2)
+      INCLUDE 'header.f'
 
-      VM(1) = VEC(1) * MAT(1,1) + VEC(2) * MAT(2,1)
-      VM(2) = VEC(1) * MAT(1,2) + VEC(2) * MAT(2,2)
+      VM(1) = VEC(1) * GAM(K,ORD,1,1) + VEC(2) * GAM(K,ORD,2,1)
+      VM(2) = VEC(1) * GAM(K,ORD,1,2) + VEC(2) * GAM(K,ORD,2,2)
 
       RETURN
       END

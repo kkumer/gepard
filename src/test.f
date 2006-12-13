@@ -44,9 +44,10 @@ C
       PAR(2) = 0.05d0
       PAR(3) = 2.5d0
 
-      CALL INIT
 
       P = 0
+      PROCESS = 'SIDIS'
+      CALL INIT
       WRITE (*, *) "For values of test parameters see src/test.f"
       WRITE (*, *) 
 
@@ -57,10 +58,15 @@ C
       CALL F2F
       WRITE (*, *) F2(0)
 
+      P = 1
+      PROCESS = 'SIDVCS'
+      CALL INIT
+
       WRITE (*, *) " ---  Test 2: LO partial sigma, no evolution ---- "
       W2 = 82.0d0**2
       Q2 = 1.0d0
       XI = Q2 / ( 2.0d0 * W2 + Q2)
+      P = 0
       WRITE (*, *) " 5608.4194288225 is result from gepard_devel.nb"
       AUX = PARSIGMA(0.d0)
       WRITE (*, *) AUX

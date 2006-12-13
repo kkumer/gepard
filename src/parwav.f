@@ -22,7 +22,6 @@ C     DOUBLE COMPLEX FPW
 C     CHARACTER PROCESS*4
 C  INPUTS
 C           K -- Mellin-Barnes integration point index
-C     PROCESS -- 'DVCS' or 'DIS'
 C  OUTPUT
 C         FPW -- partial wave
 C  PARENTS
@@ -32,17 +31,16 @@ C      AS2PF, EVOLF, HJ
 C  SOURCE
 C
 
-      SUBROUTINE PARWAVF (K, FPW, PROCESS)
+      SUBROUTINE PARWAVF (K, FPW)
 
       IMPLICIT NONE
       INTEGER K
       DOUBLE COMPLEX FPW
-      CHARACTER PROCESS*4
       INTEGER ORD, L, K1
       DOUBLE PRECISION R, ASQ02, ASMUR2, ASMUF2
       DOUBLE COMPLEX CEVNS, CNDNS, CEV(2)
       DOUBLE COMPLEX EVOLNSA(0:2)
-      DOUBLE COMPLEX J, BIGCL(0:2,2), EVOLA(0:2,2,2), FCM(2)
+      DOUBLE COMPLEX J, EVOLA(0:2,2,2), FCM(2)
       INCLUDE 'header.f'
 
       J = N(K) - 1
@@ -58,45 +56,32 @@ C
 
       CALL HJ(J, FCM)
 
-*       "Big C^(0,1,...,P)" Wilson coefficients depending on process type:
-*       (They also depend on scheme, but this is taken care of by INIT.)
-
-      DO 10 ORD = 0, P
-      DO 10 L = 1, 2
-        IF ( PROCESS .EQ. 'DVCS' ) THEN
-          BIGCL(ORD, L) = BIGC(K, ORD, L)
-        ELSE IF ( PROCESS(:3) .EQ. 'DIS' ) THEN
-          BIGCL(ORD, L) = BIGCF2(K, ORD, L)
-        ELSE 
-          CALL ERROR ('GeParD', 'PARWAVF',
-     &    'Process ' // PROCESS // ' is unknown! (Need DVCS or DIS)   ',
-     &    6, 3)
-        END IF
- 10   CONTINUE
-
 
 *        Evolution operators and partial wave depending on whether we do
-*        non-singlet or singlet case. This is specified by using non-singlet
-*        ansaetz name that starts 'NS...'.
+*        non-singlet or singlet case. This is specified by using
+*        process name that starts 'NS...'.
 
-      IF ( ANSATZ(:2) .EQ. 'NS' ) THEN
-*     non-singlet case implemented only to NLO using equality with singlet-QQ
-
-        IF ( P .GE. 2 ) THEN
-            CALL ERROR ('GeParD', 'PARWAVF',
-     &      'P>1, which is not implemented in the non-singlet case! ',
-     &      7, 2)
-        END IF
+      IF ( PROCESS(:2) .EQ. 'NS' ) THEN
 
         CALL EVOLNSF (K, R, EVOLNSA)
 
 *       CZERO puts astrong^0 term to zero for investigation of NLO effects
 
-        CEVNS = BIGCL(0, 1) * EVOLNSA(0) * CZERO
+        CEVNS = BIGCNS(K, 0) * EVOLNSA(0) * CZERO
+
         IF (P .GE. 1) THEN
-          CEVNS = CEVNS + ASMUR2 * BIGCL(1, 1) * EVOLNSA(0) +
-     &                  + ASMUF2 * BIGCL(0, 1) * EVOLNSA(1) 
-        ENDIF
+
+          CEVNS = CEVNS + ASMUR2 * BIGCNS(K, 1) * EVOLNSA(0) +
+     &                  + ASMUF2 * BIGCNS(K, 0) * EVOLNSA(1) 
+
+          IF (P .GE. 2) THEN
+
+            CEVNS = CEVNS + ASMUR2**2 * BIGCNS(K,2) * EVOLNSA(0) +
+     &          ASMUR2 * ASMUF2 * BIGCNS(K,1) * EVOLNSA(1) + 
+     &                      ASMUF2**2 *  BIGCNS(K,0) * EVOLNSA(2)
+          END IF
+
+        END IF
 
         FPW = CEVNS * FCM(1)
 
@@ -105,40 +90,41 @@ C
 
         CALL EVOLF (K, R, EVOLA)
 
-        CEV(1) = ( BIGCL(0,1) * EVOLA(0,1,1) + 
-     &             BIGCL(0,2) * EVOLA(0,2,1) ) * CZERO
-        CEV(2) = ( BIGCL(0,1) * EVOLA(0,1,2) + 
-     &             BIGCL(0,2) * EVOLA(0,2,2) ) * CZERO
+        CEV(1) = ( BIGC(K,0,1) * EVOLA(0,1,1) + 
+     &             BIGC(K,0,2) * EVOLA(0,2,1) ) * CZERO
+        CEV(2) = ( BIGC(K,0,1) * EVOLA(0,1,2) + 
+     &             BIGC(K,0,2) * EVOLA(0,2,2) ) * CZERO
 
         IF (P .GE. 1) THEN
 
-          CEV(1) = CEV(1) + ASMUR2 * ( BIGCL(1,1) * EVOLA(0,1,1) + 
-     &                                 BIGCL(1,2) * EVOLA(0,2,1) )
-     &                    + ASMUF2 * ( BIGCL(0,1) * EVOLA(1,1,1) + 
-     &                                 BIGCL(0,2) * EVOLA(1,2,1) )
+          CEV(1) = CEV(1) + ASMUR2 * ( BIGC(K,1,1) * EVOLA(0,1,1) + 
+     &                                 BIGC(K,1,2) * EVOLA(0,2,1) )
+     &                    + ASMUF2 * ( BIGC(K,0,1) * EVOLA(1,1,1) + 
+     &                                 BIGC(K,0,2) * EVOLA(1,2,1) )
 
-          CEV(2) = CEV(2) + ASMUR2 * ( BIGCL(1,1) * EVOLA(0,1,2) + 
-     &                                 BIGCL(1,2) * EVOLA(0,2,2) )
-     &                    + ASMUF2 * ( BIGCL(0,1) * EVOLA(1,1,2) + 
-     &                                 BIGCL(0,2) * EVOLA(1,2,2) )
+          CEV(2) = CEV(2) + ASMUR2 * ( BIGC(K,1,1) * EVOLA(0,1,2) + 
+     &                                 BIGC(K,1,2) * EVOLA(0,2,2) )
+     &                    + ASMUF2 * ( BIGC(K,0,1) * EVOLA(1,1,2) + 
+     &                                 BIGC(K,0,2) * EVOLA(1,2,2) )
 
-        ENDIF
 
-        IF (P .GE. 2) THEN
+          IF (P .GE. 2) THEN
 
-          CEV(1) = CEV(1) + ASMUR2**2 * ( BIGCL(2,1) * EVOLA(0,1,1) + 
-     &                                    BIGCL(2,2) * EVOLA(0,2,1) )
-     &        + ASMUR2 * ASMUF2 * ( BIGCL(1,1) * EVOLA(1,1,1) + 
-     &                              BIGCL(1,2) * EVOLA(1,2,1) )
-     &                    + ASMUF2**2 * ( BIGCL(0,1) * EVOLA(2,1,1) + 
-     &                                    BIGCL(0,2) * EVOLA(2,2,1) )
+            CEV(1) = CEV(1) + ASMUR2**2 * ( BIGC(K,2,1) * EVOLA(0,1,1) +
+     &                                    BIGC(K,2,2) * EVOLA(0,2,1) )
+     &        + ASMUR2 * ASMUF2 * ( BIGC(K,1,1) * EVOLA(1,1,1) + 
+     &                              BIGC(K,1,2) * EVOLA(1,2,1) )
+     &                    + ASMUF2**2 * ( BIGC(K,0,1) * EVOLA(2,1,1) + 
+     &                                    BIGC(K,0,2) * EVOLA(2,2,1) )
 
-          CEV(2) = CEV(2) + ASMUR2**2 * ( BIGCL(2,1) * EVOLA(0,1,2) + 
-     &                                    BIGCL(2,2) * EVOLA(0,2,2) )
-     &        + ASMUR2 * ASMUF2 * ( BIGCL(1,1) * EVOLA(1,1,2) + 
-     &                              BIGCL(1,2) * EVOLA(1,2,2) )
-     &                    + ASMUF2**2 * ( BIGCL(0,1) * EVOLA(2,1,2) + 
-     &                                    BIGCL(0,2) * EVOLA(2,2,2) )
+            CEV(2) = CEV(2) + ASMUR2**2 * ( BIGC(K,2,1) * EVOLA(0,1,2) +
+     &                                    BIGC(K,2,2) * EVOLA(0,2,2) )
+     &        + ASMUR2 * ASMUF2 * ( BIGC(K,1,1) * EVOLA(1,1,2) + 
+     &                              BIGC(K,1,2) * EVOLA(1,2,2) )
+     &                    + ASMUF2**2 * ( BIGC(K,0,1) * EVOLA(2,1,2) + 
+     &                                    BIGC(K,0,2) * EVOLA(2,2,2) )
+
+          ENDIF
 
         ENDIF
 

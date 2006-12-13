@@ -44,9 +44,10 @@ C
     
       NF = 4
       ANSATZ = 'NSFIT'
+      PROCESS = 'NSDVCS'
 
 *       1  Q02       
-        PAR(1) =   4.0d0    
+        PAR(1) =   2.5d0    
 *       2  AS0       
         PAR(2) =   0.05d0
 *       3  MU02      

@@ -38,13 +38,11 @@ C
       DOUBLE PRECISION R
       DOUBLE COMPLEX EVOLNSA(0:2), NDINT
       INTEGER ORD
-      DOUBLE COMPLEX GAMB, ERFUNCNS1, R1, AUX(0:2)
+      DOUBLE COMPLEX R1, R2, AUX(0:2)
       INCLUDE 'header.f'
 
 
-
-      CALL ERFUNCNSF (K, R, GAMB, ERFUNCNS1)
-      CALL RNNLONSF (K, R1)
+      CALL RNNLONSF (K, R1, R2)
 
       
       AUX(0) = (1.0d0, 0.0d0)
@@ -52,13 +50,17 @@ C
       IF (SCHEME(4:5) .EQ. 'LO') THEN 
 *       Just LO evolution ...
         AUX(1) = (0.0d0, 0.0d0)
+        AUX(2) = (0.0d0, 0.0d0)
       ELSE
-*       ... or normal NLO one (diagonal only!)
-        AUX(1) = - ERFUNCNS1 * R1
+*       ... or normal (N)NLO one (diagonal part)
+        AUX(1) = - ( 1.0d0 - 1.0d0 / R ) * R1
+        IF (P .GE. 2) THEN
+          AUX(2) = 0.5d0 * ( AUX(1)**2 - (1.0d0 - 1.0d0 / R**2) * R2 )
+        END IF
       ENDIF
 
       DO 10 ORD = 0, P
- 10   EVOLNSA(ORD) = AUX(ORD) * R**(-GAMB)
+ 10   EVOLNSA(ORD) = AUX(ORD) * R**( - GAMNS(K,0) / BETA0(NF) )
 
 *   Adding MSBAR non-diagonal NLO evolution (time consuming)
       IF ( (P .EQ. 1) .AND. (SCHEME .EQ. 'MSBND') ) THEN
