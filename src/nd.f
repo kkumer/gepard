@@ -32,13 +32,17 @@ C
       SUBROUTINE NDINTF (K, R, NDINT, NI, NJ)
 
       IMPLICIT NONE
-      INTEGER K, NI, NJ
+      INTEGER K, NI, NJ, ACCND
       DOUBLE PRECISION R
       DOUBLE COMPLEX NDINT
-      INTEGER L
+      INTEGER L, NINTGNDMAX, NPTSND, NPTSNDMAX
       DOUBLE COMPLEX PIHALF, EPH, EPHND
       DOUBLE COMPLEX J, ZK, CB1, CB1C
       DOUBLE COMPLEX DCTAN
+      PARAMETER ( NINTGNDMAX = 12, NPTSNDMAX = 768)
+      DOUBLE PRECISION DOWNND(NINTGNDMAX+1)
+      DOUBLE PRECISION YND(NPTSNDMAX), WGND(NPTSNDMAX)
+      DOUBLE COMPLEX ZND(NPTSNDMAX)
       INCLUDE 'header.f'
 
       PIHALF = (1.5707963267948966d0, 0.0d0)
@@ -46,20 +50,48 @@ C
       EPHND = EXP ( COMPLEX(0.D0, PHIND) )
       EPH = EXP ( COMPLEX(0.D0, PHI) )
 
+      DATA DOWNND 
+     & / 0.D0, 0.01D0, 0.025D0, 0.067D0, 0.18D0, 
+     &         0.5D0, 1.3D0, 3.7D0, 10.D0, 
+     &         25.D0, 0.67D2, 1.8D2, 5.0D2 /
+
+!     DATA DOWNND 
+!    & / 0.D0, 0.05D0, 0.25D0, 0.67D0, 1.8D0, 
+!    &         5.0D0, 25.0D0, 1.0D2, 7.0D2 /
+!
+      ACCND = ACC
+
+      CALL INTEGRAF(ACCND, SPEED, DOWNND, NINTGNDMAX, YND, WGND)
+
+      NPTSND = 2**ACCND * (NINTGNDMAX - 0) / SPEED
+
+*   Calculating actual Mellin-Barnes contour points from Gaussian abscissae
+
+      EPHND = EXP ( COMPLEX(0.D0, PHIND) )
+      DO 10 L = 1, NPTSND
+ 10     ZND(L) = CND + YND(L) * EPHND 
 
 *   Integrating over L->ZK, with fixed K->J
 
       J = N(K) - 1.0d0
       NDINT = (0.0d0, 0.0d0)
-      DO 100 L = 1, NPTS
+      DO 100 L = 1, NPTSND
 
 *       Mellin-Barnes contour for ND evolution intersects real axis at CND
 *       so contour saved in common blocks needs to be shifted by CND-C.
 *       Note that N(L)-1-C = Y*EPH
-        ZK = (N(L) - 1.0d0 - C)*CONJG(EPH)*EPHND + CND
+        ZK = ZND(L)
 
         CALL CB1F (J + ZK + 2.0d0, J, R, CB1, NI, NJ)
         CALL CB1F (J + CONJG(ZK) + 2.0d0, J, R, CB1C, NI, NJ)
+
+!        IF (K .EQ. 1) THEN
+!            WRITE(17, *) Y(L), ABS(CB1 / DCTAN(PIHALF * ZK))
+!        ELSE IF (K .EQ. 40) THEN
+!            WRITE(18, *) Y(L), ABS(CB1 / DCTAN(PIHALF * ZK))
+!        ELSE IF (K .EQ. 80) THEN
+!            WRITE(19, *) Y(L), ABS(CB1 / DCTAN(PIHALF * ZK))
+!        END IF
 
         NDINT = NDINT + WG(L)*( EPHND * CB1 / DCTAN(PIHALF * ZK)
      &      - CONJG(EPHND) * CB1C / DCTAN(PIHALF * CONJG(ZK)) )

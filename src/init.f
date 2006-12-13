@@ -43,35 +43,28 @@ C
       SUBROUTINE INIT
 * 
       IMPLICIT NONE
-      INTEGER ACCMAX, NGAUSSMAX, NGAUSS, NINTG, K, K1, K2, K3
+      INTEGER NINTGMAX, K, K1, K2, K3
       INTEGER L, ORD
-      DOUBLE PRECISION NFD, SUMM, DIFF, YI
+      DOUBLE PRECISION NFD
       DOUBLE COMPLEX J, Z, EPH
       DOUBLE COMPLEX HS1, HS2, HS3, HS4
       DOUBLE COMPLEX CF2, CFL
       DOUBLE COMPLEX C1F2(2)
       DOUBLE COMPLEX BIGC0(2), BIGC1(2), BIGC2(2)
       DOUBLE COMPLEX CLNGAMMA, PREFACT
-      PARAMETER ( NGAUSSMAX = 64, ACCMAX = 6, NINTG = 12 )
-      DOUBLE PRECISION ABSC(ACCMAX,NGAUSSMAX), WGHT(ACCMAX,NGAUSSMAX)
-      DOUBLE PRECISION DOWN(NINTG+1), UP(NINTG)
+      PARAMETER ( NINTGMAX = 12 )
+      DOUBLE PRECISION DOWN(NINTGMAX+1)
       INCLUDE 'header.f'
 
-*   Output common-blocks
 
-
-*   NGAUSS-point integration is to be performed on each
+*   (2**ACC)-point integration is to be performed on each
 *   interval defined by taking points (1, 1 + SPEED,
 *   1 + 2*SPEED, ...) from the list DOWN
       
-      NGAUSS = 2**ACC
-
       DATA DOWN 
      & / 0.D0, 0.01D0, 0.025D0, 0.067D0, 0.18D0, 
      &         0.5D0, 1.3D0, 3.7D0, 10.D0, 
      &         25.D0, 0.67D2, 1.8D2, 5.0D2 /
-
-      CALL GAUSS (ABSC, WGHT)
 
 
 *   For fast calculation it's better to compress integration region
@@ -82,40 +75,29 @@ C
 !        DOWN (NINTG + 1) = 1.3d0
 !      END IF
 
+*   Gaussian abscissae and weights:
 
-*   Mellin-Barnes contour points are C + YI * EPH
-      EPH = EXP ( COMPLEX(0.D0, PHI) )
+      CALL INTEGRAF(ACC, SPEED, DOWN, NINTGMAX, Y, WG)
 
-*   Setting up upper limits of integration intervals
-
-      DO 10 K = 1, NINTG, SPEED
- 10     UP(K) = DOWN(K+SPEED)
-
-*   Abscissas N(K) and weights WG(K) for the whole contour. Note that
-*   the factor (upper limit - lower limit)/2 is put into the weights
-
-      K = 0
-      DO 20 K2 = 1, NINTG, SPEED
-        SUMM = UP(K2) + DOWN(K2) 
-        DIFF = UP(K2) - DOWN(K2) 
-      DO 20 K3 = 1, NGAUSS
-        K = K + 1
-        YI = (DIFF * ABSC(ACC, K3) + SUMM) * 0.5D0
-        N(K) = (C + 1.0D0) + YI * EPH
-        WG(K) = 0.5D0 * DIFF * WGHT(ACC, K3) 
- 20   CONTINUE
 
 *   For everything apart from ND evolution one should use 0->4 below
 *   and increase speed by 30 %
 
-      NPTS = NGAUSS * (NINTG-0) / SPEED
+      NPTS = 2**ACC * (NINTGMAX - 0) / SPEED
 
+*   Calculating actual Mellin-Barnes contour points from Gaussian abscissae
+
+      EPH = EXP ( COMPLEX(0.D0, PHI) )
+      DO 10 K = 1, NPTS
+ 10     N(K) = C + 1.0d0 + Y(K) * EPH 
+
+*   ----  Initialization of common blocks ----
 
 *   1. Initialization of QCD beta function coefficients
 
       CALL BETAF
 
-*   Now looping over contour points and initializing
+*   Now looping over MB contour points and initializing
 
       DO 100 K = 1, NPTS
 
