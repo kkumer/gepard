@@ -49,10 +49,12 @@ C
       READ (17, *) ISINTER
       CLOSE (17)
 
-      PROCESS = 'DVCS'
+      CALL READPAR
       FFTYPE = 'SINGLET'
 
-      CALL READPAR
+      PROCESS = 'DVCS'
+      CALL INIT
+      PROCESS = 'DIS'
       CALL INIT
 
       IF (ISINTER .NE. 1) THEN
@@ -371,6 +373,8 @@ C
 
       IF (YOBS(:2) .EQ. 'PA') THEN
 
+        PROCESS = 'DVCS'
+
         READ (12,*) W
         READ (12,*) Q2
         READ (12,*) NN
@@ -410,6 +414,8 @@ C
 110     CONTINUE
 
       ELSE IF (YOBS(:2) .EQ. 'SI') THEN
+
+        PROCESS = 'DVCS'
 
         READ (12,*) WIN
         READ (12,*) Q2IN
@@ -481,6 +487,8 @@ C
 120     CONTINUE
 
       ELSE IF (YOBS(:2) .EQ. 'F2') THEN
+
+        PROCESS = 'DIS'
 
         READ (12,*) XBJIN
         READ (12,*) Q2IN

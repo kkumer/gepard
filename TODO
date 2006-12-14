@@ -1,5 +1,4 @@
 Physics: 
--  Include MS-bar evolution
 -  t_cut of ZEUS data is infinity? DVCS[46].DAT
 -  improve behaviour for large \xi so that comparison to
    NLO Les Houches is everywhere ok
@@ -11,6 +10,7 @@ Computing:
    not there)?
 -  Put evolution operators on common block when Q0 is fixed
 -  Move all gaussian points to gauss.f  (from dvcs.f e.g.)
+-  In fitting parameters should be non-squared quantities
 
 Checks:
 -  Check NNLO DIS evolution against Les Houches table 3 or 4
@@ -27,3 +27,4 @@ DONE:
 +  Transfer adacf Fortran routines to gepard to make it independent
    of adacf library.  (Done in ver. 0.89)
 +  Check NLO DIS evolution against Les Houches table 3 or 4 (done in ver. 0.9.2)
++  Include MS-bar evolution

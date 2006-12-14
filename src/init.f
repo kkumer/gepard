@@ -84,7 +84,7 @@ C
 *   If you suspect numerical problems and want extend Mellin-Barnes
 *   integration fom 0..10  to 0..500, put 4 -> 0 below
 
-      NPTS = 2**ACC * (NINTGMAX - 0) / SPEED
+      NPTS = 2**ACC * (NINTGMAX - 4) / SPEED
 
 *   Calculating actual Mellin-Barnes contour points from Gaussian abscissae
 
