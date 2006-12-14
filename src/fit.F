@@ -40,6 +40,7 @@ C
       CHARACTER COMFILE*10, OUTFILE*20
       EXTERNAL FCN
       DATA COMFILE /'MINUIT.CMD'/
+      INCLUDE 'header.f'
 
       COMMON /INTERACTIVE/ ISINTER
 
@@ -47,6 +48,9 @@ C
       OPEN (UNIT = 17, FILE = COMFILE, STATUS = 'OLD')
       READ (17, *) ISINTER
       CLOSE (17)
+
+      PROCESS = 'DVCS'
+      FFTYPE = 'SINGLET'
 
       CALL READPAR
       CALL INIT

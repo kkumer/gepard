@@ -50,5 +50,8 @@ $prog
 if [ $batch = "yes" ]; then
    ln -s figs.fm ${prefix}_fm
    fragmaster
-   rm ${prefix}_fm ${prefix}.pdf ${prefix}_fm.eps
+#  Correcting bounding box:
+   cp ${prefix}.eps tosed
+   sed 's/\(BoundingBox:\) 0 \(.*\) [0-9]*/\1 5 \2 795/' tosed > ${prefix}.eps
+   rm ${prefix}_fm ${prefix}.pdf ${prefix}_fm.eps tosed
 fi

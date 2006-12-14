@@ -37,10 +37,11 @@ C      VECMAT, HS1, HS2
 C  SOURCE
 C
 
-      SUBROUTINE CDVCSF ( K )
+      SUBROUTINE CDVCSF ( K, BIGCTMP )
 
       IMPLICIT NONE
       INTEGER K
+      DOUBLE COMPLEX BIGCTMP(0:2,2)
       INTEGER L
       DOUBLE PRECISION LRF2, LRR2
       DOUBLE COMPLEX J, HS1, HS2
@@ -55,22 +56,22 @@ C
       LRR2 = LOG(RR2)
 
       IF (SCHEME .EQ. 'EVOLQ') THEN
-        BIGC(K, 0, 1) = (1.0d0,0.0d0)
-        BIGC(K, 0, 2) = (0.0d0,0.0d0)
+        BIGCTMP(0, 1) = (1.0d0,0.0d0)
+        BIGCTMP(0, 2) = (0.0d0,0.0d0)
         DO 10 L = 1, 2
-        BIGC(K, 1, L) = (0.0d0, 0.0d0)
- 10     BIGC(K, 2, L) = (0.0d0, 0.0d0)
+        BIGCTMP(1, L) = (0.0d0, 0.0d0)
+ 10     BIGCTMP(2, L) = (0.0d0, 0.0d0)
         RETURN
       ELSE IF (SCHEME .EQ. 'EVOLG') THEN
-        BIGC(K, 0, 1) = (0.0d0,0.0d0)
-        BIGC(K, 0, 2) = (1.0d0,0.0d0)
+        BIGCTMP(0, 1) = (0.0d0,0.0d0)
+        BIGCTMP(0, 2) = (1.0d0,0.0d0)
         DO 20 L = 1, 2
-        BIGC(K, 1, L) = (0.0d0, 0.0d0)
- 20     BIGC(K, 2, L) = (0.0d0, 0.0d0)
+        BIGCTMP(1, L) = (0.0d0, 0.0d0)
+ 20     BIGCTMP(2, L) = (0.0d0, 0.0d0)
         RETURN
       END IF
 
-      IF ( PROCESS(3:) .EQ. 'DVCS' ) THEN
+      IF ( PROCESS(:3) .EQ. 'DVC' ) THEN
         SHIFT1 = HS1(J + 1.5d0) - HS1(J + 2.0d0) + 2.0d0 * LOG(2.0d0)
      &        - LRF2
         SHIFT2 = SHIFT1*SHIFT1 - HS2(J + 1.5d0) + HS2(J + 2.0d0)
@@ -80,7 +81,7 @@ C
       END IF
 
 *     auxilliary W-coeffs "small C" at given point K
-      IF ( PROCESS(3:) .EQ. 'DVCS' ) THEN
+      IF ( PROCESS(:3) .EQ. 'DVC' ) THEN
         DO 30 L = 1, 2
           C0(L) = CDIS1(K, 0, L) 
           C1(L) = CDIS1(K, 1, L) 
@@ -102,15 +103,15 @@ C
       END IF
 
 
-      BIGC(K, 0, 1) = (1.0d0,0.0d0)
-      BIGC(K, 0, 2) = (0.0d0,0.0d0)
+      BIGCTMP(0, 1) = (1.0d0,0.0d0)
+      BIGCTMP(0, 2) = (0.0d0,0.0d0)
 
       DO 50 L = 1, 2
-      BIGC(K, 1, L) = C1(L) + 0.5d0 * SHIFT1 * VM00(L)
+      BIGCTMP(1, L) = C1(L) + 0.5d0 * SHIFT1 * VM00(L)
       IF (P .GE. 2) THEN
-      BIGC(K, 2, L) = C2(L) + 0.5d0 * SHIFT1 * (VM01(L) + VM10(L)) +
+      BIGCTMP(2, L) = C2(L) + 0.5d0 * SHIFT1 * (VM01(L) + VM10(L)) +
      &      0.125d0 * SHIFT2 * VM000(L) + 0.5d0 * BETA0(NF) * (
-     &      BIGC(K, 1, L) * LRR2 + 0.25d0 * VM00(L) * LRF2**2 )
+     &      BIGCTMP(1, L) * LRR2 + 0.25d0 * VM00(L) * LRF2**2 )
       END IF
  50   CONTINUE
 

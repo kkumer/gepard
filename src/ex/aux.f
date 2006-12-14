@@ -29,15 +29,15 @@ C
       DOUBLE PRECISION Q02, Q2EXP, MP
       PARAMETER (MP = 0.938272d0 )
       CHARACTER SUBANSATZ*4
-
       INCLUDE '../header.f'
 
-      CALL READPAR
-      NF = 4
-      CZ = 1
+      PROCESS = 'DVCS'
+      FFTYPE = 'SINGLET'
 
-      ANSATZ = 'FIT'
+      CALL READPAR
+
       INCLUDE 'ansatz.f'
+      ANSATZ = 'FIT'
 
 
       Q02 = 2.5d0
@@ -45,6 +45,7 @@ C
       XI = 0.1d0
       DEL2 = -0.25d0
       SCHEME = 'MSBAR'
+      CZ = 1
 
       SUBANSATZ = 'HARD'
 

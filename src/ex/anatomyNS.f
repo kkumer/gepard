@@ -41,7 +41,7 @@ C
       IMPLICIT NONE
       INTEGER PT, NPOINTS, LN, NDEL
       DOUBLE PRECISION LOGXI, LOGXISTART, LOGXIEND, LOGXISTEP
-      PARAMETER ( NPOINTS = 60 )
+      PARAMETER ( NPOINTS = 40 )
       DOUBLE COMPLEX PREDS(6, NPOINTS), TOT
       DOUBLE PRECISION XIS(NPOINTS), MODUL, PHASE, Q02, Q2EXP, MP
       DOUBLE PRECISION DCARG
@@ -50,6 +50,8 @@ C
       PARAMETER (MP = 0.938272d0 )
       INCLUDE '../header.f'
 
+      PROCESS = 'DVCS'
+      FFTYPE = 'NONSINGLET'
       CALL READPAR
 
 *   File that will hold results
@@ -63,66 +65,10 @@ C
   5         WRITE (10 + NDEL, *) '# Output of anatomyNS.f. See prolog of 
      & that program'
 
+      INCLUDE 'ansatz.f'
       ANSATZ = 'NSFIT'
 
-*       1  Q02       
-        PAR(1) =   2.5d0    
-*       2  AS0       
-        PAR(2) =   0.05d0
-*       3  MU02      
-        PAR(3) =   2.5d0 
-
-* ------------ ANSATZ  -------------
-* ----  11 NS   --------------------
-!        PAR(11) =  see below
-*       12 AL0S      
-        PAR(12) =  1.1d0 
-*       13 ALPS      
-        PAR(13) =  0.15d0
-*       14 M02S      
-        PAR(14) =  (2.0d0 * MP)**2
-*       15 DELM2S    
-        PAR(15) =  MP**2
-*       16 PS        
-        PAR(16) =  3.0d0
-* ----  21 NG  (irrelevant for NS !)-----
-!        PAR(21) =  0.5d0
-*       22 AL0G      
-!        PAR(22) =  1.0d0 
-*       23 ALPG      
-        PAR(23) =  0.15d0
-*       24 M02G      
-        PAR(24) =  (2.0d0 * MP)**2
-*       25 DELM2G    
-        PAR(25) =  MP**2
-*       26 PG        
-        PAR(26) =  2.0d0
-* ----  31 NU  ( irrelevant, see D)-
-        PAR(31) =  2.0d0 
-*       32 AL0U      
-        PAR(32) =  0.5d0 
-*       33 ALPU      
-        PAR(33) =  1.0d0 
-*       34 M02U      
-        PAR(34) =  (2.0d0 * MP)**2
-*       35 DELM2U    
-        PAR(35) =  MP**2
-*       36 PU        
-        PAR(36) =  1.0d0 
-* ----  41 ND   (fakes whole val.) -
-        PAR(41) =  1.0d0 
-*       42 AL0D      
-        PAR(42) =  0.5d0 
-*       43 ALPD      
-        PAR(43) =  1.0d0 
-*       44 M02D      
-        PAR(44) =  (2.0d0 * MP)**2
-*       45 DELM2D    
-        PAR(45) =  MP**2
-*       46 PD        
-        PAR(46) =  1.0d0    
-
-      Q02 = 2.5d0
+      Q02  = 2.5d0
       Q2EXP = 10.0d0
       DEL2 =  -0.25d0
 
@@ -186,13 +132,13 @@ C
         TOT = PREDS(1, PT)
         IF (LN .EQ. 1) THEN
           MODUL = ABS( PREDS(4,PT) ) / ABS( TOT )
-          PHASE = DCARG( PREDS(4,PT) ) / DCARG( TOT )
+          PHASE = DCARG( (TOT - PREDS(4,PT)) / TOT )
         ELSEIF (LN .EQ. 2) THEN
-          MODUL = ABS( PREDS(5,PT) ) / ABS( TOT )
-          PHASE = DCARG( PREDS(5,PT) )  / DCARG( TOT )
+          MODUL = ABS( PREDS(5,PT)- PREDS(4,PT)) / ABS( TOT )
+          PHASE = DCARG( (TOT-PREDS(5,PT)+PREDS(4,PT)) / TOT )
         ELSEIF (LN .EQ. 3) THEN
-          MODUL = ABS( PREDS(6,PT) - PREDS(5,PT) ) / ABS( TOT )
-          PHASE = DCARG( PREDS(6,PT) - PREDS(5,PT) ) / DCARG( TOT )
+          MODUL = ABS( PREDS(6,PT)-PREDS(5,PT) ) / ABS( TOT )
+          PHASE = DCARG( (TOT-PREDS(6,PT)+PREDS(5,PT)) / TOT )
         ENDIF
         WRITE (UNIT=10+NDEL, FMT=998) XIS(PT), MODUL
         WRITE (UNIT=12+NDEL, FMT=998) XIS(PT), PHASE

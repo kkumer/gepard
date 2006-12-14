@@ -4,12 +4,12 @@
 *   Parameters
 *   ----------
 
-*   1. Constant parameters loaded from 'GEPARD.INI'
+*   1. Constant parameters loaded from 'GEPARD.INI' or fixed by program
 
       INTEGER SPEED, ACC, P, NF, CZERO
       DOUBLE PRECISION RF2, RR2
       DOUBLE PRECISION C, PHI, CND, PHIND
-      CHARACTER SCHEME*5, ANSATZ*6, PROCESS*6
+      CHARACTER SCHEME*5, ANSATZ*6, PROCESS*6, FFTYPE*10
 
 *   2. Parameters from 'MINUIT.CMD' (candidates for fitting parameters)
 
@@ -40,8 +40,6 @@
 
 *     - Values on a particular contour point
       DOUBLE COMPLEX S1, S2, S3, S4
-!     DOUBLE COMPLEX GAM0(2,2), GAM1(2,2), GAM2(2,2)
-!     DOUBLE COMPLEX GAMNS0, GAMNS1, GAMNS2
       DOUBLE COMPLEX CNS0, CNS1, CNS2
 
 *     - Values on the whole contour
@@ -49,9 +47,9 @@
       DOUBLE COMPLEX CDIS1(NPTSMAX,0:2,2), CDIS2(NPTSMAX,0:2,2)
       DOUBLE COMPLEX BIGCNS(NPTSMAX,0:2)
       DOUBLE COMPLEX BIGC(NPTSMAX,0:2,2)
+      DOUBLE COMPLEX BIGCF2(NPTSMAX,0:2,2)
       DOUBLE COMPLEX GAMNS(NPTSMAX,0:2)
       DOUBLE COMPLEX GAM(NPTSMAX,0:2,2,2)
-!     DOUBLE COMPLEX BIGCF2(NPTSMAX,0:2,2)
 
 *     - Final observables
       DOUBLE PRECISION F2(0:2)
@@ -61,12 +59,12 @@
 *   Common blocks
 *   -------------
       
-*   1. Constant parameters loaded from 'GEPARD.INI'
+*   1. Constant parameters loaded from 'GEPARD.INI' or fixed by program
 
       COMMON / PARINT /  SPEED, ACC, P, NF, CZERO
       COMMON / PARFLT /  RF2, RR2
       COMMON / MBCONT /  C, PHI, CND, PHIND
-      COMMON / PARCHR /  SCHEME, ANSATZ, PROCESS
+      COMMON / PARCHR /  SCHEME, ANSATZ, PROCESS, FFTYPE
 
 *   2. Parameters from 'MINUIT.CMD' (candidates for fitting parameters)
 
@@ -89,9 +87,6 @@
       
 *     - Values on a particular contour point
       COMMON / HARMONIC /  S1, S2, S3, S4
-!      COMMON / WGAMMA   /  GAM0, GAM1, GAM2
-!      COMMON / WGAMMANS /  GAMNS0, GAMNS1, GAMNS2
-!      COMMON / WC       /  C0, C1, C2
 
 *     - Values on the whole contour
       COMMON / CDISNS   /  CDISNS1
@@ -100,7 +95,7 @@
       COMMON / BIGC     /  BIGC
       COMMON / GAMNS    /  GAMNS
       COMMON / GAM      /  GAM
-!     COMMON / BIGCF2   /  BIGCF2
+      COMMON / BIGCF2   /  BIGCF2
 
 *     - FInal observables
       COMMON / CFF      /  CFF

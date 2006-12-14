@@ -31,13 +31,14 @@ C
 
       INCLUDE '../header.f'
 
+      PROCESS = 'DVCS'
+      FFTYPE = 'NONSINGLET'
+
       CALL READPAR
-      PROCESS = 'NSDVCS'
-      NF = 4
       CZ = 1
 
-      ANSATZ = 'NSFIT'
       INCLUDE 'ansatz.f'
+      ANSATZ = 'NSFIT'
 
 
       Q02 = 2.5d0

@@ -29,6 +29,8 @@ C
       DOUBLE PRECISION PARSIGMA, SIGMA
       INCLUDE 'header.f'
 
+      FFTYPE  = 'SINGLET'
+
       CALL READPAR
 
       PAR(21) = 0.4d0
@@ -46,7 +48,7 @@ C
 
 
       P = 0
-      PROCESS = 'SIDIS'
+      PROCESS = 'DIS'
       CALL INIT
       WRITE (*, *) "For values of test parameters see src/test.f"
       WRITE (*, *) 
@@ -59,7 +61,7 @@ C
       WRITE (*, *) F2(0)
 
       P = 1
-      PROCESS = 'SIDVCS'
+      PROCESS = 'DVCS'
       CALL INIT
 
       WRITE (*, *) " ---  Test 2: LO partial sigma, no evolution ---- "

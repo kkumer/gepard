@@ -29,6 +29,9 @@ C
       INCLUDE 'header.f'
 
 
+      PROCESS = 'DVCS'
+      FFTYPE = 'SINGLET'
+
       DATA XIA /1.D-7, 1.D-6, 1.D-5, 1.D-4, 1.D-3,
      &  1.D-2, 1.D-1, 3.D-1, 5.D-1, 7.D-1, 9.D-1 /
 

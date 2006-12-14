@@ -40,44 +40,13 @@ C
 
       DATA XIS / 0.05D0, 0.1D0, 0.25D0, 0.5D0 /
 
+      PROCESS = 'DVCS'
+      FFTYPE = 'NONSINGLET'
+
       CALL READPAR
     
-      NF = 4
+      INCLUDE 'ansatz.f'
       ANSATZ = 'NSFIT'
-      PROCESS = 'NSDVCS'
-
-*       1  Q02       
-        PAR(1) =   2.5d0    
-*       2  AS0       
-        PAR(2) =   0.05d0
-*       3  MU02      
-        PAR(3) =   2.5d0 
-
-* ------------ ANSATZ  -------------
-* ----  11 NS   --------------------
-!        PAR(11) =  see below
-*       12 AL0S      
-        PAR(12) =  1.1d0 
-*       13 ALPS      
-        PAR(13) =  0.15d0
-*       14 M02S      
-        PAR(14) =  (2.0d0 * MP)**2
-*       15 DELM2S    
-        PAR(15) =  MP**2
-*       16 PS        
-        PAR(16) =  3.0d0
-* ----  41 ND    (valence) --
-        PAR(41) =  1.0d0 
-*       42 AL0D      
-        PAR(42) =  0.5d0 
-*       43 ALPD      
-        PAR(43) =  1.0d0 
-*       44 M02D      
-        PAR(44) =  (2.0d0 * MP)**2
-*       45 DELM2D    
-        PAR(45) =  MP**2
-*       46 PD        
-        PAR(46) =  1.0d0    
 
 
 *     File that will hold results

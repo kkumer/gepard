@@ -51,6 +51,7 @@ C
       DOUBLE COMPLEX CF2, CFL
       DOUBLE COMPLEX C1F2(2)
       DOUBLE COMPLEX BIGC0(2), BIGC1(2), BIGC2(2)
+      DOUBLE COMPLEX BIGCTMP(0:2,2)
       DOUBLE COMPLEX CLNGAMMA, PREFACT
       PARAMETER ( NINTGMAX = 12 )
       DOUBLE PRECISION DOWN(NINTGMAX+1)
@@ -80,8 +81,8 @@ C
       CALL INTEGRAF(ACC, SPEED, DOWN, NINTGMAX, Y, WG)
 
 
-*   For everything apart from ND evolution one should use 0->4 below
-*   and increase speed by 30 %
+*   If you suspect numerical problems and want extend Mellin-Barnes
+*   integration fom 0..10  to 0..500, put 4 -> 0 below
 
       NPTS = 2**ACC * (NINTGMAX - 0) / SPEED
 
@@ -121,7 +122,7 @@ C
       END IF
 
 
-      IF ( PROCESS(:2) .EQ. 'SI' ) THEN
+      IF ( FFTYPE(:7) .EQ. 'SINGLET' ) THEN
 
 *****************  SINGLET  *****************
               
@@ -176,22 +177,30 @@ C
 
 *   3. "Big C' Wilson coefficients
 
-      IF (SCHEME .EQ. 'CSBAR') THEN
-          CALL CDVCSF(K)
+      IF ((SCHEME .EQ. 'CSBAR') .OR. (PROCESS(:3) .EQ. 'DIS')) THEN
+          CALL CDVCSF(K, BIGCTMP)
       ELSE IF (SCHEME(:3) .EQ. 'MSB') THEN
-          CALL MSBARF(K)
+          CALL MSBARF(K, BIGCTMP)
       END IF
 
-*     "Big C" Wilson coefficients of DVCS have to be multiplied by
+*     Writing this to BIGC or BIGCF2 common blocks.
+*     "Big C" Wilson coefficients of DVCS (in BIGC) have to be multiplied by
 *     Gamma(5/2+J) / Gamma(3+J)
 
-      IF ( PROCESS(3:) .EQ. 'DVCS' ) THEN
+      IF ( PROCESS(:3) .EQ. 'DVC' ) THEN
         DO 30 L = 1,2
         DO 30 ORD = 0, P
-          BIGC(K, ORD, L) = BIGC(K, ORD, L) * 
+          BIGC(K, ORD, L) = BIGCTMP(ORD, L) * 
      &             EXP(CLNGAMMA(2.5d0 + J) - CLNGAMMA(3.0d0 + J))
  30     CONTINUE
+      ELSE
+*        -- DIS --
+        DO 40 L = 1,2
+        DO 40 ORD = 0, P
+          BIGCF2(K, ORD, L) = BIGCTMP(ORD, L)
+ 40     CONTINUE
       END IF
+
 
       ELSE
 *****************  NON - SINGLET  *****************
@@ -222,16 +231,19 @@ C
 
 *   3.NS "Big C' Wilson coefficients
 
+*     non-singlet DIS is not implemented yet, so here we call
+*     BIGCNSF which directly writes to BIGCNS common block
+
       CALL BIGCNSF(K)
 
 *     "Big C" Wilson coefficients of DVCS have to be multiplied by
 *     Gamma(5/2+J) / Gamma(3+J)
 
-      IF ( PROCESS(3:) .EQ. 'DVCS' ) THEN
-        DO 40 ORD = 0, P
+      IF ( PROCESS(:3) .EQ. 'DVC' ) THEN
+        DO 50 ORD = 0, P
           BIGCNS(K, ORD) = BIGCNS(K, ORD) * 
      &             EXP(CLNGAMMA(2.5d0 + J) - CLNGAMMA(3.0d0 + J))
- 40     CONTINUE
+ 50     CONTINUE
       END IF
 
       END IF

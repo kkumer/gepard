@@ -31,6 +31,9 @@ C
       DOUBLE PRECISION LHXGNNLO(11), XIA(11), REF(11)
       INCLUDE 'header.f'
 
+      PROCESS = 'DIS'
+      FFTYPE = 'SINGLET'
+
       DATA XIA /1.D-7, 1.D-6, 1.D-5, 1.D-4, 1.D-3,
      &  1.D-2, 1.D-1, 3.D-1, 5.D-1, 7.D-1, 9.D-1 /
 
@@ -70,7 +73,6 @@ C
       PAR(1) = 2.0D0
       PAR(3) = 2.5D0
       ANSATZ = 'HOUCHE'
-      PROCESS = 'SIDIS'
 
 *   Following artifical renorm. scheme has C = (0, 1) at
 *   all orders, thus effectively putting F_2 -> Q_s^2 x g(x)

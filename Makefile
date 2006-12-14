@@ -37,18 +37,20 @@ export PGPLOTLIBS = -L$(HOME)/local/lib/pgplot -lpgplot
 # out the next three lines (should be automatic on Windows,
 # but it's an ugly hack)
 ifndef WINDIR
-export X11LIBS = -L/usr/X11R6/lib -lX11
+export X11LIBS = -L/usr/X11R6/lib -lX11 -lpng
 endif
 
 # targets
 export SRCTARGETS = radcorr scaledep fit test auxtest fit_nopgplot houches accuracy
-export EXTARGETS = aux auxns anatomyNS anatomy evoldep radNLONS radNLO evolutNS evolut radQ \
+export EXTARGETS = aux auxns anatomyNS anatomy radNLONS radNLO evolutNS evolut radQ \
                    radNNLONS radNNLO scalesNS scales scalesNNLO
 
 .PHONY: $(SRCTARGETS) $(EXTARGETS)
 DOCTARGETS = pdf html
 
 all: $(SRCTARGETS) $(EXTARGETS) $(DOCTARGETS)
+
+examples: $(EXTARGETS)
 
 $(SRCTARGETS):
 	$(MAKE) -C src $@

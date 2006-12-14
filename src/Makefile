@@ -19,7 +19,7 @@ CPPFLAGS = '-D NOPGPLOT'
 endif
 
 # Compiler options
-FFLAGS =  -O
+FFLAGS =  -I. -O 
 CFLAGS =  -O2
 
 # Subdirectories for storing source files
@@ -107,9 +107,6 @@ auxns: $(_FOBJS) $(_ADACFOBJS) $(EXFODIR)/auxns.o
 	$(FC) -o ../ex/$@ $^ $(FFLAGS)
 
 aux: $(_FOBJS) $(_ADACFOBJS) $(EXFODIR)/aux.o
-	$(FC) -o ../ex/$@ $^ $(FFLAGS)
-
-evoldep: $(_FOBJS) $(_ADACFOBJS) $(EXFODIR)/evoldep.o
 	$(FC) -o ../ex/$@ $^ $(FFLAGS)
 
 anatomyNS: $(_FOBJS) $(_ADACFOBJS) $(EXFODIR)/anatomyNS.o

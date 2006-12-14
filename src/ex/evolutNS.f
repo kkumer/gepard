@@ -59,14 +59,15 @@ C
 
       INCLUDE '../header.f'
 
+      PROCESS = 'DVCS'
+      FFTYPE = 'NONSINGLET'
 
       CALL READPAR
     
-      NF = 4
       DEL2 = -0.25d0
 
+      INCLUDE 'ansatz.f'
       ANSATZ = 'NSFIT'
-      INCLUDE 'header.f'
 
 *     Files that will hold results
 

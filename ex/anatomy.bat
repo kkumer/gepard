@@ -25,7 +25,7 @@ with g0
 world 9e-6, 8e-3, 0.5, 3.0
 view 0.15, 0.65, 0.6, 0.90
 legend loctype view
-legend 0.18, 0.53
+legend 0.37, 0.59
 legend length 6
 legend char size 0.64
 #  --------  x axis ------------
@@ -54,7 +54,7 @@ s1 line linewidth 1.5
 s1 legend  "DELevoD"
 #
 s2 line linestyle 1
-s2 line color 1
+s2 line color 2
 s2 line linewidth 1.5
 s2 legend  "DELevoND"
 #
@@ -89,13 +89,13 @@ s1 line color 1
 s1 line linewidth 2.5
 #
 s2 line linestyle 1
-s2 line color 1
+s2 line color 2
 s2 line linewidth 2.5
 #
 ##############################################
 with g2
 ##############################################
-world 9e-6, -2.0, 0.5, 2.0
+world 9e-6, -0.2, 0.5, 0.5
 view 0.15, 0.38, 0.6, 0.63
 #  --------  x axis ------------
 xaxes scale Logarithmic
@@ -112,8 +112,8 @@ yaxis  label place spec
 yaxis  label place 0.0, 0.11
 yaxis  ticklabel format general
 yaxis  ticklabel prec 1
-yaxis  tick major 1.0
-yaxis  tick minor ticks 9
+yaxis  tick major 0.2
+yaxis  tick minor ticks 3
 #  --------  Lines ------------
 s0 line linestyle 2
 s0 line color 1
@@ -124,13 +124,13 @@ s1 line color 1
 s1 line linewidth 1.5
 #
 s2 line linestyle 1
-s2 line color 1
+s2 line color 2
 s2 line linewidth 1.5
 #
 ##############################################
 with g3
 ##############################################
-world 9e-6, -2.0, 0.5, 2.0
+world 9e-6, -0.2, 0.5, 0.5
 view 0.69, 0.38, 1.14, 0.63
 #  --------  x axis ------------
 xaxes scale Logarithmic
@@ -144,8 +144,8 @@ yaxes scale Normal
 #yaxis  label "D1P"
 yaxis  ticklabel format general
 yaxis  ticklabel prec 1
-yaxis  tick major 1.0
-yaxis  tick minor ticks 9
+yaxis  tick major 0.2
+yaxis  tick minor ticks 3
 #  --------  Lines ------------
 s0 line linestyle 2
 s0 line color 1
@@ -156,6 +156,6 @@ s1 line color 1
 s1 line linewidth 2.5
 #
 s2 line linestyle 1
-s2 line color 1
+s2 line color 2
 s2 line linewidth 2.5
 #

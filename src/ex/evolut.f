@@ -49,7 +49,7 @@ C
       DOUBLE PRECISION LOGXI, LOGXISTART, LOGXIEND, LOGXISTEP, MP
       DOUBLE PRECISION DCARG, Q2MEM
       DOUBLE COMPLEX CFFQ, CFF0
-      PARAMETER ( NPOINTS = 60 )
+      PARAMETER ( NPOINTS = 40 )
       DOUBLE PRECISION POINTS(0:3, 6, NPOINTS)
       DOUBLE PRECISION XIS(NPOINTS)
       PARAMETER ( LOGXISTART = -5.0d0, LOGXIEND = -0.30103d0,
@@ -59,13 +59,15 @@ C
 
       INCLUDE '../header.f'
 
+      PROCESS = 'DVCS'
+      FFTYPE = 'SINGLET'
+
       CALL READPAR
     
-      NF = 4
       DEL2 = -0.25d0
 
-      ANSATZ = 'FIT'
       INCLUDE 'ansatz.f'
+      ANSATZ = 'FIT'
 
 *     Files that will hold results
 

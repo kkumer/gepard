@@ -13,9 +13,14 @@ make <target>
 
 where possible targets are: 
 
-radNLO   - singlet radiative corr., NLO in both schemes
-radQ     - singlet radiative corr., Q^2 dependence
-radNNLO. - singlet radiative corr., NNLO
+aux(ns)     -  auxilliary programs calculating single point 
+scales(NS)  -  produce Tables 1 and 2 
+scalesNNLO  -  produces Table 3
+radNLO(NS)  -  radiative corr., NLO in both schemes (Figs 6 and 8)
+evolut(NS)  -  NLO evolution from one scale to another (Figs 7 and 9)
+radQ        -  dependance on Q^2 (Fig. 10)
+radNNLO(NS) -  NNLO evolution from one scale to another (Figs 11 and 12)
+anatomy(NS) -  anatomy of various NLO contributions
 
 
 Step 2:
@@ -37,6 +42,9 @@ Alternatively, have <target>.eps created (must have fragmaster installed) by
 
 plt -b <target>
 
-To fine-tune bounding box of resulting EPS files, change it like this:
-%%BoundingBox: 0 * * 8??   ->  5 * * 795 
 
+
+
+Steps 2 and 3 can be done automatically by 
+
+make <target>.eps     ("make all" and "make everything" (long) do all figs)

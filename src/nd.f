@@ -32,7 +32,7 @@ C
       SUBROUTINE NDINTF (K, R, NDINT, NI, NJ)
 
       IMPLICIT NONE
-      INTEGER K, NI, NJ, ACCND
+      INTEGER K, NI, NJ, ACCND, SPEEDND
       DOUBLE PRECISION R
       DOUBLE COMPLEX NDINT
       INTEGER L, NINTGNDMAX, NPTSND, NPTSNDMAX
@@ -55,15 +55,12 @@ C
      &         0.5D0, 1.3D0, 3.7D0, 10.D0, 
      &         25.D0, 0.67D2, 1.8D2, 5.0D2 /
 
-!     DATA DOWNND 
-!    & / 0.D0, 0.05D0, 0.25D0, 0.67D0, 1.8D0, 
-!    &         5.0D0, 25.0D0, 1.0D2, 7.0D2 /
-!
       ACCND = ACC
+      SPEEDND = SPEED
 
-      CALL INTEGRAF(ACCND, SPEED, DOWNND, NINTGNDMAX, YND, WGND)
+      CALL INTEGRAF(ACCND, SPEEDND, DOWNND, NINTGNDMAX, YND, WGND)
 
-      NPTSND = 2**ACCND * (NINTGNDMAX - 0) / SPEED
+      NPTSND = 2**ACCND * NINTGNDMAX / SPEEDND
 
 *   Calculating actual Mellin-Barnes contour points from Gaussian abscissae
 
@@ -85,15 +82,8 @@ C
         CALL CB1F (J + ZK + 2.0d0, J, R, CB1, NI, NJ)
         CALL CB1F (J + CONJG(ZK) + 2.0d0, J, R, CB1C, NI, NJ)
 
-!        IF (K .EQ. 1) THEN
-!            WRITE(17, *) Y(L), ABS(CB1 / DCTAN(PIHALF * ZK))
-!        ELSE IF (K .EQ. 40) THEN
-!            WRITE(18, *) Y(L), ABS(CB1 / DCTAN(PIHALF * ZK))
-!        ELSE IF (K .EQ. 80) THEN
-!            WRITE(19, *) Y(L), ABS(CB1 / DCTAN(PIHALF * ZK))
-!        END IF
 
-        NDINT = NDINT + WG(L)*( EPHND * CB1 / DCTAN(PIHALF * ZK)
+        NDINT = NDINT + WGND(L)*( EPHND * CB1 / DCTAN(PIHALF * ZK)
      &      - CONJG(EPHND) * CB1C / DCTAN(PIHALF * CONJG(ZK)) )
 
  100  CONTINUE

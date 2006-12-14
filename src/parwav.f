@@ -61,7 +61,7 @@ C
 *        non-singlet or singlet case. This is specified by using
 *        process name that starts 'NS...'.
 
-      IF ( PROCESS(:2) .EQ. 'NS' ) THEN
+      IF ( FFTYPE(:7) .EQ. 'NONSING' ) THEN
 
         CALL EVOLNSF (K, R, EVOLNSA)
 
@@ -88,7 +88,10 @@ C
       ELSE
 *     singlet case
 
-        CALL EVOLF (K, R, EVOLA)
+       CALL EVOLF (K, R, EVOLA)
+
+       IF ( PROCESS(:3) .EQ. 'DVC' ) THEN
+*      --- DVCS ---
 
         CEV(1) = ( BIGC(K,0,1) * EVOLA(0,1,1) + 
      &             BIGC(K,0,2) * EVOLA(0,2,1) ) * CZERO
@@ -128,7 +131,49 @@ C
 
         ENDIF
 
-        FPW = CEV(1) * FCM(1) + CEV(2) * FCM(2)
+       ELSE
+*      --- DVCS ---
+
+        CEV(1) = ( BIGCF2(K,0,1) * EVOLA(0,1,1) + 
+     &             BIGCF2(K,0,2) * EVOLA(0,2,1) ) * CZERO
+        CEV(2) = ( BIGCF2(K,0,1) * EVOLA(0,1,2) + 
+     &             BIGCF2(K,0,2) * EVOLA(0,2,2) ) * CZERO
+
+        IF (P .GE. 1) THEN
+
+          CEV(1) = CEV(1) + ASMUR2 * ( BIGCF2(K,1,1) * EVOLA(0,1,1) + 
+     &                                 BIGCF2(K,1,2) * EVOLA(0,2,1) )
+     &                    + ASMUF2 * ( BIGCF2(K,0,1) * EVOLA(1,1,1) + 
+     &                                 BIGCF2(K,0,2) * EVOLA(1,2,1) )
+
+          CEV(2) = CEV(2) + ASMUR2 * ( BIGCF2(K,1,1) * EVOLA(0,1,2) + 
+     &                                 BIGCF2(K,1,2) * EVOLA(0,2,2) )
+     &                    + ASMUF2 * ( BIGCF2(K,0,1) * EVOLA(1,1,2) + 
+     &                                 BIGCF2(K,0,2) * EVOLA(1,2,2) )
+
+
+          IF (P .GE. 2) THEN
+
+          CEV(1) = CEV(1) + ASMUR2**2 * ( BIGCF2(K,2,1) * EVOLA(0,1,1) +
+     &                                    BIGCF2(K,2,2) * EVOLA(0,2,1) )
+     &        + ASMUR2 * ASMUF2 * ( BIGCF2(K,1,1) * EVOLA(1,1,1) + 
+     &                              BIGCF2(K,1,2) * EVOLA(1,2,1) )
+     &                  + ASMUF2**2 * ( BIGCF2(K,0,1) * EVOLA(2,1,1) + 
+     &                                    BIGCF2(K,0,2) * EVOLA(2,2,1) )
+
+          CEV(2) = CEV(2) + ASMUR2**2 * ( BIGCF2(K,2,1) * EVOLA(0,1,2) +
+     &                                    BIGCF2(K,2,2) * EVOLA(0,2,2) )
+     &        + ASMUR2 * ASMUF2 * ( BIGCF2(K,1,1) * EVOLA(1,1,2) + 
+     &                              BIGCF2(K,1,2) * EVOLA(1,2,2) )
+     &                  + ASMUF2**2 * ( BIGCF2(K,0,1) * EVOLA(2,1,2) + 
+     &                                    BIGCF2(K,0,2) * EVOLA(2,2,2) )
+
+          ENDIF
+
+        ENDIF
+
+       ENDIF
+       FPW = CEV(1) * FCM(1) + CEV(2) * FCM(2)
 
       END IF
 
