@@ -65,6 +65,8 @@ C
      &       LOGXISTEP = (LOGXIEND - LOGXISTART) / (NPOINTS - 1)  )
       INCLUDE 'header.f'
 
+      PROCESS = 'DVCS'
+      FFTYPE = 'SINGLET'
 
       CALL READPAR
 

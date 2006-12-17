@@ -39,7 +39,7 @@ $\sharp$\thecomment:} #1]}}
 
 \title{\texttt{gepard} --- Compton form factors and observables
                             by evolving moments of GEneral PARton Distributions}
-\author{Version: 0.9.1}
+\author{Version: 0.9.3}
 \date{\today}
 \maketitle
 
@@ -90,7 +90,13 @@ convergence. As long as no poles are crossed value of the
 integral should not depend on the value of $c$. One can
 try different values of $c$ and $\phi$ to get best numerical
 properties. 
-By default, in \texttt{init.f} it is set $c$ = 0.5 and $\phi = 3\pi/4$.
+For the default GPD ansatz (\texttt{ANSATZ = 'FIT'}), values of  $c$ = 0.5 or 0.25 are
+fine, as well as $\phi = 3\pi/4$. However if one uses different GPD ansatz, one should
+be aware of the position of the leading poles and choose $c$ accordingly. Also, if
+one uses $\overline{MS}$ scheme and \emph{non-diagonal evolution} (\texttt{SCHEME = 'MSBND'}),
+one should not make $\phi$ too big or one runs in the danger of hitting poles of
+the evolution operator. In this case $\phi$ only slightly larger than $\pi/2$ is the
+safest choice.
 
 \begin{figure}
 \begin{center}
@@ -164,6 +170,10 @@ On each segment, standard 8-point Gaussian integration is employed, according
 to Eq. (25.4.30) from \cite{AbS65}.
 Thus for \texttt{SPEED}=1,2, and 4 we use in total 64, 32, and 16
 integration points, respectively. 
+One can increase the number of Gaussian points by increasing the parameter
+\texttt{ACC} in \texttt{GEPARD.INI}. Number of points is $2^{\mbox{\texttt{ACC}}}$,
+but default choice is good enough for all practical purposes and increasing this
+paremeter serves only as a check of numerical stability.
 
 During the initialization phase, coordinates of points on Mellin-Barnes contour and 
 their Gaussian-integration weights
@@ -194,33 +204,35 @@ on an input scale by defining subroutine \texttt{HJ} which has the synopsis
       SUBROUTINE HJ(J, FCM)
 
       DOUBLE COMPLEX J, FCM(2)
-      DOUBLE PRECISION XI, DEL2, Q2, Q02
-      COMMON / KINEMATICS /  XI, DEL2, Q2, Q02
+      DOUBLE PRECISION XI, DEL2, Q2
+      COMMON / KINEMATICS /  XI, DEL2, Q2
 \end{verbatim}
 Input to the subroutine is the complex conformal moment \texttt{J} (i.e. coordinates of a point
-on the Melin-Barnes contour), and kinematical parameters $\xi$, $t=\Delta^2$, $\mathcal{Q}^2$
-(not used), and $\mathcal{Q}_{0}^2$ (these last four via common block), while output should 
-be corresponding values
+on the Melin-Barnes contour), and kinematical parameters $\xi$, $t=\Delta^2$, and $\mathcal{Q}^2$
+(not used), while output should be corresponding values
 \begin{align}
 \texttt{FCM(1)}& =\, ^{\Sigma}\!H_{j} (\xi,\Delta^2,\mathcal{Q}_{0}^2)  \\
 \texttt{FCM(2)}& =\, ^{G}\!H_{j}(\xi,\Delta^2,\mathcal{Q}_{0}^2) \,.
 \label{eq:FCM}
 \end{align}
 In the subroutine \texttt{HJ} provided by default, there is already implemented ansatz
-\begin{equation}
-^{a}\!H_{j}(\xi,\Delta^2,\mathcal{Q}_{0}^2) = 
-N_a F_{a} (\Delta^2) \frac{ {\rm B}\big(1+j-\alpha_{a}(\Delta^2), \mathcal{P}_a\big)}{
-{\rm B}\big(2-\alpha_{a}(0),\mathcal{P}_a\big)}\;, \qquad a = \Sigma, G \,
-\label{eq:ansatzFIT}
-\end{equation}
-where $\mathcal{P}_\Sigma$ = 8,  $\mathcal{P}_G$ = 6, $\alpha_{a}(\Delta^2) =
-\alpha_{a}(0) + 0.25 \Delta^2$  and 
-\begin{equation}
-F_{a} (\Delta^2) = \left(1 - \frac{\Delta^2}{m_{a}^2}\right)^{-3} \,.
-\label{eq:F}
-\end{equation}
-Six free parameters of this ansatz ($N_a$, $m_a$ and $\alpha_{a}(0)$, for  $a = \Sigma, G$),
-can either be fixed, or provided by the minimization routine for fitting, see
+from the big paper.
+%\begin{equation}
+%^{a}\!H_{j}(\xi,\Delta^2,\mathcal{Q}_{0}^2) = 
+%N_a F_{a} (\Delta^2) \frac{ {\rm B}\big(1+j-\alpha_{a}(\Delta^2), \mathcal{P}_a\big)}{
+%{\rm B}\big(2-\alpha_{a}(0),\mathcal{P}_a\big)}\;, \qquad a = \Sigma, G \,
+%\label{eq:ansatzFIT}
+%\end{equation}
+%where $\mathcal{P}_\Sigma$ = 8,  $\mathcal{P}_G$ = 6, $\alpha_{a}(\Delta^2) =
+%\alpha_{a}(0) + 0.25 \Delta^2$  and 
+%\begin{equation}
+%F_{a} (\Delta^2) = \left(1 - \frac{\Delta^2}{m_{a}^2}\right)^{-3} \,.
+%\label{eq:F}
+%\end{equation}
+Twenty four free parameters of this ansatz ($N_a$, $\alpha_{a}(0)$, $\alpha_{a}'$,
+$M_{0_a}$, $\Delta M_a$ and $p_a$ for  $a = \Sigma, G, u_{\rm val}, d_{\rm val}$),
+can either be fixed (e.g. in file \texttt{ansatz.f} used by example programs in
+subdirectory \texttt{ex}), or provided by the minimization routine for fitting, see
 Fig.~\ref{fig:MINUIT.CMD}.
 
 
@@ -235,8 +247,7 @@ Collection of QCD anomalous dimensions and Wilson coefficients for singlet DVCS 
 in $\overline{MS}$ up to NLO.
 
 \item
-The evolution of GPDs up to NLO in $\overline{CS}$ scheme. $\overline{MS}$
-evolution to be included.
+The evolution of GPDs up to NLO in $\overline{CS}$ and  $\overline{CS}$ schemes.
 
 \item 
 Mellin-Barnes representation for DVCS form-factors.
@@ -244,7 +255,7 @@ Mellin-Barnes representation for DVCS form-factors.
 
 For calculating and testing DVCS form factors and observables the programs \texttt{test},
 \texttt{auxtest}, \texttt{radcorr}, and \texttt{scaledep} are provided at the
-moment.
+moment. For doing example plots many programs are provided in subdirectory \texttt{ex}.
 
 For fitting the GPD parameters using Minuit, as well as for calculating observables (by
 fixing all parameters to desired value), the program \texttt{fit} is provided.
@@ -283,13 +294,18 @@ Columns two and three are just convenient reminders for the user.
 \hrule
 \begin{verbatim}
 
-    2          SPEED        1(most accurate), 2 or 4(fastest)
+    1          SPEED        1(most accurate), 2 or 4(fastest)
+    3          ACC          Gaussian subintegrations are done on 2**ACC points 
     1          P            N^{P}LO order (0, 1 or 2)
     3          NF           number of active flavours
-    0.05D0     AS0          value of astrong/(2 Pi) at 2.5 GeV^2
-    1.D0       RF2          ratio {\cal Q}^2/{\mu_{f}^2}
-    1.D0       RR2          ratio {\cal Q}^2/{\mu_{r}^2}
-    'CSBAR'    SCHEME       
+    1          CZERO        Put to zero to kill LO result
+    1.0        RF2          ratio {\cal Q}^2/{\mu_{f}^2}
+    1.0        RR2          ratio {\cal Q}^2/{\mu_{r}^2}
+    0.5        C            MB integration contour crosses real axis here
+    1.9        PHI          angle MB contour makes with positive real axis
+    -0.25      CND          same as C, but for ND evolution MB contour
+    1.58       PHIND        same as PHI, for ND evolution MB contour
+    'CSBAR'    SCHEME       'CSBAR', 'MSBAR', 'MSBLO', 'MSBND', 'EVOLG', ...
     'FIT'      ANSATZ       GPD ansatz (see parwav.f subroutine HJ)
 
 \end{verbatim}
@@ -314,7 +330,8 @@ proportional to the
 value of \texttt{SPEED}. 
 
 Analysis of how accurate are results for varius \texttt{SPEED} settings can
-be found in section \ref{sec:tests}.
+be found in section \ref{sec:tests}. In the present version of \texttt{gepard},
+\texttt{SPEED=4} is rather unreliable.
 
 \item
 \texttt{P} --- \emph{Integer}. Perturbation theory approximation level. 0 = LO, 1 = NLO, and
@@ -327,10 +344,9 @@ be found in section \ref{sec:tests}.
 \texttt{NF} --- \emph{Integer}. Number of active quark flavors
 
 \item
-\texttt{AS0} --- \emph{Double precision}. Value of $\alpha_{\rm s}(2.5
-\textrm{GeV}^2)/(2 \pi)$. For various test, as well as in
-\cite{Kumericki:2006xx} value 0.05 vas used. More realistic value is 0.0536,
-which corresponds to $\alpha(M_Z) = 0.117$. \comminline{Check this value!} 
+\texttt{CZERO} --- \emph{Integer}. This multiplies $\alpha_{s}^{0}$ i. e. LO result.
+  Should normally be 1, but can be put to 0, so one can get NLO \emph{correction},
+  instead of \emph{prdediction}, from the routines.
 
 \item
 \texttt{RF2} --- \emph{Double precision}. $ {\cal Q}^2/{\mu_{f}^2}$ i.e. ratio
@@ -341,9 +357,22 @@ of photon virtuality and factorization scales squared
 of photon virtuality and renormalization scales squared
 
 \item
-\texttt{SCHEME} --- \emph{Character*5}. Renormalization scheme label. Can presently be \texttt{'CSBAR'} or
-\texttt{'MSBAR'} corresponding to $\overline{CS}$ and $\overline{MS}$ schemes, respectively,
-but note that evolution is at the moment implemented only for \texttt{'CSBAR'} scheme.
+\texttt{C, PHI} --- \emph{Double precision}. Intercept $c$, and angle $\phi$ of
+the Mellin-Barnes contour (Figure \ref{fig:MellinBarnes}).
+
+\item
+\texttt{CND, PHIND} --- \emph{Double precision}. Same, but for 
+the Mellin-Barnes contour used in the non-diagonal $\overline{MS}$ evolution.
+
+\item
+\texttt{SCHEME} --- \emph{Character*5}. Renormalization scheme label. 
+Can presently be 
+\begin{itemize}
+\item \texttt{'CSBAR'}: $\overline{CS}$
+\item \texttt{'MSBND'}: $\overline{MS}$, including non-diagonal evolution
+\item \texttt{'MSBAR'}: $\overline{MS}$, excluding non-diagonal evolution
+\item \texttt{'MSBLO'}: $\overline{MS}$, evolution is LO only
+\end{itemize}
 
 \item
 \texttt{ANSATZ} --- \emph{Character*6}. Label of ansatz for conformal moments of GPDs on input scale. 
@@ -370,19 +399,22 @@ radiative corrections, ignores values of \texttt{P}, \texttt{SCHEME} and
 \begin{verbatim}
 
       'testfit'
-      '/VCPS'  2  3
+      '/CPS' 3  3
       'START'
-      'DVCS1.DAT'
-      'DVCS2.DAT'
-      'DVCS3.DAT'
-      'DVCS4.DAT'
-      'DVCS5.DAT'
-      'DVCS6.DAT'
-      'STOP'
+      'DVCS_H1_1.DAT'
+      'DVCS_H1_2.DAT'
+      'DVCS_H1_3.DAT'
+      'DVCS_H1_6.DAT'
       'DIS1.DAT'
-      'DIS2.DAT'
       'DIS3.DAT'
       'DIS4.DAT'
+      'STOP'
+      'DVCS_H1_5.DAT'
+      'DVCS_ZEUS_1.DAT'
+      'DVCS_ZEUS_2.DAT'
+      'DIS2.DAT'
+      'DIS5.DAT'
+      'DIS6.DAT'
 
 \end{verbatim}
 \hrule
@@ -444,19 +476,27 @@ This facilitates easy selection of data for different fits.
 \hrule
 \begin{verbatim}
 
-        0   <--  1=INTERACTIVE   0=BATCH 
+        0   <--   1=INTERACTIVE   0=BATCH  (Must be 0 on Windows!)
         SET TITLE
-           Fitting to H1/ZEUS DVCS and DIS data
+               Fitting to ansatz: FIT
         PARAMETERS
-        1  'NG        '   0.3d0     .1d0
-        2  'NSEA      '   0.2d0     .1d0
-        3  'MG        '   1.0d0     .1d0 
-        4  'MSEA      '   1.0d0     .1d0
-        5  'ALPHA0G   '   1.0d0     .1d0
-        6  'ALPHA0SEA '   1.0d0     .1d0
-        7  'Q20       '   1.0d0     .1d0
+        1  'Q02       '   7.0       .1  
+        2  'AS0       '   0.0536    .1  
+        3  'MU02      '   2.5       .1  
+        11 'NS        '   0.2       .1  
+        12 'AL0S      '   1.1       .1   
+        13 'ALPS      '   0.15      .1  
+        14 'M02S      '   3.53      .1
+        15 'DELM2S    '   0.88      .1  
+        16 'PS        '   3.0       .1  
+        21 'NG        '   0.5       .1  
+        22 'AL0G      '   1.0       .1   
+        [... some lines deleted ...]
 
-        fixed 3 4 7
+        fix  1 2 3 
+        fix  13 15 16
+        [... some lines deleted ...]
+
         migrad
         cali 3
 
@@ -483,12 +523,13 @@ If one uses default \texttt{ANSATZ = 'FIT'} in
 Fig.~\ref{fig:MINUIT.CMD}. One could than only change initial values of parameters
 (column 3), and maybe their starting step size (column 4). This \texttt{ANSATZ = 'FIT'} 
 corresponds to ansatz described in Section \ref{ssect:ansatz}.  
+Note that first parameter specifies input scale $\mathcal{Q}_0$, and second
+one specifies value of $\alpha_{\rm strong}$ at the scale given by third parameter.
 
 Last part of this file contains Minuit command instructions. E. g. in the
-example on Fig.~\ref{fig:MINUIT.CMD} one first fixes parameters number 3, 4,
-and 7 (i.e. \texttt{MG}, \texttt{MSEA} and \texttt{Q20} are held at 1.0),
-than performs minimization using \texttt{migrad} algorithm,
-and finally prints (to the file \texttt{FIT.OUT}), and maybe plots (to the file specified in
+example on Fig.~\ref{fig:MINUIT.CMD} one first fixes some parameters,
+then performs minimization using \texttt{migrad} algorithm,
+and finally prints, and maybe plots (to the file specified in
 \texttt{FIT.INI}) the results of the fit.
 
 \subsection{Data files}
@@ -498,26 +539,26 @@ and finally prints (to the file \texttt{FIT.OUT}), and maybe plots (to the file 
 \hrule
 \begin{verbatim}
 
-        'SIGMA'                    YOBS
-        89.d0                      W
+        'SIGMA'                   YOBS
+        82.d0                      W
         -1.                        Q2
         6                          N
-        7.5   5.42  0.33  0.32 
-        12.5  2.64  0.22  0.12 
-        20    1.23  0.14  0.06 
-        32.5  0.59  0.12  0.04 
-        55    0.2   0.08  0.025 
-        85    0.16  0.09  0.03
+        3.0   15.7   2.5   3.4   
+        5.25   5.7  1.1   1.4  
+        8.75  3.20  0.49  0.69
+        15.5  1.20  0.22  0.32
+        25.0  0.70  0.19  0.19
+        55.0  0.15  0.05  0.05
 
 
-        *     DVCS4  [ZEUS, Phys.Lett.B573:46-62,2003, hep-ex/0305028]
-        *       X = Q2,   Y = SIG   (TCUT = - \inf GeV ???)
-        *       W = 89 GeV
+        *     DVCS_H1_3  [H1,  Eur.Phys.J.C44:1-11,2005, hep-ex/0505061] Table 2.
+        *       X = Q2,   Y = SIG   (TCUT = - 1 GeV)
+        *       W = 82 GeV
 
 \end{verbatim}
 \hrule
 \end{center}
-\caption{Example of an experimental data file \texttt{DVCS4.DAT}.}
+\caption{Example of an experimental data file \texttt{DVCS\_H1\_3.DAT}.}
 \label{fig:DVCS4.DAT}
 \end{figure}
 
@@ -671,7 +712,9 @@ only in \texttt{gepard} versions $> 0.9$. In version $0.9$ only 8-point integrat
 \caption{Relative errors of evolution of NLO Les Houches benchmark PDF $x g(x)$
 from 2 GeV$^2$ to 10$^4$ GeV$^2$, for various settings of parameter
 \texttt{SPEED}. Large errors for $\xi > 0.1$ are due to Mellin-Barnes integration
-being cut-off too early. This could be easily fixed.}
+being cut-off too early. This could be easily fixed. \emph{NB: this plot is made
+by the older version of \texttt{gepard}. Present version has not so good
+accuracy for \texttt{SPEED=4}!}}
 \label{fig:PDFevol}
 \end{figure}
 
@@ -685,7 +728,9 @@ Fig.~\ref{fig:acc}
 \includegraphics[scale=0.8]{acc}
 \end{center}
 \caption{Relative errors of NLO total DVCS cross section when calculated with various
-\texttt{SPEED} settings.}
+\texttt{SPEED} settings. \emph{NB: this plot is made
+by the older version of \texttt{gepard}. Present version has not so good
+accuracy for \texttt{SPEED=4}!}}
 \label{fig:acc}
 \end{figure}
 
@@ -726,7 +771,9 @@ Calling graph of subroutines for executable \texttt{fit} is displayed on
 Fig.~\ref{fig:callgraph}. Each subroutine,
 function and main program is described in the extended \texttt{gepard-api.pdf} documentation,
 as well as hyperlinked HTML documentation produced by \texttt{robodoc} automatic
-documentation generator.
+documentation generator. This is corresponding to old version 0.9.1 of \texttt{gepard}.
+There are some changes in the present version, and automatically generated documentation
+is not yet completely updated.
 
 \begin{figure}[ht]
 \begin{center}

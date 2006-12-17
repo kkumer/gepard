@@ -3,7 +3,7 @@ gepard - Package for calculation of DVCS form factors and observables
          by evolving moments of GEneral PARton Distributions 
 
 
-- Version 0.9b4 2006-07-23 
+- Version 0.9.3 2006-12-16 
 
 
 Contents of this README
@@ -12,6 +12,7 @@ Contents of this README
 1. Basic usage
         1.1 Calculating with Fortran executables
         1.2 Fitting using Minuit
+        1.3 Producing example plots used in big paper
 
 2. Compilation and installation
         2.1 Unix requirements
@@ -41,7 +42,7 @@ Contents of this README
 
 - First go to directory Tests/ and try to run executable '../src/test' from 
   there, and see if numbers come out right. (By the way, one always needs to 
-  start executables from directory where relevant input files are placed.)
+  have relevant input files, such as GEPARD.INI, in the working directory.)
   Try increasing SPEED in GEPARD.INI and see how numbers get worse.
 
 - For additional tests, see Tests/README
@@ -84,6 +85,17 @@ Contents of this README
 More detailed description can be found in doc/tex/gepard.pdf
 
 
+1.3 Producing example plots used in big paper
+---------------------------------------------
+
+There are many example programs in directory ex/, which produce
+numbers which are ploted in Figures of the big paper. These numbers
+are in files with names of the form *[0-3].dat, where numbers [0-3] 
+correspon to four panels that these figures usually have.
+
+To automatically plot these data using grace plotting software see ex/README.
+This ex/README also describes which executable produces which data.
+
 
 ====================================================================
 2. Compilation and installation
@@ -96,23 +108,26 @@ in src/ directory).
 
 2.1 Unix requirements
 ---------------------
-- 'test', 'radcorr' and  'scaledep' programs can be compiled using just GNU gcc
-   compiler
+-  All executables ('test', 'radcorr', ... and all those in 'ex' subdirectory which
+   produce some example data and plots), apart from 'fit' can be compiled using 
+   just GNU gcc/g77/f77 compiler
 
-- 'fit' program needs CERNLIB's Minuit routine, usually contained in libraries
-  'kernlib' and 'packlib', distributed by CERN at
+- 'fit' program additionally needs CERNLIB's Minuit routine, usually contained
+  in libraries 'kernlib' and 'packlib', distributed by CERN at
       http://cernlib.web.cern.ch/cernlib/
   See section 2.4 for more details about installing Minuit.
-  Location of these libraries should be specified in Makefile.
+  Location of these libraries should be specified as an environment variable
+  CERNLIBS in Makefile.
 
 - For plotting feature, 'fit' program also needs PGPLOT graphic library.
       http://www.astro.caltech.edu/~tjp/pgplot/
-  Location of this library should be specified in Makefile.
+  Location of this library should be specified as an environment variable
+  PGPLOTLIBS in Makefile.
   See section 2.5 for more details about installing PGPLOT.
   If PGPLOT is not available, there is an alternative program fit_nopgplot
   that produces only tabular output.
 
-- For recreating documentation, robodoc and LaTeX softwares are needed
+- For recreating documentation, robodoc and LaTeX softwares are needed.
   Robodoc homepage is  http://www.xs4all.nl/~rfsber/Robo/robodoc.html
 
 Precompiled Minuit and PGPLOT libraries for Linux can be obtained from
@@ -157,6 +172,9 @@ make radcorr - executable for Fig 1 of Letter  (only two points per plot
 make scaledep - executable for Fig 2 of Letter (also only two points.)
 make hmtl  - creates HTML documentation (needs robodoc software)
 make pdf   - creates LaTeX documentation (needs robodoc software)
+make <example> (where <example> is one of the targets specified
+          in file ex/README) - creates example executables in directory 'ex'.
+          These than produce numbers for plots shown in big paper. 
 make all   - makes everything above and maybe more
 make clean - removes everything which is easily recreatable
 
@@ -245,6 +263,7 @@ src/adacf/  - sources for DIS anomalous dimensions and Wilson coeffs.
 Tests/  - some numbers from Letter, useful for testing. See README
           there.
 fits/ - inputs needed for fitting to DVCS and DIS data
+ex/   - files for plotting example plots shown in big paper
 
 
 3.3 Mathematica part
@@ -257,6 +276,10 @@ needed here but are useful for checking and debugging of Fortran algorithms.
 (New Mathematica interface will hopefully be made in the future.)
 
 Test/mma/gepard.m  - Mathematica package. For basic documentation try ?CFF and ?Fcm
+Test/mma/gepard_scales.m  - Mathematica package, which, unlike gepard.m, has correct
+            treatment of situation where factorization scale is not equal to Q^2.
+            However, fast interpolated Wilson coefficients (eval=GEPI, GEPIfix) are
+            not available in this package.
 Test/mma/gepard.nb - Notebook with checks and timings. Section 1 and then 3 are good
             introduction.  Section 2 of this notebook is good
             for understanding which routines are available and 

@@ -1,16 +1,20 @@
-Version 0.9.3  (2006-??-??)
+Version 0.9.3  (2006-12-17)
 
-	- ADD: non-singlet evolution subroutines EVOLNSF, ERFUNCNSF, RNNLONSF
+	- ADD: non-singlet evolution
 	- ADD: non-singlet NNLO
 	- ADD: MSbar non-diagonal evolution
-	- ADD: CZERO parameter which can be used to put LO (a_strong^0) term
-	       to zero for investigation of NLO effects
-	- ADD: inteligent choice of y-range for drawing of PDF(x)
+	- ADD: intelligent choice of y-range for drawing of PDF(x)
+	- ADD: many example programs in ex subdirectory which produce
+	       data for plots in a big paper
+    - ADD: automatic plotting and psfragging of plots
+	- FIX: dependence on factorization scale corrected now
+	- BUG: SPEED=4 is much more unreliable than before
 
 	{Merged from 0.9-fix2:}
-	- FIX: charge-factor bugs (not NF-dependent, and altogher
-	       missing from DVCS)
+	- FIX: charge-factor bugs (it was not NF-dependent, and was
+	       altogher missing from DVCS)
 	- ADD: PDF(x), resulting from fit, are also drawn now
+	- ADD: Additional experimental data points for fitting
 
 Version 0.9.2  (2006-08-03)
 
@@ -27,7 +31,7 @@ Version 0.9.1  (2006-07-26)
 	  
 Version 0.9  (2006-07-23)
 
-	- Wilson coefficients calculated in intialization phase and
+	- Wilson coefficients calculated in initialization phase and
 	  together with anomalous dimensions put into common block
 	- Integration moved from slatec to 8-point Gaussian
 	- Adacf part integrated into source
