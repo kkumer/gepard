@@ -8,6 +8,7 @@ Plots data from files prefix0, prefix1, ..., prefixnum using
 grace and grace parameters file prefix.bat.
 
  -b  batch plot + fragmaster (using prefix.fm) to prefix.{eps,pdf}
+ -e  data have error bars
  -h  this help message
 
 kkumer 2006-11-29 
@@ -16,12 +17,14 @@ EOF
 
 # Parsing arguments
 batch="no"
+errs=""
 num=3
-while getopts bhn: opt
+while getopts behn: opt
 do  
     case "$opt" in
       h)  usage; exit 0;;
       b)  batch="yes";;
+      e)  errs=" -settype xydy -bxy 1:2:3 ";;
       n)  num="$OPTARG";;
       \?) usage; exit 1;;               # unknown flag
     esac 
@@ -38,7 +41,7 @@ fi
 grf=0
 arg=""
 while [ $grf -le $num ]; do
-   arg="${arg} -graph $grf ${prefix}${grf}.dat"
+   arg="${arg} -graph $grf $errs ${prefix}${grf}.dat"
    let grf=$grf+1
 done
 

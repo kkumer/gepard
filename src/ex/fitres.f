@@ -35,7 +35,7 @@ C
       IMPLICIT NONE
       INTEGER PT, NPOINTS, LN, PANEL
       DOUBLE PRECISION MT, MP, LSTART, LEND, LSTEP
-      PARAMETER ( NPOINTS = 10 )
+      PARAMETER ( NPOINTS = 40 )
       DOUBLE PRECISION POINTS(0:3, 4, NPOINTS)
       DOUBLE PRECISION W, PARSIGMA, SIGMA
       CHARACTER FNAME*30
@@ -53,25 +53,23 @@ C
 
 * ----  "RESULTING FIT" ----------------
 
-      PAR(1)    =    7.0d0
-      PAR(2)    =    0.0536d0
+
+*    NNLO 
+      P = 2
+      SCHEME = 'CSBAR'
+      PAR(1)    =    4.0d0
+      PAR(2)    =    0.0488d0
 
 
-      PAR(11)   =    0.183
-      PAR(21)   =    0.531
-      PAR(12)   =     1.18
-      PAR(22)   =     1.20
-      PAR(14)   =     1.39
-      PAR(24)   =     1.21
+      PAR(11)   =    0.167
+      PAR(12)   =     1.136
+      PAR(14)   =     1.217
+      PAR(15)   =     0.0
 
-*     NLO_DVCS
-
-      PAR(11)   =    0.136
-      PAR(21)   =    0.350
-      PAR(12)   =     1.26
-      PAR(22)   =     1.31
-      PAR(14)   =     0.993
-      PAR(24)   =     0.599
+      PAR(21)   =    0.586
+      PAR(22)   =     1.06
+      PAR(24)   =     1.414
+      PAR(25)   =     0.06
 
 *   Removing valence quarks
       PAR(31)   =     0.0d0
@@ -184,6 +182,52 @@ C
  60     CONTINUE
         WRITE (UNIT=12, FMT=999)
  50   CONTINUE
+
+
+*   ------  PANEL 3  -------------------
+*     Looping over choices for X_BJ
+      PROCESS = 'DIS'
+      DO 70 LN =1, 6
+
+        IF (LN .EQ. 1) THEN
+          XI = 0.013d0
+          FNAME = 'DATA/DIS1H1.DAT'
+        ELSE IF (LN .EQ. 2) THEN
+          XI = 0.008d0
+          FNAME = 'DATA/DIS2H1.DAT'
+        ELSE IF (LN .EQ. 3) THEN
+          XI = 0.0032d0
+          FNAME = 'DATA/DIS4H1.DAT'
+        ELSE IF (LN .EQ. 4) THEN
+          XI = 0.0013d0
+          FNAME = 'DATA/DIS6H1.DAT'
+        ELSE IF (LN .EQ. 5) THEN
+          XI = 0.0005d0
+          FNAME = 'DATA/DIS8H1.DAT'
+        ELSE 
+          XI =  0.00013d0
+          FNAME = 'DATA/DIS11H1.DAT'
+        END IF
+        CALL PRINTDATA(13, FNAME)
+
+        CALL INIT
+        
+*     Looping over Q2
+        LSTART = 2.d0
+        LEND = 95.d0
+        LSTEP = (LEND - LSTART) / (NPOINTS - 1)
+
+        DO 80 PT = 1, NPOINTS
+
+          Q2 = LSTART + (PT - 1) * LSTEP
+          CALL F2F
+          WRITE (UNIT=13,FMT=998) Q2, F2(P), 0.0
+
+ 80     CONTINUE
+        WRITE (UNIT=13, FMT=999)
+ 70   CONTINUE
+
+
 998   FORMAT (F8.3,5X,F12.7,5X,F3.1)
 999   FORMAT (1X)
 

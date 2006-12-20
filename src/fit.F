@@ -189,6 +189,7 @@ C
         WRITE (21, 806) SCHEME, ANSATZ
         IF ( ANSATZ(:3) .EQ. 'FIT' ) THEN
           WRITE (21, 803) "Final fit parameters:"
+          WRITE (21, 811) PAR(1)
           DO 13 K = 1, 4
           WRITE (21, 807) FITNM(K), PAR(10+K)
  13       WRITE (21, 807) FITNM(4+K), PAR(20+K)
@@ -241,9 +242,9 @@ C
           CALL PGTEXT (-1., REAL(8-K), TXT)
           WRITE (TXT, 807) FITNM(4+K), PAR(20+K)
  30       CALL PGTEXT (-1., REAL(4-K), TXT)
-          WRITE (TXT, 808) NTOT, NPAR, NTOT-NPAR
+          WRITE (TXT, 808) NTOT, NPAR, NTOT-NPAR, CHISQ
           CALL PGTEXT (-1., -1., TXT)
-          WRITE (TXT, 809) CHISQ
+          WRITE (TXT, 810) PAR(1)
           CALL PGTEXT (-1., -2., TXT)
         END IF
 *     Draw last plot containing PDFs
@@ -292,11 +293,12 @@ C
 
 803   FORMAT (1X, /, 1X, '-----    ', A, '    -----', /)
 804   FORMAT (1X, 'SPEED = ', I1, 5X, 'P = ', I1, 5X, 'NF = ', I1)
-!805   FORMAT (1X, 'AS0 = ', F6.4,2X, 'RF2 = ', F3.1,2X, 'RR2 = ', F3.1)
 806   FORMAT (1X, 'SCHEME = ', A, 3X, 'ANSATZ = ', A)
 807   FORMAT (1X,  A15, ' = ', 3X, G9.3)
-808   FORMAT (1X, 'd.o.f = ', I3, ' - ', I1, ' = ', I3)
-809   FORMAT (1X, '\\gx\\u2\\d = ', F8.1)
+808   FORMAT (1X, 'd.o.f = ', I3, ' - ', I1, ' = ', I3, '    ',
+     &            '\\gx\\u2\\d = ', F8.1)
+810   FORMAT (1X, 'Q0\\u2\\d = ', F8.1, ' GeV\\u2\\d')
+811   FORMAT (1X, 'Q0^2 = ', F8.1, ' GeV^2')
 
       RETURN
       END
