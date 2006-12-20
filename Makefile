@@ -43,7 +43,7 @@ endif
 # targets
 export SRCTARGETS = radcorr scaledep fit test auxtest fit_nopgplot houches accuracy
 export EXTARGETS = aux auxns anatomyNS anatomy radNLONS radNLO evolutNS evolut radQ \
-                   radNNLONS radNNLO scalesNS scales scalesNNLO
+                   radNNLONS radNNLO scalesNS scales scalesNNLO slope fitres
 
 .PHONY: $(SRCTARGETS) $(EXTARGETS)
 DOCTARGETS = pdf html
@@ -79,6 +79,6 @@ clean:
 	$(MAKE) -C src clean
 	$(MAKE) -C doc/tex clean
 	-rm -rf doc/html/*
-	-rm -f fits/*.{min,out,ps} fits/gmon.out
+	-rm -f fits/*.{min,out,ps} fits/gmon.out fits/fitres*
 	-rm -f Tests/*dat Tests/gmon.out
-	-rm -f ex/*dat ex/*eps
+	-rm -f ex/*dat ex/*eps 

@@ -1,5 +1,5 @@
 # grace batch file for radQNS
-page size 500 350
+#page size 500 350
 page background fill off
 arrange(2, 2, .1, .2, .1)
 with string
@@ -22,7 +22,7 @@ string def "Q210"
 ##############################################
 with g0
 ##############################################
-world 0.05, -19, 0.5, 18
+world 0.00, -19, 0.5, 18
 view 0.15, 0.65, 0.6, 0.90
 legend loctype view
 legend 0.406, 0.757
@@ -85,7 +85,7 @@ s5 line linewidth 1.5
 ##############################################
 with g1
 ##############################################
-world 0.05, -19, 0.5, 18
+world 0.00, -19, 0.5, 18
 view 0.69, 0.65, 1.14, 0.90
 #  --------  x axis ------------
 xaxes scale Normal
@@ -141,7 +141,7 @@ s5 line linewidth 1.5
 ##############################################
 with g2
 ##############################################
-world 0.05, 0.0, 0.5, 0.25
+world 0.00, 0.0, 0.5, 0.25
 view 0.15, 0.38, 0.6, 0.63
 #  --------  x axis ------------
 xaxes scale Normal
@@ -192,7 +192,7 @@ s5 line linewidth 1.5
 ##############################################
 with g3
 ##############################################
-world 0.05, -0.25, 0.5, 0.0
+world 0.00, -0.25, 0.5, 0.0
 view 0.69, 0.38, 1.14, 0.63
 #  --------  x axis ------------
 xaxes scale Normal
@@ -207,7 +207,7 @@ yaxes scale Normal
 yaxis  ticklabel format general
 yaxis  ticklabel prec 2
 yaxis  tick major 0.1
-yaxis  tick minor ticks 3
+yaxis  tick minor ticks 4
 #  --------  Lines ------------
 s0 line linestyle 2
 s0 line color 1

@@ -1,0 +1,14 @@
+% Fragmaster file for all figures in this directory
+
+% psfrag commands:
+\psfrag{calQ2}{\scriptsize $\mathcal{Q}^2$ [GeV$^2$]}
+\psfrag{Q2}{\scriptsize $\mathcal{Q}^2$ [GeV$^2$]}
+\psfrag{WW}[]{\scriptsize $W$ [GeV]}
+\psfrag{MT}{\scriptsize $-t$ [GeV$^2$]}
+\psfrag{H1, placeholderpla Q2=4}{\scriptsize H1, $\mathcal{Q}^2 = 4 \,\mbox{GeV}^2$}
+\psfrag{H1, placeholderpla Q2=8}{\scriptsize H1, $\mathcal{Q}^2 = 8 \,\mbox{GeV}^2$}
+\psfrag{ZEUS, placeholderplace Q2=9.6}{\scriptsize ZEUS, $\mathcal{Q}^2 = 9.6 \,\mbox{GeV}^2$}
+\psfrag{H1, placeholderpla W=82}{\scriptsize H1, $W = 82 \,\mbox{GeV}$}
+\psfrag{ZEUS, placeholderpla W=89}{\scriptsize ZEUS, $W = 89 \,\mbox{GeV}$}
+\psfrag{PARSIGMA}[tc]{\scriptsize $d \sigma (\gamma^* p \to \gamma p)/ d t$ [nb/GeV$^2$]}
+\psfrag{SIGMA}[tc]{\scriptsize $\sigma(\gamma^* p \to \gamma p)$ [nb]}

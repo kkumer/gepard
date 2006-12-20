@@ -139,9 +139,9 @@ view 0.73, 0.45, 1.18, 0.85
 xaxes scale Normal
 xaxis  label "calQ2"
 xaxis  ticklabel format general
-# xaxis  ticklabel prec 0
+xaxis  ticklabel prec 0
 xaxis  tick major 20
-xaxis  tick minor ticks 3
+xaxis  tick minor ticks 9
 #  --------  y axis ------------
 yaxes scale Normal
 yaxis  label "ARGH"

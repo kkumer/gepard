@@ -145,6 +145,12 @@ scales: $(_FOBJS) $(_ADACFOBJS) $(EXFODIR)/scales.o
 scalesNNLO: $(_FOBJS) $(_ADACFOBJS) $(EXFODIR)/scalesNNLO.o
 	$(FC) -o ../ex/$@ $^ $(FFLAGS)
 
+fitres: $(_FOBJS) $(_ADACFOBJS) $(EXFODIR)/fitres.o
+	$(FC) -o ../fits/$@ $^ $(FFLAGS)
+
+slope: $(_FOBJS) $(_ADACFOBJS) $(EXFODIR)/slope.o $(FODIR)/Fderiv.o
+	$(FC) -o ../ex/$@ $^ $(FFLAGS)
+
 .PHONY: clean
 clean:
 	-rm -f $(SRCTARGETS)
