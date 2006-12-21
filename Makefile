@@ -79,6 +79,6 @@ clean:
 	$(MAKE) -C src clean
 	$(MAKE) -C doc/tex clean
 	-rm -rf doc/html/*
-	-rm -f fits/*.{min,out,ps} fits/gmon.out fits/fitres*dat fits/fitres
+	-rm -f fits/*.{min,out,ps,eps} fits/gmon.out fits/fitres*dat fits/fitres 
 	-rm -f Tests/*dat Tests/gmon.out
 	-rm -f ex/*dat ex/*eps 

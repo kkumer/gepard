@@ -187,26 +187,19 @@ C
 *   ------  PANEL 3  -------------------
 *     Looping over choices for X_BJ
       PROCESS = 'DIS'
-      DO 70 LN =1, 6
-
+      DO 70 LN =1, 4
         IF (LN .EQ. 1) THEN
-          XI = 0.013d0
-          FNAME = 'DATA/DIS1H1.DAT'
-        ELSE IF (LN .EQ. 2) THEN
           XI = 0.008d0
           FNAME = 'DATA/DIS2H1.DAT'
-        ELSE IF (LN .EQ. 3) THEN
+        ELSE IF (LN .EQ. 2) THEN
           XI = 0.0032d0
           FNAME = 'DATA/DIS4H1.DAT'
-        ELSE IF (LN .EQ. 4) THEN
+        ELSE IF (LN .EQ. 3) THEN
           XI = 0.0013d0
           FNAME = 'DATA/DIS6H1.DAT'
-        ELSE IF (LN .EQ. 5) THEN
+        ELSE
           XI = 0.0005d0
           FNAME = 'DATA/DIS8H1.DAT'
-        ELSE 
-          XI =  0.00013d0
-          FNAME = 'DATA/DIS11H1.DAT'
         END IF
         CALL PRINTDATA(13, FNAME)
 

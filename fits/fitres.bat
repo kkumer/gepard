@@ -1,5 +1,5 @@
 # grace batch file for fit
-#page size 500 350
+page size 500 350
 page background fill off
 arrange(2, 2, .1, .2, .1)
 ##############################################
@@ -325,11 +325,11 @@ yaxis  tick minor 9, 1.5
 yaxis  tick minor 10, 0.5
 #  --------  Lines ------------
 s0 type xydy
-s0 symbol 2
+s0 symbol 3
 s0 symbol size 0.49
-s0 symbol color 15
+s0 symbol color 13
 s0 symbol pattern 1
-s0 symbol fill color 15
+s0 symbol fill color 13
 s0 symbol fill pattern 1
 s0 symbol linewidth 1.0
 s0 symbol linestyle 1
@@ -340,20 +340,20 @@ s0 symbol skip 0
 s0 line type 0
 s0 errorbar on
 s0 errorbar place both
-s0 errorbar color 15
+s0 errorbar color 13
 s0 errorbar pattern 1
 s0 errorbar size 0.49
 #
 s1 line linestyle 1
-s1 line color 15
+s1 line color 13
 s1 line linewidth 1.5
 #
 s2 type xydy
-s2 symbol 1
+s2 symbol 7
 s2 symbol size 0.49
-s2 symbol color 4
+s2 symbol color 8
 s2 symbol pattern 1
-s2 symbol fill color 4
+s2 symbol fill color 8
 s2 symbol fill pattern 1
 s2 symbol linewidth 1.0
 s2 symbol linestyle 1
@@ -364,20 +364,20 @@ s2 symbol skip 0
 s2 line type 0
 s2 errorbar on
 s2 errorbar place both
-s2 errorbar color 4
+s2 errorbar color 8
 s2 errorbar pattern 1
 s2 errorbar size 0.49
 #
 s3 line linestyle 4
-s3 line color 4
+s3 line color 8
 s3 line linewidth 1.5
 #
 s4 type xydy
-s4 symbol 2
+s4 symbol 3
 s4 symbol size 0.49
-s4 symbol color 15
+s4 symbol color 13
 s4 symbol pattern 1
-s4 symbol fill color 15
+s4 symbol fill color 13
 s4 symbol fill pattern 1
 s4 symbol linewidth 1.0
 s4 symbol linestyle 1
@@ -388,20 +388,20 @@ s4 symbol skip 0
 s4 line type 0
 s4 errorbar on
 s4 errorbar place both
-s4 errorbar color 15
+s4 errorbar color 13
 s4 errorbar pattern 1
 s4 errorbar size 0.49
 #
 s5 line linestyle 1
-s5 line color 15
+s5 line color 13
 s5 line linewidth 1.5
 #
 s6 type xydy
-s6 symbol 1
+s6 symbol 7
 s6 symbol size 0.49
-s6 symbol color 4
+s6 symbol color 8
 s6 symbol pattern 1
-s6 symbol fill color 4
+s6 symbol fill color 8
 s6 symbol fill pattern 1
 s6 symbol linewidth 1.0
 s6 symbol linestyle 1
@@ -412,12 +412,12 @@ s6 symbol skip 0
 s6 line type 0
 s6 errorbar on
 s6 errorbar place both
-s6 errorbar color 4
+s6 errorbar color 8
 s6 errorbar pattern 1
 s6 errorbar size 0.49
 #
 s7 line linestyle 4
-s7 line color 4
+s7 line color 8
 s7 line linewidth 1.5
 #
 s8 type xydy

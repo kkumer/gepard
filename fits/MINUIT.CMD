@@ -2,8 +2,8 @@
 SET TITLE
        Fitting to ansatz: FIT
 PARAMETERS
-1  'Q02       '   7.0       .1  
-2  'AS0       '   0.0536    .1  
+1  'Q02       '   4.0       .1  
+2  'AS0       '   0.0518    .1  
 3  'MU02      '   2.5       .1  
 11 'NS        '   0.183     .1  
 12 'AL0S      '   1.18      .1   
