@@ -10,6 +10,9 @@ xaxis  ticklabel format power
 xaxis  ticklabel prec 0
 xaxis  tick major 10
 xaxis  tick minor ticks 9
+xaxis  tick major size 0.6
+xaxis  tick minor size 0.3
+xaxis  ticklabel char size 0.86
 #  --------  y axis ------------
 yaxes scale Logarithmic
 yaxis  label "|\qsee label in legend box\Q| / |total amplitude|"
@@ -17,6 +20,9 @@ yaxis  ticklabel format general
 yaxis  ticklabel prec 2
 yaxis  tick major 10
 yaxis  tick minor ticks 9
+yaxis  tick major size 0.6
+yaxis  tick minor size 0.3
+yaxis  ticklabel char size 0.86
 #  --------  Lines ------------
 s0 line linestyle 1
 s0 line linewidth 3.5

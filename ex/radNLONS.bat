@@ -25,7 +25,7 @@ with g0
 world 0, -35, 0.5, 5
 view 0.15, 0.65, 0.6, 0.90
 legend loctype view
-legend 0.28, 0.47
+legend 0.28, 0.46
 legend length 5
 legend char size 0.64
 #  --------  x axis ------------
@@ -35,6 +35,19 @@ xaxis  ticklabel format general
 xaxis  ticklabel prec 0
 xaxis  tick major 0.1
 xaxis  tick minor ticks 4
+xaxis  tick major size 0.6
+xaxis  tick minor size 0.3
+xaxis  ticklabel char size 0.86
+#  -------- alt x axis ------------
+altxaxis  on
+altxaxis  type zero true
+altxaxis  bar on
+altxaxis  bar color 1
+altxaxis  bar linestyle 1
+altxaxis  bar linewidth 0.5
+altxaxis  tick off
+altxaxis  tick major 10
+altxaxis  ticklabel off
 #  --------  y axis ------------
 yaxes scale Normal
 yaxis  label "D1K"
@@ -44,6 +57,9 @@ yaxis  ticklabel format general
 yaxis  ticklabel prec 2
 yaxis  tick major 10
 yaxis  tick minor ticks 4
+yaxis  tick major size 0.6
+yaxis  tick minor size 0.3
+yaxis  ticklabel char size 0.86
 #  --------  Lines ------------
 s0 line linestyle 4
 s0 line color 4
@@ -75,6 +91,19 @@ xaxis  ticklabel format general
 xaxis  ticklabel prec 0
 xaxis  tick major 0.1
 xaxis  tick minor ticks 4
+xaxis  tick major size 0.6
+xaxis  tick minor size 0.3
+xaxis  ticklabel char size 0.86
+#  -------- alt x axis ------------
+altxaxis  on
+altxaxis  type zero true
+altxaxis  bar on
+altxaxis  bar color 1
+altxaxis  bar linestyle 1
+altxaxis  bar linewidth 0.5
+altxaxis  tick off
+altxaxis  tick major 10
+altxaxis  ticklabel off
 #  --------  y axis ------------
 yaxes scale Normal
 #yaxis  label "KL1"
@@ -84,6 +113,9 @@ yaxis  ticklabel format general
 yaxis  ticklabel prec 3
 yaxis  tick major 10
 yaxis  tick minor ticks 4
+yaxis  tick major size 0.6
+yaxis  tick minor size 0.3
+yaxis  ticklabel char size 0.86
 #  --------  Lines ------------
 s0 line linestyle 4
 s0 line color 4
@@ -114,6 +146,19 @@ xaxis  ticklabel format general
 xaxis  ticklabel prec 1
 xaxis  tick major 0.1
 xaxis  tick minor ticks 4
+xaxis  tick major size 0.6
+xaxis  tick minor size 0.3
+xaxis  ticklabel char size 0.86
+#  -------- alt x axis ------------
+altxaxis  on
+altxaxis  type zero true
+altxaxis  bar on
+altxaxis  bar color 1
+altxaxis  bar linestyle 1
+altxaxis  bar linewidth 0.5
+altxaxis  tick off
+altxaxis  tick major 10
+altxaxis  ticklabel off
 #  --------  y axis ------------
 yaxes scale Normal
 yaxis  label "D1P"
@@ -126,7 +171,10 @@ yaxis  label place 0.0, 0.11
 yaxis  ticklabel format general
 yaxis  ticklabel prec 3
 yaxis  tick major 0.1
-yaxis  tick minor ticks 4
+yaxis  tick minor ticks 1
+yaxis  tick major size 0.6
+yaxis  tick minor size 0.3
+yaxis  ticklabel char size 0.86
 #yaxis  tick spec type both
 #yaxis  tick spec 5
 #yaxis  tick major 0, 0
@@ -166,13 +214,29 @@ xaxis  ticklabel format general
 xaxis  ticklabel prec 1
 xaxis  tick major 0.1
 xaxis  tick minor ticks 4
+xaxis  tick major size 0.6
+xaxis  tick minor size 0.3
+xaxis  ticklabel char size 0.86
+#  -------- alt x axis ------------
+altxaxis  on
+altxaxis  type zero true
+altxaxis  bar on
+altxaxis  bar color 1
+altxaxis  bar linestyle 1
+altxaxis  bar linewidth 0.5
+altxaxis  tick off
+altxaxis  tick major 10
+altxaxis  ticklabel off
 #  --------  y axis ------------
 yaxes scale Normal
 #yaxis  label "D1P"
 yaxis  ticklabel format general
 yaxis  ticklabel prec 3
 yaxis  tick major 0.1
-yaxis  tick minor ticks 4
+yaxis  tick minor ticks 1
+yaxis  tick major size 0.6
+yaxis  tick minor size 0.3
+yaxis  ticklabel char size 0.86
 # yaxis  tick spec type both
 # yaxis  tick spec 5
 # yaxis  tick major 0, 0

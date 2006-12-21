@@ -54,9 +54,12 @@ view 0.15, 0.45, 0.6, 0.85
 #  --------  x axis ------------
 xaxes scale Normal
 xaxis  label "calQ2"
-xaxis  ticklabel format general
+xaxis  ticklabel format normal
 xaxis  tick major 20
 xaxis  tick minor ticks 3
+xaxis  tick major size 0.6
+xaxis  tick minor size 0.3
+xaxis  ticklabel char size 0.86
 #  --------  y axis ------------
 yaxes scale Logarithmic 
 yaxis  label "XIH"
@@ -67,6 +70,9 @@ yaxis  tick spec 9
 yaxis  tick major 0, 5
 yaxis  ticklabel 0, "5"
 yaxis  tick minor 1, 7.5
+yaxis  tick major size 0.6
+yaxis  tick minor size 0.3
+yaxis  ticklabel char size 0.86
 yaxis  tick major 2, 10
 yaxis  ticklabel 2, "10"
 yaxis  tick minor 3, 15
@@ -138,10 +144,13 @@ view 0.73, 0.45, 1.18, 0.85
 #  --------  x axis ------------
 xaxes scale Normal
 xaxis  label "calQ2"
-xaxis  ticklabel format general
+xaxis  ticklabel format decimal
 xaxis  ticklabel prec 0
 xaxis  tick major 20
-xaxis  tick minor ticks 9
+xaxis  tick minor ticks 3
+xaxis  tick major size 0.6
+xaxis  tick minor size 0.3
+xaxis  ticklabel char size 0.86
 #  --------  y axis ------------
 yaxes scale Normal
 yaxis  label "ARGH"
@@ -151,6 +160,9 @@ yaxis  ticklabel format general
 yaxis  ticklabel prec 3
 yaxis  tick major 0.2
 yaxis  tick minor ticks 3
+yaxis  tick major size 0.6
+yaxis  tick minor size 0.3
+yaxis  ticklabel char size 0.86
 #  --------  Lines ------------
 s0 line linestyle 2
 s0 line color 1

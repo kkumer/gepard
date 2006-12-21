@@ -22,7 +22,7 @@ string def "Q2205"
 ##############################################
 with g0
 ##############################################
-world 9e-6, -10, 0.5, 60
+world 9e-6, -7, 0.5, 60
 view 0.15, 0.65, 0.6, 0.90
 legend loctype view
 legend 0.94, 0.87
@@ -33,6 +33,9 @@ xaxes scale Logarithmic
 xaxis  ticklabel off
 xaxis  tick major 10
 xaxis  tick minor ticks 9
+xaxis  tick major size 0.6
+xaxis  tick minor size 0.3
+xaxis  ticklabel char size 0.86
 #  -------- alt x axis ------------
 altxaxis  on
 altxaxis  type zero true
@@ -50,8 +53,11 @@ yaxis  label place spec
 yaxis  label place 0.02, 0.11
 yaxis  ticklabel format decimal
 yaxis  ticklabel prec 0
-yaxis  tick major 10
-yaxis  tick minor ticks 4
+yaxis  tick major 20
+yaxis  tick minor ticks 3
+yaxis  tick major size 0.6
+yaxis  tick minor size 0.3
+yaxis  ticklabel char size 0.86
 #  --------  Lines ------------
 s0 line linestyle 2
 s0 line color 1
@@ -90,6 +96,9 @@ xaxes scale Logarithmic
 xaxis  ticklabel off
 xaxis  tick major 10
 xaxis  tick minor ticks 9
+xaxis  tick major size 0.6
+xaxis  tick minor size 0.3
+xaxis  ticklabel char size 0.86
 #  -------- alt x axis ------------
 altxaxis  on
 altxaxis  type zero true
@@ -108,7 +117,10 @@ yaxes scale Normal
 yaxis  ticklabel format decimal
 yaxis  ticklabel prec 0
 yaxis  tick major 100
-yaxis  tick minor ticks 4
+yaxis  tick minor ticks 1
+yaxis  tick major size 0.6
+yaxis  tick minor size 0.3
+yaxis  ticklabel char size 0.86
 #  --------  Lines ------------
 s0 line linestyle 2
 s0 line color 1
@@ -146,6 +158,9 @@ xaxis  ticklabel format power
 xaxis  ticklabel prec 0
 xaxis  tick major 10
 xaxis  tick minor ticks 9
+xaxis  tick major size 0.6
+xaxis  tick minor size 0.3
+xaxis  ticklabel char size 0.86
 #  -------- alt x axis ------------
 altxaxis  on
 altxaxis  type zero true
@@ -169,6 +184,9 @@ yaxis  ticklabel format general
 yaxis  ticklabel prec 2
 yaxis  tick major 0.05
 yaxis  tick minor ticks 4
+yaxis  tick major size 0.6
+yaxis  tick minor size 0.3
+yaxis  ticklabel char size 0.86
 #  --------  Lines ------------
 s0 line linestyle 2
 s0 line color 1
@@ -206,6 +224,9 @@ xaxis  ticklabel prec 0
 xaxis  label "\xx"
 xaxis  tick major 10
 xaxis  tick minor ticks 9
+xaxis  tick major size 0.6
+xaxis  tick minor size 0.3
+xaxis  ticklabel char size 0.86
 #  -------- alt x axis ------------
 altxaxis  on
 altxaxis  type zero true
@@ -223,6 +244,9 @@ yaxis  ticklabel format general
 yaxis  ticklabel prec 2
 yaxis  tick major 0.1
 yaxis  tick minor ticks 4
+yaxis  tick major size 0.6
+yaxis  tick minor size 0.3
+yaxis  ticklabel char size 0.86
 #  --------  Lines ------------
 s0 line linestyle 2
 s0 line color 1
