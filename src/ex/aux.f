@@ -41,8 +41,8 @@ C
 
 
       Q02 = 2.5d0
-      Q2EXP = 25.0d0
-      XI = 0.1d0
+      Q2EXP = 4.0d0
+      XI = 1.0d-3
       DEL2 = -0.25d0
       SCHEME = 'MSBAR'
       CZ = 1
@@ -61,8 +61,8 @@ C
       PAR(11) = (2.0d0/3.0d0) - PAR(21)
 
 
-!     WRITE (*,901) ANSATZ, DEL2, XI
-!     WRITE (*,903) Q02, Q2EXP
+      WRITE (*,901) ANSATZ, DEL2, XI
+      WRITE (*,903) Q02, Q2EXP
 
 !      DO 10 CND = -0.9, 1.3, 0.2
 
@@ -73,50 +73,50 @@ C
       P = 0
       CALL INIT
       CALL CFFF 
-!     WRITE (*,902) "LO (no evol)", CFF(0)
+      WRITE (*,902) "LO (no evol)", CFF(0)
 
       Q2 = Q2EXP
       CALL INIT
       CALL CFFF 
-!     WRITE (*,902) "LO (LO evol)", CFF(0)
+      WRITE (*,902) "LO (LO evol)", CFF(0)
 
       P = 1
       CZERO = CZ
       Q2 = Q02
       CALL INIT
       CALL CFFF 
-!     WRITE (*,902) "MS NLO (no evol)", CFF(1)
+      WRITE (*,902) "MS NLO (no evol)", CFF(1)
 
       SCHEME = 'MSBLO'
       Q2 = Q2EXP
       CALL INIT
       CALL CFFF 
-!     WRITE (*,902) "MS NLO (LO evol)", CFF(1)
+      WRITE (*,902) "MS NLO (LO evol)", CFF(1)
       TMP = CFF(1)
 
       SCHEME = 'MSBAR'
       CALL INIT
       CALL CFFF 
-      WRITE (*,902) "MS NLO (evol D)", CFF(1) - TMP
-!     WRITE (*,902) "MS NLO (evol D)", CFF(1)
+!     WRITE (*,902) "MS NLO (evol D)", CFF(1) - TMP
+      WRITE (*,902) "MS NLO (evol D)", CFF(1)
       TMP = CFF(1)
 
       SCHEME = 'MSBND'
       CALL INIT
       CALL CFFF 
-      WRITE (*,902) "MS NLO (evol ND)", CFF(1) - TMP
-!     WRITE (*,902) "MS NLO (evol ND)", CFF(1)
+!     WRITE (*,902) "MS NLO (evol ND)", CFF(1) - TMP
+      WRITE (*,902) "MS NLO (evol ND)", CFF(1)
 
-!      SCHEME = 'CSBAR'
-!      Q2 = Q02
-!      CALL INIT
-!      CALL CFFF 
-!      WRITE (*,902) "CS NLO (no evol)", CFF(1)
-!
-!      Q2 = Q2EXP
-!      CALL INIT
-!      CALL CFFF 
-!      WRITE (*,902) "CS NLO (evol)", CFF(1)
+      SCHEME = 'CSBAR'
+      Q2 = Q02
+      CALL INIT
+      CALL CFFF 
+      WRITE (*,902) "CS NLO (no evol)", CFF(1)
+
+      Q2 = Q2EXP
+      CALL INIT
+      CALL CFFF 
+      WRITE (*,902) "CS NLO (evol)", CFF(1)
 
  10   CONTINUE
 
