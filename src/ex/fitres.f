@@ -71,6 +71,23 @@ C
       PAR(24)   =     1.414
       PAR(25)   =     0.06
 
+*    NLO 
+      P = 1
+      SCHEME = 'CSBAR'
+      PAR(1)    =    4.0d0
+      PAR(2)    =    0.0518d0
+
+
+      PAR(11)   =    0.167
+      PAR(12)   =     1.14
+      PAR(14)   =     1.34
+      PAR(15)   =     0.0
+
+      PAR(21)   =    0.535
+      PAR(22)   =     1.09
+      PAR(24)   =     1.59
+      PAR(25)   =     0.0
+
 *   Removing valence quarks
       PAR(31)   =     0.0d0
       PAR(41)   =     0.0d0

@@ -34,7 +34,7 @@ EXFODIR = ex/obj
 # Fortran object files
 FOBJS = Finit.o Fbeta.o Fspecial.o Fdcomplex.o Fastrong.o Flambda.o\
 Fprojectors.o Frnnlo.o Ferfunc.o Fevol.o Fcdvcs.o Fmsbar.o Fparwav.o Fcff.o\
-Fdvcs.o Ff2.o Freadpar.o Ferror.o Fgauss.o Fnd.o Fbigcns.o Fintegra.o
+Fdvcs.o Ff2.o Freadpar.o Ferror.o Fgauss.o Fnd.o Fbigcns.o Fintegra.o Fxspace.o
 _FOBJS = $(patsubst %,$(FODIR)/%,$(FOBJS))
 
 # rule for compiling example Fortran programs
@@ -148,8 +148,11 @@ scalesNNLO: $(_FOBJS) $(_ADACFOBJS) $(EXFODIR)/scalesNNLO.o
 fitres: $(_FOBJS) $(_ADACFOBJS) $(EXFODIR)/fitres.o
 	$(FC) -o ../fits/$@ $^ $(FFLAGS)
 
+fitpdfs: $(_FOBJS) $(_ADACFOBJS) $(EXFODIR)/fitpdfs.o
+	$(FC) -o ../fits/$@ $^ $(FFLAGS)
+
 slope: $(_FOBJS) $(_ADACFOBJS) $(EXFODIR)/slope.o $(FODIR)/Fderiv.o
-	$(FC) -o ../ex/$@ $^ $(FFLAGS)
+	$(FC) -o ../fits/$@ $^ $(FFLAGS)
 
 .PHONY: clean
 clean:
