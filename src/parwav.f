@@ -253,10 +253,12 @@ C
             PAR(11) = (2.0d0/3.0d0) - PAR(21)
             FCM(1) = PAR(11) * CBETA(COMPLEX(1.0d0 - PAR(12) - 
      &            PAR(13)*DEL2, 0.0d0) + J, POCHSEA) / CBETA(
-     &            COMPLEX(2.0d0 - PAR(12), 0.0d0), POCHSEA)
+     &            COMPLEX(2.0d0 - PAR(12), 0.0d0), POCHSEA) /
+     &            (1.0d0 - DEL2)**3
             FCM(2) = PAR(21) * CBETA(COMPLEX(1.0d0-PAR(22)-PAR(23)*DEL2,
      &        0.0d0) + J, POCHG) / CBETA(COMPLEX(2.0d0 - PAR(22),
-     &        0.0d0), POCHG)
+     &        0.0d0), POCHG) /
+     &            (1.0d0 - DEL2)**3
       ELSE IF (ANSATZ .EQ. 'FITOLD') THEN
             FCM(1) = PAR(11) / (1 - DEL2/PAR(14)**2)**3 / POCHHAMMER(
      &            COMPLEX(1.0d0 - PAR(12) - 
