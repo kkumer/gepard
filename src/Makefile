@@ -106,7 +106,7 @@ accuracy: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Faccuracy.o
 auxns: $(_FOBJS) $(_ADACFOBJS) $(EXFODIR)/auxns.o
 	$(FC) -o ../ex/$@ $^ $(FFLAGS)
 
-aux: $(_FOBJS) $(_ADACFOBJS) $(EXFODIR)/aux.o
+auxsi: $(_FOBJS) $(_ADACFOBJS) $(EXFODIR)/auxsi.o
 	$(FC) -o ../ex/$@ $^ $(FFLAGS)
 
 anatomyNS: $(_FOBJS) $(_ADACFOBJS) $(EXFODIR)/anatomyNS.o

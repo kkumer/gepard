@@ -46,6 +46,8 @@ C
       PAR(2) = 0.05d0
       PAR(3) = 2.5d0
 
+      PAR(50) = 0.0d0
+
 
       P = 0
       PROCESS = 'DIS'

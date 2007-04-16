@@ -68,8 +68,8 @@ C
       RES = 0.0d0
 
       DO 123 K = 1, NPTS
-      J = N(K) - 1
-      CALL PARWAVF (K, FPW)
+      J = N(1,K) - 1
+      CALL PARWAVF (1, K, FPW)
       F2IMAG = IMAGPART(EPH * (1.0d0/XI)**(J-C) * FPW )
       RES = RES + WG(K)*F2IMAG
  123  CONTINUE

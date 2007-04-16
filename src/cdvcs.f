@@ -37,10 +37,10 @@ C      VECMAT, HS1, HS2
 C  SOURCE
 C
 
-      SUBROUTINE CDVCSF ( K, BIGCTMP )
+      SUBROUTINE CDVCSF ( SEC, K, BIGCTMP )
 
       IMPLICIT NONE
-      INTEGER K
+      INTEGER SEC, K
       DOUBLE COMPLEX BIGCTMP(0:2,2)
       INTEGER L
       DOUBLE PRECISION LRF2, LRR2
@@ -50,7 +50,7 @@ C
       DOUBLE COMPLEX VM00(2), VM01(2), VM10(2), VM000(2)
       INCLUDE 'header.f'
 
-      J = N(K) - 1
+      J = N(SEC, K) - 1
 
       LRF2 = LOG(RF2)
       LRR2 = LOG(RR2)
@@ -95,11 +95,11 @@ C
  40     CONTINUE
       END IF
 
-      CALL VECMAT(C0, 0, K, VM00)
+      CALL VECMAT(C0, 0, SEC, K, VM00)
       IF (P .GE. 2) THEN
-      CALL VECMAT(C0, 1, K, VM01)
-      CALL VECMAT(C1, 0, K, VM10)
-      CALL VECMAT(VM00, 0, K, VM000)
+      CALL VECMAT(C0, 1, SEC, K, VM01)
+      CALL VECMAT(C1, 0, SEC, K, VM10)
+      CALL VECMAT(VM00, 0, SEC, K, VM000)
       END IF
 
 
@@ -137,15 +137,15 @@ C     CDVCSF
 C  SOURCE
 C
 
-      SUBROUTINE VECMAT (VEC, ORD, K, VM)
+      SUBROUTINE VECMAT (VEC, ORD, SEC, K, VM)
 
       IMPLICIT NONE
-      INTEGER K, ORD
+      INTEGER SEC, K, ORD
       DOUBLE COMPLEX VEC(2), VM(2)
       INCLUDE 'header.f'
 
-      VM(1) = VEC(1) * GAM(K,ORD,1,1) + VEC(2) * GAM(K,ORD,2,1)
-      VM(2) = VEC(1) * GAM(K,ORD,1,2) + VEC(2) * GAM(K,ORD,2,2)
+      VM(1) = VEC(1) * GAM(SEC,K,ORD,1,1) + VEC(2) * GAM(SEC,K,ORD,2,1)
+      VM(2) = VEC(1) * GAM(SEC,K,ORD,1,2) + VEC(2) * GAM(SEC,K,ORD,2,2)
 
       RETURN
       END

@@ -61,7 +61,7 @@ C
 
       IMPLICIT NONE
       INTEGER K
-      DOUBLE COMPLEX EPH, PIHALF, J, FPW
+      DOUBLE COMPLEX EPH, PIHALF, J, FPW, FPWSEC
       DOUBLE COMPLEX DCTAN
       DOUBLE PRECISION RESREAL, RESIMAG
       DOUBLE PRECISION FREAL, FIMAG
@@ -76,9 +76,16 @@ C
 
       DO 123 K = 1, NPTS
 
-      J = N(K) - 1
+      J = N(1,K) - 1
 
-      CALL PARWAVF(K, FPW)
+      CALL PARWAVF(1, K, FPW)
+*   For DVCS there is also second partial wave
+      IF ( PROCESS(:3) .EQ. 'DVC' ) THEN
+        CALL PARWAVF(2, K, FPWSEC)
+*       FIXME:Hard-wiring strength of 2nd partial wave when not fitting
+        IF (.NOT. (ANSATZ(:3) .EQ. 'FIT' )) PAR(50)=1.0D0
+        FPW = FPW + PAR(50) * FPWSEC
+      END IF
 
       PIHALF = (1.5707963267948966d0, 0.0d0)
       FREAL = IMAGPART(EPH * (2.0d0/XI)**(J-C) * DCTAN(PIHALF*J) * FPW)
