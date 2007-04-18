@@ -84,7 +84,7 @@ C
         CALL PARWAVF(2, K, FPWSEC)
 *       FIXME:Hard-wiring strength of 2nd partial wave when not fitting
         IF (.NOT. (ANSATZ(:3) .EQ. 'FIT' )) PAR(50)=1.0D0
-        FPW = FPW + PAR(50) * FPWSEC
+        FPW = FPW + FPWSEC
       END IF
 
       PIHALF = (1.5707963267948966d0, 0.0d0)

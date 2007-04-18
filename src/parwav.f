@@ -175,7 +175,12 @@ C
         ENDIF
 
        ENDIF
-       FPW = CEV(1) * FCM(1) + CEV(2) * FCM(2)
+       IF (SEC .EQ. 2) THEN
+*        second partial wave is needed:
+         FPW = PAR(50) * CEV(1) * FCM(1) + PAR(51) * CEV(2) * FCM(2)
+       ELSE
+         FPW = CEV(1) * FCM(1) + CEV(2) * FCM(2)
+       ENDIF
 
       END IF
 

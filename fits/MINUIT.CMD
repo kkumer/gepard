@@ -29,7 +29,8 @@ PARAMETERS
 44 'M02D      '   3.53      .1  
 45 'DELM2D    '   0.88      .1  
 46 'PD        '   1.0       .1  
-50 'SEC       '   0.0       .1  
+50 'SECQ      '   0.0       .1  
+51 'SECG      '   0.0       .1  
 
 
 fix  1 2 3 
@@ -37,7 +38,6 @@ fix  13 15 16
 fix  23 25 26
 fix  31 32 33 34 35 36
 fix  41 42 43 44 45 46
-fix  50
 
 migrad
 cali 3

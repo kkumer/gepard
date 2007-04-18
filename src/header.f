@@ -14,7 +14,7 @@
 *   2. Parameters from 'MINUIT.CMD' (candidates for fitting parameters)
 
       INTEGER NPARMAX
-      PARAMETER (NPARMAX = 50)
+      PARAMETER (NPARMAX = 60)
       DOUBLE PRECISION PAR(NPARMAX)
 
 *   3. Kinematics
