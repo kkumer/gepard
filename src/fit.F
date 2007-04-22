@@ -57,6 +57,8 @@ C
       PROCESS = 'DIS'
       CALL INIT
 
+      CALL INITC
+
       IF (ISINTER .NE. 1) THEN
 *   We work in batch mode
 *     File where Minuit batch commands are
@@ -153,6 +155,9 @@ C
       DO 10 K = 1, NPARMAX
         PAR(K) = A(K)
  10   CONTINUE
+
+*     Initialize GPDs
+      CALL INITGPD
 
       NTOT = 0
       CHISQ = 0.0d0
@@ -391,7 +396,8 @@ C
         DO 110 K = 1, NN
         READ (12, *) X, YY, STAT, SYS
         DY = SQRT( STAT*STAT + SYS*SYS )
-        THY = PARSIGMA(X)
+        MTIND = NMTS + K
+        THY = PARSIGMA()
         CHISQPART = CHISQPART + ( (THY - YY)**2 / DY**2 )
         IF (IFLAG .EQ. 3)  THEN
           DIFSG = (THY - YY) / DY

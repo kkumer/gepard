@@ -14,12 +14,18 @@
 *   2. Parameters from 'MINUIT.CMD' (candidates for fitting parameters)
 
       INTEGER NPARMAX
-      PARAMETER (NPARMAX = 60)
+      PARAMETER (NPARMAX = 70)
       DOUBLE PRECISION PAR(NPARMAX)
 
 *   3. Kinematics
 
+      INTEGER QINDMAX, MTINDMAX
+      PARAMETER (QINDMAX = 50, MTINDMAX = 100)
+      INTEGER NQS, NQSDIS, MTIND, NMTS, NMTSEXP
       DOUBLE PRECISION XI, DEL2, Q2
+      DOUBLE PRECISION QS(QINDMAX), QSDIS(QINDMAX)
+*     - DEL2=T=-MT integration contour points
+      DOUBLE PRECISION MTS(MTINDMAX), MTWG(MTINDMAX)
 
 *   4. Other
 
@@ -51,6 +57,11 @@
       DOUBLE COMPLEX GAMNS(NPTSMAX,0:2)
       DOUBLE COMPLEX GAM(2,NPTSMAX,0:2,2,2)
 
+      DOUBLE COMPLEX CGRIDNS(QINDMAX, NPTSMAX)
+      DOUBLE COMPLEX CGRID(2, QINDMAX, NPTSMAX, 2)
+      DOUBLE COMPLEX CGRIDDIS(QINDMAX, NPTSMAX, 2)
+      DOUBLE COMPLEX HGRID(0:MTINDMAX, NPTSMAX, 2)
+
 *     - Final observables
       DOUBLE PRECISION F2(0:2)
       DOUBLE COMPLEX CFF(0:2)
@@ -73,6 +84,10 @@
 *   3. Kinematics
 
       COMMON / KINEMATICS /  XI, DEL2, Q2
+      COMMON / NQS        /  NQS, NQSDIS
+      COMMON / QS         /  QS, QSDIS
+      COMMON / MT         /  MTIND, NMTS, NMTSEXP
+      COMMON / MTS        /  MTS, MTWG
 
 *   4. Other
 
@@ -96,6 +111,11 @@
       COMMON / GAMNS    /  GAMNS
       COMMON / GAM      /  GAM
       COMMON / BIGCF2   /  BIGCF2
+
+      COMMON / CGRIDNS  /  CGRIDNS
+      COMMON / CGRID    /  CGRID
+      COMMON / CGRIDDIS /  CGRIDDIS
+      COMMON / HGRID    /  HGRID
 
 *     - FInal observables
       COMMON / CFF      /  CFF

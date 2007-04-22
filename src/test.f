@@ -47,17 +47,22 @@ C
       PAR(3) = 2.5d0
 
       PAR(50) = 0.0d0
+      PAR(51) = 0.0d0
 
 
       P = 0
       PROCESS = 'DIS'
       CALL INIT
+      CALL INITGPD
       WRITE (*, *) "For values of test parameters see src/test.f"
       WRITE (*, *) 
 
       WRITE (*, *) " ---  Test 1: Naive parton model F2 ---- "
       XI = 0.002d0
       Q2 = 1.d0
+      NQSDIS = 1
+      QSDIS(1) = Q2
+      CALL EVOLC(1,1)
       WRITE (*, *) " 0.65783876286 is correct result"
       CALL F2F
       WRITE (*, *) F2(0)
@@ -67,12 +72,16 @@ C
       CALL INIT
 
       WRITE (*, *) " ---  Test 2: LO partial sigma, no evolution ---- "
+      P = 0
       W2 = 82.0d0**2
       Q2 = 1.0d0
+      NQS = 1
+      QS(1) = Q2
+      CALL EVOLC(1,1)
       XI = Q2 / ( 2.0d0 * W2 + Q2)
-      P = 0
       WRITE (*, *) " 5608.4194288225 is result from gepard_devel.nb"
-      AUX = PARSIGMA(0.d0)
+      MTIND = 0
+      AUX = PARSIGMA()
       WRITE (*, *) AUX
 
       P = 1
@@ -80,12 +89,17 @@ C
       WRITE (*, *) " ---  Test 3: NLO partial sigma, 1->3 GeV^2   ---- "
       W2 = 82.0d0**2
       Q2 = 3.0d0
+      NQS = 2
+      QS(2) = Q2
+      CALL EVOLC(1,2)
       XI = Q2 / ( 2.0d0 * W2 + Q2)
       WRITE (*, *) " 329.68332610735 is t=0 result from gepard_devel.nb"
-      AUX = PARSIGMA(0.d0)
+      MTIND = 0
+      AUX = PARSIGMA()
       WRITE (*, *) AUX
       WRITE (*, *) " 4.807252903 is t=-0.5 result from gepard_devel.nb"
-      AUX = PARSIGMA(0.5d0)
+      MTIND = NMTS + 3
+      AUX = PARSIGMA()
       WRITE (*, *) AUX
 
       WRITE (*, *) " ---  Test 4: NLO sigma, 1->3 GeV^2, xi~1e-4  --- "

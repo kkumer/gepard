@@ -41,9 +41,15 @@ C
 
       Q2 = 2.5d0
 
+      NQS = 1
+      QS(1) = Q2
+
       PAR(1) = 2.5d0
       PAR(2) = 0.05d0
       PAR(3) = 2.5d0
+
+      PAR(50) = 0.0d0
+      PAR(51) = 0.0d0
 
 *     1. Point "A"
       WRITE (*,*) " --- Point A  (MSBAR) ----- "
@@ -55,6 +61,9 @@ C
       SCHEME = 'MSBAR'
 
       CALL INIT
+
+      CALL EVOLC(1, 1)
+      CALL EVOLC(2, 1)
 
       CALL CFFF 
       P = P - 1

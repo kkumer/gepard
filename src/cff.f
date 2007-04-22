@@ -60,9 +60,9 @@ C
       SUBROUTINE CFFF
 
       IMPLICIT NONE
-      INTEGER K
+      INTEGER K, QIND
       DOUBLE COMPLEX EPH, PIHALF, J, FPW, FPWSEC
-      DOUBLE COMPLEX DCTAN
+      DOUBLE COMPLEX DCTAN, FCM(2)
       DOUBLE PRECISION RESREAL, RESIMAG
       DOUBLE PRECISION FREAL, FIMAG
       INCLUDE 'header.f'
@@ -72,19 +72,24 @@ C
       RESREAL = 0.0d0
       RESIMAG = 0.0d0
 
+      CALL LOOKUPQ(QIND)
+
 *   Integration ...
 
       DO 123 K = 1, NPTS
 
       J = N(1,K) - 1
 
-      CALL PARWAVF(1, K, FPW)
-*   For DVCS there is also second partial wave
-      IF ( PROCESS(:3) .EQ. 'DVC' ) THEN
-        CALL PARWAVF(2, K, FPWSEC)
-*       FIXME:Hard-wiring strength of 2nd partial wave when not fitting
-        IF (.NOT. (ANSATZ(:3) .EQ. 'FIT' )) PAR(50)=1.0D0
-        FPW = FPW + FPWSEC
+      FCM(1) = HGRID(MTIND, K, 1)
+      FCM(2) = HGRID(MTIND, K, 2)
+
+      IF ( FFTYPE(:7) .EQ. 'NONSING' ) THEN
+        FPW = CGRIDNS(QIND, K) * FCM(1)        
+      ELSE
+        FPW = CGRID(1,QIND,K,1) * FCM(1) + CGRID(1,QIND,K,2) * FCM(2)
+        FPW = FPW +  
+     &              PAR(50) * CGRID(2,QIND,K,1) * FCM(1) + 
+     &              PAR(51) * CGRID(2,QIND,K,2) * FCM(2)
       END IF
 
       PIHALF = (1.5707963267948966d0, 0.0d0)
