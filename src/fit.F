@@ -132,11 +132,11 @@ C
       CHARACTER TXT*45
       DOUBLE COMPLEX CBETA
       CHARACTER*9 FITNM
-      DIMENSION FITNM(8)
+      DIMENSION FITNM(10)
       INCLUDE 'header.f'
       DOUBLE PRECISION A(NPARMAX),GIN(NPARMAX)
       DATA FITNM /'NS', 'AL0S', 'ALPS', 'M02S',
-     & 'NG', 'AL0G', 'ALPG', 'M02G'/
+     & 'NG', 'AL0G', 'ALPG', 'M02G', 'SECS', 'SECG'/
 
 #ifndef NOPGPLOT
       INTEGER PGBEG
@@ -191,13 +191,14 @@ C
      &  STATUS = 'UNKNOWN')
         WRITE (21, 803) "Gepard parameters:"
         WRITE (21, 804) SPEED, P, NF
-        WRITE (21, 806) SCHEME, ANSATZ
+        WRITE (21, 806) SCHEME, Q02
         IF ( ANSATZ(:3) .EQ. 'FIT' ) THEN
           WRITE (21, 803) "Final fit parameters:"
-          WRITE (21, 807) 'Q02      ', Q02
           DO 13 K = 1, 4
           WRITE (21, 807) FITNM(K), PAR(10+K)
  13       WRITE (21, 807) FITNM(4+K), PAR(20+K)
+          WRITE (21, 807) FITNM(9), PAR(50)
+          WRITE (21, 807) FITNM(10), PAR(51)
         END IF
         WRITE (21, *) 
 *     Same goes to .min
@@ -235,20 +236,22 @@ C
         CALL PGPAGE
         CALL PGVSTD
         CALL PGSWIN (0., 12., 0., 12.)
-        CALL PGTEXT (-1., 12., "Gepard parameters:")
+        CALL PGTEXT (-1., 13., "Gepard parameters:")
         WRITE(TXT, 804) SPEED, P, NF
+        CALL PGTEXT (1., 12., TXT)
+        WRITE(TXT, 806) SCHEME, Q02
         CALL PGTEXT (1., 11., TXT)
-        WRITE(TXT, 806) SCHEME, ANSATZ
-        CALL PGTEXT (1., 10., TXT)
         IF ( ANSATZ(:3) .EQ. 'FIT' ) THEN
-          CALL PGTEXT (-1., 9., "Final fit parameters:")
-          WRITE(TXT, 807) 'Q02      ', Q02
-          CALL PGTEXT (-1., 8., TXT)
+          CALL PGTEXT (-1., 10., "Final fit parameters:")
           DO 30 K = 1, 4
           WRITE (TXT, 807) FITNM(K), PAR(10+K)
-          CALL PGTEXT (-1., REAL(8-K), TXT)
+          CALL PGTEXT (-1., REAL(10-K), TXT)
           WRITE (TXT, 807) FITNM(4+K), PAR(20+K)
- 30       CALL PGTEXT (-1., REAL(4-K), TXT)
+ 30       CALL PGTEXT (-1., REAL(6-K), TXT)
+          WRITE (TXT, 807) FITNM(9), PAR(50)
+          CALL PGTEXT (-1., 1., TXT)
+          WRITE (TXT, 807) FITNM(10), PAR(51)
+          CALL PGTEXT (-1., 0., TXT)
           WRITE (TXT, 808) NTOT, NPAR, NTOT-NPAR, CHISQ
           CALL PGTEXT (-1., -1., TXT)
         END IF
@@ -298,7 +301,7 @@ C
 
 803   FORMAT (1X, /, 1X, '-----    ', A, '    -----', /)
 804   FORMAT (1X, 'SPEED = ', I1, 5X, 'P = ', I1, 5X, 'NF = ', I1)
-806   FORMAT (1X, 'SCHEME = ', A, 3X, 'ANSATZ = ', A)
+806   FORMAT (1X, 'SCHEME = ', A, 3X, 'Q02 = ', F5.1)
 807   FORMAT (1X,  A15, ' = ', 3X, G9.3)
 808   FORMAT (1X, 'd.o.f = ', I3, ' - ', I1, ' = ', I3, '   ',
      &            '\\gx\\u2\\d = ', F8.1)
