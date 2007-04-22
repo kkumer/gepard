@@ -42,16 +42,12 @@ C
       DOUBLE COMPLEX J, EVOLA(0:2,2,2), FCM(2)
       INCLUDE 'header.f'
 
-      PAR(1) = 4.0d0
-      PAR(2) = 0.0488d0
-      PAR(3) = 2.5d0
-
 * ASMUF2 = alpha_s/(2 pi) at factorization scale
-      CALL AS2PF (ASMUF2, Q2/RF2, PAR(2), PAR(3))
+      CALL AS2PF (ASMUF2, Q2/RF2, ASP(P), MU02)
 * ASMUR2 = alpha_s/(2 pi) at renormalization scale
-      CALL AS2PF (ASMUR2, Q2/RR2, PAR(2), PAR(3))
+      CALL AS2PF (ASMUR2, Q2/RR2, ASP(P), MU02)
 * ASQ02 = alpha_s/(2 pi) at input scale
-      CALL AS2PF (ASQ02, PAR(1), PAR(2), PAR(3))
+      CALL AS2PF (ASQ02, Q02, ASP(P), MU02)
 
       R = ASMUF2/ASQ02
 

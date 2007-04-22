@@ -25,6 +25,7 @@ C
       PROGRAM TEST
 
       IMPLICIT NONE
+      INTEGER K
       DOUBLE PRECISION W2, AUX
       DOUBLE PRECISION PARSIGMA, SIGMA
       INCLUDE 'header.f'
@@ -32,6 +33,8 @@ C
       FFTYPE  = 'SINGLET'
 
       CALL READPAR
+
+*   GPD ansatz:
 
       PAR(21) = 0.4d0
       PAR(11) = 2./3. - PAR(21)
@@ -42,10 +45,7 @@ C
       PAR(23) = 0.25d0
       PAR(24) = 1.2d0
 
-      PAR(1) = 1.0d0
-      PAR(2) = 0.05d0
-      PAR(3) = 2.5d0
-
+*   turn off second partial wave
       PAR(50) = 0.0d0
       PAR(51) = 0.0d0
 

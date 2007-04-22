@@ -7,7 +7,8 @@
 *   1. Constant parameters loaded from 'GEPARD.INI' or fixed by program
 
       INTEGER SPEED, ACC, P, NF, CZERO
-      DOUBLE PRECISION RF2, RR2
+      DOUBLE PRECISION MU02, ASP(0:2)
+      DOUBLE PRECISION Q02, RF2, RR2
       DOUBLE PRECISION C, PHI, CND, PHIND
       CHARACTER SCHEME*5, ANSATZ*6, PROCESS*6, FFTYPE*10
 
@@ -73,7 +74,8 @@
 *   1. Constant parameters loaded from 'GEPARD.INI' or fixed by program
 
       COMMON / PARINT /  SPEED, ACC, P, NF, CZERO
-      COMMON / PARFLT /  RF2, RR2
+      COMMON / ASTRONG/  MU02, ASP
+      COMMON / PARFLT /  Q02, RF2, RR2
       COMMON / MBCONT /  C, PHI, CND, PHIND
       COMMON / PARCHR /  SCHEME, ANSATZ, PROCESS, FFTYPE
 

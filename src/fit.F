@@ -194,7 +194,7 @@ C
         WRITE (21, 806) SCHEME, ANSATZ
         IF ( ANSATZ(:3) .EQ. 'FIT' ) THEN
           WRITE (21, 803) "Final fit parameters:"
-          WRITE (21, 807) 'Q02      ', PAR(1)
+          WRITE (21, 807) 'Q02      ', Q02
           DO 13 K = 1, 4
           WRITE (21, 807) FITNM(K), PAR(10+K)
  13       WRITE (21, 807) FITNM(4+K), PAR(20+K)
@@ -242,7 +242,7 @@ C
         CALL PGTEXT (1., 10., TXT)
         IF ( ANSATZ(:3) .EQ. 'FIT' ) THEN
           CALL PGTEXT (-1., 9., "Final fit parameters:")
-          WRITE(TXT, 807) 'Q02      ', PAR(1)
+          WRITE(TXT, 807) 'Q02      ', Q02
           CALL PGTEXT (-1., 8., TXT)
           DO 30 K = 1, 4
           WRITE (TXT, 807) FITNM(K), PAR(10+K)
@@ -257,11 +257,11 @@ C
         CALL PGPAGE
         CALL PGVSTD
         DRAW = .FALSE.
-        IF (PAR(1) .LT. 3.0d0) THEN
+        IF (Q02 .LT. 3.0d0) THEN
             CALL PGSWIN (-4., -1., -2., 5.)
-        ELSEIF (PAR(1) .LT. 8.0d0) THEN
+        ELSEIF (Q02 .LT. 8.0d0) THEN
             CALL PGSWIN (-4., -1., 0., 12.)
-        ELSEIF (PAR(1) .LT. 22.0d0) THEN
+        ELSEIF (Q02 .LT. 22.0d0) THEN
             CALL PGSWIN (-4., -1., 0., 24.)
         ELSE
             CALL PGSWIN (-4., -1., 0., 50.)
