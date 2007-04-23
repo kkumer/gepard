@@ -64,7 +64,7 @@ C
 
 *   Adding MSBAR non-diagonal NLO evolution (time consuming)
       IF ( (P .EQ. 1) .AND. (SCHEME .EQ. 'MSBND') ) THEN
-        CALL NDINTF(K, R, NDINT, 0, 0)
+        CALL NDINTF(1, K, R, NDINT, 0, 0)
         EVOLNSA(1) = EVOLNSA(1) + NDINT
       ENDIF
 
@@ -162,7 +162,7 @@ C
       IF ( (P .EQ. 1) .AND. (SCHEME .EQ. 'MSBND') ) THEN
         DO 50 I = 1, 2
         DO 50 J = 1, 2
-          CALL NDINTF(K, R, NDINT, I, J)
+          CALL NDINTF(SEC, K, R, NDINT, I, J)
           EVOLA(1,I,J) = EVOLA(1,I,J) + NDINT
  50     CONTINUE
       ENDIF
