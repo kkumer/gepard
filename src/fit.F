@@ -195,16 +195,15 @@ C
         IF ( ANSATZ(:3) .EQ. 'FIT' ) THEN
           WRITE (21, 803) "Final fit parameters:"
           DO 13 K = 1, 4
-          WRITE (21, 807) FITNM(K), PAR(10+K)
- 13       WRITE (21, 807) FITNM(4+K), PAR(20+K)
-          WRITE (21, 807) FITNM(9), PAR(50)
-          WRITE (21, 807) FITNM(10), PAR(51)
+          WRITE (21, 809) FITNM(K), PAR(10+K), FITNM(4+K), PAR(20+K)
+ 13       CONTINUE
+          WRITE (21, 809) FITNM(9), PAR(50), FITNM(10), PAR(51)
         END IF
         WRITE (21, *) 
 *     Same goes to .min
         WRITE (6, 803) "Gepard parameters:"
         WRITE (6, 804) SPEED, P, NF
-        WRITE (6, 806) SCHEME, ANSATZ
+        WRITE (6, 806) SCHEME, Q02
         WRITE (6, *) 
       END IF
 
@@ -244,16 +243,13 @@ C
         IF ( ANSATZ(:3) .EQ. 'FIT' ) THEN
           CALL PGTEXT (-1., 10., "Final fit parameters:")
           DO 30 K = 1, 4
-          WRITE (TXT, 807) FITNM(K), PAR(10+K)
+          WRITE (TXT, 809) FITNM(K), PAR(10+K), FITNM(K+4), PAR(20+K)
           CALL PGTEXT (-1., REAL(10-K), TXT)
-          WRITE (TXT, 807) FITNM(4+K), PAR(20+K)
- 30       CALL PGTEXT (-1., REAL(6-K), TXT)
-          WRITE (TXT, 807) FITNM(9), PAR(50)
-          CALL PGTEXT (-1., 1., TXT)
-          WRITE (TXT, 807) FITNM(10), PAR(51)
-          CALL PGTEXT (-1., 0., TXT)
+ 30       CONTINUE
+          WRITE (TXT, 809) FITNM(9), PAR(50), FITNM(10), PAR(51)
+          CALL PGTEXT (-1., 5., TXT)
           WRITE (TXT, 808) NTOT, NPAR, NTOT-NPAR, CHISQ
-          CALL PGTEXT (-1., -1., TXT)
+          CALL PGTEXT (-1., 3., TXT)
         END IF
 *     Draw last plot containing PDFs
         CALL PGSCH(1.8)
@@ -305,6 +301,7 @@ C
 807   FORMAT (1X,  A15, ' = ', 3X, G9.3)
 808   FORMAT (1X, 'd.o.f = ', I3, ' - ', I1, ' = ', I3, '   ',
      &            '\\gx\\u2\\d = ', F8.1)
+809   FORMAT (3X,  A6, '=', 1X, G8.2, 5X, A6, '=', 1X, G8.2)
 
       RETURN
       END
