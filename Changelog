@@ -6,7 +6,7 @@ Version 0.9.3  (2006-12-17)
 	- ADD: intelligent choice of y-range for drawing of PDF(x)
 	- ADD: many example programs in ex subdirectory which produce
 	       data for plots in a big paper
-    - ADD: automatic plotting and psfragging of plots
+	- ADD: automatic plotting and psfragging of plots
 	- FIX: dependence on factorization scale corrected now
 	- BUG: SPEED=4 is much more unreliable than before
 

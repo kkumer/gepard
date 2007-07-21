@@ -9,6 +9,10 @@
 
 -  fitres is behaving funny for C=0.25
 
+-  change to sid broke almost everything. Fix it.
+    FIXED: test, radcorr, scaledep, houches, accuracy, auxtest, radNNLO
+
+-  NNLO comparison to Vogt is bad
 
 Fixed:
 ------

@@ -34,6 +34,7 @@ fix  13 15 16
 fix  23 25 26
 fix  31 32 33 34 35 36
 fix  41 42 43 44 45 46
+fix  50 51
 
 migrad
 cali 3

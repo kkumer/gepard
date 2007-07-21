@@ -48,6 +48,7 @@ C
       IMPLICIT NONE
       INTEGER NINTGMAX, K, K1, K2, K3
       INTEGER L, ORD, SEC
+      INTEGER EFFACC, NBNDMAX
       DOUBLE PRECISION NFD
       DOUBLE COMPLEX J, Z, EPH
       DOUBLE COMPLEX HS1, HS2, HS3, HS4
@@ -59,7 +60,40 @@ C
       PARAMETER ( NINTGMAX = 12 )
       DOUBLE PRECISION DOWN(NINTGMAX+1)
       INCLUDE 'header.f'
+      PARAMETER (NBNDMAX = 1)
+      DOUBLE PRECISION BND(NBNDMAX+1), MTSEXP(4), MTSAUX(MTINDMAX)
 
+*  Initialization of MTS array, carrying all needed -t values
+
+*     [1] MT=0 for forward (DIS) case
+      MTS(0) = 0.0D0
+
+*     [2] MT's occuring as abscissae of Gaussian integration of PARSIGMA(MT)
+*     Integration is done on the interval:
+      DATA BND /0.0D0, 1.0D0/ 
+*     Integrand PARSIGMA(MT) is nicely-behaved function and we
+*     integrate it by equidistant Gauss-Legendre integration.
+*     Effective numerical accuracy used for this integration is:
+      EFFACC = ACC - SPEED + 1
+*     which means that resulting number of integration points is:
+      NMTS = 2**EFFACC
+*     Calculating abscissas and weights
+      CALL INTEGRAF(EFFACC, 1, BND, NBNDMAX, MTSAUX, MTWG)
+*     Puting abscissas into MTS array
+      DO 4 K = 1, NMTS
+        MTS(K) = MTSAUX(K)
+  4   CONTINUE
+
+*     [3] MT's occuring in experimental data
+      NMTSEXP = 4
+      DATA MTSEXP / 0.1d0, 0.3d0, 0.5d0, 0.8d0 /
+      DO 5 K = 1, NMTSEXP
+        MTS(NMTS+K) = MTSEXP(K)
+  5   CONTINUE
+
+
+
+*  Initialization of N array, carrying all needed j values on MB contour
 
 *   (2**ACC)-point integration is to be performed on each
 *   interval defined by taking points (1, 1 + SPEED,

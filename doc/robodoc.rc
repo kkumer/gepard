@@ -16,7 +16,10 @@ items:
     SEE ALSO
     CHILDREN
     PARENTS
+    MEMBER OF
     SOURCE
+source items:
+    SYNOPSIS
 options:
     --src ./src 
 #    --nodesc
@@ -27,6 +30,8 @@ headertypes:
     p "Programs" programs
     s "Subroutines" subroutines
     f "Functions" functions
+    c "Common Blocks" commonblocks
+    v "Variables" variables
 accept files:
    headers.h
    accuracy.f
@@ -62,3 +67,4 @@ accept files:
    radQ.f
    radNNLO.f
    scalesNS.f
+   header.f

@@ -2,7 +2,7 @@
 Accuracy and dependance on SPEED (from GEPARD.INI) can be studied by
 the following test programs.
 
-Make sure to use AS0=0.05 in GEPARD.INI. Best agreement should be
+FIXME: Make sure to use AS0=0.05 in GEPARD.INI. Best agreement should be
 obtained by SPEED=1.
 
 First test

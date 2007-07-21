@@ -18,32 +18,25 @@ C    equation for a fixed number of massless flavours  NF.  Except at
 C    leading order (LO), result is obtained using a fourth-order
 C    Runge-Kutta integration. 
 C  SYNOPSIS
-C     SUBROUTINE AS2PF (AS, R2, AS0, R20)
-C     
-C     INTEGER NF, P
-C     DOUBLE PRECISION AS, R2, AS0, R20
+C
+      SUBROUTINE AS2PF (AS, R2, AS0, R20)
+      
+      IMPLICIT NONE
+      DOUBLE PRECISION AS, R2, AS0, R20
 C  INPUTS
 C          R2 -- final momentum scale squared
 C         AS0 -- initial value for a_strong/(2 Pi)
 C         R20 -- initial momentum scale squared
-C          NF -- number of massless active flavours
-C           P -- approximation order, which is N^{P}LO
 C  OUTPUT
 C          AS -- final value for a_strong/(2 Pi)
 C  PARENTS
 C     PARWAVF
 C  NOTES
 C     Requires a previous call of BETAF to initialize common block !
-C  BUGS
-C     Should get values of P and NF via common block to be consistent
-C     with rest of the gepard
+C     This routine is taken from A. Vogt's QCD-Pegasus
 C  SOURCE
 C
 
-      SUBROUTINE AS2PF (AS, R2, AS0, R20)
-      
-      IMPLICIT NONE
-      DOUBLE PRECISION AS, R2, AS0, R20
       DOUBLE PRECISION LRRAT, DLR, SXTH, A
       INTEGER NASTPS, K1
       DOUBLE PRECISION FBETA1, FBETA2, FBETA3

@@ -39,7 +39,7 @@ $\sharp$\thecomment:} #1]}}
 
 \title{\texttt{gepard} --- Compton form factors and observables
                             by evolving moments of GEneral PARton Distributions}
-\author{Version: 0.9.3}
+\author{Version: sid}
 \date{\today}
 \maketitle
 
@@ -686,10 +686,10 @@ in the file \texttt{OUTFILE.ps}. Example graph is shown on Fig.~\ref{fig:fitps}.
 By going to forward limit, as shown in Section~\ref{ssect:DIS}, one can check the accuracy of 
 \texttt{gepard} by comparing results with the established DIS routines.
 For such comparison we used package {\sc QCD-Pegasus} \cite{Vogt:2004ns} for fast evolution of PDFs.
-In particular, we compared evolution of gluonic PDF, which is easiest.
+In particular, we compared evolution of gluonic PDF, which is easiest to compare.
 
-To make \texttt{gepard} calculate only evolution of gluonic PDFs, we implemented special ``renormalization
-scheme'' \texttt{SCHEME} = \texttt{UNITG} which
+To make \texttt{gepard} calculate only evolution of gluonic PDFs, we implemented special
+``renormalization scheme'' \texttt{SCHEME} = \texttt{UNITG} which
 makes Wilson coefficient vector equal to $(C_{\Sigma}, C_G) = (0, 1)$
 to all orders. Then the same routine that normally calculates observable $F_2(x)$ gives $x g(x)$, up
 to the charge factor $Q_s$. We also implemented \texttt{ANSATZ} = \texttt{HOUCHE}, corresponding to the
@@ -697,61 +697,44 @@ input form of PDFs as used by \cite{Vogt:2004ns}. This is so called Les Houches 
 input \cite{Giele:2002hx}.  Finally, to have the same treatment of perturbative expansion of
 the solution to RGE, one sets {\sc QCD-Pegasus} parameter \texttt{IMODEV = 3}, as explained in
 manual \cite{Vogt:2004ns}. 
-At NLO, we get agreement to all decimal places, five of them, produced by {\sc QCD-Pegasus}. 
-Comparison of various \texttt{SPEED} modes to this referent result\footnote{which is obtained with
-\texttt{SPEED = 1}, but also with 64-point Gaussian integration (instead of usual 8), as well
-as with extended integration region 0\dots 200 (instead of usual 0\dots 10) which is needed 
-for $\xi > 0.7$. Possibility of various Gaussian integrations from 2-  to 64-point, is present
-only in \texttt{gepard} versions $> 0.9$. In version $0.9$ only 8-point integration is done.
-\label{fn:acc}} are ploted on Fig.~\ref{fig:PDFevol}.
+Both at NLO and NNLO, we get excellent agreement, with relative differences to
+{\sc QCD-Pegasus} results being of the order of $10^{-7}$, as seen on
+Fig.~\ref{fig:PDFevol}.
+
 
 \begin{figure}
 \begin{center}
 \includegraphics[scale=0.8]{PDFevol}
 \end{center}
-\caption{Relative errors of evolution of NLO Les Houches benchmark PDF $x g(x)$
-from 2 GeV$^2$ to 10$^4$ GeV$^2$, for various settings of parameter
-\texttt{SPEED}. Large errors for $\xi > 0.1$ are due to Mellin-Barnes integration
-being cut-off too early. This could be easily fixed. \emph{NB: this plot is made
-by the older version of \texttt{gepard}. Present version has not so good
-accuracy for \texttt{SPEED=4}!}}
+\caption{Relative difference of NLO (dashed) and NNLO (solid) Les Houches benchmark PDF $x g(x)$
+evolved from 2 GeV$^2$ to 10$^4$ GeV$^2$, with respect to referent {\sc QCD-Pegasus} 
+\cite{Vogt:2004ns} results.}
 \label{fig:PDFevol}
 \end{figure}
 
-To see what accuracy can be expected for various values of \texttt{SPEED} when calculating total
+To see what accuracy can be expected for various values of \texttt{SPEED} parameter 
+when calculating total
 DVCS cross section, we compare to a referent result obtained using a typical input GPD shape and
-maximal precision (same as described in footnote \ref{fn:acc}). Results are shown on
-Fig.~\ref{fig:acc}
+maximal \texttt{gepard} precision (\texttt{ACC=6} and \texttt{SPEED=1}, corresponding to
+64 points on each integration segment.). Results are shown on
+Fig.~\ref{fig:acc}. Here \texttt{ACC = 3} is used, which is the recommended value.
+One sees that for  \texttt{SPEED=1} error is always below one per mill, for
+\texttt{SPEED=2} it can rise at some values of $\xi$ to a maximum of couple percent, 
+but this is usually good
+enough. For \texttt{SPEED=3} error is between 15 and 45 percent which may seem
+unacceptable for precision analysis, but for fast experimenting with fits it
+produces fit results which are often quite similar to those obtained with
+smaller \texttt{SPEED} settings.
 
 \begin{figure}
 \begin{center}
 \includegraphics[scale=0.8]{acc}
 \end{center}
 \caption{Relative errors of NLO total DVCS cross section when calculated with various
-\texttt{SPEED} settings. \emph{NB: this plot is made
-by the older version of \texttt{gepard}. Present version has not so good
-accuracy for \texttt{SPEED=4}!}}
+\texttt{SPEED} settings for \texttt{ACC = 3}.}
 \label{fig:acc}
 \end{figure}
 
-\begin{commblock}
-KK: I also made comparison with Vogt QCD-Pegasus routines at NNLO order. Relative error to
-him is ploted on Fig.~\ref{fig:PDFevolNNLO}. Note that we use approximate NNLO
-Wilson coefficients and anomalous dimensions which should be correct to one per mill.
-Thus, one per mill relative error could be considered acceptable. However, for
-small $\xi$ there is up to one percent error, which we should at some point try to understand.
-It is quite possible that there is some series-truncation subtlety which I am not
-aware of, so I'm actually not comparing same things.
-\end{commblock}
-
-\begin{figure}
-\begin{center}
-\includegraphics[scale=0.8]{PDFevolNNLO}
-\end{center}
-\caption{\texttt{Preliminary!} Relative error of NNLO evolution of Les Houches benchmark PDF $x g(x)$
-from 2 GeV$^2$ to 10$^4$ GeV$^2$.}
-\label{fig:PDFevolNNLO}
-\end{figure}
 
 \section{Advanced usage and modifications}
 

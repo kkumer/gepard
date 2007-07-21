@@ -22,39 +22,17 @@ endif
 FFLAGS =  -I. -O 
 CFLAGS =  -O2
 
-# Subdirectories for storing source files
+# Subdirectories for storing example source files
 EXDIR = ex
 
 # Directories for storing object files
+ADACFODIR = adacf/obj
 FODIR = Fobj
 ODIR = obj
-ADACFODIR = adacf/obj
+MMAODIR = Mobj
 EXFODIR = ex/obj
 
-# Fortran object files
-FOBJS = Finit.o Fbeta.o Fspecial.o Fdcomplex.o Fastrong.o Flambda.o\
-Fprojectors.o Frnnlo.o Ferfunc.o Fevol.o Fcdvcs.o Fmsbar.o Fcff.o\
-Fdvcs.o Ff2.o Freadpar.o Ferror.o Fgauss.o Fnd.o Fbigcns.o Fintegra.o Fxspace.o\
-Finitc.o Fevolc.o Finitgpd.o Fhj.o
-_FOBJS = $(patsubst %,$(FODIR)/%,$(FOBJS))
-
-# rule for compiling example Fortran programs
-$(EXFODIR)/%.o: $(EXDIR)/%.f
-	$(FC) -c -o $@ $< $(FFLAGS)
-
-# rule for compiling fit.F
-$(FODIR)/Ffit.o: fit.F
-	$(FC) -c -o $@ $< $(FFLAGS) $(CPPFLAGS)
-$(FODIR)/Ffit_nopgplot.o: fit.F
-	$(FC) -c -o $@ $< $(FFLAGS) '-D NOPGPLOT'
-
-# rule for compiling Fortran .f  files
-# (prefix "F" is used to avoid possible future clashes with
-#  C-wrappers with the same name)
-$(FODIR)/F%.o: %.f
-	$(FC) -c -o $@ $< $(FFLAGS)
-
-# "adacf" Fortran object files
+# "adacf" package Fortran object files
 ADACFOBJS = Harmonic.o Mellin.o WgammaVNSP0F.o WgammaVNSP1F.o\
 WgammaVNSP2F.o WgammaVQQ0F.o WgammaVQQ1F.o WgammaVQQ2F.o WgammaVQG0F.o\
 WgammaVQG1F.o WgammaVQG2F.o WgammaVGQ0F.o WgammaVGQ1F.o WgammaVGQ2F.o\
@@ -68,15 +46,56 @@ _ADACFOBJS = $(patsubst %,$(ADACFODIR)/%,$(ADACFOBJS))
 $(ADACFODIR)/%.o: adacf/%.f 
 	$(FC) -c -o $@ $< $(FFLAGS)
 
+
+# Fortran object files
+FOBJS = Finit.o Fbeta.o Fspecial.o Fdcomplex.o Fastrong.o Flambda.o\
+Fprojectors.o Frnnlo.o Ferfunc.o Fevol.o Fcdvcs.o Fmsbar.o Fcff.o\
+Fdvcs.o Ff2.o Freadpar.o Ferror.o Fgauss.o Fnd.o Fbigcns.o Fintegra.o Fxspace.o\
+Finitc.o Fevolc.o Finitgpd.o Fhj.o
+_FOBJS = $(patsubst %,$(FODIR)/%,$(FOBJS))
+
+# rule for compiling fcn.F
+$(FODIR)/Ffcn.o: fcn.F header.f
+	$(FC) -c -o $@ $< $(FFLAGS) $(CPPFLAGS)
+$(FODIR)/Ffcn_nopgplot.o: fcn.F header.f
+	$(FC) -c -o $@ $< $(FFLAGS) '-D NOPGPLOT'
+
+
+# rule for compiling Fortran .f  files
+# (prefix "F" is used to avoid possible future clashes with
+#  C-wrappers with the same name)
+$(FODIR)/F%.o: %.f  header.f
+	$(FC) -c -o $@ $< $(FFLAGS)
+
 # C object files
-OBJS = flushout.o
+OBJS = flushout.o atest.o
 _OBJS = $(patsubst %,$(ODIR)/%,$(OBJS))
 
 # rule for compiling C files
 $(ODIR)/%.o: %.c
 	$(CC) -c -o $@ $< $(CFLAGS) $(INCS)
 
+# rules for compiling MathLink C files
+$(MMAODIR)/%.tm.c: %.tm
+	$(MPREP) -o $@ $<
+$(MMAODIR)/%.tm.o: $(MMAODIR)/%.tm.c $(MMAODIR)/%.o
+	$(CC) -c -o $@ $< -I$(CADDSDIR) $(FFLAGS)
+$(MMAODIR)/%.o: %.c  header.h
+	$(CC) -c -o $@ $< -I$(CADDSDIR) $(FFLAGS)
+
+
+# rule for compiling example Fortran programs
+$(EXFODIR)/%.o: $(EXDIR)/%.f header.f
+	$(FC) -c -o $@ $< $(FFLAGS)
+
+# mma targets
+
+mmafit: $(_FOBJS) $(_ADACFOBJS) $(MMAODIR)/fit.tm.o $(MMAODIR)/fit.o $(ODIR)/flushout.o $(FODIR)/Ffcn.o $(FODIR)/Fmninterface.o
+	$(FC) -o ../fits/$@ $^ $(FFLAGS) $(CERNLIBS) $(MLLIBS) $(ALLPGPLOTLIBS)
+
 # targets
+atest: $(_FOBJS) $(_ADACFOBJS) $(ODIR)/atest.o
+	$(FC) -o $@ $^ $(FFLAGS)
 
 auxtest: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Fauxtest.o
 	$(FC) -o $@ $^ $(FFLAGS)
@@ -90,10 +109,10 @@ radcorr: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Fradcorr.o
 scaledep: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Fscaledep.o $(FODIR)/Fderiv.o
 	$(FC) -o $@ $^ $(FFLAGS)
 
-fit: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Ffit.o $(ODIR)/flushout.o
+fit: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Ffit.o $(FODIR)/Ffcn.o $(ODIR)/flushout.o
 	$(FC) -o $@ $^ $(FFLAGS) $(CERNLIBS) $(ALLPGPLOTLIBS)
 
-fit_nopgplot: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Ffit_nopgplot.o $(ODIR)/flushout.o
+fit_nopgplot: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Ffit.o $(FODIR)/Ffcn_nopgplot.o $(ODIR)/flushout.o
 	$(FC) -o $@ $^ $(FFLAGS) $(CERNLIBS)
 
 houches: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Fhouches.o 
@@ -157,8 +176,10 @@ slope: $(_FOBJS) $(_ADACFOBJS) $(EXFODIR)/slope.o $(FODIR)/Fderiv.o
 
 .PHONY: clean
 clean:
+	-rm -f $(ADACFODIR)/*.o $(FODIR)/F*.o $(ODIR)/*.o $(EXFODIR)/*.o $(MMAODIR)/*
 	-rm -f $(SRCTARGETS)
 	-rm -f $(patsubst %,%.exe,$(SRCTARGETS))
-	-rm -f $(ADACFODIR)/*.o $(FODIR)/F*.o $(ODIR)/*.o $(EXFODIR)/*.o 
+	-rm -f $(patsubst %,../fits/%,$(MMATARGETS))
+	-rm -f $(patsubst %,../fits/%.exe,$(MMATARGETS))
 	-rm -f $(patsubst %,../ex/%,$(EXTARGETS))
 	-rm -f $(patsubst %,../ex/%.exe,$(EXTARGETS))

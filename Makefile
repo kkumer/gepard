@@ -30,6 +30,16 @@
 # Location and links to CERNLIB's kernlib and packlib
 export CERNLIBS =  -L$(HOME)/local/lib -lpacklib -lkernlib
 
+# Location and links to MathLink
+export MMAVERSION=5.2
+#export SYS = Linux# Set this value with the result of evaluating $SystemID
+export SYS = Linux-x86-64# Set this value with the result of evaluating $SystemID
+export MLINKDIR=/usr/local/Wolfram/Mathematica/$(MMAVERSION)/AddOns/MathLink/DeveloperKit
+#export MLINKDIR = /usr/local/Wolfram/Mathematica/$(MMAVERSION)/SystemFiles/Links/MathLink/DeveloperKit
+export CADDSDIR = $(MLINKDIR)/$(SYS)/CompilerAdditions
+export MPREP = $(CADDSDIR)/mprep
+export MLLIBS = -L$(CADDSDIR) -lML -lpthread
+
 # Location and links to pgplot libs (if you have them. 
 # If not, compile with 'make NOPGPLOT=1 fit'.)
 export PGPLOTLIBS = -L$(HOME)/local/lib/pgplot -lpgplot
@@ -41,18 +51,22 @@ export X11LIBS = -L/usr/X11R6/lib -lX11 -lpng
 endif
 
 # targets
-export SRCTARGETS = radcorr scaledep fit test auxtest fit_nopgplot houches accuracy
+export SRCTARGETS = radcorr scaledep fit test auxtest fit_nopgplot houches accuracy atest
 export EXTARGETS = auxsi auxns anatomyNS anatomy radNLONS radNLO evolutNS evolut radQ \
                    radNNLONS radNNLO scalesNS scales scalesNNLO slope fitres fitpdfs
+export MMATARGETS = mmafit
 
 .PHONY: $(SRCTARGETS) $(EXTARGETS)
-DOCTARGETS = pdf html
+DOCTARGETS = pdf html htmlnocss
 
 all: $(SRCTARGETS) $(EXTARGETS) $(DOCTARGETS)
 
 examples: $(EXTARGETS)
 
 $(SRCTARGETS):
+	$(MAKE) -C src $@
+
+$(MMATARGETS):
 	$(MAKE) -C src $@
 
 $(EXTARGETS):
@@ -67,6 +81,9 @@ tex:
 	robodoc --rc doc/robodoc.rc --latex --singledoc --toc --index --doc ./doc/tex/gepard-api
 	
 html:
+	robodoc --rc doc/robodoc.rc  --html --multidoc --index --doc ./doc/html --css ./doc/gepard.css
+
+htmlnocss:
 	robodoc --rc doc/robodoc.rc  --html --multidoc --index --doc ./doc/html
 
 .PHONY: rmfig

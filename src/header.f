@@ -1,13 +1,70 @@
-
-*   "header" file with definitions
+C     ****h* gepard/header.f
+C  FILE DESCRIPTION
+C    Fortran header file with definition of common blocks
+C    $Id:$
+C     *******
 
 *   Parameters
 *   ----------
 
 *   1. Constant parameters loaded from 'GEPARD.INI' or fixed by program
 
-      INTEGER SPEED, ACC, P, NF, CZERO
-      DOUBLE PRECISION MU02, ASP(0:2)
+C     ****v* header.f/SPEED
+C  DESCRIPTION
+C     SPEED -- Speed of evaluations: 1 (most accurate) - 3 (fastest).
+C              This controls how fine is subdivision of Mellin-Barnes
+C              integral.
+C  MEMBER OF
+C     PARINT
+C  SYNOPSIS
+      INTEGER SPEED
+C     ***
+
+C     ****v* header.f/ACC
+C  DESCRIPTION
+C     ACC -- Accuracy of numerical integrations: 1 (worst) - 3 (recommended) - 6 (best)
+C            Mellin-Barnes integration is done on 2**ACC Gauss-Legendre
+C            points per each subinterval.
+C            Integration of partial cross-sections over DEL2 are done on
+C            2**(ACC-SPEED+1) Gauss-Legendre points on interval (0, -1).
+C  MEMBER OF
+C     PARINT
+C  SYNOPSIS
+      INTEGER ACC
+C     ***
+
+C     ****v* header.f/P
+C  DESCRIPTION
+C         P -- approximation order, which is N^{P}LO, P=0, 1 or 2
+C  MEMBER OF
+C     PARINT
+C  SYNOPSIS
+      INTEGER P
+C     ***
+
+      INTEGER NF, CZERO
+
+C     ****v* header.f/MU02
+C  DESCRIPTION
+C       MU02 -- Starting scale for RGE evolution of alpha_strong.
+C  MEMBER OF
+C     ASTRONG
+C  SYNOPSIS
+      DOUBLE PRECISION MU02
+C     ***
+
+C     ****v* header.f/ASP
+C  DESCRIPTION
+C   ASP(P) -- Array holding the input values of alpha_strong/(2 pi) at the
+C       scale MU02. This must be specified by the user, and for other
+C       scales numerical integration of N^{P}LO order RGE equation will
+C       be used (subroutine AS2PF).
+C  MEMBER OF
+C     ASTRONG
+C  SYNOPSIS
+      DOUBLE PRECISION ASP(0:2)
+C     ***
+
       DOUBLE PRECISION Q02, RF2, RR2
       DOUBLE PRECISION C, PHI, CND, PHIND
       CHARACTER SCHEME*5, ANSATZ*6, PROCESS*6, FFTYPE*10
@@ -26,12 +83,13 @@
       DOUBLE PRECISION XI, DEL2, Q2
       DOUBLE PRECISION QS(QINDMAX), QSDIS(QINDMAX)
 *     - DEL2=T=-MT integration contour points
-      DOUBLE PRECISION MTS(MTINDMAX), MTWG(MTINDMAX)
+      DOUBLE PRECISION MTS(0:MTINDMAX), MTWG(MTINDMAX)
 
 *   4. Other
 
-      DOUBLE PRECISION PI, CF, CA, TF
+      DOUBLE PRECISION PI, PIHALF, CF, CA, TF
       PARAMETER ( PI = 3.1415 92653 58979 D0 )
+      PARAMETER ( PIHALF = 1.5707 963267 948966 D0 )
       PARAMETER ( CF = 4.0d0 / 3.0d0, CA = 3.0d0, TF = 0.5d0 )
 
 *     - QCD beta function
@@ -73,8 +131,21 @@
       
 *   1. Constant parameters loaded from 'GEPARD.INI' or fixed by program
 
+
+C     ****c* header.f/PARINT
+C  DESCRIPTION
+C     Integer parameters
+C  SYNOPSIS
       COMMON / PARINT /  SPEED, ACC, P, NF, CZERO
+C     ***
+
+C     ****c* header.f/ASTRONG
+C  DESCRIPTION
+C     Initial value of alpha_strong
+C  SYNOPSIS
       COMMON / ASTRONG/  MU02, ASP
+C     ***
+
       COMMON / PARFLT /  Q02, RF2, RR2
       COMMON / MBCONT /  C, PHI, CND, PHIND
       COMMON / PARCHR /  SCHEME, ANSATZ, PROCESS, FFTYPE

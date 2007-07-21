@@ -53,7 +53,7 @@ C
       P = 0
       PROCESS = 'DIS'
       CALL INIT
-      CALL INITGPD
+      CALL INITGPD(1)
       WRITE (*, *) "For values of test parameters see src/test.f"
       WRITE (*, *) 
 
@@ -118,6 +118,15 @@ C
       AUX = SIGMA ()
       WRITE (*, *) AUX
 
+      WRITE (*, *) " ---  Test 6: NLO sigma, 1->4 GeV^2, xi=1e-6  --- "
+      Q2 = 4.0D0
+      NQS = 3
+      QS(3) = Q2
+      CALL EVOLC(1,3)
+      XI = 1.0D-6
+      WRITE (*, *) " 99.8381042 is old gepard result"
+      AUX = SIGMA ()
+      WRITE (*, *) AUX
 
       STOP
       END

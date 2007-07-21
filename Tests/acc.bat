@@ -34,10 +34,11 @@ s1 line linewidth 1.5
 s1 line color 2
 s1 legend  "SPEED = 2"
 #
-s2 hidden true
+s2 type xy
+s2 line linestyle 4
+s2 line linewidth 1.5
+s2 line color 4
+s2 legend  "SPEED = 3"
 #
-s3 type xy
-s3 line linestyle 4
-s3 line linewidth 1.5
-s3 line color 4
-s3 legend  "SPEED = 4"
+s3 hidden true
+#

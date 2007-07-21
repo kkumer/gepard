@@ -83,9 +83,13 @@ C
 
       QVAR2 = 4.0d0
 
-      PAR(1) = 1.0d0
-      PAR(2) = 0.05d0
-      PAR(3) = 2.5d0
+      NQS = 1
+
+
+*   turn off second partial wave
+      PAR(50) = 0.0d0
+      PAR(51) = 0.0d0
+
 
       SCHEME = 'CSBAR'
       P = 2
@@ -111,15 +115,20 @@ C
             P = 1
       END IF
       IF (DBLE(LN/2) .EQ. LN/2.0d0) THEN
-            DEL2 = -0.5d0
+            NDEL = 1
       ELSE
-            DEL2 = 0.0d0
+            NDEL = 0
       END IF
       IF (LN .LE. 4) THEN
             ANSATZ = 'HARD'
       ELSE
             ANSATZ = 'SOFT'
       END IF
+
+      CALL INIT
+      CALL INITGPD(1)
+      MTIND = 0
+      IF (NDEL .EQ. 1) MTIND = NMTS + 3
 
 
 *     Calculating derivatives of CFFs needed for present line and point ...
@@ -178,6 +187,8 @@ C
       INCLUDE 'header.f'
 
       Q2 = QQ2
+      QS(1) = Q2
+      CALL EVOLC(1, 1)
 
       CALL CFFF 
 
@@ -207,6 +218,8 @@ C
       INCLUDE 'header.f'
 
       Q2 = QQ2
+      QS(1) = Q2
+      CALL EVOLC(1, 1)
 
       CALL CFFF 
 

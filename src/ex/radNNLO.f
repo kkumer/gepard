@@ -87,6 +87,8 @@ C
 
       Q2 = 2.5d0
       IF (NDEL .EQ. 1) Q2 = 100.0d0
+      NQS = 1
+      QS(1) = Q2
 
       LOGXI = LOGXISTART
       DO 20 PT = 1, NPOINTS
@@ -119,8 +121,12 @@ C
 *     Calculating two CFFs needed for present line and point ...
 
       CALL INIT
+      CALL INITGPD(0.25D0)
+
+      CALL EVOLC(1, 1)
       CALL CFFF 
       P = P - 1
+      CALL EVOLC(1, 1)
       CALL CFFF 
       P = P + 1
 

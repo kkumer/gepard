@@ -1,90 +1,3 @@
-C     ****h* gepard/fit.f
-C  FILE DESCRIPTION
-C    Fitting of DVCS (and DIS in future) experimental data.
-C
-C    $Id$
-C     *******
-
-C     ****p* fit.f/FIT
-C  NAME
-C    FIT   --  Determines parameters of GPDs (and low-energy
-C              input point Q0), by fitting to DVCS and DIS
-C              experimental data.
-C            
-C  DESCRIPTION
-C             Calls minuit subroutine for minimization and
-C             prints results in various ways.
-C
-C  INPUTS
-C          FIT.INI -- file with names of files with experimental
-C                     data to be fitted to
-C       MINUIT.CMD -- file with specification of fit parameters
-C                     and with minuit commands.
-C
-C  OUTPUT
-C          Goes to files with extensions .out (tabular representation
-C          of fit), .ps (graphical representation of fit), and .min
-C          (Minuit output)
-C
-C  CHILDREN
-C      READPAR, INIT, MINUIT, FCN (via MINUIT)
-C
-C  SOURCE
-C
-
-
-      PROGRAM FIT
-
-      IMPLICIT NONE
-      INTEGER ISINTER
-      CHARACTER COMFILE*10, OUTFILE*20
-      EXTERNAL FCN
-      DATA COMFILE /'MINUIT.CMD'/
-      INCLUDE 'header.f'
-
-      COMMON /INTERACTIVE/ ISINTER
-
-*   Reading from first line whether we want interactive Minuit session.
-      OPEN (UNIT = 17, FILE = COMFILE, STATUS = 'OLD')
-      READ (17, *) ISINTER
-      CLOSE (17)
-
-      CALL READPAR
-      FFTYPE = 'SINGLET'
-
-      PROCESS = 'DVCS'
-      CALL INIT
-      PROCESS = 'DIS'
-      CALL INIT
-
-      CALL INITC
-
-      IF (ISINTER .NE. 1) THEN
-*   We work in batch mode
-*     File where Minuit batch commands are
-        OPEN (UNIT = 5, FILE = COMFILE, STATUS = 'OLD')
-        OPEN (UNIT = 11, FILE = 'FIT.INI', STATUS = 'OLD')
-        READ (11, *) OUTFILE
-        CLOSE (11)
-*     File for writing out Minuit output
-        OPEN (UNIT = 6, FILE = 
-     &    OUTFILE(1:MAX(1,INDEX(OUTFILE//' ',' ')-1)) // '.min',
-     &    STATUS = 'UNKNOWN')
-      ELSE
-*   We work in interactive mode
-        WRITE (*, 801) COMFILE
-      END IF
-
-      CALL MINUIT(FCN,0)  
-
-801   FORMAT (1X, // 1X, 72('-') / 1X, " -- Interactive mode ! --" / 1X,
-     & "You can answer 'SET INPUT 18 ", A, "' to the querry below" / 1X,
-     & "(Second question about rewinding the unit is irrelevant.)" / 1X,
-     & 72('-') //)
-      STOP
-      END
-C     ****
-
 C     ****s* fit.f/FCN
 C  NAME
 C     FCN  --  minimization subroutine called by minuit
@@ -157,7 +70,13 @@ C
  10   CONTINUE
 
 *     Initialize GPDs
-      CALL INITGPD
+      IF (ANSATZ(:3) .EQ. 'MMA') THEN
+        CALL INITGPDMMA(1.0d0)
+      ELSE
+        CALL INITGPD(1.0d0)
+      END IF
+
+*     CALL INITGPDMMA(1.0d0)
 
       NTOT = 0
       CHISQ = 0.0d0
@@ -192,7 +111,7 @@ C
         WRITE (21, 803) "Gepard parameters:"
         WRITE (21, 804) SPEED, P, NF
         WRITE (21, 806) SCHEME, Q02
-        IF ( ANSATZ(:3) .EQ. 'FIT' ) THEN
+        IF ((ANSATZ(:3) .EQ. 'FIT') .OR. (ANSATZ(:3) .EQ. 'MMA')) THEN
           WRITE (21, 803) "Final fit parameters:"
           DO 13 K = 1, 4
           WRITE (21, 809) FITNM(K), PAR(10+K), FITNM(4+K), PAR(20+K)
@@ -240,7 +159,7 @@ C
         CALL PGTEXT (1., 12., TXT)
         WRITE(TXT, 806) SCHEME, Q02
         CALL PGTEXT (1., 11., TXT)
-        IF ( ANSATZ(:3) .EQ. 'FIT' ) THEN
+        IF ((ANSATZ(:3) .EQ. 'FIT') .OR. (ANSATZ(:3) .EQ. 'MMA')) THEN
           CALL PGTEXT (-1., 10., "Final fit parameters:")
           DO 30 K = 1, 4
           WRITE (TXT, 809) FITNM(K), PAR(10+K), FITNM(K+4), PAR(20+K)
@@ -369,6 +288,7 @@ C
         CALL PGPAGE
         CALL PGVSTD
         DRAW = .FALSE.
+        CALL PGSLW(2)
 #endif
       END IF
 
