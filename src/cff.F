@@ -73,23 +73,30 @@ C
       RESIMAG = 0.0d0
 
       CALL LOOKUPQ(QIND)
+#ifdef MMA
+      IF (ANSATZ(:3) .EQ. 'MMA') THEN
+        CALL GETMBGPDMMA
+      ELSE
+        CALL GETMBGPD
+      END IF
+#else
+      IF (ANSATZ(:3) .EQ. 'MMA') THEN
+        WRITE(*,*) 'ANSATZ=MMA unavailable. Recompile with -D MMA'
+      ELSE
+        CALL GETMBGPD
+      END IF
+#endif
 
 *   Integration ...
 
       DO 123 K = 1, NPTS
 
-      J = N(1,K) - 1
-
-      FCM(1) = HGRID(MTIND, K, 1)
-      FCM(2) = HGRID(MTIND, K, 2)
+      J = N(K) - 1
 
       IF ( FFTYPE(:7) .EQ. 'NONSING' ) THEN
-        FPW = CGRIDNS(QIND, K) * FCM(1)        
+        FPW = CGRIDNS(QIND,K)*MBGPD(K,1)        
       ELSE
-        FPW = CGRID(1,QIND,K,1) * FCM(1) + CGRID(1,QIND,K,2) * FCM(2)
-        FPW = FPW +  
-     &              PAR(50) * CGRID(2,QIND,K,1) * FCM(1) + 
-     &              PAR(51) * CGRID(2,QIND,K,2) * FCM(2)
+        FPW = CGRID(QIND,K,1)*MBGPD(K,1) + CGRID(QIND,K,2)*MBGPD(K,2)
       END IF
 
       FREAL = IMAGPART(EPH * (2.0d0/XI)**(J-C) * DCTAN(PIHALF*J) * FPW)

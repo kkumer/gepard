@@ -40,9 +40,9 @@ C
       DOUBLE COMPLEX HSEA, HU, HD
       DOUBLE PRECISION NORMS
       DOUBLE COMPLEX CLNGAMMA, CBETA, POCHSEA, POCHG, POCHHAMMER
-      DOUBLE COMPLEX NUM, DENN
+      DOUBLE COMPLEX NUM, DENN, JMA(2), DCTAN
       INTEGER LHBETA(4), LHBETAF(4)
-      DOUBLE PRECISION LHA(4), LHLAM(4)
+      DOUBLE PRECISION LHA(4), LHLAM(4), ALPT(2)
       INCLUDE 'header.f'
       DATA LHBETA / 3, 4, 6, 5 /
       DATA LHBETAF / 6, 24, 720, 120 /
@@ -93,6 +93,40 @@ C
      &        0.0d0) + J, 6) * POCHHAMMER(COMPLEX(2.0d0 - PAR(22),
      &        0.0d0), 6)
       ELSE IF (ANSATZ .EQ. 'FIT') THEN
+          ALPT(1) = PAR(12) + PAR(13)*DEL2
+          ALPT(2) = PAR(22) + PAR(23)*DEL2
+          JMA(1) = J - COMPLEX(ALPT(1), 0.0d0)
+          JMA(2) = J - COMPLEX(ALPT(2), 0.0d0)
+        IF ( PROCESS .EQ. 'DIS' ) THEN 
+          FCM(1) = PAR(11) * POCHHAMMER(COMPLEX(2.0d0 - PAR(12), 0.0d0) 
+     &              , 8) / POCHHAMMER(COMPLEX(1.0d0 - PAR(12), 0.0d0)
+     &          + J , 8) * (COMPLEX(1.0d0 - PAR(12), 0.0d0) + J) /
+     &           (1.0d0 - DEL2/(PAR(14)+PAR(15)*J))**PAR(16) *
+     &          ( 1.0d0/(JMA(1) + 1.0d0) )
+          FCM(2) = PAR(21) * POCHHAMMER(COMPLEX(2.0d0 - PAR(22), 0.0d0) 
+     &              , 6) / POCHHAMMER(COMPLEX(1.0d0 - PAR(22), 0.0d0)
+     &          + J , 6) * (COMPLEX(1.0d0 - PAR(22), 0.0d0) + J) /
+     &           (1.0d0 - DEL2/(PAR(24)+PAR(25)*J))**PAR(26) *
+     &          ( 1.0d0/(JMA(2) + 1.0d0) )
+        ELSE  
+          FCM(1) = PAR(11) * POCHHAMMER(COMPLEX(2.0d0 - PAR(12), 0.0d0) 
+     &              , 8) / POCHHAMMER(COMPLEX(1.0d0 - PAR(12), 0.0d0)
+     &          + J , 8) * (COMPLEX(1.0d0 - PAR(12), 0.0d0) + J) /
+     &           (1.0d0 - DEL2/(PAR(14)+PAR(15)*J))**PAR(16) *
+     &          ( 1.0d0/(JMA(1) + 1.0d0) + PAR(19)*PI*( 1.0d0 / 
+     &              TAN(-ALPT(1)*PIHALF) + DCTAN(JMA(1)*PIHALF) ) *
+     &             (XI/2)**(JMA(1)+1.0d0) )
+          FCM(2) = PAR(21) * POCHHAMMER(COMPLEX(2.0d0 - PAR(22), 0.0d0) 
+     &              , 6) / POCHHAMMER(COMPLEX(1.0d0 - PAR(22), 0.0d0)
+     &          + J , 6) * (COMPLEX(1.0d0 - PAR(22), 0.0d0) + J) /
+     &           (1.0d0 - DEL2/(PAR(24)+PAR(25)*J))**PAR(26) *
+     &          ( 1.0d0/(JMA(2) + 1.0d0) + PAR(29)*PI*( 1.0d0 / 
+     &              TAN(-ALPT(2)*PIHALF) + DCTAN(JMA(2)*PIHALF) ) *
+     &             (XI/2)**(JMA(2)+1.0d0) )
+        ENDIF
+      ELSE IF (ANSATZ .EQ. 'SPLICE') THEN
+              CALL SPLICE(J, FCM)
+      ELSE IF (ANSATZ .EQ. 'FITBP') THEN
             HU = PAR(31) * POCHHAMMER(COMPLEX(1.0d0 - PAR(32), 0.0d0) 
      &              , 4) / POCHHAMMER(COMPLEX(1.0d0 - PAR(32), 0.0d0)
      &          + J , 4) * (COMPLEX(1.0d0 - PAR(32), 0.0d0) + J) /

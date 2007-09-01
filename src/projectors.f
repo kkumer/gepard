@@ -33,10 +33,10 @@ C      LAMBDAF
 C  SOURCE
 C
 
-      SUBROUTINE PROJECTORSF (SEC, K, LAM, PR)
+      SUBROUTINE PROJECTORSF (K, LAM, PR)
 
       IMPLICIT NONE
-      INTEGER SEC, K
+      INTEGER K
       DOUBLE COMPLEX LAM(2), PR(2,2,2)
       DOUBLE COMPLEX DEN
       INCLUDE 'header.f'
@@ -46,10 +46,10 @@ C
 
 *     P(+)
 
-      PR(1,1,1) = DEN * (GAM(SEC,K,0,1,1) - LAM(2)) 
-      PR(1,1,2) = DEN *  GAM(SEC,K,0,1,2)
-      PR(1,2,1) = DEN *  GAM(SEC,K,0,2,1)
-      PR(1,2,2) = DEN * (GAM(SEC,K,0,2,2) - LAM(2)) 
+      PR(1,1,1) = DEN * (GAM(K,0,1,1) - LAM(2)) 
+      PR(1,1,2) = DEN *  GAM(K,0,1,2)
+      PR(1,2,1) = DEN *  GAM(K,0,2,1)
+      PR(1,2,2) = DEN * (GAM(K,0,2,2) - LAM(2)) 
 
 *     Using P(-) = 1 - P(+) 
 

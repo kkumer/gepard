@@ -45,7 +45,7 @@ C
       HX(L) = 0.0d0
       DO 10 K = 1, NPTS
 
-      J = N(1,K) - 1
+      J = N(K) - 1
       CALL HJ(J, FCM)
 
  10   HX(L) = HX(L) + WG(K) * IMAGPART( EPH * (1.0d0/X)**J * FCM(L) )

@@ -28,10 +28,10 @@ C      PROJECTORSF, ERFUNCF
 C  SOURCE
 C
 
-      SUBROUTINE LAMBDAF (SEC, K, LAM)
+      SUBROUTINE LAMBDAF (K, LAM)
 
       IMPLICIT NONE
-      INTEGER SEC, K
+      INTEGER K
       DOUBLE COMPLEX LAM(2)
       DOUBLE COMPLEX AUX
       INCLUDE 'header.f'
@@ -40,10 +40,10 @@ C
 *  Eigenvalues. Expression is adjusted to avoid the crossing
 *    of the SQRT cut on the negative real axis
 
-      AUX = (GAM(SEC,K,0,1,1) - GAM(SEC,K,0,2,2)) * SQRT (1.0d0 + 
-     &     4.0d0 * GAM(SEC,K,0,1,2)*GAM(SEC,K,0,2,1)/(GAM(SEC,K,0,1,1) 
-     &          - GAM(SEC,K,0,2,2))**2)
-      LAM(1) = 0.5d0 * (GAM(SEC,K,0,1,1) + GAM(SEC,K,0,2,2) - AUX)
+      AUX = (GAM(K,0,1,1) - GAM(K,0,2,2)) * SQRT (1.0d0 + 
+     &     4.0d0 * GAM(K,0,1,2)*GAM(K,0,2,1)/(GAM(K,0,1,1) 
+     &          - GAM(K,0,2,2))**2)
+      LAM(1) = 0.5d0 * (GAM(K,0,1,1) + GAM(K,0,2,2) - AUX)
       LAM(2) = LAM(1) + AUX
 
       RETURN

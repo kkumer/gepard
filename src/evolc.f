@@ -31,10 +31,10 @@ C      AS2PF, EVOLF, HJ
 C  SOURCE
 C
 
-      SUBROUTINE EVOLC (SEC, QIND)
+      SUBROUTINE EVOLC ( QIND )
 
       IMPLICIT NONE
-      INTEGER K, SEC, QIND
+      INTEGER K,  QIND
       INTEGER ORD, L, K1
       DOUBLE PRECISION R, ASQ02, ASMUR2, ASMUF2
       DOUBLE COMPLEX CEVNS, CNDNS, CEV(2)
@@ -85,51 +85,51 @@ C
       ELSE
 *     singlet case
 
-       CALL EVOLF (SEC, K, R, EVOLA)
+       CALL EVOLF ( K, R, EVOLA)
 
        IF ( PROCESS(:3) .EQ. 'DVC' ) THEN
 *      --- DVCS ---
 
-        CEV(1) = ( BIGC(SEC,K,0,1) * EVOLA(0,1,1) + 
-     &             BIGC(SEC,K,0,2) * EVOLA(0,2,1) ) * CZERO
-        CEV(2) = ( BIGC(SEC,K,0,1) * EVOLA(0,1,2) + 
-     &             BIGC(SEC,K,0,2) * EVOLA(0,2,2) ) * CZERO
+        CEV(1) = ( BIGC(K,0,1) * EVOLA(0,1,1) + 
+     &             BIGC(K,0,2) * EVOLA(0,2,1) ) * CZERO
+        CEV(2) = ( BIGC(K,0,1) * EVOLA(0,1,2) + 
+     &             BIGC(K,0,2) * EVOLA(0,2,2) ) * CZERO
 
         IF (P .GE. 1) THEN
 
-          CEV(1) = CEV(1) + ASMUR2 * ( BIGC(SEC,K,1,1) * EVOLA(0,1,1) + 
-     &                                 BIGC(SEC,K,1,2) * EVOLA(0,2,1) )
-     &                    + ASMUF2 * ( BIGC(SEC,K,0,1) * EVOLA(1,1,1) + 
-     &                                 BIGC(SEC,K,0,2) * EVOLA(1,2,1) )
+          CEV(1) = CEV(1) + ASMUR2 * ( BIGC(K,1,1) * EVOLA(0,1,1) + 
+     &                                 BIGC(K,1,2) * EVOLA(0,2,1) )
+     &                    + ASMUF2 * ( BIGC(K,0,1) * EVOLA(1,1,1) + 
+     &                                 BIGC(K,0,2) * EVOLA(1,2,1) )
 
-          CEV(2) = CEV(2) + ASMUR2 * ( BIGC(SEC,K,1,1) * EVOLA(0,1,2) + 
-     &                                 BIGC(SEC,K,1,2) * EVOLA(0,2,2) )
-     &                    + ASMUF2 * ( BIGC(SEC,K,0,1) * EVOLA(1,1,2) + 
-     &                                 BIGC(SEC,K,0,2) * EVOLA(1,2,2) )
+          CEV(2) = CEV(2) + ASMUR2 * ( BIGC(K,1,1) * EVOLA(0,1,2) + 
+     &                                 BIGC(K,1,2) * EVOLA(0,2,2) )
+     &                    + ASMUF2 * ( BIGC(K,0,1) * EVOLA(1,1,2) + 
+     &                                 BIGC(K,0,2) * EVOLA(1,2,2) )
 
 
           IF (P .GE. 2) THEN
 
-            CEV(1) = CEV(1)+ASMUR2**2*( BIGC(SEC,K,2,1) * EVOLA(0,1,1) +
-     &                                 BIGC(SEC,K,2,2) * EVOLA(0,2,1) )
-     &        + ASMUR2 * ASMUF2 * ( BIGC(SEC,K,1,1) * EVOLA(1,1,1) + 
-     &                              BIGC(SEC,K,1,2) * EVOLA(1,2,1) )
-     &                 + ASMUF2**2 * ( BIGC(SEC,K,0,1) * EVOLA(2,1,1) + 
-     &                                 BIGC(SEC,K,0,2) * EVOLA(2,2,1) )
+            CEV(1) = CEV(1)+ASMUR2**2*( BIGC(K,2,1) * EVOLA(0,1,1) +
+     &                                 BIGC(K,2,2) * EVOLA(0,2,1) )
+     &        + ASMUR2 * ASMUF2 * ( BIGC(K,1,1) * EVOLA(1,1,1) + 
+     &                              BIGC(K,1,2) * EVOLA(1,2,1) )
+     &                 + ASMUF2**2 * ( BIGC(K,0,1) * EVOLA(2,1,1) + 
+     &                                 BIGC(K,0,2) * EVOLA(2,2,1) )
 
-            CEV(2) = CEV(2)+ASMUR2**2*( BIGC(SEC,K,2,1) * EVOLA(0,1,2) +
-     &                                 BIGC(SEC,K,2,2) * EVOLA(0,2,2) )
-     &        + ASMUR2 * ASMUF2 * ( BIGC(SEC,K,1,1) * EVOLA(1,1,2) + 
-     &                              BIGC(SEC,K,1,2) * EVOLA(1,2,2) )
-     &                 + ASMUF2**2 * ( BIGC(SEC,K,0,1) * EVOLA(2,1,2) + 
-     &                                 BIGC(SEC,K,0,2) * EVOLA(2,2,2) )
+            CEV(2) = CEV(2)+ASMUR2**2*( BIGC(K,2,1) * EVOLA(0,1,2) +
+     &                                 BIGC(K,2,2) * EVOLA(0,2,2) )
+     &        + ASMUR2 * ASMUF2 * ( BIGC(K,1,1) * EVOLA(1,1,2) + 
+     &                              BIGC(K,1,2) * EVOLA(1,2,2) )
+     &                 + ASMUF2**2 * ( BIGC(K,0,1) * EVOLA(2,1,2) + 
+     &                                 BIGC(K,0,2) * EVOLA(2,2,2) )
 
           ENDIF
 
         ENDIF
 
-        CGRID(SEC, QIND, K, 1) = CEV(1)
-        CGRID(SEC, QIND, K, 2) = CEV(2)
+        CGRID(QIND, K, 1) = CEV(1)
+        CGRID(QIND, K, 2) = CEV(2)
 
        ELSE
 *      --- DIS ---

@@ -45,7 +45,7 @@ C
       DOUBLE PRECISION FUNCTION PARSIGMA ()
 
       IMPLICIT NONE
-      DOUBLE PRECISION MT, NGIN, W2
+      DOUBLE PRECISION W2
       INCLUDE 'header.f'
 
 *     Scales and kinematics
@@ -56,6 +56,7 @@ C
 
 *     260.5633976788416 = 4 Pi alpha^2 * (GeV^-2 -> nbarn)
       
+      DEL2 = - MTS(MTIND)
       CALL CFFF 
 
 *     Multiplying with charge factor

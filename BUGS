@@ -5,14 +5,15 @@
 
 -  Interactive mode freezes on MS Windows
 
--  SPEED=4 is unreliable
-
 -  fitres is behaving funny for C=0.25
 
 -  change to sid broke almost everything. Fix it.
-    FIXED: test, radcorr, scaledep, houches, accuracy, auxtest, radNNLO
+    FIXED: test
 
--  NNLO comparison to Vogt is bad
+-  mma interface function cffH is not accurate
+
+-  one must 'make clean' between making  gepard.exe and non-mma executables
+
 
 Fixed:
 ------
@@ -30,3 +31,7 @@ Fixed:
 2006-12-13 -  Because of ND evolution all MB integrations go 0..500
               now which is overkill for "outer" integration and makes
               everything unnecessary 30% slower
+
+2007-07 -  NNLO comparison to Vogt is bad [not same an. dims used]
+
+2007-07 -  SPEED=4 is unreliable [=3 preferable now]

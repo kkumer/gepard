@@ -190,13 +190,13 @@ C
         P = 1
         CALL INIT
         CALL INITGPD(1)
-        CALL EVOLC(1, 1)
+        CALL EVOLC(1)
         EPH = EXP ( COMPLEX(0.0d0, PHI) )
 
         MTIND = 0
         QIND = 1
         DO 30 K = 1, NPTS
-        J = N(1,K) - 1
+        J = N(K) - 1
         FCM(1) = HGRID(MTIND, K, 1)
         FCM(2) = HGRID(MTIND, K, 2)
         FPW = CGRIDDIS(QIND,K,1) * FCM(1) + CGRIDDIS(QIND,K,2) * FCM(2)
@@ -216,14 +216,14 @@ C
         P = 2
         CALL INIT
         CALL INITGPD(1)
-        CALL EVOLC(1, 1)
+        CALL EVOLC(1)
         EPH = EXP ( COMPLEX(0.0d0, PHI) )
 
 
         MTIND = 0
         QIND = 1
         DO 40 K = 1, NPTS
-        J = N(1,K) - 1
+        J = N(K) - 1
         FCM(1) = HGRID(MTIND, K, 1)
         FCM(2) = HGRID(MTIND, K, 2)
         FPW = CGRIDDIS(QIND,K,1) * FCM(1) + CGRIDDIS(QIND,K,2) * FCM(2)

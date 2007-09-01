@@ -2,14 +2,13 @@ Physics:
 -  t_cut of ZEUS data is infinity? DVCS[46].DAT
 
 Computing:
--  Restore MathLink communication
--  Make C-MathLink communication function that recognizes input type
--  Remove unused variables (specially in adacf, or specially
-   not there)?
+-  Make fancy C-MathLink communication function that recognizes input type
+-  Remove unused variables (specially in adacf, or specially not there)?
 -  In fitting parameters should be non-squared quantities
+-  FIT.INI file should not have hardcoded filename but it should be passed via command line
+-  use autoconf and friends
 
 Checks:
--  Check NNLO DIS evolution against Les Houches table 3 or 4
 -  Check plotting of error-bars (Implement stat-syst as in 
    original papers and Dieter's femtoholographic paper?)
    It seems that grace is doing this wrong for log-y axis!
@@ -28,3 +27,5 @@ DONE:
    NLO Les Houches is everywhere ok
 +  Put evolution operators on common block when Q0 is fixed
 +  Move all gaussian points to gauss.f  (from dvcs.f e.g.)
++  Check NNLO DIS evolution against Les Houches table 3 or 4
++  Restore MathLink communication

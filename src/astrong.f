@@ -3,11 +3,7 @@ C  FILE DESCRIPTION
 C    running of QCD coupling constant
 C
 C    $Id$
-C  NOTES
-C    This is modification of file asrgkt.f
-C    from package `QCD-Pegasus'  by  Andreas Vogt.
 C     *******
-
 
 C     ****s* astrong.f/AS2PF
 C  NAME
@@ -18,11 +14,12 @@ C    equation for a fixed number of massless flavours  NF.  Except at
 C    leading order (LO), result is obtained using a fourth-order
 C    Runge-Kutta integration. 
 C  SYNOPSIS
-C
+
       SUBROUTINE AS2PF (AS, R2, AS0, R20)
       
       IMPLICIT NONE
       DOUBLE PRECISION AS, R2, AS0, R20
+
 C  INPUTS
 C          R2 -- final momentum scale squared
 C         AS0 -- initial value for a_strong/(2 Pi)
@@ -33,7 +30,8 @@ C  PARENTS
 C     PARWAVF
 C  NOTES
 C     Requires a previous call of BETAF to initialize common block !
-C     This routine is taken from A. Vogt's QCD-Pegasus
+C     This is slightly modified routine from file asrgkt.f from package
+C     'QCD-Pegasus' by Andreas Vogt, hep-ph/0408244
 C  SOURCE
 C
 
@@ -106,4 +104,4 @@ C
 
       RETURN
       END
-C     *******
+C     ****

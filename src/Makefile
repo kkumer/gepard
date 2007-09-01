@@ -49,9 +49,9 @@ $(ADACFODIR)/%.o: adacf/%.f
 
 # Fortran object files
 FOBJS = Finit.o Fbeta.o Fspecial.o Fdcomplex.o Fastrong.o Flambda.o\
-Fprojectors.o Frnnlo.o Ferfunc.o Fevol.o Fcdvcs.o Fmsbar.o Fcff.o\
+Fprojectors.o Frnnlo.o Ferfunc.o Fevol.o Fcdvcs.o Fmsbar.o \
 Fdvcs.o Ff2.o Freadpar.o Ferror.o Fgauss.o Fnd.o Fbigcns.o Fintegra.o Fxspace.o\
-Finitc.o Fevolc.o Finitgpd.o Fhj.o
+Finitc.o Fevolc.o Fgetmbgpd.o Fhj.o Fsplice.o
 _FOBJS = $(patsubst %,$(FODIR)/%,$(FOBJS))
 
 # rule for compiling fcn.F
@@ -60,6 +60,9 @@ $(FODIR)/Ffcn.o: fcn.F header.f
 $(FODIR)/Ffcn_nopgplot.o: fcn.F header.f
 	$(FC) -c -o $@ $< $(FFLAGS) '-D NOPGPLOT'
 
+# rule for compiling *.F
+$(FODIR)/Fcff.o: cff.F header.f
+	$(FC) -c -o $@ $< $(FFLAGS) $(CPPFLAGS)
 
 # rule for compiling Fortran .f  files
 # (prefix "F" is used to avoid possible future clashes with
@@ -77,11 +80,11 @@ $(ODIR)/%.o: %.c
 
 # rules for compiling MathLink C files
 $(MMAODIR)/%.tm.c: %.tm
-	$(MPREP) -o $@ $<
+	$(MPREP) -o $@ $< 
 $(MMAODIR)/%.tm.o: $(MMAODIR)/%.tm.c $(MMAODIR)/%.o
-	$(CC) -c -o $@ $< -I$(CADDSDIR) $(FFLAGS)
+	$(CC) -c -o $@ $< -I$(MLINCDIR) $(CFLAGS) $(MLEXTRA)
 $(MMAODIR)/%.o: %.c  header.h
-	$(CC) -c -o $@ $< -I$(CADDSDIR) $(FFLAGS)
+	$(CC) -c -o $@ $< -I$(MLINCDIR) $(CFLAGS)
 
 
 # rule for compiling example Fortran programs
@@ -90,8 +93,9 @@ $(EXFODIR)/%.o: $(EXDIR)/%.f header.f
 
 # mma targets
 
-mmafit: $(_FOBJS) $(_ADACFOBJS) $(MMAODIR)/fit.tm.o $(MMAODIR)/fit.o $(ODIR)/flushout.o $(FODIR)/Ffcn.o $(FODIR)/Fmninterface.o
-	$(FC) -o ../fits/$@ $^ $(FFLAGS) $(CERNLIBS) $(MLLIBS) $(ALLPGPLOTLIBS)
+gepard.exe: FFLAGS := $(FFLAGS) '-D MMA'
+gepard.exe: $(_FOBJS) $(_ADACFOBJS) $(MMAODIR)/fit.tm.o $(MMAODIR)/fit.o $(ODIR)/flushout.o $(FODIR)/Ffcn.o $(FODIR)/Fmninterface.o $(FODIR)/Fcff.o
+	$(FC) -o ../fits/$@/$(SYS)/$@ $^ $(FFLAGS) $(CERNLIBS) -L$(MLLIBDIR) -l$(MLLIB) $(ALLPGPLOTLIBS) $(MLEXTRA)
 
 # targets
 atest: $(_FOBJS) $(_ADACFOBJS) $(ODIR)/atest.o
@@ -100,7 +104,7 @@ atest: $(_FOBJS) $(_ADACFOBJS) $(ODIR)/atest.o
 auxtest: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Fauxtest.o
 	$(FC) -o $@ $^ $(FFLAGS)
 
-test: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Ftest.o
+test: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Ftest.o $(FODIR)/Fcff.o
 	$(FC) -o $@ $^ $(FFLAGS)
 
 radcorr: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Fradcorr.o
@@ -109,7 +113,7 @@ radcorr: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Fradcorr.o
 scaledep: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Fscaledep.o $(FODIR)/Fderiv.o
 	$(FC) -o $@ $^ $(FFLAGS)
 
-fit: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Ffit.o $(FODIR)/Ffcn.o $(ODIR)/flushout.o
+fit: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Ffit.o $(FODIR)/Ffcn.o $(ODIR)/flushout.o $(FODIR)/Fcff.o
 	$(FC) -o $@ $^ $(FFLAGS) $(CERNLIBS) $(ALLPGPLOTLIBS)
 
 fit_nopgplot: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Ffit.o $(FODIR)/Ffcn_nopgplot.o $(ODIR)/flushout.o
@@ -179,7 +183,6 @@ clean:
 	-rm -f $(ADACFODIR)/*.o $(FODIR)/F*.o $(ODIR)/*.o $(EXFODIR)/*.o $(MMAODIR)/*
 	-rm -f $(SRCTARGETS)
 	-rm -f $(patsubst %,%.exe,$(SRCTARGETS))
-	-rm -f $(patsubst %,../fits/%,$(MMATARGETS))
-	-rm -f $(patsubst %,../fits/%.exe,$(MMATARGETS))
+	-rm -f ../fits/gepard.exe/$(SYS)/gepard.exe
 	-rm -f $(patsubst %,../ex/%,$(EXTARGETS))
 	-rm -f $(patsubst %,../ex/%.exe,$(EXTARGETS))

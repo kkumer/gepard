@@ -1,28 +1,37 @@
-C     ****s* fit.f/FCN
+C     ****h* gepard/fcn.F
+C  FILE DESCRIPTION
+C    subroutine returning the chi-sqare
+C
+C    $Id$
+C     *******
+
+C     ****s* fcn.F/FCN
 C  NAME
-C     FCN  --  minimization subroutine called by minuit
+C     FCN  --  called by minuit, returns chi-square
 C            
 C  DESCRIPTION
 C    Reads experimental datasets and calculates chi-square by
 C    comparing to theoretical prediction functions.
 C    Writes out theoretical line points for fit plotting.
 C  SYNOPSIS
-C     SUBROUTINE FCN(NPAR,GIN,F,A,IFLAG,FUTIL)
 C
-C     INTEGER NPAR, IFLAG, NPARMAX
-C     PARAMETER (NPARMAX = 10)
-C     DOUBLE PRECISION CHISQ, FUTIL
-C     DOUBLE PRECISION A(NPARMAX),GIN(NPARMAX)
+      SUBROUTINE FCN(NPAR,GIN,CHISQ,A,IFLAG,FUTIL)
+
+      IMPLICIT NONE
+      INTEGER NPAR, IFLAG
+      DOUBLE PRECISION CHISQ, FUTIL
+      INCLUDE 'header.f'
+      DOUBLE PRECISION A(NPARMAX),GIN(NPARMAX)
 C    
 C  INPUTS 
 C                NPAR  --  Number of variable parameters
 C                   A  --  Values of all parameters
 C               IFLAG  --  If .EQ. 3 then print results out, see minuit doc
 C  OUTPUT
-C                   F  --  Value of chi-square
+C               CHISQ  --  Value of chi-square
 C  IDENTIFIERS
 C     FITPAR  --  Equal to A
-C  CHISQPART  --  chi-square produced by single data set
+C  CHISQPART  --  chi-square produced by a single data set
 C
 C  CHILDREN
 C      PROCDATA, PGPLOT routines
@@ -32,13 +41,6 @@ C      MINUIT, FIT (via MINUIT)
 C
 C  SOURCE
 C
-
-
-      SUBROUTINE FCN(NPAR,GIN,CHISQ,A,IFLAG,FUTIL)
-
-      IMPLICIT NONE
-      INTEGER NPAR, IFLAG
-      DOUBLE PRECISION CHISQ, FUTIL
       INTEGER NN, NTOT, K, IER, XPANELS, YPANELS
       DOUBLE PRECISION CHISQPART
       CHARACTER*30 DATAFNAME, OUTFILE, OUTFORMAT
@@ -46,10 +48,8 @@ C
       DOUBLE COMPLEX CBETA
       CHARACTER*9 FITNM
       DIMENSION FITNM(10)
-      INCLUDE 'header.f'
-      DOUBLE PRECISION A(NPARMAX),GIN(NPARMAX)
       DATA FITNM /'NS', 'AL0S', 'ALPS', 'M02S',
-     & 'NG', 'AL0G', 'ALPG', 'M02G', 'SECS', 'SECG'/
+     & 'NG', 'AL0G', 'ALPG', 'M02G', 'SKEWS', 'SKEWG'/
 
 #ifndef NOPGPLOT
       INTEGER PGBEG
@@ -69,14 +69,25 @@ C
         PAR(K) = A(K)
  10   CONTINUE
 
-*     Initialize GPDs
+*     Initialize (only forward!) GPDs
+      DEL2 = 0.0d0
+#ifdef MMA
       IF (ANSATZ(:3) .EQ. 'MMA') THEN
-        CALL INITGPDMMA(1.0d0)
+        CALL GETMBGPDMMA
       ELSE
-        CALL INITGPD(1.0d0)
+        CALL GETMBGPD
       END IF
-
-*     CALL INITGPDMMA(1.0d0)
+#else
+      IF (ANSATZ(:3) .EQ. 'MMA') THEN
+        WRITE(*,*) 'ANSATZ=MMA unavailable. Recompile with -D MMA'
+      ELSE
+        CALL GETMBGPD
+      END IF
+#endif
+      DO 11  K = 1, NPTS
+        HGRID(0, K, 1) = MBGPD(K, 1) 
+        HGRID(0, K, 2) = MBGPD(K, 2)
+ 11   CONTINUE
 
       NTOT = 0
       CHISQ = 0.0d0
@@ -108,6 +119,7 @@ C
         OPEN (UNIT = 21, FILE = 
      &  OUTFILE(1:MAX(1,INDEX(OUTFILE//' ',' ')-1)) // '.out',
      &  STATUS = 'UNKNOWN')
+        OPEN (UNIT = 22, FILE = 'tmp.mma', STATUS = 'UNKNOWN')
         WRITE (21, 803) "Gepard parameters:"
         WRITE (21, 804) SPEED, P, NF
         WRITE (21, 806) SCHEME, Q02
@@ -116,7 +128,7 @@ C
           DO 13 K = 1, 4
           WRITE (21, 809) FITNM(K), PAR(10+K), FITNM(4+K), PAR(20+K)
  13       CONTINUE
-          WRITE (21, 809) FITNM(9), PAR(50), FITNM(10), PAR(51)
+          WRITE (21, 809) FITNM(9), PAR(19), FITNM(10), PAR(29)
         END IF
         WRITE (21, *) 
 *     Same goes to .min
@@ -145,9 +157,12 @@ C
 
       IF (IFLAG .EQ. 3)  THEN
          WRITE (21, *) 'FREE PARAMS = ', NPAR
+         WRITE (22, *)  NPAR
          WRITE (21, *) 'D.O.F = ', NTOT - NPAR
+         WRITE (22, *)  NTOT - NPAR
          WRITE (21, *) 'CHISQ = ', CHISQ
          CLOSE (21)
+         CLOSE (22)
 #ifndef NOPGPLOT
 *     Draw next-to-last plot containing just parameter values
         CALL PGSCH(1.3)
@@ -165,7 +180,7 @@ C
           WRITE (TXT, 809) FITNM(K), PAR(10+K), FITNM(K+4), PAR(20+K)
           CALL PGTEXT (-1., REAL(10-K), TXT)
  30       CONTINUE
-          WRITE (TXT, 809) FITNM(9), PAR(50), FITNM(10), PAR(51)
+          WRITE (TXT, 809) FITNM(9), PAR(19), FITNM(10), PAR(29)
           CALL PGTEXT (-1., 5., TXT)
           WRITE (TXT, 808) NTOT, NPAR, NTOT-NPAR, CHISQ
           CALL PGTEXT (-1., 3., TXT)
@@ -235,17 +250,20 @@ C    Reads experimental datasets and calculates chi-square by
 C    comparing to theoretical prediction functions.
 C    Writes out theoretical line points for fit plotting.
 C  SYNOPSIS
-C     SUBROUTINE PROCDATA (FNAME, IFLAG, N, CHISQPART)
 C
-C     CHARACTER  FNAME*15
-C     INTEGER IFLAG, N
-C     DOUBLE PRECISION CHISQPART
+      SUBROUTINE PROCDATA (FNAME, IFLAG, NN, CHISQPART)
+
+      IMPLICIT NONE
+      CHARACTER  FNAME*30
+      INTEGER IFLAG, NN
+      DOUBLE PRECISION CHISQPART
+C
 C  INPUTS
 C      FNAME  --  Name of the file containing data
 C      IFLAG  --  If .EQ. 3 then print results out, see minuit doc
 C  OUTPUT
 C   CHISQPART --  contribution to chi-square from processed data set
-C          N  --  Number of points in a given data set
+C         NN  --  Number of points in a given data set
 C  IDENTIFIERS
 C          X  --  Array with x-values of experimental points
 C          Y  --  Array with y-values of experimental points
@@ -260,12 +278,6 @@ C  CHILDREN
 C      PARSIGMA, SIGMA, F2F, PGPLOT routines
 C  SOURCE
 C
-      SUBROUTINE PROCDATA (FNAME, IFLAG, NN, CHISQPART)
-
-      IMPLICIT NONE
-      CHARACTER  FNAME*30
-      INTEGER IFLAG, NN
-      DOUBLE PRECISION CHISQPART
       CHARACTER YOBS*8
       INTEGER K
       DOUBLE PRECISION X, YY, DY, THY, DIFSG
@@ -322,6 +334,7 @@ C
         IF (IFLAG .EQ. 3)  THEN
           DIFSG = (THY - YY) / DY
           WRITE (21, 901) X, THY, YY, DY, DIFSG
+          WRITE (22, *) CHISQPART
 #ifndef NOPGPLOT
           CALL PGERRY(1, SNGL(X), LOG10(SNGL(YY-DY)), 
      &                  LOG10(SNGL(YY+DY)), 3.0)

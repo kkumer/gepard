@@ -69,7 +69,7 @@ C
       RES = 0.0d0
 
       DO 123 K = 1, NPTS
-      J = N(1,K) - 1
+      J = N(K) - 1
       FCM(1) = HGRID(MTIND, K, 1)
       FCM(2) = HGRID(MTIND, K, 2)
       FPW = CGRIDDIS(QIND,K,1) * FCM(1) + CGRIDDIS(QIND,K,2) * FCM(2)

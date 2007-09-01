@@ -47,7 +47,7 @@ C
 * 
       IMPLICIT NONE
       INTEGER NINTGMAX, K, K1, K2, K3
-      INTEGER L, ORD, SEC
+      INTEGER L, ORD
       INTEGER EFFACC, NBNDMAX
       DOUBLE PRECISION NFD
       DOUBLE COMPLEX J, Z, EPH
@@ -127,8 +127,7 @@ C
 
       EPH = EXP ( COMPLEX(0.D0, PHI) )
       DO 10 K = 1, NPTS
-        N(1,K) = C + 1.0d0 + Y(K) * EPH 
- 10     N(2,K) = C + 3.0d0 + Y(K) * EPH 
+ 10     N(K) = C + 1.0d0 + Y(K) * EPH 
 
 *   ----  Initialization of common blocks ----
 
@@ -136,15 +135,11 @@ C
 
       CALL BETAF
 
-*   Making everything for two MB contours, first shifted (j+2),
-*   and then the original one, so that SEC-independent stuff
-*   ends up with original values
-      DO 100 SEC = 2, 1, -1
 *   Now looping over MB contour points and initializing
       DO 100 K = 1, NPTS
 
-      Z = N(SEC,K)
-      J = N(SEC,K) - 1
+      Z = N(K)
+      J = N(K) - 1
 
 *   2. ADACF initialization
 
@@ -169,22 +164,22 @@ C
               
 *   2.b Anomalous dimensions matrices: LO, NLO, and NNLO
 
-      CALL WgammaVQQ0F(NFD, Z, GAM(SEC, K, 0, 1, 1))
-      CALL WgammaVQG0F(NFD, Z, GAM(SEC, K, 0, 1, 2))
-      CALL WgammaVGQ0F(NFD, Z, GAM(SEC, K, 0, 2, 1))
-      CALL WgammaVGG0F(NFD, Z, GAM(SEC, K, 0, 2, 2))
+      CALL WgammaVQQ0F(NFD, Z, GAM(K, 0, 1, 1))
+      CALL WgammaVQG0F(NFD, Z, GAM(K, 0, 1, 2))
+      CALL WgammaVGQ0F(NFD, Z, GAM(K, 0, 2, 1))
+      CALL WgammaVGG0F(NFD, Z, GAM(K, 0, 2, 2))
 
       IF (P .GE. 1) THEN
-        CALL WgammaVQQ1F(NFD, Z, GAM(SEC, K, 1, 1, 1))
-        CALL WgammaVQG1F(NFD, Z, GAM(SEC, K, 1, 1, 2))
-        CALL WgammaVGQ1F(NFD, Z, GAM(SEC, K, 1, 2, 1))
-        CALL WgammaVGG1F(NFD, Z, GAM(SEC, K, 1, 2, 2))
+        CALL WgammaVQQ1F(NFD, Z, GAM(K, 1, 1, 1))
+        CALL WgammaVQG1F(NFD, Z, GAM(K, 1, 1, 2))
+        CALL WgammaVGQ1F(NFD, Z, GAM(K, 1, 2, 1))
+        CALL WgammaVGG1F(NFD, Z, GAM(K, 1, 2, 2))
 
         IF (P .GE. 2) THEN
-          CALL WgammaVQQ2F(NFD, Z, GAM(SEC, K, 2, 1, 1))
-          CALL WgammaVQG2F(NFD, Z, GAM(SEC, K, 2, 1, 2))
-          CALL WgammaVGQ2F(NFD, Z, GAM(SEC, K, 2, 2, 1))
-          CALL WgammaVGG2F(NFD, Z, GAM(SEC, K, 2, 2, 2))
+          CALL WgammaVQQ2F(NFD, Z, GAM(K, 2, 1, 1))
+          CALL WgammaVQG2F(NFD, Z, GAM(K, 2, 1, 2))
+          CALL WgammaVGQ2F(NFD, Z, GAM(K, 2, 2, 1))
+          CALL WgammaVGG2F(NFD, Z, GAM(K, 2, 2, 2))
         END IF
       END IF
 
@@ -219,9 +214,9 @@ C
 *   3. "Big C' Wilson coefficients
 
       IF ((SCHEME .EQ. 'CSBAR') .OR. (PROCESS(:3) .EQ. 'DIS')) THEN
-          CALL CDVCSF(SEC, K, BIGCTMP)
+          CALL CDVCSF(K, BIGCTMP)
       ELSE IF (SCHEME(:3) .EQ. 'MSB') THEN
-          CALL MSBARF(SEC, K, BIGCTMP)
+          CALL MSBARF(K, BIGCTMP)
       END IF
 
 *     Writing this to BIGC or BIGCF2 common blocks.
@@ -231,7 +226,7 @@ C
       IF ( PROCESS(:3) .EQ. 'DVC' ) THEN
         DO 30 L = 1,2
         DO 30 ORD = 0, P
-          BIGC(SEC, K, ORD, L) = BIGCTMP(ORD, L) * 
+          BIGC(K, ORD, L) = BIGCTMP(ORD, L) * 
      &             EXP(CLNGAMMA(2.5d0 + J) - CLNGAMMA(3.0d0 + J))
  30     CONTINUE
       ELSE

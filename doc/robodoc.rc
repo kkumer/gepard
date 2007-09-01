@@ -26,12 +26,12 @@ options:
     --sections
     --toc
 headertypes:
-    h "Files" files
-    p "Programs" programs
-    s "Subroutines" subroutines
-    f "Functions" functions
-    c "Common Blocks" commonblocks
-    v "Variables" variables
+    h "File" file
+    p "Program" program
+    s "Subroutine" subroutine
+    f "Function" function
+    c "Common Block" commonblock
+    v "Variable" variable
 accept files:
    headers.h
    accuracy.f
@@ -48,14 +48,15 @@ accept files:
    evol.f
    evoldep.f
    f2.f
-   fit.F
+   fit.f
+   fcn.F
    gauss.f
    houches.f
    init.f
    lambda.f
    msbar.f
    nd.f
-   parwav.f
+   hj.f
    projectors.f
    radcorr.f
    readpar.f
@@ -68,3 +69,4 @@ accept files:
    radNNLO.f
    scalesNS.f
    header.f
+   mninterface.f

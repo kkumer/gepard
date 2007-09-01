@@ -29,10 +29,10 @@ C      CB1F, DCTAN
 C  SOURCE
 C
 
-      SUBROUTINE NDINTF (SEC, K, R, NDINT, NI, NJ)
+      SUBROUTINE NDINTF (K, R, NDINT, NI, NJ)
 
       IMPLICIT NONE
-      INTEGER SEC, K, NI, NJ, ACCND, SPEEDND
+      INTEGER  K, NI, NJ, ACCND, SPEEDND
       DOUBLE PRECISION R
       DOUBLE COMPLEX NDINT
       INTEGER L, NINTGNDMAX, NPTSND, NPTSNDMAX
@@ -69,7 +69,7 @@ C
 
 *   Integrating over L->ZK, with fixed K->J
 
-      J = N(SEC,K) - 1.0d0
+      J = N(K) - 1.0d0
       NDINT = (0.0d0, 0.0d0)
       DO 100 L = 1, NPTSND
 

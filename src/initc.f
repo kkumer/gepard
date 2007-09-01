@@ -166,13 +166,12 @@ C     Initialize grids with values of evolved C's
       PROCESS = 'DVCS'
       DO 310 QIND = 1, NQS
         Q2 = QS(QIND)
-        CALL EVOLC(1, QIND)
-        CALL EVOLC(2, QIND)
+        CALL EVOLC(QIND)
  310  CONTINUE
       PROCESS = 'DIS'
       DO 320 QIND = 1, NQSDIS
         Q2 = QSDIS(QIND)
-        CALL EVOLC(1, QIND)
+        CALL EVOLC(QIND)
  320  CONTINUE
         
 

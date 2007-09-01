@@ -121,10 +121,10 @@ C
 
 *     Calculating two CFFs needed for present line and point ...
 
-      CALL EVOLC(1, 1)
+      CALL EVOLC(1)
       CALL CFFF 
       P = P - 1
-      CALL EVOLC(1, 1)
+      CALL EVOLC(1)
       CALL CFFF 
 
 *     ... and saving them to array

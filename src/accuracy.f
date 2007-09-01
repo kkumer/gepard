@@ -76,7 +76,7 @@ C
         XI = XIA(K)
         CALL INIT
         CALL INITGPD(1)
-        CALL EVOLC(1, 1)
+        CALL EVOLC(1)
         AUX = SIGMA ()
         WRITE (11, 901) XI, ABS((AUX-REF(K))/REF(K))
  20   CONTINUE

@@ -53,10 +53,10 @@ C
       CALL INIT
       CALL INITGPD(0.5D0)
 
-      CALL EVOLC(1, 1)
+      CALL EVOLC(1)
       CALL CFFF 
       P = P - 1
-      CALL EVOLC(1, 1)
+      CALL EVOLC(1)
       CALL CFFF 
 
       WRITE (*,*) "Expect NLO: 0.248594238 + 102.323245 I"
@@ -77,10 +77,10 @@ C
       CALL INIT
       MTIND = 0
 
-      CALL EVOLC(1, 1)
+      CALL EVOLC(1)
       CALL CFFF 
       P = P - 1
-      CALL EVOLC(1, 1)
+      CALL EVOLC(1)
       CALL CFFF 
 
       WRITE (*,*) "Expect NLO: -25716.505846 + 1134612.30 I"

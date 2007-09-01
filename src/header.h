@@ -101,7 +101,7 @@ struct{
  *      INTEGER NPTS, NPTSMAX
  *      PARAMETER (NPTSMAX = 768)
  *      DOUBLE PRECISION Y(NPTSMAX), WG(NPTSMAX)
- *      DOUBLE COMPLEX N(2,NPTSMAX)
+ *      DOUBLE COMPLEX N(NPTSMAX)
  *      COMMON / CONTOUR  /  NPTS
  *      COMMON / POINTS   /  Y, WG
  *      COMMON / NPOINTS  /  N
@@ -112,7 +112,7 @@ struct{
 } contour_;
 
 struct{
-        struct dblcomplex n[NPTSMAX][2];
+        struct dblcomplex n[NPTSMAX];
 } npoints_;
 
 /*
@@ -124,6 +124,10 @@ struct{
 struct{
         struct dblcomplex hgrid[2][NPTSMAX][MTINDMAX+1];
 } hgrid_;
+
+struct{
+        struct dblcomplex mbgpd[2][NPTSMAX];
+} mbgpd_;
 
 
 /*     - Final observables */

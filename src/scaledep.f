@@ -188,7 +188,7 @@ C
 
       Q2 = QQ2
       QS(1) = Q2
-      CALL EVOLC(1, 1)
+      CALL EVOLC(1)
 
       CALL CFFF 
 
@@ -219,7 +219,7 @@ C
 
       Q2 = QQ2
       QS(1) = Q2
-      CALL EVOLC(1, 1)
+      CALL EVOLC(1)
 
       CALL CFFF 
 
