@@ -189,16 +189,17 @@ C
         RES = 0.0D0
         P = 1
         CALL INIT
-        CALL INITGPD(1)
         CALL EVOLC(1)
+        DEL2 = 0.0d0
+        CALL GETMBGPD
         EPH = EXP ( COMPLEX(0.0d0, PHI) )
 
         MTIND = 0
         QIND = 1
         DO 30 K = 1, NPTS
         J = N(K) - 1
-        FCM(1) = HGRID(MTIND, K, 1)
-        FCM(2) = HGRID(MTIND, K, 2)
+        FCM(1) = MBGPD(K, 1)
+        FCM(2) = MBGPD(K, 2)
         FPW = CGRIDDIS(QIND,K,1) * FCM(1) + CGRIDDIS(QIND,K,2) * FCM(2)
         F2IMAG = IMAGPART(EPH * (1.0d0/XI)**(J-C) * FPW )
         RES = RES + WG(K)*F2IMAG
@@ -215,8 +216,8 @@ C
         RES = 0.0D0
         P = 2
         CALL INIT
-        CALL INITGPD(1)
         CALL EVOLC(1)
+        CALL GETMBGPD
         EPH = EXP ( COMPLEX(0.0d0, PHI) )
 
 
@@ -224,8 +225,8 @@ C
         QIND = 1
         DO 40 K = 1, NPTS
         J = N(K) - 1
-        FCM(1) = HGRID(MTIND, K, 1)
-        FCM(2) = HGRID(MTIND, K, 2)
+        FCM(1) = MBGPD(K, 1)
+        FCM(2) = MBGPD(K, 2)
         FPW = CGRIDDIS(QIND,K,1) * FCM(1) + CGRIDDIS(QIND,K,2) * FCM(2)
         F2IMAG = IMAGPART(EPH * (1.0d0/XI)**(J-C) * FPW )
         RES = RES + WG(K)*F2IMAG

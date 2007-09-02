@@ -8,11 +8,13 @@
 -  fitres is behaving funny for C=0.25
 
 -  change to sid broke almost everything. Fix it.
-    FIXED: test
+    FIXED: test radcorr scaledep auxtest atest fit houches accuracy
 
 -  mma interface function cffH is not accurate
 
 -  one must 'make clean' between making  gepard.exe and non-mma executables
+
+-  houches still problematic for very large x_BJ. At input scale as well!
 
 
 Fixed:

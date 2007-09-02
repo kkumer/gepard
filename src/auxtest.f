@@ -38,9 +38,6 @@ C
       NQS = 1
       QS(1) = Q2
 
-*  turning off second partial wave
-      PAR(50) = 0.0d0
-      PAR(51) = 0.0d0
 
 *     1. Point "A"
       WRITE (*,*) " --- Point A  (MSBAR) ----- "
@@ -51,7 +48,8 @@ C
       SCHEME = 'MSBAR'
 
       CALL INIT
-      CALL INITGPD(0.5D0)
+      MTIND = NMTS + 4
+      DEL2 = -MTS(MTIND)
 
       CALL EVOLC(1)
       CALL CFFF 
@@ -76,6 +74,7 @@ C
 
       CALL INIT
       MTIND = 0
+      DEL2 = -MTS(MTIND)
 
       CALL EVOLC(1)
       CALL CFFF 

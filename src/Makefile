@@ -98,31 +98,31 @@ gepard.exe: $(_FOBJS) $(_ADACFOBJS) $(MMAODIR)/fit.tm.o $(MMAODIR)/fit.o $(ODIR)
 	$(FC) -o ../fits/$@/$(SYS)/$@ $^ $(FFLAGS) $(CERNLIBS) -L$(MLLIBDIR) -l$(MLLIB) $(ALLPGPLOTLIBS) $(MLEXTRA)
 
 # targets
-atest: $(_FOBJS) $(_ADACFOBJS) $(ODIR)/atest.o
+atest: $(_FOBJS) $(_ADACFOBJS) $(ODIR)/atest.o $(FODIR)/Fcff.o
 	$(FC) -o $@ $^ $(FFLAGS)
 
-auxtest: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Fauxtest.o
+auxtest: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Fauxtest.o $(FODIR)/Fcff.o
 	$(FC) -o $@ $^ $(FFLAGS)
 
 test: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Ftest.o $(FODIR)/Fcff.o
 	$(FC) -o $@ $^ $(FFLAGS)
 
-radcorr: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Fradcorr.o
+radcorr: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Fradcorr.o $(FODIR)/Fcff.o
 	$(FC) -o $@ $^ $(FFLAGS)
 
-scaledep: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Fscaledep.o $(FODIR)/Fderiv.o
+scaledep: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Fscaledep.o $(FODIR)/Fderiv.o $(FODIR)/Fcff.o
 	$(FC) -o $@ $^ $(FFLAGS)
 
 fit: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Ffit.o $(FODIR)/Ffcn.o $(ODIR)/flushout.o $(FODIR)/Fcff.o
 	$(FC) -o $@ $^ $(FFLAGS) $(CERNLIBS) $(ALLPGPLOTLIBS)
 
-fit_nopgplot: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Ffit.o $(FODIR)/Ffcn_nopgplot.o $(ODIR)/flushout.o
+fit_nopgplot: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Ffit.o $(FODIR)/Ffcn_nopgplot.o $(ODIR)/flushout.o $(FODIR)/Fcff.o
 	$(FC) -o $@ $^ $(FFLAGS) $(CERNLIBS)
 
-houches: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Fhouches.o 
+houches: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Fhouches.o $(FODIR)/Fcff.o
 	$(FC) -o $@ $^ $(FFLAGS)
 
-accuracy: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Faccuracy.o 
+accuracy: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Faccuracy.o $(FODIR)/Fcff.o
 	$(FC) -o $@ $^ $(FFLAGS)
 
 # targets for examples

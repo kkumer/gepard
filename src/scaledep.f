@@ -86,11 +86,6 @@ C
       NQS = 1
 
 
-*   turn off second partial wave
-      PAR(50) = 0.0d0
-      PAR(51) = 0.0d0
-
-
       SCHEME = 'CSBAR'
       P = 2
       CALL INIT
@@ -126,10 +121,9 @@ C
       END IF
 
       CALL INIT
-      CALL INITGPD(1)
       MTIND = 0
       IF (NDEL .EQ. 1) MTIND = NMTS + 3
-
+      DEL2 = -MTS(MTIND)
 
 *     Calculating derivatives of CFFs needed for present line and point ...
 *     ... and saving them to array (note that P changes value)

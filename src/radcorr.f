@@ -78,11 +78,6 @@ C
       QS(1) = Q2
 
 
-*   turn off second partial wave
-      PAR(50) = 0.0d0
-      PAR(51) = 0.0d0
-
-
 *     Looping over two different walues of \Delta^2
 
       DO 40 NDEL = 0, 1
@@ -115,9 +110,9 @@ C
       END IF
 
       CALL INIT
-      CALL INITGPD(1)
       MTIND = 0
       IF (NDEL .EQ. 1) MTIND = NMTS + 3
+      DEL2 = -MTS(MTIND)
 
 *     Calculating two CFFs needed for present line and point ...
 

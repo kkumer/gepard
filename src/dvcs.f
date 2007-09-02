@@ -12,25 +12,19 @@ C                  d sigma / d t as a function of t, GPD
 C                  parameters and Q0
 C  DESCRIPTION
 C    Calls CFFF for calculation of Compton form factor,
-C    and multiplies by required kinematical factors. It is intened
+C    and multiplies by required kinematical factors. It is intended
 C    to be called by chi-square minimization program for
 C    fitting the experimental data.
 C  SYNOPSIS
-C     DOUBLE PRECISION FUNCTION PARSIGMA (MT)
-C
-C     DOUBLE PRECISION MT
-C  INPUTS 
-C                  MT  --  (- t) = (- DEL2), minus
-C                          DVCS asymmetry parameter t=(P2-P1)^2
-C              FITPAR  --  Array with fit parameters, see FIT.CMD
-C                          for description (via common block)
-C  OUTPUT
-C            PARSIGMA  --  partial cross section d sigma / d t
+
+      DOUBLE PRECISION FUNCTION PARSIGMA ()
+
 C  IDENTIFIERS
 C
 C          W2 -- (gamma*-proton) invariant mass squared
 C          XI -- DVCS scaling parameter
 C        DEL2 -- DVCS asymmetry parameter (P2-P1)^2
+C       MTIND -- index of MTS array holding required -DEL2
 C          Q2 -- photon virtuality squared
 C         Q02 -- initial scale squared
 C  PARENTS
@@ -42,7 +36,6 @@ C       dimension of FITPAR is hardcoded
 C  SOURCE
 C
 
-      DOUBLE PRECISION FUNCTION PARSIGMA ()
 
       IMPLICIT NONE
       DOUBLE PRECISION W2
@@ -54,7 +47,6 @@ C
 
 *     Calculating CFF
 
-*     260.5633976788416 = 4 Pi alpha^2 * (GeV^-2 -> nbarn)
       
       DEL2 = - MTS(MTIND)
       CALL CFFF 
@@ -70,6 +62,8 @@ C
      &   'NF is not integer equal to 3 or 4!                          ',
      &   5, 3)
       END IF
+
+*     260.5633976788416 = 4 Pi alpha^2 * (GeV^-2 -> nbarn)
 
       PARSIGMA = 260.5633976788416d0 * W2 * ABS(CFF(P))**2 / (
      &  (W2 + Q2) * (2.0d0 * W2 + Q2)**2 )
