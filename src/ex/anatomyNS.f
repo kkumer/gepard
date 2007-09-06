@@ -9,6 +9,10 @@ C     *******
 C     ****p* anatomyNS.f/ANATOMYNS
 C  NAME
 C     ANATOMYNS -- Main program
+C  SYNOPSIS
+
+      PROGRAM ANATOMYNS
+
 C  DESCRIPTION
 C    calculation of relative effects of various evolutions
 C    in MSBAR scheme: LO, NLO, NLO non-diagonal, ... (non-singlet)
@@ -35,15 +39,12 @@ C  CHILDREN
 C      READPAR, INIT, CFFF
 C  SOURCE
 C
-
-      PROGRAM ANATOMYNS
-
       IMPLICIT NONE
       INTEGER PT, NPOINTS, LN, NDEL
       DOUBLE PRECISION LOGXI, LOGXISTART, LOGXIEND, LOGXISTEP
       PARAMETER ( NPOINTS = 40 )
       DOUBLE COMPLEX PREDS(6, NPOINTS), TOT
-      DOUBLE PRECISION XIS(NPOINTS), MODUL, PHASE, Q02, Q2EXP, MP
+      DOUBLE PRECISION XIS(NPOINTS), MODUL, PHASE, Q2EXP, MP
       DOUBLE PRECISION DCARG
       PARAMETER ( LOGXISTART = -5.0d0, LOGXIEND = -0.30103d0,
      &       LOGXISTEP = (LOGXIEND - LOGXISTART) / (NPOINTS - 1)  )
@@ -71,6 +72,7 @@ C
       Q02  = 2.5d0
       Q2EXP = 10.0d0
       DEL2 =  -0.25d0
+      NQS = 1
 
 *     Looping over two different ansaetze
 
@@ -93,7 +95,6 @@ C
 
 * 1st line is the default total result:
       P = 1
-      PAR(1) = Q02
       Q2 = Q2EXP
       SCHEME = 'MSBND'
       CZERO = 1
@@ -115,6 +116,9 @@ C
 *   Doing calculation ...
   
       CALL INIT
+      QS(1) = Q2
+      CALL EVOLC(1)
+      CALL GETMBGPD
       CALL CFFF 
 
 *   ... and saving it to arrray

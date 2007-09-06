@@ -43,7 +43,7 @@ C
       DOUBLE PRECISION LOGXI, LOGXISTART, LOGXIEND, LOGXISTEP
       PARAMETER ( NPOINTS = 40 )
       DOUBLE COMPLEX PREDS(6, NPOINTS), TOT
-      DOUBLE PRECISION XIS(NPOINTS), MODUL, PHASE, Q02, Q2EXP, MP
+      DOUBLE PRECISION XIS(NPOINTS), MODUL, PHASE, Q2EXP, MP
       DOUBLE PRECISION DCARG
       CHARACTER SUBANSATZ*4
       PARAMETER ( LOGXISTART = -5.0d0, LOGXIEND = -0.30103d0,
@@ -73,6 +73,7 @@ C
       Q02 = 2.5d0
       Q2EXP = 10.0d0
       DEL2 =  -0.25d0
+      NQS = 1
 
 
 *     Looping over two different ansaetze
@@ -128,6 +129,9 @@ C
 *   Doing calculation ...
   
       CALL INIT
+      QS(1) = Q2
+      CALL EVOLC(1)
+      CALL GETMBGPD
       CALL CFFF 
 
 *   ... and saving it to arrray

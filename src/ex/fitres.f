@@ -11,6 +11,10 @@ C     *******
 C     ****p* fitres.f/FITRES
 C  NAME
 C     FITRES  --  Ploting final fit results
+C  SYNOPSIS
+
+      PROGRAM FITRES
+
 C  DESCRIPTION
 C    Produces data files for Fig. ? of  KMPKS06b
 C  OUTPUT
@@ -29,9 +33,6 @@ C  CHILDREN
 C      READPAR, INIT, CFFF, DCARG
 C  SOURCE
 C
-
-      PROGRAM FITRES
-
       IMPLICIT NONE
       INTEGER PT, NPOINTS, LN, PANEL
       DOUBLE PRECISION MT, MP, LSTART, LEND, LSTEP

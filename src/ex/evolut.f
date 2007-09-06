@@ -11,6 +11,10 @@ C     *******
 C     ****p* evolut.f/EVOLUT
 C  NAME
 C     EVOLUT  --  Program producing data for Figure evolut
+C  SYNOPSIS
+      
+      PROGRAM EVOLUT
+
 C  DESCRIPTION
 C    evolution of NLO corrections to {\cal H} singlet
 C    DVCS form factor in CSBAR and MSBAR scheme
@@ -41,9 +45,6 @@ C  CHILDREN
 C      READPAR, INIT, CFFF, DCARG
 C  SOURCE
 C
-
-      PROGRAM EVOLUT
-
       IMPLICIT NONE
       INTEGER PT, NPOINTS, LN, NDEL
       DOUBLE PRECISION LOGXI, LOGXISTART, LOGXIEND, LOGXISTEP, MP
@@ -65,6 +66,7 @@ C
       CALL READPAR
     
       DEL2 = -0.25d0
+      NQS = 1
 
       INCLUDE 'ansatz.f'
       ANSATZ = 'FIT'
@@ -127,11 +129,18 @@ C
 *     Calculating two CFFs needed for present line and point ...
 
       CALL INIT
+      QS(1) = Q2
+      CALL EVOLC(1)
+      CALL GETMBGPD
       CALL CFFF 
       CFFQ = CFF(P)
       Q2MEM = Q2
-      Q2 = PAR(1)
+      Q2 = Q02
+
       CALL INIT
+      QS(1) = Q2
+      CALL EVOLC(1)
+      CALL GETMBGPD
       CALL CFFF 
       CFF0 = CFF(P)
       Q2 = Q2MEM

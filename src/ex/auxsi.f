@@ -1,32 +1,30 @@
-C     ****h* gepard/aux.f
+C     ****h* gepard/auxsi.f
 C  FILE DESCRIPTION
 C    Auxilliary program for printing out non-singlet CFF's
 C
 C    $Id$
 C     *******
 
-C     ****p* aux.f/AUX
+C     ****p* auxsi.f/AUXSI
 C  NAME
-C    AUX  --  Auxilliary program for printing out singlet CFF's
-C            
+C    AUXSI  --  Auxilliary program for printing out singlet CFF's
 C  DESCRIPTION
 C             Calculates LO and NLO CFFs in both MSBAR
 C             and CSBAR schemes, with various choices
 C             for evolution.
-C
+C  SYNOPSIS
+
+      PROGRAM AUXSI
+
 C  CHILDREN
 C      READPAR, INIT, CFF
-C
 C  SOURCE
 C
-
-
-      PROGRAM AUX
 
       IMPLICIT NONE
       INTEGER CZ
       DOUBLE COMPLEX TMP
-      DOUBLE PRECISION Q02, Q2EXP, MP
+      DOUBLE PRECISION Q2EXP, MP
       PARAMETER (MP = 0.938272d0 )
       CHARACTER SUBANSATZ*4
       INCLUDE '../header.f'
@@ -46,6 +44,7 @@ C
       DEL2 = -0.25d0
       SCHEME = 'MSBAR'
       CZ = 1
+      NQS = 1
 
       SUBANSATZ = 'HARD'
 
@@ -72,11 +71,17 @@ C
       PAR(1) = Q02
       P = 0
       CALL INIT
+      QS(1) = Q2
+      CALL EVOLC(1)
+      CALL GETMBGPD
       CALL CFFF 
       WRITE (*,902) "LO (no evol)", CFF(0)
 
       Q2 = Q2EXP
       CALL INIT
+      QS(1) = Q2
+      CALL EVOLC(1)
+      CALL GETMBGPD
       CALL CFFF 
       WRITE (*,902) "LO (LO evol)", CFF(0)
 
@@ -84,18 +89,27 @@ C
       CZERO = CZ
       Q2 = Q02
       CALL INIT
+      QS(1) = Q2
+      CALL EVOLC(1)
+      CALL GETMBGPD
       CALL CFFF 
       WRITE (*,902) "MS NLO (no evol)", CFF(1)
 
       SCHEME = 'MSBLO'
       Q2 = Q2EXP
       CALL INIT
+      QS(1) = Q2
+      CALL EVOLC(1)
+      CALL GETMBGPD
       CALL CFFF 
       WRITE (*,902) "MS NLO (LO evol)", CFF(1)
       TMP = CFF(1)
 
       SCHEME = 'MSBAR'
       CALL INIT
+      QS(1) = Q2
+      CALL EVOLC(1)
+      CALL GETMBGPD
       CALL CFFF 
 !     WRITE (*,902) "MS NLO (evol D)", CFF(1) - TMP
       WRITE (*,902) "MS NLO (evol D)", CFF(1)
@@ -103,6 +117,9 @@ C
 
       SCHEME = 'MSBND'
       CALL INIT
+      QS(1) = Q2
+      CALL EVOLC(1)
+      CALL GETMBGPD
       CALL CFFF 
 !     WRITE (*,902) "MS NLO (evol ND)", CFF(1) - TMP
       WRITE (*,902) "MS NLO (evol ND)", CFF(1)
@@ -110,11 +127,17 @@ C
       SCHEME = 'CSBAR'
       Q2 = Q02
       CALL INIT
+      QS(1) = Q2
+      CALL EVOLC(1)
+      CALL GETMBGPD
       CALL CFFF 
       WRITE (*,902) "CS NLO (no evol)", CFF(1)
 
       Q2 = Q2EXP
       CALL INIT
+      QS(1) = Q2
+      CALL EVOLC(1)
+      CALL GETMBGPD
       CALL CFFF 
       WRITE (*,902) "CS NLO (evol)", CFF(1)
 

@@ -10,6 +10,10 @@ C     *******
 C     ****p* fitpdfs.f/PDF
 C  NAME
 C     FITPDFS  --  Ploting PDFs resulting from fitted GPDs
+C  SYNOPSIS
+
+      PROGRAM FITPDFS
+
 C  DESCRIPTION
 C    Produces data files for Fig. 14 of  KMPKS06b
 C  OUTPUT
@@ -30,9 +34,6 @@ C  CHILDREN
 C      READPAR, INIT, XSPACE
 C  SOURCE
 C
-
-      PROGRAM FITPDFS
-
       IMPLICIT NONE
       INTEGER PT, NPOINTS, LN
       DOUBLE PRECISION HX(2)

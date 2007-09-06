@@ -65,13 +65,15 @@ endif
 # -- 3. PGPLOT related things
 #  
 # Location and links to pgplot libs (if you have them. 
-# If not, compile with 'make NOPGPLOT=1 fit'.)
+# If not, compile fit_nopgplot instead of fit'.)
 export PGPLOTLIBS = -L$(HOME)/local/lib/pgplot -lpgplot
 # If you have pgplot libs, but without /XSERVE driver, comment 
 # out the next three lines (should be automatic on Windows)
 ifndef WINDIR
   export X11LIBS = -L/usr/X11R6/lib -lX11 -lpng
 endif
+# All PGPLOT libs together for easier reference:
+export ALLPGPLOTLIBS = $(PGPLOTLIBS) $(X11LIBS)
 
 # ------------------------------------------------------------------------  
 # ---- END of system dependent stuff                                  ----
@@ -79,26 +81,21 @@ endif
 
 
 # targets
-export SRCTARGETS = radcorr scaledep fit test auxtest fit_nopgplot houches accuracy atest
+export SRCTARGETS = fit fit_nopgplot
+export TESTTARGETS = radcorr scaledep test auxtest houches accuracy atest
 export EXTARGETS = auxsi auxns anatomyNS anatomy radNLONS radNLO evolutNS evolut radQ \
                    radNNLONS radNNLO scalesNS scales scalesNNLO slope fitres fitpdfs \
 				   contours
 export MMATARGETS = gepard.exe
 
-.PHONY: $(SRCTARGETS) $(EXTARGETS)
+.PHONY: $(SRCTARGETS) $(TESTTARGETS) $(EXTARGETS) $(MMATARGETS)
 DOCTARGETS = pdf html htmlnocss
 
-all: $(SRCTARGETS) $(EXTARGETS) $(DOCTARGETS)
+all: $(SRCTARGETS) $(TESTTARGETS) $(EXTARGETS) $(MMATARGETS) $(DOCTARGETS)
 
 examples: $(EXTARGETS)
 
-$(SRCTARGETS):
-	$(MAKE) -C src $@
-
-$(MMATARGETS):
-	$(MAKE) -C src $@
-
-$(EXTARGETS):
+$(SRCTARGETS) $(TESTTARGETS) $(EXTARGETS) $(MMATARGETS):
 	$(MAKE) -C src $@
 
 doc: html pdf
