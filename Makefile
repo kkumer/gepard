@@ -48,7 +48,7 @@ ifdef WINDIR
   export MLLIB = ml32i2w
   export MLEXTRA = -mwindows -DWIN32_MATHLINK
 else
-  export SYS = Linux
+  export SYS = Linux-x86-64
   ifeq '$(MMAVERSION)' '6.0'
     export MLDIR = /usr/local/Wolfram/Mathematica/$(MMAVERSION)/SystemFiles/Links/MathLink/DeveloperKit/$(SYS)/CompilerAdditions
   else
@@ -81,21 +81,20 @@ export ALLPGPLOTLIBS = $(PGPLOTLIBS) $(X11LIBS)
 
 
 # targets
-export SRCTARGETS = fit fit_nopgplot
-export TESTTARGETS = radcorr scaledep test auxtest houches accuracy atest
+export TESTTARGETS = radcorr scaledep test auxtest houches accuracy
 export EXTARGETS = auxsi auxns anatomyNS anatomy radNLONS radNLO evolutNS evolut radQ \
-                   radNNLONS radNNLO scalesNS scales scalesNNLO slope fitres fitpdfs \
-				   contours
+                   radNNLONS radNNLO scalesNS scales scalesNNLO
+export FITTARGETS = fitres fitpdfs slope contours
 export MMATARGETS = gepard.exe
 
-.PHONY: $(SRCTARGETS) $(TESTTARGETS) $(EXTARGETS) $(MMATARGETS)
+.PHONY: $(TESTTARGETS) $(EXTARGETS) $(FITTARGETS) $(MMATARGETS)
 DOCTARGETS = pdf html htmlnocss
 
-all: $(SRCTARGETS) $(TESTTARGETS) $(EXTARGETS) $(MMATARGETS) $(DOCTARGETS)
+all: $(TESTTARGETS) $(EXTARGETS) fit fit_nopgplot  $(FITTARGETS) $(MMATARGETS) $(DOCTARGETS)
 
-examples: $(EXTARGETS)
+tests: $(TESTTARGETS)
 
-$(SRCTARGETS) $(TESTTARGETS) $(EXTARGETS) $(MMATARGETS):
+$(TESTTARGETS) $(EXTARGETS) fit fit_nopgplot $(FITTARGETS) $(MMATARGETS):
 	$(MAKE) -C src $@
 
 doc: html pdf
@@ -122,7 +121,6 @@ clean:
 	$(MAKE) -C src clean
 	$(MAKE) -C doc/tex clean
 	-rm -rf doc/html/*
-	-rm -f fits/*.{min,out,ps,eps} fits/tmp.mma fits/fitres*dat fits/fitres 
-	-rm -f fits/fitpdfs*dat fits/fitpdfs fits/slope*dat fits/slope
-	-rm -f Tests/*dat Tests/gmon.out
-	-rm -f ex/*dat ex/*eps 
+	-rm -f fits/*.{min,out,ps,eps,dat,out} fits/tmp.mma
+	-rm -f Tests/*{dat,out,eps}
+	-rm -f ex/*{dat,eps}

@@ -69,7 +69,7 @@ C
       NQS = 1
 
       INCLUDE 'ansatz.f'
-      ANSATZ = 'FIT'
+      ANSATZ = 'FITBP'
 
 *     Files that will hold results
 
@@ -131,16 +131,14 @@ C
       CALL INIT
       QS(1) = Q2
       CALL EVOLC(1)
-      CALL GETMBGPD
       CALL CFFF 
       CFFQ = CFF(P)
       Q2MEM = Q2
-      Q2 = Q02
 
+      Q2 = Q02
       CALL INIT
       QS(1) = Q2
       CALL EVOLC(1)
-      CALL GETMBGPD
       CALL CFFF 
       CFF0 = CFF(P)
       Q2 = Q2MEM

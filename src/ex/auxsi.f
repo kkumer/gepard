@@ -35,7 +35,7 @@ C
       CALL READPAR
 
       INCLUDE 'ansatz.f'
-      ANSATZ = 'FIT'
+      ANSATZ = 'FITBP'
 
 
       Q02 = 2.5d0
@@ -68,12 +68,10 @@ C
 !     WRITE (*,904) CND
 
       Q2 = Q02
-      PAR(1) = Q02
       P = 0
       CALL INIT
       QS(1) = Q2
       CALL EVOLC(1)
-      CALL GETMBGPD
       CALL CFFF 
       WRITE (*,902) "LO (no evol)", CFF(0)
 
@@ -81,7 +79,6 @@ C
       CALL INIT
       QS(1) = Q2
       CALL EVOLC(1)
-      CALL GETMBGPD
       CALL CFFF 
       WRITE (*,902) "LO (LO evol)", CFF(0)
 
@@ -91,7 +88,6 @@ C
       CALL INIT
       QS(1) = Q2
       CALL EVOLC(1)
-      CALL GETMBGPD
       CALL CFFF 
       WRITE (*,902) "MS NLO (no evol)", CFF(1)
 
@@ -100,7 +96,6 @@ C
       CALL INIT
       QS(1) = Q2
       CALL EVOLC(1)
-      CALL GETMBGPD
       CALL CFFF 
       WRITE (*,902) "MS NLO (LO evol)", CFF(1)
       TMP = CFF(1)
@@ -109,7 +104,6 @@ C
       CALL INIT
       QS(1) = Q2
       CALL EVOLC(1)
-      CALL GETMBGPD
       CALL CFFF 
 !     WRITE (*,902) "MS NLO (evol D)", CFF(1) - TMP
       WRITE (*,902) "MS NLO (evol D)", CFF(1)
@@ -119,7 +113,6 @@ C
       CALL INIT
       QS(1) = Q2
       CALL EVOLC(1)
-      CALL GETMBGPD
       CALL CFFF 
 !     WRITE (*,902) "MS NLO (evol ND)", CFF(1) - TMP
       WRITE (*,902) "MS NLO (evol ND)", CFF(1)
@@ -129,7 +122,6 @@ C
       CALL INIT
       QS(1) = Q2
       CALL EVOLC(1)
-      CALL GETMBGPD
       CALL CFFF 
       WRITE (*,902) "CS NLO (no evol)", CFF(1)
 
@@ -137,7 +129,6 @@ C
       CALL INIT
       QS(1) = Q2
       CALL EVOLC(1)
-      CALL GETMBGPD
       CALL CFFF 
       WRITE (*,902) "CS NLO (evol)", CFF(1)
 

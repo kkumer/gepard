@@ -22,11 +22,12 @@ C  IDENTIFIERS
 C
 C  CHILDREN
 C      READPAR, INIT, CFFF, DCARG
-C  SOURCE
-C
+C  SYNOPSIS
 
       PROGRAM SCALESNS
 
+C  SOURCE
+C
       IMPLICIT NONE
       INTEGER PT, NPOINTS, LN, NDEL
       DOUBLE PRECISION DCARG, MP, FACF, FACR
@@ -47,6 +48,7 @@ C
     
       INCLUDE 'ansatz.f'
       ANSATZ = 'NSFIT'
+      NQS = 1
 
 
 *     File that will hold results
@@ -88,7 +90,7 @@ C
             FACR = 1.0
       ELSEIF (LN .EQ. 2) THEN
             P = 1
-            SCHEME = 'MSBND'
+            SCHEME = 'MSBAR'
             FACF = 2.0
             FACR = 1.0
       ELSEIF (LN .EQ. 3) THEN
@@ -98,7 +100,7 @@ C
             FACR = 1.0
       ELSEIF (LN .EQ. 4) THEN
             P = 1
-            SCHEME = 'MSBND'
+            SCHEME = 'MSBAR'
             FACF = 1.0
             FACR = 2.0
       ELSE
@@ -114,18 +116,24 @@ C
       RR2 = 1.0d0
       RF2 = 1.0d0
       CALL INIT
+      QS(1) = Q2
+      CALL EVOLC(1)
       CALL CFFF 
       CFFM = CFF(P)
 
       RR2 = 1.0d0 / FACR
       RF2 = 1.0d0 / FACF
       CALL INIT
+      QS(1) = Q2
+      CALL EVOLC(1)
       CALL CFFF 
       CFFD = CFF(P)
 
       RR2 = FACR
       RF2 = FACF
       CALL INIT
+      QS(1) = Q2
+      CALL EVOLC(1)
       CALL CFFF 
       CFFU = CFF(P)
       

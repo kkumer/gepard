@@ -36,11 +36,12 @@ C               PP -- approximation order N^{P}LO P=0,1,2
 C
 C  CHILDREN
 C      READPAR, INIT, CFFF, DCARG
-C  SOURCE
-C
+C  SYNOPSIS
 
       PROGRAM RADQ
 
+C  SOURCE
+C
       IMPLICIT NONE
       INTEGER PT, NPOINTS, LN, NXI, PANEL
       DOUBLE PRECISION Q2START, Q2END, Q2STEP, MP
@@ -61,7 +62,7 @@ C
       CALL READPAR
     
       INCLUDE 'ansatz.f'
-      ANSATZ = 'FIT'
+      ANSATZ = 'FITBP'
 * ----  "SOFT"   --------------------
       PAR(21) = 0.3d0
       PAR(22) = PAR(12) - 0.2d0
@@ -70,6 +71,7 @@ C
 
       DEL2 = -0.25d0
       SCHEME = 'CSBAR'
+      NQS = 1
 
 
 *     Files that will hold results
@@ -108,8 +110,10 @@ C
 
         Q2 = Q2START + (PT - 1) * Q2STEP
         Q2S(PT) = Q2
+        QS(1) = Q2
         P = 2
         CALL INIT
+
 
 *       Looping over \xi's
 
@@ -121,6 +125,7 @@ C
 
           DO 10 P = 0, 2
 
+            CALL EVOLC(1)
             CALL CFFF 
 
 *         ... and saving them to array

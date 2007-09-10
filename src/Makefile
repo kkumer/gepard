@@ -90,21 +90,26 @@ $(EXFODIR)/%.o: $(EXDIR)/%.f header.f
 # test and fit targets
 
 $(TESTTARGETS): %: $(ALLOBJS) $(FODIR)/F%.o
-	$(FC) -o $@ $^ $(FFLAGS)
+	$(FC) -o ../Tests/$@ $^ $(FFLAGS)
 
-fit_nopgplot: $(ALLOBJS) $(FODIR)/Ffit.o
-	$(FC) -o $@ $^ $(FFLAGS) $(CERNLIBS)
+#fit_nopgplot: $(ALLOBJS) $(FODIR)/Ffit.o
+	#$(FC) -o $@ $^ $(FFLAGS) $(CERNLIBS)
 
+# main fit target  (an variant withouth PGPLOT)
 fit: CPPFLAGS :=
-fit: $(ALLOBJS) $(FODIR)/Ffit.o
-	$(FC) -o $@ $^ $(FFLAGS) $(CERNLIBS) $(ALLPGPLOTLIBS)
+fit_nopgplot: ALLPGPLOTLIBS :=
+fit fit_nopgplot:  $(ALLOBJS) $(FODIR)/Ffit.o
+	$(FC) -o ../fits/$@ $^ $(FFLAGS) $(CERNLIBS) $(ALLPGPLOTLIBS)
+
+# targets for processing/presenting GPDs resulting from fit
+$(FITTARGETS): %: $(ALLOBJS) $(EXFODIR)/%.o
+	$(FC) -o ../fits/$@ $^ $(FFLAGS)
 
 # mma targets
 
 gepard.exe: CPPFLAGS := $(CPPFLAGS) -D MMA
 gepard.exe: $(ALLOBJS) $(_MMAOBJS)  $(FODIR)/Fmninterface.o
 	$(FC) -o ../fits/$@/$(SYS)/$@ $^ $(FFLAGS) $(CERNLIBS) -L$(MLLIBDIR) -l$(MLLIB) $(ALLPGPLOTLIBS) $(MLEXTRA)
-
 
 # targets for examples
 #
@@ -115,8 +120,11 @@ $(EXTARGETS): %: $(ALLOBJS) $(EXFODIR)/%.o
 .PHONY: clean
 clean:
 	-rm -f $(ADACFODIR)/*.o $(FODIR)/F*.o $(ODIR)/*.o $(EXFODIR)/*.o $(MMAODIR)/*
-	-rm -f $(SRCTARGETS) $(TESTTARGETS)
-	-rm -f $(patsubst %,%.exe,$(SRCTARGETS)) $(patsubst %,%.exe,$(TESTTARGETS))
-	-rm -f ../fits/gepard.exe/$(SYS)/gepard.exe
+	-rm -f $(patsubst %,../Tests/%,$(TESTTARGETS))
+	-rm -f $(patsubst %,../Tests/%.exe,$(TESTTARGETS))
+	-rm -f $(patsubst %,../fits/%,$(FITTARGETS))
+	-rm -f $(patsubst %,../fits/%.exe,$(FITTARGETS))
+	-rm -f ../fits/fit ../fits/fit.exe ../fits/fit_nopgplot ../fits/fit_nopgplot.exe
 	-rm -f $(patsubst %,../ex/%,$(EXTARGETS))
 	-rm -f $(patsubst %,../ex/%.exe,$(EXTARGETS))
+	-rm -f ../fits/gepard.exe/$(SYS)/gepard.exe

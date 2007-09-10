@@ -48,7 +48,8 @@ C
       SCHEME = 'MSBAR'
 
       CALL INIT
-      MTIND = NMTS + 4
+*      DEL2 = -0.5 which is 3rd "experimental" t
+      MTIND = NMTS + 3
       DEL2 = -MTS(MTIND)
 
       CALL EVOLC(1)

@@ -11,6 +11,10 @@ C     *******
 C     ****p* radNLO.f/RADNLO
 C  NAME
 C     RADNLO  --  Program producing data for Figure radNLO
+C  SYNOPSIS
+      
+      PROGRAM RADNLO
+
 C  DESCRIPTION
 C    calculation of relative radiative NLO corrections to {\cal H} singlet
 C    DVCS form factor in MSBAR and CSBAR schemes
@@ -39,9 +43,6 @@ C  CHILDREN
 C      READPAR, INIT, CFFF, DCARG
 C  SOURCE
 C
-
-      PROGRAM RADNLO
-
       IMPLICIT NONE
       INTEGER PT, NPOINTS, LN, NDEL
       DOUBLE PRECISION LOGXI, LOGXISTART, LOGXIEND, LOGXISTEP, MP
@@ -62,7 +63,7 @@ C
       CALL READPAR
     
       INCLUDE 'ansatz.f'
-      ANSATZ = 'FIT'
+      ANSATZ = 'FITBP'
 
 
 *     Files that will hold results
@@ -78,6 +79,7 @@ C
 
 *     Scales 
 
+      NQS = 1
       Q2 = 2.5d0
 
 *     Looping over two different walues of \Delta^2
@@ -101,7 +103,7 @@ C
       IF (LN .LE. 2) THEN
             SCHEME = 'CSBAR'
       ELSE
-            SCHEME = 'MSBAR'
+            SCHEME = 'MSBND'
       END IF
       IF ((LN .EQ. 1) .OR. (LN .EQ. 3)) THEN
 !          'HARD'
@@ -119,8 +121,14 @@ C
 
       P = 1
       CALL INIT
+      QS(1) = Q2
+      CALL EVOLC(1)
       CALL CFFF 
+
       P = 0
+      CALL INIT
+      QS(1) = Q2
+      CALL EVOLC(1)
       CALL CFFF 
 
 *     ... and saving them to array

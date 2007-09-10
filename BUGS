@@ -1,18 +1,20 @@
--  Code taken from Vogt/Vermasseren may not be pure double precision.
-  (Although maybe it behaves as double precision.)
+Open:
+-----
 
--  Complex tangent DCTAN may be problematic
+-  Code taken from Vogt/Vermasseren may not be pure double precision.
+   (Although maybe it behaves as double precision.)
+
+-  Complex tangent DCTAN may be problematic (Demidovich?)
 
 -  Interactive mode freezes on MS Windows
 
 -  fitres is behaving funny for C=0.25
 
--  change to sid broke almost everything. Fix it.
-    FIXED: test radcorr scaledep auxtest atest fit houches accuracy
-
 -  mma interface function cffH is not accurate
 
 -  one must 'make clean' between making  gepard.exe and non-mma executables
+    (and similarly with fit.exe with PGPLOG)
+   (Thus, 'make all' probably doesn't work as intended.)
 
 -  houches still problematic for very large x_BJ. At input scale as well!
 

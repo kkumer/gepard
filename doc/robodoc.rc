@@ -24,7 +24,6 @@ options:
     --src ./src 
 #    --nodesc
     --sections
-    --toc
 headertypes:
     h "File" file
     p "Program" program

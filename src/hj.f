@@ -61,6 +61,7 @@ C
      &                  POCHHAMMER(COMPLEX(0.5d0, 0.0d0) + J, 4)
 *          'Dummy' gluonic, not used:
             FCM(2) = (0.0d0, 0.0d0)
+*  ## ansaetze used in PLB paper hep-ph/0605237
       ELSE IF ((ANSATZ .EQ. 'HARD') .OR. (ANSATZ .EQ. 'SOFT')) THEN
             PAR(12) = 1.1d0
             PAR(13) = 0.25d0
@@ -83,7 +84,8 @@ C
      &        0.0d0) + J, POCHG) / CBETA(COMPLEX(2.0d0 - PAR(22),
      &        0.0d0), POCHG) /
      &            (1.0d0 - DEL2)**3
-      ELSE IF (ANSATZ .EQ. 'FITOLD') THEN
+*  ## ansatz used for testing (programs 'test' and 'accuracy')
+      ELSE IF (ANSATZ .EQ. 'TEST') THEN
             FCM(1) = PAR(11) / (1 - DEL2/PAR(14)**2)**3 / POCHHAMMER(
      &            COMPLEX(1.0d0 - PAR(12) - 
      &            PAR(13)*DEL2, 0.0d0) + J, 8) * POCHHAMMER(
@@ -126,6 +128,7 @@ C
         ENDIF
       ELSE IF (ANSATZ .EQ. 'SPLICE') THEN
               CALL SPLICE(J, FCM)
+*  ## ansatz used for "big paper"  hep-ph/0703179
       ELSE IF (ANSATZ .EQ. 'FITBP') THEN
             HU = PAR(31) * POCHHAMMER(COMPLEX(1.0d0 - PAR(32), 0.0d0) 
      &              , 4) / POCHHAMMER(COMPLEX(1.0d0 - PAR(32), 0.0d0)
@@ -171,6 +174,7 @@ C
           FCM(1) = HD - 0.5d0 / (2.0d0 + 0.5d0) * HSEA
 *    'Dummy' gluonic, not used:
           FCM(2) = (0.0d0, 0.0d0)
+*  ## ansatz for comparison with Les Houches PDF evolution benchmark
       ELSE IF (ANSATZ .EQ. 'HOUCHE') THEN
         FCM(1) =
      &      LHA(1)*LHBETAF(1) / POCHHAMMER(J-COMPLEX(LHLAM(1), 0.0D0),

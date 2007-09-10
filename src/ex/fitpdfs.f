@@ -93,7 +93,7 @@ C
           PAR(22) =  1.25
           PAR(24) =  0.263
         ELSE IF (LN .EQ. 2) THEN
-          SCHEME = 'MSBAR'
+          SCHEME = 'MSBND'
           P=1
           PAR(11) =  0.172
           PAR(12) =  1.14
@@ -143,6 +143,9 @@ C
       WRITE (UNIT=10, FMT=999)
       WRITE (UNIT=11, FMT=999)
  40   CONTINUE
+
+      WRITE (*,*) "To plot with xmgr, you need to add Alekhin's PDF by
+     & hand to the beginning of fitpdfs[01].dat!"
 
 998   FORMAT (F12.7,5X,F12.7)
 999   FORMAT (1X)

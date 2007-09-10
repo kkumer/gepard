@@ -15,6 +15,8 @@ C  DESCRIPTION
 C    calculation of relative radiative NNLONS and NLO corrections to {\cal H} non-singlet
 C    DVCS form factor in CSBAR scheme
 C    Produces data files for Fig. 11 of  KMPKS06b
+C  SYNOPSIS
+      PROGRAM RADNNLONS
 C  OUTPUT
 C       radNNLONS[0-3].dat  --  4 files (one for each panel of Figure
 C                            radNNLONS) with 4 sets of point coordinates
@@ -39,9 +41,6 @@ C  CHILDREN
 C      READPAR, INIT, CFFF, DCARG
 C  SOURCE
 C
-
-      PROGRAM RADNNLONS
-
       IMPLICIT NONE
       INTEGER PT, NPOINTS, LN, NDEL
       DOUBLE PRECISION XISTART, XIEND, XISTEP, MP
@@ -64,6 +63,7 @@ C
 
       INCLUDE 'ansatz.f'
       ANSATZ = 'NSFIT'
+      NQS = 1
 
 
 *     Files that will hold results
@@ -87,6 +87,7 @@ C
 
       Q2 = 2.5d0
       IF (NDEL .EQ. 1) Q2 = 10.0d0
+      QS(1) = Q2
 
       XI = XISTART
       DO 20 PT = 1, NPOINTS
@@ -115,8 +116,11 @@ C
 *     Calculating two CFFs needed for present line and point ...
 
       CALL INIT
+      CALL EVOLC(1)
       CALL CFFF 
       P = P - 1
+      CALL INIT
+      CALL EVOLC(1)
       CALL CFFF 
       P = P + 1
 
