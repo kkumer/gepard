@@ -1,17 +1,6 @@
 
 *   "header" file with singlet ansatz
 
-* ------------ INPUT SCALE----------
-
-*       1  Q02       
-        PAR(1) =   2.5d0    
-
-* -----------  ASTRONG    ----------
-
-*       2  AS0       
-        PAR(2) =   0.05d0
-*       3  MU02      
-        PAR(3) =   2.5d0 
 
 * ------- GPD  ANSATZ  -------------
 

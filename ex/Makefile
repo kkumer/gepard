@@ -6,7 +6,7 @@
 
 
 # targets
-export DATTARGETS = aux0.dat auxns0.dat scalesNS0.dat scales0.dat scalesNNLO0.dat
+export DATTARGETS = auxsi0.dat auxns0.dat scalesNS0.dat scales0.dat scalesNNLO0.dat
 export FIGTARGETS = radNLONS.eps radNLO.eps evolutNS.eps \
                    evolut.eps radQ.eps radNNLONS.eps radNNLO.eps 
 

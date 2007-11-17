@@ -26,36 +26,75 @@
 # 	  make FFLAGS='-O -mno-cygwin' CFLAGS='-O2 -mno-cygwin' test
 #
 
+# ------------------------------------------------------------------------  
+# ---- BEGIN of system dependent stuff (fix it by hand where needed!) ----
+# ------------------------------------------------------------------------  
 
+# -- 1. MINUIT related things
+#
 # Location and links to CERNLIB's kernlib and packlib
 export CERNLIBS =  -L$(HOME)/local/lib -lpacklib -lkernlib
 
-# Location and links to pgplot libs (if you have them. 
-# If not, compile with 'make NOPGPLOT=1 fit'.)
-export PGPLOTLIBS = -L$(HOME)/local/lib/pgplot -lpgplot
-# If you have pgplot libs, but without /XSERVE driver, comment 
-# out the next three lines (should be automatic on Windows,
-# but it's an ugly hack)
-ifndef WINDIR
-export X11LIBS = -L/usr/X11R6/lib -lX11 -lpng
+# -- 2. MathLink related things
+#
+# Version of Mathematica
+export MMAVERSION=5.2
+ifdef WINDIR
+  export SYS = Windows
+  export MLDIR=/cygdrive/c/Program\ Files/Wolfram\ Research/Mathematica/$(MMAVERSION)/AddOns/MathLink/DeveloperKit/$(SYS)/CompilerAdditions/mldev32
+  export MPREP = $(MLDIR)/bin/mprep
+  export MLINCDIR = $(MLDIR)/include
+  export MLLIBDIR = $(MLDIR)/lib 
+  export MLLIB = ml32i2w
+  export MLEXTRA = -mwindows -DWIN32_MATHLINK
+else
+  export SYS = Linux
+  ifeq '$(MMAVERSION)' '6.0'
+    export MLDIR = /usr/local/Wolfram/Mathematica/$(MMAVERSION)/SystemFiles/Links/MathLink/DeveloperKit/$(SYS)/CompilerAdditions
+  else
+    export MLDIR=/usr/local/Wolfram/Mathematica/$(MMAVERSION)/AddOns/MathLink/DeveloperKit/$(SYS)/CompilerAdditions
+  endif
+  export MPREP = $(MLDIR)/mprep
+  export MLINCDIR = $(MLDIR)
+  export MLLIBDIR = $(MLDIR)
+  export MLLIB = ML
+  export MLEXTRA = -lpthread
 endif
 
+
+# -- 3. PGPLOT related things
+#  
+# Location and links to pgplot libs (if you have them. 
+# If not, compile fit_nopgplot instead of fit'.)
+export PGPLOTLIBS = -L$(HOME)/local/lib/pgplot -lpgplot
+# If you have pgplot libs, but without /XSERVE driver, comment 
+# out the next three lines (should be automatic on Windows)
+ifndef WINDIR
+  export X11LIBS = -L/usr/X11R6/lib -lX11 -lpng
+endif
+# All PGPLOT libs together for easier reference:
+export ALLPGPLOTLIBS = $(PGPLOTLIBS) $(X11LIBS)
+
+# ------------------------------------------------------------------------  
+# ---- END of system dependent stuff                                  ----
+# ------------------------------------------------------------------------  
+
+
 # targets
-export SRCTARGETS = radcorr scaledep fit test auxtest fit_nopgplot houches accuracy
-export EXTARGETS = aux auxns anatomyNS anatomy radNLONS radNLO evolutNS evolut radQ \
-                   radNNLONS radNNLO scalesNS scales scalesNNLO slope fitres fitpdfs
+export TESTTARGETS = radcorr scaledep test auxtest houches accuracy
+export EXTARGETS = auxsi auxns anatomyNS anatomy radNLONS radNLO evolutNS evolut radQ \
+                   radNNLONS radNNLO scalesNS scales scalesNNLO
+export FITTARGETS = fitres fitpdfs slope contours
+export MMATARGETS = gepard.exe
 
-.PHONY: $(SRCTARGETS) $(EXTARGETS)
-DOCTARGETS = pdf html
+.PHONY: $(TESTTARGETS) $(EXTARGETS) $(FITTARGETS) $(MMATARGETS)
+DOCTARGETS = pdf html htmlnocss
 
-all: $(SRCTARGETS) $(EXTARGETS) $(DOCTARGETS)
+all: $(TESTTARGETS) $(EXTARGETS) fit fit_nopgplot  $(FITTARGETS) $(MMATARGETS) $(DOCTARGETS)
 
-examples: $(EXTARGETS)
+tests: $(TESTTARGETS)
 
-$(SRCTARGETS):
-	$(MAKE) -C src $@
-
-$(EXTARGETS):
+$(TESTTARGETS) $(EXTARGETS) fit fit_nopgplot $(FITTARGETS) $(MMATARGETS):
 	$(MAKE) -C src $@
 
 doc: html pdf
@@ -67,6 +106,9 @@ tex:
 	robodoc --rc doc/robodoc.rc --latex --singledoc --toc --index --doc ./doc/tex/gepard-api
 	
 html:
+	robodoc --rc doc/robodoc.rc  --html --multidoc --index --doc ./doc/html --css ./doc/gepard.css
+
+htmlnocss:
 	robodoc --rc doc/robodoc.rc  --html --multidoc --index --doc ./doc/html
 
 .PHONY: rmfig
@@ -79,7 +121,6 @@ clean:
 	$(MAKE) -C src clean
 	$(MAKE) -C doc/tex clean
 	-rm -rf doc/html/*
-	-rm -f fits/*.{min,out,ps,eps} fits/gmon.out fits/fitres*dat fits/fitres 
-	-rm -f fits/fitpdfs*dat fits/fitpdfs fits/slope*dat fits/slope
-	-rm -f Tests/*dat Tests/gmon.out
-	-rm -f ex/*dat ex/*eps 
+	-rm -f fits/*.{min,out,ps,eps,dat,out} fits/tmp.mma
+	-rm -f Tests/*{dat,out,eps}
+	-rm -f ex/*{dat,eps}

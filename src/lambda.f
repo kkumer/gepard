@@ -41,7 +41,7 @@ C
 *    of the SQRT cut on the negative real axis
 
       AUX = (GAM(K,0,1,1) - GAM(K,0,2,2)) * SQRT (1.0d0 + 
-     &          4.0d0 * GAM(K,0,1,2)*GAM(K,0,2,1)/(GAM(K,0,1,1) 
+     &     4.0d0 * GAM(K,0,1,2)*GAM(K,0,2,1)/(GAM(K,0,1,1) 
      &          - GAM(K,0,2,2))**2)
       LAM(1) = 0.5d0 * (GAM(K,0,1,1) + GAM(K,0,2,2) - AUX)
       LAM(2) = LAM(1) + AUX

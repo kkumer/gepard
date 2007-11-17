@@ -22,11 +22,12 @@ C  IDENTIFIERS
 C
 C  CHILDREN
 C      READPAR, INIT, CFFF, DCARG
-C  SOURCE
-C
+C  SYNOPSIS
 
       PROGRAM SCALESNNLO
 
+C  SOURCE
+C
       IMPLICIT NONE
       INTEGER PT, NPOINTS, LN, NDEL
       DOUBLE PRECISION DCARG, MP, FACF, FACR
@@ -46,7 +47,8 @@ C
       CALL READPAR
       
       INCLUDE 'ansatz.f'
-      ANSATZ = 'FIT'
+      ANSATZ = 'FITBP'
+      NQS = 1
 
 *     File that will hold results
 
@@ -57,9 +59,10 @@ C
 
 *     Scales 
 
-      PAR(1) = 4.0d0
+      Q02 = 4.0d0
       Q2 = 4.0d0
       DEL2 = -0.25d0
+      QS(1) = Q2
 
 *     Looping over two different ansaetze
 
@@ -102,18 +105,21 @@ C
       RR2 = 1.0d0
       RF2 = 1.0d0
       CALL INIT
+      CALL EVOLC(1)
       CALL CFFF 
       CFFM = CFF(P)
 
       RR2 = 1.0d0 / FACR
       RF2 = 1.0d0 / FACF
       CALL INIT
+      CALL EVOLC(1)
       CALL CFFF 
       CFFD = CFF(P)
 
       RR2 = FACR
       RF2 = FACF
       CALL INIT
+      CALL EVOLC(1)
       CALL CFFF 
       CFFU = CFF(P)
       

@@ -39,11 +39,12 @@ C                P -- approximation order N^{P}LO P=0,1,2
 C
 C  CHILDREN
 C      READPAR, INIT, CFFF, DCARG
-C  SOURCE
-C
+C  SYNOPSIS
 
       PROGRAM EVOLUTNS
 
+C  SOURCE
+C
       IMPLICIT NONE
       INTEGER PT, NPOINTS, LN, NDEL
       DOUBLE PRECISION XISTART, XIEND, XISTEP, MP
@@ -65,6 +66,7 @@ C
       CALL READPAR
     
       DEL2 = -0.25d0
+      NQS = 1
 
       INCLUDE 'ansatz.f'
       ANSATZ = 'NSFIT'
@@ -123,11 +125,16 @@ C
 *     Calculating two CFFs needed for present line and point ...
 
       CALL INIT
+      QS(1) = Q2
+      CALL EVOLC(1)
       CALL CFFF 
       CFFQ = CFF(P)
       Q2MEM = Q2
-      Q2 = PAR(1)
+
+      Q2 = Q02
       CALL INIT
+      QS(1) = Q2
+      CALL EVOLC(1)
       CALL CFFF 
       CFF0 = CFF(P)
       Q2 = Q2MEM

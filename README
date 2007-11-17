@@ -119,6 +119,8 @@ in src/ directory).
   Location of these libraries should be specified as an environment variable
   CERNLIBS in Makefile.
 
+  On Debian: apt-get install libkernlib1-dev libpacklib1-dev
+
 - For plotting feature, 'fit' program also needs PGPLOT graphic library.
       http://www.astro.caltech.edu/~tjp/pgplot/
   Location of this library should be specified as an environment variable
@@ -127,8 +129,12 @@ in src/ directory).
   If PGPLOT is not available, there is an alternative program fit_nopgplot
   that produces only tabular output.
 
+  On Debian: apt-get install pgplot
+
 - For recreating documentation, robodoc and LaTeX softwares are needed.
   Robodoc homepage is  http://www.xs4all.nl/~rfsber/Robo/robodoc.html
+
+  On Debian: apt-get install robodoc
 
 Precompiled Minuit and PGPLOT libraries for Linux can be obtained from
 me, but if one wants to compile them himself, there are some instructions in 

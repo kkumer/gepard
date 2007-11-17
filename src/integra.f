@@ -15,11 +15,11 @@ C     that points are more dense in the subregion where function changes
 C     more violently. Subintegration intervals are defined as:
 C     DIVISION(1) .. DIVISION(1 + SPEED) .. DIVISION(1 + 2*SPEED) ..
 C        ... DIVISION(MAXDIV + 1), 
-C     and on each interval 2**ACC Gauss-Legendre points are used.
+C     and on each interval 2**ACR Gauss-Legendre points are used.
 C  SYNOPSIS
 C     SUBROUTINE INTEGRA
 C   INPUT
-C      ACC  -- accuracy. each subintegration is done on 2**ACC
+C      ACR  -- accuracy. each subintegration is done on 2**ACR
 C              Gauss-Legendre points
 C    SPEED  -- speed. Only each SPEEDth point from array DIVISION is
 C              used for specification of subintegration intervals
@@ -36,18 +36,18 @@ C      INIT
 C  SOURCE
 C
 
-      SUBROUTINE INTEGRAF(ACC, SPEED, DIVISION, NINTGMAX, X, WG)
+      SUBROUTINE INTEGRAF(ACR, SPEED, DIVISION, NINTGMAX, X, WG)
 * 
       IMPLICIT NONE
-      INTEGER ACC, SPEED, NINTGMAX
-      INTEGER NGAUSSMAX, ACCMAX, NINTGMAXMAX, K, K2, K3
+      INTEGER ACR, SPEED, NINTGMAX
+      INTEGER NGAUSSMAX, ACRMAX, NINTGMAXMAX, K, K2, K3
       DOUBLE PRECISION NGAUSS, SUMM, DIFF
-      PARAMETER ( NGAUSSMAX = 64, ACCMAX = 6, NINTGMAXMAX = 12 )
+      PARAMETER ( NGAUSSMAX = 64, ACRMAX = 6, NINTGMAXMAX = 12 )
       DOUBLE PRECISION DIVISION( NINTGMAXMAX+1 )
       DOUBLE PRECISION X( NINTGMAXMAX * NGAUSSMAX ) 
       DOUBLE PRECISION WG( NINTGMAXMAX * NGAUSSMAX )
-      DOUBLE PRECISION ABSC( ACCMAX, NGAUSSMAX ) 
-      DOUBLE PRECISION WGHT( ACCMAX, NGAUSSMAX )
+      DOUBLE PRECISION ABSC( ACRMAX, NGAUSSMAX ) 
+      DOUBLE PRECISION WGHT( ACRMAX, NGAUSSMAX )
       DOUBLE PRECISION DOWN( NINTGMAXMAX + 1 ), UP( NINTGMAXMAX )
 
 
@@ -60,10 +60,10 @@ C
       DO 20 K2 = 1, NINTGMAX, SPEED
         SUMM = DIVISION(K2 + SPEED) + DIVISION(K2) 
         DIFF = DIVISION(K2 + SPEED) - DIVISION(K2) 
-      DO 20 K3 = 1, 2**ACC
+      DO 20 K3 = 1, 2**ACR
         K = K + 1
-        X(K) = (DIFF * ABSC(ACC, K3) + SUMM) * 0.5D0
-        WG(K) = 0.5D0 * DIFF * WGHT(ACC, K3) 
+        X(K) = (DIFF * ABSC(ACR, K3) + SUMM) * 0.5D0
+        WG(K) = 0.5D0 * DIFF * WGHT(ACR, K3) 
  20   CONTINUE
 
 

@@ -33,17 +33,18 @@ C                P -- approximation order N^{P}LO P=0,1,2
 C
 C  CHILDREN
 C      READPAR, INIT, CFFF
-C  SOURCE
-C
+C  SYNOPSIS
 
       PROGRAM ANATOMYNS
 
+C  SOURCE
+C
       IMPLICIT NONE
       INTEGER PT, NPOINTS, LN, NDEL
       DOUBLE PRECISION LOGXI, LOGXISTART, LOGXIEND, LOGXISTEP
       PARAMETER ( NPOINTS = 40 )
       DOUBLE COMPLEX PREDS(6, NPOINTS), TOT
-      DOUBLE PRECISION XIS(NPOINTS), MODUL, PHASE, Q02, Q2EXP, MP
+      DOUBLE PRECISION XIS(NPOINTS), MODUL, PHASE, Q2EXP, MP, Q02IN
       DOUBLE PRECISION DCARG
       PARAMETER ( LOGXISTART = -5.0d0, LOGXIEND = -0.30103d0,
      &       LOGXISTEP = (LOGXIEND - LOGXISTART) / (NPOINTS - 1)  )
@@ -68,9 +69,10 @@ C
       INCLUDE 'ansatz.f'
       ANSATZ = 'NSFIT'
 
-      Q02  = 2.5d0
+      Q02IN  = 2.5d0
       Q2EXP = 10.0d0
       DEL2 =  -0.25d0
+      NQS = 1
 
 *     Looping over two different ansaetze
 
@@ -93,13 +95,13 @@ C
 
 * 1st line is the default total result:
       P = 1
-      PAR(1) = Q02
+      Q02 = Q02IN
       Q2 = Q2EXP
       SCHEME = 'MSBND'
       CZERO = 1
       IF (LN .EQ. 2) THEN
           P = 0
-          PAR(1) = Q2
+          Q02 = Q2
       ELSEIF (LN .EQ. 3) THEN
           P = 0
       ELSEIF (LN .EQ. 4) THEN
@@ -115,6 +117,8 @@ C
 *   Doing calculation ...
   
       CALL INIT
+      QS(1) = Q2
+      CALL EVOLC(1)
       CALL CFFF 
 
 *   ... and saving it to arrray

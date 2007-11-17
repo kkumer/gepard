@@ -1,19 +1,16 @@
 Physics: 
 -  t_cut of ZEUS data is infinity? DVCS[46].DAT
--  improve behaviour for large \xi so that comparison to
-   NLO Les Houches is everywhere ok
 
 Computing:
--  Restore MathLink communication
--  Make C-MathLink communication function that recognizes input type
--  Remove unused variables (specially in adacf, or specially
-   not there)?
--  Put evolution operators on common block when Q0 is fixed
--  Move all gaussian points to gauss.f  (from dvcs.f e.g.)
+-  Make fancy C-MathLink communication function that recognizes input type
+-  Remove unused variables (specially in adacf, or specially not there)?
 -  In fitting parameters should be non-squared quantities
+-  FIT.INI file should not have hardcoded filename but it should be passed via command line
+-  use autoconf and friends
+-  MSBND -> MSBAR, MSBAR -> MSBDI
+-  Automatize putting Alekhin's PDFs into fitpdfs
 
 Checks:
--  Check NNLO DIS evolution against Les Houches table 3 or 4
 -  Check plotting of error-bars (Implement stat-syst as in 
    original papers and Dieter's femtoholographic paper?)
    It seems that grace is doing this wrong for log-y axis!
@@ -28,3 +25,10 @@ DONE:
    of adacf library.  (Done in ver. 0.89)
 +  Check NLO DIS evolution against Les Houches table 3 or 4 (done in ver. 0.9.2)
 +  Include MS-bar evolution
++  improve behaviour for large \xi so that comparison to
+   NLO Les Houches is everywhere ok
++  Put evolution operators on common block when Q0 is fixed
++  Move all gaussian points to gauss.f  (from dvcs.f e.g.)
++  Check NNLO DIS evolution against Les Houches table 3 or 4
++  Restore MathLink communication
++  FIT->FITBP  FITOLD->TEST

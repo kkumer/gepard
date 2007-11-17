@@ -11,6 +11,10 @@ C     *******
 C     ****p* fitres.f/FITRES
 C  NAME
 C     FITRES  --  Ploting final fit results
+C  SYNOPSIS
+
+      PROGRAM FITRES
+
 C  DESCRIPTION
 C    Produces data files for Fig. ? of  KMPKS06b
 C  OUTPUT
@@ -29,11 +33,8 @@ C  CHILDREN
 C      READPAR, INIT, CFFF, DCARG
 C  SOURCE
 C
-
-      PROGRAM FITRES
-
       IMPLICIT NONE
-      INTEGER PT, NPOINTS, LN, PANEL
+      INTEGER PT, NPOINTS, LN, PANEL, K
       DOUBLE PRECISION MT, MP, LSTART, LEND, LSTEP
       PARAMETER ( NPOINTS = 40 )
       DOUBLE PRECISION POINTS(0:3, 4, NPOINTS)
@@ -48,6 +49,11 @@ C
       FFTYPE = 'SINGLET'
 
       CALL READPAR
+
+      ANSATZ = 'FITBP'
+      Q02    =    4.0d0
+      NQS = 1
+      NQSDIS = 1
     
       INCLUDE 'ansatz.f'
 
@@ -57,36 +63,30 @@ C
 *    NNLO 
       P = 2
       SCHEME = 'CSBAR'
-      PAR(1)    =    4.0d0
-      PAR(2)    =    0.0488d0
 
+      PAR(11)   =    0.1673
+      PAR(12)   =    1.14
+      PAR(14)   =    1.167
+      PAR(15)   =    0.0
 
-      PAR(11)   =    0.167
-      PAR(12)   =     1.136
-      PAR(14)   =     1.217
-      PAR(15)   =     0.0
-
-      PAR(21)   =    0.586
-      PAR(22)   =     1.06
-      PAR(24)   =     1.414
-      PAR(25)   =     0.06
+      PAR(21)   =    0.571
+      PAR(22)   =    1.068
+      PAR(24)   =    1.391
+      PAR(25)   =    0.0
 
 *    NLO 
-      P = 1
-      SCHEME = 'CSBAR'
-      PAR(1)    =    4.0d0
-      PAR(2)    =    0.0518d0
-
-
-      PAR(11)   =    0.167
-      PAR(12)   =     1.14
-      PAR(14)   =     1.34
-      PAR(15)   =     0.0
-
-      PAR(21)   =    0.535
-      PAR(22)   =     1.09
-      PAR(24)   =     1.59
-      PAR(25)   =     0.0
+*      P = 1
+*      SCHEME = 'CSBAR'
+*
+*      PAR(11)   =    0.167
+*      PAR(12)   =     1.14
+*      PAR(14)   =     1.34
+*      PAR(15)   =     0.0
+*
+*      PAR(21)   =    0.535
+*      PAR(22)   =     1.09
+*      PAR(24)   =     1.59
+*      PAR(25)   =     0.0
 
 *   Removing valence quarks
       PAR(31)   =     0.0d0
@@ -122,6 +122,8 @@ C
         CALL PRINTDATA(10, FNAME)
 
         CALL INIT
+        QS(1) = Q2
+        CALL EVOLC(1)
         
 *     Looping over MT
         LSTART = 0.05
@@ -131,7 +133,9 @@ C
         DO 10 PT = 1, NPOINTS
 
           MT = LSTART + (PT - 1) * LSTEP
-          WRITE (UNIT=10,FMT=998) MT, PARSIGMA(MT), 0.0
+          MTIND = NMTS + NMTSEXP + 1
+          MTS(MTIND) = MT
+          WRITE (UNIT=10,FMT=998) MT, PARSIGMA(), 0.0
 
  10     CONTINUE
         WRITE (UNIT=10, FMT=999)
@@ -161,6 +165,8 @@ C
 
           Q2 = LSTART + (PT - 1) * LSTEP
           XI = Q2 / ( 2.0d0 * W**2 + Q2)
+          QS(1) = Q2
+          CALL EVOLC(1)
           WRITE (UNIT=11,FMT=998) Q2, SIGMA(), 0.0
 
  40     CONTINUE
@@ -184,6 +190,8 @@ C
         CALL PRINTDATA(12, FNAME)
 
         CALL INIT
+        QS(1) = Q2
+        CALL EVOLC(1)
         
 *     Looping over W
         LSTART = 30.d0
@@ -220,7 +228,13 @@ C
         END IF
         CALL PRINTDATA(13, FNAME)
 
+        DEL2 = 0.0d0
         CALL INIT
+        CALL GETMBGPD
+        DO 68  K = 1, NPTS
+          HGRID(0, K, 1) = MBGPD(K, 1) 
+          HGRID(0, K, 2) = MBGPD(K, 2)
+ 68     CONTINUE
         
 *     Looping over Q2
         LSTART = 2.d0
@@ -230,6 +244,8 @@ C
         DO 80 PT = 1, NPOINTS
 
           Q2 = LSTART + (PT - 1) * LSTEP
+          QSDIS(1) = Q2
+          CALL EVOLC(1)
           CALL F2F
           WRITE (UNIT=13,FMT=998) Q2, F2(P), 0.0
 

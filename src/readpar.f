@@ -30,6 +30,11 @@ C
       READ (61, *) P
       READ (61, *) NF
       READ (61, *) CZERO
+      READ (61, *) MU02
+      READ (61, *) ASP(0)
+      READ (61, *) ASP(1)
+      READ (61, *) ASP(2)
+      READ (61, *) Q02
       READ (61, *) RF2
       READ (61, *) RR2
       READ (61, *) C

@@ -72,17 +72,15 @@ C
 
 *     Scales 
 
+      Q02 = 2.5d0
       Q2 = 2.5d0
-      PAR(1) = 2.5d0
-      PAR(2) = 0.05d0
-      PAR(3) = 2.5d0
+      NQS = 1
+      QS(1) = Q2
+
 
 *     Looping over two different walues of \Delta^2
 
       DO 40 NDEL = 0, 1
-
-      DEL2 = 0.0d0
-      IF (NDEL .EQ. 1) DEL2 = -0.5d0
 
       LOGXI = LOGXISTART
       DO 20 PT = 1, NPOINTS
@@ -112,11 +110,16 @@ C
       END IF
 
       CALL INIT
+      MTIND = 0
+      IF (NDEL .EQ. 1) MTIND = NMTS + 3
+      DEL2 = -MTS(MTIND)
 
 *     Calculating two CFFs needed for present line and point ...
 
+      CALL EVOLC(1)
       CALL CFFF 
       P = P - 1
+      CALL EVOLC(1)
       CALL CFFF 
 
 *     ... and saving them to array

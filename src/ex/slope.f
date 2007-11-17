@@ -29,11 +29,12 @@ C                P -- approximation order N^{P}LO P=0,1,2
 C
 C  CHILDREN
 C      READPAR, INIT, LNHX, DERIV
-C  SOURCE
-C
+C  SYNOPSIS
 
       PROGRAM SLOPE
 
+C  SOURCE
+C
       IMPLICIT NONE
       INTEGER PT, NPOINTS, LN, NEVALS
       DOUBLE PRECISION HX(2)
@@ -96,7 +97,7 @@ C
           PAR(22) =  1.25
           PAR(24) =  0.263
         ELSE IF (LN .EQ. 4) THEN
-          SCHEME = 'MSBAR'
+          SCHEME = 'MSBND'
           P=1
           PAR(11) =  0.172
           PAR(12) =  1.14

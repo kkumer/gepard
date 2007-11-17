@@ -12,48 +12,23 @@
 #   make fit_nopgplot
 #
 
-ifndef NOPGPLOT
-ALLPGPLOTLIBS = $(PGPLOTLIBS) $(X11LIBS)
-else
-CPPFLAGS = '-D NOPGPLOT'
-endif
 
 # Compiler options
 FFLAGS =  -I. -O 
 CFLAGS =  -O2
+CPPFLAGS = -D NOPGPLOT
 
-# Subdirectories for storing source files
+# Subdirectories for storing example source files
 EXDIR = ex
 
 # Directories for storing object files
+ADACFODIR = adacf/obj
 FODIR = Fobj
 ODIR = obj
-ADACFODIR = adacf/obj
+MMAODIR = Mobj
 EXFODIR = ex/obj
 
-# Fortran object files
-FOBJS = Finit.o Fbeta.o Fspecial.o Fdcomplex.o Fastrong.o Flambda.o\
-Fprojectors.o Frnnlo.o Ferfunc.o Fevol.o Fcdvcs.o Fmsbar.o Fparwav.o Fcff.o\
-Fdvcs.o Ff2.o Freadpar.o Ferror.o Fgauss.o Fnd.o Fbigcns.o Fintegra.o Fxspace.o
-_FOBJS = $(patsubst %,$(FODIR)/%,$(FOBJS))
-
-# rule for compiling example Fortran programs
-$(EXFODIR)/%.o: $(EXDIR)/%.f
-	$(FC) -c -o $@ $< $(FFLAGS)
-
-# rule for compiling fit.F
-$(FODIR)/Ffit.o: fit.F
-	$(FC) -c -o $@ $< $(FFLAGS) $(CPPFLAGS)
-$(FODIR)/Ffit_nopgplot.o: fit.F
-	$(FC) -c -o $@ $< $(FFLAGS) '-D NOPGPLOT'
-
-# rule for compiling Fortran .f  files
-# (prefix "F" is used to avoid possible future clashes with
-#  C-wrappers with the same name)
-$(FODIR)/F%.o: %.f
-	$(FC) -c -o $@ $< $(FFLAGS)
-
-# "adacf" Fortran object files
+# "adacf" package Fortran object files
 ADACFOBJS = Harmonic.o Mellin.o WgammaVNSP0F.o WgammaVNSP1F.o\
 WgammaVNSP2F.o WgammaVQQ0F.o WgammaVQQ1F.o WgammaVQQ2F.o WgammaVQG0F.o\
 WgammaVQG1F.o WgammaVQG2F.o WgammaVGQ0F.o WgammaVGQ1F.o WgammaVGQ2F.o\
@@ -67,6 +42,23 @@ _ADACFOBJS = $(patsubst %,$(ADACFODIR)/%,$(ADACFOBJS))
 $(ADACFODIR)/%.o: adacf/%.f 
 	$(FC) -c -o $@ $< $(FFLAGS)
 
+
+# Fortran object files
+FOBJS = Finit.o Fbeta.o Fspecial.o Fdcomplex.o Fastrong.o Flambda.o\
+Fprojectors.o Frnnlo.o Ferfunc.o Fevol.o Fcdvcs.o Fmsbar.o \
+Fdvcs.o Ff2.o Freadpar.o Ferror.o Fgauss.o Fnd.o Fbigcns.o Fintegra.o Fxspace.o\
+Finitc.o Fevolc.o Fgetmbgpd.o Fhj.o Fsplice.o Fcff.o Ffcn.o Fderiv.o
+_FOBJS = $(patsubst %,$(FODIR)/%,$(FOBJS))
+
+
+# rule for compiling Fortran .f  files
+# (prefix "F" is used to avoid possible future clashes with
+#  C-wrappers with the same name)
+$(FODIR)/F%.o: %.f  header.f
+	$(FC) -c -o $@ $< $(FFLAGS)
+$(FODIR)/F%.o: %.F  header.f
+	$(FC) -c -o $@ $< $(FFLAGS) $(CPPFLAGS)
+
 # C object files
 OBJS = flushout.o
 _OBJS = $(patsubst %,$(ODIR)/%,$(OBJS))
@@ -75,89 +67,64 @@ _OBJS = $(patsubst %,$(ODIR)/%,$(OBJS))
 $(ODIR)/%.o: %.c
 	$(CC) -c -o $@ $< $(CFLAGS) $(INCS)
 
-# targets
+# All object files together
+export ALLOBJS = $(_OBJS) $(_ADACFOBJS) $(_FOBJS)
 
-auxtest: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Fauxtest.o
-	$(FC) -o $@ $^ $(FFLAGS)
+# Mathlink C object files
+MMAOBJS = fit.tm.o fit.o 
+_MMAOBJS = $(patsubst %,$(MMAODIR)/%,$(MMAOBJS))
 
-test: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Ftest.o
-	$(FC) -o $@ $^ $(FFLAGS)
+# rules for compiling MathLink C files
+$(MMAODIR)/%.tm.c: %.tm
+	$(MPREP) -o $@ $< 
+$(MMAODIR)/%.tm.o: $(MMAODIR)/%.tm.c $(MMAODIR)/%.o
+	$(CC) -c -o $@ $< -I$(MLINCDIR) $(CFLAGS) $(MLEXTRA)
+$(MMAODIR)/%.o: %.c  header.h
+	$(CC) -c -o $@ $< -I$(MLINCDIR) $(CFLAGS)
 
-radcorr: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Fradcorr.o
-	$(FC) -o $@ $^ $(FFLAGS)
 
-scaledep: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Fscaledep.o $(FODIR)/Fderiv.o
-	$(FC) -o $@ $^ $(FFLAGS)
+# rule for compiling example Fortran programs
+$(EXFODIR)/%.o: $(EXDIR)/%.f header.f
+	$(FC) -c -o $@ $< $(FFLAGS)
 
-fit: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Ffit.o $(ODIR)/flushout.o
-	$(FC) -o $@ $^ $(FFLAGS) $(CERNLIBS) $(ALLPGPLOTLIBS)
+# test and fit targets
 
-fit_nopgplot: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Ffit_nopgplot.o $(ODIR)/flushout.o
-	$(FC) -o $@ $^ $(FFLAGS) $(CERNLIBS)
+$(TESTTARGETS): %: $(ALLOBJS) $(FODIR)/F%.o
+	$(FC) -o ../Tests/$@ $^ $(FFLAGS)
 
-houches: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Fhouches.o 
-	$(FC) -o $@ $^ $(FFLAGS)
+#fit_nopgplot: $(ALLOBJS) $(FODIR)/Ffit.o
+	#$(FC) -o $@ $^ $(FFLAGS) $(CERNLIBS)
 
-accuracy: $(_FOBJS) $(_ADACFOBJS) $(FODIR)/Faccuracy.o 
-	$(FC) -o $@ $^ $(FFLAGS)
+# main fit target  (an variant withouth PGPLOT)
+fit: CPPFLAGS :=
+fit_nopgplot: ALLPGPLOTLIBS :=
+fit fit_nopgplot:  $(ALLOBJS) $(FODIR)/Ffit.o
+	$(FC) -o ../fits/$@ $^ $(FFLAGS) $(CERNLIBS) $(ALLPGPLOTLIBS)
+
+# targets for processing/presenting GPDs resulting from fit
+$(FITTARGETS): %: $(ALLOBJS) $(EXFODIR)/%.o
+	$(FC) -o ../fits/$@ $^ $(FFLAGS)
+
+# mma targets
+
+gepard.exe: CPPFLAGS := $(CPPFLAGS) -D MMA
+gepard.exe: $(ALLOBJS) $(_MMAOBJS)  $(FODIR)/Fmninterface.o
+	$(FC) -o ../fits/$@/$(SYS)/$@ $^ $(FFLAGS) $(CERNLIBS) -L$(MLLIBDIR) -l$(MLLIB) $(ALLPGPLOTLIBS) $(MLEXTRA)
 
 # targets for examples
 #
-auxns: $(_FOBJS) $(_ADACFOBJS) $(EXFODIR)/auxns.o
+$(EXTARGETS): %: $(ALLOBJS) $(EXFODIR)/%.o
 	$(FC) -o ../ex/$@ $^ $(FFLAGS)
 
-aux: $(_FOBJS) $(_ADACFOBJS) $(EXFODIR)/aux.o
-	$(FC) -o ../ex/$@ $^ $(FFLAGS)
-
-anatomyNS: $(_FOBJS) $(_ADACFOBJS) $(EXFODIR)/anatomyNS.o
-	$(FC) -o ../ex/$@ $^ $(FFLAGS)
-
-anatomy: $(_FOBJS) $(_ADACFOBJS) $(EXFODIR)/anatomy.o
-	$(FC) -o ../ex/$@ $^ $(FFLAGS)
-
-radNLONS: $(_FOBJS) $(_ADACFOBJS) $(EXFODIR)/radNLONS.o
-	$(FC) -o ../ex/$@ $^ $(FFLAGS)
-
-radNLO: $(_FOBJS) $(_ADACFOBJS) $(EXFODIR)/radNLO.o
-	$(FC) -o ../ex/$@ $^ $(FFLAGS)
-
-radQ: $(_FOBJS) $(_ADACFOBJS) $(EXFODIR)/radQ.o
-	$(FC) -o ../ex/$@ $^ $(FFLAGS)
-
-evolutNS: $(_FOBJS) $(_ADACFOBJS) $(EXFODIR)/evolutNS.o
-	$(FC) -o ../ex/$@ $^ $(FFLAGS)
-
-evolut: $(_FOBJS) $(_ADACFOBJS) $(EXFODIR)/evolut.o
-	$(FC) -o ../ex/$@ $^ $(FFLAGS)
-
-radNNLONS: $(_FOBJS) $(_ADACFOBJS) $(EXFODIR)/radNNLONS.o
-	$(FC) -o ../ex/$@ $^ $(FFLAGS)
-
-radNNLO: $(_FOBJS) $(_ADACFOBJS) $(EXFODIR)/radNNLO.o
-	$(FC) -o ../ex/$@ $^ $(FFLAGS)
-
-scalesNS: $(_FOBJS) $(_ADACFOBJS) $(EXFODIR)/scalesNS.o
-	$(FC) -o ../ex/$@ $^ $(FFLAGS)
-
-scales: $(_FOBJS) $(_ADACFOBJS) $(EXFODIR)/scales.o
-	$(FC) -o ../ex/$@ $^ $(FFLAGS)
-
-scalesNNLO: $(_FOBJS) $(_ADACFOBJS) $(EXFODIR)/scalesNNLO.o
-	$(FC) -o ../ex/$@ $^ $(FFLAGS)
-
-fitres: $(_FOBJS) $(_ADACFOBJS) $(EXFODIR)/fitres.o
-	$(FC) -o ../fits/$@ $^ $(FFLAGS)
-
-fitpdfs: $(_FOBJS) $(_ADACFOBJS) $(EXFODIR)/fitpdfs.o
-	$(FC) -o ../fits/$@ $^ $(FFLAGS)
-
-slope: $(_FOBJS) $(_ADACFOBJS) $(EXFODIR)/slope.o $(FODIR)/Fderiv.o
-	$(FC) -o ../fits/$@ $^ $(FFLAGS)
 
 .PHONY: clean
 clean:
-	-rm -f $(SRCTARGETS)
-	-rm -f $(patsubst %,%.exe,$(SRCTARGETS))
-	-rm -f $(ADACFODIR)/*.o $(FODIR)/F*.o $(ODIR)/*.o $(EXFODIR)/*.o 
+	-rm -f $(ADACFODIR)/*.o $(FODIR)/F*.o $(ODIR)/*.o $(EXFODIR)/*.o $(MMAODIR)/*
+	-rm -f $(patsubst %,../Tests/%,$(TESTTARGETS))
+	-rm -f $(patsubst %,../Tests/%.exe,$(TESTTARGETS))
+	-rm -f $(patsubst %,../fits/%,$(FITTARGETS))
+	-rm -f $(patsubst %,../fits/%.exe,$(FITTARGETS))
+	-rm -f ../fits/fit ../fits/fit.exe ../fits/fit_nopgplot ../fits/fit_nopgplot.exe
 	-rm -f $(patsubst %,../ex/%,$(EXTARGETS))
 	-rm -f $(patsubst %,../ex/%.exe,$(EXTARGETS))
+	-rm -f ../fits/gepard.exe/$(SYS)/gepard.exe

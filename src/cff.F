@@ -60,9 +60,9 @@ C
       SUBROUTINE CFFF
 
       IMPLICIT NONE
-      INTEGER K
-      DOUBLE COMPLEX EPH, PIHALF, J, FPW
-      DOUBLE COMPLEX DCTAN
+      INTEGER K, QIND
+      DOUBLE COMPLEX EPH, J, FPW, FPWSEC
+      DOUBLE COMPLEX DCTAN, FCM(2)
       DOUBLE PRECISION RESREAL, RESIMAG
       DOUBLE PRECISION FREAL, FIMAG
       INCLUDE 'header.f'
@@ -72,15 +72,33 @@ C
       RESREAL = 0.0d0
       RESIMAG = 0.0d0
 
+      CALL LOOKUPQ(QIND)
+#ifdef MMA
+      IF (ANSATZ(:3) .EQ. 'MMA') THEN
+        CALL GETMBGPDMMA
+      ELSE
+        CALL GETMBGPD
+      END IF
+#else
+      IF (ANSATZ(:3) .EQ. 'MMA') THEN
+        WRITE(*,*) 'ANSATZ=MMA unavailable. Recompile with -D MMA'
+      ELSE
+        CALL GETMBGPD
+      END IF
+#endif
+
 *   Integration ...
 
       DO 123 K = 1, NPTS
 
       J = N(K) - 1
 
-      CALL PARWAVF(K, FPW)
+      IF ( FFTYPE(:7) .EQ. 'NONSING' ) THEN
+        FPW = CGRIDNS(QIND,K)*MBGPD(K,1)        
+      ELSE
+        FPW = CGRID(QIND,K,1)*MBGPD(K,1) + CGRID(QIND,K,2)*MBGPD(K,2)
+      END IF
 
-      PIHALF = (1.5707963267948966d0, 0.0d0)
       FREAL = IMAGPART(EPH * (2.0d0/XI)**(J-C) * DCTAN(PIHALF*J) * FPW)
 
       FIMAG = IMAGPART(EPH * (2.0d0/XI)**(J-C) * FPW)

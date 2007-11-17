@@ -1,3 +1,16 @@
+Version 0.9.4  (unreleased yet)
+
+	{Merged from sid  67:85}
+	- ADD: Possibility of eta-dependent ansatz
+	- ADD: Mathematica interface completely redone so both
+	       calculation of CFFs and fitting is possible from
+		   within Mathematica
+	- ADD: Evolved Wilson coefficients can be now calculated in
+	       the initialization phase which leads to much faster
+		   execution
+	- FIX: comparison to PEGASUS is OK at NNLO as well
+	- FIX: SPEED=3 should be used instead of SPEED=4 now
+
 Version 0.9.3  (2006-12-17)
 
 	- ADD: non-singlet evolution
@@ -6,7 +19,7 @@ Version 0.9.3  (2006-12-17)
 	- ADD: intelligent choice of y-range for drawing of PDF(x)
 	- ADD: many example programs in ex subdirectory which produce
 	       data for plots in a big paper
-    - ADD: automatic plotting and psfragging of plots
+	- ADD: automatic plotting and psfragging of plots
 	- FIX: dependence on factorization scale corrected now
 	- BUG: SPEED=4 is much more unreliable than before
 

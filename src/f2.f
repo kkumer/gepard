@@ -54,22 +54,25 @@ C
       SUBROUTINE F2F
 
       IMPLICIT NONE
-      INTEGER K
+      INTEGER K, QIND
       DOUBLE PRECISION RES, F2IMAG
-      DOUBLE COMPLEX EPH, FPW, J
+      DOUBLE COMPLEX EPH, FPW, J, FCM(2)
       INCLUDE 'header.f'
 
 
+      CALL LOOKUPQ(QIND)
 
 *     Fixing forward kinematics:
-      DEL2 = 0.0d0
+      MTIND = 0
 
       EPH = EXP ( COMPLEX(0.0d0, PHI) )
       RES = 0.0d0
 
       DO 123 K = 1, NPTS
       J = N(K) - 1
-      CALL PARWAVF (K, FPW)
+      FCM(1) = HGRID(MTIND, K, 1)
+      FCM(2) = HGRID(MTIND, K, 2)
+      FPW = CGRIDDIS(QIND,K,1) * FCM(1) + CGRIDDIS(QIND,K,2) * FCM(2)
       F2IMAG = IMAGPART(EPH * (1.0d0/XI)**(J-C) * FPW )
       RES = RES + WG(K)*F2IMAG
  123  CONTINUE
