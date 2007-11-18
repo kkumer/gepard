@@ -42,7 +42,26 @@ C  SYNOPSIS
       INTEGER P
 C     ***
 
-      INTEGER NF, CZERO
+C     ****v* header.f/NF
+C  DESCRIPTION
+C        NF -- number of active light quark flavours
+C  MEMBER OF
+C     PARINT
+C  SYNOPSIS
+      INTEGER NF
+C     ***
+
+C     ****v* header.f/CZERO
+C  DESCRIPTION
+C     CZERO -- This multiplies $\alpha_{s}^{0}$ i. e. LO result.
+C       Should normally be 1, but can be put to 0, so one can get NLO
+C       correction, instead of prediction, from the routines.
+C  MEMBER OF
+C     PARINT
+C  SYNOPSIS
+      INTEGER CZERO
+C     ***
+      
 
 C     ****v* header.f/MU02
 C  DESCRIPTION
@@ -65,25 +84,252 @@ C  SYNOPSIS
       DOUBLE PRECISION ASP(0:2)
 C     ***
 
-      DOUBLE PRECISION Q02, RF2, RR2
-      DOUBLE PRECISION C, PHI, CND, PHIND
-      CHARACTER SCHEME*5, ANSATZ*6, PROCESS*6, FFTYPE*10
+C     ****v* header.f/Q02
+C  DESCRIPTION
+C       Q02 -- GPD input scale
+C  MEMBER OF
+C     PARFLT
+C  SYNOPSIS
+      DOUBLE PRECISION Q02
+C     ***
+
+C     ****v* header.f/RF2
+C  DESCRIPTION
+C        RF2 --  $ {\cal Q}^2/{\mu_{f}^2}$ i.e. ratio
+C               of photon virtuality and factorization scales squared
+C  MEMBER OF
+C     PARFLT
+C  SYNOPSIS
+      DOUBLE PRECISION RF2
+C     ***
+
+C     ****v* header.f/RR2
+C  DESCRIPTION
+C        RR2 -- $ {\cal Q}^2/{\mu_{r}^2}$ i.e. ratio
+C               of photon virtuality and renormalization scales squared
+C  MEMBER OF
+C     PARFLT
+C  SYNOPSIS
+      DOUBLE PRECISION RR2
+C     ***
+
+
+C     ****v* header.f/C
+C  DESCRIPTION
+C          C -- MB integration contour crosses real axis here
+C  MEMBER OF
+C     MBCONT
+C  SYNOPSIS
+      DOUBLE PRECISION C
+C     ***
+
+C     ****v* header.f/PHI
+C  DESCRIPTION
+C        PHI -- angle MB contour makes with positive real axis 
+C  MEMBER OF
+C     MBCONT
+C  SYNOPSIS
+      DOUBLE PRECISION PHI
+C     ***
+
+C     ****v* header.f/CND
+C  DESCRIPTION
+C        CND -- MB integration contour crosses real axis here
+C               (contour for non-diagonal MS-bar evolution) 
+C  MEMBER OF
+C     MBCONT
+C  SYNOPSIS
+      DOUBLE PRECISION CND
+C     ***
+
+C     ****v* header.f/PHIND
+C  DESCRIPTION
+C      PHIND -- angle MB contour makes with positive real axis 
+C               (contour for non-diagonal MS-bar evolution) 
+C  MEMBER OF
+C     MBCONT
+C  SYNOPSIS
+      DOUBLE PRECISION PHIND
+C     ***
+
+C     ****v* header.f/SCHEME
+C  DESCRIPTION
+C      SCHEME -- renormalization scheme: CSBAR, MSBAR, MSBND, MSBLO,
+C                EVOLQ, EVOLG
+C  MEMBER OF
+C     PARCHR
+C  SYNOPSIS
+      CHARACTER SCHEME*5
+C     ***
+
+C     ****v* header.f/ANSATZ
+C  DESCRIPTION
+C      ANSATZ -- GPD ansatz: SOFT, HARD, FITBP, FIT, SPLICE, MMA, ...
+C  MEMBER OF
+C     PARCHR
+C  SYNOPSIS
+      CHARACTER ANSATZ*6
+C     ***
+
+C     ****v* header.f/PROCESS
+C  DESCRIPTION
+C      PROCESS -- process (DVCS or DIS)
+C  MEMBER OF
+C     PARCHR
+C  SYNOPSIS
+      CHARACTER PROCESS*6
+C     ***
+
+C     ****v* header.f/FFTYPE
+C  DESCRIPTION
+C      FFTYPE -- form-factor type (SINGLET or NONSINGLET)
+C  MEMBER OF
+C     PARCHR
+C  SYNOPSIS
+      CHARACTER FFTYPE*10
+C     ***
+
 
 *   2. Parameters from 'MINUIT.CMD' (candidates for fitting parameters)
 
+C     ****v* header.f/PAR
+C  DESCRIPTION
+C      PAR -- When MINUIT calls chi-square function FCN values of
+C             parameters are written to this array.
+C             This array is in the same-name common block.
+C  MEMBER OF
+C     PAR(block)
+C  SYNOPSIS
       INTEGER NPARMAX
       PARAMETER (NPARMAX = 50)
       DOUBLE PRECISION PAR(NPARMAX)
+C     ***
 
 *   3. Kinematics
 
-      INTEGER QINDMAX, MTINDMAX
-      PARAMETER (QINDMAX = 50, MTINDMAX = 100)
-      INTEGER NQS, NQSDIS, MTIND, NMTS, NMTSEXP
-      DOUBLE PRECISION XI, DEL2, Q2
-      DOUBLE PRECISION QS(QINDMAX), QSDIS(QINDMAX)
-*     - DEL2=T=-MT integration contour points
-      DOUBLE PRECISION MTS(0:MTINDMAX), MTWG(MTINDMAX)
+C     ****v* header.f/XI
+C  DESCRIPTION
+C      XI --  Bjorken-like variable \xi for DVCS, or x_Bj for DIS
+C  MEMBER OF
+C     KINEMATICS
+C  SYNOPSIS
+      DOUBLE PRECISION XI
+C     ***
+
+C     ****v* header.f/DEL2
+C  DESCRIPTION
+C      DEL2 --  momentum transfer \Delta^2 = t
+C  MEMBER OF
+C     KINEMATICS
+C  SYNOPSIS
+      DOUBLE PRECISION DEL2
+C     ***
+
+C     ****v* header.f/Q2
+C  DESCRIPTION
+C      Q2  --  photon virtuality 
+C  MEMBER OF
+C     KINEMATICS
+C  SYNOPSIS
+      DOUBLE PRECISION Q2
+C     ***
+
+C     ****v* header.f/NQS
+C  DESCRIPTION
+C      NQS -- Number of different Q2 values occuring in DVCS
+C             data. Set in subroutine INITC.
+C  MEMBER OF
+C     NQS(block)
+C  SYNOPSIS
+      INTEGER NQS
+C     ***
+
+C     ****v* header.f/NQSDIS
+C  DESCRIPTION
+C      NQSDIS -- Number of different Q2 values occuring in DIS
+C                data. Set in subroutine INITC.
+C  MEMBER OF
+C     NQS(block)
+C  SYNOPSIS
+      INTEGER NQSDIS
+C     ***
+
+C     ****v* header.f/QS
+C  DESCRIPTION
+C      QS -- values of Q2 occuring in DVCS data. Set in INITC.
+C  MEMBER OF
+C     QS(block)
+C  SYNOPSIS
+      INTEGER QINDMAX
+      PARAMETER (QINDMAX = 50)
+      DOUBLE PRECISION QS(QINDMAX)
+C     ***
+
+C     ****v* header.f/QSDIS
+C  DESCRIPTION
+C      QSDIS -- values of Q2 occuring in DIS data. Set in INITC.
+C  MEMBER OF
+C     QS(block)
+C  SYNOPSIS
+      DOUBLE PRECISION  QSDIS(QINDMAX)
+C     ***
+
+C     ****v* header.f/MTIND
+C  DESCRIPTION
+C      MTIND -- index of position of actual -t=MT in MTS array
+C  MEMBER OF
+C      MT
+C  SYNOPSIS
+      INTEGER MTIND
+C     ***
+
+C     ****v* header.f/NMTS
+C  DESCRIPTION
+C      NMTS -- number of points for integration over -t.
+C              Set in subroutine INIT.
+C  MEMBER OF
+C      MT
+C  SYNOPSIS
+      INTEGER NMTS
+C     ***
+
+C     ****v* header.f/NMTSEXP
+C  DESCRIPTION
+C      NMTSEXP -- number of -t values occuring in data.
+C              Set by hand in subroutine INIT (unlike Q2
+C              values which are read from data)!
+C  MEMBER OF
+C      MT
+C  SYNOPSIS
+      INTEGER NMTSEXP
+C     ***
+
+C     ****v* header.f/MTS
+C  DESCRIPTION
+C      MTS --  Values of -t=MT occuring in data or in
+C              integration over -t:
+C          MTS(0) = 0    (forward case, DIS)         
+C          MTS(1..NMTS) = values for Gauss integration over -t
+C          MTS(NMTS+1..NMTS+NMTSEXP) = values of -t in data
+C  MEMBER OF
+C     MTS(block)
+C  SYNOPSIS
+      INTEGER MTINDMAX
+      PARAMETER (MTINDMAX = 100)
+      DOUBLE PRECISION MTS(0:MTINDMAX)
+C     ***
+
+
+C     ****v* header.f/MTWG
+C  DESCRIPTION
+C      MTWG -- weights for Gauss integration over -t
+C  MEMBER OF
+C     MTS(block)
+C  SYNOPSIS
+      DOUBLE PRECISION MTWG(MTINDMAX)
+C     ***
+
+
 
 *   4. Other
 
@@ -98,33 +344,207 @@ C     ***
       DOUBLE PRECISION BETA0, BETA1, BETA2, BETA3
 
 *     - Mellin-Barnes integration contour points
-      INTEGER NPTS, NPTSMAX
-      PARAMETER (NPTSMAX = 768)
-      DOUBLE PRECISION Y(NPTSMAX), WG(NPTSMAX)
-      DOUBLE COMPLEX N(NPTSMAX)
 
-*     - Values on a particular contour point
+C     ****v* header.f/NPTS
+C  DESCRIPTION
+C       NPTS  --  number of points on MB contour
+C            Set in subroutine INIT.
+C  MEMBER OF
+C     CONTOUR
+C  SYNOPSIS
+      INTEGER NPTS
+C     ***
+
+
+C     ****v* header.f/NPTSMAX
+C  DESCRIPTION
+C       NPTSMAX  --  Maximal value of NPTS
+C  SYNOPSIS
+      INTEGER NPTSMAX
+      PARAMETER (NPTSMAX = 768)
+C     ***
+
+C     ****v* header.f/Y
+C  DESCRIPTION
+C      Y(K) -- Real coordinate along MB contour
+C            Set in subroutine INIT.
+C  MEMBER OF
+C     POINTS
+C  SYNOPSIS
+      DOUBLE PRECISION Y(NPTSMAX)
+C     ***
+
+C     ****v* header.f/WG
+C  DESCRIPTION
+C      WG(K) -- Weights for Gauss-Legendre integration over MB contour
+C            Set in subroutine INIT.
+C  MEMBER OF
+C     POINTS
+C  SYNOPSIS
+      DOUBLE PRECISION  WG(NPTSMAX)
+C     ***
+
+C     ****v* header.f/N
+C  DESCRIPTION
+C      N(K)  --  Complex coordinates of points on MB contour 
+C  MEMBER OF
+C     NPOINTS
+C  SYNOPSIS
+      DOUBLE COMPLEX N(NPTSMAX)
+C     ***
+
+*     ----- Values on a particular contour point
       DOUBLE COMPLEX S1, S2, S3, S4
       DOUBLE COMPLEX CNS0, CNS1, CNS2
 
-*     - Values on the whole contour
-      DOUBLE COMPLEX CDISNS1(NPTSMAX,0:2)
-      DOUBLE COMPLEX CDIS1(NPTSMAX,0:2,2), CDIS2(NPTSMAX,0:2,2)
-      DOUBLE COMPLEX BIGCNS(NPTSMAX,0:2)
-      DOUBLE COMPLEX BIGC(NPTSMAX,0:2,2)
-      DOUBLE COMPLEX BIGCF2(NPTSMAX,0:2,2)
-      DOUBLE COMPLEX GAMNS(NPTSMAX,0:2)
-      DOUBLE COMPLEX GAM(NPTSMAX,0:2,2,2)
+*     ----- Values on the whole contour
 
+C     ****v* header.f/CDISNS1
+C  DESCRIPTION
+C     CDISNS1(K,P) -- DIS F1 nonsinglet Wilson coefficient  
+C  MEMBER OF
+C     CDISNS(block)
+C  SYNOPSIS
+      DOUBLE COMPLEX CDISNS1(NPTSMAX,0:2)
+C     ***
+
+C     ****v* header.f/CDIS1
+C  DESCRIPTION
+C     CDIS1(K,P,flavour) -- DIS F1 singlet Wilson coefficients
+C  MEMBER OF
+C     CDIS(block)
+C  SYNOPSIS
+      DOUBLE COMPLEX CDIS1(NPTSMAX,0:2,2)
+C     ***
+
+C     ****v* header.f/CDIS2
+C  DESCRIPTION
+C     CDIS2(1,P,flavour) -- DIS F2 singlet Wilson coefficients
+C  MEMBER OF
+C     CDIS(block)
+C  SYNOPSIS
+      DOUBLE COMPLEX CDIS2(NPTSMAX,0:2,2)
+C     ***
+
+
+C     ****v* header.f/BIGCNS
+C  DESCRIPTION
+C     BIGCNS(K,P) -- "Big C" DVCS nonsinglet Wilson coefficient  
+C  MEMBER OF
+C     BIGCNS(block)
+C  SYNOPSIS
+      DOUBLE COMPLEX BIGCNS(NPTSMAX,0:2)
+C     ***
+
+
+C     ****v* header.f/BIGC
+C  DESCRIPTION
+C     BIGC(K,P,flavour) -- "Big C" DVCS singlet Wilson coefficient  
+C  MEMBER OF
+C     BIGC(block)
+C  SYNOPSIS
+      DOUBLE COMPLEX BIGC(NPTSMAX,0:2,2)
+C     ***
+
+C     ****v* header.f/BIGCF2
+C  DESCRIPTION
+C     BIGCF2(K,P,flavour) -- "Big C" DIS F2 singlet Wilson coefficient  
+C  MEMBER OF
+C     BIGCF2(block)
+C  SYNOPSIS
+      DOUBLE COMPLEX BIGCF2(NPTSMAX,0:2,2)
+C     ***
+
+
+C     ****v* header.f/GAMNS
+C  DESCRIPTION
+C      GAMNS(K,P) -- non-singlet DIS anomalous dimensions 
+C  MEMBER OF
+C     GAMNS(block)
+C  SYNOPSIS
+      DOUBLE COMPLEX GAMNS(NPTSMAX,0:2)
+C     ***
+
+C     ****v* header.f/GAM
+C  DESCRIPTION
+C      GAM(K,P,flavour_i,flavour_j) -- non-singlet DIS anomalous dimensions 
+C  MEMBER OF
+C     GAMNS(block)
+C  SYNOPSIS
+      DOUBLE COMPLEX GAM(NPTSMAX,0:2,2,2)
+C     ***
+
+C     ****v* header.f/CGRIDNS
+C  DESCRIPTION
+C      CGRIDNS(QIND,K) -- "Evolved" "big C" nonsinglet Wilson
+C      coefficients of DVCS i.e. multiplied by evolution operator for
+C      evolution from Q02 to QS(QIND)
+C  MEMBER OF
+C    CGRIDNS(block)
+C  SYNOPSIS
       DOUBLE COMPLEX CGRIDNS(QINDMAX, NPTSMAX)
+C     ***
+
+
+C     ****v* header.f/CGRID
+C  DESCRIPTION
+C      CGRID(QIND,K,flavour) -- "Evolved" "big C" singlet Wilson
+C      coefficients of DVCS i.e. multiplied by evolution operator for
+C      evolution from Q02 to QS(QIND)
+C  MEMBER OF
+C    CGRID(block)
+C  SYNOPSIS
       DOUBLE COMPLEX CGRID(QINDMAX, NPTSMAX, 2)
+C     ***
+
+C     ****v* header.f/CGRIDDIS
+C  DESCRIPTION
+C      CGRIDDIS(QIND,K,flavour) -- "Evolved" "big C" singlet Wilson
+C      coefficients of DIS F2 i.e. multiplied by evolution operator for
+C      evolution from Q02 to QSDIS(QIND)
+C  MEMBER OF
+C    CGRIDDIS(block)
+C  SYNOPSIS
       DOUBLE COMPLEX CGRIDDIS(QINDMAX, NPTSMAX, 2)
+C     ***
+
+C     ****v* header.f/HGRID
+C  DESCRIPTION
+C       HGRID(MTIND, K, flavour) -- values of GPD H
+C               obsoleted by MBGPD, should be changed to MBGPD in code
+C  MEMBER OF
+C    HGRID(block) 
+C  SYNOPSIS
       DOUBLE COMPLEX HGRID(0:MTINDMAX, NPTSMAX, 2)
+C     ***
+
+C     ****v* header.f/MBGPD
+C  DESCRIPTION
+C      MBGPD(K, flavour)  --  values of GPD H 
+C  MEMBER OF
+C    MBGPD(block) 
+C  SYNOPSIS
       DOUBLE COMPLEX MBGPD(NPTSMAX, 2)
+C     ***
 
 *     - Final observables
+C     ****v* header.f/F2
+C  DESCRIPTION
+C      F2(P)   --  DIS F2 function 
+C  MEMBER OF
+C    F2(block) 
+C  SYNOPSIS
       DOUBLE PRECISION F2(0:2)
+C     ***
+
+C     ****v* header.f/CFF
+C  DESCRIPTION
+C      CFF(P)  --  DVCS Compton form factor 
+C  MEMBER OF
+C    CFF(block) 
+C  SYNOPSIS
       DOUBLE COMPLEX CFF(0:2)
+C     ***
         
 
 *   Common blocks
@@ -141,57 +561,226 @@ C  SYNOPSIS
 C     ***
 
 C     ****c* header.f/ASTRONG
-C  DESCRIPTION
+C  DESCRIPTION 
 C     Initial value of alpha_strong
 C  SYNOPSIS
       COMMON / ASTRONG/  MU02, ASP
 C     ***
 
+C     ****c* header.f/PARFLT
+C  DESCRIPTION
+C     Floating point parameters
+C  SYNOPSIS
       COMMON / PARFLT /  Q02, RF2, RR2
+C     ***
+
+C     ****c* header.f/MBCONT
+C  DESCRIPTION
+C     Parameters specifying Mellin-Barnes contours
+C  SYNOPSIS
       COMMON / MBCONT /  C, PHI, CND, PHIND
+C     ***
+
+C     ****c* header.f/PARCHR
+C  DESCRIPTION
+C     String parameters
+C  SYNOPSIS
       COMMON / PARCHR /  SCHEME, ANSATZ, PROCESS, FFTYPE
+C     ***
 
 *   2. Parameters from 'MINUIT.CMD' (candidates for fitting parameters)
 
+C     ****c* header.f/PAR(block)
+C  DESCRIPTION
+C      Parameters from 'MINUIT.CMD' (candidates for fitting parameters)
+C      This block holds only array of the same name.
+C  SYNOPSIS
       COMMON / PAR    /  PAR
+C     ***
 
 *   3. Kinematics
 
+C     ****c* header.f/KINEMATICS
+C  DESCRIPTION
+C      Kinematics of the process. Experimental parameters.
+C  SYNOPSIS
       COMMON / KINEMATICS /  XI, DEL2, Q2
+C     ***
+
+C     ****c* header.f/NQS(block)
+C  DESCRIPTION
+C      Number of different Q2 occuring in the DVCS and DIS data
+C  SYNOPSIS
       COMMON / NQS        /  NQS, NQSDIS
+C     ***
+
+C     ****c* header.f/QS(block)
+C  DESCRIPTION
+C      Values of Q2 occuring in the DVCS and DIS data
+C  SYNOPSIS
       COMMON / QS         /  QS, QSDIS
+C     ***
+
+C     ****c* header.f/MT
+C  DESCRIPTION
+C      MT (i.e. -t) index and maximal values of this index
+C  SYNOPSIS
       COMMON / MT         /  MTIND, NMTS, NMTSEXP
+C     ***
+
+C     ****c* header.f/MTS(block)
+C  DESCRIPTION
+C      Values of -t, and weights for integrals over -t
+C  SYNOPSIS
       COMMON / MTS        /  MTS, MTWG
+C     ***
+
 
 *   4. Other
 
-*     - QCD beta function
+
+C     ****c* header.f/BETABLK
+C  DESCRIPTION
+C     QCD beta function coefficients
+C  SYNOPSIS
       COMMON / BETABLK / BETA0 (NFMIN:NFMAX), BETA1 (NFMIN:NFMAX),
      &                   BETA2 (NFMIN:NFMAX), BETA3 (NFMIN:NFMAX)
+C     ***
 
-*     - Mellin-Barnes integration contour points
+*     ------- Mellin-Barnes integration contour points
+
+C     ****c* header.f/CONTOUR
+C  DESCRIPTION
+C      Number of points on Mellin-Barnes contour. Actual points
+C      are in common blocks POINTS (real coordinate along the
+C      contour) and NPOINTS (complex coordinates).
+C  SYNOPSIS
       COMMON / CONTOUR  /  NPTS
+C     ***
+
+C     ****c* header.f/POINTS
+C  DESCRIPTION
+C      Real coordinates along MB contour, and integration weights.
+C      Corresponding complex coordinates are in common block NPOINTS.
+C  SYNOPSIS
       COMMON / POINTS   /  Y, WG
+C     ***
+
+C     ****c* header.f/NPOINTS
+C  DESCRIPTION
+C      Complex coordinates of MB contour points.
+C  SYNOPSIS
       COMMON / NPOINTS  /  N
+C     ***
       
-*     - Values on a particular contour point
+*     ----- Values on a particular contour point
+
+C     ****c* header.f/HARMONIC
+C  DESCRIPTION
+C      Values of harmonic sums at actual MB point
+C  SYNOPSIS
       COMMON / HARMONIC /  S1, S2, S3, S4
+C     ***
 
-*     - Values on the whole contour
+*     ---- Values on the whole contour
+
+C     ****c* header.f/CDISNS
+C  DESCRIPTION
+C     Nonsinglet DIS Wilson coefficients (small "c")  for F1
+C  SYNOPSIS
       COMMON / CDISNS   /  CDISNS1
+C     ***
+
+C     ****c* header.f/CDIS
+C  DESCRIPTION
+C     Singlet DIS Wilson coefficients (small "c") for F1 and F2
+C  SYNOPSIS
       COMMON / CDIS     /  CDIS1, CDIS2
+C     ***
+
+C     ****c* header.f/BIGCNS(block)
+C  DESCRIPTION
+C     Nonsinglet Wilson DIS coefficients  (big "C")
+C  SYNOPSIS
       COMMON / BIGCNS   /  BIGCNS
+C     ***
+
+C     ****c* header.f/BIGC(block)
+C  DESCRIPTION
+C     Singlet Wilson DIS coefficients  (big "C")
+C  SYNOPSIS
       COMMON / BIGC     /  BIGC
+C     ***
+
+C     ****c* header.f/GAMNS(block)
+C  DESCRIPTION
+C     Nonsinglet DIS anomalous dimensions 
+C  SYNOPSIS
       COMMON / GAMNS    /  GAMNS
+C     ***
+
+C     ****c* header.f/GAM(block)
+C  DESCRIPTION
+C     Singlet DIS anomalous dimensions 
+C  SYNOPSIS
       COMMON / GAM      /  GAM
+C     ***
+
+C     ****c* header.f/BIGCF2(block)
+C  DESCRIPTION
+C     DIS F2 Wilson coefficient 
+C  SYNOPSIS
       COMMON / BIGCF2   /  BIGCF2
+C     ***
 
+C     ****c* header.f/CGRIDNS(block)
+C  DESCRIPTION
+C     "Evolved" non-singlet DVCS Wilson coefficients
+C  SYNOPSIS
       COMMON / CGRIDNS  /  CGRIDNS
-      COMMON / CGRID    /  CGRID
-      COMMON / CGRIDDIS /  CGRIDDIS
-      COMMON / HGRID    /  HGRID
-      COMMON / MBGPD    /  MBGPD
+C     ***
 
-*     - FInal observables
+C     ****c* header.f/CGRID(block)
+C  DESCRIPTION
+C     "Evolved" singlet DVCS Wilson coefficients
+C  SYNOPSIS
+      COMMON / CGRID    /  CGRID
+C     ***
+
+C     ****c* header.f/CGRIDDIS(block)
+C  DESCRIPTION
+C     "Evolved" DIS F2 Wilson coefficients
+C  SYNOPSIS
+      COMMON / CGRIDDIS /  CGRIDDIS
+C     ***
+
+C     ****c* header.f/HGRID(block)
+C  DESCRIPTION
+C      Values of GPDs on MB contour for all needed -t (in principle)
+C      Maybe obsoleted by MBGPD
+C  SYNOPSIS
+      COMMON / HGRID    /  HGRID
+C     ***
+
+C     ****c* header.f/MBGPD(block)
+C  DESCRIPTION
+C     Values of GPDs on MB contour
+C  SYNOPSIS
+      COMMON / MBGPD    /  MBGPD
+C     ***
+
+*     ---- Final observables
+
+C     ****c* header.f/CFF(block)
+C  DESCRIPTION
+C     Compton form factor 
+C  SYNOPSIS
       COMMON / CFF      /  CFF
+C     ***
+
+C     ****c* header.f/F2(block)
+C  DESCRIPTION
+C     DIS F2 form factor
+C  SYNOPSIS
       COMMON / F2       /  F2
+C     ***

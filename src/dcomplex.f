@@ -13,18 +13,17 @@ C     ****f* dcomplex.f/DCTAN
 C  NAME
 C    DCTAN  --  tangent function
 C  SYNOPSIS
-C    DOUBLE COMPLEX FUNCTION DCTAN (Z)
-C
-C    DOUBLE COMPLEX Z
-C  PARENTS
-C     CFFF
-C  SOURCE
-C
 
       DOUBLE COMPLEX FUNCTION DCTAN (Z)
 
       IMPLICIT NONE
       DOUBLE COMPLEX Z
+
+C  PARENTS
+C     CFFF, HJ
+C  SOURCE
+C
+
       DOUBLE PRECISION SMALL, X2, Y2, SN2X, DEN
       DATA SMALL /1.0D-8/
 
@@ -61,16 +60,15 @@ C     ****f* dcomplex.f/DCARG
 C  NAME
 C     DCARG  --   argument of a complex number
 C  SYNOPSIS
-C     DOUBLE PRECISION FUNCTION DCARG (Z)
-C
-C     DOUBLE COMPLEX Z
-C  SOURCE
-C
 
       DOUBLE PRECISION FUNCTION DCARG (Z)
 
       IMPLICIT NONE
       DOUBLE COMPLEX Z
+
+C  SOURCE
+C
+
       DCARG = 0.0d0
       IF (DBLE(Z).NE.0.0d0 .OR. DIMAG(Z).NE.0.0d0) DCARG =
      &  ATAN2 (DIMAG(Z), DBLE(Z))

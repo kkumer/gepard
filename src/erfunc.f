@@ -10,38 +10,28 @@ C  NAME
 C     ERFUNCF  --   scale dependent part of the singlet evolution operator
 C  DESCRIPTION
 C    calculates scale dependent part of the singlet evolution operator
-C    i.e.  {\cal R}^{(n)}_{ab} - functions
-C    |latex \begin{eqnarray*}
-C    |latex {\cal R}^{(n)}_{ab}\equiv \beta_0{^{ab}\!R}_j(\mu,\mu_0|n)=
-C    |latex \frac{\beta_0}{
-C    |latex n \beta_0+{^{a}\! \lambda}_j-{^{b}\! \lambda}_j}\left[
-C    |latex 1- \left(\frac{\alpha_s(\mu_0)}{\alpha_s(\mu)}\right)^{\frac{n
-C    |latex \beta_0+{^{a}\! \lambda}_j-{^{b}\! \lambda}_j}{\beta_0}}
-C    |latex \right]
-C    |latex \end{eqnarray*}
+C    i.e.  {\cal R}^{(n)}_{jk} - functions, see formula in 
+C      Eq. (126) in [Kumericki:2007sa]
 C  SYNOPSIS
-C     SUBROUTINE ERFUNCF (R, LAM, ERFUNC1, ERFUNC2)
-C
-C     DOUBLE PRECISION R
-C     DOUBLE COMPLEX LAMB(2), ERFUNC1(2,2), ERFUNC2(2,2)
-C  INPUTS
-C           R -- ratio of astrong(mu)/astrong(mu0)
-C         LAM -- eigenvalues of LO evolution operator
-C  OUTPUT
-C     ERFUNC1 -- matrix {\mathcal R}(mu, mu0 | 1}_{ab}
-C     ERFUNC2 -- matrix {\mathcal R}(mu, mu0 | 2}_{ab}
-C  PARENTS
-C      EVOLF
-C  CHILDREN
-C      LAMBDAF
-C  SOURCE
-C
 
       SUBROUTINE ERFUNCF (R, LAMN, LAMK, ERFUNC1, ERFUNC2)
 
       IMPLICIT NONE
       DOUBLE PRECISION R
       DOUBLE COMPLEX LAMN(2), LAMK(2), ERFUNC1(2,2), ERFUNC2(2,2)
+
+C  INPUTS
+C         R -- ratio of astrong(mu)/astrong(mu0)
+C   LAMN(flav) -- eigenvalues of LO evolution operator at conformal moment n
+C   LAMK(flav) -- eigenvalues of LO evolution operator at conformal moment k
+C         
+C  OUTPUT
+C     ERFUNC1(flav,flav) -- matrix {\mathcal R}(mu, mu0 | 1}
+C     ERFUNC2(flav,flav) -- matrix {\mathcal R}(mu, mu0 | 2}
+C  PARENTS
+C      EVOLF, CB1F
+C  SOURCE
+C
       INTEGER A, B
       DOUBLE PRECISION RINV
       DOUBLE COMPLEX LAMNB(2), LAMKB(2)

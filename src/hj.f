@@ -1,6 +1,6 @@
 C     ****h* gepard/hj.f
 C  FILE DESCRIPTION
-C    calculates J-th conformal partial wave for DVCS
+C    conformal moments of GPD ansaetze
 C
 C    $Id: parwav.f 71 2007-04-18 20:39:48Z kkumer $
 C     *******
@@ -10,33 +10,26 @@ C     ****s* hj.f/HJ
 C  NAME
 C     HJ  --  conformal moment of input-scale singlet GPD  H_{J}
 C  DESCRIPTION
-C     returns H_{J} for various ansaetze
+C     returns H_{J} for various ansaetze, depending on the variable
+C     ANSATZ
 C  SYNOPSIS
-C     SUBROUTINE HJ(J, FCM)
-C
-C     DOUBLE COMPLEX J, FCM(2) 
-C  INPUTS
-C           J -- conformal moment
-C
-C    (Following parameters are inputs only for ANSATZ='FIT')
-C
-C     ALPHA0SEA, ALPHA0G -- intercepts of Regge trajectories for
-C                           "sea" quark and gluon GPDs/PDFs
-C               NSEA, NG -- normalization factors
-C             MSEA2, MG2 -- positions of DEL2 triple poles
-C  OUTPUT
-C         FCM -- input scale singlet GPD H_{J}
-C  PARENTS
-C     PARWAVF
-C  CHILDREN
-C     CLNGAMMA, CBETA, POCHHAMMER
-C  SOURCE
-C
 
       SUBROUTINE HJ(J, FCM)
 
       IMPLICIT NONE
       DOUBLE COMPLEX J, FCM(2) 
+
+C  INPUTS
+C           J -- conformal moment
+C  OUTPUT
+C         FCM -- input scale singlet GPD H_{J}
+C  PARENTS
+C     INITGPD, GETMBGPD
+C  CHILDREN
+C     CLNGAMMA, CBETA, POCHHAMMER
+C  SOURCE
+C
+
       DOUBLE COMPLEX HSEA, HU, HD
       DOUBLE PRECISION NORMS
       DOUBLE COMPLEX CLNGAMMA, CBETA, POCHSEA, POCHG, POCHHAMMER

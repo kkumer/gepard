@@ -5,37 +5,34 @@ C
 C    $Id$
 C     *******
 
-C     ****s* nd.f/NDNS
+C     ****s* nd.f/NDINTF
 C  NAME
-C        NDNS  --   R_1
+C        NDNINTF  --   non-diagonal part of evolution operator
 C  DESCRIPTION
-C     Calculation non-singlet R_1  (cf. my DIS-p61  for singlet case)
-C     - combination of gamma^(n) and beta_m needed in evolution operator 
+C     Non-diagonal part of evolution operator according to Eq. (143) in
+C     [Kumericki:2007sa]
 C  SYNOPSIS
-C     SUBROUTINE NDNS (K, R, CNDNS)
-C
-C     INTEGER K
-C     DOUBLE PRECISION R
-C     DOUBLE COMPLEX CNDNS
-C  INPUTS
-C           K -- Mellin-Barnes integration point index
-C           R -- ratio of astrong(mu)/astrong(mu0)
-C  OUTPUT
-C       CNDNS -- non-diagonally evolved Wilson coefficient
-C  PARENTS
-C      PARWAV
-C  CHILDREN
-C      CB1F, DCTAN
-C  SOURCE
-C
 
       SUBROUTINE NDINTF (K, R, NDINT, NI, NJ)
 
       IMPLICIT NONE
-      INTEGER  K, NI, NJ, ACCND, SPEEDND
+      INTEGER  K, NI, NJ
       DOUBLE PRECISION R
       DOUBLE COMPLEX NDINT
-      INTEGER L, NINTGNDMAX, NPTSND, NPTSNDMAX
+
+C  INPUTS
+C           K -- Mellin-Barnes integration point index
+C           R -- ratio of astrong(mu)/astrong(mu0)
+C  OUTPUT
+C       NDINT(NI,NJ) -- non-diagonal evolution operator matrix
+C  PARENTS
+C      EVOLF
+C  CHILDREN
+C      CB1F, INTEGRAF, DCTAN
+C  SOURCE
+C
+
+      INTEGER ACCND, SPEEDND, L, NINTGNDMAX, NPTSND, NPTSNDMAX
       DOUBLE COMPLEX EPH, EPHND
       DOUBLE COMPLEX J, ZK, CB1, CB1C
       DOUBLE COMPLEX DCTAN
@@ -96,7 +93,7 @@ C     ****
 
 C     ****s* nd.f/CB1F
 C  NAME
-C        CB1  --  
+C        CB1F  --  
 C  DESCRIPTION
 C     NLO non-diagonally evolved non-singlet LO Wilson coefficient.
 C     It's multiplied by GAMMA(3/2) GAMMA(K+3) / (2^(K+1) GAMMA(K+5/2))
@@ -104,22 +101,6 @@ C     so it's ready to be combined with diagonally evolved C_K = 1 + ...
 C     where in the end everything will be multiplied by 
 C     (2^(K+1) GAMMA(K+5/2))  / ( GAMMA(3/2) GAMMA(K+3) )
 C  SYNOPSIS
-C     SUBROUTINE CB1F (ZN, ZK, R,  CB1)
-C
-C     DOUBLE COMPLEX ZN, ZK, CB1
-C     DOUBLE PRECISION R
-C  INPUTS
-C          ZN -- non-diagonal evolution Mellin-Barnes integration point
-C          ZK -- COPE Mellin-Barnes integration point
-C           R -- ratio of astrong(mu)/astrong(mu0)
-C  OUTPUT
-C         CB1 -- Cnormalization(K)^-1 C_N  B^{(1)}_{N, K}
-C  PARENTS
-C      NDNS
-C  CHILDREN
-C      HS1, WgammaVNSP0F
-C  SOURCE
-C
 
       SUBROUTINE CB1F (ZN, ZK, R, CB1, NI, NJ)
 
@@ -127,6 +108,20 @@ C
       INTEGER NI, NJ
       DOUBLE COMPLEX ZN, ZK, CB1
       DOUBLE PRECISION R
+
+C  INPUTS
+C          ZN -- non-diagonal evolution Mellin-Barnes integration point
+C          ZK -- COPE Mellin-Barnes integration point
+C           R -- ratio of astrong(mu)/astrong(mu0)
+C  OUTPUT
+C         CB1 -- Cnormalization(K)^-1 C_N  B^{(1)}_{N, K}
+C  PARENTS
+C      NDINTF
+C  CHILDREN
+C      HS1, WgammaVNSP0F
+C  SOURCE
+C
+
       INTEGER A, B
       DOUBLE PRECISION NFD
       DOUBLE COMPLEX S1ORIG

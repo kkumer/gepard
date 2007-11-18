@@ -17,6 +17,7 @@ Open:
    (Thus, 'make all' probably doesn't work as intended.)
 
 -  houches still problematic for very large x_BJ. At input scale as well!
+   Related to that. Large x_BJ extension of integration should be automatic.
 
 
 Fixed:

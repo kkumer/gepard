@@ -1,10 +1,10 @@
 \providecommand{\href}[2]{#2}\begingroup\raggedright\begin{thebibliography}{1}
 
 \bibitem{Kumericki:2006xx}
-K.~Kumeri\v{c}ki, D.~M{\"{u}}ller, K.~Passek-Kumeri\v{c}ki and
-  A.~Sch{\"{a}}fer, {\it Deeply virtual {C}ompton scattering beyond
-  next-to-leading order: The flavor singlet case},
-  \href{http://arXiv.org/abs/hep-ph/0605237}{{\tt hep-ph/0605237}}.
+K.~Kumeri{\v c}ki, D.~M{\"u}ller, K.~Passek-Kumeri{\v c}ki and A.~Sch{\"a}fer,
+  {\it Deeply virtual {C}ompton scattering beyond next-to-leading order: The
+  flavor singlet case},  \href{http://arXiv.org/abs/hep-ph/0605237}{{\tt
+  hep-ph/0605237}}.
 %%CITATION = HEP-PH 0605237;%%
 
 \bibitem{vanNeerven:2000uj}
@@ -24,8 +24,20 @@ A.~Vogt, {\it Efficient evolution of unpolarized and polarized parton
 M.~Abramowitz and I.~A. Stegun, {\em Handbook of Mathematical Functions}.
 \newblock Dover, 1965.
 
+\bibitem{Kumericki:2007sa}
+K.~Kumeri{\v c}ki, D.~M{\"u}ller and K.~Passek-Kumeri{\v c}ki, {\it Towards a
+  fitting procedure for deeply virtual {C}ompton scattering at next-to-leading
+  order and beyond},  \href{http://arXiv.org/abs/hep-ph/0703179}{{\tt
+  hep-ph/0703179}}.
+%%CITATION = HEP-PH/0703179;%%
+
 \bibitem{Minuit}
 F.~James, {\em Minuit reference manual, version 94.1}.
 \newblock CERN, 1994.
+
+\bibitem{Giele:2002hx}
+W.~Giele {\em et.~al.}, {\it The {QCD/SM} working group: Summary report},
+  \href{http://arXiv.org/abs/hep-ph/0204316}{{\tt hep-ph/0204316}}.
+%%CITATION = HEP-PH 0204316;%%
 
 \end{thebibliography}\endgroup

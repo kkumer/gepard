@@ -8,16 +8,17 @@ C     *******
 C     ****s* readpar.f/READPAR
 C  NAME
 C        READPAR -- reads parameters from file GEPARD.INI
+C  DESCRIPTION
+C     (See gepard.pdf or provided self-documented GEPARD.INI for meaning
+C     of each parameter.)
 C  SYNOPSIS
-C     SUBROUTINE READPAR
-C  IDENTIFIERS
-C     (see gepard.pdf or provided self-documented GEPARD.INI)
-C  PARENTS
-C      AUXTEST, TEST, RADCORR, SCALEDEP, FIT
-C  SOURCE
-C
 
       SUBROUTINE READPAR
+
+C  PARENTS
+C      FIT
+C  SOURCE
+C
 
       IMPLICIT NONE
       INCLUDE 'header.f'

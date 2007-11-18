@@ -11,31 +11,18 @@ C     INITC  --  initialize "evolved" Wilson coefficients
 C            
 C  DESCRIPTION
 C    Reads experimental datasets and calculates evolved
-C    Wilson coefficients for all needed Q2 values
+C    Wilson coefficients for all needed Q2 values i.e.
+C    Wilson coefficients multiplied by evolution operator
 C  SYNOPSIS
-C     SUBROUTINE INITC
-C
-C  INPUTS 
-C                NPAR  --  Number of variable parameters
-C                   A  --  Values of all parameters
-C               IFLAG  --  If .EQ. 3 then print results out, see minuit doc
-C  OUTPUT
-C                   F  --  Value of chi-square
-C  IDENTIFIERS
-C     FITPAR  --  Equal to A
-C  CHISQPART  --  chi-square produced by single data set
-C
-C  CHILDREN
-C      PROCDATA, PGPLOT routines
-C
-C  PARENTS
-C      MINUIT, FIT (via MINUIT)
-C
-C  SOURCE
-C
-
 
       SUBROUTINE INITC
+
+C  CHILDREN
+C      LOOKUPQ
+C  PARENTS
+C      FIT
+C  SOURCE
+C
 
       IMPLICIT NONE
       INTEGER NN, K, QIND, XPANELS, YPANELS, LOC

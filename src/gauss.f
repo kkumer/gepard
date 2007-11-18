@@ -15,22 +15,20 @@ C     integration, according to Abramowitz and Stegun Eq. (25.4.30)
 C     AMAX = 64 at the moment.
 C     All numbers below produced by Mathematica.
 C  SYNOPSIS
-C     SUBROUTINE GAUSS (ABS, WGH)
-C
-C     INTEGER A
-C     DOUBLE PRECISION ABSC(6, 64), WGHT(6, 64)
-C  OUTPUT
-C      ABS  -- Abscissas
-C      WGH  -- Weights
-C  PARENTS
-C      INIT, PARSIGMA
-C  SOURCE
-C
 
       SUBROUTINE GAUSS (ABSC, WGHT)
  
       IMPLICIT NONE
       DOUBLE PRECISION ABSC(6, 64), WGHT(6, 64)
+
+C  OUTPUT
+C      ABS  -- Abscissas
+C      WGH  -- Weights
+C  PARENTS
+C      INTEGRAF
+C  SOURCE
+C
+
       DOUBLE PRECISION ABSCDT(6, 32), WGHTDT(6, 32)
       INTEGER A, I, HLF
   

@@ -9,8 +9,11 @@ Computing:
 -  use autoconf and friends
 -  MSBND -> MSBAR, MSBAR -> MSBDI
 -  Automatize putting Alekhin's PDFs into fitpdfs
+-  We don't need both HGRID and MBGPD, it seems.
+-  deriv.f should be copyright-cleared
 
 Checks:
+-  Check F_2 of DIS beyond LO (compare to Vogt etc.). Why is BIGCF2 \neq CDIS2
 -  Check plotting of error-bars (Implement stat-syst as in 
    original papers and Dieter's femtoholographic paper?)
    It seems that grace is doing this wrong for log-y axis!

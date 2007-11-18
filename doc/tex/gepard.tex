@@ -4,7 +4,10 @@
 
 \usepackage{a4wide}
 \usepackage{graphicx}
+\usepackage{color}       
+\usepackage{bold-extra} %for bold typewriter fonts, needs [CTAN]/fonts/cm/mf-extra/bold
 \usepackage{amsmath}
+\usepackage[colorlinks=true,citecolor=blue,linkcolor=blue]{hyperref}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Macros for comments
@@ -33,6 +36,14 @@ $\sharp$\thecomment:} #1]}}
 \begin{quote}\renewcommand{\baselinestretch}{1}
 \ttfamily\small$\blacktriangleright$ \textbf{\underline{Reply} $\sharp$\thecomment:}}%
 {\end{quote}}
+
+
+\definecolor{defbox}{gray}{0.85} 
+
+\newcommand{\defboxitem}[3]{ {\ttfamily \bfseries #1[}\emph{#2}{\ttfamily \bfseries ]} & #3 }
+\newcommand{\optboxitem}[3]{ {\ttfamily \bfseries #1} & {\ttfamily \bfseries #2 } & #3 }
+\newcommand{\mmacomm}[1]{ {\ttfamily \bfseries #1} }
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{document}
@@ -194,7 +205,8 @@ speed turns out to be insufficient.
 \end{commblock}
 
 
-\subsection{Ansatz for GPD $\mbox{\boldmath $H$}_{j} (\xi,\Delta^2,\mathcal{Q}_{0}^2)$}
+%\subsection{Ansatz for GPD $\mbox{\boldmath $H$}_{j} (\xi,\Delta^2,\mathcal{Q}_{0}^2)$}
+\subsection{Ansatz for GPD}
 \label{ssect:ansatz}
 
 User has to provide values of moments of GPDs $\mbox{\boldmath $H$}_{j} 
@@ -288,25 +300,31 @@ Only the first column is read by the program and it contains
 values of internal Fortran variables specified in the second column and
 shortly described in the third one. 
 Columns two and three are just convenient reminders for the user. 
-
+Only the first column is read by subroutine \texttt{READPAR} and the
+order of entries should correspond to code in that subroutine.  
 \begin{figure}[t]
 \begin{center}
 \hrule
 \begin{verbatim}
 
-    1          SPEED        1(most accurate), 2 or 4(fastest)
-    3          ACC          Gaussian subintegrations are done on 2**ACC points 
-    1          P            N^{P}LO order (0, 1 or 2)
-    3          NF           number of active flavours
-    1          CZERO        Put to zero to kill LO result
-    1.0        RF2          ratio {\cal Q}^2/{\mu_{f}^2}
-    1.0        RR2          ratio {\cal Q}^2/{\mu_{r}^2}
-    0.5        C            MB integration contour crosses real axis here
-    1.9        PHI          angle MB contour makes with positive real axis
-    -0.25      CND          same as C, but for ND evolution MB contour
-    1.58       PHIND        same as PHI, for ND evolution MB contour
-    'CSBAR'    SCHEME       'CSBAR', 'MSBAR', 'MSBLO', 'MSBND', 'EVOLG', ...
-    'FIT'      ANSATZ       GPD ansatz (see parwav.f subroutine HJ)
+2          SPEED        1(most accurate), 2 or 3(fastest)
+3          ACC          Gaussian subintegrations are on 2**ACC points 
+1          P            N^{P}LO order (0, 1 or 2)
+4          NF           number of active flavours
+1          CZERO        Put to zero to kill LO result
+2.5        MU02         scale at which a_strong below is defined
+0.0606     ASP(0)       LO  astrong(MU02)/(2 pi)
+0.0518     ASP(1)       NLO  astrong(MU02)/(2 pi)
+0.0488     ASP(2)       NNLO  astrong(MU02)/(2 pi)
+4.0        Q02          GPD input scale
+1.0        RF2          ratio {\cal Q}^2/{\mu_{f}^2}
+1.0        RR2          ratio {\cal Q}^2/{\mu_{r}^2}
+0.5        C            MB integration contour crosses real axis here
+1.956      PHI          angle MB contour makes with positive real axis
+-0.25      CND          same as C, but for ND evolution MB contour
+1.57       PHIND        same as PHI, for ND evolution MB contour
+'CSBAR'    SCHEME       'CSBAR', 'MSBAR', 'MSBLO', 'MSBND', 'EVOLG', ...
+'FIT'      ANSATZ       GPD ansatz label. Usually FIT, SPLICE or MMA
 
 \end{verbatim}
 \hrule
@@ -319,7 +337,7 @@ Columns two and three are just convenient reminders for the user.
 \begin{itemize}
 \item
 \texttt{SPEED} --- \emph{Integer}. Controls the speed and accuracy of the execution. Values can
-presently be only 1, 2, and 4, where 1 is the most accurate and at the
+presently be only 1, 2, 3 and 4, where 1 is the most accurate and at the
 same time the slowest case.
 As described in Section \ref{ssect:Integration}, \texttt{SPEED} controls the number
 of segments in which Mellin-Barnes integration contour is divided before 8-point
@@ -331,7 +349,8 @@ value of \texttt{SPEED}.
 
 Analysis of how accurate are results for varius \texttt{SPEED} settings can
 be found in section \ref{sec:tests}. In the present version of \texttt{gepard},
-\texttt{SPEED=4} is rather unreliable.
+\texttt{SPEED=4} is rather unreliable, and in practice maximal sensible
+value of \texttt{SPEED} is 3.
 
 \item
 \texttt{P} --- \emph{Integer}. Perturbation theory approximation level. 0 = LO, 1 = NLO, and
@@ -346,15 +365,26 @@ be found in section \ref{sec:tests}. In the present version of \texttt{gepard},
 \item
 \texttt{CZERO} --- \emph{Integer}. This multiplies $\alpha_{s}^{0}$ i. e. LO result.
   Should normally be 1, but can be put to 0, so one can get NLO \emph{correction},
-  instead of \emph{prdediction}, from the routines.
+  instead of \emph{prediction}, from the routines.
+
+\item
+\texttt{MU02} --- \emph{Double precision}. $\mu_{0}^2$ scale at which
+$\alpha_s$ input value is specified
+
+\item
+\texttt{ASP(0)}, \texttt{ASP(1)}, \texttt{ASP(2)} --- 
+\emph{Double precision}. LO, NLO and NNLO $\alpha_{s}(\mu_{0}^2)/(2\pi)$.
+
+\item
+\texttt{Q02} --- \emph{Double precision}. Input GPD scale ${\cal Q}_{0}^2$.
 
 \item
 \texttt{RF2} --- \emph{Double precision}. $ {\cal Q}^2/{\mu_{f}^2}$ i.e. ratio
-of photon virtuality and factorization scales squared
+of photon virtuality and factorization scales squared.
 
 \item
 \texttt{RR2} --- \emph{Double precision}. $ {\cal Q}^2/{\mu_{r}^2}$ i.e. ratio
-of photon virtuality and renormalization scales squared
+of photon virtuality and renormalization scales squared.
 
 \item
 \texttt{C, PHI} --- \emph{Double precision}. Intercept $c$, and angle $\phi$ of
@@ -372,15 +402,30 @@ Can presently be
 \item \texttt{'MSBND'}: $\overline{MS}$, including non-diagonal evolution
 \item \texttt{'MSBAR'}: $\overline{MS}$, excluding non-diagonal evolution
 \item \texttt{'MSBLO'}: $\overline{MS}$, evolution is LO only
+\item \texttt{'EVOLQ'}: $\mbox{\boldmath $C$} = (1,0)$ to all orders
+\item \texttt{'EVOLG'}: $\mbox{\boldmath $C$} = (0,1)$ to all orders
 \end{itemize}
+Last two are not really renormalization schemes, but just a way to calculate
+just a GPD or PDF evolution, without multiplying with Wilson coefficients.
+For example, scheme \texttt{'EVOLG'} is used in Sect. \ref{sec:tests} to calculate
+evolution of Les Houches benchmark PDFs.
 
 \item
 \texttt{ANSATZ} --- \emph{Character*6}. Label of ansatz for conformal moments of GPDs on input scale. 
-It should correspond to one  \texttt{IF\ldots ELSE IF} stanza in subroutine
-\texttt{HJ} in file \texttt{parwav.f}. Defaultly implemented ansaetze are
+It should correspond to one of  \texttt{IF\ldots ELSE IF} stanzas in subroutine
+\texttt{HJ} in file \texttt{hj.f}. Defaultly implemented ansaetze are
 \texttt{TOY} (used in some old development Mathematica notebooks), \texttt{SOFT} and \texttt{HARD},
-corresponding to ansaetze from \cite{Kumericki:2006xx}, and \texttt{FIT}, corresponding
-to ansatz used for fitting, see description of \texttt{MINUIT.CMD} below.
+corresponding to ansaetze from \cite{Kumericki:2006xx}, \texttt{FITBP}, corresponding
+to ansatz used in \cite{Kumericki:2007sa}, and \texttt{FIT}, corresponding to a new
+expeimental ansatz including subleading partial wave.
+
+There are also two special values for \texttt{ANSATZ}. First is \texttt{ANSATZ = 'MMA'}, which
+can be used if Mathematica interface is active , which
+means that values for GPD will be obtained from the ansatz function defined within
+Mathematica (see Sect. \ref{sec:mma}). Second is \texttt{ANSATZ = 'SPLICE'}, which
+means that GPD is defined in subroutine \texttt{SPLICE} in file \texttt{splice.f}. This
+subroutine is automatically created by splicing Fotran code of GPD function originally
+defined within Mathematica, but is independent of Mathematica interface (see Sect. \ref{sec:mma}).
 
 \end{itemize}
 
@@ -456,7 +501,7 @@ values depend on your installation of PGPLOT. Some useful values are
   \end{itemize}
 On one physical page graphs will be arranged on a grid \texttt{XPANELS} 
 $\times$ \texttt{YPANELS}.
-If PGPLOT is not used, this line is ignored but have to be present and formatted correctly.
+If PGPLOT is not used, this line is ignored but has to be present and formatted correctly.
 
 \item
 Other lines (\texttt{DATAFNAME}) --- \emph{Character*20}. Names of
@@ -748,6 +793,195 @@ Although they are irrelevant now, they should be made as
 \end{itemize}
 
 
+
+\section{Mathematica interface}
+\label{sec:mma}
+
+
+\subsection{High level functions}
+
+Main ``high level'' functions for accessing Gepard from mathematica are following:
+
+\begin{flushleft}
+\colorbox{defbox}{%
+\begin{minipage}{\textwidth}%
+\begin{tabular}{rp{8cm}}%
+\defboxitem{GepardFit}{ \{par1, par2, \ldots\}, options}{Simple fitting of data to 
+variable parameters \{par1, par2, \ldots\}} \\[0.8ex]
+\defboxitem{JustCali3}{ \{par1, par2, \ldots\}, options}{Just prints out initial chi-square without
+any fitting. Useful for checking ansaetze and debugging}\\[0.8ex]
+\defboxitem{cffH}{xi, t, q2, q02, options}{Returns singlet Compton form factor
+$\mathcal{H}(xi=\xi, t=\Delta^2, q2=\mathcal{Q}^2, q02=\mathcal{Q}_{0}^2)$\footnote{
+This function is not reliable at the moment. There are some discrepancies I don't
+understand yet. See last section of fit.nb notebook.}.} 
+\end{tabular}%
+\end{minipage}}\\[0.5ex]
+{\small High level functions available in \emph{Mathematica} interface.}
+\end{flushleft}
+
+Parameters controlling detailed behavior of these functions are specified in
+the usual \texttt{GEPARD.INI} file, but important subset of these parameters can
+be overriden by \emph{options}:
+
+\begin{flushleft}
+\colorbox{defbox}{%
+\begin{minipage}{\textwidth}%
+\begin{tabular}{llp{8cm}}%
+\emph{option name} & \emph{default value} & \\ \hline
+\optboxitem{SPEED}{\emph{in GEPARD.INI}}{speed of execution} \\
+\optboxitem{P}{\emph{in GEPARD.INI}}{order of perturbation series N$^{P}$LO}\\
+\optboxitem{SCHEME}{\emph{in GEPARD.INI}}{factorization scheme (CSBAR, MSBND, \ldots)}\\
+\optboxitem{ANSATZ}{\emph{in GEPARD.INI}}{ansatz used (MMA, SPLICE, FIT, \ldots)}
+\end{tabular}%
+\end{minipage}}\\[0.5ex]
+{\small Options of \mmacomm{GepardFit}, \mmacomm{JustCali3} and \mmacomm{cffH}.}
+\end{flushleft}
+
+All of these functions expect that user has provided ansatz for GPDs and PDFs
+in one of the three following ways, denoted by the corresponding setting
+of parameter 'ANSATZ' and ordered by decreasing flexibility and increasing speed:
+
+\begin{description}
+\item[\texttt{MMA}] 
+Moments of GPDs and PDFs have to be defined as a Mathematica two-element vector function
+\mmacomm{GPDMom[j\_,t\_,xi\_]} = \{\mmacomm{GPDMomQ}, \mmacomm{GPDMomG} \}  where 
+\mmacomm{GPDMomQ} and \mmacomm{GPDMomG} are expressions for (singlet) quark and gluon GPDs
+depending, apart from explicit arguments $j$, $t$, and $xi$, only on
+parameters \mmacomm{PAR[n]}, where $n$ corresponds to the first column of the \mmacomm{Parameters}
+array described below. (Same for PDFs with \mmacomm{GPD}$\to$\mmacomm{PDF} above.) 
+After defining this function, it has to be compiled by issuing command \mmacomm{CompileMoments[]}.
+
+\item[\texttt{SPLICE}] 
+One defines moments in exactly the same way as in point 1 above, but then, instead of compiling
+them, one transforms them into Fortran form, and puts them into Fortran subroutine
+\texttt{SPLICE}. This is automatized by function \mmacomm{SpliceToFortran}. Resulting code
+is 10 times faster, but one is limited to ansaetze which can be expressed in terms of available
+Fortran functions (log-exp, trigonometric, hyperbolic), or one needs to write some
+Fortran code defining required additional functions. Also, after issuing \mmacomm{SpliceToFortran}
+one musts recompile Gepard (which usually means just issuing command '\emph{make gepard.exe}')
+and reload gepard.exe (which usually means just reevaluating $\langle\langle<<$~\emph{gepard.m}).
+
+\item[\texttt{FIT}] 
+One writes explicitly Fortran code in subroutine 'HJ', following examples there. This
+is usually not much faster than 'SPLICE', but can be used to put at ones disposal
+many different ansaetze at the same time, by just using additional names.
+(At the moment, name 'FIT' denotes the same ansatz as defined in example notebook fit.nb,
+name 'FITBP' denotes ansatz used in ``big paper'', 'HARD' and 'SOFT' denote ansaetze used in
+PLB paper etc.)
+\end{description}
+
+Apart from speed, one advantage of ansaetze 'SPLICE' and 'FIT' is that they are
+available to pure Fortran fitting without Mathematica.
+
+\begin{flushleft}
+\colorbox{defbox}{%
+\begin{minipage}{\textwidth}%
+\begin{tabular}{rp{8cm}}%
+\defboxitem{CompileMoments}{}{Creates ANSATZ 'MMA' with compiled Mathematica 
+functions \mmacomm{GPD} and \mmacomm{PDF} called by Fortran via MathLink.} \\[0.8ex]
+\defboxitem{SpliceToFortran}{path, substitutions}{Creates ANSATZ `SPLICE' by
+creating  Fortran subroutine `SPLICE` with Fortran expressions for ansatz.
+\emph{path} is path to gepard/src directory, and 
+\emph{substitutions} is a list of replacement rules which should take care of some 
+differences in names of Mathematica and Fortran variables and functions.} 
+\end{tabular}%
+\end{minipage}}\\[0.5ex]
+{\small Functions creating ansaetze from Mathematica expressions.}
+\end{flushleft}
+
+\subsection{Parameters}
+
+Additionally to ansatz, user has to specify parameters on which ansatz depends and
+which will be varied during the fitting process. These parameters must be collected
+in the 2D matrix \mmacomm{Parameters} where each row has six entires defining one 
+parameter in the form expected by Minuit:
+
+\vspace*{2ex}
+
+\begin{tabular}[h]{|c|c|c|c|c|c|}
+\hline
+\emph{ID} & \emph{name} & \emph{starting value} & \emph{step} & \emph{lower bound} & 
+\emph{upper bound} \\
+\hline
+\end{tabular}
+
+\vspace*{2ex}
+
+'ID' must be integer, 'name' string of maximally 10 characters, and other are real numbers.
+Lower and upper bounds should preferably be 0.0, which means that parameter is unbounded.
+See Minuit manual for details.
+
+\subsection{Low level functions}
+
+High level functions are just a canned sequences of low level functions which can
+be used for finer control over the whole process. Here is just a list with
+descriptions. For details, see example notebook 'fit.nb', especially section ``Advanced fitting''.
+
+
+\begin{flushleft}
+\colorbox{defbox}{%
+\begin{minipage}{\textwidth}%
+\begin{tabular}{rp{8cm}}%
+\defboxitem{GepardInit}{options}{Initializes Gepard parameters by first reading GEPARD.INI
+and then taking into account \emph{options} which are the same as for 
+\mmacomm{GepardFit}. } \\[0.8ex]
+\defboxitem{MinuitInit}{integer}{Initializes Minuit, initializes COMMON blocks with evolved
+Wilson coefficients and returns coordinates on Mellin-Barnes contour. \emph{integer} is
+presently ignored.} \\[0.8ex]
+\multicolumn{2}{l}{\mmacomm{MinuitSetParameter[}\emph{id, pname, vstart, step, lo, hi}
+\mmacomm{]} } \\
+ & Declares Minuit parameter by forwarding arguments to subroutine MNPARM \\[0.8ex]
+\defboxitem{MinuitCommand}{string}{sends to Minuit the command \emph{string} by
+forwarding it to subroutine MNCOMD. } \\[0.8ex]
+\end{tabular}%
+\end{minipage}}\\[0.5ex]
+{\small Functions controlling fitting procedure. First three should probably not be
+used directly at all, but only by calling high level functions.}
+\end{flushleft}
+
+
+\begin{flushleft}
+\colorbox{defbox}{%
+\begin{minipage}{\textwidth}%
+\begin{tabular}{rp{8cm}}%
+\defboxitem{PrettyStatus}{}{Prints out current fitting result (chi-square, values of
+arameters,\ldots) in a nicely formatted form.} \\[0.8ex]
+\defboxitem{MinuitStatus}{}{Returns current status of minimization in form of a 
+list {chi-square, quality of covariance matrix: 0-3}} \\[0.8ex]
+\defboxitem{MinuitGetParameter}{ID}{Returns the current value of a parameter
+number \emph{ID} by calling Minuit subroutine MNPOUT. It returns list 
+\{\emph{value}, \emph{error estimate}, \emph{internal parameter number} (or \emph{zero} if
+constant/fixed, or negative if undefined)\}. } \\[0.8ex]
+\defboxitem{ParameterID}{symbol}{Returns parameter number (ID) of a parameter
+with name \emph{symbol} (not string!), as specified by array Parameters.} \\[0.8ex]
+\end{tabular}%
+\end{minipage}}\\[0.5ex]
+{\small Functions for displaying results I.}
+\end{flushleft}
+
+
+\begin{flushleft}
+\colorbox{defbox}{%
+\begin{minipage}{\textwidth}%
+\begin{tabular}{rp{8cm}}%
+\defboxitem{GPD}{flavor, x, t, xi}{Gives value of x-space GPDs (flavor: 1=Q, 2=G). 
+It relies on moments \mmacomm{GPDcurrent[j,t,xi]} which are set up automatically
+by calling \mmacomm{GepardFit}, \mmacomm{JustCali3} or \mmacomm{PrettyStatus}, and can
+be set up manually using ansatz and parameter values. Not to be confused with
+\mmacomm{GPD[\{val1, val2, ...\}, t, xi]} which provides ansatz. (Should use
+different names in the future.)} \\[0.8ex]
+\defboxitem{plotPDFs}{}{Plots GPD[flavor, x, 0, 0] for flavor 1=Q (blue) 
+or 2=G (red).} \\[0.8ex]
+\defboxitem{slope}{flavor, x}{GPD slope at x} \\[0.8ex]
+\defboxitem{plotslopes}{}{Plots GPD slope as a function of x for flavor 1=Q (blue) and
+ 2=G (red).} \\[0.8ex]
+\defboxitem{ChiSquareProbability}{dof, chisq}{Gives probability that chi-square
+for a system with \emph{dof} degrees of freedom will be larger than or equal to \emph{chisq}.}
+\end{tabular}%
+\end{minipage}}\\[0.5ex]
+{\small Functions for displaying results II.}
+\end{flushleft}
+
 \section{Algorithmic structure of \texttt{gepard} and its subroutines}
 
 Calling graph of subroutines for executable \texttt{fit} is displayed on
@@ -770,9 +1004,9 @@ is not yet completely updated.
 
 
 %\bibliographystyle{h-physrev4}
-\bibliographystyle{$HOME/tex/inputs/JHEP-2}
+\bibliographystyle{JHEP-2}
 %\bibliographystyle{mynatbib}
-\bibliography{$HOME/Lit/kkumer}
+\bibliography{/home/kkumer/Lit/kkumer}
 
 
 

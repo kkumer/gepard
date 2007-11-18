@@ -11,33 +11,25 @@ C     ****s* bigcns.f/BIGCNSF
 C  NAME
 C     BIGCNSF  --  "big C" Wilson coefficients (non-singlet)
 C  DESCRIPTION
-C    calculates Wilson coefficients for DVCS in CSbar scheme
-C    according to KMKPS06 paper.
+C    calculates Wilson coefficients for nonsinglet DVCS in 
+C    MSbar and CSbar scheme, according to formulas in
+C    [Kumericki:2007sa]: 
+C          Eqs. (127) for MSbar and (91b-c) for CSbar
 C  SYNOPSIS
-C     SUBROUTINE BIGCNSF (K)
-C
-C  INPUTS
-C           J -- conformal moment
-C  OUTPUT
-C       BIGC0 -- vector of two C^{(0)} (quark and gluon) Wilson 
-C                coefficients (trivially equal to (1,0))
-C       BIGC1 -- vector  C^{(1)} 
-C       BIGC2 -- vector  C^{(2)} 
-C  IDENTIFIERS
-C       BETABLK, WGAMMA, WC -- common blocks with beta function coefficients
-C       of QCD, and J-th moments of anomalous dimensions and Wilson 
-C       coefficients of DIS, initialized by subroutine INIT
-C  PARENTS
-C      INIT
-C  CHILDREN
-C      VECMAT, HS1, HS2
-C  SOURCE
-C
 
       SUBROUTINE BIGCNSF ( K )
 
       IMPLICIT NONE
       INTEGER K
+
+C
+C  INPUTS
+C           K -- conformal moment index
+C  PARENTS
+C      INIT
+C  SOURCE
+C
+
       DOUBLE PRECISION LRF2, LRR2
       DOUBLE COMPLEX J, HS1, HS2
       DOUBLE COMPLEX SHIFT1, SHIFT2

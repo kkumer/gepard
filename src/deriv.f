@@ -14,11 +14,13 @@ C     DERIV  --   derivative of a function
 C  DESCRIPTION
 C    calculates derivative using Ridders-Neville's algorithm
 C  SYNOPSIS
-C     SUBROUTINE DERIV(FUNC, X, H, NEVALS, DRV, ERR)
-C
-C     INTEGER NEVALS
-C     DOUBLE PRECISION FUNC, X, H, DRV, ERR
-C     EXTERNAL FUNC
+
+      SUBROUTINE DERIV(FUNC, X, H, NEVALS, DRV, ERR)
+
+      IMPLICIT NONE
+      INTEGER NEVALS
+      DOUBLE PRECISION FUNC, X, H, DRV, ERR
+
 C  INPUTS
 C        FUNC --  function to be differentiated. Should be
 C                 declared EXTERNAL in the calling program
@@ -38,12 +40,7 @@ C       SCALEDEP
 C  SOURCE
 C
 
-      SUBROUTINE DERIV(FUNC, X, H, NEVALS, DRV, ERR)
-
-      IMPLICIT NONE
-      INTEGER NEVALS
       INTEGER I, J
-      DOUBLE PRECISION FUNC, X, H, DRV, ERR
       DOUBLE PRECISION CON, CON2, BIG, SAFE
       DOUBLE PRECISION ERRT, FAC, HH, A(NEVALS, NEVALS)
       PARAMETER (CON=1.4d0, CON2=CON*CON, BIG=1.d30, SAFE=2.0d0)

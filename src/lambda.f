@@ -14,25 +14,23 @@ C    calculates eigenvalues of the LO singlet anomalous dimensions
 C    matrix using Dieter's trick for treating the square-root cut
 C    in complex plane
 C  SYNOPSIS
-C     SUBROUTINE LAMBDAF (K, LAM)
-C
-C     INTEGER K
-C     DOUBLE COMPLEX LAM(2)
-C  INPUTS
-C           K -- Mellin-Barnes integration point index
-C  OUTPUT
-C         LAM -- eigenvalues (LAM(1) is "+" and LAM(2) 
-C                 is "-" eigenvalue)
-C  PARENTS
-C      PROJECTORSF, ERFUNCF
-C  SOURCE
-C
 
       SUBROUTINE LAMBDAF (K, LAM)
 
       IMPLICIT NONE
       INTEGER K
       DOUBLE COMPLEX LAM(2)
+
+C  INPUTS
+C           K -- Mellin-Barnes integration point index
+C  OUTPUT
+C         LAM -- eigenvalues (LAM(1) is "+" and LAM(2) 
+C                 is "-" eigenvalue)
+C  PARENTS
+C      PROJECTORSF, EVOLF
+C  SOURCE
+C
+
       DOUBLE COMPLEX AUX
       INCLUDE 'header.f'
 
@@ -59,25 +57,24 @@ C    calculates eigenvalues of the LO singlet anomalous dimensions
 C    matrix using Dieter's trick for treating the square-root cut
 C    in complex plane - version needed for non-diagonal evolution only
 C  SYNOPSIS
-C     SUBROUTINE LAMBDAF (K, LAM)
-C
-C     INTEGER K
-C     DOUBLE COMPLEX LAM(2)
-C  INPUTS
-C           K -- Mellin-Barnes integration point index
-C  OUTPUT
-C         LAM -- eigenvalues (LAM(1) is "+" and LAM(2) 
-C                 is "-" eigenvalue)
-C  PARENTS
-C      PROJECTORSF, ERFUNCF
-C  SOURCE
-C
-
+      
       SUBROUTINE LAMBDANDF (GAMN, GAMK, LAMN, LAMK)
 
       IMPLICIT NONE
-      INTEGER K1
       DOUBLE COMPLEX GAMN(2,2), GAMK(2,2), LAMN(2), LAMK(2)
+
+C  INPUTS
+C        GAMN -- anomalous matrix for conformal moment n
+C        GAMK -- anomalous matrix for conformal moment k
+C  OUTPUT
+C        LAMN -- eigenvalues of GAMN 
+C        LAMK -- eigenvalues of GAMK 
+C  PARENTS
+C      CB1F
+C  SOURCE
+C
+
+      INTEGER K1
       DOUBLE COMPLEX AUX
       INCLUDE 'header.f'
 

@@ -5,36 +5,31 @@ C
 C    $Id: parwav.f 71 2007-04-18 20:39:48Z kkumer $
 C     *******
 
-C     ****s* parwav.f/PARWAVF
+C     ****s* evolc.f/EVOLC
 C  NAME
-C     PARWAVF  --  J-th conformal partial wave for DVCS and DIS
+C     EVOLC  --  "evolved" Wilson coefficients
 C  DESCRIPTION
-C    calculates J-th conformal partial wave FPW i.e. 
-C    |latex $\vec{C}_j \cdot \vec{H}_j$
-C    |html  &nbsp; &nbsp;&nbsp;&nbsp;&nbsp; <b><i>C</i></b><sub>j</sub> <b>. <i>H</i></b><sub>j</sub>
-C    (together with evolution), and in DVCS case together with
-C    prefactor Gamma(5/2+J) / Gamma(3+J)
+C      Calculates "evolved" Wilson coefficients  for both singlet and
+C      nonsinglet DVCS and DIS, which means that Wilson coefficients are
+C      multiplied by evolution operator.
+C   
 C  SYNOPSIS
-C     SUBROUTINE PARWAVF (K, FPW, PROCESS)
-C
-C     INTEGER K
-C     DOUBLE COMPLEX FPW
-C     CHARACTER PROCESS*4
-C  INPUTS
-C           K -- Mellin-Barnes integration point index
-C  OUTPUT
-C         FPW -- partial wave
-C  PARENTS
-C      CFFF, F2F
-C  CHILDREN
-C      AS2PF, EVOLF, HJ
-C  SOURCE
-C
 
       SUBROUTINE EVOLC ( QIND )
 
       IMPLICIT NONE
-      INTEGER K,  QIND
+      INTEGER QIND
+
+C  INPUTS
+C        QIND -- index of actual Q2 value in QS or QSDIS array
+C  PARENTS
+C      INITC
+C  CHILDREN
+C      AS2PF, EVOLF
+C  SOURCE
+C
+
+      INTEGER K
       INTEGER ORD, L, K1
       DOUBLE PRECISION R, ASQ02, ASMUR2, ASMUF2
       DOUBLE COMPLEX CEVNS, CNDNS, CEV(2)

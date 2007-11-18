@@ -1,7 +1,6 @@
 C     ****h* gepard/msbar.f
 C  FILE DESCRIPTION
-C    calculation of  Wilson coefficients for DVCS in MSbar scheme
-C    according to KMKPS06 paper
+C    calculation of  singlet Wilson coefficients for DVCS in MSbar scheme
 C
 C    $Id$
 C     *******
@@ -9,22 +8,22 @@ C     *******
 
 C     ****s* msbar.f/MSBARF
 C  NAME
-C     MSBARF  --   Wilson coefficients (in MSbar scheme)
+C     MSBARF  --   singlet Wilson coefficients (in MSbar scheme)
 C  DESCRIPTION
-C    calculates Wilson coefficients for DVCS in MSbar scheme
-C    according to KMKPS06 paper
+C    calculates singlet Wilson coefficients for DVCS in MSbar scheme
+C    according to formula Eqs. (127) and (129) of [Kumericki:2007sa]
 C  SYNOPSIS
-C     SUBROUTINE MSBARF (J, BIGC0, BIGC1)
-C
-C     DOUBLE COMPLEX J, BIGC0(2), BIGC1(2)
+
+      SUBROUTINE MSBARF ( K, BIGCTMP )
+
+      IMPLICIT NONE
+      INTEGER  K
+      DOUBLE COMPLEX BIGCTMP(0:2,2)
+
 C  INPUTS
-C           J -- conformal moment
+C           K -- conformal moment index
 C  OUTPUT
-C       BIGC0 -- vector of two C^{(0)} (quark and gluon) Wilson 
-C                coefficients (trivially equal to (1,0))
-C       BIGC1 -- vector  C^{(1)} 
-C  IDENTIFIERS
-C       WGAMMA -- common block with moments of anomalous dimensions of DIS
+C       BIGCTMP(P, flavour) -- Wilson coefficients
 C  PARENTS
 C      INIT
 C  CHILDREN
@@ -32,11 +31,6 @@ C      HS1
 C  SOURCE
 C
 
-      SUBROUTINE MSBARF ( K, BIGCTMP )
-
-      IMPLICIT NONE
-      INTEGER  K
-      DOUBLE COMPLEX BIGCTMP(0:2,2)
       DOUBLE PRECISION LRF2
       DOUBLE COMPLEX J, HS1, BIGC0(2), BIGC1(2)
       INCLUDE 'header.f'

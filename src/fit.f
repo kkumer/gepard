@@ -1,39 +1,32 @@
 C     ****h* gepard/fit.f
 C  FILE DESCRIPTION
-C    Fitting of DVCS (and DIS in future) experimental data.
+C    Fitting of GPD model to DVCS and DIS  experimental data.
 C
 C    $Id: fit.F 76 2007-04-23 15:39:11Z kkumer $
 C     *******
 
 C     ****p* fit.f/FIT
 C  NAME
-C    FIT   --  Determines parameters of GPDs (and low-energy
-C              input point Q0), by fitting to DVCS and DIS
+C    FIT   --  Determines parameters of GPDs by fitting to DVCS and DIS
 C              experimental data.
 C            
 C  DESCRIPTION
 C             Calls minuit subroutine for minimization and
 C             prints results in various ways.
-C
-C  INPUTS
-C          FIT.INI -- file with names of files with experimental
-C                     data to be fitted to
-C       MINUIT.CMD -- file with specification of fit parameters
-C                     and with minuit commands.
-C
-C  OUTPUT
-C          Goes to files with extensions .out (tabular representation
+C    Output goes to files with extensions .out (tabular representation
 C          of fit), .ps (graphical representation of fit), and .min
 C          (Minuit output)
+C  SYNOPSIS
+
+      PROGRAM FIT
+
+C
 C
 C  CHILDREN
-C      READPAR, INIT, MINUIT, FCN (via MINUIT)
+C      READPAR, INIT, INITC, MINUIT, FCN (via MINUIT)
 C
 C  SOURCE
 C
-
-
-      PROGRAM FIT
 
       IMPLICIT NONE
       INTEGER ISINTER

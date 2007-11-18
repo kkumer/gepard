@@ -7,44 +7,25 @@ C     *******
 
 C     ****s* init.f/INIT
 C  NAME
-C        INIT  --  initialization (singlet)
+C        INIT  --  basic initialization
 C  DESCRIPTION
 C     Puts values of abscissas and weights of Mellin-Barnes
 C     integration contour on common blocks, as well as
 C     corresponding values of Wilson coefficients and
 C     anomalous dimensions
 C  SYNOPSIS
-C     SUBROUTINE INIT
-C  OUTPUT
-C     BIGC  -- values of DVCS Wilson coefficients for
-C              singlet CFF form factor \mathcal{H}
-C     BIGC  -- values of DVCS Wilson coefficients for
-C              singlet CFF form factor \mathcal{H}
-C              but on a shifted contour C_{j+2}
-C      GAM  -- singlet anomalous dimensions
-C    GAMNS  -- non-singlet anomalous dimensions
-C   BIGCF2  -- values of DIS Wilson coefficients for
-C              singlet form factor F2
-C  IDENTIFIERS
-C       SPEED -- speed of evaluations
-C           P -- approximation order, which is N^{P}LO
-C           C -- intersection point of Mellin- Barnes integration 
-C                path with real axis
-C         PHI -- angle between Mellin-Barnes contour and Re(J) axis
-C        GAM? -- ?=0,1,2  singlet anomalous dimensions
-C      GAMNS? -- ?=0,1,2  non-singlet anomalous dimensions
-C          C? -- ?=0,1,2  DIS Wilson coefficients
+
+      SUBROUTINE INIT
+
 C  CHILDREN
-C      BETAF, WgammaV*F, WcV*F, CDVCSF, MSBARF
+C      BETAF, INTEGRAF, WgammaV*F, WcV*F, CDVCSF, MSBARF, BIGCNSF
 C  PARENTS
-C      AUXTEST, TEST, RADCORR, SCALEDEP, FIT
+C      FIT
 C  BUGS
 C       For large xi>0.7 integration should be extended to larger Y
 C  SOURCE
 C
 
-      SUBROUTINE INIT
-* 
       IMPLICIT NONE
       INTEGER NINTGMAX, K, K1, K2, K3
       INTEGER L, ORD
@@ -118,8 +99,9 @@ C
       CALL INTEGRAF(ACC, SPEED, DOWN, NINTGMAX, Y, WG)
 
 
-*   If you suspect numerical problems and want extend Mellin-Barnes
+*   If you suspect numerical problems and want to extend Mellin-Barnes
 *   integration fom 0..10  to 0..500, put 4 -> 0 below
+*   FIXME: this should be automatic
 
       NPTS = 2**ACC * (NINTGMAX - 4) / SPEED
 

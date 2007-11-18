@@ -34,7 +34,7 @@ C     FITPAR  --  Equal to A
 C  CHISQPART  --  chi-square produced by a single data set
 C
 C  CHILDREN
-C      PROCDATA, PGPLOT routines
+C      GETMBGPD, GETMBGPDMMA, PROCDATA, PGPLOT routines, FLUSHOUT
 C
 C  PARENTS
 C      MINUIT, FIT (via MINUIT)

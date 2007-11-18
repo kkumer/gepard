@@ -3,18 +3,17 @@ C  FILE DESCRIPTION
 C    calculation of Compton form factors
 C
 C    $Id$
-C  BUGS
-C     Some complex arithmetic (REALPART, COMPLEX, ...) could be
-C     specific to GNU G77 compiler.
 C     *******
 
 
 C     ****s* cff.f/CFFF
 C  NAME
-C     CFFF  --   Compton form factors
+C     CFFF  --   Compton form factor \mathcal{H}
 C  DESCRIPTION
 C    calculates singlet Compton form factor H by numerical Mellin-Barnes 
-C    integration of conformal partial waves provided by subroutine PARWAV. 
+C    integration according to formula Eq. (58) from [Kumericki:2007sa]
+C      NB!! - only one of three CFF(0:2) array elements, CFF(P)
+C             is changed by single call to CFFF!
 C    |latex  \begin{eqnarray*}
 C    |latex  {{\cal H}^{\rm S}}(\xi,\Delta^2,{\cal Q}^2)
 C    |latex  &\!\!\!=\!\!\!& \frac{1}{2i}\int_{c-i \infty}^{c+ i \infty}\!
@@ -32,32 +31,17 @@ C    |latex  \tan\big(\frac{\pi(c + y e^{i\phi})}{2}\big)
 C    |latex  \texttt{FPW}(j)
 C    |latex  \end{eqnarray*} 
 C    |latex  where $j=c+ye^{i\phi}$.
-C    |latex  This is implemented now with fixed $\phi = \pi/2$, but
-C    |latex  implementation with, say, $\phi = 3\pi /4$ should give faster
-C    |latex  convergence.
-C    All INPUTS and OUTPUT below is via common blocks!
 C  SYNOPSIS
-C     SUBROUTINE CFFF
-C  OUTPUT
-C    CFF(0:2) --  Compton form factor in LO, NLO and NNLO approximations 
-C                 (for SCHEME='CSBAA'; for SCHEME= 'MSBAR' only LO and
-C                 NLO exists and CFF(3) is garbage) 
-C                 NB!! - only one of three CFF(3) array elements, CFF(P)
-C                 is changed by single call to CFFF!
-C  IDENTIFIERS
-C          XI -- DVCS scaling parameter
-C           K -- Mellin-Barnes integration point index
-C           J -- conformal moment
-C          XI -- DVCS scaling parameter
-C           C -- intersection point of Mellin- Barnes integration 
-C                path with real axis
-C         PHI -- angle between Mellin-Barnes contour and Re(J) axis
+
+      SUBROUTINE CFFF
+
+C  PARENTS
+C    PARSIGMA
 C  CHILDREN
-C    PARWAV, DCTAN
+C    GETMBGPD, GETMBGPDMMA, LOOKUPQ, DCTAN
 C  SOURCE
 C
 
-      SUBROUTINE CFFF
 
       IMPLICIT NONE
       INTEGER K, QIND

@@ -27,7 +27,7 @@ C         R20 -- initial momentum scale squared
 C  OUTPUT
 C          AS -- final value for a_strong/(2 Pi)
 C  PARENTS
-C     PARWAVF
+C     EVOLC
 C  NOTES
 C     Requires a previous call of BETAF to initialize common block !
 C     This is slightly modified routine from file asrgkt.f from package

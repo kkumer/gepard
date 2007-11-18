@@ -14,26 +14,26 @@ C     CLNGAMMA  --  logarithm of gamma function of complex argument
 C  DESCRIPTION
 C     Uses Lanczos algorithm
 C  SYNOPSIS
-C     DOUBLE COMPLEX FUNCTION CLNGAMMA(Z)
-C
-C     DOUBLE COMPLEX Z
+
+      DOUBLE COMPLEX FUNCTION CLNGAMMA(XX)
+
+      DOUBLE COMPLEX XX
+
 C  INPUTS
-C     Z -- argument
+C     XX -- argument
 C  RETURN VALUE
 C     CLNGAMMA -- ln(Gamma(z))
 C  NOTES
 C     Error is strictly smaller than 2x10^(-10), and in practice is often
 C     less then 10^(-14)
 C  PARENTS
-C     INIT, PARWAVF
+C     INIT, CBETA, HJ
 C  SOURCE
 C
 
-      DOUBLE COMPLEX FUNCTION CLNGAMMA(XX)
-
       INTEGER J
       DOUBLE PRECISION STP, COF(6)
-      DOUBLE COMPLEX XX, SER, TMP, X, Y
+      DOUBLE COMPLEX SER, TMP, X, Y
       SAVE COF, STP 
       DATA COF, STP /76.18009172947146d0,-86.50532032941677d0,
      &  24.01409824083091d0,-1.231739572450155d0,.1208650973866179d-2,
@@ -58,24 +58,23 @@ C     ****f* special.f/CBETA
 C  NAME
 C     CBETA  --  beta function of complex argument
 C  SYNOPSIS
-C     DOUBLE COMPLEX FUNCTION CBETA(Z, W)
-C
-C     DOUBLE COMPLEX Z
-C     DOUBLE COMPLEX W
+
+      DOUBLE COMPLEX FUNCTION CBETA(Z, W)
+
+      DOUBLE COMPLEX Z, W 
+
 C  INPUTS
 C     Z, W -- arguments
 C  RETURN VALUE
 C     CBETA -- Beta(Z, W)
 C  PARENTS
-C     HJ
+C     FCN, HJ
 C  CHILDREN
 C     CLNGAMMA  -- log(Gamma(z)) function
 C  SOURCE
 C
 
-      DOUBLE COMPLEX FUNCTION CBETA(Z, W)
-
-      DOUBLE COMPLEX Z, W, CLNGAMMA
+      DOUBLE COMPLEX CLNGAMMA
 
       CBETA = EXP( CLNGAMMA(Z) + CLNGAMMA(W) - CLNGAMMA(Z + W) )
 
@@ -87,23 +86,22 @@ C     ****f* special.f/POCHHAMMER
 C  NAME
 C     POCHHAMMER  --  Pochhammer symbol
 C  SYNOPSIS
-C     DOUBLE COMPLEX FUNCTION POCHHAMMER(Z, M)
-C
-C     INTEGER M
-C     DOUBLE COMPLEX Z
+
+      DOUBLE COMPLEX FUNCTION POCHHAMMER(Z, M)
+
+      INTEGER M
+      DOUBLE COMPLEX Z
+
 C  INPUTS
 C     Z, M -- arguments
 C  RETURN VALUE
-C     POCHAMMER -- (Z)_M
+C     POCHHAMMER -- (Z)_M
 C  PARENTS
 C     HJ
 C  SOURCE
 C
 
-      DOUBLE COMPLEX FUNCTION POCHHAMMER(Z, M)
-
-      INTEGER M, K
-      DOUBLE COMPLEX Z
+      INTEGER K
 
       POCHHAMMER = Z
       DO 10 K = 1, M - 1

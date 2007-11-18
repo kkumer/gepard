@@ -5,9 +5,9 @@ C
 C    $Id: dvcs.f 11 2006-07-12 07:50:28Z kuk05260 $
 C     *******
 
-C     ****s* integra.f/INTEGRA
+C     ****s* integra.f/INTEGRAF
 C  NAME
-C        INTEGRA  -- Gaussian integration between array of points
+C        INTEGRAF  -- Gaussian integration between array of points
 C  DESCRIPTION
 C     Returns array of abscissas and weights for Gaussian integration
 C     over some region which is subdivided by an array of points so
@@ -17,7 +17,16 @@ C     DIVISION(1) .. DIVISION(1 + SPEED) .. DIVISION(1 + 2*SPEED) ..
 C        ... DIVISION(MAXDIV + 1), 
 C     and on each interval 2**ACR Gauss-Legendre points are used.
 C  SYNOPSIS
-C     SUBROUTINE INTEGRA
+
+      SUBROUTINE INTEGRAF(ACR, SPEED, DIVISION, NINTGMAX, X, WG)
+
+      IMPLICIT NONE
+      INTEGER ACR, SPEED, NINTGMAX
+      INTEGER NGAUSSMAX, ACRMAX, NINTGMAXMAX
+      PARAMETER ( NGAUSSMAX = 64, ACRMAX = 6, NINTGMAXMAX = 12 )
+      DOUBLE PRECISION X( NINTGMAXMAX * NGAUSSMAX ) 
+      DOUBLE PRECISION WG( NINTGMAXMAX * NGAUSSMAX )
+
 C   INPUT
 C      ACR  -- accuracy. each subintegration is done on 2**ACR
 C              Gauss-Legendre points
@@ -32,20 +41,13 @@ C       WG  -- weights
 C  CHILDREN
 C      GAUSS
 C  PARENTS
-C      INIT
+C      INIT, NDINTF
 C  SOURCE
 C
 
-      SUBROUTINE INTEGRAF(ACR, SPEED, DIVISION, NINTGMAX, X, WG)
-* 
-      IMPLICIT NONE
-      INTEGER ACR, SPEED, NINTGMAX
-      INTEGER NGAUSSMAX, ACRMAX, NINTGMAXMAX, K, K2, K3
+      INTEGER K, K2, K3
       DOUBLE PRECISION NGAUSS, SUMM, DIFF
-      PARAMETER ( NGAUSSMAX = 64, ACRMAX = 6, NINTGMAXMAX = 12 )
       DOUBLE PRECISION DIVISION( NINTGMAXMAX+1 )
-      DOUBLE PRECISION X( NINTGMAXMAX * NGAUSSMAX ) 
-      DOUBLE PRECISION WG( NINTGMAXMAX * NGAUSSMAX )
       DOUBLE PRECISION ABSC( ACRMAX, NGAUSSMAX ) 
       DOUBLE PRECISION WGHT( ACRMAX, NGAUSSMAX )
       DOUBLE PRECISION DOWN( NINTGMAXMAX + 1 ), UP( NINTGMAXMAX )

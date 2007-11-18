@@ -10,7 +10,9 @@ C  NAME
 C     GETMBGPD  --  calculate GPD values on the all MB contour points
 C            
 C  SYNOPSIS
+
       SUBROUTINE GETMBGPD
+
 C  SOURCE
 C
       IMPLICIT NONE

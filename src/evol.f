@@ -1,6 +1,6 @@
 C     ****h* gepard/evol.f
 C  FILE DESCRIPTION
-C     calculates evolution operator
+C     calculates evolution operators
 C
 C    $Id$
 C     *******
@@ -11,11 +11,14 @@ C     EVOLNSF  --  non-singlet evolution operator
 C  DESCRIPTION
 C    calculates non-singlet evolution operator
 C  SYNOPSIS
-C     SUBROUTINE EVOLNSF (K, R, EVOLNSA)
-C
-C     INTEGER K
-C     DOUBLE PRECISION R
-C     DOUBLE COMPLEX EVOLNSA(0:2), 
+
+      SUBROUTINE EVOLNSF (K, R, EVOLNSA)
+
+      IMPLICIT NONE
+      INTEGER K
+      DOUBLE PRECISION R
+      DOUBLE COMPLEX EVOLNSA(0:2)
+
 C  INPUTS
 C           K -- Mellin-Barnes integration point index
 C           R -- ratio of astrong(mu)/astrong(mu0)
@@ -25,18 +28,13 @@ C                 {\cal A}^{0,1,2}(a_s/a0_s)^{-\gamma^0/beta_0} in
 C                 alpha_s/(2\pi) expansion of evolution operator 
 C                 \Epsilon(mu, mu0)
 C  PARENTS
-C      PARWAVF
+C      EVOLC
 C  CHILDREN
-C      ERFUNCNSF, RNNLONSF
+C      RNNLONSF, NDINTF
 C  SOURCE
 C
 
-      SUBROUTINE EVOLNSF (K, R, EVOLNSA)
-
-      IMPLICIT NONE
-      INTEGER K
-      DOUBLE PRECISION R
-      DOUBLE COMPLEX EVOLNSA(0:2), NDINT
+      DOUBLE COMPLEX NDINT
       INTEGER ORD
       DOUBLE COMPLEX R1, R2, AUX(0:2)
       INCLUDE 'header.f'
@@ -79,13 +77,15 @@ C  NAME
 C     EVOLF  --   singlet evolution operator
 C  DESCRIPTION
 C    calculates singlet evolution operator
-C    according to KMKPS06 paper
 C  SYNOPSIS
-C     SUBROUTINE EVOLF (K, R, EVOLA)
-C
-C     INTEGER K
-C     DOUBLE PRECISION R
-C     DOUBLE COMPLEX EVOLA(0:2,2,2), 
+
+      SUBROUTINE EVOLF (K, R, EVOLA)
+
+      IMPLICIT NONE
+      INTEGER  K
+      DOUBLE PRECISION R
+      DOUBLE COMPLEX EVOLA(0:2,2,2)
+
 C  INPUTS
 C           K -- Mellin-Barnes integration point index
 C           R -- ratio of astrong(mu)/astrong(mu0)
@@ -95,18 +95,12 @@ C                 {\cal A}^{0,1,2}(a_s/a0_s)^{-\gamma^0/beta_0} in
 C                 alpha_s/(2\pi) expansion of evolution operator 
 C                 \Epsilon(mu, mu0)
 C  PARENTS
-C      PARWAVF
+C      EVOLC
 C  CHILDREN
-C      ERFUNCF, RNNLOF, KRONECKER
-C  SOURCE
+C      ERFUNCF, RNNLOF, KRONECKER, LAMBDAF, NDINTF 
+C  SOURCE 
 C
 
-      SUBROUTINE EVOLF (K, R, EVOLA)
-
-      IMPLICIT NONE
-      INTEGER  K
-      DOUBLE PRECISION R
-      DOUBLE COMPLEX EVOLA(0:2,2,2)
       INTEGER A, B, CE, I, J, K1, ORD
       DOUBLE PRECISION RINV
       DOUBLE COMPLEX LAM(2), PR(2,2,2)
@@ -176,18 +170,16 @@ C     ****f* evol.f/KRONECKER
 C  NAME
 C    KRONECKER -- kronecker delta symbol
 C  SYNOPSIS
-C    INTEGER FUNCTION KRONECKER (A, B)
-C
-C    INTEGER A, B
-C  PARENTS
-C       EVOLF
-C  SOURCE
-C
 
       INTEGER FUNCTION KRONECKER (A, B)
 
       IMPLICIT NONE
       INTEGER A, B
+
+C  PARENTS
+C       EVOLF
+C  SOURCE
+C
 
       IF (A .EQ. B) THEN
             KRONECKER = 1

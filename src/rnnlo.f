@@ -1,5 +1,5 @@
 C     ****h* gepard/rnnlo.f
-C  FILE DESCRIPTION  - THIS FILE IS NOT USED
+C  FILE DESCRIPTION
 C     Calculation of matrices R_1 and R_2, from my DIS-p61 
 C     - combination of gamma^(n) and beta_m needed in evolution operator 
 C     - projected on +/- directions
@@ -11,30 +11,26 @@ C     ****s* rnnlo.f/RNNLONSF
 C  NAME
 C     RNNLONSF  --   R_1
 C  DESCRIPTION
-C     Calculation non-singlet R_1  (cf. my DIS-p61  for singlet case)
+C     Calculation of non-singlet R_1  (cf. my DIS-p61  for singlet case)
 C     - combination of gamma^(n) and beta_m needed in evolution operator 
 C  SYNOPSIS
-C     SUBROUTINE RNNLONSF (K, R1)
-C
-C     INTEGER K
-C     DOUBLE COMPLEX R1
-C  INPUTS
-C           K -- Mellin-Barnes integration point index
-C  OUTPUT
-C          R1
-C  IDENTIFIERS
-C       BETABLK, NGAM -- common blocks with beta function coefficients
-C       of QCD, and moments of anomalous dimensions of DIS
-C  PARENTS
-C      EVOLNSF
-C  SOURCE
-C
 
       SUBROUTINE RNNLONSF (K, R1, R2)
 
       IMPLICIT NONE
       INTEGER K
       DOUBLE COMPLEX R1, R2
+
+C  INPUTS
+C           K -- Mellin-Barnes integration point index
+C  OUTPUT
+C          R1 --  cf. DIS-p61
+C          R2 --  cf. DIS-p61
+C  PARENTS
+C      EVOLNSF
+C  SOURCE
+C
+
       INTEGER K1, L
       DOUBLE PRECISION INV
       INCLUDE 'header.f'
@@ -67,10 +63,14 @@ C     Calculation of matrices R_1 and R_2, from my DIS-p61
 C     - combination of gamma^(n) and beta_m needed in evolution operator 
 C     - projected on +/- directions
 C  SYNOPSIS
-C     SUBROUTINE RNNLOF (K, PR, R1PROJ, R2PROJ)
-C
-C     INTEGER K
-C     DOUBLE COMPLEX PR(2,2,2), R1PROJ(2,2,2,2), R2PROJ(2,2,2,2)
+
+      SUBROUTINE RNNLOF (K, LAM, PR, R1PROJ, R2PROJ)
+
+      IMPLICIT NONE
+      INTEGER  K
+      DOUBLE COMPLEX LAM(2)
+      DOUBLE COMPLEX PR(2,2,2), R1PROJ(2,2,2,2), R2PROJ(2,2,2,2)
+
 C  INPUTS
 C           K -- Mellin-Barnes integration point index
 C         LAM -- eigenvalues of LO evolution operator
@@ -81,9 +81,6 @@ C      R1PROJ -- R1PROJ(a,b,i,j) = P_a . R_1(i,j) . P_b
 C                a,b \in {+,-};  i,j \in {Q, G}
 C      R2PROJ -- R2PROJ(a,b,i,j) = P_a . R_2(i,j) . P_b
 C                a,b \in {+,-};  i,j \in {Q, G}
-C  IDENTIFIERS
-C       BETABLK, NGAM -- common blocks with beta function coefficients
-C       of QCD, and moments of anomalous dimensions of DIS
 C  PARENTS
 C      EVOLF
 C  CHILDREN
@@ -91,12 +88,6 @@ C      PROJECTORSF, PROJECTION
 C  SOURCE
 C
 
-      SUBROUTINE RNNLOF (K, LAM, PR, R1PROJ, R2PROJ)
-
-      IMPLICIT NONE
-      INTEGER  K
-      DOUBLE COMPLEX LAM(2)
-      DOUBLE COMPLEX PR(2,2,2), R1PROJ(2,2,2,2), R2PROJ(2,2,2,2)
       INTEGER K1, L
       DOUBLE PRECISION INV
       DOUBLE COMPLEX R1(2,2), R2(2,2)
@@ -134,10 +125,13 @@ C     PROJECTION  --  matrix multiplication  PL . M . PR
 C  DESCRIPTION
 C     Auxilliary subroutine
 C  SYNOPSIS
-C     SUBROUTINE PROJECTION (PL, M, PR, PROJ)
-C
-C     DOUBLE COMPLEX PL(2,2,2), M(2,2), PR(2,2,2)
-C     DOUBLE COMPLEX PROJ(2,2,2,2)
+
+      SUBROUTINE PROJECTION (PL, M, PR, PROJ)
+
+      IMPLICIT NONE
+      DOUBLE COMPLEX PL(2,2,2), M(2,2), PR(2,2,2)
+      DOUBLE COMPLEX PROJ(2,2,2,2)
+
 C  INPUTS
 C          PR -- projection matrices P(1)=P^+, P(2)=P^-
 C           M -- matrix to be projected
@@ -149,11 +143,6 @@ C     RNNLOF
 C  SOURCE
 C
 
-      SUBROUTINE PROJECTION (PL, M, PR, PROJ)
-
-      IMPLICIT NONE
-      DOUBLE COMPLEX PL(2,2,2), M(2,2), PR(2,2,2)
-      DOUBLE COMPLEX PROJ(2,2,2,2)
       INTEGER A, B, C, D, L, R
       DOUBLE COMPLEX AUX(2,2)
 

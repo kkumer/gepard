@@ -8,8 +8,7 @@ C     *******
 C     ****f* dvcs.f/PARSIGMA
 C  NAME
 C    PARSIGMA  --  calculation of partial DVCS cross section
-C                  d sigma / d t as a function of t, GPD
-C                  parameters and Q0
+C                  d sigma / d t 
 C  DESCRIPTION
 C    Calls CFFF for calculation of Compton form factor,
 C    and multiplies by required kinematical factors. It is intended
@@ -19,20 +18,10 @@ C  SYNOPSIS
 
       DOUBLE PRECISION FUNCTION PARSIGMA ()
 
-C  IDENTIFIERS
-C
-C          W2 -- (gamma*-proton) invariant mass squared
-C          XI -- DVCS scaling parameter
-C        DEL2 -- DVCS asymmetry parameter (P2-P1)^2
-C       MTIND -- index of MTS array holding required -DEL2
-C          Q2 -- photon virtuality squared
-C         Q02 -- initial scale squared
 C  PARENTS
 C      SIGMA, PROCDATA
 C  CHILDREN
 C      CFFF
-C  BUGS
-C       dimension of FITPAR is hardcoded 
 C  SOURCE
 C
 
@@ -77,28 +66,19 @@ C     ****
 C     ****f* dvcs.f/SIGMA
 C  NAME
 C       SIGMA  --  calculation of total DVCS cross section
-C                  sigma as a function of GPD
-C                  parameters and Q0
-C  SYNOPSIS
-C     DOUBLE PRECISION FUNCTION SIGMA ()
 C  DESCRIPTION
 C    Calls PARSIGMA for calculation of partial cross section
 C    and integrates over t numerically, using Gauss method
-C
-C  INPUTS 
-C              FITPAR  --  Array with fit parameters, see FIT.CMD
-C                          for description
-C  OUTPUT
-C               SIGMA  --  total cross section sigma
-C
+C  SYNOPSIS
+
+      DOUBLE PRECISION FUNCTION SIGMA ()
+
 C  PARENTS
 C     PROCDATA
 C  CHILDREN
 C     PARSIGMA   -- integrand, partial cross section  d sigma / d |t|
 C  SOURCE
 C
-
-      DOUBLE PRECISION FUNCTION SIGMA ()
 
       IMPLICIT NONE
       DOUBLE PRECISION PARSIGMA

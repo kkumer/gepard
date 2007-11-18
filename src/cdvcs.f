@@ -1,7 +1,7 @@
 C     ****h* gepard/cdvcs.f
 C  FILE DESCRIPTION
-C    calculation of  Wilson coefficients for DVCS in CSbar scheme
-C    according to KMKPS06 paper
+C    calculation of singlet  Wilson coefficients for DVCS in CSbar scheme
+C    and DIS (where MSbar=CSbar)
 C
 C    $Id$
 C     *******
@@ -9,27 +9,27 @@ C     *******
 
 C     ****s* cdvcs.f/CDVCSF
 C  NAME
-C     CDVCSF  --   Wilson coefficients (in CSbar scheme)
+C     CDVCSF  --   singlet Wilson coefficients  "big C"
 C  DESCRIPTION
-C    calculates Wilson coefficients for DVCS in CSbar scheme
-C    according to KMKPS06 paper. Also used for DIS where
-C    CSbar=MSbar, and for special SCHEME='UNITC'.
+C    calculates Wilson coefficients for DVCS 
+C    according to  formulas from [Kumericki:2007sa]
+C       (101b-c) - CSbar;   (127,129) - MSbar
+C    Also used for DIS where
+C    CSbar=MSbar, and for special 'EVOLQ' and 'EVOLG'
+C    schemes used for evolution of GPDs/PDFs without
+C    multiplying with Wilson coefficients..
 C  SYNOPSIS
-C     SUBROUTINE CDVCSF (J, BIGC0, BIGC1, BIGC2)
-C
-C     DOUBLE COMPLEX J, BIGC0(2), BIGC1(2), BIGC2(2)
-C     CHARACTER PROCESS*4
+
+      SUBROUTINE CDVCSF (  K, BIGCTMP )
+
+      IMPLICIT NONE
+      INTEGER  K
+      DOUBLE COMPLEX BIGCTMP(0:2,2)
+
 C  INPUTS
-C           J -- conformal moment
+C           K -- conformal moment index
 C  OUTPUT
-C       BIGC0 -- vector of two C^{(0)} (quark and gluon) Wilson 
-C                coefficients (trivially equal to (1,0))
-C       BIGC1 -- vector  C^{(1)} 
-C       BIGC2 -- vector  C^{(2)} 
-C  IDENTIFIERS
-C       BETABLK, WGAMMA, WC -- common blocks with beta function coefficients
-C       of QCD, and J-th moments of anomalous dimensions and Wilson 
-C       coefficients of DIS, initialized by subroutine INIT
+C       BIGCTMP(P, flavour) --  "big  C^{(P)}"
 C  PARENTS
 C      INIT
 C  CHILDREN
@@ -37,11 +37,6 @@ C      VECMAT, HS1, HS2
 C  SOURCE
 C
 
-      SUBROUTINE CDVCSF (  K, BIGCTMP )
-
-      IMPLICIT NONE
-      INTEGER  K
-      DOUBLE COMPLEX BIGCTMP(0:2,2)
       INTEGER L
       DOUBLE PRECISION LRF2, LRR2
       DOUBLE COMPLEX J, HS1, HS2
@@ -125,23 +120,24 @@ C     ****s* cdvcs.f/VECMAT
 C  NAME
 C     VECMAT  --   multiplies row vector with anomalous matrix
 C  SYNOPSIS
-C     SUBROUTINE VECMAT (VEC, ORD, VM)
-C
-C     DOUBLE COMPLEX VEC(2), VM(2)
-C  INPUTS
-C         VEC -- row vector
-C  OUTPUT
-C          VM -- resulting vector VM = VEC . GAMMA^(ORD)_J(K)
-C  PARENTS
-C     CDVCSF
-C  SOURCE
-C
 
       SUBROUTINE VECMAT (VEC, ORD, K, VM)
 
       IMPLICIT NONE
       INTEGER  K, ORD
       DOUBLE COMPLEX VEC(2), VM(2)
+
+C  INPUTS
+C         VEC(flavour) -- row vector
+C                  ORD -- order of perturbation expansion i.e. P
+C                    K -- conformal moment index
+C  OUTPUT
+C          VM(flavour) -- resulting vector VM = VEC . GAMMA^(ORD)_J(K)
+C  PARENTS
+C     CDVCSF
+C  SOURCE
+C
+
       INCLUDE 'header.f'
 
       VM(1) = VEC(1) * GAM(K,ORD,1,1) + VEC(2) * GAM(K,ORD,2,1)
