@@ -10,8 +10,6 @@ Open:
 
 -  fitres is behaving funny for C=0.25
 
--  mma interface function cffH is not accurate
-
 -  one must 'make clean' between making  gepard.exe and non-mma executables
     (and similarly with fit.exe with PGPLOG)
    (Thus, 'make all' probably doesn't work as intended.)
@@ -40,3 +38,7 @@ Fixed:
 2007-07 -  NNLO comparison to Vogt is bad [not same an. dims used]
 
 2007-07 -  SPEED=4 is unreliable [=3 preferable now]
+
+2007-11-19 -  mma interface function cffH is not accurate [I didn't use proper
+              GEPARD.INI before, it seems. Everything is fine.]
+

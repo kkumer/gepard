@@ -13,16 +13,16 @@ C  DESCRIPTION
 C             Calculates LO and NLO CFFs corresponding
 C             to testpoints A and B from letter-num.nb
 C             and gepard_devel.nb
+C  SYNOPSIS
+
+      PROGRAM AUXTEST
+
 C
 C  CHILDREN
 C      READPAR, INIT, CFF
 C
 C  SOURCE
 C
-
-
-      PROGRAM AUXTEST
-
       IMPLICIT NONE
       INCLUDE 'header.f'
 

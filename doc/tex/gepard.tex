@@ -50,7 +50,7 @@ $\sharp$\thecomment:} #1]}}
 
 \title{\texttt{gepard} --- Compton form factors and observables
                             by evolving moments of GEneral PARton Distributions}
-\author{Version: sid}
+\author{Version: 0.9.4}
 \date{\today}
 \maketitle
 
@@ -60,8 +60,8 @@ $\mathcal{H}$ and corresponding Compton cross-sections, as well as
 DIS form factor $F_2$ by evolving GPDs in conformal moment space from an ansatz shape
 specified at some input scale.  Together
 with \texttt{Minuit} minimization subroutine GPD parameters can be fitted to
-experimental DVCS and DIS data. For installation instructions and
-basic usage, see README file coming with the package.
+experimental DVCS and DIS data. For installation instructions
+see README file coming with the package.
 \end{abstract}
 
 \tableofcontents
@@ -90,7 +90,8 @@ dj\,\xi^{-j-1} \left[i + \tan \left(\frac{\pi j}{2}\right) \right]
 DVCS Wilson coefficients $\mbox{\boldmath $C$}_{j}({\cal Q}^2/\mu^2,\alpha_s(\mu))$
 are given in Eq. (18) of \cite{Kumericki:2006xx}, while moments of
 GPD $\mbox{\boldmath $H$}_{j} (\xi,\Delta^2,\mu^2)$ should be specified
-by the user in subroutine \texttt{HJ}, as described in subsection \ref{ssect:ansatz}.
+by the user in subroutine \texttt{HJ}, as described in Sect. \ref{ssect:ansatz}, or
+within Mathematica sesion, as described in Sect. \ref{sec:mma}.
 
 In practice it is good to use Mellin-Barnes contour of the form displayed
 on Fig.~\ref{fig:MellinBarnes}, with point on the contour given
@@ -196,13 +197,17 @@ time-demanding evaluations are performed only once.
 It would be good to calculate also evolution operator during the initialization phase.
 This would be reasonably easy to implement for fits with fixed $\mathcal{Q}_{0}^2$, 
 where evolution is needed only for small number of fixed ratios 
-$\alpha_{s}(\mathcal{Q})/\alpha_{s}(\mathcal{Q}_0)$. (In the general case, one could
-maybe make interpolation function for evolution operator.)
+$\alpha_{s}(\mathcal{Q})/\alpha_{s}(\mathcal{Q}_0)$. 
 Looking at the execution profile of the present code, i.e. how much time is spent
 in particular subroutines, it seems to me that by such improvements one can hope
 for a speed-up of about factor 5-8. This could be the next step if the present
 speed turns out to be insufficient.
 \end{commblock}
+
+\begin{commblock}
+This is now done! (I just need to explain it in the manual \dots)
+\end{commblock}
+
 
 
 %\subsection{Ansatz for GPD $\mbox{\boldmath $H$}_{j} (\xi,\Delta^2,\mathcal{Q}_{0}^2)$}
@@ -259,10 +264,11 @@ Collection of QCD anomalous dimensions and Wilson coefficients for singlet DVCS 
 in $\overline{MS}$ up to NLO.
 
 \item
-The evolution of GPDs up to NLO in $\overline{CS}$ and  $\overline{CS}$ schemes.
+The evolution of GPDs up to NLO in $\overline{MS}$ and  $\overline{CS}$ schemes.
 
 \item 
-Mellin-Barnes representation for DVCS form-factors.
+Mellin-Barnes representation for DVCS form-factor ${ }^{\rm S}\mathcal{H}$, and
+DIS form-factor ${}^{\rm S}F_2$
 \end{itemize}
 
 For calculating and testing DVCS form factors and observables the programs \texttt{test},
@@ -270,7 +276,8 @@ For calculating and testing DVCS form factors and observables the programs \text
 moment. For doing example plots many programs are provided in subdirectory \texttt{ex}.
 
 For fitting the GPD parameters using Minuit, as well as for calculating observables (by
-fixing all parameters to desired value), the program \texttt{fit} is provided.
+fixing all parameters to desired value), the program \texttt{fit} is provided, and
+also Mathematica interface for fitting and evaluating CFF.
 
 \section{Initialization files}
 \label{sec:init}
@@ -781,18 +788,6 @@ smaller \texttt{SPEED} settings.
 \end{figure}
 
 
-\section{Advanced usage and modifications}
-
-\begin{itemize}
-\item If one wants to introduce the relations between fitting parameters, they
-can be entered in Fortran programs \texttt{dvcs.f} and \texttt{f2.f}.
-The number of parameters will decrease and some fitting parameters 
-will be ``dummies'' (their value will not be used at all). 
-Although they are irrelevant now, they should be made as
-``fixed'' in \texttt{MINUIT.CMD}
-\end{itemize}
-
-
 
 \section{Mathematica interface}
 \label{sec:mma}
@@ -811,9 +806,7 @@ variable parameters \{par1, par2, \ldots\}} \\[0.8ex]
 \defboxitem{JustCali3}{ \{par1, par2, \ldots\}, options}{Just prints out initial chi-square without
 any fitting. Useful for checking ansaetze and debugging}\\[0.8ex]
 \defboxitem{cffH}{xi, t, q2, q02, options}{Returns singlet Compton form factor
-$\mathcal{H}(xi=\xi, t=\Delta^2, q2=\mathcal{Q}^2, q02=\mathcal{Q}_{0}^2)$\footnote{
-This function is not reliable at the moment. There are some discrepancies I don't
-understand yet. See last section of fit.nb notebook.}.} 
+$\mathcal{H}(xi=\xi, t=\Delta^2, q2=\mathcal{Q}^2, q02=\mathcal{Q}_{0}^2)$.} 
 \end{tabular}%
 \end{minipage}}\\[0.5ex]
 {\small High level functions available in \emph{Mathematica} interface.}
