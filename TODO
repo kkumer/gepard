@@ -11,6 +11,8 @@ Computing:
 -  Automatize putting Alekhin's PDFs into fitpdfs
 -  We don't need both HGRID and MBGPD, it seems.
 -  deriv.f should be copyright-cleared
+-  FIT.INI should have optional name, changable by mma interface
+-  tmp.mma is a kludge
 
 Checks:
 -  Check F_2 of DIS beyond LO (compare to Vogt etc.). Why is BIGCF2 \neq CDIS2

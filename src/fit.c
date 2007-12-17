@@ -1,3 +1,10 @@
+/****h* gepard/fit.c
+*  FILE DESCRIPTION
+*    Mathematica - Minuit interface (C)
+*
+*    $Id:$
+******
+*/
 
 #include "mathlink.h"
 #include "header.h"
@@ -5,7 +12,30 @@
 
 /*  Commands that call Minuit subroutines via Fortran intermediaries */
 
-void MinuitInit(int a) {
+/****f* fit.c/MinuitInit
+*  NAME
+*     MinuitInit  --   Initialization of fitting procedure
+*  DESCRIPTION
+*     Wrapper around FITINIT, which additionally returns to
+*     Mathematica a list of complex
+*     coordinates of points on Mellin-Barnes contour
+*  SYNOPSIS
+*/
+
+void MinuitInit(int a) 
+
+/*
+*  INPUTS 
+*              a  --  does nothing
+*  PARENTS
+*     MinuitSetParameter
+*  CHILDREN
+*     FITINIT, MLPut*
+*  BUGS    
+*     should be without arguments?
+*  SOURCE
+*/
+{
         int i;
         struct dblcomplex nc;
 
@@ -21,8 +51,29 @@ void MinuitInit(int a) {
 
         return;
 };
+/******/
 
-void spliceparchr(char *out, int start, int end) {
+/****f* fit.c/spliceparchr
+*  NAME
+*     spliceparchr  --   Takes a substring of PARCHR block
+*  DESCRIPTION
+*     Since Fortran CHARACTER common blocks are recognized from
+*     C as just a char array, to access members of this block
+*     we extract part of the array.
+*  SYNOPSIS
+*/
+
+void spliceparchr(char *out, int start, int end)
+
+/*
+*  INPUTS 
+*           start -- (Fortran) index of first character we want - 1
+*             end -- (Fortran) index of last character we want
+*  PARENTS
+*     GepardInitInternal
+*  SOURCE
+*/
+{
         int i, k;
 
         for (i = start, k=0; i < end; i++, k++)
@@ -30,9 +81,35 @@ void spliceparchr(char *out, int start, int end) {
 
         return;
 }
+/******/
 
-char *GepardInitInternal(int speed, int p, char *scheme, char *ansatz) {
-        const char dflt[4] = "DFLT";
+/****f* fit.c/GepardInitInternal
+*  NAME
+*     GepardInitInternal  --   Optional overriding of GEPARD.INI
+*  DESCRIPTION
+*     Performs initialization of GeParD parameters. First reads default values
+*     from GEPARD.INI, which are then overriden by the function arguments with
+*     the same name if they are positive numbers or strings different then
+*     'DFLT'.
+*  SYNOPSIS
+*/
+
+char *GepardInitInternal(int speed, int p, char *scheme, char *ansatz)
+ 
+/*
+*  INPUTS 
+*           speed -- SPEED
+*               p -- P
+*          scheme -- SCHEME
+*          ansatz -- ANSATZ
+*  PARENTS
+*     GepardInit
+*  CHILDREN
+*     READPAR, spliceparchr
+*  SOURCE
+*/
+{
+        const char dflt[4] = "DFLT"; 
         char inischeme[6], iniansatz[7];
 
         readpar_();
@@ -63,9 +140,31 @@ char *GepardInitInternal(int speed, int p, char *scheme, char *ansatz) {
         /*FALLBACK: strcpy(parchr_, "MSBARMMA   DVCS  SINGLET");*/
         return parchr_;
 };
+/******/
 
 
-int MinuitSetParameter(long int id, char *pnam, double vstrt, double step, double lo, double hi){
+/****f* fit.c/MinuitSetParameter
+*  NAME
+*     MinuitSetParameter  --   C wrapper for MPAR
+*  SYNOPSIS
+*/
+
+int MinuitSetParameter(long int id, char *pnam, double vstrt, double step, double lo, double hi)
+
+/*
+*  INPUTS 
+*                  id  --  parameter number
+*                pnam  --  parameter name
+*               vstrt  --  starting value of parameter
+*                step  --  starting step size or approx. parameter error
+*                  lo  --  lower bound on parameter
+*                  hi  --  upper bound on parameter
+*                          (if lo=hi=0 parameter is considered unbounded)
+*  CHILDREN
+*            MPAR
+*  SOURCE
+*/
+{        
         long int tlen;
 
         tlen = strlen(pnam);
@@ -73,17 +172,53 @@ int MinuitSetParameter(long int id, char *pnam, double vstrt, double step, doubl
 
         return 0;
 };
+/******/
 
-int MinuitCommand(char *cmd){
+/****f* fit.c/MinuitCommand
+*  NAME
+*     MinuitCommand  --  C wrapper for MCOM
+*  SYNOPSIS
+*/
+
+int MinuitCommand(char *cmd)
+
+/*
+*  INPUTS 
+*           cmd -- Minuit command as character string
+*  CHILDREN
+*            MCOM
+*  SOURCE
+*/
+{
         long int tlen, ierflg;
 
         tlen = strlen(cmd);
         mcom_(&tlen, cmd, &ierflg,tlen);
+        flushout_();
 
         return ierflg;
 };
+/******/
 
-void MinuitGetParameter(long int id){
+/****f* fit.c/MinuitGetParameter
+*  NAME
+*     MinuitGetParameter  --  C wrapper for GETPAR
+*  DESCRIPTION
+*     It returns current value of parameter and
+*     its error, and internal parameter number to Mathematica
+*  SYNOPSIS
+*/
+
+void MinuitGetParameter(long int id)
+
+/*
+*  INPUTS 
+*           id -- MINUIT's parameter number
+*  CHILDREN
+*            GETPAR, MLPut*
+*  SOURCE
+*/
+{
         long int ivarbl;
         double val, error;
 
@@ -96,10 +231,27 @@ void MinuitGetParameter(long int id){
 
         return;
 };
+/******/
 
 /*  Commands that directly call Minuit subroutines */
 
-void MinuitStatus(void){
+/****f* fit.c/MinuitStatus
+*  NAME
+*     MinuitStatus -- C Wrapper for MINUIT's MNSTAT
+*  SYNOPSIS
+*/
+
+void MinuitStatus(void)
+
+/*
+*  OUTPUT 
+*          rfmin  --  chi-square  
+*          istat  --  quality of covariance matrix
+*  CHILDREN
+*     mnstat, MLPut*
+*  SOURCE
+*/
+{
         long int npari, nparx, istat;
         double fmin, fedm, errdef;
 
@@ -111,8 +263,24 @@ void MinuitStatus(void){
 
         return;
 };
+/******/
 
-void MinuitCovarianceMatrix(int adim){
+/****f* fit.c/MinuitCovarianceMatrix
+*  NAME
+*     MinuitCovarianceMatrix  --  C wrapper for MINUIT's MNEMAT
+*  SYNOPSIS
+*/
+
+void MinuitCovarianceMatrix(int adim)
+
+/*
+*  INPUTS 
+*            adim -- Number of variable parameters
+*  CHILDREN
+*           MNEMAT, MLPut*
+*  SOURCE
+*/
+{
         int i,j;
         long int ndim=NPARMAX;
         double emat[NPARMAX][NPARMAX];
@@ -128,46 +296,28 @@ void MinuitCovarianceMatrix(int adim){
           }
         return;
 };
+/******/
 
 /*  Other commands (that don't communicate with Minuit) */
 
-void getRealList(int n, double list[10]){
-        int j, xint, dttype;
-        double xreal;
-        long int nargs;
-        const char *fname, *sname;
 
-/* getting input via MathLink.  */
+/****f* fit.c/cffHInternal
+*  NAME
+*     cffHInternal  --  calculates CFF H
+*  SYNOPSIS
+*/
 
-        /*MLGetFunction(stdlink, &fname, &nargs); [> fname = List <]*/
-            for (j = 0; j < n; j++){
+void cffHInternal(double xi, double t, double q2, double q02, int speed, int p, char *scheme, char *ansatz) 
 
-                dttype=MLGetType(stdlink); 
-                
-                switch (MLGetType(stdlink)) {
-                        case MLTKINT:   /* Mma sent integer number*/
-                                MLGetInteger(stdlink, &xint);
-                                xreal = (double) xint;
-                                break;
-                        case MLTKREAL:  /* Mma sent real number */
-                                MLGetReal(stdlink, &xreal);
-                                break;
-                       /*  case MLTKSYM:
-                                MLGetSymbol(stdlink, &sname);
-                                MLPutSymbol(stdlink, "err-sym");
-                                return;
-                       */
-                        default:  /* Return an error */
-                                MLPutSymbol(stdlink, "errnan");
-                                return;
-                }
-                list[j] = xreal;
-        }
-        return;
-}
-
-void cffHInternal(double xi, double t, double q2, double q02, int speed, int p, char *scheme, char *ansatz) {
-
+/*
+*  INPUTS 
+*         xi -- XI;   t -- DEL2;  q2 -- Q2;  q02 -- Q02;
+*      speed -- SPEED; p -- P; scheme -- SCHEME; ansatz -- ANSATZ
+*  CHILDREN
+*     GepardInitInternal, INIT, EVOLC, CFFF, MLPut*
+*  SOURCE
+*/
+{
         int i, j, xint, dttype;
         double xreal, xim, xre;
         struct dblcomplex xc, nc;
@@ -225,9 +375,29 @@ cfff_();
 
         return;
 };
+/******/
 
 
-void getmbgpdmma_(void) {
+/****f* fit.c/getmbgpdmma_
+*  NAME
+*     getmbgpdmma_  --  get GPD values from Mathematica
+*  DESCRIPTION
+*     This Fortran-callable function uses MathLink to
+*     evaluate functions GPD[{fitting parameters}, DEL2, XI] and 
+*     PDF[...the same...] and thus uses GPD ansatz as defined
+*     within Mathematica session. Mathematica returns values
+*     on MB contour which are written into MBGPD common block.
+*  SYNOPSIS
+*/
+
+void getmbgpdmma_(void) 
+
+/*
+*  PARENTS
+*     FCN, CFFF
+*  SOURCE
+*/
+{
 
         int i, j;
         double xr, xi;
@@ -235,7 +405,7 @@ void getmbgpdmma_(void) {
         long int effacc, nargs;
         const char *fname;
 
-/* calling Mathematica function GPD[{params}]  */
+/* calling Mathematica function GPD[{params}, DEL2, XI]  */
 
         MLPutFunction(stdlink, "EvaluatePacket", 1);
         if (parchr_[12] == 'I') /* DIS */
@@ -275,8 +445,15 @@ void getmbgpdmma_(void) {
 
         return;
 };
+/******/
+
+/****p* fit.c/main
+*  NAME
+*     main  --  main MathLink program
+*  SOURCE
+*/
 
 int main(int argc, char *argv[]) {
            return MLMain(argc, argv);
 }
-
+/******/

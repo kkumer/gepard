@@ -1,6 +1,6 @@
 C     ****h* gepard/mninterface.f
 C  FILE DESCRIPTION
-C    Mathematica - Minuit interface
+C    Mathematica - Minuit interface (Fortran)
 C
 C    $Id:$
 C     *******

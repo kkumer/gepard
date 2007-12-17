@@ -50,6 +50,7 @@ accept files:
    evoldep.f
    f2.f
    fit.f
+   fit.c
    fcn.F
    gauss.f
    getmbgpd.f

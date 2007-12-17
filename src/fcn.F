@@ -369,7 +369,13 @@ C
           Q2 = Q2IN
 #ifndef NOPGPLOT
           IF (IFLAG .EQ. 3) THEN
-            CALL PGSWIN (30., 140., 0., 12.)
+            IF (Q2 .LE. 6.) THEN
+              CALL PGSWIN (30., 140., 0., 18.)
+            ELSE IF (Q2 .GE. 15.) THEN
+              CALL PGSWIN (30., 140., 0., 3.)
+            ELSE
+              CALL PGSWIN (30., 140., 0., 12.)
+            END IF
             CALL PGBOX ('BCNST1', 0.0, 0, 'BCNST', 0.0, 0)
             CALL PGLAB("W", '\\gs', FNAME)
           END IF

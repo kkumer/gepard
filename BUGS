@@ -17,6 +17,13 @@ Open:
 -  houches still problematic for very large x_BJ. At input scale as well!
    Related to that. Large x_BJ extension of integration should be automatic.
 
+-  Coercion to COMPLEX is not working! Thus, one must treat by hand 
+   or set fancy rules to anticipate real arguments while SPLICE-ing.
+
+-  One has to delete .min file on Windows or PrintMinuitCommand is not ok.
+
+   
+
 
 Fixed:
 ------

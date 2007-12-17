@@ -80,8 +80,12 @@ PAR::usage = "PAR[n] is the symbol for n-th fitting parameter."
 MinuitInit::usage = "MinuitInit"
 MinuitSetParameter::usage = "MinuitSetParameter"
 MinuitGetParameter::usage = "MinuitGetParameter"
-MinuitCommand::usage = "MinuitCommand"
+MinuitCommand::usage = "MinuitCommand[command_] executes MINUIT command"
 MinuitStatus::usage = "MinuitStatus"
+PrintMinuitCommand::usage = "MinuitCommand[command_, file_] executes MINUIT
+command and reads MINUIT output from file and prints it. 
+MinuitCommand[command_, file_, fontsize_] does the printing with font
+size fontsize (values 4-10 are nice)."
 
 SPEED::usage = "GeParD parameter"
 P::usage = "GeParD parameter"
@@ -145,11 +149,11 @@ Options[cffH] = {SPEED -> -1, P -> -1, SCHEME -> "DFLT", ANSATZ -> "DFLT"};
 GepardInit[(opts___)?OptionQ] := GepardInitInternal @@ ( {SPEED, P, SCHEME, ANSATZ} 
         /. {opts} /. Options[GepardInit] )
 
-cffH[xi_, t_, q2_, q02_, (opts___)?OptionQ] := cffHInternal @@ ( {xi, t, q2, q02,
+cffH[(xi_)?NumericQ, (t_)?NumericQ, (q2_)?NumericQ, (q02_)?NumericQ, (opts___)?OptionQ] := cffHInternal @@ ( {xi, t, q2, q02,
 		SPEED, P, SCHEME, ANSATZ} /. {opts} /. Options[cffH] )
 
 GepardFit[pars_, (opts___)?OptionQ] := Block[{varpars = ParameterID /@ pars, 
-      allpars = First[Transpose[Parameters]], status, ierr, chidel, dof, 
+      allpars = First[Transpose[Parameters]], status, ierr, tchis, chidel, dof, 
       probchi}, fixedpars = Complement[allpars, varpars]; 
       GepardInit[opts];
       jValues = MinuitInit[1]; (MinuitSetParameter @@ #1 & ) /@ Parameters; 
@@ -162,8 +166,9 @@ GepardFit[pars_, (opts___)?OptionQ] := Block[{varpars = ParameterID /@ pars,
        Null]; MinuitCommand["cali 3"]; status = MinuitStatus[]; 
       GPDcurrent[j_, t_, xi_] = GPDMom[j, t, xi] /. 
         PAR[n_] :> First[MinuitGetParameter[n]]; 
-      chidel = Plus @@ ReadList["tmp.mma"][[{4, 8}]]; 
-      dof = ReadList["tmp.mma"][[10]]; probchi = ChiSquareProbability[dof, 
+      tchis = ReadList["tmp.mma"];
+      chidel = Plus @@ tchis[[Range[4, Length[tchis],4]]]; 
+      dof = tchis[[-1]]; probchi = ChiSquareProbability[dof, 
         First[status]]; Print[StringJoin["\!\(\[Chi]\^2\) = ", 
         ToString[First[status]], 
         "    \!\(\[Chi]\_\(\[CapitalDelta]\^2\)\^2\)=", ToString[chidel], 
@@ -176,12 +181,13 @@ GepardFit[pars_, (opts___)?OptionQ] := Block[{varpars = ParameterID /@ pars,
           (MinuitGetParameter /@ Transpose[Parameters][[1]])[[n]]], 
          {n, Length[Parameters]}], Last[#1] != 0 & ]]
 
-PrettyStatus[] := Block[{},
+PrettyStatus[] := Block[{tchis},
        MinuitCommand["cali 3"]; status = MinuitStatus[]; 
       GPDcurrent[j_, t_, xi_] = GPDMom[j, t, xi] /. 
         PAR[n_] :> First[MinuitGetParameter[n]]; 
-      chidel = Plus @@ ReadList["tmp.mma"][[{4, 8}]]; 
-      dof = ReadList["tmp.mma"][[10]]; probchi = ChiSquareProbability[dof, 
+      tchis = ReadList["tmp.mma"];
+      chidel = Plus @@ tchis[[Range[4, Length[tchis],4]]]; 
+      dof = tchis[[-1]]; probchi = ChiSquareProbability[dof, 
         First[status]]; Print[StringJoin["\!\(\[Chi]\^2\) = ", 
         ToString[First[status]], 
         "    \!\(\[Chi]\_\(\[CapitalDelta]\^2\)\^2\)=", ToString[chidel], 
@@ -266,6 +272,18 @@ ParameterID[symb_Symbol] := Select[Parameters, #1[[2]] == ToString[symb] & ][[
 ChiSquareProbability[d_, chisq_] := Gamma[d/2, chisq/2]/Gamma[d/2]
  
 ReducedChiSquareProbability[d_, chisq_] := ChiSquareProbability[d, d chisq]
+
+rdfile[fname_] := Block[{str, 
+    outp = {}, ln = Null}, str = OpenRead[fname]; While[
+        ln =!= EndOfFile, AppendTo[outp, ln = Read[str, String]]]; Close[str];
+       outp]
+
+PrintMinuitCommand[comm_?StringQ, fname_?StringQ, 
+    fsize_:8] := Module[{before, after}, before = rdfile[fname]; 
+  MinuitCommand[
+    comm]; after = rdfile[fname]; StylePrint[TableForm[
+      Take[after, Length[before] - 
+    Length[after]]], "Input", FontSize -> fsize, CellLabel -> fname]]
 
 End[ ]
 

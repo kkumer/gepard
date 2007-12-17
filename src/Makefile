@@ -16,7 +16,7 @@
 # Compiler options
 FFLAGS =  -I. -O 
 CFLAGS =  -O2
-CPPFLAGS = -D NOPGPLOT
+#CPPFLAGS = -D NOPGPLOT
 
 # Subdirectories for storing example source files
 EXDIR = ex
