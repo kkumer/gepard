@@ -72,3 +72,12 @@
 :ReturnType:    Manual
 :End:
 
+:Evaluate: cffEInternal::usage = "cffEInternal[xi, t, q2, q02, SPEED, P, SCHEME, ANSATZ] returns singlet CFF E(xi, t, q2, q02). This function is not ment to be called by user who should use cffE[] instead."
+:Begin:
+:Function:      cffEInternal
+:Pattern:       cffEInternal[(xi_)?NumericQ, (t_)?NumericQ, (q2_)?NumericQ, (q02_)?NumericQ, speed_Integer, p_Integer, scheme_String, ansatz_String]
+:Arguments:     {xi, t, q2, q02, speed, p, scheme, ansatz}
+:ArgumentTypes: {Real, Real, Real, Real, Integer, Integer, String, String}
+:ReturnType:    Manual
+:End:
+

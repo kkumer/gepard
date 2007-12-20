@@ -539,11 +539,20 @@ C     ***
 
 C     ****v* header.f/CFF
 C  DESCRIPTION
-C      CFF(P)  --  DVCS Compton form factor 
+C      CFF(P)  --  DVCS Compton form factor  \mathcal{H}
 C  MEMBER OF
 C    CFF(block) 
 C  SYNOPSIS
       DOUBLE COMPLEX CFF(0:2)
+C     ***
+        
+C     ****v* header.f/CFFE
+C  DESCRIPTION
+C      CFFE(P)  --  DVCS Compton form factor \mathcal{E}
+C  MEMBER OF
+C    CFFE(block) 
+C  SYNOPSIS
+      DOUBLE COMPLEX CFFE(0:2)
 C     ***
         
 
@@ -773,9 +782,9 @@ C     ***
 
 C     ****c* header.f/CFF(block)
 C  DESCRIPTION
-C     Compton form factor 
+C     Compton form factor \mathcal{H}
 C  SYNOPSIS
-      COMMON / CFF      /  CFF
+      COMMON / CFF      /  CFF, CFFE
 C     ***
 
 C     ****c* header.f/F2(block)

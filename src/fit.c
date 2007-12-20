@@ -377,6 +377,82 @@ cfff_();
 };
 /******/
 
+/****f* fit.c/cffEInternal
+*  NAME
+*     cffEInternal  --  calculates CFF E
+*  SYNOPSIS
+*/
+
+void cffEInternal(double xi, double t, double q2, double q02, int speed, int p, char *scheme, char *ansatz) 
+
+/*
+*  INPUTS 
+*         xi -- XI;   t -- DEL2;  q2 -- Q2;  q02 -- Q02;
+*      speed -- SPEED; p -- P; scheme -- SCHEME; ansatz -- ANSATZ
+*  CHILDREN
+*     GepardInitInternal, INIT, EVOLC, CFFFE, MLPut*
+*  SOURCE
+*/
+{
+        int i, j, xint, dttype;
+        double xreal, xim, xre;
+        struct dblcomplex xc, nc;
+        double args[10], mt;
+        long int nargs;
+        const char *fname, *sname;
+        long int evoli=1, evolj=1;
+
+
+        GepardInitInternal(speed, p, scheme, ansatz);
+
+        kinematics_.xi = xi;
+        kinematics_.del2 = t;
+        kinematics_.q2 = q2;
+        nqs_.nqs = 2; /* Why not 1? */
+        qs_.qs[0] = kinematics_.q2;
+        parflt_.q02 = q02;
+
+        init_();
+
+        MLPutFunction(stdlink, "EvaluatePacket", 1);
+          MLPutFunction(stdlink, "Set", 2);
+            MLPutSymbol(stdlink, "jValues");
+            MLPutFunction(stdlink, "List", contour_.npts); /* passing MB points */
+              for (i = 0; i < contour_.npts; i++){
+                      nc = npoints_.n[i];
+                      MLPutFunction(stdlink, "Complex", 2);
+                        MLPutReal(stdlink, nc.dr - 1);
+                        MLPutReal(stdlink, nc.di);
+              }
+        MLEndPacket(stdlink);
+        MLNextPacket(stdlink);
+        MLNewPacket(stdlink);
+
+        MLPutFunction(stdlink, "EvaluatePacket", 1);
+          MLPutFunction(stdlink, "AllParameterValues", 0);
+        MLEndPacket(stdlink);
+
+        MLNextPacket(stdlink);
+        MLGetFunction(stdlink, &fname, &nargs); /* fname = List */
+            for (i = 0; i < NPARMAX; i++){
+                    MLGetReal(stdlink, &xreal);
+                    par_.par[i] = xreal;
+            }
+        MLEndPacket(stdlink);
+
+evolc_(&evoli, &evolj);
+
+cfff_();
+
+/* returning result via MathLink  */
+        MLPutFunction(stdlink, "Complex", 2);
+        MLPutReal(stdlink, cff_.cffe[parint_.p].dr);
+        MLPutReal(stdlink, cff_.cffe[parint_.p].di);
+
+        return;
+};
+/******/
+
 
 /****f* fit.c/getmbgpdmma_
 *  NAME

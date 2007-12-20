@@ -137,7 +137,7 @@ struct{
        */
 
 struct{
-        struct dblcomplex cff[3];
+        struct dblcomplex cff[3], cffe[3];
 } cff_;
 
 struct{

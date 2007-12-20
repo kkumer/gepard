@@ -11,7 +11,7 @@ Open:
 -  fitres is behaving funny for C=0.25
 
 -  one must 'make clean' between making  gepard.exe and non-mma executables
-    (and similarly with fit.exe with PGPLOG)
+    (and similarly with fit.exe with PGPLOT)
    (Thus, 'make all' probably doesn't work as intended.)
 
 -  houches still problematic for very large x_BJ. At input scale as well!

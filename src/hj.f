@@ -77,6 +77,9 @@ C
      &        0.0d0) + J, POCHG) / CBETA(COMPLEX(2.0d0 - PAR(22),
      &        0.0d0), POCHG) /
      &            (1.0d0 - DEL2)**3
+*           Killing E contribution
+            PAR(18) = 0.0d0
+            PAR(28) = 0.0d0
 *  ## ansatz used for testing (programs 'test' and 'accuracy')
       ELSE IF (ANSATZ .EQ. 'TEST') THEN
             FCM(1) = PAR(11) / (1 - DEL2/PAR(14)**2)**3 / POCHHAMMER(
@@ -87,76 +90,9 @@ C
      &            COMPLEX(1.0d0 - PAR(22) - PAR(23)*DEL2,
      &        0.0d0) + J, 6) * POCHHAMMER(COMPLEX(2.0d0 - PAR(22),
      &        0.0d0), 6)
-      ELSE IF (ANSATZ .EQ. 'FITOLD') THEN
-          ALPT(1) = PAR(12) + PAR(13)*DEL2
-          ALPT(2) = PAR(22) + PAR(23)*DEL2
-          JMA(1) = J - ALPT(1)
-          JMA(2) = J - ALPT(2)
-        IF ( PROCESS .EQ. 'DIS' ) THEN 
-          FCM(1) = PAR(11) * POCHHAMMER(COMPLEX(2.0d0 - PAR(12),0.0d0) 
-     &              , 8) / POCHHAMMER(1.0d0 - PAR(12)
-     &          + J , 8) * (1.0d0 - PAR(12) + J) /
-     &           (1.0d0 - DEL2/(PAR(14)+PAR(15)*J))**PAR(16) *
-     &          ( 1.0d0/(JMA(1) + 1.0d0) )
-          FCM(2) = PAR(21) * POCHHAMMER(COMPLEX(2.0d0 - PAR(22),0.0d0)
-     &              , 6) / POCHHAMMER(1.0d0 - PAR(22)
-     &          + J , 6) * (1.0d0 - PAR(22) + J) /
-     &           (1.0d0 - DEL2/(PAR(24)+PAR(25)*J))**PAR(26) *
-     &          ( 1.0d0/(JMA(2) + 1.0d0) )
-        ELSE  
-          FCM(1) = PAR(11) * POCHHAMMER(COMPLEX(2.0d0 - PAR(12),0.0d0)
-     &              , 8) / POCHHAMMER(1.0d0 - PAR(12)
-     &          + J , 8) * (1.0d0 - PAR(12) + J) /
-     &           (1.0d0 - DEL2/(PAR(14)+PAR(15)*J))**PAR(16) *
-     &          ( 1.0d0/(JMA(1) + 1.0d0) + PAR(19)*PI*( 1.0d0 / 
-     &              TAN(-ALPT(1)*PIHALF) + DCTAN(JMA(1)*PIHALF) ) *
-     &             (XI/2)**(JMA(1)+1.0d0) )
-          FCM(2) = PAR(21) * POCHHAMMER(COMPLEX(2.0d0 - PAR(22),0.0d0)
-     &              , 6) / POCHHAMMER(1.0d0 - PAR(22)
-     &          + J , 6) * (1.0d0 - PAR(22) + J) /
-     &           (1.0d0 - DEL2/(PAR(24)+PAR(25)*J))**PAR(26) *
-     &          ( 1.0d0/(JMA(2) + 1.0d0) + PAR(29)*PI*( 1.0d0 / 
-     &              TAN(-ALPT(2)*PIHALF) + DCTAN(JMA(2)*PIHALF) ) *
-     &             (XI/2)**(JMA(2)+1.0d0) )
-        ENDIF
-      ELSE IF (ANSATZ .EQ. 'FITKAP') THEN
-          ALPT(1) = PAR(12) + PAR(13)*DEL2
-          ALPT(2) = PAR(22) + PAR(23)*DEL2
-          JMA(1) = J - ALPT(1)
-          JMA(2) = J - ALPT(2)
-        IF ( PROCESS .EQ. 'DIS' ) THEN 
-          FCM(1) = PAR(11) * POCHHAMMER(COMPLEX(2.0d0 - PAR(12),0.0d0) 
-     &              , 8) / POCHHAMMER(1.0d0 - PAR(12)
-     &          + J , 8) * (1.0d0 - PAR(12) + J) / (1.0d0 + JMA(1))
-          FCM(2) = PAR(21) * POCHHAMMER(COMPLEX(2.0d0 - PAR(22),0.0d0)
-     &              , 6) / POCHHAMMER(1.0d0 - PAR(22)
-     &          + J , 6) * (1.0d0 - PAR(22) + J) / (1.0d0 + JMA(2))
-        ELSE  
-          FCM(1) = SQRT(1.0d0 - DEL2*PAR(18)**2/3.5344D0) *
-     &           PAR(11) * POCHHAMMER(COMPLEX(2.0d0 - PAR(12),0.0d0)
-     &              , 8) / POCHHAMMER(1.0d0 - PAR(12)
-     &          + J , 8) * (1.0d0 - PAR(12) + J) / (1.0d0 + JMA(1)) /
-     &           (1.0d0 - DEL2/(PAR(14)+PAR(15)*J))**PAR(16) *
-     &        ( 1.0d0 - PAR(19)*PI*(XI/2.0d0)**(JMA(1)+1.0d0)*SQRT(PI)*
-     &         2.0d0**(-2.0d0*ALPT(1))*EXP( CLNGAMMA(1.0d0+J) +
-     &          CLNGAMMA(1.0d0+J+ALPT(1)) - CLNGAMMA(1.5d0+J) - 
-     &          CLNGAMMA(1.0d0+JMA(1)) - 2.0d0*CLNGAMMA(
-     &           COMPLEX(ALPT(1), 0.0d0)) ) / SIN(PI*ALPT(1)) *
-     &          (1.0d0 - (SIN(PI*ALPT(1)) -
-     &           SIN(J*PI))/SIN(PI*JMA(1)) ) )
-          FCM(2) = SQRT(1.0d0 - DEL2*PAR(18)**2/3.5344D0) *
-     &           PAR(21) * POCHHAMMER(COMPLEX(2.0d0 - PAR(22),0.0d0)
-     &              , 6) / POCHHAMMER(1.0d0 - PAR(22)
-     &          + J , 6) * (1.0d0 - PAR(22) + J) / (1.0d0 + JMA(2)) /
-     &           (1.0d0 - DEL2/(PAR(24)+PAR(25)*J))**PAR(26) *
-     &        ( 1.0d0 - PAR(29)*PI*(XI/2.0d0)**(JMA(2)+1.0d0)*SQRT(PI)*
-     &         2.0d0**(-2.0d0*ALPT(2))*EXP( CLNGAMMA(1.0d0+J) +
-     &          CLNGAMMA(1.0d0+J+ALPT(2)) - CLNGAMMA(1.5d0+J) - 
-     &          CLNGAMMA(1.0d0+JMA(2)) - 2.0d0*CLNGAMMA(
-     &           COMPLEX(ALPT(2), 0.0d0)) ) / SIN(PI*ALPT(2)) *
-     &          (1.0d0 - (SIN(PI*ALPT(2)) -
-     &           SIN(J*PI))/SIN(PI*JMA(2)) ) )
-        ENDIF
+*           Killing E contribution
+            PAR(18) = 0.0d0
+            PAR(28) = 0.0d0
       ELSE IF (ANSATZ .EQ. 'FIT') THEN
           ALPT(1) = PAR(12) + PAR(13)*DEL2
           ALPT(2) = PAR(22) + PAR(23)*DEL2
@@ -195,6 +131,9 @@ C
         ENDIF
       ELSE IF (ANSATZ .EQ. 'SPLICE') THEN
               CALL SPLICE(J, FCM)
+*           Killing E contribution
+            PAR(18) = 0.0d0
+            PAR(28) = 0.0d0
 *  ## ansatz used for "big paper"  hep-ph/0703179 
       ELSE IF (ANSATZ .EQ. 'FITBP') THEN
             HU = PAR(31) * POCHHAMMER(COMPLEX(1.0d0 - PAR(32), 0.0d0) 
@@ -225,6 +164,9 @@ C
      &          + J , 6) * (COMPLEX(1.0d0 - PAR(22), 0.0d0) + J) /
      &           (COMPLEX(1.0d0 - PAR(22) - PAR(23)*DEL2, 0.0d0) + J) /
      &           (1.0d0 - DEL2/(PAR(24)+PAR(25)*J))**PAR(26)
+*           Killing E contribution
+            PAR(18) = 0.0d0
+            PAR(28) = 0.0d0
       ELSE IF (ANSATZ .EQ. 'NSFIT') THEN
 *    Ugly kludge: NS valence = down
             HD = PAR(41) * POCHHAMMER(COMPLEX(1.0d0 - PAR(42), 0.0d0) 
@@ -255,6 +197,9 @@ C
         FCM(2) = 
      &      LHA(4)*LHBETAF(4) / POCHHAMMER(J-COMPLEX(LHLAM(4), 0.0D0),
      &        LHBETA(4)+1) 
+*           Killing E contribution
+            PAR(18) = 0.0d0
+            PAR(28) = 0.0d0
       END IF
 
       RETURN

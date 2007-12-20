@@ -36,18 +36,16 @@ C
                 FCM(1)=(PAR(11)*(2-PAR(12))*(3-PAR(12))*(4
      &  -PAR(12))*(5-PAR(12))*(6-PAR(12))*(7-PAR(1
      &  2))*(8-PAR(12))*(9-PAR(12))*(1/(1-DEL2/(PA
-     &  R(14)+j*PAR(15))))**PAR(16)*sqrt(1-2.82933
-     &  4540516071d-1*DEL2*PAR(18)**2))/((2+j-PAR(
-     &  12))*(3+j-PAR(12))*(4+j-PAR(12))*(5+j-PAR(
-     &  12))*(6+j-PAR(12))*(7+j-PAR(12))*(8+j-PAR(
-     &  12))*(1+j-PAR(12)-DEL2*PAR(13))) 
+     &  R(14)+j*PAR(15))))**PAR(16))/((2+j-PAR(12)
+     &  )*(3+j-PAR(12))*(4+j-PAR(12))*(5+j-PAR(12)
+     &  )*(6+j-PAR(12))*(7+j-PAR(12))*(8+j-PAR(12)
+     &  )*(1+j-PAR(12)-DEL2*PAR(13))) 
                 FCM(2)=(PAR(21)*(2-PAR(22))*(3-PAR(22))*(4
      &  -PAR(22))*(5-PAR(22))*(6-PAR(22))*(7-PAR(2
      &  2))*(1/(1-DEL2/(PAR(24)+j*PAR(25))))**PAR(
-     &  26)*sqrt(1-2.829334540516071d-1*DEL2*PAR(1
-     &  8)**2))/((2+j-PAR(22))*(3+j-PAR(22))*(4+j-
-     &  PAR(22))*(5+j-PAR(22))*(6+j-PAR(22))*(1+j-
-     &  PAR(22)-DEL2*PAR(23))) 
+     &  26))/((2+j-PAR(22))*(3+j-PAR(22))*(4+j-PAR
+     &  (22))*(5+j-PAR(22))*(6+j-PAR(22))*(1+j-PAR
+     &  (22)-DEL2*PAR(23))) 
       ELSE  
                 FCM(1)=(PAR(11)*(2-PAR(12))*(3-PAR(12))*(4
      &  -PAR(12))*(5-PAR(12))*(6-PAR(12))*(7-PAR(1
@@ -61,11 +59,10 @@ C
      &  -PAR(12)-DEL2*PAR(13)))))/(EXP(CLNGAMMA(1.
      &  5d0+j))*EXP(CLNGAMMA(1+j-PAR(12)-DEL2*PAR(
      &  13)))*EXP(CLNGAMMA(PAR(12)+DEL2*PAR(13)))*
-     &  *2*sin(Pi*(PAR(12)+DEL2*PAR(13)))))*sqrt(1
-     &  -2.829334540516071d-1*DEL2*PAR(18)**2))/((
-     &  2+j-PAR(12))*(3+j-PAR(12))*(4+j-PAR(12))*(
-     &  5+j-PAR(12))*(6+j-PAR(12))*(7+j-PAR(12))*(
-     &  8+j-PAR(12))*(1+j-PAR(12)-DEL2*PAR(13))) 
+     &  *2*sin(Pi*(PAR(12)+DEL2*PAR(13))))))/((2+j
+     &  -PAR(12))*(3+j-PAR(12))*(4+j-PAR(12))*(5+j
+     &  -PAR(12))*(6+j-PAR(12))*(7+j-PAR(12))*(8+j
+     &  -PAR(12))*(1+j-PAR(12)-DEL2*PAR(13))) 
                 FCM(2)=(PAR(21)*(2-PAR(22))*(3-PAR(22))*(4
      &  -PAR(22))*(5-PAR(22))*(6-PAR(22))*(7-PAR(2
      &  2))*(1/(1-DEL2/(PAR(24)+j*PAR(25))))**PAR(
@@ -78,10 +75,9 @@ C
      &  )/(EXP(CLNGAMMA(1.5d0+j))*EXP(CLNGAMMA(1+j
      &  -PAR(22)-DEL2*PAR(23)))*EXP(CLNGAMMA(PAR(2
      &  2)+DEL2*PAR(23)))**2*sin(Pi*(PAR(22)+DEL2*
-     &  PAR(23)))))*sqrt(1-2.829334540516071d-1*DE
-     &  L2*PAR(18)**2))/((2+j-PAR(22))*(3+j-PAR(22
-     &  ))*(4+j-PAR(22))*(5+j-PAR(22))*(6+j-PAR(22
-     &  ))*(1+j-PAR(22)-DEL2*PAR(23))) 
+     &  PAR(23))))))/((2+j-PAR(22))*(3+j-PAR(22))*
+     &  (4+j-PAR(22))*(5+j-PAR(22))*(6+j-PAR(22))*
+     &  (1+j-PAR(22)-DEL2*PAR(23))) 
       ENDIF
 
       RETURN

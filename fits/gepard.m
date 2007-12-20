@@ -4,7 +4,7 @@
 (*     ==============================    *)
 
 
-Print["GeParD - Mathematica interface (2007-08-03)"];
+Print["GeParD - Mathematica interface (2007-12-20)"];
 
 
 BeginPackage["gepard`", "Format`", "NumericalMath`NLimit`", "Graphics`Graphics`"]
@@ -109,7 +109,12 @@ cffH::usage = "cffH[xi, t, q2, q02, options] returns singlet CFF H(xi, t, q2, q0
 Other parameters are read from  GEPARD.INI and additionally parameters SPEED, P, SCHEME and ANSATZ 
 can be set by specifying corresponding options e.g. GepardInit[P->0, ANSATZ->\"MMA\"]."
 
+cffE::usage = "cffE[xi, t, q2, q02, options] returns singlet CFF E(xi, t, q2, q02). 
+Other parameters are read from  GEPARD.INI and additionally parameters SPEED, P, SCHEME and ANSATZ 
+can be set by specifying corresponding options e.g. GepardInit[P->0, ANSATZ->\"MMA\"]."
+
 cffHInternal::usage = "MathLink function ..."
+cffEInternal::usage = "MathLink function ..."
 cInt::usage = "MathLink function ..."
 
 AllParameterValues::usage = "AllParameterValues[] returns complete list that corresponds to 
@@ -145,12 +150,16 @@ lobj = Install["gepard.exe"]  (* Installing C and Fortran routines. *)
 
 Options[GepardInit] = {SPEED -> -1, P -> -1, SCHEME -> "DFLT", ANSATZ -> "DFLT"};
 Options[cffH] = {SPEED -> -1, P -> -1, SCHEME -> "DFLT", ANSATZ -> "DFLT"};
+Options[cffE] = {SPEED -> -1, P -> -1, SCHEME -> "DFLT", ANSATZ -> "DFLT"};
 
 GepardInit[(opts___)?OptionQ] := GepardInitInternal @@ ( {SPEED, P, SCHEME, ANSATZ} 
         /. {opts} /. Options[GepardInit] )
 
 cffH[(xi_)?NumericQ, (t_)?NumericQ, (q2_)?NumericQ, (q02_)?NumericQ, (opts___)?OptionQ] := cffHInternal @@ ( {xi, t, q2, q02,
 		SPEED, P, SCHEME, ANSATZ} /. {opts} /. Options[cffH] )
+
+cffE[(xi_)?NumericQ, (t_)?NumericQ, (q2_)?NumericQ, (q02_)?NumericQ, (opts___)?OptionQ] := cffEInternal @@ ( {xi, t, q2, q02,
+		SPEED, P, SCHEME, ANSATZ} /. {opts} /. Options[cffE] )
 
 GepardFit[pars_, (opts___)?OptionQ] := Block[{varpars = ParameterID /@ pars, 
       allpars = First[Transpose[Parameters]], status, ierr, tchis, chidel, dof, 
@@ -245,23 +254,24 @@ PDF[pars_, t_, xi_] :=
         {PDFMomCompiledQ @@ args, PDFMomCompiledG @@ args}, 
        {jind, Length[jValues]}]]]
  
+(*FIXME: PAR(18) and PAR(28) hard-wired here!! *)
 
 CompileMoments[] := Block[{},
         GPDMomCompiledQ = 
             Compile[Evaluate[{rej, imj, t, xi}~Join~
-                  Union[Cases[GPDMom[j, t, xi], PAR[n_], Infinity]]], 
+                  Union[Cases[GPDMom[j, t, xi], PAR[n_], Infinity]~Join~{PAR[18], PAR[28]}]], 
               Evaluate[GPDMom[rej + I imj, t, xi][[1]]]];
         GPDMomCompiledG = 
             Compile[Evaluate[{rej, imj, t, xi}~Join~
-                  Union[Cases[GPDMom[j, t, xi], PAR[n_], Infinity]]], 
+                  Union[Cases[GPDMom[j, t, xi], PAR[n_], Infinity]~Join~{PAR[18], PAR[28]}]], 
               Evaluate[GPDMom[rej + I imj, t, xi][[2]]]];
         PDFMomCompiledQ = 
             Compile[Evaluate[{rej, imj, t, xi}~Join~
-                  Union[Cases[GPDMom[j, t, xi], PAR[n_], Infinity]]], 
+                  Union[Cases[GPDMom[j, t, xi], PAR[n_], Infinity]~Join~{PAR[18], PAR[28]}]], 
               Evaluate[PDFMom[rej + I imj, t, xi][[1]]]];
         PDFMomCompiledG = 
             Compile[Evaluate[{rej, imj, t, xi}~Join~
-                  Union[Cases[GPDMom[j, t, xi], PAR[n_], Infinity]]], 
+                  Union[Cases[GPDMom[j, t, xi], PAR[n_], Infinity]~Join~{PAR[18], PAR[28]}]], 
               Evaluate[PDFMom[rej + I imj, t, xi][[2]]]];
 ]
 

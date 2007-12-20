@@ -13,6 +13,10 @@ C  SYNOPSIS
 
       SUBROUTINE GETMBGPD
 
+C  PARENTS
+C    FCN, CFFF
+C  CHILDREN
+C    HJ
 C  SOURCE
 C
       IMPLICIT NONE
@@ -21,7 +25,6 @@ C
       DOUBLE COMPLEX J, FCM(2)
 
 
-C     Initialize grid with values of GPD's for forward case
       DO 30  K = 1, NPTS
         J = N(K) - 1
         CALL HJ(J, FCM)

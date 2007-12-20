@@ -47,9 +47,10 @@ C
       CHARACTER TXT*45
       DOUBLE COMPLEX CBETA
       CHARACTER*9 FITNM
-      DIMENSION FITNM(10)
+      DIMENSION FITNM(12)
       DATA FITNM /'NS', 'AL0S', 'ALPS', 'M02S',
-     & 'NG', 'AL0G', 'ALPG', 'M02G', 'SKEWS', 'SKEWG'/
+     & 'NG', 'AL0G', 'ALPG', 'M02G', 'SKEWS', 'SKEWG',
+     & 'KAPS', 'KAPG'/
 
 #ifndef NOPGPLOT
       INTEGER PGBEG
@@ -128,6 +129,7 @@ C
           DO 13 K = 1, 4
           WRITE (21, 809) FITNM(K), PAR(10+K), FITNM(4+K), PAR(20+K)
  13       CONTINUE
+          WRITE (21, 809) FITNM(11), PAR(18), FITNM(12), PAR(28)
           WRITE (21, 809) FITNM(9), PAR(19), FITNM(10), PAR(29)
         END IF
         WRITE (21, *) 
@@ -180,10 +182,12 @@ C
           WRITE (TXT, 809) FITNM(K), PAR(10+K), FITNM(K+4), PAR(20+K)
           CALL PGTEXT (-1., REAL(10-K), TXT)
  30       CONTINUE
-          WRITE (TXT, 809) FITNM(9), PAR(19), FITNM(10), PAR(29)
+          WRITE (TXT, 809) FITNM(11), PAR(18), FITNM(12), PAR(28)
           CALL PGTEXT (-1., 5., TXT)
+          WRITE (TXT, 809) FITNM(9), PAR(19), FITNM(10), PAR(29)
+          CALL PGTEXT (-1., 4., TXT)
           WRITE (TXT, 808) NTOT, NPAR, NTOT-NPAR, CHISQ
-          CALL PGTEXT (-1., 3., TXT)
+          CALL PGTEXT (-1., 2., TXT)
         END IF
 *     Draw last plot containing PDFs
         CALL PGSCH(1.8)

@@ -1,9 +1,9 @@
 # Makefile for gepard Fortran and C sources
 
 # Interesting targets:
+# 	test       -  tests both DVCS and DIS routines
 # 	radcorr    -  program for producing Fig. 1 in letter
 # 	scaledep   -  program for producing Fig. 2 in letter
-# 	test       -  tests both DVCS and DIS routines
 # 	fit        -  fitting GPD ansatz to DVCS and DIS data
 #
 # To remove PGPLOT (plotting) compile with
@@ -16,7 +16,7 @@
 # Compiler options
 FFLAGS =  -I. -O 
 CFLAGS =  -O2
-#CPPFLAGS = -D NOPGPLOT
+CPPFLAGS = -D NOPGPLOT
 
 # Subdirectories for storing example source files
 EXDIR = ex
@@ -107,7 +107,7 @@ $(FITTARGETS): %: $(ALLOBJS) $(EXFODIR)/%.o
 
 # mma targets
 
-gepard.exe: CPPFLAGS := $(CPPFLAGS) -D MMA
+gepard.exe: CPPFLAGS := -D MMA
 gepard.exe: $(ALLOBJS) $(_MMAOBJS)  $(FODIR)/Fmninterface.o
 	$(FC) -o ../fits/$@/$(SYS)/$@ $^ $(FFLAGS) $(CERNLIBS) -L$(MLLIBDIR) -l$(MLLIB) $(ALLPGPLOTLIBS) $(MLEXTRA)
 
