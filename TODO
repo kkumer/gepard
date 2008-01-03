@@ -5,7 +5,6 @@ Computing:
 -  Make fancy C-MathLink communication function that recognizes input type
 -  Remove unused variables (specially in adacf, or specially not there)?
 -  In fitting parameters should be non-squared quantities
--  FIT.INI file should not have hardcoded filename but it should be passed via command line
 -  use autoconf and friends
 -  MSBND -> MSBAR, MSBAR -> MSBDI
 -  Automatize putting Alekhin's PDFs into fitpdfs
@@ -14,6 +13,7 @@ Computing:
 -  FIT.INI should have optional name, changable by mma interface
 -  tmp.mma is a kludge
 -  PAR(18) and (28) hardwired in CompileMoments[]
+-  Using GOTO statements in fcn.F should be avoided
 
 Checks:
 -  Check F_2 of DIS beyond LO (compare to Vogt etc.). Why is BIGCF2 \neq CDIS2
@@ -23,8 +23,6 @@ Checks:
 
 Design:
 -  Verbatim \ref in robodoc TeX?
--  Improve /XSERVE output.
--  There should be no dots on red fit lines
 
 DONE:
 +  Transfer adacf Fortran routines to gepard to make it independent
@@ -39,3 +37,5 @@ DONE:
 +  Restore MathLink communication
 +  FIT->FITBP  FITOLD->TEST
 +  Beautify Robodoc output.
++  There should be no dots on red fit lines
++  Improve /XSERVE output.

@@ -51,6 +51,16 @@ C
       IF (DATAFNAME(:4) .EQ. 'STOP') THEN
         GOTO 20
       ELSE
+      IF (DATAFNAME(:5) .EQ. 'CHISQ') THEN
+*       Skip partial CHISQ
+        READ (11, *) DATAFNAME
+        IF (DATAFNAME(:4) .EQ. 'STOP') GOTO 20
+      END IF
+      IF (DATAFNAME(:6) .EQ. 'NEWFIG') THEN
+*       Skip PGPLOT definitions
+        READ (11, *) DATAFNAME
+        READ (11, *) DATAFNAME
+      END IF
 C       BEGIN count datapoints from this file
       OPEN (UNIT = 12, FILE = DATAFNAME, STATUS = 'OLD')
 

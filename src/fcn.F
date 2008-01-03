@@ -41,13 +41,18 @@ C      MINUIT, FIT (via MINUIT)
 C
 C  SOURCE
 C
-      INTEGER NN, NTOT, K, IER, XPANELS, YPANELS
-      DOUBLE PRECISION CHISQPART
+      INTEGER NN, NTOT, K, IER, XPANELS, YPANELS, ICOL
+      INTEGER COL(6), NPART, IPANEL
+      DOUBLE PRECISION CHISQPART, CHIPART
       CHARACTER*30 DATAFNAME, OUTFILE, OUTFORMAT
+      CHARACTER*20 FIGLABEL, XLABEL, YLABEL, XTYPE, YTYPE
       CHARACTER TXT*45
       DOUBLE COMPLEX CBETA
+      REAL XMIN, XMAX, YMIN, YMAX, CHSIZE
       CHARACTER*9 FITNM
       DIMENSION FITNM(12)
+*      Colors used by PGPLOT:
+      DATA COL /1, 2, 4, 8, 12, 13/
       DATA FITNM /'NS', 'AL0S', 'ALPS', 'M02S',
      & 'NG', 'AL0G', 'ALPG', 'M02G', 'SKEWS', 'SKEWG',
      & 'KAPS', 'KAPG'/
@@ -90,8 +95,12 @@ C
         HGRID(0, K, 2) = MBGPD(K, 2)
  11   CONTINUE
 
+      NPART = 0
+      CHIPART = 0.0
       NTOT = 0
       CHISQ = 0.0d0
+      ICOL = 0
+      IPANEL = 0
 
       OPEN (UNIT = 11, FILE = 'FIT.INI', STATUS = 'OLD')
       READ (11, *) OUTFILE
@@ -147,10 +156,63 @@ C
       IF (DATAFNAME(:5) .NE. 'START') GOTO 15
  18   READ (11, *) DATAFNAME
       IF (DATAFNAME(:4) .EQ. 'STOP') THEN
-        GOTO 20
+        GOTO 20 
       ELSE
-        CALL PROCDATA (DATAFNAME, IFLAG, NN, CHISQPART)
-        CHISQ = CHISQ + CHISQPART
+        IF (DATAFNAME(:6) .EQ. 'NEWFIG') THEN
+*         New panel is desired.
+*         Read next line with PGPLOT parameters.
+          READ (11, *) FIGLABEL, XLABEL, YLABEL, 
+     &      XMIN, XMAX, YMIN, YMAX, XTYPE, YTYPE
+*         start plotting panel
+#ifndef NOPGPLOT
+          IF (IFLAG .EQ. 3) THEN
+*         check if second X window is needed
+            IPANEL = IPANEL + 1
+            IF (IPANEL .EQ. XPANELS*YPANELS+1) THEN
+              CALL PGEND
+              IF (OUTFORMAT(:2) .EQ. '/X') THEN
+                IER = PGBEG(0, "2/XSERVE", XPANELS, YPANELS)
+                IF (IER.NE.1) STOP
+                CALL PGSCH(1.8)
+              END IF
+            END IF
+            CALL PGPAGE
+            CALL PGVSTD
+            CALL PGSLW(2)
+            CALL PGSWIN (XMIN, XMAX, YMIN, YMAX)
+            CALL PGBOX (XTYPE, 0.0, 0, YTYPE, 0.0, 0)
+            CALL PGLAB(XLABEL, YLABEL, FIGLABEL)
+          END IF
+#endif
+          GOTO 18
+        ELSE IF (DATAFNAME(:5) .EQ. 'CHISQ') THEN
+          IF (IFLAG .EQ. 3)  THEN
+*         print out the partial chi-square
+            WRITE(21, *) '====== SUBTOTAL ====='
+            NPART = NTOT - NPART
+            CHIPART = CHISQ - CHIPART
+            WRITE(21, 810) NPART, CHIPART
+            WRITE(TXT, 810) NPART, CHIPART
+            NPART = NTOT
+            CHIPART = CHISQ
+            CALL PGQCH(CHSIZE)
+            CALL PGSCH(1.4)
+            CALL PGTEXT (XMIN, YMAX+(YMAX-YMIN)/30., TXT)
+            CALL PGSCH(CHSIZE)
+          END IF
+        ELSE
+          IF (IFLAG .EQ. 3)  THEN
+            ICOL = ICOL + 1
+            IF (ICOL .EQ. 7) ICOL = 1
+            CALL PGSCI(COL(ICOL))
+          END IF
+          CALL PROCDATA (DATAFNAME, IFLAG, NN, CHISQPART)
+          CHISQ = CHISQ + CHISQPART
+          IF (IFLAG .EQ. 3)  THEN
+            CALL PGSCI(1)
+          END IF
+        END IF
+          
         NTOT = NTOT + NN
         IF (IFLAG .EQ. 3) WRITE (21, *)
       END IF
@@ -229,6 +291,7 @@ C
           LASTYS = YS
           DRAW = .TRUE.
  40     CONTINUE
+        CALL PGIDEN
         CALL PGEND
 #endif
       END IF
@@ -240,6 +303,7 @@ C
 808   FORMAT (1X, 'd.o.f = ', I3, ' - ', I1, ' = ', I3, '   ',
      &            '\\gx\\u2\\d = ', F8.1)
 809   FORMAT (3X,  A6, '=', 1X, G8.2, 5X, A6, '=', 1X, G8.2)
+810   FORMAT (1X, 'PTS = ', I3, 3X, 'CHISQPART = ', F5.1)
 
       RETURN
       END
@@ -301,10 +365,7 @@ C
       IF (IFLAG .EQ. 3) THEN
         WRITE (21, 902) FNAME
 #ifndef NOPGPLOT
-        CALL PGPAGE
-        CALL PGVSTD
         DRAW = .FALSE.
-        CALL PGSLW(2)
 #endif
       END IF
 
@@ -321,13 +382,6 @@ C
         READ (12,*) NN
 
         XI = Q2 / ( 2.0d0 * W**2 + Q2)
-#ifndef NOPGPLOT
-        IF (IFLAG .EQ. 3) THEN
-          CALL PGSWIN (0., 1., -1.3, 2.)
-          CALL PGBOX ('BCNST1', 0.0, 0, 'BCLNST', 0.0, 0)
-          CALL PGLAB("-t", 'd\\gs/dt', FNAME)
-        END IF
-#endif
 
         DO 110 K = 1, NN
         READ (12, *) X, YY, STAT, SYS
@@ -342,16 +396,13 @@ C
 #ifndef NOPGPLOT
           CALL PGERRY(1, SNGL(X), LOG10(SNGL(YY-DY)), 
      &                  LOG10(SNGL(YY+DY)), 3.0)
-          CALL PGSCI(2)
           IF (DRAW) THEN
             CALL PGMOVE(LASTX, LASTY)
             CALL PGDRAW(SNGL(X), LOG10(SNGL(THY)))
           END IF
-          CALL PGPT1(SNGL(X), LOG10(SNGL(THY)), 17)
           LASTX = SNGL(X)
           LASTY = LOG10(SNGL(THY)) 
           DRAW = .TRUE.
-          CALL PGSCI(1)
 #endif
         END IF
 110     CONTINUE
@@ -371,29 +422,9 @@ C
         IF (WIN .LT. 0.) THEN
           W = X
           Q2 = Q2IN
-#ifndef NOPGPLOT
-          IF (IFLAG .EQ. 3) THEN
-            IF (Q2 .LE. 6.) THEN
-              CALL PGSWIN (30., 140., 0., 18.)
-            ELSE IF (Q2 .GE. 15.) THEN
-              CALL PGSWIN (30., 140., 0., 3.)
-            ELSE
-              CALL PGSWIN (30., 140., 0., 12.)
-            END IF
-            CALL PGBOX ('BCNST1', 0.0, 0, 'BCNST', 0.0, 0)
-            CALL PGLAB("W", '\\gs', FNAME)
-          END IF
-#endif
         ELSE IF (Q2IN .LT. 0) THEN
           Q2 = X
           W = WIN
-#ifndef NOPGPLOT
-          IF (IFLAG .EQ. 3) THEN
-            CALL PGSWIN (0., 90., -1.7, 1.4)
-            CALL PGBOX ('BCNST1', 0.0, 0, 'BCLNST', 0.0, 0)
-            CALL PGLAB("Q\\u2\\d", '\\gs', FNAME)
-          END IF
-#endif
         ELSE
           CALL ERROR ('GeParD', 'PROCDATA',
      &    'Either W or Q2 in ' // FNAME // ' should be negative!',
@@ -408,29 +439,24 @@ C
 #ifndef NOPGPLOT
           IF (WIN .LT. 0.) THEN
             CALL PGERRY(1, SNGL(X), SNGL(YY-DY), SNGL(YY+DY), 3.0)
-            CALL PGSCI(2)
             IF (DRAW) THEN
               CALL PGMOVE(LASTX, LASTY)
               CALL PGDRAW(SNGL(X), SNGL(THY))
             END IF
-            CALL PGPT1(SNGL(X), SNGL(THY), 17)
             LASTX = SNGL(X)
             LASTY = SNGL(THY)
             DRAW = .TRUE.
           ELSE
             CALL PGERRY(1,SNGL(X), LOG10(SNGL(YY-DY)), 
      &              LOG10(SNGL(YY+DY)), 3.0)
-            CALL PGSCI(2)
             IF (DRAW) THEN
               CALL PGMOVE(LASTX, LASTY)
               CALL PGDRAW(SNGL(X), LOG10(SNGL(THY)))
             END IF
-            CALL PGPT1(SNGL(X), LOG10(SNGL(THY)), 17)
             LASTX = SNGL(X)
             LASTY = LOG10(SNGL(THY)) 
             DRAW = .TRUE.
           END IF
-          CALL PGSCI(1)
 #endif
         END IF
 120     CONTINUE
@@ -450,23 +476,9 @@ C
         IF (XBJIN .LT. 0.) THEN
           XBJ = X
           Q2 = Q2IN
-#ifndef NOPGPLOT
-          IF (IFLAG .EQ. 3) THEN
-            CALL PGSWIN (0., 0.01, 0., 1.5)
-            CALL PGBOX ('BCNST1', 0.0, 0, 'BCNST', 0.0, 0)
-            CALL PGLAB("x\\dBJ\\u", 'F\\d2\\u(x\\dBJ\\u)', FNAME)
-          END IF
-#endif
         ELSE IF (Q2IN .LT. 0) THEN
           Q2 = X
           XBJ = XBJIN
-#ifndef NOPGPLOT
-          IF (IFLAG .EQ. 3) THEN
-            CALL PGSWIN (0., 70., 0., 1.5)
-            CALL PGBOX ('BCNST1', 0.0, 0, 'BCNST', 0.0, 0)
-            CALL PGLAB("Q\\u2\\d", 'F\\d2\\u(Q\\u2\\d)', FNAME)
-          END IF
-#endif
         ELSE
           CALL ERROR ('GeParD', 'PROCDATA',
      &    'Either XBJ or Q2 in ' // FNAME // ' should be negative!',
@@ -481,16 +493,13 @@ C
           WRITE (21, 901) X, THY, YY, DY, DIFSG
 #ifndef NOPGPLOT
           CALL PGERR1(6, SNGL(X), SNGL(YY), SNGL(DY), 3.0)
-          CALL PGSCI(2)
           IF (DRAW) THEN
             CALL PGMOVE(LASTX, LASTY)
             CALL PGDRAW(SNGL(X), SNGL(THY))
           END IF
-          CALL PGPT1(SNGL(X), SNGL(THY), 17)
           LASTX = SNGL(X)
           LASTY = SNGL(THY) 
           DRAW = .TRUE.
-          CALL PGSCI(1)
 #endif
         END IF
 130     CONTINUE
