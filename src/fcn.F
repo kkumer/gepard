@@ -42,20 +42,28 @@ C
 C  SOURCE
 C
       INTEGER NN, NTOT, K, IER, XPANELS, YPANELS, ICOL
-      INTEGER COL(6), NPART, IPANEL
+      INTEGER COL(6), PRPARMAX, NPART, IPANEL
       DOUBLE PRECISION CHISQPART, CHIPART
       CHARACTER*30 DATAFNAME, OUTFILE, OUTFORMAT
       CHARACTER*20 FIGLABEL, XLABEL, YLABEL, XTYPE, YTYPE
-      CHARACTER TXT*45
+      CHARACTER TXT*45, CHTXT*15, CHTXTOT*60
       DOUBLE COMPLEX CBETA
       REAL XMIN, XMAX, YMIN, YMAX, CHSIZE
       CHARACTER*9 FITNM
       DIMENSION FITNM(12)
+      INTEGER IVAR
+      CHARACTER*10 NAML, NAMR
+      CHARACTER*1 VFLAGL, VFLAGR
+      DOUBLE PRECISION VALL, VALR, ERL, ERR, BND1, BND2
 *      Colors used by PGPLOT:
       DATA COL /1, 2, 4, 8, 12, 13/
       DATA FITNM /'NS', 'AL0S', 'ALPS', 'M02S',
      & 'NG', 'AL0G', 'ALPG', 'M02G', 'SKEWS', 'SKEWG',
      & 'KAPS', 'KAPG'/
+*      Parameters to be printed on the plot (only second digit)
+      PARAMETER (PRPARMAX = 5)
+      INTEGER PRPAR(PRPARMAX)
+      DATA PRPAR / 1, 2, 4, 8, 9 /
 
 #ifndef NOPGPLOT
       INTEGER PGBEG
@@ -64,6 +72,9 @@ C
       REAL XB, LGXB, LASTLGXB, YG, YS, LASTYG, LASTYS
 #endif
 
+      VFLAGL = ' '
+      VFLAGR = ' '
+      CHTXTOT = ''
 
 *     Clear output buffer
 
@@ -168,13 +179,12 @@ C
           IF (IFLAG .EQ. 3) THEN
 *         check if second X window is needed
             IPANEL = IPANEL + 1
-            IF (IPANEL .EQ. XPANELS*YPANELS+1) THEN
+            IF ( (IPANEL .EQ. XPANELS*YPANELS+1) .AND. 
+     &           (OUTFORMAT(:2) .EQ. '/X') ) THEN
               CALL PGEND
-              IF (OUTFORMAT(:2) .EQ. '/X') THEN
-                IER = PGBEG(0, "2/XSERVE", XPANELS, YPANELS)
-                IF (IER.NE.1) STOP
-                CALL PGSCH(1.8)
-              END IF
+              IER = PGBEG(0, "2/XSERVE", XPANELS, YPANELS)
+              IF (IER.NE.1) STOP
+              CALL PGSCH(1.8)
             END IF
             CALL PGPAGE
             CALL PGVSTD
@@ -191,6 +201,12 @@ C
             WRITE(21, *) '====== SUBTOTAL ====='
             NPART = NTOT - NPART
             CHIPART = CHISQ - CHIPART
+*         memorize it for final printout
+            WRITE(CHTXT, 811) CHIPART, NPART
+            CHTXTOT = 
+     &       CHTXTOT(1:MAX(1,INDEX(CHTXTOT//'   ','   ')-1)) // CHTXT
+            WRITE(*,*) CHTXT
+            WRITE(*,*) CHTXTOT
             WRITE(21, 810) NPART, CHIPART
             WRITE(TXT, 810) NPART, CHIPART
             NPART = NTOT
@@ -239,17 +255,22 @@ C
         WRITE(TXT, 806) SCHEME, Q02
         CALL PGTEXT (1., 11., TXT)
         IF ((ANSATZ(:3) .EQ. 'FIT') .OR. (ANSATZ(:3) .EQ. 'MMA')) THEN
-          CALL PGTEXT (-1., 10., "Final fit parameters:")
-          DO 30 K = 1, 4
-          WRITE (TXT, 809) FITNM(K), PAR(10+K), FITNM(K+4), PAR(20+K)
+          CALL PGTEXT (-1., 10., "Final fit parameters (*=fixed):")
+          DO 30 K = 1, PRPARMAX
+          CALL MNPOUT(10+PRPAR(K), NAML, VALL, ERL, BND1, BND2, IVAR)
+          IF (IVAR .EQ. 0) VFLAGL="*"
+          NAML = VFLAGL//NAML
+          CALL MNPOUT(20+PRPAR(K), NAMR, VALR, ERR, BND1, BND2, IVAR)
+          IF (IVAR .EQ. 0) VFLAGR="*"
+          NAMR = VFLAGR//NAMR
+          WRITE (TXT, 809) NAML, VALL, NAMR, VALR
           CALL PGTEXT (-1., REAL(10-K), TXT)
  30       CONTINUE
-          WRITE (TXT, 809) FITNM(11), PAR(18), FITNM(12), PAR(28)
-          CALL PGTEXT (-1., 5., TXT)
-          WRITE (TXT, 809) FITNM(9), PAR(19), FITNM(10), PAR(29)
-          CALL PGTEXT (-1., 4., TXT)
+          CALL PGTEXT(-1.,4.,'[\\gx\\u2\\d\\dpartial\\u / datapoints]:')
+          CALL PGTEXT (-1., 3., CHTXTOT)
           WRITE (TXT, 808) NTOT, NPAR, NTOT-NPAR, CHISQ
-          CALL PGTEXT (-1., 2., TXT)
+          CALL PGTEXT(-1.,2.,'Total \\gx\\u2\\d:')
+          CALL PGTEXT (-1., 1., TXT)
         END IF
 *     Draw last plot containing PDFs
         CALL PGSCH(1.8)
@@ -304,6 +325,7 @@ C
      &            '\\gx\\u2\\d = ', F8.1)
 809   FORMAT (3X,  A6, '=', 1X, G8.2, 5X, A6, '=', 1X, G8.2)
 810   FORMAT (1X, 'PTS = ', I3, 3X, 'CHISQPART = ', F5.1)
+811   FORMAT (1X, '[', F5.1, '/', I3, ']', 3X)
 
       RETURN
       END

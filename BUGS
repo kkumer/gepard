@@ -22,7 +22,7 @@ Open:
 
 -  One has to delete .min file on Windows or PrintMinuitCommand is not ok.
 
-   
+-  Checking for new /XSERVE window is done only when plotting fit lines
 
 
 Fixed:
