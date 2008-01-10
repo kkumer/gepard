@@ -14,6 +14,9 @@ Computing:
 -  tmp.mma is a kludge
 -  PAR(18) and (28) hardwired in CompileMoments[]
 -  Using GOTO statements in fcn.F should be avoided
+-  There should be PDF() function so that PDFs are not calculated
+   internally in FCN()
+-  Implement plotting of GPD slopes
 
 Checks:
 -  Check F_2 of DIS beyond LO (compare to Vogt etc.). Why is BIGCF2 \neq CDIS2

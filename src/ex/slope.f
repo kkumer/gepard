@@ -28,7 +28,7 @@ C
 C                P -- approximation order N^{P}LO P=0,1,2
 C
 C  CHILDREN
-C      READPAR, INIT, LNHX, DERIV
+C      READPAR, INIT, LNHX, SLOPEH
 C  SYNOPSIS
 
       PROGRAM SLOPE
@@ -37,7 +37,7 @@ C  SOURCE
 C
       IMPLICIT NONE
       INTEGER PT, NPOINTS, LN, NEVALS
-      DOUBLE PRECISION HX(2)
+      DOUBLE PRECISION BH(2)
       DOUBLE PRECISION LOGXI, LOGXISTART, LOGXIEND, LOGXISTEP, MP
       DOUBLE PRECISION LNHXQ, LNHXG, T, H, DRV, ERR
       EXTERNAL LNHXQ, LNHXG
@@ -142,17 +142,13 @@ C
 *     Calculating slopes needed for present line and point ...
 *     ... and saving them to array
 
-      T = 0.0d0
-
-      CALL DERIV(LNHXQ, T, H, NEVALS, DRV, ERR)
+      !CALL DERIV(LNHXQ, T, H, NEVALS, DRV, ERR)
 !      WRITE (30, *) XI, DRV, ERR
-      POINTS(0, LN, PT) = DRV
 
-      T = 0.0d0
+      CALL SLOPEH(BH, XI)
 
-      CALL DERIV(LNHXG, T, H, NEVALS, DRV, ERR)
-!      WRITE (31, *) XI, DRV, ERR
-      POINTS(1, LN, PT) = DRV
+      POINTS(0, LN, PT) = BH(1)
+      POINTS(1, LN, PT) = BH(2)
 
 
 
@@ -193,31 +189,4 @@ C
       END
 C     ****
 
-
-
-      DOUBLE PRECISION FUNCTION LNHXQ(T)
-
-      IMPLICIT NONE
-      DOUBLE PRECISION HX(2), T
-      INCLUDE '../header.f'
-
-      CALL XSPACE ( HX, XI, T)
-
-      LNHXQ = LOG( HX(1) )
-
-      RETURN
-      END
-
-      DOUBLE PRECISION FUNCTION LNHXG(T)
-
-      IMPLICIT NONE
-      DOUBLE PRECISION HX(2), T
-      INCLUDE '../header.f'
-
-      CALL XSPACE ( HX, XI, T)
-
-      LNHXG = LOG( HX(2) )
-
-      RETURN
-      END
 

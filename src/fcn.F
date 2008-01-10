@@ -43,7 +43,7 @@ C  SOURCE
 C
       INTEGER NN, NTOT, K, IER, XPANELS, YPANELS, ICOL
       INTEGER COL(6), PRPARMAX, NPART, IPANEL
-      DOUBLE PRECISION CHISQPART, CHIPART
+      DOUBLE PRECISION CHISQPART, CHIPART, HX(2), BH(2)
       CHARACTER*30 DATAFNAME, OUTFILE, OUTFORMAT
       CHARACTER*20 FIGLABEL, XLABEL, YLABEL, XTYPE, YTYPE
       CHARACTER TXT*45, CHTXT*15, CHTXTOT*60
@@ -211,22 +211,28 @@ C
             WRITE(TXT, 810) NPART, CHIPART
             NPART = NTOT
             CHIPART = CHISQ
+#ifndef NOPGPLOT
             CALL PGQCH(CHSIZE)
             CALL PGSCH(1.4)
             CALL PGTEXT (XMIN, YMAX+(YMAX-YMIN)/30., TXT)
             CALL PGSCH(CHSIZE)
+#endif
           END IF
         ELSE
+#ifndef NOPGPLOT
           IF (IFLAG .EQ. 3)  THEN
             ICOL = ICOL + 1
             IF (ICOL .EQ. 7) ICOL = 1
             CALL PGSCI(COL(ICOL))
           END IF
+#endif
           CALL PROCDATA (DATAFNAME, IFLAG, NN, CHISQPART)
           CHISQ = CHISQ + CHISQPART
+#ifndef NOPGPLOT
           IF (IFLAG .EQ. 3)  THEN
             CALL PGSCI(1)
           END IF
+#endif
         END IF
           
         NTOT = NTOT + NN
@@ -244,7 +250,7 @@ C
          CLOSE (21)
          CLOSE (22)
 #ifndef NOPGPLOT
-*     Draw next-to-last plot containing just parameter values
+*     Draw plot containing just parameter values
         CALL PGSCH(1.3)
         CALL PGPAGE
         CALL PGVSTD
@@ -272,8 +278,9 @@ C
           CALL PGTEXT(-1.,2.,'Total \\gx\\u2\\d:')
           CALL PGTEXT (-1., 1., TXT)
         END IF
-*     Draw last plot containing PDFs
+*     Draw plot of PDFs
         CALL PGSCH(1.8)
+        CALL PGSCI(1)
         CALL PGPAGE
         CALL PGVSTD
         DRAW = .FALSE.
@@ -289,14 +296,17 @@ C
         CALL PGBOX ('BCLNST', 0.0, 0, 'BCNST1', 0.0, 0)
         CALL PGLAB('x\\dBJ\\u', 'x\\gS(x)(blue), xg(x)(red)', 
      &       'Resulting PDFs')
-        NORMSEA = PAR(11) / 
-     &              CBETA(COMPLEX(2.0D0-PAR(12),0.0d0), (8.0d0,0.0d0))
-        NORMG = PAR(21) / 
-     &              CBETA(COMPLEX(2.0D0-PAR(22),0.0d0), (6.0d0,0.0d0))
+*        NORMSEA = PAR(11) / 
+*     &              CBETA(COMPLEX(2.0D0-PAR(12),0.0d0), (8.0d0,0.0d0))
+*        NORMG = PAR(21) / 
+*     &              CBETA(COMPLEX(2.0D0-PAR(22),0.0d0), (6.0d0,0.0d0))
         DO 40 LGXB = -4., -1., 0.02
           XB = 10**(LGXB)
-          YS = NORMSEA * XB**(1.0d0-PAR(12)) * (1.0d0-XB)**7.0
-          YG = NORMG * XB**(1.0d0-PAR(22)) * (1.0d0-XB)**5.0
+*          YS = NORMSEA * XB**(1.0d0-PAR(12)) * (1.0d0-XB)**7.0
+*          YG = NORMG * XB**(1.0d0-PAR(22)) * (1.0d0-XB)**5.0
+          CALL XSPACE(HX, DBLE(XB), 0.0d0)
+          YS = HX(1)
+          YG = HX(2)
           IF (DRAW) THEN
             CALL PGSCI(2)
             CALL PGSLS(2)
@@ -312,6 +322,41 @@ C
           LASTYS = YS
           DRAW = .TRUE.
  40     CONTINUE
+*     Draw plot of GPD slopes B(x)
+        CALL PGSCH(1.8)
+        CALL PGSCI(1)
+        CALL PGPAGE
+        CALL PGVSTD
+        DRAW = .FALSE.
+        CALL PGSWIN (-4., -1., 0., 6.)
+        CALL PGBOX ('BCLNST', 0.0, 0, 'BCNST1', 0.0, 0)
+        CALL PGLAB('x\\dBJ\\u', 'slope B(x) (blue=q, red=g)', 
+     &       'GPD slopes')
+        DO 50 LGXB = -4., -1., 0.02
+          XB = 10**(LGXB)
+          CALL SLOPEH(BH, DBLE(XB))
+          YS = BH(1)
+          YG = BH(2)
+          !WRITE (*,*) XB
+          !WRITE (*,*) BH(1), BH(2)
+          !WRITE (*,*) YS, YG
+          IF (DRAW) THEN
+            CALL PGSCI(2)
+            CALL PGSLS(2)
+            !CALL PGMOVE(LASTLGXB, LASTYG)
+            !CALL PGDRAW(LGXB, YG)
+            CALL PGPT1(LGXB, YG, -1)
+            CALL PGSCI(4)
+            CALL PGSLS(1)
+            !CALL PGMOVE(LASTLGXB, LASTYS)
+            !CALL PGDRAW(LGXB, YS)
+            CALL PGPT1(LGXB, YS, -2)
+          END IF
+          LASTLGXB = LGXB
+          LASTYG = YG
+          LASTYS = YS
+          DRAW = .TRUE.
+ 50     CONTINUE
         CALL PGIDEN
         CALL PGEND
 #endif
