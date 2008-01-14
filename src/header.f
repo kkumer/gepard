@@ -330,13 +330,51 @@ C  SYNOPSIS
 C     ***
 
 
+C     ****v* header.f/W2
+C  DESCRIPTION
+C      W2 --  c.m. energy squared
+C  MEMBER OF
+C     BCAKIN
+C  SYNOPSIS
+      DOUBLE PRECISION W2
+C     ***
+
+C     ****v* header.f/XB
+C  DESCRIPTION
+C      XB --  X Bjorken
+C  MEMBER OF
+C     BCAKIN
+C  SYNOPSIS
+      DOUBLE PRECISION XB
+C     ***
+
+C     ****v* header.f/YB
+C  DESCRIPTION
+C      YB --  "Y Bjorken": lepton energy fraction 
+C  MEMBER OF
+C     BCAKIN
+C  SYNOPSIS
+      DOUBLE PRECISION YB
+C     ***
+
+C     ****v* header.f/PHIAZ
+C  DESCRIPTION
+C      PHIAZ --  azymuthal angle between lepton plane and
+C                incoming photon-scattered proton plane
+C  MEMBER OF
+C     BCAKIN
+C  SYNOPSIS
+      DOUBLE PRECISION PHIAZ
+C     ***
+
 
 *   4. Other
 
-      DOUBLE PRECISION PI, PIHALF, CF, CA, TF
+      DOUBLE PRECISION PI, PIHALF, CF, CA, TF, MP2
       PARAMETER ( PI = 3.1415 92653 58979 D0 )
       PARAMETER ( PIHALF = 1.5707 963267 948966 D0 )
       PARAMETER ( CF = 4.0d0 / 3.0d0, CA = 3.0d0, TF = 0.5d0 )
+      PARAMETER ( MP2 = 0.880354d0 )
 
 *     - QCD beta function
       INTEGER NFMIN, NFMAX
@@ -555,6 +593,35 @@ C  SYNOPSIS
       DOUBLE COMPLEX CFFE(0:2)
 C     ***
         
+C     ****v* header.f/CHISQ
+C  DESCRIPTION
+C      CHISQ(0:10)   --  Total [CHISQ(0)] and partial chi-squares
+C  MEMBER OF
+C    CHISQBLK
+C  SYNOPSIS
+      DOUBLE PRECISION CHISQ(0:10)
+C     ***
+
+C     ****v* header.f/NDATAPTS
+C  DESCRIPTION
+C      NDATAPTS(0:10)   --  Number of data points belonging
+C               to total [NDATAPTS(0)] and partial chi-squares
+C  MEMBER OF
+C    NDATAPTSBLK
+C  SYNOPSIS
+      INTEGER NDATAPTS(0:10)
+C     ***
+
+
+C     ****v* header.f/CHIN
+C  DESCRIPTION
+C      CHIN   --  Index of last partial chi-square
+C  MEMBER OF
+C    CHINBLK
+C  SYNOPSIS
+      INTEGER CHIN
+C     ***
+
 
 *   Common blocks
 *   -------------
@@ -642,6 +709,13 @@ C  DESCRIPTION
 C      Values of -t, and weights for integrals over -t
 C  SYNOPSIS
       COMMON / MTS        /  MTS, MTWG
+C     ***
+
+C     ****c* header.f/BCAKIN
+C  DESCRIPTION
+C      Kinematics of the process, relevant for BCA
+C  SYNOPSIS
+      COMMON / BCAKIN     /  W2, XB,YB, PHIAZ
 C     ***
 
 
@@ -793,3 +867,27 @@ C     DIS F2 form factor
 C  SYNOPSIS
       COMMON / F2       /  F2
 C     ***
+
+C     ****c* header.f/CHISQBLK
+C  DESCRIPTION
+C      Values of chi-square
+C  SYNOPSIS
+      COMMON / CHISQBLK /  CHISQ
+C     ***
+
+C     ****c* header.f/NDATAPTSBLK
+C  DESCRIPTION
+C      Number of data points used for fit
+C  SYNOPSIS
+      COMMON / NDATAPTSBLK /  NDATAPTS
+C     ***
+
+
+C     ****c* header.f/CHINBLK
+C  DESCRIPTION
+C      Index of last partial chi-square in CHISQ
+C  SYNOPSIS
+      COMMON / CHINBLK /  CHIN
+C     ***
+
+

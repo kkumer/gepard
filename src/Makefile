@@ -47,7 +47,7 @@ $(ADACFODIR)/%.o: adacf/%.f
 FOBJS = Finit.o Fbeta.o Fspecial.o Fdcomplex.o Fastrong.o Flambda.o\
 Fprojectors.o Frnnlo.o Ferfunc.o Fevol.o Fcdvcs.o Fmsbar.o \
 Fdvcs.o Ff2.o Freadpar.o Ferror.o Fgauss.o Fnd.o Fbigcns.o Fintegra.o Fxspace.o\
-Finitc.o Fevolc.o Fgetmbgpd.o Fhj.o Fsplice.o Fcff.o Ffcn.o Fderiv.o
+Finitc.o Fevolc.o Fgetmbgpd.o Fhj.o Fsplice.o Fcff.o Ffcn.o Fderiv.o Fbca.o
 _FOBJS = $(patsubst %,$(FODIR)/%,$(FOBJS))
 
 

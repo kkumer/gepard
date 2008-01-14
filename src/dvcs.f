@@ -27,7 +27,6 @@ C
 
 
       IMPLICIT NONE
-      DOUBLE PRECISION W2
       INCLUDE 'header.f'
 
 *     Scales and kinematics

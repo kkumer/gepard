@@ -36,6 +36,7 @@ accept files:
    accuracy.f
    astrong.f
    aux.f
+   bca.f
    beta.f
    bigcns.f
    cdvcs.f

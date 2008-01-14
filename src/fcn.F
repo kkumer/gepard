@@ -15,11 +15,11 @@ C    comparing to theoretical prediction functions.
 C    Writes out theoretical line points for fit plotting.
 C  SYNOPSIS
 C
-      SUBROUTINE FCN(NPAR,GIN,CHISQ,A,IFLAG,FUTIL)
+      SUBROUTINE FCN(NPAR,GIN,CHI2,A,IFLAG,FUTIL)
 
       IMPLICIT NONE
       INTEGER NPAR, IFLAG
-      DOUBLE PRECISION CHISQ, FUTIL
+      DOUBLE PRECISION CHI2, FUTIL
       INCLUDE 'header.f'
       DOUBLE PRECISION A(NPARMAX),GIN(NPARMAX)
 C    
@@ -28,7 +28,7 @@ C                NPAR  --  Number of variable parameters
 C                   A  --  Values of all parameters
 C               IFLAG  --  If .EQ. 3 then print results out, see minuit doc
 C  OUTPUT
-C               CHISQ  --  Value of chi-square
+C               CHI2   --  Value of total chi-square = CHISQ(0)
 C  IDENTIFIERS
 C     FITPAR  --  Equal to A
 C  CHISQPART  --  chi-square produced by a single data set
@@ -41,9 +41,9 @@ C      MINUIT, FIT (via MINUIT)
 C
 C  SOURCE
 C
-      INTEGER NN, NTOT, K, IER, XPANELS, YPANELS, ICOL
-      INTEGER COL(6), PRPARMAX, NPART, IPANEL
-      DOUBLE PRECISION CHISQPART, CHIPART, HX(2), BH(2)
+      INTEGER NN, K, IER, XPANELS, YPANELS, ICOL
+      INTEGER COL(6), PRPARMAX, NSUBTOT, IPANEL
+      DOUBLE PRECISION CHISUBTOT, CHISQPART, HX(2), BH(2)
       CHARACTER*30 DATAFNAME, OUTFILE, OUTFORMAT
       CHARACTER*20 FIGLABEL, XLABEL, YLABEL, XTYPE, YTYPE
       CHARACTER TXT*45, CHTXT*15, CHTXTOT*60
@@ -55,6 +55,7 @@ C
       CHARACTER*10 NAML, NAMR
       CHARACTER*1 VFLAGL, VFLAGR
       DOUBLE PRECISION VALL, VALR, ERL, ERR, BND1, BND2
+      DOUBLE PRECISION BCA0
 *      Colors used by PGPLOT:
       DATA COL /1, 2, 4, 8, 12, 13/
       DATA FITNM /'NS', 'AL0S', 'ALPS', 'M02S',
@@ -69,7 +70,7 @@ C
       INTEGER PGBEG
       LOGICAL DRAW
       REAL NORMG, NORMSEA
-      REAL XB, LGXB, LASTLGXB, YG, YS, LASTYG, LASTYS
+      REAL XBJ, LGXBJ, LASTLGXBJ, YG, YS, LASTYG, LASTYS
 #endif
 
       VFLAGL = ' '
@@ -106,12 +107,12 @@ C
         HGRID(0, K, 2) = MBGPD(K, 2)
  11   CONTINUE
 
-      NPART = 0
-      CHIPART = 0.0
-      NTOT = 0
-      CHISQ = 0.0d0
       ICOL = 0
       IPANEL = 0
+
+      NDATAPTS(0) = 0
+      CHISQ(0) = 0.0d0
+      CHIN = 0
 
       OPEN (UNIT = 11, FILE = 'FIT.INI', STATUS = 'OLD')
       READ (11, *) OUTFILE
@@ -140,18 +141,9 @@ C
         OPEN (UNIT = 21, FILE = 
      &  OUTFILE(1:MAX(1,INDEX(OUTFILE//' ',' ')-1)) // '.out',
      &  STATUS = 'UNKNOWN')
-        OPEN (UNIT = 22, FILE = 'tmp.mma', STATUS = 'UNKNOWN')
         WRITE (21, 803) "Gepard parameters:"
         WRITE (21, 804) SPEED, P, NF
         WRITE (21, 806) SCHEME, Q02
-        IF ((ANSATZ(:3) .EQ. 'FIT') .OR. (ANSATZ(:3) .EQ. 'MMA')) THEN
-          WRITE (21, 803) "Final fit parameters:"
-          DO 13 K = 1, 4
-          WRITE (21, 809) FITNM(K), PAR(10+K), FITNM(4+K), PAR(20+K)
- 13       CONTINUE
-          WRITE (21, 809) FITNM(11), PAR(18), FITNM(12), PAR(28)
-          WRITE (21, 809) FITNM(9), PAR(19), FITNM(10), PAR(29)
-        END IF
         WRITE (21, *) 
 *     Same goes to .min
         WRITE (6, 803) "Gepard parameters:"
@@ -194,23 +186,29 @@ C
             CALL PGLAB(XLABEL, YLABEL, FIGLABEL)
           END IF
 #endif
-          GOTO 18
         ELSE IF (DATAFNAME(:5) .EQ. 'CHISQ') THEN
           IF (IFLAG .EQ. 3)  THEN
-*         print out the partial chi-square
-            WRITE(21, *) '====== SUBTOTAL ====='
-            NPART = NTOT - NPART
-            CHIPART = CHISQ - CHIPART
-*         memorize it for final printout
-            WRITE(CHTXT, 811) CHIPART, NPART
+*         Calculate partial chi-square and corresponding number
+*         of data points used for fitting and write to the
+*         next free space in arrays CHISQ and NDATAPTS ...
+            NSUBTOT = 0
+            CHISUBTOT = 0.0d0
+            DO 19 K = 1, CHIN
+              NSUBTOT = NSUBTOT + NDATAPTS(K)
+              CHISUBTOT = CHISUBTOT + CHISQ(K)
+ 19         CONTINUE
+            CHIN = CHIN + 1
+            NDATAPTS(CHIN) = NDATAPTS(0) - NSUBTOT
+            CHISQ(CHIN) = CHISQ(0) - CHISUBTOT
+*         ... and also add to string CHXTOT for final printout on graph
+            WRITE(CHTXT, 811) CHISQ(CHIN), NDATAPTS(CHIN)
             CHTXTOT = 
      &       CHTXTOT(1:MAX(1,INDEX(CHTXTOT//'   ','   ')-1)) // CHTXT
-            WRITE(*,*) CHTXT
-            WRITE(*,*) CHTXTOT
-            WRITE(21, 810) NPART, CHIPART
-            WRITE(TXT, 810) NPART, CHIPART
-            NPART = NTOT
-            CHIPART = CHISQ
+*         ... and to .out file
+            WRITE(21, *) '====== SUBTOTAL ====='
+            WRITE(21, 810) CHISQ(CHIN), NDATAPTS(CHIN)
+*         ... and to title of last panel
+            WRITE(TXT, 810) CHISQ(CHIN), NDATAPTS(CHIN)
 #ifndef NOPGPLOT
             CALL PGQCH(CHSIZE)
             CALL PGSCH(1.4)
@@ -222,33 +220,49 @@ C
 #ifndef NOPGPLOT
           IF (IFLAG .EQ. 3)  THEN
             ICOL = ICOL + 1
-            IF (ICOL .EQ. 7) ICOL = 1
+            IF (ICOL .EQ. 5) ICOL = 1
             CALL PGSCI(COL(ICOL))
+            CALL PGSLS(ICOL)
           END IF
 #endif
           CALL PROCDATA (DATAFNAME, IFLAG, NN, CHISQPART)
-          CHISQ = CHISQ + CHISQPART
+          CHISQ(0) = CHISQ(0) + CHISQPART
+          NDATAPTS(0) = NDATAPTS(0) + NN
 #ifndef NOPGPLOT
           IF (IFLAG .EQ. 3)  THEN
             CALL PGSCI(1)
+            CALL PGSLS(1)
           END IF
 #endif
         END IF
-          
-        NTOT = NTOT + NN
         IF (IFLAG .EQ. 3) WRITE (21, *)
       END IF
       GOTO 18
  20   CLOSE(11)
 
       IF (IFLAG .EQ. 3)  THEN
-         WRITE (21, *) 'FREE PARAMS = ', NPAR
-         WRITE (22, *)  NPAR
-         WRITE (21, *) 'D.O.F = ', NTOT - NPAR
-         WRITE (22, *)  NTOT - NPAR
-         WRITE (21, *) 'CHISQ = ', CHISQ
-         CLOSE (21)
-         CLOSE (22)
+        IF ((ANSATZ(:3) .EQ. 'FIT') .OR. (ANSATZ(:3) .EQ. 'MMA')) THEN
+          WRITE (21, 803) "Final fit parameters (*=fixed):"
+          DO 25 K = 1, PRPARMAX
+          CALL MNPOUT(10+PRPAR(K), NAML, VALL, ERL, BND1, BND2, IVAR)
+          IF (IVAR .EQ. 0) VFLAGL="*"
+          NAML = VFLAGL//NAML
+          CALL MNPOUT(20+PRPAR(K), NAMR, VALR, ERR, BND1, BND2, IVAR)
+          IF (IVAR .EQ. 0) VFLAGR="*"
+          NAMR = VFLAGR//NAMR
+          WRITE (21, 809) NAML, VALL, NAMR, VALR
+ 25       CONTINUE
+        END IF
+        WRITE (21, 803) '[partial chi-squares / datapoints]:'
+        WRITE (21, *) CHTXTOT
+        WRITE (21, 803) "Chi-square:"
+        WRITE (21, *) 'FREE PARAMS = ', NPAR
+        WRITE (21, *) 'D.O.F = ', NDATAPTS(0) - NPAR
+        WRITE (21, *) 'CHISQ = ', CHISQ(0)
+        WRITE (21, 803) 'Beam charge asymmetry'
+        CALL BCA(BCA0)
+        WRITE (21, *) 'BCA(PHI=0) = ', BCA0
+        CLOSE (21)
 #ifndef NOPGPLOT
 *     Draw plot containing just parameter values
         CALL PGSCH(1.3)
@@ -274,9 +288,12 @@ C
  30       CONTINUE
           CALL PGTEXT(-1.,4.,'[\\gx\\u2\\d\\dpartial\\u / datapoints]:')
           CALL PGTEXT (-1., 3., CHTXTOT)
-          WRITE (TXT, 808) NTOT, NPAR, NTOT-NPAR, CHISQ
+          WRITE (TXT, 818) NDATAPTS(0), NPAR, NDATAPTS(0)-NPAR, CHISQ(0)
           CALL PGTEXT(-1.,2.,'Total \\gx\\u2\\d:')
           CALL PGTEXT (-1., 1., TXT)
+          CALL PGTEXT(-1.,0.,'Beam charge asymmetry:')
+          WRITE (TXT, 812) BCA0
+          CALL PGTEXT (-1., -1., TXT)
         END IF
 *     Draw plot of PDFs
         CALL PGSCH(1.8)
@@ -294,30 +311,31 @@ C
             CALL PGSWIN (-4., -1., 0., 50.)
         ENDIF
         CALL PGBOX ('BCLNST', 0.0, 0, 'BCNST1', 0.0, 0)
-        CALL PGLAB('x\\dBJ\\u', 'x\\gS(x)(blue), xg(x)(red)', 
+        CALL PGLAB('x', 'x\\gS(x)(blue), xg(x)(red)', 
      &       'Resulting PDFs')
 *        NORMSEA = PAR(11) / 
 *     &              CBETA(COMPLEX(2.0D0-PAR(12),0.0d0), (8.0d0,0.0d0))
 *        NORMG = PAR(21) / 
-*     &              CBETA(COMPLEX(2.0D0-PAR(22),0.0d0), (6.0d0,0.0d0))
-        DO 40 LGXB = -4., -1., 0.02
-          XB = 10**(LGXB)
-*          YS = NORMSEA * XB**(1.0d0-PAR(12)) * (1.0d0-XB)**7.0
-*          YG = NORMG * XB**(1.0d0-PAR(22)) * (1.0d0-XB)**5.0
-          CALL XSPACE(HX, DBLE(XB), 0.0d0)
+*     &              CBETA(COMPLEX(3.0D0-PAR(22),0.0d0), (6.0d0,0.0d0))
+        DO 40 LGXBJ = -4., -1., 0.02
+          XBJ = 10**(LGXBJ)
+*          YS = NORMSEA * XBJ**(1.0d0-PAR(12)) * (1.0d0-XBJ)**7.0
+*          YG = NORMG * XBJ**(1.0d0-PAR(22)) * (1.0d0-XBJ)**5.0
+          PROCESS = 'DIS'
+          CALL XSPACE(HX, DBLE(XBJ), 0.0d0)
           YS = HX(1)
           YG = HX(2)
           IF (DRAW) THEN
             CALL PGSCI(2)
             CALL PGSLS(2)
-            CALL PGMOVE(LASTLGXB, LASTYG)
-            CALL PGDRAW(LGXB, YG)
+            CALL PGMOVE(LASTLGXBJ, LASTYG)
+            CALL PGDRAW(LGXBJ, YG)
             CALL PGSCI(4)
             CALL PGSLS(1)
-            CALL PGMOVE(LASTLGXB, LASTYS)
-            CALL PGDRAW(LGXB, YS)
+            CALL PGMOVE(LASTLGXBJ, LASTYS)
+            CALL PGDRAW(LGXBJ, YS)
           END IF
-          LASTLGXB = LGXB
+          LASTLGXBJ = LGXBJ
           LASTYG = YG
           LASTYS = YS
           DRAW = .TRUE.
@@ -330,29 +348,24 @@ C
         DRAW = .FALSE.
         CALL PGSWIN (-4., -1., 0., 6.)
         CALL PGBOX ('BCLNST', 0.0, 0, 'BCNST1', 0.0, 0)
-        CALL PGLAB('x\\dBJ\\u', 'slope B(x) (blue=q, red=g)', 
+        CALL PGLAB('x', 'slope B(x) (blue=q, red=g)', 
      &       'GPD slopes')
-        DO 50 LGXB = -4., -1., 0.02
-          XB = 10**(LGXB)
-          CALL SLOPEH(BH, DBLE(XB))
+        DO 50 LGXBJ = -4., -1., 0.02
+          XBJ = 10**(LGXBJ)
+          CALL SLOPEH(BH, DBLE(XBJ))
           YS = BH(1)
           YG = BH(2)
-          !WRITE (*,*) XB
-          !WRITE (*,*) BH(1), BH(2)
-          !WRITE (*,*) YS, YG
           IF (DRAW) THEN
             CALL PGSCI(2)
             CALL PGSLS(2)
-            !CALL PGMOVE(LASTLGXB, LASTYG)
-            !CALL PGDRAW(LGXB, YG)
-            CALL PGPT1(LGXB, YG, -1)
+            CALL PGMOVE(LASTLGXBJ, LASTYG)
+            CALL PGDRAW(LGXBJ, YG)
             CALL PGSCI(4)
             CALL PGSLS(1)
-            !CALL PGMOVE(LASTLGXB, LASTYS)
-            !CALL PGDRAW(LGXB, YS)
-            CALL PGPT1(LGXB, YS, -2)
+            CALL PGMOVE(LASTLGXBJ, LASTYS)
+            CALL PGDRAW(LGXBJ, YS)
           END IF
-          LASTLGXB = LGXB
+          LASTLGXBJ = LGXBJ
           LASTYG = YG
           LASTYS = YS
           DRAW = .TRUE.
@@ -362,6 +375,9 @@ C
 #endif
       END IF
 
+*   return total chi-square value to MINUIT:
+      CHI2 = CHISQ(0)
+
 803   FORMAT (1X, /, 1X, '-----    ', A, '    -----', /)
 804   FORMAT (1X, 'SPEED = ', I1, 5X, 'P = ', I1, 5X, 'NF = ', I1)
 806   FORMAT (1X, 'SCHEME = ', A, 3X, 'Q02 = ', F5.1)
@@ -369,8 +385,11 @@ C
 808   FORMAT (1X, 'd.o.f = ', I3, ' - ', I1, ' = ', I3, '   ',
      &            '\\gx\\u2\\d = ', F8.1)
 809   FORMAT (3X,  A6, '=', 1X, G8.2, 5X, A6, '=', 1X, G8.2)
-810   FORMAT (1X, 'PTS = ', I3, 3X, 'CHISQPART = ', F5.1)
+810   FORMAT (1X, 'CHISQPART = ', F5.1, 3X, 'PTS = ', I3)
 811   FORMAT (1X, '[', F5.1, '/', I3, ']', 3X)
+812   FORMAT (1X, 'BCA(\\gf=0) = ', F7.3)
+818   FORMAT (1X, 'd.o.f = ', I3, ' - ', I1, ' = ', I3, '   ',
+     &            'chi-square = ', F8.1)
 
       RETURN
       END
@@ -407,6 +426,7 @@ C         W2  -- (gamma*-proton) invariant mass squared
 C         XI  -- DVCS scaling parameter or Bjorken x
 C       DEL2  -- DVCS asymmetry parameter (P2-P1)^2
 C         Q2  -- photon virtuality squared
+C         LS  -- line style
 C  PARENTS
 C      FCN
 C  CHILDREN
@@ -414,7 +434,7 @@ C      PARSIGMA, SIGMA, F2F, PGPLOT routines
 C  SOURCE
 C
       CHARACTER YOBS*8
-      INTEGER K
+      INTEGER K, LS
       DOUBLE PRECISION X, YY, DY, THY, DIFSG
       DOUBLE PRECISION STAT, SYS
       DOUBLE PRECISION W
@@ -459,10 +479,12 @@ C
         IF (IFLAG .EQ. 3)  THEN
           DIFSG = (THY - YY) / DY
           WRITE (21, 901) X, THY, YY, DY, DIFSG
-          WRITE (22, *) CHISQPART
 #ifndef NOPGPLOT
+          CALL PGQLS(LS)
+          CALL PGSLS(1)
           CALL PGERRY(1, SNGL(X), LOG10(SNGL(YY-DY)), 
      &                  LOG10(SNGL(YY+DY)), 3.0)
+          CALL PGSLS(LS)
           IF (DRAW) THEN
             CALL PGMOVE(LASTX, LASTY)
             CALL PGDRAW(SNGL(X), LOG10(SNGL(THY)))
@@ -505,7 +527,10 @@ C
           WRITE (21, 901) X, THY, YY, DY, DIFSG
 #ifndef NOPGPLOT
           IF (WIN .LT. 0.) THEN
+            CALL PGQLS(LS)
+            CALL PGSLS(1)
             CALL PGERRY(1, SNGL(X), SNGL(YY-DY), SNGL(YY+DY), 3.0)
+            CALL PGSLS(LS)
             IF (DRAW) THEN
               CALL PGMOVE(LASTX, LASTY)
               CALL PGDRAW(SNGL(X), SNGL(THY))
@@ -514,8 +539,11 @@ C
             LASTY = SNGL(THY)
             DRAW = .TRUE.
           ELSE
+            CALL PGQLS(LS)
+            CALL PGSLS(1)
             CALL PGERRY(1,SNGL(X), LOG10(SNGL(YY-DY)), 
      &              LOG10(SNGL(YY+DY)), 3.0)
+            CALL PGSLS(LS)
             IF (DRAW) THEN
               CALL PGMOVE(LASTX, LASTY)
               CALL PGDRAW(SNGL(X), LOG10(SNGL(THY)))
@@ -559,7 +587,10 @@ C
           DIFSG = (THY - YY) / DY
           WRITE (21, 901) X, THY, YY, DY, DIFSG
 #ifndef NOPGPLOT
+          CALL PGQLS(LS)
+          CALL PGSLS(1)
           CALL PGERR1(6, SNGL(X), SNGL(YY), SNGL(DY), 3.0)
+          CALL PGSLS(LS)
           IF (DRAW) THEN
             CALL PGMOVE(LASTX, LASTY)
             CALL PGDRAW(SNGL(X), SNGL(THY))

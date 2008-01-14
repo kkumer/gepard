@@ -11,12 +11,10 @@ Computing:
 -  We don't need both HGRID and MBGPD, it seems.
 -  deriv.f should be copyright-cleared
 -  FIT.INI should have optional name, changable by mma interface
--  tmp.mma is a kludge
 -  PAR(18) and (28) hardwired in CompileMoments[]
 -  Using GOTO statements in fcn.F should be avoided
--  There should be PDF() function so that PDFs are not calculated
-   internally in FCN()
--  Implement plotting of GPD slopes
+-  Charge factor treatment should be improved
+
 
 Checks:
 -  Check F_2 of DIS beyond LO (compare to Vogt etc.). Why is BIGCF2 \neq CDIS2
@@ -42,3 +40,7 @@ DONE:
 +  Beautify Robodoc output.
 +  There should be no dots on red fit lines
 +  Improve /XSERVE output.
++  Implement plotting of GPD slopes
++  There should be PDF() function so that PDFs are not calculated
+   internally in FCN()
++  tmp.mma is a kludge

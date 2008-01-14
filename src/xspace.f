@@ -84,6 +84,7 @@ C
       PARAMETER ( NEVALS = 5, H = 0.41d0 )
       INCLUDE 'header.f'
 
+      PROCESS = 'DVCS'
       XI = X
 
       T = 0.0d0

@@ -86,7 +86,7 @@ C
       XIS(PT) = XI
 
 *     Looping over six lines
-      DO 10 LN =1, 6
+      DO 10 LN =1, 1
 
         IF (LN .EQ. 3) THEN
           P = 0
@@ -115,12 +115,12 @@ C
           PAR(24) =  1.59
         ELSE IF (LN .EQ. 1) THEN
           P=1
-          PAR(11) =  0.167
-          PAR(12) =  1.14
-          PAR(14) =  1.23
-          PAR(21) =  0.535
-          PAR(22) =  1.09
-          PAR(24) =  1.19
+          PAR(11) =  0.158
+          PAR(12) =  1.154
+          PAR(14) =  1.01
+          PAR(21) =  0.562
+          PAR(22) =  1.079
+          PAR(24) =  0.640
         ELSE IF (LN .EQ. 2) THEN
           P=1
           PAR(11) =  0.167
