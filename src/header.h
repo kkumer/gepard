@@ -144,6 +144,24 @@ struct{
         struct dblcomplex f2[3];
 } f2_;
 
+      /*
+       *COMMON / CHISQBLK /  CHISQ
+       *COMMON / NDATAPTSBLK /  NDATAPTS
+       *COMMON / CHINBLK /  CHIN
+       */
+
+struct{
+        double chisq[11];
+} chisqblk_;
+
+struct{
+        int ndatapts[11];
+} ndataptsblk_;
+
+struct{
+        int chin;
+} chinblk_;
+
 /*
  *   Prototypes
  *   -------------

@@ -523,6 +523,38 @@ void getmbgpdmma_(void)
 };
 /******/
 
+
+/****f* fit.c/GetChiSquares
+*  NAME
+*     GetChiSquares --  Read chi-squares from common block
+*  SYNOPSIS
+*/
+
+void GetChiSquares(void) 
+
+/*
+*  PARENTS
+*     JustCali3, GepardFit
+*  SOURCE
+*/
+{
+
+        int i, nmax;
+
+        nmax = chinblk_.chin + 1;
+
+        MLPutFunction(stdlink, "List", nmax); /* passing parameters */
+            for (i = 0; i < nmax; i++){
+                    MLPutFunction(stdlink, "List", 2);
+                    MLPutReal(stdlink, chisqblk_.chisq[i]);
+                    MLPutReal(stdlink, ndataptsblk_.ndatapts[i]);
+            }
+        MLEndPacket(stdlink);
+
+        return;
+};
+/******/
+
 /****p* fit.c/main
 *  NAME
 *     main  --  main MathLink program

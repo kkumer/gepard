@@ -4,7 +4,7 @@
 (*     ==============================    *)
 
 
-Print["GeParD - Mathematica interface (2007-12-20)"];
+Print["GeParD - Mathematica interface (2008-01-15)"];
 
 
 BeginPackage["gepard`", "Format`", "NumericalMath`NLimit`", "Graphics`Graphics`"]
@@ -82,6 +82,7 @@ MinuitSetParameter::usage = "MinuitSetParameter"
 MinuitGetParameter::usage = "MinuitGetParameter"
 MinuitCommand::usage = "MinuitCommand[command_] executes MINUIT command"
 MinuitStatus::usage = "MinuitStatus"
+GetChiSquares::usage = "GetChiSquares"
 PrintMinuitCommand::usage = "MinuitCommand[command_, file_] executes MINUIT
 command and reads MINUIT output from file and prints it. 
 MinuitCommand[command_, file_, fontsize_] does the printing with font
@@ -162,7 +163,7 @@ cffE[(xi_)?NumericQ, (t_)?NumericQ, (q2_)?NumericQ, (q02_)?NumericQ, (opts___)?O
 		SPEED, P, SCHEME, ANSATZ} /. {opts} /. Options[cffE] )
 
 GepardFit[pars_, (opts___)?OptionQ] := Block[{varpars = ParameterID /@ pars, 
-      allpars = First[Transpose[Parameters]], status, ierr, tchis, chidel, dof, 
+      allpars = First[Transpose[Parameters]], status, ierr, chis, dof, 
       probchi}, fixedpars = Complement[allpars, varpars]; 
       GepardInit[opts];
       jValues = MinuitInit[1]; (MinuitSetParameter @@ #1 & ) /@ Parameters; 
@@ -175,16 +176,14 @@ GepardFit[pars_, (opts___)?OptionQ] := Block[{varpars = ParameterID /@ pars,
        Null]; MinuitCommand["cali 3"]; status = MinuitStatus[]; 
       GPDcurrent[j_, t_, xi_] = GPDMom[j, t, xi] /. 
         PAR[n_] :> First[MinuitGetParameter[n]]; 
-      tchis = ReadList["tmp.mma"];
-      chidel = Plus @@ tchis[[Range[4, Length[tchis],4]]]; 
-      dof = tchis[[-1]]; probchi = ChiSquareProbability[dof, 
-        First[status]]; Print[StringJoin["\!\(\[Chi]\^2\) = ", 
-        ToString[First[status]], 
-        "    \!\(\[Chi]\_\(\[CapitalDelta]\^2\)\^2\)=", ToString[chidel], 
-        "    d.o.f.=", ToString[dof], 
-        "    P(\[GreaterEqual]\!\(\[Chi]\^2\))=", ToString[probchi]]]; 
+      chis = GetChiSquares[];
+      dof = chis[[1,2]]; probchi = ChiSquareProbability[dof, 
+        chis[[1,1]]];  
       Print[StringJoin["quality of covariance matrix = ", 
         ToString[Last[status]]]]; 
+      Print[Transpose[chis]];
+      Print[StringJoin["Probability of this and larger total chi-square = ", 
+        ToString[probchi]]]; 
       Print["  ----    Parameter status :       ----- "]; 
       ParameterStatus = Select[Table[Join[Parameters[[n]], 
           (MinuitGetParameter /@ Transpose[Parameters][[1]])[[n]]], 
@@ -194,16 +193,14 @@ PrettyStatus[] := Block[{tchis},
        MinuitCommand["cali 3"]; status = MinuitStatus[]; 
       GPDcurrent[j_, t_, xi_] = GPDMom[j, t, xi] /. 
         PAR[n_] :> First[MinuitGetParameter[n]]; 
-      tchis = ReadList["tmp.mma"];
-      chidel = Plus @@ tchis[[Range[4, Length[tchis],4]]]; 
-      dof = tchis[[-1]]; probchi = ChiSquareProbability[dof, 
-        First[status]]; Print[StringJoin["\!\(\[Chi]\^2\) = ", 
-        ToString[First[status]], 
-        "    \!\(\[Chi]\_\(\[CapitalDelta]\^2\)\^2\)=", ToString[chidel], 
-        "    d.o.f.=", ToString[dof], 
-        "    P(\[GreaterEqual]\!\(\[Chi]\^2\))=", ToString[probchi]]]; 
+      chis = GetChiSquares[];
+      dof = chis[[1,2]]; probchi = ChiSquareProbability[dof, 
+        First[status]]; 
       Print[StringJoin["quality of covariance matrix = ", 
         ToString[Last[status]]]]; 
+      Print[Transpose[chis]];
+      Print[StringJoin["Probability of this and larger total chi-square = ", 
+        ToString[probchi]]]; 
       Print["  ----    Parameter status :       ----- "]; 
       ParameterStatus = Select[Table[Join[Parameters[[n]], 
           (MinuitGetParameter /@ Transpose[Parameters][[1]])[[n]]], 

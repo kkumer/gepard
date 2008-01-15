@@ -81,3 +81,12 @@
 :ReturnType:    Manual
 :End:
 
+:Evaluate: GetChiSquares::usage = "GetChiSquares[] returns array of chi-squares and corresponding number of datapints. First element is total chi-square and the rest are partial ones."
+:Begin:
+:Function:      GetChiSquares
+:Pattern:       GetChiSquares[]
+:Arguments:     {}
+:ArgumentTypes: {}
+:ReturnType:    Manual
+:End:
+
