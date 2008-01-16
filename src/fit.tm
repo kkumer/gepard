@@ -7,12 +7,12 @@
 :ReturnType:    Manual
 :End:
 
-:Evaluate: GepardInitInternal::usage = "GepardInitInternal[SPEED, P, SCHEME, ANSATZ] performs initialization of GeParD parameters. It reads GEPARD.INI for default parameters which will then be overridden by the arguments with same name if they are positive numbers or strings different then 'DFLT'. This function is not ment to be called by user who should use GepardInit[] instead."
+:Evaluate: GepardInitInternal::usage = "GepardInitInternal[SPEED, P, SCHEME, ANSATZ, DATFILE, OUTFILE] performs initialization of GeParD parameters. It reads GEPARD.INI for default parameters which will then be overridden by the arguments with same name if they are positive numbers or strings different then 'DFLT'. *FILE default parameters are set in the GepardInitInternal routine code. This function is not ment to be called by user who should use GepardInit[] instead."
 :Begin:
 :Function:      GepardInitInternal
-:Pattern:       GepardInitInternal[speed_Integer, p_Integer, scheme_String, ansatz_String]
-:Arguments:     {speed, p, scheme, ansatz}
-:ArgumentTypes: {Integer, Integer, String, String}
+:Pattern:       GepardInitInternal[speed_Integer, p_Integer, scheme_String, ansatz_String, datfile_String, outfile_String]
+:Arguments:     {speed, p, scheme, ansatz, datfile, outfile}
+:ArgumentTypes: {Integer, Integer, String, String, String, String}
 :ReturnType:    String
 :End:
 

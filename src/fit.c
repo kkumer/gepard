@@ -94,7 +94,8 @@ void spliceparchr(char *out, int start, int end)
 *  SYNOPSIS
 */
 
-char *GepardInitInternal(int speed, int p, char *scheme, char *ansatz)
+char *GepardInitInternal(int speed, int p, char *scheme, char *ansatz, 
+    char *datfile, char *outfile)
  
 /*
 *  INPUTS 
@@ -102,6 +103,8 @@ char *GepardInitInternal(int speed, int p, char *scheme, char *ansatz)
 *               p -- P
 *          scheme -- SCHEME
 *          ansatz -- ANSATZ
+*          datfile -- DATFILE
+*          outfile -- OUTFILE
 *  PARENTS
 *     GepardInit
 *  CHILDREN
@@ -110,9 +113,32 @@ char *GepardInitInternal(int speed, int p, char *scheme, char *ansatz)
 */
 {
         const char dflt[4] = "DFLT"; 
+      /* default filenames: */
+        char inidatfile[20] = "fit.dat             ";
+        char inioutfile[20] = "fit.out             ";
         char inischeme[6], iniansatz[7];
 
-        readpar_();
+        readpar_();  /* other defaults read from GEPARD.INI */
+
+
+        /* 1. Overriding filename defaults */
+
+        strcat(datfile, "                    "); /* want len(..) at least 20 */ 
+        strcat(outfile, "                    "); /* want len(..) at least 20 */ 
+
+        if (strncmp(datfile, dflt, 4) != 0)   /* override */  
+          strncpy(inidatfile, datfile, 20);
+
+        if (strncmp(outfile, dflt, 4) != 0)   /* override */  
+          strncpy(inioutfile, outfile, 20);
+
+         /* write to common block */
+        strcpy(filenames_, "");
+        strncat(filenames_, inidatfile, 20);
+        strncat(filenames_, inioutfile, 20);
+
+
+        /* 2. Overriding GEPARD.INI */
 
         if (speed >= 0) /* override GEPARD.INI */
           parint_.speed = speed;
@@ -132,6 +158,7 @@ char *GepardInitInternal(int speed, int p, char *scheme, char *ansatz)
         if (strncmp(ansatz, dflt, 4) != 0)   /* override GEPARD.INI */  
           strncpy(iniansatz, ansatz, 6);
 
+         /* write to common block */
         strcpy(parchr_, "");
         strncat(parchr_, inischeme, 5);
         strncat(parchr_, iniansatz, 6);
@@ -307,7 +334,7 @@ void MinuitCovarianceMatrix(int adim)
 *  SYNOPSIS
 */
 
-void cffHInternal(double xi, double t, double q2, double q02, int speed, int p, char *scheme, char *ansatz) 
+void cffHInternal(double xi, double t, double q2, double q02, int speed, int p, char *scheme, char *ansatz, char* datfile, char* outfile) 
 
 /*
 *  INPUTS 
@@ -327,7 +354,7 @@ void cffHInternal(double xi, double t, double q2, double q02, int speed, int p, 
         long int evoli=1, evolj=1;
 
 
-        GepardInitInternal(speed, p, scheme, ansatz);
+        GepardInitInternal(speed, p, scheme, ansatz, datfile, outfile);
 
         kinematics_.xi = xi;
         kinematics_.del2 = t;
@@ -383,7 +410,7 @@ cfff_();
 *  SYNOPSIS
 */
 
-void cffEInternal(double xi, double t, double q2, double q02, int speed, int p, char *scheme, char *ansatz) 
+void cffEInternal(double xi, double t, double q2, double q02, int speed, int p, char *scheme, char *ansatz, char* datfile, char* outfile) 
 
 /*
 *  INPUTS 
@@ -403,7 +430,7 @@ void cffEInternal(double xi, double t, double q2, double q02, int speed, int p, 
         long int evoli=1, evolj=1;
 
 
-        GepardInitInternal(speed, p, scheme, ansatz);
+        GepardInitInternal(speed, p, scheme, ansatz, datfile, outfile);
 
         kinematics_.xi = xi;
         kinematics_.del2 = t;

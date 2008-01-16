@@ -189,6 +189,34 @@ C  SYNOPSIS
       CHARACTER FFTYPE*10
 C     ***
 
+C     ****v* header.f/DATFILE
+C  DESCRIPTION
+C      DATFILE -- file with specification of datasets
+C                 used for fitting
+C  MEMBER OF
+C     FILENAMES
+C  SYNOPSIS
+      CHARACTER DATFILE*20
+C     ***
+
+C     ****v* header.f/OUTFILE
+C  DESCRIPTION
+C      OUTFILE -- file where output goes
+C  MEMBER OF
+C     FILENAMES
+C  SYNOPSIS
+      CHARACTER OUTFILE*20
+C     ***
+
+C     ****v* header.f/CMDFILE
+C  DESCRIPTION
+C      CMDFILE -- file with MINUIT batch commands
+C  MEMBER OF
+C     FILENAMES
+C  SYNOPSIS
+      CHARACTER CMDFILE*20
+C     ***
+
 
 *   2. Parameters from 'MINUIT.CMD' (candidates for fitting parameters)
 
@@ -663,6 +691,14 @@ C     String parameters
 C  SYNOPSIS
       COMMON / PARCHR /  SCHEME, ANSATZ, PROCESS, FFTYPE
 C     ***
+
+C     ****c* header.f/FILENAMES
+C  DESCRIPTION
+C     Filenames for input and output
+C  SYNOPSIS
+      COMMON / FILENAMES /  DATFILE, OUTFILE, CMDFILE
+C     ***
+
 
 *   2. Parameters from 'MINUIT.CMD' (candidates for fitting parameters)
 

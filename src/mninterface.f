@@ -21,7 +21,6 @@ C    READPAR, INIT, INITC, MNINIT, MNSETI
 C  SOURCE
 C
       IMPLICIT NONE
-      CHARACTER OUTFILE*20
       INCLUDE 'header.f'
 
 
@@ -32,14 +31,9 @@ C
 
       CALL INITC
 
-*     File for writing out Minuit output is determined by
-*     reading first line in file FIT.INI
-
-      OPEN (UNIT = 11, FILE = 'FIT.INI', STATUS = 'OLD')
-      READ (11, *) OUTFILE
-      CLOSE (11)
-      OPEN (UNIT = 6, FILE = 
-     &    OUTFILE(1:MAX(1,INDEX(OUTFILE//' ',' ')-1)) // '.min',
+*      File where MINUIT (and STDOUT) output is written
+        OPEN (UNIT = 6, FILE = 
+     &    OUTFILE(1:INDEX(OUTFILE,'.out')-1) // '.mnt',
      &    STATUS = 'UNKNOWN')
 
 

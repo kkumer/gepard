@@ -44,7 +44,7 @@ C
       INTEGER NN, K, IER, XPANELS, YPANELS, ICOL
       INTEGER COL(6), PRPARMAX, NSUBTOT, IPANEL
       DOUBLE PRECISION CHISUBTOT, CHISQPART, HX(2), BH(2)
-      CHARACTER*30 DATAFNAME, OUTFILE, OUTFORMAT
+      CHARACTER*30 DATAFNAME, OUTFORMAT
       CHARACTER*20 FIGLABEL, XLABEL, YLABEL, XTYPE, YTYPE
       CHARACTER TXT*45, CHTXT*15, CHTXTOT*60
       DOUBLE COMPLEX CBETA
@@ -114,8 +114,7 @@ C
       CHISQ(0) = 0.0d0
       CHIN = 0
 
-      OPEN (UNIT = 11, FILE = 'FIT.INI', STATUS = 'OLD')
-      READ (11, *) OUTFILE
+      OPEN (UNIT = 11, FILE = DATFILE, STATUS = 'OLD')
       READ (11, *) OUTFORMAT, XPANELS, YPANELS
 #ifndef NOPGPLOT
 *    Initailization of plotting on a grid of panels
@@ -126,7 +125,7 @@ C
         ELSE
 *         Ploting to /PSDRIV
         IER = PGBEG(0, 
-     &  OUTFILE(1:MAX(1,INDEX(OUTFILE//' ',' ')-1)) // '.ps' //
+     &  OUTFILE(1:INDEX(OUTFILE,'.out')-1) // '.ps' //
      &  OUTFORMAT(1:MAX(1,INDEX(OUTFORMAT//' ',' ')-1)),
      &  XPANELS, YPANELS)
         END IF
@@ -138,9 +137,7 @@ C
 *     Initialization of printing of the results tables to .out
 
       IF (IFLAG .EQ. 3)  THEN
-        OPEN (UNIT = 21, FILE = 
-     &  OUTFILE(1:MAX(1,INDEX(OUTFILE//' ',' ')-1)) // '.out',
-     &  STATUS = 'UNKNOWN')
+        OPEN (UNIT = 21, FILE = OUTFILE, STATUS = 'UNKNOWN')
         WRITE (21, 803) "Gepard parameters:"
         WRITE (21, 804) SPEED, P, NF
         WRITE (21, 806) SCHEME, Q02
@@ -152,7 +149,7 @@ C
         WRITE (6, *) 
       END IF
 
-*     Process only files specified in FIT.INI between
+*     Process only files specified in DATFILE between
 *      'START' and 'STOP'
 
  15   READ (11, *) DATAFNAME

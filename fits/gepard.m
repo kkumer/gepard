@@ -4,7 +4,7 @@
 (*     ==============================    *)
 
 
-Print["GeParD - Mathematica interface (2008-01-15)"];
+Print["GeParD - Mathematica interface (2008-01-16)"];
 
 
 BeginPackage["gepard`", "Format`", "NumericalMath`NLimit`", "Graphics`Graphics`"]
@@ -93,6 +93,9 @@ P::usage = "GeParD parameter"
 SCHEME::usage = "GeParD parameter"
 ANSATZ::usage = "GeParD parameter"
 
+DATFILE::usage = "GeParD parameter"
+OUTFILE::usage = "GeParD parameter"
+
 GPDQsplice::usage = "Fortran format function to be spliced into splice.f"
 GPDGsplice::usage = "Fortran format function to be spliced into splice.f"
 PDFQsplice::usage = "Fortran format function to be spliced into splice.f"
@@ -147,13 +150,16 @@ SpliceToFortran[path_String, tfor_] :=
     Splice[StringJoin[path, "/splice_template.f"], 
       StringJoin[path, "/splice.f"], FormatType -> OutputForm]]
 
-lobj = Install["gepard.exe"]  (* Installing C and Fortran routines. *)
+ lobj = Install["gepard.exe"]   (* Installing C and Fortran routines. *)
 
-Options[GepardInit] = {SPEED -> -1, P -> -1, SCHEME -> "DFLT", ANSATZ -> "DFLT"};
-Options[cffH] = {SPEED -> -1, P -> -1, SCHEME -> "DFLT", ANSATZ -> "DFLT"};
-Options[cffE] = {SPEED -> -1, P -> -1, SCHEME -> "DFLT", ANSATZ -> "DFLT"};
+defaultopts = {SPEED -> -1, P -> -1, SCHEME -> "DFLT", ANSATZ -> "DFLT", 
+  DATFILE -> "DFLT", OUTFILE -> "DFLT"};
+Options[GepardInit] = defaultopts;
+Options[cffH] = defaultopts;
+Options[cffE] = defaultopts;
 
-GepardInit[(opts___)?OptionQ] := GepardInitInternal @@ ( {SPEED, P, SCHEME, ANSATZ} 
+GepardInit[(opts___)?OptionQ] := GepardInitInternal @@ ( 
+  {SPEED, P, SCHEME, ANSATZ, DATFILE, OUTFILE} 
         /. {opts} /. Options[GepardInit] )
 
 cffH[(xi_)?NumericQ, (t_)?NumericQ, (q2_)?NumericQ, (q02_)?NumericQ, (opts___)?OptionQ] := cffHInternal @@ ( {xi, t, q2, q02,

@@ -14,6 +14,9 @@ Computing:
 -  PAR(18) and (28) hardwired in CompileMoments[]
 -  Using GOTO statements in fcn.F should be avoided
 -  Charge factor treatment should be improved
+-  filenames setting should be separated from GepardInitInternal because
+   this is not needed for cffEinternal and cffHinternal
+-  Numbers in fit.c should be changed by preprocesor variables
 
 
 Checks:

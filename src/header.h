@@ -34,6 +34,7 @@ struct dblcomplex {
       /* COMMON / PARFLT /  Q02, RF2, RR2 */
       /* INTEGER SPEED, ACC, P, NF, CZERO */
       /* COMMON / PARCHR /  SCHEME, ANSATZ, PROCESS, FFTYPE */
+      /* COMMON / FILENAMES /  DATFILE, OUTFILE, CMDFILE */
 
 struct{
         int speed, acc, p, nf, czero;
@@ -45,6 +46,7 @@ struct{
         double q02, rf2, rr2;
 } parflt_;
 char parchr_[27];
+char filenames_[60];
 
 
 /*   2. Parameters from 'MINUIT.CMD' (candidates for fitting parameters) */

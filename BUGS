@@ -24,6 +24,11 @@ Open:
 
 -  Checking for new /XSERVE window is done only when plotting fit lines
 
+-  filename specification is iconsistent between fit.exe and gepard.exe
+   (fit.exe without and gepard.exe with extensions)
+
+-  Stars denoting fixed parameters is buggy
+
 
 Fixed:
 ------

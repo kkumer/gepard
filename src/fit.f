@@ -14,7 +14,7 @@ C  DESCRIPTION
 C             Calls minuit subroutine for minimization and
 C             prints results in various ways.
 C    Output goes to files with extensions .out (tabular representation
-C          of fit), .ps (graphical representation of fit), and .min
+C          of fit), .ps (graphical representation of fit), and .mnt
 C          (Minuit output)
 C  SYNOPSIS
 
@@ -29,16 +29,42 @@ C  SOURCE
 C
 
       IMPLICIT NONE
-      INTEGER ISINTER
-      CHARACTER COMFILE*10, OUTFILE*20
+      INTEGER ISINTER, NARGS
+      CHARACTER FNAME*20
       EXTERNAL FCN
-      DATA COMFILE /'MINUIT.CMD'/
       INCLUDE 'header.f'
 
       COMMON /INTERACTIVE/ ISINTER
 
-*   Reading from first line whether we want interactive Minuit session.
-      OPEN (UNIT = 17, FILE = COMFILE, STATUS = 'OLD')
+*   Determining filenames. Default is fit.{ini,out,mnt,cmd,ps}.
+      NARGS = IARGC()
+*   *.dat (1st argument) is file with datasets specification
+      IF (NARGS .GE. 1) THEN
+        CALL GETARG(1, FNAME)
+        DATFILE = FNAME(1:MAX(1,INDEX(FNAME//' ',' ')-1)) // '.dat'
+      ELSE 
+        DATFILE = 'fit.dat'
+      END IF
+*   *.out *.ps *.mnt (2nd argument) is where results go
+      IF (NARGS .GE. 2) THEN
+        CALL GETARG(2, FNAME)
+        OUTFILE = FNAME(1:MAX(1,INDEX(FNAME//' ',' ')-1)) // '.out'
+      ELSE 
+*     default is to be same as DATFILE but .dat -> .out
+        OUTFILE = DATFILE(1:INDEX(DATFILE,'.dat')-1) // '.out'
+      END IF
+*   *.cmd (3rd argument) is from where MINUIT commands are read
+      IF (NARGS .GE. 3) THEN
+        CALL GETARG(3, FNAME)
+        CMDFILE = FNAME(1:MAX(1,INDEX(FNAME//' ',' ')-1)) // '.cmd'
+      ELSE 
+        CMDFILE = 'fit.cmd'
+      END IF
+*    other arguments are ignored
+
+
+*   Reading from first line of CMDFILE whether we want interactive Minuit session.
+      OPEN (UNIT = 17, FILE = CMDFILE, STATUS = 'OLD')
       READ (17, *) ISINTER
       CLOSE (17)
 
@@ -54,18 +80,15 @@ C
 
       IF (ISINTER .NE. 1) THEN
 *   We work in batch mode
-*     File where Minuit batch commands are
-        OPEN (UNIT = 5, FILE = COMFILE, STATUS = 'OLD')
-        OPEN (UNIT = 11, FILE = 'FIT.INI', STATUS = 'OLD')
-        READ (11, *) OUTFILE
-        CLOSE (11)
-*     File for writing out Minuit output
+*      File where Minuit batch commands are
+        OPEN (UNIT = 5, FILE = CMDFILE, STATUS = 'OLD')
+*      File wher MINUIT (and STDOUT) output is written
         OPEN (UNIT = 6, FILE = 
-     &    OUTFILE(1:MAX(1,INDEX(OUTFILE//' ',' ')-1)) // '.min',
+     &    OUTFILE(1:INDEX(OUTFILE,'.out')-1) // '.mnt',
      &    STATUS = 'UNKNOWN')
       ELSE
 *   We work in interactive mode
-        WRITE (*, 801) COMFILE
+        WRITE (*, 801) CMDFILE
       END IF
 
       CALL MINUIT(FCN,0)  
