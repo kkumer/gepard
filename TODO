@@ -17,6 +17,7 @@ Computing:
 -  filenames setting should be separated from GepardInitInternal because
    this is not needed for cffEinternal and cffHinternal
 -  Numbers in fit.c should be changed by preprocesor variables
+-  PrintMinuitCommand should inquire FILENAMES common block for filename
 
 
 Checks:

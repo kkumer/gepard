@@ -121,6 +121,6 @@ clean:
 	$(MAKE) -C src clean
 	$(MAKE) -C doc/tex clean
 	-rm -rf doc/html/*
-	-rm -f fits/*.{min,out,ps,eps,dat,out} fits/tmp.mma
+	-rm -f fits/*.{mnt,out,ps,eps,out}
 	-rm -f Tests/*{dat,out,eps}
 	-rm -f ex/*{dat,eps}

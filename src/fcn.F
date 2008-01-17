@@ -49,8 +49,6 @@ C
       CHARACTER TXT*45, CHTXT*15, CHTXTOT*60
       DOUBLE COMPLEX CBETA
       REAL XMIN, XMAX, YMIN, YMAX, CHSIZE
-      CHARACTER*9 FITNM
-      DIMENSION FITNM(12)
       INTEGER IVAR
       CHARACTER*10 NAML, NAMR
       CHARACTER*1 VFLAGL, VFLAGR
@@ -58,9 +56,6 @@ C
       DOUBLE PRECISION BCA0
 *      Colors used by PGPLOT:
       DATA COL /1, 2, 4, 8, 12, 13/
-      DATA FITNM /'NS', 'AL0S', 'ALPS', 'M02S',
-     & 'NG', 'AL0G', 'ALPG', 'M02G', 'SKEWS', 'SKEWG',
-     & 'KAPS', 'KAPG'/
 *      Parameters to be printed on the plot (only second digit)
       PARAMETER (PRPARMAX = 5)
       INTEGER PRPAR(PRPARMAX)
@@ -73,8 +68,6 @@ C
       REAL XBJ, LGXBJ, LASTLGXBJ, YG, YS, LASTYG, LASTYS
 #endif
 
-      VFLAGL = ' '
-      VFLAGR = ' '
       CHTXTOT = ''
 
 *     Clear output buffer
@@ -89,6 +82,7 @@ C
 
 *     Initialize (only forward!) GPDs
       DEL2 = 0.0d0
+      PROCESS = "DIS"
 #ifdef MMA
       IF (ANSATZ(:3) .EQ. 'MMA') THEN
         CALL GETMBGPDMMA
@@ -238,14 +232,23 @@ C
  20   CLOSE(11)
 
       IF (IFLAG .EQ. 3)  THEN
+*     Write parameter values, chi-squares and BCA to *.out
         IF ((ANSATZ(:3) .EQ. 'FIT') .OR. (ANSATZ(:3) .EQ. 'MMA')) THEN
           WRITE (21, 803) "Final fit parameters (*=fixed):"
           DO 25 K = 1, PRPARMAX
           CALL MNPOUT(10+PRPAR(K), NAML, VALL, ERL, BND1, BND2, IVAR)
-          IF (IVAR .EQ. 0) VFLAGL="*"
+          IF (IVAR .EQ. 0) THEN
+            VFLAGL="*"
+          ELSE
+            VFLAGL=" "
+          ENDIF
           NAML = VFLAGL//NAML
           CALL MNPOUT(20+PRPAR(K), NAMR, VALR, ERR, BND1, BND2, IVAR)
-          IF (IVAR .EQ. 0) VFLAGR="*"
+          IF (IVAR .EQ. 0) THEN
+            VFLAGR="*"
+          ELSE
+            VFLAGR=" "
+          ENDIF
           NAMR = VFLAGR//NAMR
           WRITE (21, 809) NAML, VALL, NAMR, VALR
  25       CONTINUE
@@ -261,7 +264,7 @@ C
         WRITE (21, *) 'BCA(PHI=0) = ', BCA0
         CLOSE (21)
 #ifndef NOPGPLOT
-*     Draw plot containing just parameter values
+*     Write parameter values, chi-squares and BCA to plot
         CALL PGSCH(1.3)
         CALL PGPAGE
         CALL PGVSTD
@@ -275,10 +278,18 @@ C
           CALL PGTEXT (-1., 10., "Final fit parameters (*=fixed):")
           DO 30 K = 1, PRPARMAX
           CALL MNPOUT(10+PRPAR(K), NAML, VALL, ERL, BND1, BND2, IVAR)
-          IF (IVAR .EQ. 0) VFLAGL="*"
+          IF (IVAR .EQ. 0) THEN
+            VFLAGL="*"
+          ELSE
+            VFLAGL=" "
+          ENDIF
           NAML = VFLAGL//NAML
           CALL MNPOUT(20+PRPAR(K), NAMR, VALR, ERR, BND1, BND2, IVAR)
-          IF (IVAR .EQ. 0) VFLAGR="*"
+          IF (IVAR .EQ. 0) THEN
+            VFLAGR="*"
+          ELSE
+            VFLAGR=" "
+          ENDIF
           NAMR = VFLAGR//NAMR
           WRITE (TXT, 809) NAML, VALL, NAMR, VALR
           CALL PGTEXT (-1., REAL(10-K), TXT)
@@ -370,8 +381,9 @@ C
         CALL PGIDEN
         CALL PGEND
 #endif
+*   set to actual number of d.o.f
+        NDATAPTS(0) = NDATAPTS(0) - NPAR
       END IF
-
 *   return total chi-square value to MINUIT:
       CHI2 = CHISQ(0)
 
@@ -385,7 +397,7 @@ C
 810   FORMAT (1X, 'CHISQPART = ', F5.1, 3X, 'PTS = ', I3)
 811   FORMAT (1X, '[', F5.1, '/', I3, ']', 3X)
 812   FORMAT (1X, 'BCA(\\gf=0) = ', F7.3)
-818   FORMAT (1X, 'd.o.f = ', I3, ' - ', I1, ' = ', I3, '   ',
+818   FORMAT (1X, 'd.o.f = ', I3, ' - ', I2, ' = ', I3, '   ',
      &            'chi-square = ', F8.1)
 
       RETURN

@@ -34,9 +34,10 @@ C
       PHIAZ = 0.0d0
 
       Q2 = Q2AVG
-      NQS = 1
-      QS(1) = Q2
-      CALL EVOLC(1)
+*     NQS = 1
+*     QS(1) = Q2
+*     CALL EVOLC(1)
+*  FIXME: this works only if Q2AVG is already in QS()
 
       DEL2 = TAVG
       W2 = WAVG**2

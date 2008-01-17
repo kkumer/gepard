@@ -574,7 +574,7 @@ void GetChiSquares(void)
             for (i = 0; i < nmax; i++){
                     MLPutFunction(stdlink, "List", 2);
                     MLPutReal(stdlink, chisqblk_.chisq[i]);
-                    MLPutReal(stdlink, ndataptsblk_.ndatapts[i]);
+                    MLPutInteger(stdlink, ndataptsblk_.ndatapts[i]);
             }
         MLEndPacket(stdlink);
 

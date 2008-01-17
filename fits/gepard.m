@@ -4,10 +4,11 @@
 (*     ==============================    *)
 
 
-Print["GeParD - Mathematica interface (2008-01-16)"];
+Print["GeParD - Mathematica interface (2008-01-17)"];
 
 
-BeginPackage["gepard`", "Format`", "NumericalMath`NLimit`", "Graphics`Graphics`"]
+BeginPackage["gepard`", "Format`", "NumericalMath`NLimit`", "Graphics`Graphics`",
+                        "Utilities`FilterOptions`"]
 
 
 GepardInit::usage = "GepardInit[] performs initialization of GeParD parameters. 
@@ -80,7 +81,7 @@ PAR::usage = "PAR[n] is the symbol for n-th fitting parameter."
 MinuitInit::usage = "MinuitInit"
 MinuitSetParameter::usage = "MinuitSetParameter"
 MinuitGetParameter::usage = "MinuitGetParameter"
-MinuitCommand::usage = "MinuitCommand[command_] executes MINUIT command"
+MinuitCommand::usage = "MinuitCommand[command_] executes MINUIT command, which should be specified as a string."
 MinuitStatus::usage = "MinuitStatus"
 GetChiSquares::usage = "GetChiSquares"
 PrintMinuitCommand::usage = "MinuitCommand[command_, file_] executes MINUIT
@@ -150,7 +151,7 @@ SpliceToFortran[path_String, tfor_] :=
     Splice[StringJoin[path, "/splice_template.f"], 
       StringJoin[path, "/splice.f"], FormatType -> OutputForm]]
 
- lobj = Install["gepard.exe"]   (* Installing C and Fortran routines. *)
+lobj = Install["gepard.exe"]   (* Installing C and Fortran routines. *)
 
 defaultopts = {SPEED -> -1, P -> -1, SCHEME -> "DFLT", ANSATZ -> "DFLT", 
   DATFILE -> "DFLT", OUTFILE -> "DFLT"};
@@ -169,8 +170,8 @@ cffE[(xi_)?NumericQ, (t_)?NumericQ, (q2_)?NumericQ, (q02_)?NumericQ, (opts___)?O
 		SPEED, P, SCHEME, ANSATZ} /. {opts} /. Options[cffE] )
 
 GepardFit[pars_, (opts___)?OptionQ] := Block[{varpars = ParameterID /@ pars, 
-      allpars = First[Transpose[Parameters]], status, ierr, chis, dof, 
-      probchi}, fixedpars = Complement[allpars, varpars]; 
+      allpars = First[Transpose[Parameters]], status, ierr, chis}, 
+      fixedpars = Complement[allpars, varpars]; 
       GepardInit[opts];
       jValues = MinuitInit[1]; (MinuitSetParameter @@ #1 & ) /@ Parameters; 
       MinuitCommand[StringJoin["fix ", StringJoin[
@@ -182,31 +183,24 @@ GepardFit[pars_, (opts___)?OptionQ] := Block[{varpars = ParameterID /@ pars,
        Null]; MinuitCommand["cali 3"]; status = MinuitStatus[]; 
       GPDcurrent[j_, t_, xi_] = GPDMom[j, t, xi] /. 
         PAR[n_] :> First[MinuitGetParameter[n]]; 
-      chis = GetChiSquares[];
-      dof = chis[[1,2]]; probchi = ChiSquareProbability[dof, 
-        chis[[1,1]]];  
-      Print[StringJoin["quality of covariance matrix = ", 
+      Print[StringJoin["Quality of covariance matrix = ", 
         ToString[Last[status]]]]; 
-      Print[Transpose[chis]];
-      Print[StringJoin["Probability of this and larger total chi-square = ", 
-        ToString[probchi]]]; 
+      Print["  ----    Total and partial chi-squares  ----- "]; 
+       chis = GetChiSquares[];
+       Print[ChiTable[chis]];
       Print["  ----    Parameter status :       ----- "]; 
       ParameterStatus = Select[Table[Join[Parameters[[n]], 
           (MinuitGetParameter /@ Transpose[Parameters][[1]])[[n]]], 
          {n, Length[Parameters]}], Last[#1] != 0 & ]]
 
-PrettyStatus[] := Block[{tchis},
+PrettyStatus[] := Block[{status, chis},
        MinuitCommand["cali 3"]; status = MinuitStatus[]; 
       GPDcurrent[j_, t_, xi_] = GPDMom[j, t, xi] /. 
         PAR[n_] :> First[MinuitGetParameter[n]]; 
       chis = GetChiSquares[];
-      dof = chis[[1,2]]; probchi = ChiSquareProbability[dof, 
-        First[status]]; 
-      Print[StringJoin["quality of covariance matrix = ", 
+      Print[StringJoin["Quality of covariance matrix = ", 
         ToString[Last[status]]]]; 
-      Print[Transpose[chis]];
-      Print[StringJoin["Probability of this and larger total chi-square = ", 
-        ToString[probchi]]]; 
+       Print[ChiTable[chis]];
       Print["  ----    Parameter status :       ----- "]; 
       ParameterStatus = Select[Table[Join[Parameters[[n]], 
           (MinuitGetParameter /@ Transpose[Parameters][[1]])[[n]]], 
@@ -297,6 +291,29 @@ PrintMinuitCommand[comm_?StringQ, fname_?StringQ,
     comm]; after = rdfile[fname]; StylePrint[TableForm[
       Take[after, Length[before] - 
     Length[after]]], "Input", FontSize -> fsize, CellLabel -> fname]]
+
+(* Nice printing any table *)
+PrettyTable[m_List, opts___] := DisplayForm[StyleBox[
+      GridBox[m, Evaluate[FilterOptions[GridBox, opts]], GridFrame -> 2, 
+        RowLines -> {1, 0}, ColumnLines -> {1, 1, 0}], 
+      Evaluate[FilterOptions[StyleBox, opts]], Background -> GrayLevel[0.9]]]
+
+(* Nice printing chi-squares table *)
+ChiTable[chis_List] := PrettyTable[
+      (* Calculating chi-square probabilities and coloring bad ones *)
+       chisa = {#[[1]], #[[2]], (prb = ChiSquareProbability[#[[2]], #[[1]]]; 
+        prbpr = NumberForm[prb, {4, 3}]; 
+        If[prb < 0.2, DisplayForm[StyleBox[prbpr, FontColor -> Hue[1]]], 
+          prbpr])} & /@ chis;
+        chis1=Transpose[chisa]; 
+        chis2={Map[NumberForm[#, {5, 1}] &, chis1[[1]], {1}], chis1[[2]], chis1[[3]]};
+    Transpose[Prepend[Transpose[Prepend[chis2, 
+           (* labels of columns : *)
+ {"    total     "}~Join~Table["part-"<>ToString[k], {k, 1, Length[First[chis2]] - 1}]
+               ]], 
+           (* labels of rows : *)
+    {"", "\!\(\[Chi]\^2\)", "d.o.f", "probabilities"}
+    ]]]
 
 End[ ]
 
