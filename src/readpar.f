@@ -46,6 +46,11 @@ C
       READ (61, *) ANSATZ
       CLOSE (61)
 
+*   default filenames
+      DATFILE = 'fit.dat'
+      OUTFILE = 'fit.out'
+      CMDFILE = 'fit.cmd'
+
       RETURN
       END
 C     ***

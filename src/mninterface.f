@@ -24,6 +24,7 @@ C
       INCLUDE 'header.f'
 
 
+      FFTYPE = 'SINGLET'
       PROCESS = 'DVCS'
       CALL INIT
       PROCESS = 'DIS'
@@ -116,9 +117,17 @@ C  SOURCE
 C
       CHARACTER TCMD*100
       EXTERNAL FCN
+      INCLUDE 'header.f'
+
+*   First flush the .mnt file
+C      CLOSE(6)
+C      OPEN(UNIT = 6, FILE = 
+C     &  OUTFILE(1:INDEX(OUTFILE,'.out')-1) // '.mnt', STATUS = "OLD")
+C 10   READ(6, *, END=20)
+C      GOTO 10
+C 20   BACKSPACE (11)
 
       TCMD = CMD(1:SIZ)
-
       CALL MNCOMD(FCN, TCMD, IERFLG, 0)
 
       RETURN
@@ -160,42 +169,59 @@ C
       END
 C     ****
 
-C     ****s* mninterface.f/FILENAMEINT
+C     ****s* mninterface.f/PARINIT
 C  NAME
-C     FILENAMEINIT  --   sets filenames
+C     PARINIT  --   sets optional parameters
 C  SYNOPSIS
 
-      SUBROUTINE FILENAMEINIT(DATSIZ, DATFNAME, OUTSIZ, OUTFNAME)
+      SUBROUTINE PARINIT(INSPEED, INP, INSCHEMESIZ, INSCHEME, 
+     &   INANSATZSIZ, INANSATZ, 
+     &   INDATFILESIZ, INDATFILE, 
+     &   INOUTFILESIZ, INOUTFILE
+     &   )
 
       IMPLICIT NONE
-      INTEGER DATSIZ, OUTSIZ
-      CHARACTER DATFNAME*20, OUTFNAME*20
+      INTEGER INSPEED, INP
+      INTEGER INSCHEMESIZ, INANSATZSIZ 
+      INTEGER INDATFILESIZ, INOUTFILESIZ
+      CHARACTER INSCHEME*6, INANSATZ*7 
+      CHARACTER INDATFILE*16, INOUTFILE*16
       INCLUDE 'header.f'
 
 C  INPUTS 
-C              DATSIZ  --  length of DATFNAME
-C            DATFNAME  --  name of DATFILE
-C              OUTSIZ  --  length of OUTFNAME
-C            OUTFNAME  --  name of OUTFILE
+C           IN*SIZ  --  length of IN*
+C              IN*  --  input value of *
 C  PARENTS
-C     MinuitSetParameter
+C     GepardInitInternal
 C  CHILDREN
-C     MNPARM
-C  BUGS    
-C     IERFLG should be returned to caller
+C     READPAR
 C  SOURCE
 C
+
+*  read the defaults:
+
+      CALL READPAR
+
+*  override what's requested:
+
+      IF ( INSPEED .GT. 0 ) SPEED = INSPEED
+
+      IF ( INP .GE. 0 ) P = INP
+
+      IF ( INSCHEME(1:INSCHEMESIZ) .NE. 'DFLT' )
+     &         SCHEME = INSCHEME(1:INSCHEMESIZ)
+
+      IF ( INANSATZ(1:INANSATZSIZ) .NE. 'DFLT' )
+     &         ANSATZ = INANSATZ(1:INANSATZSIZ)
       
-      IF ( DATFNAME(1:DATSIZ) .EQ. 'DFLT' ) THEN
-        DATFILE = 'fit.dat'
+      IF ( INDATFILE(1:INDATFILESIZ) .NE. 'DFLT' )
+     &        DATFILE = INDATFILE(1:INDATFILESIZ)//'.dat'
+
+      IF ( INOUTFILE(1:INOUTFILESIZ) .NE. 'DFLT' ) THEN
+              OUTFILE = INOUTFILE(1:INOUTFILESIZ)//'.out'
       ELSE
-        DATFILE = DATFNAME(1:DATSIZ)//".dat"
-      END IF
-   
-      IF ( OUTFNAME(1:OUTSIZ) .EQ. 'DFLT' ) THEN
-        OUTFILE = 'fit.out'
-      ELSE
-        OUTFILE = OUTFNAME(1:OUTSIZ)//".out"
+*       same rootname as .dat
+        OUTFILE = DATFILE(1:INDEX(DATFILE,'.dat')-1) // '.out'
       END IF
 
       RETURN

@@ -53,35 +53,6 @@ void MinuitInit(int a)
 };
 /******/
 
-/****f* fit.c/spliceparchr
-*  NAME
-*     spliceparchr  --   Takes a substring of PARCHR block
-*  DESCRIPTION
-*     Since Fortran CHARACTER common blocks are recognized from
-*     C as just a char array, to access members of this block
-*     we extract part of the array.
-*  SYNOPSIS
-*/
-
-void spliceparchr(char *out, int start, int end)
-
-/*
-*  INPUTS 
-*           start -- (Fortran) index of first character we want - 1
-*             end -- (Fortran) index of last character we want
-*  PARENTS
-*     GepardInitInternal
-*  SOURCE
-*/
-{
-        int i, k;
-
-        for (i = start, k=0; i < end; i++, k++)
-                out[k] = parchr_[i];
-
-        return;
-}
-/******/
 
 /****f* fit.c/GepardInitInternal
 *  NAME
@@ -108,54 +79,21 @@ int *GepardInitInternal(int speed, int p, char *scheme, char *ansatz,
 *  PARENTS
 *     GepardInit
 *  CHILDREN
-*     READPAR, spliceparchr
+*     PARINIT
 *  SOURCE
 */
 {
-        long int datlen, outlen;
-        const char dflt[4] = "DFLT"; 
-        char inischeme[6], iniansatz[7];
+        long int schemelen, ansatzlen, datfilelen, outfilelen;
 
-        readpar_();  /* other defaults read from GEPARD.INI */
+        schemelen = strlen(scheme);
+        ansatzlen = strlen(ansatz);
+        datfilelen = strlen(datfile);
+        outfilelen = strlen(outfile);
 
+        parinit_(&speed, &p, &schemelen, scheme, &ansatzlen, ansatz,
+                        &datfilelen, datfile, &outfilelen, outfile, 
+                        schemelen, ansatzlen, datfilelen, outfilelen);
 
-        /* 1. Overriding filename defaults */
-        /* relegated to Fortran due to some weird glibc bug I was not able to solve */
-
-
-        datlen = strlen(datfile);
-        outlen = strlen(outfile);
-
-        filenameinit_(&datlen, datfile, &outlen, outfile, datlen, outlen);
-
-
-        /* 2. Overriding GEPARD.INI */
-
-        if (speed >= 0) /* override GEPARD.INI */
-          parint_.speed = speed;
-        if (p >= 0) /* override GEPARD.INI */
-          parint_.p = p;
-
-
-        spliceparchr(inischeme, 0, 5);
-        spliceparchr(iniansatz, 5, 11);
-
-        strcat(scheme, "     "); /* want len(scheme) at least 5 */ 
-        strcat(ansatz, "      "); /* want len(ansatz) at least 6 */ 
-
-        if (strncmp(scheme, dflt, 4) != 0)   /* override GEPARD.INI */  
-          strncpy(inischeme, scheme, 5);
-
-        if (strncmp(ansatz, dflt, 4) != 0)   /* override GEPARD.INI */  
-          strncpy(iniansatz, ansatz, 6);
-
-         /* write to common block */
-        strcpy(parchr_, "");
-        strncat(parchr_, inischeme, 5);
-        strncat(parchr_, iniansatz, 6);
-        strcat(parchr_, "DVCS  SINGLET   ");
-
-        /*FALLBACK: strcpy(parchr_, "MSBARMMA   DVCS  SINGLET");*/
         return 0;
 };
 /******/

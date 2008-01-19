@@ -36,14 +36,16 @@ C
 
       COMMON /INTERACTIVE/ ISINTER
 
-*   Determining filenames. Default is fit.{ini,out,mnt,cmd,ps}.
+      CALL READPAR
+
+*   Overriding filenames from READPAR if they are specified
+*   on commad line:
+
       NARGS = IARGC()
 *   *.dat (1st argument) is file with datasets specification
       IF (NARGS .GE. 1) THEN
         CALL GETARG(1, FNAME)
         DATFILE = FNAME(1:MAX(1,INDEX(FNAME//' ',' ')-1)) // '.dat'
-      ELSE 
-        DATFILE = 'fit.dat'
       END IF
 *   *.out *.ps *.mnt (2nd argument) is where results go
       IF (NARGS .GE. 2) THEN
@@ -57,8 +59,6 @@ C
       IF (NARGS .GE. 3) THEN
         CALL GETARG(3, FNAME)
         CMDFILE = FNAME(1:MAX(1,INDEX(FNAME//' ',' ')-1)) // '.cmd'
-      ELSE 
-        CMDFILE = 'fit.cmd'
       END IF
 *    other arguments are ignored
 
@@ -68,9 +68,7 @@ C
       READ (17, *) ISINTER
       CLOSE (17)
 
-      CALL READPAR
       FFTYPE = 'SINGLET'
-
       PROCESS = 'DVCS'
       CALL INIT
       PROCESS = 'DIS'

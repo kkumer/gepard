@@ -217,10 +217,7 @@ JustCali3[pars_, (opts___)?OptionQ] := Block[{varpars = ParameterID /@ pars,
       status = MinuitStatus[]; Print[StringJoin["\!\(\[Chi]\^2\) = ", 
         ToString[First[status]]]]; GPDcurrent[j_, t_, xi_] = 
        GPDMom[j, t, xi] /. PAR[n_] :> First[MinuitGetParameter[n]]; 
-      Print["  ----    Parameter status :       ----- "]; 
-      ParameterStatus = Select[Table[Join[Parameters[[n]], 
-          (MinuitGetParameter /@ Transpose[Parameters][[1]])[[n]]], 
-         {n, Length[Parameters]}], Last[#1] != 0 & ]]
+      ]
 
 plotPDFs[] := LogLinearPlot[{GPD[1, x, 0, 0], GPD[2, x, 0, 0]}, 
      {x, 1/10000, 0.1}, PlotRange -> All, AxesLabel -> 
