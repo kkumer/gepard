@@ -13,7 +13,7 @@
 :Pattern:       GepardInitInternal[speed_Integer, p_Integer, scheme_String, ansatz_String, datfile_String, outfile_String]
 :Arguments:     {speed, p, scheme, ansatz, datfile, outfile}
 :ArgumentTypes: {Integer, Integer, String, String, String, String}
-:ReturnType:    String
+:ReturnType:    Integer
 :End:
 
 

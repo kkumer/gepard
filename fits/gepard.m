@@ -4,7 +4,7 @@
 (*     ==============================    *)
 
 
-Print["GeParD - Mathematica interface (2008-01-17)"];
+Print["GeParD - Mathematica interface (2008-01-18)"];
 
 
 BeginPackage["gepard`", "Format`", "NumericalMath`NLimit`", "Graphics`Graphics`",
@@ -285,12 +285,12 @@ rdfile[fname_] := Block[{str,
         ln =!= EndOfFile, AppendTo[outp, ln = Read[str, String]]]; Close[str];
        outp]
 
-PrintMinuitCommand[comm_?StringQ, fname_?StringQ, 
+PrintMinuitCommand[comm_?StringQ, fname_:"fit.mnt", 
     fsize_:8] := Module[{before, after}, before = rdfile[fname]; 
   MinuitCommand[
     comm]; after = rdfile[fname]; StylePrint[TableForm[
       Take[after, Length[before] - 
-    Length[after]]], "Input", FontSize -> fsize, CellLabel -> fname]]
+    Length[after]]], "Input", FontSize -> fsize, CellLabel -> fname]] /; StringQ[fname]
 
 (* Nice printing any table *)
 PrettyTable[m_List, opts___] := DisplayForm[StyleBox[

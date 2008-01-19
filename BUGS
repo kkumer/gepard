@@ -20,7 +20,8 @@ Open:
 -  Coercion to COMPLEX is not working! Thus, one must treat by hand 
    or set fancy rules to anticipate real arguments while SPLICE-ing.
 
--  One has to delete .min file on Windows or PrintMinuitCommand is not ok.
+-  One has to delete .mnt file sometimes or PrintMinuitCommand is not ok.
+   (Maybe one should use separate file and open/close it?)
 
 -  Checking for new /XSERVE window is done only when plotting fit lines
 

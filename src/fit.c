@@ -94,7 +94,7 @@ void spliceparchr(char *out, int start, int end)
 *  SYNOPSIS
 */
 
-char *GepardInitInternal(int speed, int p, char *scheme, char *ansatz, 
+int *GepardInitInternal(int speed, int p, char *scheme, char *ansatz, 
     char *datfile, char *outfile)
  
 /*
@@ -165,7 +165,7 @@ char *GepardInitInternal(int speed, int p, char *scheme, char *ansatz,
         strcat(parchr_, "DVCS  SINGLET   ");
 
         /*FALLBACK: strcpy(parchr_, "MSBARMMA   DVCS  SINGLET");*/
-        return parchr_;
+        return 0;
 };
 /******/
 
