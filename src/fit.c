@@ -112,30 +112,21 @@ int *GepardInitInternal(int speed, int p, char *scheme, char *ansatz,
 *  SOURCE
 */
 {
+        long int datlen, outlen;
         const char dflt[4] = "DFLT"; 
-      /* default filenames: */
-        char inidatfile[20] = "fit.dat             ";
-        char inioutfile[20] = "fit.out             ";
         char inischeme[6], iniansatz[7];
 
         readpar_();  /* other defaults read from GEPARD.INI */
 
 
         /* 1. Overriding filename defaults */
+        /* relegated to Fortran due to some weird glibc bug I was not able to solve */
 
-        strcat(datfile, "                    "); /* want len(..) at least 20 */ 
-        strcat(outfile, "                    "); /* want len(..) at least 20 */ 
 
-        if (strncmp(datfile, dflt, 4) != 0)   /* override */  
-          strncpy(inidatfile, datfile, 20);
+        datlen = strlen(datfile);
+        outlen = strlen(outfile);
 
-        if (strncmp(outfile, dflt, 4) != 0)   /* override */  
-          strncpy(inioutfile, outfile, 20);
-
-         /* write to common block */
-        strcpy(filenames_, "");
-        strncat(filenames_, inidatfile, 20);
-        strncat(filenames_, inioutfile, 20);
+        filenameinit_(&datlen, datfile, &outlen, outfile, datlen, outlen);
 
 
         /* 2. Overriding GEPARD.INI */

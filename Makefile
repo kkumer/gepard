@@ -48,7 +48,11 @@ ifdef WINDIR
   export MLLIB = ml32i2w
   export MLEXTRA = -mwindows -DWIN32_MATHLINK
 else
-  export SYS = Linux-x86-64
+  ifdef NOT64
+    export SYS = Linux
+  else 
+    export SYS = Linux-x86-64
+  endif
   ifeq '$(MMAVERSION)' '6.0'
     export MLDIR = /usr/local/Wolfram/Mathematica/$(MMAVERSION)/SystemFiles/Links/MathLink/DeveloperKit/$(SYS)/CompilerAdditions
   else

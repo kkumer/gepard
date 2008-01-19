@@ -159,3 +159,45 @@ C
       RETURN
       END
 C     ****
+
+C     ****s* mninterface.f/FILENAMEINT
+C  NAME
+C     FILENAMEINIT  --   sets filenames
+C  SYNOPSIS
+
+      SUBROUTINE FILENAMEINIT(DATSIZ, DATFNAME, OUTSIZ, OUTFNAME)
+
+      IMPLICIT NONE
+      INTEGER DATSIZ, OUTSIZ
+      CHARACTER DATFNAME*20, OUTFNAME*20
+      INCLUDE 'header.f'
+
+C  INPUTS 
+C              DATSIZ  --  length of DATFNAME
+C            DATFNAME  --  name of DATFILE
+C              OUTSIZ  --  length of OUTFNAME
+C            OUTFNAME  --  name of OUTFILE
+C  PARENTS
+C     MinuitSetParameter
+C  CHILDREN
+C     MNPARM
+C  BUGS    
+C     IERFLG should be returned to caller
+C  SOURCE
+C
+      
+      IF ( DATFNAME(1:DATSIZ) .EQ. 'DFLT' ) THEN
+        DATFILE = 'fit.dat'
+      ELSE
+        DATFILE = DATFNAME(1:DATSIZ)//".dat"
+      END IF
+   
+      IF ( OUTFNAME(1:OUTSIZ) .EQ. 'DFLT' ) THEN
+        OUTFILE = 'fit.out'
+      ELSE
+        OUTFILE = OUTFNAME(1:OUTSIZ)//".out"
+      END IF
+
+      RETURN
+      END
+C     ****
