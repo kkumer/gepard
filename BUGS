@@ -1,34 +1,27 @@
 Open:
 -----
 
--  Code taken from Vogt/Vermasseren may not be pure double precision.
-   (Although maybe it behaves as double precision.)
+1 -  Code taken from Vogt/Vermasseren may not be pure double precision.
+    (Although maybe it behaves as double precision.)
 
--  Complex tangent DCTAN may be problematic (Demidovich?)
+2 -  Complex tangent DCTAN may be problematic (Demidovich?)
 
--  Interactive mode freezes on MS Windows
+3 -  Interactive mode freezes on MS Windows
 
--  fitres is behaving funny for C=0.25
+4!-  fitres is behaving funny for C=0.25
 
--  one must 'make clean' between making  gepard.exe and non-mma executables
-    (and similarly with fit.exe with PGPLOT)
-   (Thus, 'make all' probably doesn't work as intended.)
+5!-  one must 'make clean' between making  gepard.exe and non-mma executables
+     (and similarly with fit.exe with PGPLOT)
+    (Thus, 'make all' probably doesn't work as intended.)
 
--  houches still problematic for very large x_BJ. At input scale as well!
-   Related to that. Large x_BJ extension of integration should be automatic.
+6 -  houches still problematic for very large x_BJ. At input scale as well!
+     Related to that. Large x_BJ extension of integration should be automatic.
 
--  Coercion to COMPLEX is not working! Thus, one must treat by hand 
-   or set fancy rules to anticipate real arguments while SPLICE-ing.
+7!-  Coercion to COMPLEX is not working! Thus, one must treat by hand 
+    or set fancy rules to anticipate real arguments while SPLICE-ing.
 
--  One has to delete .mnt file sometimes or PrintMinuitCommand is not ok.
-   (Maybe one should use separate file and open/close it?)
+8 -  Checking for new /XSERVE window is done only when plotting fit lines
 
--  Checking for new /XSERVE window is done only when plotting fit lines
-
--  filename specification is iconsistent between fit.exe and gepard.exe
-   (fit.exe without and gepard.exe with extensions)
-
--  Stars denoting fixed parameters is buggy
 
 
 Fixed:
@@ -54,4 +47,12 @@ Fixed:
 
 2007-11-19 -  mma interface function cffH is not accurate [I didn't use proper
               GEPARD.INI before, it seems. Everything is fine.]
+
+2008-01-19 -  Stars denoting fixed parameters is buggy
+
+2008-01-19 -  filename specification is iconsistent between fit.exe and gepard.exe
+              (fit.exe without and gepard.exe with extensions)
+
+2008-01-19 -  One has to delete .mnt file sometimes or PrintMinuitCommand is not ok.
+   (Maybe one should use separate file and open/close it?)
 

@@ -4,7 +4,7 @@
 (*     ==============================    *)
 
 
-Print["GeParD - Mathematica interface (2008-01-18)"];
+Print["GeParD - Mathematica interface (2008-01-19)"];
 
 
 BeginPackage["gepard`", "Format`", "NumericalMath`NLimit`", "Graphics`Graphics`",
@@ -12,8 +12,9 @@ BeginPackage["gepard`", "Format`", "NumericalMath`NLimit`", "Graphics`Graphics`"
 
 
 GepardInit::usage = "GepardInit[] performs initialization of GeParD parameters. 
-It reads GEPARD.INI for default parameters. Parameters SPEED, P, SCHEME and ANSATZ 
-can then be overriden by specifying corresponding options e.g. GepardInit[P->0, ANSATZ->\"MMA\"]."
+It reads GEPARD.INI for default parameters. Parameters SPEED, P, SCHEME, ANSATZ,
+DATFILE and OUTFILE can be overriden by specifying corresponding options 
+e.g. GepardInit[P->0, DATFILE->\"dvcs\"]."
 
 GepardInitInternal::usage = "MathLink function ..."
 
@@ -46,6 +47,8 @@ its starting value, etc. as expected by Minuit. See Minuit manual."
 
 ParameterID::usage = "ParameterID[symbol] returns parameter number (id) of a parameter with
 name symbol, as specified by array Parameters."
+
+ParameterName::usage = "ParameterName[id] returns name string corresponding to parameter number id, as specified by array Parameters."
 
 GPD::usage = "GPD[{val1, val2, ...}, t, xi] is a function that is contacted by MathLink Minuit
 interface and should give GPD's for .... GPD[flavor, x, t, xi] gives value of x-space
@@ -84,18 +87,18 @@ MinuitGetParameter::usage = "MinuitGetParameter"
 MinuitCommand::usage = "MinuitCommand[command_] executes MINUIT command, which should be specified as a string."
 MinuitStatus::usage = "MinuitStatus"
 GetChiSquares::usage = "GetChiSquares"
-PrintMinuitCommand::usage = "MinuitCommand[command_, file_] executes MINUIT
-command and reads MINUIT output from file and prints it. 
-MinuitCommand[command_, file_, fontsize_] does the printing with font
-size fontsize (values 4-10 are nice)."
+PrintMinuitCommand::usage = "MinuitCommand[command_] executes MINUIT
+command and reads MINUIT output from file fit.mnt and prints it. 
+MinuitCommand[command_, fontsize_] does the printing with font
+size fontsize (values 4-10 are nice, 5 is default)."
 
 SPEED::usage = "GeParD parameter"
 P::usage = "GeParD parameter"
 SCHEME::usage = "GeParD parameter"
 ANSATZ::usage = "GeParD parameter"
 
-DATFILE::usage = "GeParD parameter"
-OUTFILE::usage = "GeParD parameter"
+DATFILE::usage = "GeParD parameter. Filename without extension."
+OUTFILE::usage = "GeParD parameter. Filename without extension."
 
 GPDQsplice::usage = "Fortran format function to be spliced into splice.f"
 GPDGsplice::usage = "Fortran format function to be spliced into splice.f"
@@ -111,20 +114,24 @@ xi::usage = "xi - DVCS kinematical variable."
 lobj::usage = "lobj - MathLink link"
 
 cffH::usage = "cffH[xi, t, q2, q02, options] returns singlet CFF H(xi, t, q2, q02). 
-Other parameters are read from  GEPARD.INI and additionally parameters SPEED, P, SCHEME and ANSATZ 
-can be set by specifying corresponding options e.g. GepardInit[P->0, ANSATZ->\"MMA\"]."
+Options are same as for GepardInit."
 
 cffE::usage = "cffE[xi, t, q2, q02, options] returns singlet CFF E(xi, t, q2, q02). 
-Other parameters are read from  GEPARD.INI and additionally parameters SPEED, P, SCHEME and ANSATZ 
-can be set by specifying corresponding options e.g. GepardInit[P->0, ANSATZ->\"MMA\"]."
+Options are same as for GepardInit."
 
 cffHInternal::usage = "MathLink function ..."
 cffEInternal::usage = "MathLink function ..."
 cInt::usage = "MathLink function ..."
+MinuitContour::usage = "MathLink function ..."
 
 AllParameterValues::usage = "AllParameterValues[] returns complete list that corresponds to 
 COMMON block PAR. For internal use."
 
+PlotMinuitContour::usage = "PlotMinuitContour[par1, par2, npts, options] plots two-parameter correlation contour produced by Minuit's MNCONT. par1 and par2 are symbols from Parameters list, npts is number of points on the contour and options are same as for ListPlot. See also PlotMinuitContourFixed and PlotMinuitContourFixedAll."
+
+PlotMinuitContourFixed::usage = "PlotMinuitContourFixed[par1, par2, npts, options] plots two-parameter correlation contour produced by Minuit's MNCONT. par1 and par2 are symbols from Parameters list, npts is number of points on the contour and options are same as for ListPlot. Other parameters are temporarily fixed and then released for faster plotting. See also PlotMinuitContour and PlotMinuitContourFixedAll"
+
+PlotMinuitContourFixedAll::usage = "PlotMinuitContourFixed[par1, par2, npts, options] plots two-parameter correlation contour produced by Minuit's MNCONT. par1 and par2 are symbols from Parameters list, npts is number of points on the contour and options are same as for ListPlot. Other parameters are temporarily fixed and then released for faster plotting. Additionally values of par1 and par2 are returned to old values before plotting. See also PlotMinuitContour and PlotMinuitContourFixed"
 Begin["`Private`"]
 
 AllParameterValues[] := Block[{iv = Table[0, {70}]}, 
@@ -273,6 +280,9 @@ CompileMoments[] := Block[{},
 ParameterID[symb_Symbol] := Select[Parameters, #1[[2]] == ToString[symb] & ][[
      1,1]]
 
+ParameterName[id_Integer] := ToString[Select[Parameters, #1[[1]] == id & ][[
+     1,2]]]
+
 ChiSquareProbability[d_, chisq_] := Gamma[d/2, chisq/2]/Gamma[d/2]
  
 ReducedChiSquareProbability[d_, chisq_] := ChiSquareProbability[d, d chisq]
@@ -282,12 +292,12 @@ rdfile[fname_] := Block[{str,
         ln =!= EndOfFile, AppendTo[outp, ln = Read[str, String]]]; Close[str];
        outp]
 
-PrintMinuitCommand[comm_?StringQ, fname_:"fit.mnt", 
-    fsize_:8] := Module[{before, after}, before = rdfile[fname]; 
-  MinuitCommand[
-    comm]; after = rdfile[fname]; StylePrint[TableForm[
-      Take[after, Length[before] - 
-    Length[after]]], "Input", FontSize -> fsize, CellLabel -> fname]] /; StringQ[fname]
+PrintMinuitCommand[comm_?StringQ, fsize_:5] := 
+  Module[{before, after, fname="fit.mnt"}, 
+    before = rdfile[fname]; MinuitCommand[comm]; after = rdfile[fname]; 
+    StylePrint[TableForm[Take[after, Length[before] - Length[after]]], 
+      FontFamily->"Bitstream vera sans mono", 
+      FontSize -> fsize, CellLabel -> fname]]
 
 (* Nice printing any table *)
 PrettyTable[m_List, opts___] := DisplayForm[StyleBox[
@@ -311,6 +321,56 @@ ChiTable[chis_List] := PrettyTable[
            (* labels of rows : *)
     {"", "\!\(\[Chi]\^2\)", "d.o.f", "probabilities"}
     ]]]
+
+(* Plotting two-parameter correlation ellipse *)
+
+PlotMinuitContour[par1_Symbol, par2_Symbol, npts_Integer, (opts___)?OptionQ] :=
+  Module[{list},
+    list = MinuitContour[ParameterID[par1], ParameterID[par2], npts]; 
+    AppendTo[list, First[list]]; (* closing contour *)
+    ListPlot[list, Join[
+      {AxesLabel -> {par1,par2}, PlotJoined->True, 
+      PlotStyle -> {Hue[1], Thickness[0.01]}}, {opts}]]
+        ]
+
+(* Same, but with all the other parameters fixed *)
+
+PlotMinuitContourFixed[par1_Symbol, par2_Symbol, npts_Integer, (opts___)?OptionQ] :=
+  Module[{allvarpars, contpars, strpars},
+    contpars = {ParameterID[par1], ParameterID[par2]};
+    allvarpars = Transpose[Select[Table[Join[Parameters[[n]], 
+     (MinuitGetParameter /@ Transpose[Parameters][[1]])[[n]]], 
+            {n, Length[Parameters]}], 
+                Last[#1] != 0 &]
+                       ][[1]];
+    otherpars = Complement[allvarpars, contpars];
+    strpars = StringJoin[(ToString[#] <> " ") & /@ otherpars];
+    MinuitCommand["fix " <> strpars];
+    PlotMinuitContour[par1, par2, npts, opts];
+    MinuitCommand["release " <> strpars];
+        ]
+
+(* Same, but with all the other parameters fixed, and contour parameters   *)
+(*  returned to previous value after plotting.                             *)
+
+PlotMinuitContourFixedAll[par1_Symbol, par2_Symbol, npts_Integer, (opts___)?OptionQ] :=
+  Module[{allvarpars, contpars, strpars, oldvals},
+    contpars = {ParameterID[par1], ParameterID[par2]};
+    oldvals = First[Transpose[MinuitGetParameter /@ contpars]];
+    allvarpars = Transpose[Select[Table[Join[Parameters[[n]], 
+     (MinuitGetParameter /@ Transpose[Parameters][[1]])[[n]]], 
+            {n, Length[Parameters]}], 
+                Last[#1] != 0 &]
+                       ][[1]];
+    otherpars = Complement[allvarpars, contpars];
+    strpars = StringJoin[(ToString[#] <> " ") & /@ otherpars];
+    MinuitCommand["fix " <> strpars];
+    PlotMinuitContour[par1, par2, npts, opts];
+    MinuitCommand["release " <> strpars];
+    MinuitCommand["set param " <> ToString[contpars[[1]]] <> " " <> ToString[oldvals[[1]]]];
+    MinuitCommand["set param " <> ToString[contpars[[2]]] <> " " <> ToString[oldvals[[2]]]];
+        ]
+
 
 End[ ]
 

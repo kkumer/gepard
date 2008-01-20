@@ -81,9 +81,7 @@ C
 *      File where Minuit batch commands are
         OPEN (UNIT = 5, FILE = CMDFILE, STATUS = 'OLD')
 *      File wher MINUIT (and STDOUT) output is written
-        OPEN (UNIT = 6, FILE = 
-     &    OUTFILE(1:INDEX(OUTFILE,'.out')-1) // '.mnt',
-     &    STATUS = 'UNKNOWN')
+        OPEN (UNIT = 6, FILE = 'fit.mnt', STATUS = 'UNKNOWN')
       ELSE
 *   We work in interactive mode
         WRITE (*, 801) CMDFILE

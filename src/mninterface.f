@@ -33,9 +33,7 @@ C
       CALL INITC
 
 *      File where MINUIT (and STDOUT) output is written
-        OPEN (UNIT = 6, FILE = 
-     &    OUTFILE(1:INDEX(OUTFILE,'.out')-1) // '.mnt',
-     &    STATUS = 'UNKNOWN')
+        OPEN (UNIT = 6, FILE = 'fit.mnt', STATUS = 'UNKNOWN')
 
 
       CALL MNINIT(5, 6, 7)
@@ -119,13 +117,12 @@ C
       EXTERNAL FCN
       INCLUDE 'header.f'
 
-*   First flush the .mnt file
-C      CLOSE(6)
-C      OPEN(UNIT = 6, FILE = 
-C     &  OUTFILE(1:INDEX(OUTFILE,'.out')-1) // '.mnt', STATUS = "OLD")
-C 10   READ(6, *, END=20)
-C      GOTO 10
-C 20   BACKSPACE (11)
+*   First flush the fit.mnt file
+      CLOSE(6)
+      OPEN(UNIT = 6, FILE = 'fit.mnt', STATUS = "OLD")
+ 10   READ(6, *, END=20)
+      GOTO 10
+ 20   BACKSPACE (11)
 
       TCMD = CMD(1:SIZ)
       CALL MNCOMD(FCN, TCMD, IERFLG, 0)
@@ -223,6 +220,46 @@ C
 *       same rootname as .dat
         OUTFILE = DATFILE(1:INDEX(DATFILE,'.dat')-1) // '.out'
       END IF
+
+      RETURN
+      END
+C     ****
+
+C     ****s* mninterface.f/MCONT
+C  NAME
+C     MCONT  --  parameter correlation contour
+C  SYNOPSIS
+
+      SUBROUTINE MCONT(NUM1, NUM2, NPT, XPT, YPT, NFOUND)
+
+      IMPLICIT NONE
+      INTEGER NUM1, NUM2, NPT, NFOUND
+      DOUBLE PRECISION XPT(250), YPT(250)
+
+C  INPUTS 
+C                NUM1  --  first parameter number (external)
+C                NUM2  --  second parameter number (external)
+C                 NPT  --  number of points required on a contour
+C  OUTPUT 
+C                XPT  --  array of contour x-coordinates (x: NUM1)
+C                YPT  --  array of contour y-coordinates (y: NUM2)
+C  PARENTS
+C     MinuitContour
+C  CHILDREN
+C     MNCONT
+C  SOURCE
+C
+
+      EXTERNAL FCN
+
+      CALL MNCONT (FCN,NUM1,NUM2,NPT,XPT,YPT,NFOUND,0)
+        IF (NFOUND .LT. 0) THEN
+          WRITE(6, '(A,I,I)') 
+     &     'Cannot calculate contour for parameters ', NUM1, NUM2
+        ELSE IF (NFOUND .LT. NPT) THEN
+          WRITE(6, '(A,I,I)') 
+     &     'Problematic contour for parameters ', NUM1, NUM2
+        END IF
 
       RETURN
       END

@@ -104,11 +104,14 @@ try different values of $c$ and $\phi$ to get best numerical
 properties. 
 For the default GPD ansatz (\texttt{ANSATZ = 'FIT'}), values of  $c$ = 0.5 or 0.25 are
 fine, as well as $\phi = 3\pi/4$. However if one uses different GPD ansatz, one should
-be aware of the position of the leading poles and choose $c$ accordingly. Also, if
+be aware of the position of the leading poles and choose $c$ accordingly 
+\comminline{In the
+future version one should implement some sort of automatic choosing of $c$ depending
+on the ansatz.}. Also, if
 one uses $\overline{MS}$ scheme and \emph{non-diagonal evolution} (\texttt{SCHEME = 'MSBND'}),
 one should not make $\phi$ too big or one runs in the danger of hitting poles of
-the evolution operator. In this case $\phi$ only slightly larger than $\pi/2$ is the
-safest choice.
+the evolution operator. In this case $\phi$ only slightly larger than (or
+equal to $\pi/2$ is the safest choice.
 
 \begin{figure}
 \begin{center}
@@ -165,49 +168,39 @@ Numerical integration is performed in a way very similar to the one described in
 fluctuates most rapidly around zero, mostly due to the factor $\xi^{-j}$. As we
 move away from real axis, both
 amplitude and oscillation frequency decrease exponentially.
-This leads us to divide integration region in exponentially expanding intervals
+This leads us to divide integration region in exponentially expanding segments
 defined by points:
 \begin{align*}
-0 \,\ldots\, 0.01 \,\ldots\, 0.025\,\ldots\, 0.067\,\ldots\,& 0.18\,\ldots\, 0.5\,\ldots\, 1.3\,\ldots\, 3.7\,\ldots\, 10&
-\qquad \text{(for \texttt{SPEED=1})} \\
-0  \,\ldots\, 0.025\,\ldots\,& 0.18\,\ldots\, 1.3 \,\ldots\, 10&
-\qquad \text{(for \texttt{SPEED=2})} \\
-0  \,\ldots\,& 0.18 \,\ldots\, 3.7&
-\qquad \text{(for \texttt{SPEED=4})} \\
+0 \,\ldots\, 0.01 & \,\ldots\, 0.025 \,\ldots\, 0.067\,\ldots\, 0.18\,\ldots\, 0.5\,\ldots\, 1.3\,\ldots\, 3.7\,\ldots\, 10. \, \ldots \\
+ & \ldots  \, 25. \, \ldots\, 67. \, \ldots\, 182. \, \ldots \, 500. \;,
 \label{<intervals>}
 \end{align*}
+for \texttt{SPEED=1}, while for higher values of \texttt{SPEED} segments
+are defined only using points number $(1, 1+SPEED, 1+ 2 SPEED, \ldots)$ from
+the above list (\ref{intervals}).
 Here \texttt{SPEED} is one of \texttt{gepard}'s initialization parameters which
 controls speed and accuracy of evaluations, see Section \ref{ssect:GEPARD.INI}.
 On each segment, standard 8-point Gaussian integration is employed, according
 to Eq. (25.4.30) from \cite{AbS65}.
-Thus for \texttt{SPEED}=1,2, and 4 we use in total 64, 32, and 16
+Thus for \texttt{SPEED}=1,2, and 3 we use in total 96, 48, and 32
 integration points, respectively. 
 One can increase the number of Gaussian points by increasing the parameter
-\texttt{ACC} in \texttt{GEPARD.INI}. Number of points is $2^{\mbox{\texttt{ACC}}}$,
+\texttt{ACC} in \texttt{GEPARD.INI}. Number of points on each segment
+is $2^{\mbox{\texttt{ACC}}}$,
 but default choice is good enough for all practical purposes and increasing this
 paremeter serves only as a check of numerical stability.
 
 During the initialization phase, coordinates of points on Mellin-Barnes contour and 
 their Gaussian-integration weights
 are put on the Fortran common blocks, together with corresponding values of
-the moments of Wilson coefficients and anomalous dimensions. Thus these
-time-demanding evaluations are performed only once.
+the moments of Wilson coefficients and anomalous dimensions. 
 
-\begin{commblock}
-It would be good to calculate also evolution operator during the initialization phase.
-This would be reasonably easy to implement for fits with fixed $\mathcal{Q}_{0}^2$, 
-where evolution is needed only for small number of fixed ratios 
-$\alpha_{s}(\mathcal{Q})/\alpha_{s}(\mathcal{Q}_0)$. 
-Looking at the execution profile of the present code, i.e. how much time is spent
-in particular subroutines, it seems to me that by such improvements one can hope
-for a speed-up of about factor 5-8. This could be the next step if the present
-speed turns out to be insufficient.
-\end{commblock}
+Also, files with experimental data points, used for fitting, are automatically
+inspected, corresponding values of photon virtualities $\mathcal{Q}^2$ are
+extracted, and evolution operators for all occuring ratios
+$\alpha_{s}(\mathcal{Q}^2)/\alpha_{s}(\mathcal{Q}^{2}_0)$ are also pre-calculated.
 
-\begin{commblock}
-This is now done! (I just need to explain it in the manual \dots)
-\end{commblock}
-
+Thus these time-demanding evaluations are performed only once.
 
 
 %\subsection{Ansatz for GPD $\mbox{\boldmath $H$}_{j} (\xi,\Delta^2,\mathcal{Q}_{0}^2)$}
@@ -219,38 +212,26 @@ User has to provide values of moments of GPDs $\mbox{\boldmath $H$}_{j}
 on an input scale by defining subroutine \texttt{HJ} which has the synopsis
 \begin{verbatim}
       SUBROUTINE HJ(J, FCM)
-
       DOUBLE COMPLEX J, FCM(2)
-      DOUBLE PRECISION XI, DEL2, Q2
-      COMMON / KINEMATICS /  XI, DEL2, Q2
 \end{verbatim}
 Input to the subroutine is the complex conformal moment \texttt{J} (i.e. coordinates of a point
-on the Melin-Barnes contour), and kinematical parameters $\xi$, $t=\Delta^2$, and $\mathcal{Q}^2$
-(not used), while output should be corresponding values
+on the Melin-Barnes contour), and kinematical parameters \texttt{XI}$=\xi$ and
+\texttt{DEL2}$=t=\Delta^2$,
+while output should be corresponding values
 \begin{align}
 \texttt{FCM(1)}& =\, ^{\Sigma}\!H_{j} (\xi,\Delta^2,\mathcal{Q}_{0}^2)  \\
 \texttt{FCM(2)}& =\, ^{G}\!H_{j}(\xi,\Delta^2,\mathcal{Q}_{0}^2) \,.
 \label{eq:FCM}
 \end{align}
-In the subroutine \texttt{HJ} provided by default, there is already implemented ansatz
-from the big paper.
-%\begin{equation}
-%^{a}\!H_{j}(\xi,\Delta^2,\mathcal{Q}_{0}^2) = 
-%N_a F_{a} (\Delta^2) \frac{ {\rm B}\big(1+j-\alpha_{a}(\Delta^2), \mathcal{P}_a\big)}{
-%{\rm B}\big(2-\alpha_{a}(0),\mathcal{P}_a\big)}\;, \qquad a = \Sigma, G \,
-%\label{eq:ansatzFIT}
-%\end{equation}
-%where $\mathcal{P}_\Sigma$ = 8,  $\mathcal{P}_G$ = 6, $\alpha_{a}(\Delta^2) =
-%\alpha_{a}(0) + 0.25 \Delta^2$  and 
-%\begin{equation}
-%F_{a} (\Delta^2) = \left(1 - \frac{\Delta^2}{m_{a}^2}\right)^{-3} \,.
-%\label{eq:F}
-%\end{equation}
-Twenty four free parameters of this ansatz ($N_a$, $\alpha_{a}(0)$, $\alpha_{a}'$,
+In the subroutine \texttt{HJ} provided with the software, there are several ansaetze 
+already implemented, such as \texttt{ANSATZ='SOFT'} and \texttt{ANSATZ='HARD'}
+used in \cite{Kumericki:2006xx}, as well as \texttt{ANSATZ='FITBP'}, used in
+\cite{Kumericki:2007sa}.
+Twenty four free parameters of this latter ansatz ($N_a$, $\alpha_{a}(0)$, $\alpha_{a}'$,
 $M_{0_a}$, $\Delta M_a$ and $p_a$ for  $a = \Sigma, G, u_{\rm val}, d_{\rm val}$),
 can either be fixed (e.g. in file \texttt{ansatz.f} used by example programs in
 subdirectory \texttt{ex}), or provided by the minimization routine for fitting, see
-Fig.~\ref{fig:MINUIT.CMD}.
+Fig.~\ref{fig:fit.cmd}.
 
 
 \section{\texttt{gepard} ingredients}
@@ -275,7 +256,8 @@ For calculating and testing DVCS form factors and observables the programs \text
 \texttt{auxtest}, \texttt{radcorr}, and \texttt{scaledep} are provided at the
 moment. For doing example plots many programs are provided in subdirectory \texttt{ex}.
 
-For fitting the GPD parameters using Minuit, as well as for calculating observables (by
+For fitting the GPD parameters using Minuit \cite{James:1975dr}, 
+as well as for calculating observables (by
 fixing all parameters to desired value), the program \texttt{fit} is provided, and
 also Mathematica interface for fitting and evaluating CFF.
 
@@ -286,18 +268,20 @@ Execution of \texttt{gepard} routines depends on the initialization parameters s
 the following files
 \begin{itemize}
 \item  \texttt{GEPARD.INI} --- main initialization for all routines
-\item  \texttt{FIT.INI} --- which sets of data are used in fits
-\item \texttt{MINUIT.CMD} --- Minuit minimization batch file
-\item \emph{data files} --- as specified in \texttt{FIT.INI}
+\item  \texttt{fit.dat} --- which sets of data are used in fits and how are they processed
+\item \texttt{fit.cmd} --- Minuit minimization batch file
+\item \emph{data files} --- as specified in \texttt{fit.dat}
 \end{itemize}
 The format and contents of these files should be mostly clear by looking at provided
-examples, and detailed explanations follow in the next subsections.
+examples, and detailed explanations follow in the next subsections. Names of the
+files used instead of \texttt{fit.dat} and \texttt{fit.cmd} can be specified
+as command-line options of fitting program.
 
-\textbf{NB:} Note that various constants in these files should be specified
+\textbf{NB:} Various constants in these files should be specified
 according to Fortran 77 standard! Thus, integers should be without dot (e.g.
 \texttt{1}), double precision values with dot and \texttt{'D'} (e.g.
 \texttt{1.D0}), while character constants (i.e. strings) should be enclosed in
-single quotation marks.
+single quotation marks (e.g. \texttt{'MSBAR'}).
 
 \subsection{\texttt{GEPARD.INI}}
 \label{ssect:GEPARD.INI}
@@ -344,20 +328,16 @@ order of entries should correspond to code in that subroutine.
 \begin{itemize}
 \item
 \texttt{SPEED} --- \emph{Integer}. Controls the speed and accuracy of the execution. Values can
-presently be only 1, 2, 3 and 4, where 1 is the most accurate and at the
+presently be only 1, 2 and 3, where 1 is the most accurate and at the
 same time the slowest case.
 As described in Section \ref{ssect:Integration}, \texttt{SPEED} controls the number
 of segments in which Mellin-Barnes integration contour is divided before 8-point
 Gaussian integration is performed on each segment. It also controls number of
-points used for Gaussian integration of partial Compton cross-section. This
-number is 8/\texttt{SPEED}.  Thus, the total speed of fitting is approximately
-proportional to the
-value of \texttt{SPEED}. 
+points used for Gaussian integration of partial Compton cross-section over
+momentum transfer $t$. This number is 8/\texttt{SPEED}. 
 
 Analysis of how accurate are results for varius \texttt{SPEED} settings can
-be found in section \ref{sec:tests}. In the present version of \texttt{gepard},
-\texttt{SPEED=4} is rather unreliable, and in practice maximal sensible
-value of \texttt{SPEED} is 3.
+be found in section \ref{sec:tests}.
 
 \item
 \texttt{P} --- \emph{Integer}. Perturbation theory approximation level. 0 = LO, 1 = NLO, and
@@ -424,15 +404,19 @@ It should correspond to one of  \texttt{IF\ldots ELSE IF} stanzas in subroutine
 \texttt{TOY} (used in some old development Mathematica notebooks), \texttt{SOFT} and \texttt{HARD},
 corresponding to ansaetze from \cite{Kumericki:2006xx}, \texttt{FITBP}, corresponding
 to ansatz used in \cite{Kumericki:2007sa}, and \texttt{FIT}, corresponding to a new
-expeimental ansatz including subleading partial wave.
+ansatz including skewness dependence.
 
 There are also two special values for \texttt{ANSATZ}. First is \texttt{ANSATZ = 'MMA'}, which
-can be used if Mathematica interface is active , which
-means that values for GPD will be obtained from the ansatz function defined within
+can be used if Mathematica interface is active, and
+then values for GPDs will be obtained from the ansatz function defined within
 Mathematica (see Sect. \ref{sec:mma}). Second is \texttt{ANSATZ = 'SPLICE'}, which
 means that GPD is defined in subroutine \texttt{SPLICE} in file \texttt{splice.f}. This
 subroutine is automatically created by splicing Fotran code of GPD function originally
 defined within Mathematica, but is independent of Mathematica interface (see Sect. \ref{sec:mma}).
+
+\begin{commblock}
+This splicing is buggy at the moment and cannot be used!
+\end{commblock}
 
 \end{itemize}
 
@@ -443,123 +427,140 @@ radiative corrections, ignores values of \texttt{P}, \texttt{SCHEME} and
 \texttt{ANSATZ} in \texttt{GEPARD.INI}, and sets them itself.
 
 
-\subsection{\texttt{FIT.INI}}
+\subsection{\texttt{fit.dat}\label{sec:fit.dat}}
 
 \begin{figure}[t]
 \begin{center}
 \hrule
 \begin{verbatim}
 
-      'testfit'
-      '/CPS' 3  3
-      'START'
-      'DVCS_H1_1.DAT'
-      'DVCS_H1_2.DAT'
-      'DVCS_H1_3.DAT'
-      'DVCS_H1_6.DAT'
-      'DIS1.DAT'
-      'DIS3.DAT'
-      'DIS4.DAT'
-      'STOP'
-      'DVCS_H1_5.DAT'
-      'DVCS_ZEUS_1.DAT'
-      'DVCS_ZEUS_2.DAT'
-      'DIS2.DAT'
-      'DIS5.DAT'
-      'DIS6.DAT'
+'/CPS' 3  2
+'START'
+'NEWFIG'
+'DVCS' '-t' 'dsigma/dt' 0.  1. -1.3  1.2 'BCNST1' 'BCLNST'
+'DATA/DVCS_H1_0506_08.DAT'
+'DATA/DVCS_H1_0506_09.DAT'
+'NEWFIG'
+'DVCS' '-t' 'dsigma/dt' 0.  1. -1.3  1.2 'BCNST1' 'BCLNST'
+'DATA/DVCS_H1_0506_11.DAT'
+'DATA/DVCS_H1_0506_12.DAT'
+'CHISQ'
+'NEWFIG'
+'DVCS' 'Q2' 'sigma' 0.  90. -1.3  1.4 'BCNST1' 'BCLNST'
+'DATA/DVCS_H1_3.DAT'
+'DATA/DVCS_H1_0506_01.DAT'
+'DATA/DVCS_ZEUS_1.DAT'
+'CHISQ'
+'STOP'
+'NEWFIG'
+'DIS' 'Q2' 'F2' 0.  50. 0.45  1.5 'BCNST1' 'BCNST'
+'DATA/DIS2H1.DAT'
+'DATA/DIS4H1.DAT'
+'DATA/DIS6H1.DAT'
+'CHISQ'
 
 \end{verbatim}
 \hrule
 \end{center}
-\caption{Example of initialization file \texttt{FIT.INI}}
-\label{fig:FIT.INI}
+\caption{Example of initialization file \texttt{fit.dat}}
+\label{fig:fit.dat}
 \end{figure}
 
-File has the structure displayed on Fig.~\ref{fig:FIT.INI}.
+File has the structure displayed on Fig.~\ref{fig:fit.dat}.
 
 
 \begin{itemize}
-
-\item
-1$^{\rm st}$ line (\texttt{OUTFILE}) --- \emph{Character*20}. Name of the file(s) used for output.
-There are usually three output files:
-\begin{itemize}
-\item \texttt{OUTFILE.min}  ---  Output of Minuit routines (When run in batch mode. When
-run in the interactive mode one can somehow log the terminal output. For example,
-on Linux, by issuing command \texttt{script filename} before the run, and
-\texttt{exit})
-\item \texttt{OUTFILE.out}   ---  Final fit results in tabular form, as shown on
-Fig.~\ref{fig:fitout}
-\item \texttt{OUTFILE.ps}    ---  Same information as in \texttt{OUTFILE}.out but 
-in graphical form, as shown on
-Fig.~\ref{fig:fitps}  (This works only if you have PGPLOT library. If not, use
-executable \texttt{fit\_nopgplot}.)
-\end{itemize}
 
 \item 
-2$^{\rm nd}$ line (\texttt{OUTFORMAT, XPANELS, YPANELS}) ---  \emph{Character*20, Integer, Integer}.
-\texttt{OUTFORMAT} specifies which graphical driver should be used according to PGPLOT conventions. Possible
-values depend on your installation of PGPLOT. Some useful values are
+1$^{\rm st}$ line (\texttt{OUTFORMAT, XPANELS, YPANELS}) ---  \emph{Character*20, Integer, Integer}.
+\texttt{OUTFORMAT} specifies which graphical driver should be used according to PGPLOT conventions.
+Possible values depend on your installation of PGPLOT. Some useful values are
   \begin{itemize}
   \item \texttt{'/CPS'}  will get output into landscape color Postscript file 
   \item \texttt{'/VCPS'}  will get output into portrait color Postscript file 
-  \item \texttt{'/XSERVE'} will get output in an X window (may not work on MS Windows, and
-   on Linux there could be problems when there are more than one page of graphs)
+  \item \texttt{'/XSERVE'} will get output in an X window (may not work on MS Windows, even
+   in cygwin environment)
   \end{itemize}
 On one physical page graphs will be arranged on a grid \texttt{XPANELS} 
 $\times$ \texttt{YPANELS}.
 If PGPLOT is not used, this line is ignored but has to be present and formatted correctly.
 
 \item
-Other lines (\texttt{DATAFNAME}) --- \emph{Character*20}. Names of
-files containing the experimental data to be fitted to (see next
-section for the format of these data files), or strings \texttt{'START'} and \texttt{'STOP'}. 
-Only files between \texttt{'START'}
+Other lines (\texttt{COMMAND}s) --- \emph{Character*20}. Have to be one
+of the following things:
+\begin{enumerate}
+\item 
+\texttt{'NEWFIG'} --- New panel of plot is started. All subsequent
+datasets, until next \texttt{'NEWFIG'}, will be plotted on the same panel.
+In the following row must come a specification of this plot,
+in format:
+\begin{center}
+ \texttt{FIGLABEL, XLABEL, YLABEL, XMIN, XMAX, YMIN, YMAX, XTYPE, YTYPE}
+\end{center}
+and then PGPLOT will be called as
+\begin{verbatim}
+CALL PGSWIN (XMIN, XMAX, YMIN, YMAX)
+CALL PGBOX (XTYPE, 0.0, 0, YTYPE, 0.0, 0)
+CALL PGLAB(XLABEL, YLABEL, FIGLABEL)
+\end{verbatim}
+see PGPLOT documentation of these functions for details, but apart from
+\texttt{XTYPE} and \texttt{YTYPE} purpose of parameters should be obvious.
+\item
+ Names of files containing the experimental data to be fitted to (see
+section \ref{sec:datafiles} for the format of these data files).
+\item 
+\texttt{'CHISQ'} --- Partial values of $\chi^2$ will be calculated for
+  datasets between two \texttt{'CHISQ'} (and between \texttt{'START'} 
+and \texttt{'CHISQ'})
+\item
+\texttt{'START'} or \texttt{'STOP'} --- Only files between \texttt{'START'}
 and \texttt{'STOP'} rows will be included in actual fits, while everything beyond
-\texttt{'STOP'} is ignored, see example on Fig.~\ref{fig:FIT.INI}.
-This facilitates easy selection of data for different fits.
+\texttt{'STOP'} is ignored,
+\end{enumerate}
+
 \end{itemize}
 
 
-\subsection{\texttt{MINUIT.CMD}}
+\subsection{\texttt{fit.cmd}}
 
 \begin{figure}[t]
 \begin{center}
 \hrule
 \begin{verbatim}
 
-        0   <--   1=INTERACTIVE   0=BATCH  (Must be 0 on Windows!)
-        SET TITLE
-               Fitting to ansatz: FIT
-        PARAMETERS
-        1  'Q02       '   7.0       .1  
-        2  'AS0       '   0.0536    .1  
-        3  'MU02      '   2.5       .1  
-        11 'NS        '   0.2       .1  
-        12 'AL0S      '   1.1       .1   
-        13 'ALPS      '   0.15      .1  
-        14 'M02S      '   3.53      .1
-        15 'DELM2S    '   0.88      .1  
-        16 'PS        '   3.0       .1  
-        21 'NG        '   0.5       .1  
-        22 'AL0G      '   1.0       .1   
-        [... some lines deleted ...]
+0   <--   1=INTERACTIVE   0=BATCH  (Must be 0 on Windows!)
+SET TITLE
+       Fitting to ansatz: FIT
+PARAMETERS
+11 'NS        '   0.18      .1  
+12 'AL0S      '   1.1       .1   
+13 'ALPS      '   0.15      .1  
+14 'M02S      '   1.4       .1
+15 'DELM2S    '   0.00      .1  
+16 'PS        '   3.0       .1  
+18 'KAPS      '   1.1       .1  
+19 'SKEWS     '   0.9       .1  
+21 'NG        '   0.5       .1  
+22 'AL0G      '   1.20      .1   
+23 'ALPG      '   0.15      .1  
+24 'M02G      '   1.1       .1
+25 'DELM2G    '   0.00      .1  
+26 'PG        '   2.0       .1  
+28 'KAPG      '   0.9       .1  
+29 'SKEWG     '   1.1       .1  
 
-        fix  1 2 3 
-        fix  13 15 16
-        [... some lines deleted ...]
-
-        migrad
-        cali 3
+fix  13 15 16 18 19 23 25 26 28 29
+migrad
+cali 3
 
 \end{verbatim}
 \hrule
 \end{center}
-\caption{Example of Minuit batch file \texttt{MINUIT.CMD}}
-\label{fig:MINUIT.CMD}
+\caption{Example of Minuit batch file \texttt{fit.cmd}}
+\label{fig:fit.cmd}
 \end{figure}
 
-\texttt{MINUIT.CMD} is a file containing Minuit batch commands. Its format is explained in
+\texttt{fit.cmd} is a file containing Minuit batch commands. Its format is explained in
 Minuit manual \cite{Minuit}, Section 3.2.1. The only difference with respect to the
 standard Minuit batch file is that first line has to contain integer 1 or 0 as a first
 item. This controls whether one will do an interactive Minuit session, or not.
@@ -572,19 +573,15 @@ Second and third line are just giving some label to Minuit session.
 Then comes the part where fit parameters are specified.
 If one uses default \texttt{ANSATZ = 'FIT'} in
 \texttt{GEPARD.INI}, then this part should look like on
-Fig.~\ref{fig:MINUIT.CMD}. One could than only change initial values of parameters
-(column 3), and maybe their starting step size (column 4). This \texttt{ANSATZ = 'FIT'} 
-corresponds to ansatz described in Section \ref{ssect:ansatz}.  
-Note that first parameter specifies input scale $\mathcal{Q}_0$, and second
-one specifies value of $\alpha_{\rm strong}$ at the scale given by third parameter.
+Fig.~\ref{fig:fit.cmd}. One could than only change initial values of parameters
+(column 3), and maybe their starting step size (column 4).
 
 Last part of this file contains Minuit command instructions. E. g. in the
-example on Fig.~\ref{fig:MINUIT.CMD} one first fixes some parameters,
+example on Fig.~\ref{fig:fit.cmd} one first fixes some parameters,
 then performs minimization using \texttt{migrad} algorithm,
-and finally prints, and maybe plots (to the file specified in
-\texttt{FIT.INI}) the results of the fit.
+and finally prints, and maybe plots the results of the fit.
 
-\subsection{Data files}
+\subsection{Data files\label{sec:datafiles}}
 
 \begin{figure}[t]
 \begin{center}
@@ -614,7 +611,8 @@ and finally prints, and maybe plots (to the file specified in
 \label{fig:DVCS4.DAT}
 \end{figure}
 
-Names of these files should be specified in \texttt{FIT.INI}.
+Names of these files should be specified in \texttt{fit.dat}, as explained
+in section \ref{sec:fitdat}.
 Each data file has the structure displayed on Fig.~\ref{fig:DVCS4.DAT}. In the first
 four rows only the first item is read by the program and the second one
 (corresponding to internal Fortran variable) is just convenient user
@@ -683,15 +681,32 @@ Statistical and systematical errors are combined in quadrature for fitting.
 
 In the directory where all initialization files named in Section~\ref{sec:init} are
 placed one runs executable \texttt{fit}. When minimization is over, and results
-printed out (e.g. by Minuit commands \texttt{stop, return, cali 3, \dots}), one gets
-files: \texttt{OUTFILE.min} (if in batch mode),
-\texttt{OUTFILE.out}, and \texttt{OUTFILE.ps} (if PGPLOT is used), where \texttt{OUTFILE}
-is specified in the first line of \texttt{FIT.INI}.
-The file \texttt{OUTFILE.min} contains the standard output of Minuit routines.
-The file \texttt{OUTFILE.out} contains the numbers from each data file, together with
+printed out (e.g. by Minuit commands \texttt{stop, return, cali 3, \dots}), one 
+usually gets three output files:
+\begin{itemize}
+\item \texttt{fit.mnt}  ---  Output of Minuit routines (When run in batch mode. When
+run in the interactive mode one can somehow log the terminal output. For example,
+on Linux, by issuing command \texttt{script filename} before the run, and
+\texttt{exit} afterwards.)
+\item \texttt{OUTFILE.out}   ---  
+The file contains the numbers from each processed data file, together with
 resulting fit value \texttt{Y(X)\_FIT},
-and last column says how many sigmas is fit value different from experiment.
+and last column saying how many sigmas is fit value different from experiment.
 One stanza from such file is displayed on Fig.~\ref{fig:fitout}.
+\item \texttt{OUTFILE.ps}    ---  Almost the same information as 
+in \texttt{OUTFILE}.out but in graphical form, as shown on
+Fig.~\ref{fig:fitps}  (This works only if you have PGPLOT library. If not, use
+executable \texttt{fit\_nopgplot}.). Additionally, \texttt{OUTFILE.ps} has plots
+of PDFs and slopes of GPDs using resulting fit parameters.
+\end{itemize}
+
+By default \texttt{OUTFILE=fit}, but this can be changed by second command-line
+argument of fitting program \texttt{fit}. Thus \texttt{fit  dvcs dvcsnlo test}
+will use \texttt{dvcs.dat} instead of \texttt{fit.dat} for reading required
+datasets, Minuit commands will be read from \texttt{test.cmd} instead of
+\texttt{fit.cmd} and results will go to \texttt{nlodvcs.out} and \texttt{nlodvcs.ps}.
+
+
 
 \begin{figure}
 \begin{center}
@@ -727,7 +742,7 @@ in the file \texttt{OUTFILE.ps}. Example graph is shown on Fig.~\ref{fig:fitps}.
 \begin{center}
 \includegraphics[scale=0.72]{examplefit}
 \end{center}
-\caption{Example of a fit to DIS data.}
+\caption{Result of simplified fit to some DVCS and DIS data.}
 \label{fig:fitps}
 \end{figure}
 
@@ -743,7 +758,8 @@ In particular, we compared evolution of gluonic PDF, which is easiest to compare
 To make \texttt{gepard} calculate only evolution of gluonic PDFs, we implemented special
 ``renormalization scheme'' \texttt{SCHEME} = \texttt{UNITG} which
 makes Wilson coefficient vector equal to $(C_{\Sigma}, C_G) = (0, 1)$
-to all orders. Then the same routine that normally calculates observable $F_2(x)$ gives $x g(x)$, up
+to all orders. Then the same routine that normally calculates DIS form factor
+$F_2(x)$ gives $x g(x)$, up
 to the charge factor $Q_s$. We also implemented \texttt{ANSATZ} = \texttt{HOUCHE}, corresponding to the
 input form of PDFs as used by \cite{Vogt:2004ns}. This is so called Les Houches benchmark PDF
 input \cite{Giele:2002hx}.  Finally, to have the same treatment of perturbative expansion of
@@ -806,7 +822,9 @@ variable parameters \{par1, par2, \ldots\}} \\[0.8ex]
 \defboxitem{JustCali3}{ \{par1, par2, \ldots\}, options}{Just prints out initial chi-square without
 any fitting. Useful for checking ansaetze and debugging}\\[0.8ex]
 \defboxitem{cffH}{xi, t, q2, q02, options}{Returns singlet Compton form factor
-$\mathcal{H}(xi=\xi, t=\Delta^2, q2=\mathcal{Q}^2, q02=\mathcal{Q}_{0}^2)$.} 
+$\mathcal{H}(xi=\xi, t=\Delta^2, q2=\mathcal{Q}^2, q02=\mathcal{Q}_{0}^2)$.}\\[0.8ex]
+\defboxitem{cffE}{xi, t, q2, q02, options}{Returns singlet Compton form factor
+$\mathcal{E}(xi=\xi, t=\Delta^2, q2=\mathcal{Q}^2, q02=\mathcal{Q}_{0}^2)$.} 
 \end{tabular}%
 \end{minipage}}\\[0.5ex]
 {\small High level functions available in \emph{Mathematica} interface.}
@@ -824,10 +842,13 @@ be overriden by \emph{options}:
 \optboxitem{SPEED}{\emph{in GEPARD.INI}}{speed of execution} \\
 \optboxitem{P}{\emph{in GEPARD.INI}}{order of perturbation series N$^{P}$LO}\\
 \optboxitem{SCHEME}{\emph{in GEPARD.INI}}{factorization scheme (CSBAR, MSBND, \ldots)}\\
-\optboxitem{ANSATZ}{\emph{in GEPARD.INI}}{ansatz used (MMA, SPLICE, FIT, \ldots)}
+\optboxitem{ANSATZ}{\emph{in GEPARD.INI}}{ansatz used (MMA, SPLICE, FIT, \ldots)}\\
+\optboxitem{DATFILE}{\emph{fit}}{file DATFILE.dat specifies fitting datasets.}\\
+\optboxitem{OUTFILE}{\emph{fit}}{output to go to OUTFILE.out and OUTFILE.ps}
 \end{tabular}%
 \end{minipage}}\\[0.5ex]
-{\small Options of \mmacomm{GepardFit}, \mmacomm{JustCali3} and \mmacomm{cffH}.}
+{\small Options of \mmacomm{GepardFit}, \mmacomm{JustCali3}, \mmacomm{cffH}, 
+and \mmacomm{cffE}.}
 \end{flushleft}
 
 All of these functions expect that user has provided ansatz for GPDs and PDFs
@@ -853,6 +874,7 @@ Fortran functions (log-exp, trigonometric, hyperbolic), or one needs to write so
 Fortran code defining required additional functions. Also, after issuing \mmacomm{SpliceToFortran}
 one musts recompile Gepard (which usually means just issuing command '\emph{make gepard.exe}')
 and reload gepard.exe (which usually means just reevaluating $\langle\langle<<$~\emph{gepard.m}).
+\comminline{This \texttt{SPLICE} is somewhat broken at the moment.}
 
 \item[\texttt{FIT}] 
 One writes explicitly Fortran code in subroutine 'HJ', following examples there. This
@@ -864,7 +886,7 @@ PLB paper etc.)
 \end{description}
 
 Apart from speed, one advantage of ansaetze 'SPLICE' and 'FIT' is that they are
-available to pure Fortran fitting without Mathematica.
+available to pure Fortran fitting without the need for Mathematica software.
 
 \begin{flushleft}
 \colorbox{defbox}{%
@@ -908,7 +930,7 @@ See Minuit manual for details.
 
 High level functions are just a canned sequences of low level functions which can
 be used for finer control over the whole process. Here is just a list with
-descriptions. For details, see example notebook 'fit.nb', especially section ``Advanced fitting''.
+descriptions. For details, see example notebook 'fit.nb'.
 
 
 \begin{flushleft}
@@ -926,10 +948,14 @@ presently ignored.} \\[0.8ex]
  & Declares Minuit parameter by forwarding arguments to subroutine MNPARM \\[0.8ex]
 \defboxitem{MinuitCommand}{string}{sends to Minuit the command \emph{string} by
 forwarding it to subroutine MNCOMD. } \\[0.8ex]
+\defboxitem{PrintMinuitCommand}{string, fontsize}{same, but prints the Minuit output
+by reading \texttt{fit.mnt} file. Useful for Minuit commands such as
+``show correlations'' or ``scan''.} \\[0.8ex]
 \end{tabular}%
 \end{minipage}}\\[0.5ex]
 {\small Functions controlling fitting procedure. First three should probably not be
-used directly at all, but only by calling high level functions.}
+used directly at all, but only via calling high level functions. Last two essentially
+enable complete Minuit interface from within Mathematica session.}
 \end{flushleft}
 
 
@@ -945,8 +971,8 @@ list {chi-square, quality of covariance matrix: 0-3}} \\[0.8ex]
 number \emph{ID} by calling Minuit subroutine MNPOUT. It returns list 
 \{\emph{value}, \emph{error estimate}, \emph{internal parameter number} (or \emph{zero} if
 constant/fixed, or negative if undefined)\}. } \\[0.8ex]
-\defboxitem{ParameterID}{symbol}{Returns parameter number (ID) of a parameter
-with name \emph{symbol} (not string!), as specified by array Parameters.} \\[0.8ex]
+%\defboxitem{ParameterID}{symbol}{Returns parameter number (ID) of a parameter
+%with name \emph{symbol} (not string!), as specified by array Parameters.} \\[0.8ex]
 \end{tabular}%
 \end{minipage}}\\[0.5ex]
 {\small Functions for displaying results I.}
@@ -957,6 +983,19 @@ with name \emph{symbol} (not string!), as specified by array Parameters.} \\[0.8
 \colorbox{defbox}{%
 \begin{minipage}{\textwidth}%
 \begin{tabular}{rp{8cm}}%
+\multicolumn{2}{l}{\mmacomm{PlotMinuitContour[}\emph{par1, par2, npts, options}
+\mmacomm{]} } \\
+ & Plots correlation contour
+of parameters par1 and par2 using Minuit's MNCONT \\[0.8ex]
+\multicolumn{2}{l}{\mmacomm{PlotMinuitContourFixed[}\emph{par1, par2, npts, options}
+\mmacomm{]} } \\
+& same, but chi-square
+is not minimized with respect to other parameters for each point. Thus
+significantly faster. \\[0.8ex]
+\multicolumn{2}{l}{\mmacomm{PlotMinuitContourFixedAll[}\emph{par1, par2, npts, options}
+\mmacomm{]} } \\
+& same, but
+also values of par1 and par2 are not changed even if better minimum is found. \\[0.8ex]
 \defboxitem{GPD}{flavor, x, t, xi}{Gives value of x-space GPDs (flavor: 1=Q, 2=G). 
 It relies on moments \mmacomm{GPDcurrent[j,t,xi]} which are set up automatically
 by calling \mmacomm{GepardFit}, \mmacomm{JustCali3} or \mmacomm{PrettyStatus}, and can
@@ -967,7 +1006,7 @@ different names in the future.)} \\[0.8ex]
 or 2=G (red).} \\[0.8ex]
 \defboxitem{slope}{flavor, x}{GPD slope at x} \\[0.8ex]
 \defboxitem{plotslopes}{}{Plots GPD slope as a function of x for flavor 1=Q (blue) and
- 2=G (red).} \\[0.8ex]
+ 2=G (red). Slow, better just look at PS file.} \\[0.8ex]
 \defboxitem{ChiSquareProbability}{dof, chisq}{Gives probability that chi-square
 for a system with \emph{dof} degrees of freedom will be larger than or equal to \emph{chisq}.}
 \end{tabular}%
@@ -981,15 +1020,13 @@ Calling graph of subroutines for executable \texttt{fit} is displayed on
 Fig.~\ref{fig:callgraph}. Each subroutine,
 function and main program is described in the extended \texttt{gepard-api.pdf} documentation,
 as well as hyperlinked HTML documentation produced by \texttt{robodoc} automatic
-documentation generator. This is corresponding to old version 0.9.1 of \texttt{gepard}.
-There are some changes in the present version, and automatically generated documentation
-is not yet completely updated.
+documentation generator.
 
 \begin{figure}[ht]
 \begin{center}
 \includegraphics[scale=0.52]{callgraph}
 \end{center}
-\caption{Calling graph}
+\caption{Calling graph (for slightly older version gepard 0.9.1)}
 \label{fig:callgraph}
 \end{figure}
 

@@ -10,14 +10,12 @@ Computing:
 -  Automatize putting Alekhin's PDFs into fitpdfs
 -  We don't need both HGRID and MBGPD, it seems.
 -  deriv.f should be copyright-cleared
--  FIT.INI should have optional name, changable by mma interface
 -  PAR(18) and (28) hardwired in CompileMoments[]
 -  Using GOTO statements in fcn.F should be avoided
 -  Charge factor treatment should be improved
 -  filenames setting should be separated from GepardInitInternal because
    this is not needed for cffEinternal and cffHinternal
 -  Numbers in fit.c should be changed by preprocesor variables
--  PrintMinuitCommand should inquire FILENAMES common block for filename
 
 
 Checks:
@@ -48,3 +46,5 @@ DONE:
 +  There should be PDF() function so that PDFs are not calculated
    internally in FCN()
 +  tmp.mma is a kludge
++  FIT.INI should have optional name, changable by mma interface
++  PrintMinuitCommand should inquire FILENAMES common block for filename

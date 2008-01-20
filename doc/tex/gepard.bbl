@@ -1,11 +1,11 @@
 \providecommand{\href}[2]{#2}\begingroup\raggedright\begin{thebibliography}{1}
 
 \bibitem{Kumericki:2006xx}
-K.~Kumeri{\v c}ki, D.~M{\"u}ller, K.~Passek-Kumeri{\v c}ki and A.~Sch{\"a}fer,
-  {\it Deeply virtual {C}ompton scattering beyond next-to-leading order: The
-  flavor singlet case},  \href{http://arXiv.org/abs/hep-ph/0605237}{{\tt
-  hep-ph/0605237}}.
-%%CITATION = HEP-PH 0605237;%%
+K.~Kumeri{\v c}ki, D.~M{\"u}ller, K.~Passek-Kumeri{\v c}ki and A.~Sch{\" a}fer,
+  {\it Deeply virtual compton scattering beyond next-to-leading order: The
+  flavor singlet case},  {\em Phys. Lett.} {\bf B648} (2007) 186--194
+  [\href{http://arXiv.org/abs/hep-ph/0605237}{{\tt hep-ph/0605237}}].
+%%CITATION = HEP-PH/0605237;%%
 
 \bibitem{vanNeerven:2000uj}
 W.~L. van Neerven and A.~Vogt, {\it {NNLO} evolution of deep-inelastic
@@ -28,8 +28,14 @@ M.~Abramowitz and I.~A. Stegun, {\em Handbook of Mathematical Functions}.
 K.~Kumeri{\v c}ki, D.~M{\"u}ller and K.~Passek-Kumeri{\v c}ki, {\it Towards a
   fitting procedure for deeply virtual {C}ompton scattering at next-to-leading
   order and beyond},  \href{http://arXiv.org/abs/hep-ph/0703179}{{\tt
-  hep-ph/0703179}}.
+  hep-ph/0703179}}. To appear in Nucl. Phys. {\bf B}.
 %%CITATION = HEP-PH/0703179;%%
+
+\bibitem{James:1975dr}
+F.~James and M.~Roos, {\it Minuit: A system for function minimization and
+  analysis of the parameter errors and correlations},  {\em Comput. Phys.
+  Commun.} {\bf 10} (1975) 343--367.
+%%CITATION = CPHCB,10,343;%%
 
 \bibitem{Minuit}
 F.~James, {\em Minuit reference manual, version 94.1}.

@@ -90,3 +90,12 @@
 :ReturnType:    Manual
 :End:
 
+:Evaluate: MinuitContour::usage = "MinuitContour[num1, num2, npts] calculates coordinates of two-parameter correlation contour by calling MNCONT"
+:Begin:
+:Function:      MinuitContour
+:Pattern:       MinuitContour[num1_Integer, num2_Integer, npts_Integer]
+:Arguments:     {num1, num2, npts}
+:ArgumentTypes: {Integer, Integer, Integer}
+:ReturnType:    Manual
+:End:
+

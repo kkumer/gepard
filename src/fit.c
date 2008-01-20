@@ -189,6 +189,48 @@ void MinuitGetParameter(long int id)
 };
 /******/
 
+/****f* fit.c/MinuitContour
+*  NAME
+*     MinuitContour  --  C wrapper for MNCONT via CONTOUR
+*  DESCRIPTION
+*     It returns list of contour coordinates
+*  SYNOPSIS
+*/
+
+void MinuitContour(long int num1, long int num2, long int npt)
+
+/*
+*  INPUTS 
+*                num1  --  first parameter number (external)
+*                num2  --  second parameter number (external)
+*                 npt  --  number of points required on a contour
+*  OUTPUT 
+*                xpt  --  array of contour x-coordinates (x: NUM1)
+*                ypt  --  array of contour y-coordinates (y: NUM2)
+*  PARENTS
+*      PlotMinuitContour
+*  CHILDREN
+*            MCONT
+*  SOURCE
+*/
+
+{
+        int nfound, i;
+        double xpt[250], ypt[250];
+
+        mcont_(&num1, &num2, &npt, xpt, ypt, &nfound);
+
+        MLPutFunction(stdlink, "List", nfound);
+            for (i = 0; i < nfound; i++){
+                    MLPutFunction(stdlink, "List", 2);
+                      MLPutReal(stdlink, xpt[i]);
+                      MLPutReal(stdlink, ypt[i]);
+            }
+
+        return;
+};
+/******/
+
 /*  Commands that directly call Minuit subroutines */
 
 /****f* fit.c/MinuitStatus
