@@ -4,7 +4,7 @@
 (*     ==============================    *)
 
 
-Print["GeParD - Mathematica interface (2008-01-19)"];
+Print["GeParD - Mathematica interface (2008-02-23)"];
 
 
 BeginPackage["gepard`", "Format`", "NumericalMath`NLimit`", "Graphics`Graphics`",
@@ -44,6 +44,10 @@ After recompiling gepard.exe this ansatz is available as ANSATZ 'SPLICE'."
 Parameters::usage = "Parameters is an array of the form {{id1, par1, val1, step1, low1, hi1},
 {id2, par2, ...}, ...}. Here idn is the parameter number, par1 is parameter name, val1 is
 its starting value, etc. as expected by Minuit. See Minuit manual."
+
+SaveParameters::usage = "SaveParameters[] writes present values of fitting
+parameters (which are only recorded in the internal Minuit-Gepard memory)
+into the list Parameters, preparing it thus for next fitting procedure."
 
 ParameterID::usage = "ParameterID[symbol] returns parameter number (id) of a parameter with
 name symbol, as specified by array Parameters."
@@ -371,6 +375,9 @@ PlotMinuitContourFixedAll[par1_Symbol, par2_Symbol, npts_Integer, (opts___)?Opti
     MinuitCommand["set param " <> ToString[contpars[[2]]] <> " " <> ToString[oldvals[[2]]]];
         ]
 
+SaveParameters[] := Block[{},
+Parameters = Map[{#[[1]], #[[2]], 
+  MinuitGetParameter[#[[1]]][[1]], #[[4]], #[[5]], #[[6]]}&, Parameters];]
 
 End[ ]
 
