@@ -122,7 +122,7 @@ C
       OPEN(UNIT = 6, FILE = 'fit.mnt', STATUS = "OLD")
  10   READ(6, *, END=20)
       GOTO 10
- 20   BACKSPACE (11)
+ 20   BACKSPACE (6)
 
       TCMD = CMD(1:SIZ)
       CALL MNCOMD(FCN, TCMD, IERFLG, 0)

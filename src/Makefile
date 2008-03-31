@@ -47,7 +47,7 @@ $(ADACFODIR)/%.o: adacf/%.f
 FOBJS = Finit.o Fbeta.o Fspecial.o Fdcomplex.o Fastrong.o Flambda.o\
 Fprojectors.o Frnnlo.o Ferfunc.o Fevol.o Fcdvcs.o Fmsbar.o \
 Fdvcs.o Ff2.o Freadpar.o Ferror.o Fgauss.o Fnd.o Fbigcns.o Fintegra.o Fxspace.o\
-Finitc.o Fevolc.o Fgetmbgpd.o Fhj.o Fsplice.o Fcff.o Ffcn.o Fderiv.o Fbca.o
+Finitc.o Fevolc.o Fgetmbgpd.o Fhj.o Fsplice.o Fcff.o Fderiv.o Fbca.o
 _FOBJS = $(patsubst %,$(FODIR)/%,$(FOBJS))
 
 
@@ -95,10 +95,10 @@ $(TESTTARGETS): %: $(ALLOBJS) $(FODIR)/F%.o
 #fit_nopgplot: $(ALLOBJS) $(FODIR)/Ffit.o
 	#$(FC) -o $@ $^ $(FFLAGS) $(CERNLIBS)
 
-# main fit target  (an variant withouth PGPLOT)
+# main fit target  (a variant withouth PGPLOT)
 fit: CPPFLAGS :=
 fit_nopgplot: ALLPGPLOTLIBS :=
-fit fit_nopgplot:  $(ALLOBJS) $(FODIR)/Ffit.o
+fit fit_nopgplot:  $(ALLOBJS) $(FODIR)/Ffcn.o $(FODIR)/Ffit.o
 	$(FC) -o ../fits/$@ $^ $(FFLAGS) $(CERNLIBS) $(ALLPGPLOTLIBS)
 
 # targets for processing/presenting GPDs resulting from fit
@@ -108,7 +108,7 @@ $(FITTARGETS): %: $(ALLOBJS) $(EXFODIR)/%.o
 # mma targets
 
 gepard.exe: CPPFLAGS := -D MMA
-gepard.exe: $(ALLOBJS) $(_MMAOBJS)  $(FODIR)/Fmninterface.o
+gepard.exe: $(ALLOBJS) $(FODIR)/Ffcn.o $(_MMAOBJS)  $(FODIR)/Fmninterface.o
 	$(FC) -o ../fits/$@/$(SYS)/$@ $^ $(FFLAGS) $(CERNLIBS) -L$(MLLIBDIR) -l$(MLLIB) $(ALLPGPLOTLIBS) $(MLEXTRA)
 
 # targets for examples
