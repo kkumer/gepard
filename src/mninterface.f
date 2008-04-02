@@ -264,3 +264,34 @@ C
       RETURN
       END
 C     ****
+
+C     ****s* mninterface.f/SETPROC
+C  NAME
+C     SETPROC  --  Sets DVCS or DIS
+C  SYNOPSIS
+
+      SUBROUTINE SETPROC(IPR)
+
+      IMPLICIT NONE
+      INTEGER IPR
+
+C  INPUTS 
+C               IPR  --  2=DIS, anthing else = DVCS
+C  PARENTS
+C     cffHInternal, cffEInternal
+C  SOURCE
+C
+      INCLUDE 'header.f'
+
+
+      FFTYPE = 'SINGLET'
+
+      IF (IPR .EQ. 2) THEN
+              PROCESS = 'DIS'
+      ELSE
+              PROCESS = 'DVCS'
+      ENDIF
+
+      RETURN
+      END
+C     ****

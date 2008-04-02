@@ -20,7 +20,7 @@ C  SYNOPSIS
 C  CHILDREN
 C      BETAF, INTEGRAF, WgammaV*F, WcV*F, CDVCSF, MSBARF, BIGCNSF
 C  PARENTS
-C      FIT
+C      FIT, FITINIT, cffHInternal, cffEInternal
 C  BUGS
 C       For large xi>0.7 integration should be extended to larger Y
 C  SOURCE
@@ -142,7 +142,7 @@ C
 
       IF ( FFTYPE(:7) .EQ. 'SINGLET' ) THEN
 
-*****************  SINGLET  *****************
+*   -----------  SINGLET  ------------------
               
 *   2.b Anomalous dimensions matrices: LO, NLO, and NNLO
 
@@ -221,7 +221,7 @@ C
 
 
       ELSE
-*****************  NON - SINGLET  *****************
+*  -------------  NON - SINGLET  ----------------
 
 *   2.bNS Anomalous dimensions matrices: LO, NLO, and NNLO
 

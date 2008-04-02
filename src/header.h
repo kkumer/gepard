@@ -135,6 +135,7 @@ struct{
 /*     - Final observables */
       /* DOUBLE COMPLEX CFF(0:2)
        * COMMON / CFF      /  CFF
+       * DOUBLE PRECISION F2(0:2)
        * COMMON / F2       /  F2
        */
 
@@ -143,7 +144,7 @@ struct{
 } cff_;
 
 struct{
-        struct dblcomplex f2[3];
+        double f2[3];
 } f2_;
 
       /*
@@ -173,6 +174,7 @@ void cfff_();
 void readpar_();
 void init_();
 void initgpd_();
+void getmbgpdmma_();
 void evolc_(long int *i, long int *j);
 void mpar_(long int *id, long int *siz, char* pnam, double *vstrt, double *stp, double *lo, double *hi, int ch_len);
 void mcom_(long int *siz, char* cmd, long int *ierflg, int cmd_len);

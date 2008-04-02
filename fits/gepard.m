@@ -4,7 +4,7 @@
 (*     ==============================    *)
 
 
-Print["GeParD - Mathematica interface (2008-02-23)"];
+Print["GeParD - Mathematica interface (2008-04-01)"];
 
 
 BeginPackage["gepard`", "Format`", "NumericalMath`NLimit`", "Graphics`Graphics`",
@@ -114,6 +114,7 @@ FCM::usage = "Fortran format array holding the expressions for GPDs"
 j::usage = "j - complex conformal moment"
 t::usage = "t - Mandelstam variable. In Fortran represented as DEL2"
 xi::usage = "xi - DVCS kinematical variable."
+xbj::usage = "xbj - DIS kinematical variable x_Bjorken."
 
 lobj::usage = "lobj - MathLink link"
 
@@ -123,8 +124,12 @@ Options are same as for GepardInit."
 cffE::usage = "cffE[xi, t, q2, q02, options] returns singlet CFF E(xi, t, q2, q02). 
 Options are same as for GepardInit."
 
+F2::usage = "F2[xbj, q2, q02, options] returns singlet F2(xbj, q2, q02). 
+Options are same as for GepardInit."
+
 cffHInternal::usage = "MathLink function ..."
 cffEInternal::usage = "MathLink function ..."
+F2Internal::usage = "MathLink function ..."
 cInt::usage = "MathLink function ..."
 MinuitContour::usage = "MathLink function ..."
 
@@ -169,6 +174,7 @@ defaultopts = {SPEED -> -1, P -> -1, SCHEME -> "DFLT", ANSATZ -> "DFLT",
 Options[GepardInit] = defaultopts;
 Options[cffH] = defaultopts;
 Options[cffE] = defaultopts;
+Options[F2] = defaultopts;
 
 GepardInit[(opts___)?OptionQ] := GepardInitInternal @@ ( 
   {SPEED, P, SCHEME, ANSATZ, DATFILE, OUTFILE} 
@@ -179,6 +185,8 @@ cffH[(xi_)?NumericQ, (t_)?NumericQ, (q2_)?NumericQ, (q02_)?NumericQ, (opts___)?O
 
 cffE[(xi_)?NumericQ, (t_)?NumericQ, (q2_)?NumericQ, (q02_)?NumericQ, (opts___)?OptionQ] := cffEInternal @@ ( {xi, t, q2, q02,
 		SPEED, P, SCHEME, ANSATZ} /. {opts} /. Options[cffE] )
+
+F2[(xbj_)?NumericQ, (q2_)?NumericQ, (q02_)?NumericQ, (opts___)?OptionQ] := F2Internal @@ ( {xbj, q2, q02, SPEED, P, SCHEME, ANSATZ} /. {opts} /. Options[F2] )
 
 GepardFit[pars_, (opts___)?OptionQ] := Block[{varpars = ParameterID /@ pars, 
       allpars = First[Transpose[Parameters]], status, ierr, chis}, 

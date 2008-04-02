@@ -81,6 +81,15 @@
 :ReturnType:    Manual
 :End:
 
+:Evaluate: F2Internal::usage = "F2Internal[xBJ, q2, q02, SPEED, P, SCHEME, ANSATZ] returns singlet DIS F2(xBJ, q2, q02). This function is not ment to be called by user who should use F2[] instead."
+:Begin:
+:Function:      F2Internal
+:Pattern:       F2Internal[(xbj_)?NumericQ, (q2_)?NumericQ, (q02_)?NumericQ, speed_Integer, p_Integer, scheme_String, ansatz_String]
+:Arguments:     {xbj, q2, q02, speed, p, scheme, ansatz}
+:ArgumentTypes: {Real, Real, Real, Integer, Integer, String, String}
+:ReturnType:    Manual
+:End:
+
 :Evaluate: GetChiSquares::usage = "GetChiSquares[] returns array of chi-squares and corresponding number of datapints. First element is total chi-square and the rest are partial ones."
 :Begin:
 :Function:      GetChiSquares

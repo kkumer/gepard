@@ -305,7 +305,7 @@ void MinuitCovarianceMatrix(int adim)
 *  SYNOPSIS
 */
 
-void cffHInternal(double xi, double t, double q2, double q02, int speed, int p, char *scheme, char *ansatz, char* datfile, char* outfile) 
+void cffHInternal(double xi, double t, double q2, double q02, int speed, int p, char *scheme, char *ansatz) 
 
 /*
 *  INPUTS 
@@ -322,7 +322,9 @@ void cffHInternal(double xi, double t, double q2, double q02, int speed, int p, 
         double args[10], mt;
         long int nargs;
         const char *fname, *sname;
-        long int evoli=1, evolj=1;
+        long int evoli=1, evolj=1, iproc=1;
+        char datfile[] = "DFLT";
+        char outfile[] = "DFLT";
 
 
         GepardInitInternal(speed, p, scheme, ansatz, datfile, outfile);
@@ -334,6 +336,7 @@ void cffHInternal(double xi, double t, double q2, double q02, int speed, int p, 
         qs_.qs[0] = kinematics_.q2;
         parflt_.q02 = q02;
 
+        setproc_(&iproc);  /* DVCS */
         init_();
 
         MLPutFunction(stdlink, "EvaluatePacket", 1);
@@ -368,8 +371,8 @@ cfff_();
 
 /* returning result via MathLink  */
         MLPutFunction(stdlink, "Complex", 2);
-        MLPutReal(stdlink, cff_.cff[parint_.p].dr);
-        MLPutReal(stdlink, cff_.cff[parint_.p].di);
+        MLPutReal(stdlink, cff_.cff[p].dr);
+        MLPutReal(stdlink, cff_.cff[p].di);
 
         return;
 };
@@ -381,7 +384,7 @@ cfff_();
 *  SYNOPSIS
 */
 
-void cffEInternal(double xi, double t, double q2, double q02, int speed, int p, char *scheme, char *ansatz, char* datfile, char* outfile) 
+void cffEInternal(double xi, double t, double q2, double q02, int speed, int p, char *scheme, char *ansatz) 
 
 /*
 *  INPUTS 
@@ -398,7 +401,9 @@ void cffEInternal(double xi, double t, double q2, double q02, int speed, int p, 
         double args[10], mt;
         long int nargs;
         const char *fname, *sname;
-        long int evoli=1, evolj=1;
+        long int evoli=1, evolj=1, iproc=1;
+        char datfile[] = "DFLT";
+        char outfile[] = "DFLT";
 
 
         GepardInitInternal(speed, p, scheme, ansatz, datfile, outfile);
@@ -410,6 +415,7 @@ void cffEInternal(double xi, double t, double q2, double q02, int speed, int p, 
         qs_.qs[0] = kinematics_.q2;
         parflt_.q02 = q02;
 
+        setproc_(&iproc);  /* DVCS */
         init_();
 
         MLPutFunction(stdlink, "EvaluatePacket", 1);
@@ -444,12 +450,101 @@ cfff_();
 
 /* returning result via MathLink  */
         MLPutFunction(stdlink, "Complex", 2);
-        MLPutReal(stdlink, cff_.cffe[parint_.p].dr);
-        MLPutReal(stdlink, cff_.cffe[parint_.p].di);
+        MLPutReal(stdlink, cff_.cffe[p].dr);
+        MLPutReal(stdlink, cff_.cffe[p].di);
 
         return;
 };
 /******/
+
+/****f* fit.c/F2Internal
+*  NAME
+*     F2Internal  --  calculates singlet F2(x, Q2)
+*  SYNOPSIS
+*/
+
+void F2Internal(double xbj, double q2, double q02, int speed, int p, char *scheme, char *ansatz) 
+
+/*
+*  INPUTS 
+*         xbj -- X_BJ;   q2 -- Q2;  q02 -- Q02;
+*      speed -- SPEED; p -- P; scheme -- SCHEME; ansatz -- ANSATZ
+*  CHILDREN
+*     GepardInitInternal, INIT, EVOLC, F2, MLPut*
+*  SOURCE
+*/
+{
+        int i, j, xint, dttype;
+        double xreal, xim, xre;
+        struct dblcomplex xc, nc;
+        double args[10], mt;
+        long int nargs;
+        const char *fname, *sname;
+        long int evoli=1, evolj=1, iproc=2;
+        char datfile[] = "DFLT";
+        char outfile[] = "DFLT";
+
+
+        GepardInitInternal(speed, p, scheme, ansatz, datfile, outfile);
+
+        kinematics_.xi = xbj;
+        kinematics_.del2 = 0;
+        kinematics_.q2 = q2;
+        nqs_.nqsdis = 2; /* Why not 1? */
+        qs_.qsdis[0] = kinematics_.q2;
+        parflt_.q02 = q02;
+
+        setproc_(&iproc);  /* DVCS */
+        init_();
+
+        MLPutFunction(stdlink, "EvaluatePacket", 1);
+          MLPutFunction(stdlink, "Set", 2);
+            MLPutSymbol(stdlink, "jValues");
+            MLPutFunction(stdlink, "List", contour_.npts); /* passing MB points */
+              for (i = 0; i < contour_.npts; i++){
+                      nc = npoints_.n[i];
+                      MLPutFunction(stdlink, "Complex", 2);
+                        MLPutReal(stdlink, nc.dr - 1);
+                        MLPutReal(stdlink, nc.di);
+              }
+        MLEndPacket(stdlink);
+        MLNextPacket(stdlink);
+        MLNewPacket(stdlink);
+
+        MLPutFunction(stdlink, "EvaluatePacket", 1);
+          MLPutFunction(stdlink, "AllParameterValues", 0);
+        MLEndPacket(stdlink);
+
+        MLNextPacket(stdlink);
+        MLGetFunction(stdlink, &fname, &nargs); /* fname = List */
+            for (i = 0; i < NPARMAX; i++){
+                    MLGetReal(stdlink, &xreal);
+                    par_.par[i] = xreal;
+            }
+        MLEndPacket(stdlink);
+
+        evolc_(&evoli, &evolj);
+
+        if (parchr_[5] == 'M' && parchr_[6] == 'M' && parchr_[7] == 'A')  /* MMA */
+          getmbgpdmma_();
+        else                    /* FIT or other Fortran */
+          getmbgpd_();
+
+        for (i = 0; i < contour_.npts; i++){
+                hgrid_.hgrid[0][i][0] = mbgpd_.mbgpd[0][i];
+                hgrid_.hgrid[1][i][0] = mbgpd_.mbgpd[1][i];
+        }
+
+
+        f2f_();
+
+/* returning result via MathLink. */
+        MLPutReal(stdlink, f2_.f2[p]);
+
+        return;
+};
+/******/
+
 
 
 /****f* fit.c/getmbgpdmma_

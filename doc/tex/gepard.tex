@@ -824,7 +824,9 @@ any fitting. Useful for checking ansaetze and debugging}\\[0.8ex]
 \defboxitem{cffH}{xi, t, q2, q02, options}{Returns singlet Compton form factor
 $\mathcal{H}(xi=\xi, t=\Delta^2, q2=\mathcal{Q}^2, q02=\mathcal{Q}_{0}^2)$.}\\[0.8ex]
 \defboxitem{cffE}{xi, t, q2, q02, options}{Returns singlet Compton form factor
-$\mathcal{E}(xi=\xi, t=\Delta^2, q2=\mathcal{Q}^2, q02=\mathcal{Q}_{0}^2)$.} 
+$\mathcal{E}(xi=\xi, t=\Delta^2, q2=\mathcal{Q}^2, q02=\mathcal{Q}_{0}^2)$.}\\[0.8ex] 
+\defboxitem{F2}{xbj, q2, q02, options}{Returns DIS singlet form factor
+$F_{2}(xbj=x_{BJ}, q2=\mathcal{Q}^2, q02=\mathcal{Q}_{0}^2)$.} 
 \end{tabular}%
 \end{minipage}}\\[0.5ex]
 {\small High level functions available in \emph{Mathematica} interface.}
@@ -950,7 +952,10 @@ presently ignored.} \\[0.8ex]
 forwarding it to subroutine MNCOMD. } \\[0.8ex]
 \defboxitem{PrintMinuitCommand}{string, fontsize}{same, but prints the Minuit output
 by reading \texttt{fit.mnt} file. Useful for Minuit commands such as
-``show correlations'' or ``scan''.} \\[0.8ex]
+``show correlations'' or ``scan''.} \\
+\defboxitem{SaveParameters}{}{writes present values of fitting
+parameters into the list \texttt{Parameters}, preparing it thus for next fitting procedure or
+for evaluation of \texttt{cffH}, \texttt{cffE} or \texttt{F2}.}
 \end{tabular}%
 \end{minipage}}\\[0.5ex]
 {\small Functions controlling fitting procedure. First three should probably not be

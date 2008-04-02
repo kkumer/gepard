@@ -8,7 +8,8 @@ Computing:
 -  use autoconf and friends
 -  MSBND -> MSBAR, MSBAR -> MSBDI
 -  Automatize putting Alekhin's PDFs into fitpdfs
--  We don't need both HGRID and MBGPD, it seems.
+-  We don't need both HGRID and MBGPD, it seems. (Or HGRID memorises
+   PDFs during fitting, so it's needed?)
 -  deriv.f should be copyright-cleared
 -  PAR(18) and (28) hardwired in CompileMoments[]
 -  Using GOTO statements in fcn.F should be avoided
