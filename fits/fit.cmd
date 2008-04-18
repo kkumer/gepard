@@ -1,4 +1,4 @@
-0   <--   1=INTERACTIVE   0=BATCH  (Must be 0 on Windows!)
+0   <--   1=INTERACTIVE   0=BATCH 
 SET TITLE
        Fitting to ansatz: FIT
 PARAMETERS
