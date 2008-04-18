@@ -3,7 +3,7 @@ gepard - Package for calculation of DVCS form factors and observables
          by evolving moments of GEneral PARton Distributions 
 
 
-- Version 0.9.3 2006-12-16 
+- Version 0.9.4beta (unreleased yet)
 
 
 Contents of this README
@@ -15,6 +15,7 @@ Contents of this README
         1.3 Producing example plots used in big paper
 
 2. Compilation and installation
+        2.0 Obtaining the source
         2.1 Unix requirements
         2.2 Microsoft Windows requirements
         2.3 Compilation targets
@@ -36,6 +37,7 @@ Contents of this README
 1. Basic usage
 ========================================
 
+(Assummes that you have downloaded package gepard-*.tgz from somewhere.)
 
 1.1 Calculating with Fortran executables
 ----------------------------------------
@@ -50,35 +52,19 @@ Contents of this README
 1.2 Fitting using Minuit
 ------------------------
 
-- Use provided executable '../src/fit', if you can, or create it by 'make fit'.
+- Use provided executable 'fits/fit'.
   It needs to be started from directory fits/ where input files are.
-  If you don't have Cygwin and PGPLOT, use '../src/fit_nopgplot' instead!
+  If you don't have Cygwin and PGPLOT, use 'fits/fit_nopgplot' instead!
 
 - Parameters (not for fit ansatz but for everything else) are specified in
   GEPARD.INI which is self-documented.
 
-- To select which experimental data will be used for fit, edit file FIT.INI.
+- To select which experimental data will be used for fit, see file fit.dat
   Only sets between strings 'START' and 'STOP' will be used.
-
-- First line of FIT.INI specifies filename for output. There are usually three
-  output files:
-    <filename>.min   -  Output of Minuit routines (when in batch mode)
-    <filename>.out   -  Final fit results in tabular form
-    <filename>.ps    -  Same as .out but in graphical form (This works only
-                        if you have PGPLOT library. If not, use executable
-                        '../src/fit_nopgplot'.)
-
-- Second line of FIT.INI specifies type of graphical output to <filename>.ps
-  (fit_nopgplot ignores this line, but it has to be present)
-   *) first comes a string specifying PGPLOT driver:
-    '/CPS'  will get output into PS file (landscape)
-    '/VCPS'  will get output into PS file (portrait)
-    '/XSERVE'   will get output in X window (may not work on MS Windows)
-   *) then come two integers specifying number of graphs on
-      one physical page: XPANELS x YPANELS
+  (For exact meaning of lines in fit.dat see manual doc/tex/gepard.pdf)
 
 - Commands for driving Minuit and for specifying initial values of
-  fitting parameters are in file MINUIT.CMD (see Minuit manual for their exact
+  fitting parameters are in file fit.cmd (see Minuit manual for their exact
   meaning!).
 
 
@@ -103,7 +89,10 @@ This ex/README also describes which executable produces which data.
 
 You need information in this section only if you want to recreate executables
 and documentation (ideally, they should be provided in distributed gepard.tgz
-in src/ directory).
+directory). 
+Also, if you want automatic plotting of fits (required by 'fit'
+executable, but not by 'fit_nopgplot') you need to install PGPLOT library.
+Otherwise, plots will still be generated, but without any symbols on them.
 
 
 2.1 Unix requirements
@@ -136,6 +125,14 @@ in src/ directory).
 
   On Debian: apt-get install robodoc
 
+- For plotting examples in ex/ and test/ (i.e. not for fit results),
+  one already has prepared batch description files for 'grace' software.
+  Grace's homepage: http://plasma-gate.weizmann.ac.il/Grace/
+  (But results of examples are simple data file which can presumably be
+   plotted by any plotting software.)
+
+  On Debian: apt-get install grace
+
 Precompiled Minuit and PGPLOT libraries for Linux can be obtained from
 me, but if one wants to compile them himself, there are some instructions in 
 Sections  2.4 and 2.5  below.
@@ -153,6 +150,8 @@ I guess that packages Devel/gcc-core, Devel/gcc-g77 and
 Devel/make should be minimally enough but note that a lot of useful 
 Unix utilities, editors etc. are available including the whole
 of X Window System.
+For documentation: robodoc and tetex packages are probably needed
+For getting latest sources: subversion
 
 
 Precompiled Minuit and PGPLOT libraries for Windows can be obtained from
@@ -160,7 +159,7 @@ me, but if one wants to compile them himself, there are some instructions in
 Sections  2.4 and 2.5  below.
 
 
-2.3 Compilation targets
+2.3 (Some) compilation targets
 -----------------------
 
 Following make commands should be issued in top gepard/ directory, where
@@ -170,9 +169,9 @@ make test  - creates simple executable for testing
 make auxtest  - creates simple executable for testing (this tests values
              of \mathcal{H} in two points corresponding to points "A" and "B"
              in notebook lett-num.nb)
+make fit_nopgplot - creates executable for fitting, but without plotting 
 make fit   - creates executable for fitting. It needs to be started
              from directory fits/ where input files are.
-make fit_nopgplot - creates executable for fitting, but without plotting 
 make radcorr - executable for Fig 1 of Letter  (only two points per plot
             by default. Change NPOINTS in radcorr.f for more)
 make scaledep - executable for Fig 2 of Letter (also only two points.)
@@ -182,7 +181,7 @@ make <example> (where <example> is one of the targets specified
           in file ex/README) - creates example executables in directory 'ex'.
           These than produce numbers for plots shown in big paper. 
 make all   - makes everything above and maybe more
-make clean - removes everything which is easily recreatable
+make clean - removes all objects which are easily recreatable
 
 
 2.4 Installation of Minuit library
@@ -205,9 +204,6 @@ in Minuit manual, this can be just a simple routine like
       INTRAC = .FALSE.
       RETURN
       END
-
-I haven't succeeded yet in making Minuit work interactively under Windows.
-(Works only as a batch job reading command from file MINUIT.CMD)
 
 
 2.5 Installation of PGPLOT library
@@ -275,54 +271,10 @@ ex/   - files for plotting example plots shown in big paper
 3.3 Mathematica part
 --------------------
 
-Note that the present version of gepard is considered Fortran-only. Mathematica
-packages and notebooks correspond to older version gepard-0.8* (which was
+Tests/mma/ directory contains Mathematica
+packages and notebooks that correspond to older version gepard-0.8* (which was
 used also for hep-ph/0605237 letter numerics). They are slow and actually not 
 needed here but are useful for checking and debugging of Fortran algorithms.
-(New Mathematica interface will hopefully be made in the future.)
 
-Test/mma/gepard.m  - Mathematica package. For basic documentation try ?CFF and ?Fcm
-Test/mma/gepard_scales.m  - Mathematica package, which, unlike gepard.m, has correct
-            treatment of situation where factorization scale is not equal to Q^2.
-            However, fast interpolated Wilson coefficients (eval=GEPI, GEPIfix) are
-            not available in this package.
-Test/mma/gepard.nb - Notebook with checks and timings. Section 1 and then 3 are good
-            introduction.  Section 2 of this notebook is good
-            for understanding which routines are available and 
-            for understanding correspondence with DM's CFFNNLO.nb routines.
-Test/mma/gepard.exe - binary FORTRAN library. (Linux and Windows versions)
-Test/mma/CFFNNLO_KK.nb - Notebook needed if one wants to recalculate referent
-                               results in gepard.nb to which gepard results are compared
-Test/mma/gepard_devel.nb - Notebook used for development. Not so easy to follow.
-
-
-3.3.1 Calculating CFFs in Mathematica
-
-Put gepard.m file and gepard.exe directory where Mathematica can find it, then
-install via:
-
-<< gepard.m
-
-Mathematica should automatically load file gepard.exe in subdirectory according
-to $SystemID
-
-If this doesn't work ("gepard.exe not found"), then in file gepard.m adjust line 
-    Install["gepard.exe"]
-to
-    Install["<exact path to file gepard.exe for your system>"]
-
-Alternatively, for Linux systems with $SystemID not equal to "Linux" make a link 
-   ln -s Linux [$SystemID]
-
-For usage, type ?CFF or better read gepard.nb and DM's CFFNNLO.nb which uses
-the same calling conventions for high level functions i.e. only  "eval" label
-there should be changed from as2pF(II) to either:
-
-GEP  - exact Fortran routines
-GEPI, GEPIfix  - two types of interpolations
-
-Quickest introduction is by going over 1st and 3rd section of gepard.nb, then
-returning to 2nd for details and lower level functions if needed, and only then
-use ?CFF, ?interpol, ?interpolfix, ?Fpw, ?cDVCS, ?RAope, ?Fcm, ?common, ?AS2P
-which are a bit cryptic.
-
+They are also obsoleted by the new Mathematica, described in manual
+doc/tex/gepard.pdf
