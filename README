@@ -5,6 +5,11 @@ gepard - Package for calculation of DVCS form factors and observables
 
 - Version 0.9.4beta (unreleased yet)
 
+------------------------------------------------------------------------  
+Note that there is additional documentation in gepard manual
+doc/tex/gepard.pdf, and Fortran/C routines are extensively
+self-documented in doc/html/masterindex.html .
+------------------------------------------------------------------------  
 
 Contents of this README
 -----------------------
