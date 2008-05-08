@@ -36,8 +36,6 @@ Notebook reader applications are available free of charge from
 Wolfram Research.
 *******************************************************************)
 
-(*CacheID: 232*)
-
 
 (*NotebookFileLineBreakTest
 NotebookFileLineBreakTest*)

@@ -2,6 +2,7 @@ Physics:
 -  t_cut of ZEUS data is infinity? DVCS[46].DAT
 
 Computing:
+-  Go to www.hepforge.org?
 -  Make fancy C-MathLink communication function that recognizes input type
 -  Remove unused variables (specially in adacf, or specially not there)?
 -  In fitting parameters should be non-squared quantities
@@ -17,6 +18,7 @@ Computing:
 -  filenames setting should be separated from GepardInitInternal because
    this is not needed for cffEinternal and cffHinternal
 -  Numbers in fit.c should be changed by preprocesor variables
+-  Implementing Talbot contour for MB integration (cf. e.g. hep-ph/0607122)
 
 
 Checks:

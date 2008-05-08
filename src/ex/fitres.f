@@ -50,7 +50,7 @@ C
 
       CALL READPAR
 
-      ANSATZ = 'FITBP'
+      ANSATZ = 'FIT'
       Q02    =    4.0d0
       NQS = 1
       NQSDIS = 1
@@ -87,6 +87,29 @@ C
 *      PAR(22)   =     1.09
 *      PAR(24)   =     1.59
 *      PAR(25)   =     0.0
+
+*    LO 
+      P = 0
+      SCHEME = 'CSBAR'
+
+      PAR(11)   =    0.1546
+      PAR(12)   =    1.1769
+      PAR(13)   =    0.15
+      PAR(14)   =    0.781
+      PAR(15)   =    0.0
+      PAR(16)   =    3.0
+      PAR(18)   =    0.0
+      PAR(19)   =   -8.356
+
+      PAR(21)   =    0.554
+      PAR(22)   =    1.2
+      PAR(23)   =    0.15
+      PAR(24)   =    0.7
+      PAR(25)   =    0.0
+      PAR(26)   =    2.0
+      PAR(28)   =    0.0
+      PAR(29)   =  -27.09
+
 
 *   Removing valence quarks
       PAR(31)   =     0.0d0
