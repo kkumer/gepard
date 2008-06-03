@@ -14,7 +14,7 @@ define prcff
     x/6f cff_
 end
 
-break MAIN__
-break  F2Internal
-break  cffHInternal
+#break MAIN__
+#break  F2Internal
+#break  cffHInternal
 run -linkmode listen -linkname 5000

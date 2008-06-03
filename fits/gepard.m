@@ -4,11 +4,15 @@
 (*     ==============================    *)
 
 
-Print["GeParD - Mathematica interface (2008-04-01)"];
+Print["GeParD - Mathematica interface (2008-05-15)"];
 
 
+If[$VersionNumber<5.999,  (* Mathematica 5.*)
 BeginPackage["gepard`", "Format`", "NumericalMath`NLimit`", "Graphics`Graphics`",
-                        "Utilities`FilterOptions`"]
+                        "Utilities`FilterOptions`"], 
+                     (* else Mathematica 6.* *)
+BeginPackage["gepard`", "Format`", "NumericalCalculus`", "Utilities`FilterOptions`"]]
+
 
 
 GepardInit::usage = "GepardInit[] performs initialization of GeParD parameters. 
@@ -167,7 +171,7 @@ SpliceToFortran[path_String, tfor_] :=
     Splice[StringJoin[path, "/splice_template.f"], 
       StringJoin[path, "/splice.f"], FormatType -> OutputForm]]
 
-lobj = Install["gepard.exe"]   (* Installing C and Fortran routines. *)
+lobj = Install["gepard.exe"]  (* Installing C and Fortran routines. *)
 
 defaultopts = {SPEED -> -1, P -> -1, SCHEME -> "DFLT", ANSATZ -> "DFLT", 
   DATFILE -> "DFLT", OUTFILE -> "DFLT"};

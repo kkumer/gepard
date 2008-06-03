@@ -312,7 +312,7 @@ void cffHInternal(double xi, double t, double q2, double q02, int speed, int p, 
 *         xi -- XI;   t -- DEL2;  q2 -- Q2;  q02 -- Q02;
 *      speed -- SPEED; p -- P; scheme -- SCHEME; ansatz -- ANSATZ
 *  CHILDREN
-*     GepardInitInternal, INIT, EVOLC, CFFF, MLPut*
+*     GepardInitInternal, SETPROC, INIT, EVOLC, CFFF, MLPut*
 *  SOURCE
 */
 {
@@ -391,7 +391,7 @@ void cffEInternal(double xi, double t, double q2, double q02, int speed, int p, 
 *         xi -- XI;   t -- DEL2;  q2 -- Q2;  q02 -- Q02;
 *      speed -- SPEED; p -- P; scheme -- SCHEME; ansatz -- ANSATZ
 *  CHILDREN
-*     GepardInitInternal, INIT, EVOLC, CFFFE, MLPut*
+*     GepardInitInternal, SETPROC, INIT, EVOLC, CFFFE, MLPut*
 *  SOURCE
 */
 {
@@ -470,7 +470,7 @@ void F2Internal(double xbj, double q2, double q02, int speed, int p, char *schem
 *         xbj -- X_BJ;   q2 -- Q2;  q02 -- Q02;
 *      speed -- SPEED; p -- P; scheme -- SCHEME; ansatz -- ANSATZ
 *  CHILDREN
-*     GepardInitInternal, INIT, EVOLC, F2, MLPut*
+*     GepardInitInternal, SETPROC, INIT, EVOLC, F2, MLPut*
 *  SOURCE
 */
 {

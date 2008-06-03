@@ -195,10 +195,23 @@ C
 
 *   3. "Big C' Wilson coefficients
 
-      IF ((SCHEME .EQ. 'CSBAR') .OR. (PROCESS(:3) .EQ. 'DIS')) THEN
+      IF (SCHEME .EQ. 'CSBAR') THEN
           CALL CDVCSF(K, BIGCTMP)
       ELSE IF (SCHEME(:3) .EQ. 'MSB') THEN
           CALL MSBARF(K, BIGCTMP)
+      ELSE IF (SCHEME .EQ. 'EVOLQ') THEN
+        BIGCTMP(0, 1) = (1.0d0,0.0d0)
+        BIGCTMP(0, 2) = (0.0d0,0.0d0)
+        DO 15 L = 1, 2
+        BIGCTMP(1, L) = (0.0d0, 0.0d0)
+ 15     BIGCTMP(2, L) = (0.0d0, 0.0d0)
+      ELSE IF (SCHEME .EQ. 'EVOLG') THEN
+        BIGCTMP(0, 1) = (0.0d0,0.0d0)
+        BIGCTMP(0, 2) = (1.0d0,0.0d0)
+        DO 20 L = 1, 2
+        BIGCTMP(1, L) = (0.0d0, 0.0d0)
+ 20     BIGCTMP(2, L) = (0.0d0, 0.0d0)
+        RETURN
       END IF
 
 *     Writing this to BIGC or BIGCF2 common blocks.
