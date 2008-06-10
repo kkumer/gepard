@@ -16,6 +16,8 @@ Open:
 
 6 -  houches still problematic for very large x_BJ. At input scale as well!
      Related to that. Large x_BJ extension of integration should be automatic.
+     (Note that evolution operator diverges for x_BJ->1 so one should treat
+     this somehow, cf. Rojos PhD thesis.)
 
 7!-  Coercion to COMPLEX is not working! Thus, one must treat by hand 
     or set fancy rules to anticipate real arguments while SPLICE-ing.
@@ -28,7 +30,7 @@ Open:
 
 11 - .mnt file is not named according to OUTFILE
 
-12 - CFFs should be, like F2, defined with charge factors included
+13 - numerics is not accurate for resummed ansatz (it is MB-phi dependent!)
 
 
 Fixed:
@@ -63,3 +65,4 @@ Fixed:
 2008-01-19 -  One has to delete .mnt file sometimes or PrintMinuitCommand is not ok.
    (Maybe one should use separate file and open/close it?)
 
+12  - CFFs should be, like F2, defined with charge factors included (2008-06-10)

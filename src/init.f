@@ -138,6 +138,13 @@ C
         END IF
       END IF
 
+*         -- when calculating just GPDs --
+
+      IF ( ( SCHEME(:4) .EQ. 'ZERO' ) .OR. 
+     &     ( SCHEME(:4) .EQ. 'TRAJ' ) ) THEN
+        CHARGEFAC = 1.0d0
+      END IF
+
 *   1. Initialization of QCD beta function coefficients
 
       CALL BETAF
@@ -224,19 +231,26 @@ C
           CALL CDVCSF(K, BIGCTMP)
       ELSE IF (SCHEME(:3) .EQ. 'MSB') THEN
           CALL MSBARF(K, BIGCTMP)
-      ELSE IF (SCHEME .EQ. 'EVOLQ') THEN
-        BIGCTMP(0, 1) = (1.0d0,0.0d0)
-        BIGCTMP(0, 2) = (0.0d0,0.0d0)
+      ELSE IF ( (SCHEME .EQ. 'ZEROQ') .OR. (SCHEME .EQ. 'TRAJQ') ) THEN
+        BIGCTMP(0, 1) = (1.0d0, 0.0d0)
+        BIGCTMP(0, 2) = (0.0d0, 0.0d0)
         DO 15 L = 1, 2
-        BIGCTMP(1, L) = (0.0d0, 0.0d0)
- 15     BIGCTMP(2, L) = (0.0d0, 0.0d0)
-      ELSE IF (SCHEME .EQ. 'EVOLG') THEN
-        BIGCTMP(0, 1) = (0.0d0,0.0d0)
-        BIGCTMP(0, 2) = (1.0d0,0.0d0)
+        DO 15 ORD = 1, 2
+ 15     BIGCTMP(ORD, L) = (0.0d0, 0.0d0)
+      ELSE IF ( (SCHEME .EQ. 'ZEROG') .OR. (SCHEME .EQ. 'TRAJG') .OR.
+     &          (SCHEME .EQ. 'EVOLG') ) THEN
+        BIGCTMP(0, 1) = (0.0d0, 0.0d0)
+*  Gluons need special treatment here and for DVCS additional factor of xi later
+        IF ( SCHEME .EQ. 'TRAJG' ) THEN
+*         GPD(x, eta=x,t)                                              
+          BIGCTMP(0, 2) = 2.0d0 / (3.0d0 + J)
+        ELSE
+*         PDF(x) and GPD(x, eta=0,t)                                              
+          BIGCTMP(0, 2) = (1.0d0,0.0d0)
+        END IF
         DO 20 L = 1, 2
-        BIGCTMP(1, L) = (0.0d0, 0.0d0)
- 20     BIGCTMP(2, L) = (0.0d0, 0.0d0)
-        RETURN
+        DO 20 ORD = 1, 2
+ 20     BIGCTMP(ORD, L) = (0.0d0, 0.0d0)
       END IF
 
 *     Writing this to BIGC or BIGCF2 common blocks.
@@ -244,20 +258,21 @@ C
 *     2^(J+1) Gamma(5/2+J) / Gamma(3/2) / Gamma(3+J)
 *     BTW,  Gamma(3/2) = 0.88622...
 
-      IF ( PROCESS(:3) .EQ. 'DVC' ) THEN
-        DO 30 L = 1,2
-        DO 30 ORD = 0, P
+      DO 30 L = 1,2
+      DO 30 ORD = 0, P
+        IF ( PROCESS(:3) .EQ. 'DIS' ) THEN
+*          -- F2 or PDFs --
+          BIGCF2(K, ORD, L) = BIGCTMP(ORD, L)
+        ELSE IF ( SCHEME(:4) .EQ. 'ZERO' ) THEN
+*          -- GPDs at eta=0 trajectory --
+          BIGC(K, ORD, L) = BIGCTMP(ORD, L)
+        ELSE
+*          -- CFFs or GPDs at eta=x trajectory --
           BIGC(K, ORD, L) = BIGCTMP(ORD, L) * 2.0d0**(J+1.d0)
      &           * EXP(CLNGAMMA(2.5d0 + J) - CLNGAMMA(3.0d0 + J))
      &           / 0.886226925452758014d0
- 30     CONTINUE
-      ELSE
-*        -- DIS --
-        DO 40 L = 1,2
-        DO 40 ORD = 0, P
-          BIGCF2(K, ORD, L) = BIGCTMP(ORD, L)
- 40     CONTINUE
-      END IF
+        END IF
+ 30   CONTINUE
 
 
       ELSE

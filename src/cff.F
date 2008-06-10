@@ -51,6 +51,7 @@ C
       DOUBLE PRECISION FREALH, FIMAGH
       DOUBLE PRECISION RESREALE, RESIMAGE
       DOUBLE PRECISION FREALE, FIMAGE
+      DOUBLE PRECISION XIMEM
       INCLUDE 'header.f'
 
       EPH = EXP ( COMPLEX(0.0d0, PHI) )
@@ -59,6 +60,11 @@ C
       RESIMAGH = 0.0d0
       RESREALE = 0.0d0
       RESIMAGE = 0.0d0
+
+
+      XIMEM = XI
+*     -- when calculating just GPDs at eta=0 --
+      IF ( SCHEME(:4) .EQ. 'ZERO' ) XI = 0
 
       CALL LOOKUPQ(QIND)
 #ifdef MMA
@@ -74,6 +80,8 @@ C
         CALL GETMBGPD
       END IF
 #endif
+
+      XI = XIMEM
 
 *   Integration ...
 

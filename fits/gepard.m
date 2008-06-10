@@ -4,7 +4,7 @@
 (*     ==============================    *)
 
 
-Print["GeParD - Mathematica interface (2008-06-05)"];
+Print["GeParD - Mathematica interface (2008-06-10)"];
 
 
 If[$VersionNumber<5.999,  (* Mathematica 5.*)
@@ -63,7 +63,11 @@ interface and should give GPD's for .... GPD[flavor, x, t, xi] gives value of x-
 GPDs (flavor: 1=Q, 2=G). It relies on moments GPDcurrent[j,t,xi] which have to be set up e.g.
 by GPDcurrent[j_, t_, xi_] = GPDMom[j, t, xi] /. PAR[n_] :> First[MinuitGetParameter[n]]"
 
-GPDtraj::usage = "GPD on trajectory ..."
+gpdHtraj::usage = "gpdHtraj[x, t, Q2, Q02, opts] returns singlet GPD H(x, eta=x, t, Q2), both
+quark and gluon.  Options are same as for GepardInit."
+
+gpdHzero::usage = "gpdHzero[x, t, Q2, Q02, opts] returns singlet GPD H(x, eta=0, t, Q2), both
+quark and gluon.  Options are same as for GepardInit."
 
 PDF::usage = "PDF[{val1, val2, ...}, t, xi] is a function that is contacted by MathLink Minuit
 interface and should give PDF's for .... "
@@ -194,6 +198,16 @@ cffE[(xi_)?NumericQ, (t_)?NumericQ, (q2_)?NumericQ, (q02_)?NumericQ, (opts___)?O
 
 F2[(xbj_)?NumericQ, (q2_)?NumericQ, (q02_)?NumericQ, (opts___)?OptionQ] := F2Internal @@ ( {xbj, q2, q02, SPEED, P, SCHEME, ANSATZ} /. {opts} /. Options[F2] )
 
+(* Formulas for GPDs and PDFs using LO Wilson coefs in formulas for CFFs and F2 *)
+
+gpdHzero[(x_)?NumericQ, (t_)?NumericQ, (q2_)?NumericQ, (q02_)?NumericQ, (opts___)?OptionQ] := Im[{
+  cffHInternal @@ ( {x, t, q2, q02, SPEED, P, SCHEME, ANSATZ} /. SCHEME->"ZEROQ" /. {opts} /. Options[cffH] ),
+ x cffHInternal @@ ( {x, t, q2, q02, SPEED, P, SCHEME, ANSATZ} /. SCHEME->"ZEROG" /. {opts} /. Options[cffH] ) }] / Pi
+
+gpdHtraj[(x_)?NumericQ, (t_)?NumericQ, (q2_)?NumericQ, (q02_)?NumericQ, (opts___)?OptionQ] := Im[{
+  cffHInternal @@ ( {x, t, q2, q02, SPEED, P, SCHEME, ANSATZ} /. SCHEME->"TRAJQ" /. {opts} /. Options[cffH] ),
+ x cffHInternal @@ ( {x, t, q2, q02, SPEED, P, SCHEME, ANSATZ} /. SCHEME->"TRAJG" /. {opts} /. Options[cffH] ) }] / Pi
+
 GepardFit[pars_, (opts___)?OptionQ] := Block[{varpars = ParameterID /@ pars, 
       allpars = First[Transpose[Parameters]], status, ierr, chis}, 
       fixedpars = Complement[allpars, varpars]; 
@@ -265,6 +279,7 @@ GPDtraj[f_Integer, (x_)?NumericQ, (t_)?NumericQ] :=
     Chop[(1/(2*Pi))*NIntegrate[2^(0.5+I*y+1) Gamma[0.5+I*y+5/2] / (
             Gamma[3/2]*Gamma[0.5+I*y+3]) GPDcurrent[0.5 + I*y, t, x][[f]]/
         x^(0.5 + I*y), {y, -10, -2, -0.5, 0, 0.5, 2, 10}]]
+
  
 GPD[pars_, t_, xi_] := 
     Module[{j, upars = Join[{t, xi}, pars[[Transpose[Parameters][[1]]]]]}, 
