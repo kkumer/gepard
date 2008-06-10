@@ -2,7 +2,7 @@ C     ****h* gepard/radNLO.f
 C  FILE DESCRIPTION
 C    calculation of relative radiative corrections to {\cal H} singlet
 C    DVCS form factor
-C    Produces data files for Fig. 7. of  KMPKS06b paper
+C    Produces data files for Fig. 9. of  KMPKS06b paper
 C
 C    $Id$
 C     *******

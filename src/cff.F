@@ -104,9 +104,10 @@ C
 
  123  CONTINUE
       
-      CFF(P) = COMPLEX(RESREALH, RESIMAGH)
+*     Multiplying with charge factor
 
-      CFFE(P) = COMPLEX(RESREALE, RESIMAGE) 
+      CFF(P) = CHARGEFAC * COMPLEX(RESREALH, RESIMAGH)
+      CFFE(P) = CHARGEFAC * COMPLEX(RESREALE, RESIMAGE) 
 
       RETURN
       END

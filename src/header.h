@@ -31,7 +31,7 @@ struct dblcomplex {
       /* DOUBLE PRECISION MU02, ASP(0:2) */
       /* COMMON / ASTRONG/  MU02, ASP */
       /* DOUBLE PRECISION Q02, RF2, RR2 */
-      /* COMMON / PARFLT /  Q02, RF2, RR2 */
+      /* COMMON / PARFLT /  Q02, RF2, RR2, CHARGEFAC */
       /* INTEGER SPEED, ACC, P, NF, CZERO */
       /* COMMON / PARCHR /  SCHEME, ANSATZ, PROCESS, FFTYPE */
       /* COMMON / FILENAMES /  DATFILE, OUTFILE, CMDFILE */
@@ -43,7 +43,7 @@ struct{
         double mu02, asp[3];
 } astrong_;
 struct{
-        double q02, rf2, rr2;
+        double q02, rf2, rr2, chargefac;
 } parflt_;
 char parchr_[27];
 char filenames_[60];

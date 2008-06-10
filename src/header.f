@@ -113,6 +113,14 @@ C  SYNOPSIS
       DOUBLE PRECISION RR2
 C     ***
 
+C     ****v* header.f/CHARGEFAC
+C  DESCRIPTION
+C     CHARGEFAC -- charge factor, cf. Eq. (79) hep-ph/0703179
+C  MEMBER OF
+C     PARFLT
+C  SYNOPSIS
+      DOUBLE PRECISION CHARGEFAC
+C     ***
 
 C     ****v* header.f/C
 C  DESCRIPTION
@@ -675,7 +683,7 @@ C     ****c* header.f/PARFLT
 C  DESCRIPTION
 C     Floating point parameters
 C  SYNOPSIS
-      COMMON / PARFLT /  Q02, RF2, RR2
+      COMMON / PARFLT /  Q02, RF2, RR2, CHARGEFAC
 C     ***
 
 C     ****c* header.f/MBCONT

@@ -34,24 +34,9 @@ C
       W2 = (Q2 - XI * Q2) / (2.0d0 * XI)
 
 *     Calculating CFF
-
       
       DEL2 = - MTS(MTIND)
       CALL CFFF 
-
-*     Multiplying with charge factor
-
-      IF (NF .EQ. 3) THEN
-         CFF(P) = CFF(P) * 2.0D0 / 9.0D0
-         CFFE(P) = CFFE(P) * 2.0D0 / 9.0D0
-      ELSE IF (NF .EQ. 4) THEN
-         CFF(P) = CFF(P) * 5.0D0 / 18.0D0
-         CFFE(P) = CFFE(P) * 5.0D0 / 18.0D0
-      ELSE
-         CALL ERROR ('GeParD', '  CFF',
-     &   'NF is not integer equal to 3 or 4!                          ',
-     &   5, 3)
-      END IF
 
 *     260.5633976788416 = 4 Pi alpha^2 * (GeV^-2 -> nbarn)
 *     3.52142 = 4 MP^2

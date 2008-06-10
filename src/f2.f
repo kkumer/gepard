@@ -58,19 +58,11 @@ C
       FCM(1) = HGRID(MTIND, K, 1)
       FCM(2) = HGRID(MTIND, K, 2)
       FPW = CGRIDDIS(QIND,K,1) * FCM(1) + CGRIDDIS(QIND,K,2) * FCM(2)
-      F2IMAG = IMAGPART(EPH * (1.0d0/XI)**(J-C) * FPW )
+      F2IMAG = IMAGPART( EPH / XI**J * FPW )
       RES = RES + WG(K)*F2IMAG
  123  CONTINUE
 
-      IF (NF .EQ. 3) THEN
-         F2(P) = (1.0d0/XI)**(C) * RES * 2.0D0 / 9.0D0 / PI
-      ELSE IF (NF .EQ. 4) THEN
-         F2(P) = (1.0d0/XI)**(C) * RES * 5.0D0 / 18.0D0 / PI
-      ELSE
-         CALL ERROR ('GeParD', '  CFF',
-     &   'NF is not integer equal to 3 or 4!                          ',
-     &   5, 3)
-      END IF
+      F2(P) = RES * CHARGEFAC / PI
 
       RETURN
       END

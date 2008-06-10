@@ -2,7 +2,7 @@ C     ****h* gepard/radNLONS.f
 C  FILE DESCRIPTION
 C    calculation of relative radiative corrections to {\cal H} non-singlet
 C    DVCS form factor
-C    Produces data files for Fig. 6. of  KMPKS06b paper
+C    Produces data files for Fig. 7. of  KMPKS06b paper
 C
 C    $Id$
 C     *******
@@ -14,7 +14,7 @@ C     RADNLONS  --  Program producing data for Figure radNLONS
 C  DESCRIPTION
 C    calculation of relative radiative NLO corrections to {\cal H} non-singlet
 C    DVCS form factor in MSBAR and CSBAR schemes
-C    Produces data files for Fig. 6 of  KMPKS06b
+C    Produces data files for Fig. 7 of  KMPKS06b
 C  SYNOPSIS
 
       PROGRAM RADNLONS
