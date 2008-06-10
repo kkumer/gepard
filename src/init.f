@@ -216,13 +216,15 @@ C
 
 *     Writing this to BIGC or BIGCF2 common blocks.
 *     "Big C" Wilson coefficients of DVCS (in BIGC) have to be multiplied by
-*     Gamma(5/2+J) / Gamma(3+J)
+*     2^(J+1) Gamma(5/2+J) / Gamma(3/2) / Gamma(3+J)
+*     BTW,  Gamma(3/2) = 0.88622...
 
       IF ( PROCESS(:3) .EQ. 'DVC' ) THEN
         DO 30 L = 1,2
         DO 30 ORD = 0, P
-          BIGC(K, ORD, L) = BIGCTMP(ORD, L) * 
-     &             EXP(CLNGAMMA(2.5d0 + J) - CLNGAMMA(3.0d0 + J))
+          BIGC(K, ORD, L) = BIGCTMP(ORD, L) * 2.0d0**(J+1.d0)
+     &           * EXP(CLNGAMMA(2.5d0 + J) - CLNGAMMA(3.0d0 + J))
+     &           / 0.886226925452758014d0
  30     CONTINUE
       ELSE
 *        -- DIS --

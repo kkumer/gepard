@@ -4,7 +4,7 @@
 (*     ==============================    *)
 
 
-Print["GeParD - Mathematica interface (2008-05-15)"];
+Print["GeParD - Mathematica interface (2008-06-05)"];
 
 
 If[$VersionNumber<5.999,  (* Mathematica 5.*)
@@ -62,6 +62,8 @@ GPD::usage = "GPD[{val1, val2, ...}, t, xi] is a function that is contacted by M
 interface and should give GPD's for .... GPD[flavor, x, t, xi] gives value of x-space
 GPDs (flavor: 1=Q, 2=G). It relies on moments GPDcurrent[j,t,xi] which have to be set up e.g.
 by GPDcurrent[j_, t_, xi_] = GPDMom[j, t, xi] /. PAR[n_] :> First[MinuitGetParameter[n]]"
+
+GPDtraj::usage = "GPD on trajectory ..."
 
 PDF::usage = "PDF[{val1, val2, ...}, t, xi] is a function that is contacted by MathLink Minuit
 interface and should give PDF's for .... "
@@ -257,6 +259,11 @@ slope[f_Integer, x_] := - ND[Log[GPD[f, x, -t, 0]], t, 0]
  
 GPD[f_Integer, (x_)?NumericQ, (t_)?NumericQ, (xi_)?NumericQ] := 
     Chop[(1/(2*Pi))*NIntegrate[GPDcurrent[0.5 + I*y, t, xi][[f]]/
+        x^(0.5 + I*y), {y, -10, -2, -0.5, 0, 0.5, 2, 10}]]
+
+GPDtraj[f_Integer, (x_)?NumericQ, (t_)?NumericQ] := 
+    Chop[(1/(2*Pi))*NIntegrate[2^(0.5+I*y+1) Gamma[0.5+I*y+5/2] / (
+            Gamma[3/2]*Gamma[0.5+I*y+3]) GPDcurrent[0.5 + I*y, t, x][[f]]/
         x^(0.5 + I*y), {y, -10, -2, -0.5, 0, 0.5, 2, 10}]]
  
 GPD[pars_, t_, xi_] := 

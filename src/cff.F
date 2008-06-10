@@ -80,7 +80,7 @@ C
       DO 123 K = 1, NPTS
 
       J = N(K) - 1
-      CFAC = EPH*(2.0d0/XI)**(J-C)
+      CFAC = EPH / XI**(J+1.d0)
 
       IF ( FFTYPE(:7) .EQ. 'NONSING' ) THEN
         FPWH = CGRIDNS(QIND,K)*MBGPD(K,1)        
@@ -104,13 +104,9 @@ C
 
  123  CONTINUE
       
-*   Gamma(3/2) = 0.8862....
+      CFF(P) = COMPLEX(RESREALH, RESIMAGH)
 
-      CFF(P) = (2.0d0/XI)**(C + 1.0d0) * 
-     &      COMPLEX(RESREALH, RESIMAGH) / 0.886226925452758014d0
-
-      CFFE(P) = (2.0d0/XI)**(C + 1.0d0) * 
-     &      COMPLEX(RESREALE, RESIMAGE) / 0.886226925452758014d0
+      CFFE(P) = COMPLEX(RESREALE, RESIMAGE) 
 
       RETURN
       END

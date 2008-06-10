@@ -494,7 +494,7 @@ void F2Internal(double xbj, double q2, double q02, int speed, int p, char *schem
         qs_.qsdis[0] = kinematics_.q2;
         parflt_.q02 = q02;
 
-        setproc_(&iproc);  /* DVCS */
+        setproc_(&iproc);  /* DIS */
         init_();
 
         MLPutFunction(stdlink, "EvaluatePacket", 1);
