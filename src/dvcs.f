@@ -58,18 +58,6 @@ C
       
       CALL CFFF 
 
-*     Multiplying with charge factor
-
-      IF (NF .EQ. 3) THEN
-         CFF(P) = CFF(P) * 2.0D0 / 9.0D0
-      ELSE IF (NF .EQ. 4) THEN
-         CFF(P) = CFF(P) * 5.0D0 / 18.0D0
-      ELSE
-         CALL ERROR ('GeParD', '  CFF',
-     &   'NF is not integer equal to 3 or 4!                          ',
-     &   5, 3)
-      END IF
-
       PARSIGMA = 260.5633976788416d0 * W2 * ABS(CFF(P))**2 / (
      &  (W2 + Q2) * (2.0d0 * W2 + Q2)**2 )
 

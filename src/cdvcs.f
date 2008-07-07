@@ -55,21 +55,6 @@ C
       LRF2 = LOG(RF2)
       LRR2 = LOG(RR2)
 
-      IF (SCHEME .EQ. 'EVOLQ') THEN
-        BIGCTMP(0, 1) = (1.0d0,0.0d0)
-        BIGCTMP(0, 2) = (0.0d0,0.0d0)
-        DO 10 L = 1, 2
-        BIGCTMP(1, L) = (0.0d0, 0.0d0)
- 10     BIGCTMP(2, L) = (0.0d0, 0.0d0)
-        RETURN
-      ELSE IF (SCHEME .EQ. 'EVOLG') THEN
-        BIGCTMP(0, 1) = (0.0d0,0.0d0)
-        BIGCTMP(0, 2) = (1.0d0,0.0d0)
-        DO 20 L = 1, 2
-        BIGCTMP(1, L) = (0.0d0, 0.0d0)
- 20     BIGCTMP(2, L) = (0.0d0, 0.0d0)
-        RETURN
-      END IF
 
       IF ( PROCESS(:3) .EQ. 'DVC' ) THEN
         SHIFT1 = HS1(J + 1.5d0) - HS1(J + 2.0d0) + 2.0d0 * LOG(2.0d0)

@@ -61,10 +61,11 @@ C
 
       IMPLICIT NONE
       INTEGER K, QIND
-      DOUBLE COMPLEX EPH, PIHALF, J, FPW, FPWSEC
+      DOUBLE COMPLEX EPH, CFAC, PIHALF, J, FPW, FPWSEC
       DOUBLE COMPLEX DCTAN, FCM(2)
       DOUBLE PRECISION RESREAL, RESIMAG
       DOUBLE PRECISION FREAL, FIMAG
+      DOUBLE PRECISION XIMEM
       INCLUDE 'header.f'
 
       EPH = EXP ( COMPLEX(0.0d0, PHI) )
@@ -72,13 +73,20 @@ C
       RESREAL = 0.0d0
       RESIMAG = 0.0d0
 
+
+      XIMEM = XI
+*     -- when calculating just GPDs at eta=0 --
+      IF ( SCHEME(:4) .EQ. 'ZERO' ) XI = 0
+
       CALL LOOKUPQ(QIND)
 
+      XI = XIMEM
 *   Integration ...
 
       DO 123 K = 1, NPTS
 
       J = N(1,K) - 1
+      CFAC = EPH / XI**(J+1.d0)
 
       FCM(1) = HGRID(MTIND, K, 1)
       FCM(2) = HGRID(MTIND, K, 2)
@@ -93,19 +101,18 @@ C
       END IF
 
       PIHALF = (1.5707963267948966d0, 0.0d0)
-      FREAL = IMAGPART(EPH * (2.0d0/XI)**(J-C) * DCTAN(PIHALF*J) * FPW)
+      FREAL = IMAGPART(CFAC * DCTAN(PIHALF*J) * FPW)
 
-      FIMAG = IMAGPART(EPH * (2.0d0/XI)**(J-C) * FPW)
+      FIMAG = IMAGPART(CFAC * FPW)
 
       RESREAL = RESREAL + WG(K)*FREAL
       RESIMAG = RESIMAG + WG(K)*FIMAG
 
  123  CONTINUE
       
-*   Gamma(3/2) = 0.8862....
-
-      CFF(P) = (2.0d0/XI)**(C + 1.0d0) * 
-     &      COMPLEX(RESREAL, RESIMAG) / 0.886226925452758014d0
+*     Multiplying with charge factor
+  
+      CFF(P) = CHARGEFAC * COMPLEX(RESREAL, RESIMAG)
 
       RETURN
       END

@@ -98,6 +98,38 @@ C
 
 *   ----  Initialization of common blocks ----
 
+*   0. Initialization of charge factor
+
+      IF ( FFTYPE(:7) .EQ. 'SINGLET' ) THEN
+        IF (NF .EQ. 3) THEN
+           CHARGEFAC =  2.0D0 / 9.0D0
+        ELSE IF (NF .EQ. 4) THEN
+           CHARGEFAC =  5.0D0 / 18.0D0
+        ELSE
+           CALL ERROR ('GeParD', ' INIT',
+     & 'NF is not integer equal to 3 or 4!                          ',
+     & 5, 3)
+        END IF
+      ELSE
+*         -- NONSINGLET --
+        IF (NF .EQ. 3) THEN
+           CHARGEFAC =  1.0D0 / 9.0D0
+        ELSE IF (NF .EQ. 4) THEN
+           CHARGEFAC =  1.0D0 / 6.0D0
+        ELSE
+           CALL ERROR ('GeParD', ' INIT',
+     & 'NF is not integer equal to 3 or 4!                          ',
+     & 5, 3)
+        END IF
+      END IF
+
+*         -- when calculating just GPDs --
+
+      IF ( ( SCHEME(:4) .EQ. 'ZERO' ) .OR. 
+     &     ( SCHEME(:4) .EQ. 'TRAJ' ) ) THEN
+        CHARGEFAC = 1.0d0
+      END IF
+
 *   1. Initialization of QCD beta function coefficients
 
       CALL BETAF
@@ -184,29 +216,52 @@ C
 
 *   3. "Big C' Wilson coefficients
 
-      IF ((SCHEME .EQ. 'CSBAR') .OR. (PROCESS(:3) .EQ. 'DIS')) THEN
+      IF (SCHEME .EQ. 'CSBAR') THEN
           CALL CDVCSF(SEC, K, BIGCTMP)
       ELSE IF (SCHEME(:3) .EQ. 'MSB') THEN
           CALL MSBARF(SEC, K, BIGCTMP)
+      ELSE IF ( (SCHEME .EQ. 'ZEROQ') .OR. (SCHEME .EQ. 'TRAJQ') ) THEN
+        BIGCTMP(0, 1) = (1.0d0, 0.0d0)
+        BIGCTMP(0, 2) = (0.0d0, 0.0d0)
+        DO 15 L = 1, 2
+        DO 15 ORD = 1, 2
+ 15     BIGCTMP(ORD, L) = (0.0d0, 0.0d0)
+      ELSE IF ( (SCHEME .EQ. 'ZEROG') .OR. (SCHEME .EQ. 'TRAJG') .OR.
+     &          (SCHEME .EQ. 'EVOLG') ) THEN
+        BIGCTMP(0, 1) = (0.0d0, 0.0d0)
+*  Gluons need special treatment here and for DVCS additional factor of xi later
+        IF ( SCHEME .EQ. 'TRAJG' ) THEN
+*         GPD(x, eta=x,t)                                              
+          BIGCTMP(0, 2) = 2.0d0 / (3.0d0 + J)
+        ELSE
+*         PDF(x) and GPD(x, eta=0,t)                                              
+          BIGCTMP(0, 2) = (1.0d0,0.0d0)
+        END IF
+        DO 20 L = 1, 2
+        DO 20 ORD = 1, 2
+ 20     BIGCTMP(ORD, L) = (0.0d0, 0.0d0)
       END IF
 
 *     Writing this to BIGC or BIGCF2 common blocks.
 *     "Big C" Wilson coefficients of DVCS (in BIGC) have to be multiplied by
-*     Gamma(5/2+J) / Gamma(3+J)
+*     2^(J+1) Gamma(5/2+J) / Gamma(3/2) / Gamma(3+J)
+*     BTW,  Gamma(3/2) = 0.88622...
 
-      IF ( PROCESS(:3) .EQ. 'DVC' ) THEN
-        DO 30 L = 1,2
-        DO 30 ORD = 0, P
-          BIGC(SEC, K, ORD, L) = BIGCTMP(ORD, L) * 
-     &             EXP(CLNGAMMA(2.5d0 + J) - CLNGAMMA(3.0d0 + J))
- 30     CONTINUE
-      ELSE
-*        -- DIS --
-        DO 40 L = 1,2
-        DO 40 ORD = 0, P
+      DO 30 L = 1,2
+      DO 30 ORD = 0, P
+        IF ( PROCESS(:3) .EQ. 'DIS' ) THEN
+*          -- F2 or PDFs --
           BIGCF2(K, ORD, L) = BIGCTMP(ORD, L)
- 40     CONTINUE
-      END IF
+        ELSE IF ( SCHEME(:4) .EQ. 'ZERO' ) THEN
+*          -- GPDs at eta=0 trajectory --
+          BIGC(SEC, K, ORD, L) = BIGCTMP(ORD, L)
+        ELSE
+*          -- CFFs or GPDs at eta=x trajectory --
+          BIGC(SEC, K, ORD, L) = BIGCTMP(ORD, L) * 2.0d0**(J+1.d0)
+     &           * EXP(CLNGAMMA(2.5d0 + J) - CLNGAMMA(3.0d0 + J))
+     &           / 0.886226925452758014d0
+        END IF
+ 30   CONTINUE
 
 
       ELSE
@@ -243,13 +298,15 @@ C
 
       CALL BIGCNSF(K)
 
-*     "Big C" Wilson coefficients of DVCS have to be multiplied by
-*     Gamma(5/2+J) / Gamma(3+J)
+*     "Big C" Wilson coefficients of DVCS (in BIGC) have to be multiplied by
+*     2^(J+1) Gamma(5/2+J) / Gamma(3/2) / Gamma(3+J)
+*     BTW,  Gamma(3/2) = 0.88622...
 
       IF ( PROCESS(:3) .EQ. 'DVC' ) THEN
         DO 50 ORD = 0, P
-          BIGCNS(K, ORD) = BIGCNS(K, ORD) * 
-     &             EXP(CLNGAMMA(2.5d0 + J) - CLNGAMMA(3.0d0 + J))
+          BIGCNS(K, ORD) = BIGCNS(K, ORD) * 2.0d0**(J+1.d0) 
+     &          *  EXP(CLNGAMMA(2.5d0 + J) - CLNGAMMA(3.0d0 + J))
+     &          / 0.886226925452758014d0
  50     CONTINUE
       END IF
 
