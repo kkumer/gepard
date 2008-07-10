@@ -1,9 +1,10 @@
+2008-07-10 
 
 Examples of the usage of gepard
 ===============================
 
-Producing Figures for KMPK06b:
------------------------------
+Producing Figures for hep-ph/0703179:
+------------------------------------
 
 Step 1: 
 
@@ -25,7 +26,7 @@ anatomy(NS) -  anatomy of various NLO contributions
 
 Step 2:
 
-Execute program <target>. This produces data
+Execute program <target> in this directory. This produces data
 files <target>[0,1,...].dat
 
 

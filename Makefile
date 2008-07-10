@@ -1,4 +1,4 @@
-# Master Makefile for gepard project
+# Master Makefile for gepard project 2008-07-10 
 
 # Interesting targets:
 # 	radcorr  -  program for producing Fig. 1 in letter
@@ -8,6 +8,7 @@
 # 	auxtest  -  tests DVCS \mathcal{H} calculation
 # 	fit      -  fitting GPD ansatz to DVCS and DIS data
 # 	fit_nopgplot -  same as fit, but without plotting
+# 	gepard.exe - Mathematica interface
 # 	html     -  HTML documentation
 # 	pdf      -  LaTeX -> PDF documentation
 #

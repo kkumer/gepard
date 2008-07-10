@@ -1,3 +1,4 @@
+2008-07-10 
 
 gepard - Package for calculation of DVCS form factors and observables
          by evolving moments of GEneral PARton Distributions 
@@ -9,7 +10,10 @@ gepard - Package for calculation of DVCS form factors and observables
 Note that there is additional documentation in gepard manual
 doc/tex/gepard.pdf, and Fortran/C routines are extensively
 self-documented in doc/html/masterindex.html .
+That documentation includes description of more recent Mathematica 
+interface, not included in this README.
 ------------------------------------------------------------------------  
+
 
 Contents of this README
 -----------------------
@@ -17,7 +21,7 @@ Contents of this README
 1. Basic usage
         1.1 Calculating with Fortran executables
         1.2 Fitting using Minuit
-        1.3 Producing example plots used in big paper
+        1.3 Producing example plots used in big paper hep-ph/0703179
 
 2. Compilation and installation
         2.0 Obtaining the source
@@ -80,9 +84,9 @@ More detailed description can be found in doc/tex/gepard.pdf
 ---------------------------------------------
 
 There are many example programs in directory ex/, which produce
-numbers which are ploted in Figures of the big paper. These numbers
-are in files with names of the form *[0-3].dat, where numbers [0-3] 
-correspon to four panels that these figures usually have.
+numbers which are ploted in Figures of the big paper hep-ph/0703179. 
+These numbers are in files with names of the form *[0-3].dat, where 
+numbers [0-3] correspon to four panels that these figures usually have.
 
 To automatically plot these data using grace plotting software see ex/README.
 This ex/README also describes which executable produces which data.
@@ -184,7 +188,7 @@ make hmtl  - creates HTML documentation (needs robodoc software)
 make pdf   - creates LaTeX documentation (needs robodoc software)
 make <example> (where <example> is one of the targets specified
           in file ex/README) - creates example executables in directory 'ex'.
-          These than produce numbers for plots shown in big paper. 
+          These than produce numbers for plots shown in big paper hep-ph/0703179.
 make all   - makes everything above and maybe more
 make clean - removes all objects which are easily recreatable
 
@@ -270,7 +274,7 @@ src/adacf/  - sources for DIS anomalous dimensions and Wilson coeffs.
 Tests/  - some numbers from Letter, useful for testing. See README
           there.
 fits/ - inputs needed for fitting to DVCS and DIS data
-ex/   - files for plotting example plots shown in big paper
+ex/   - files for plotting example plots shown in big paper hep-ph/0703179
 
 
 3.3 Mathematica part
@@ -281,5 +285,5 @@ packages and notebooks that correspond to older version gepard-0.8* (which was
 used also for hep-ph/0605237 letter numerics). They are slow and actually not 
 needed here but are useful for checking and debugging of Fortran algorithms.
 
-They are also obsoleted by the new Mathematica, described in manual
+They are also obsoleted by the new Mathematica interface, described in manual
 doc/tex/gepard.pdf

@@ -1,6 +1,9 @@
+2008-07-10 
+
 Version 0.9.4  (unreleased yet)
 
 	{Merged from sid  67:85}
+	- ADD: Evolution of GPDs at eta=0 and eta=x
 	- ADD: Possibility of eta-dependent ansatz
 	- ADD: Mathematica interface completely redone so both
 	       calculation of CFFs and fitting is possible from

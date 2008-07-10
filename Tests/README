@@ -1,5 +1,6 @@
+2008-07-10 
 
-Accuracy and dependance on SPEED (from GEPARD.INI) can be studied by
+Accuracy and dependence on SPEED (from GEPARD.INI) can be studied by
 the following test programs.
 
 FIXME: Make sure to use AS0=0.05 in GEPARD.INI. Best agreement should be
