@@ -1,4 +1,4 @@
-2008-07-10 
+2008-07-11 
 
 Open:
 -----
@@ -34,6 +34,9 @@ Open:
 
 13! - numerics is not accurate for resummed ansatz (it is MB-phi dependent!)
 
+14 - auxtest is broken
+
+15 -  gepard-api.pdf is not generated
 
 Fixed:
 ------

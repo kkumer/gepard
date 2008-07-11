@@ -1,8 +1,8 @@
-# Master Makefile for gepard project 2008-07-10 
+# Master Makefile for gepard project 2008-07-11 
 
 # Interesting targets:
-# 	radcorr  -  program for producing Fig. 1 in letter
-# 	scaledep -  program for producing Fig. 2 in letter
+# 	radcorr  -  program for producing Fig. 1 in hep-ph/0605237
+# 	scaledep -  program for producing Fig. 2 in hep-ph/0605237
 # 	auxns    -  comparing MSBAR and CSBAR schemes
 # 	test     -  tests both DVCS and DIS routines
 # 	auxtest  -  tests DVCS \mathcal{H} calculation
@@ -38,7 +38,7 @@ export CERNLIBS =  -L$(HOME)/local/lib -lpacklib -lkernlib
 
 # -- 2. MathLink related things
 #
-# Version of Mathematica
+# Put your version of Mathematica here
 export MMAVERSION=5.2
 ifdef WINDIR
   export SYS = Windows

@@ -1,8 +1,7 @@
-2008-07-10 
+2008-07-11 
 
-gepard - Package for calculation of DVCS form factors and observables
-         by evolving moments of GEneral PARton Distributions 
-
+gepard - Package for evolving conformal moments of GEneral PARton 
+         Distributions and calculation of DVCS form factors and observables
 
 - Version 0.9.4beta (unreleased yet)
 
@@ -38,7 +37,7 @@ Contents of this README
 3. Files, and what they are
         3.1 Documentation
         3.2 Fortran part
-        3.3 Mathematica part
+        3.3 Mathematica part (obsolete)
                 3.3.1 Calculating CFFs in Mathematica
 
 
@@ -46,12 +45,13 @@ Contents of this README
 1. Basic usage
 ========================================
 
-(Assummes that you have downloaded package gepard-*.tgz from somewhere.)
+(Assummes that you have downloaded package gepard-*.tgz with
+all executables from somewhere.)
 
 1.1 Calculating with Fortran executables
 ----------------------------------------
 
-- First go to directory Tests/ and try to run executable '../src/test' from 
+- First go to directory Tests/ and try to run executable './test' from 
   there, and see if numbers come out right. (By the way, one always needs to 
   have relevant input files, such as GEPARD.INI, in the working directory.)
   Try increasing SPEED in GEPARD.INI and see how numbers get worse.
@@ -77,16 +77,17 @@ Contents of this README
   meaning!).
 
 
-More detailed description can be found in doc/tex/gepard.pdf
+The list of output files and the more detailed description can be 
+found in doc/tex/gepard.pdf
 
 
-1.3 Producing example plots used in big paper
----------------------------------------------
+1.3 Producing example plots used in hep-ph/0703179
+--------------------------------------------------
 
 There are many example programs in directory ex/, which produce
 numbers which are ploted in Figures of the big paper hep-ph/0703179. 
 These numbers are in files with names of the form *[0-3].dat, where 
-numbers [0-3] correspon to four panels that these figures usually have.
+numbers [0-3] correspond to four panels that these figures usually have.
 
 To automatically plot these data using grace plotting software see ex/README.
 This ex/README also describes which executable produces which data.
@@ -97,8 +98,8 @@ This ex/README also describes which executable produces which data.
 ====================================================================
 
 You need information in this section only if you want to recreate executables
-and documentation (ideally, they should be provided in distributed gepard.tgz
-directory). 
+and documentation (ideally, they should be provided in distributed gepard-*.tgz
+package). 
 Also, if you want automatic plotting of fits (required by 'fit'
 executable, but not by 'fit_nopgplot') you need to install PGPLOT library.
 Otherwise, plots will still be generated, but without any symbols on them.
@@ -160,7 +161,7 @@ Devel/make should be minimally enough but note that a lot of useful
 Unix utilities, editors etc. are available including the whole
 of X Window System.
 For documentation: robodoc and tetex packages are probably needed
-For getting latest sources: subversion
+For getting latest sources: subversion package
 
 
 Precompiled Minuit and PGPLOT libraries for Windows can be obtained from
@@ -169,7 +170,7 @@ Sections  2.4 and 2.5  below.
 
 
 2.3 (Some) compilation targets
------------------------
+------------------------------
 
 Following make commands should be issued in top gepard/ directory, where
 main Makefile is located:
@@ -252,6 +253,7 @@ You may have to define environment variables as in Linux case.
 
 Makefile - use this if needed to compile Fortran and create documentation.
            See section 2.3 of this README.
+
 GEPARD.INI - file controlling behavior of routines
 
 
@@ -277,7 +279,7 @@ fits/ - inputs needed for fitting to DVCS and DIS data
 ex/   - files for plotting example plots shown in big paper hep-ph/0703179
 
 
-3.3 Mathematica part
+3.3 Mathematica part (obsolete)
 --------------------
 
 Tests/mma/ directory contains Mathematica

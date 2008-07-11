@@ -49,16 +49,19 @@ $\sharp$\thecomment:} #1]}}
 \begin{document}
 
 \title{\texttt{gepard} --- Compton form factors and observables
-                            by evolving moments of GEneral PARton Distributions}
-\author{Version: 0.9.4}
-\date{July 10th 2008}
+                            by evolving moments of GEneral PARton 
+                            Distributions}
+\author{Version: 0.9.4(unreleased)\footnote{For 
+informations contact Kre\v{s}imir Kumeri\v{c}ki, \url{kkumer@phy.hr}}}
+\date{July 11th 2008}
 \maketitle
 
 \begin{abstract}
 Fortran package \texttt{gepard} calculates singlet Compton form factor
-$\mathcal{H}$ and corresponding Compton cross-sections, as well as
-DIS form factor $F_2$ by evolving GPDs in conformal moment space from an ansatz shape
-specified at some input scale.  Together
+$\mathcal{H}$ and corresponding Compton cross-sections, beam charge
+asymmetry, \ldots,  as well as
+DIS form factor $F_2$ by evolving GPDs in conformal moment space 
+from an ansatz shape specified at some input scale.  Together
 with \texttt{Minuit} minimization subroutine GPD parameters can be fitted to
 experimental DVCS and DIS data. For installation instructions
 see README file coming with the package.
@@ -81,7 +84,7 @@ For small $\xi$, DVCS cross section can be approximated by
 where singlet Compton form factor $^{\rm S}\mathcal{H}$ in Mellin-Barnes representation is given by
 \begin{equation}
 {^{\rm S}{\cal H}}(\xi,\Delta^2,{\cal Q}^2)
-= \frac{1}{2i}\int_{c-i \infty}^{c+ i \infty}\!
+= \frac{Q_{S}^2}{2i}\int_{c-i \infty}^{c+ i \infty}\!
 dj\,\xi^{-j-1} \left[i + \tan \left(\frac{\pi j}{2}\right) \right]
 \mbox{\boldmath $C$}_{j}({\cal Q}^2/\mu^2,\alpha_s(\mu)) 
 \mbox{\boldmath $H$}_{j} (\xi,\Delta^2,\mu^2) \;.
@@ -91,7 +94,7 @@ DVCS Wilson coefficients $\mbox{\boldmath $C$}_{j}({\cal Q}^2/\mu^2,\alpha_s(\mu
 are given in Eq. (18) of \cite{Kumericki:2006xx}, while moments of
 GPD $\mbox{\boldmath $H$}_{j} (\xi,\Delta^2,\mu^2)$ should be specified
 by the user in subroutine \texttt{HJ}, as described in Sect. \ref{ssect:ansatz}, or
-within Mathematica sesion, as described in Sect. \ref{sec:mma}.
+within Mathematica session, as described in Sect. \ref{sec:mma}.
 
 In practice it is good to use Mellin-Barnes contour of the form displayed
 on Fig.~\ref{fig:MellinBarnes}, with point on the contour given
@@ -127,7 +130,7 @@ over real variable $y$, one can employ Schwartz reflection principle to
 actually integrate over only one of two legs on Fig.~\ref{fig:MellinBarnes}
 and write
 \begin{multline}
-{^{\rm S}{\cal H}}(\xi,\Delta^2,{\cal Q}^2) =
+{^{\rm S}{\cal H}}(\xi,\Delta^2,{\cal Q}^2) = Q_{S}^2
 \Im\! m\:  e^{i\phi} 
 \int_{0}^{\infty} dy \, \xi^{-j-1}
 \tan\big(\frac{\pi j}{2}\big)
@@ -173,7 +176,7 @@ defined by points:
 \begin{align*}
 0 \,\ldots\, 0.01 & \,\ldots\, 0.025 \,\ldots\, 0.067\,\ldots\, 0.18\,\ldots\, 0.5\,\ldots\, 1.3\,\ldots\, 3.7\,\ldots\, 10. \, \ldots \\
  & \ldots  \, 25. \, \ldots\, 67. \, \ldots\, 182. \, \ldots \, 500. \;,
-\label{<intervals>}
+\label{intervals}
 \end{align*}
 for \texttt{SPEED=1}, while for higher values of \texttt{SPEED} segments
 are defined only using points number $(1, 1+SPEED, 1+ 2 SPEED, \ldots)$ from
@@ -217,7 +220,7 @@ on an input scale by defining subroutine \texttt{HJ} which has the synopsis
 Input to the subroutine is the complex conformal moment \texttt{J} (i.e. coordinates of a point
 on the Melin-Barnes contour), and kinematical parameters \texttt{XI}$=\xi$ and
 \texttt{DEL2}$=t=\Delta^2$,
-while output should be corresponding values
+while output should consist of corresponding values
 \begin{align}
 \texttt{FCM(1)}& =\, ^{\Sigma}\!H_{j} (\xi,\Delta^2,\mathcal{Q}_{0}^2)  \\
 \texttt{FCM(2)}& =\, ^{G}\!H_{j}(\xi,\Delta^2,\mathcal{Q}_{0}^2) \,.
@@ -242,10 +245,11 @@ unpolarized DIS up to NNLO which can be used for calculating DVCS form factors
 in $\overline{CS}$ scheme. For detailed description of (Mathematica) version of
 corresponding functions and sources, see the document \texttt{adacf.pdf}.
 Collection of QCD anomalous dimensions and Wilson coefficients for singlet DVCS form factors
-in $\overline{MS}$ up to NLO.
+in $\overline{MS}$ scheme up to NLO.
 
 \item
-The evolution of GPDs up to NLO in $\overline{MS}$ and  $\overline{CS}$ schemes.
+The evolution of GPDs up to NLO in $\overline{MS}$ scheme 
+and  NNLO in $\overline{CS}$ scheme.
 
 \item 
 Mellin-Barnes representation for DVCS form-factor ${ }^{\rm S}\mathcal{H}$, and
@@ -275,7 +279,7 @@ the following files
 The format and contents of these files should be mostly clear by looking at provided
 examples, and detailed explanations follow in the next subsections. Names of the
 files used instead of \texttt{fit.dat} and \texttt{fit.cmd} can be specified
-as command-line options of fitting program.
+as command-line options of fitting program, see Section \ref{sect:examplerun}.
 
 \textbf{NB:} Various constants in these files should be specified
 according to Fortran 77 standard! Thus, integers should be without dot (e.g.
@@ -314,7 +318,7 @@ order of entries should correspond to code in that subroutine.
 1.956      PHI          angle MB contour makes with positive real axis
 -0.25      CND          same as C, but for ND evolution MB contour
 1.57       PHIND        same as PHI, for ND evolution MB contour
-'CSBAR'    SCHEME       'CSBAR', 'MSBAR', 'MSBLO', 'MSBND', 'EVOLG', ...
+'CSBAR'    SCHEME       'CSBAR', 'MSBAR', 'MSBLO', 'MSBND', 'ZEROG', ...
 'FIT'      ANSATZ       GPD ansatz label. Usually FIT, SPLICE or MMA
 
 \end{verbatim}
@@ -367,11 +371,11 @@ $\alpha_s$ input value is specified
 
 \item
 \texttt{RF2} --- \emph{Double precision}. $ {\cal Q}^2/{\mu_{f}^2}$ i.e. ratio
-of photon virtuality and factorization scales squared.
+of photon virtuality and factorization scale squared.
 
 \item
 \texttt{RR2} --- \emph{Double precision}. $ {\cal Q}^2/{\mu_{r}^2}$ i.e. ratio
-of photon virtuality and renormalization scales squared.
+of photon virtuality and renormalization scale squared.
 
 \item
 \texttt{C, PHI} --- \emph{Double precision}. Intercept $c$, and angle $\phi$ of
@@ -389,12 +393,12 @@ Can presently be
 \item \texttt{'MSBND'}: $\overline{MS}$, including non-diagonal evolution
 \item \texttt{'MSBAR'}: $\overline{MS}$, excluding non-diagonal evolution
 \item \texttt{'MSBLO'}: $\overline{MS}$, evolution is LO only
-\item \texttt{'EVOLQ'}: $\mbox{\boldmath $C$} = (1,0)$ to all orders
-\item \texttt{'EVOLG'}: $\mbox{\boldmath $C$} = (0,1)$ to all orders
+\item \texttt{'ZEROQ'}, \texttt{'TRAJQ'}: $\mbox{\boldmath $C$} = (1,0)$ to all orders
+\item \texttt{'ZEROG', \texttt{'TRAJG'}}: $\mbox{\boldmath $C$} = (0,1)$ to all orders
 \end{itemize}
 Last two are not really renormalization schemes, but just a way to calculate
 just a GPD or PDF evolution, without multiplying with Wilson coefficients.
-For example, scheme \texttt{'EVOLG'} is used in Sect. \ref{sec:tests} to calculate
+For example, scheme \texttt{'ZEROG'} is used in Sect. \ref{sec:tests} to calculate
 evolution of Les Houches benchmark PDFs.
 
 \item
@@ -427,7 +431,7 @@ radiative corrections, ignores values of \texttt{P}, \texttt{SCHEME} and
 \texttt{ANSATZ} in \texttt{GEPARD.INI}, and sets them itself.
 
 
-\subsection{\texttt{fit.dat}\label{sec:fit.dat}}
+\subsection{\texttt{fit.dat}\label{ssect:fitdat}}
 
 \begin{figure}[t]
 \begin{center}
@@ -565,7 +569,7 @@ Minuit manual \cite{Minuit}, Section 3.2.1. The only difference with respect to 
 standard Minuit batch file is that first line has to contain integer 1 or 0 as a first
 item. This controls whether one will do an interactive Minuit session, or not.
 \comminline{At the beginning of the interactive part, one must issue two user-unfriendly
-command, as instructed by the program. This will be made more elegant one day.}
+commands, as instructed by the program. This will be made more elegant one day.}
 Interactive Minuit session can be very powerful, after one carefully reads Minuit manual.
 
 Second and third line are just giving some label to Minuit session.
@@ -612,7 +616,7 @@ and finally prints, and maybe plots the results of the fit.
 \end{figure}
 
 Names of these files should be specified in \texttt{fit.dat}, as explained
-in section \ref{sec:fitdat}.
+in Sect. \ref{ssect:fitdat}.
 Each data file has the structure displayed on Fig.~\ref{fig:DVCS4.DAT}. In the first
 four rows only the first item is read by the program and the second one
 (corresponding to internal Fortran variable) is just convenient user
@@ -648,7 +652,8 @@ In other words:
 \begin{itemize}
 \item 
 For \texttt{YOBS} = \texttt{PARSIGMA}, ``x--axis'' variable is 
-always $-t = - \Delta^2$, so there are no negative values.
+always $-t = - \Delta^2$, so there are no negative values in second
+and third row.
 \item 
 For \texttt{YOBS} = \texttt{SIGMA}, ``x--axis'' variable is 
 either $W$ or $\mathcal{Q}^2$ and corresponding row should have negative number.
@@ -678,6 +683,7 @@ Statistical and systematical errors are combined in quadrature for fitting.
 
 
 \section{An example run}
+\label{sect:examplerun}
 
 In the directory where all initialization files named in Section~\ref{sec:init} are
 placed one runs executable \texttt{fit}. When minimization is over, and results
@@ -704,7 +710,7 @@ By default \texttt{OUTFILE=fit}, but this can be changed by second command-line
 argument of fitting program \texttt{fit}. Thus \texttt{fit  dvcs dvcsnlo test}
 will use \texttt{dvcs.dat} instead of \texttt{fit.dat} for reading required
 datasets, Minuit commands will be read from \texttt{test.cmd} instead of
-\texttt{fit.cmd} and results will go to \texttt{nlodvcs.out} and \texttt{nlodvcs.ps}.
+\texttt{fit.cmd} and results will go to \texttt{dvcsnlo.out} and \texttt{dvcsnlo.ps} (as well as \texttt{fit.mnt}).
 
 
 
@@ -735,7 +741,8 @@ datasets, Minuit commands will be read from \texttt{test.cmd} instead of
 \label{fig:fitout}
 \end{figure}
 
-If one has PGPLOT library compiled in, than this fits are also graphed,
+If one has PGPLOT library compiled in, then these fits are as
+said before graphed,
 in the file \texttt{OUTFILE.ps}. Example graph is shown on Fig.~\ref{fig:fitps}.
 
 \begin{figure}
@@ -755,8 +762,8 @@ By going to forward limit, as shown in Section~\ref{ssect:DIS}, one can check th
 For such comparison we used package {\sc QCD-Pegasus} \cite{Vogt:2004ns} for fast evolution of PDFs.
 In particular, we compared evolution of gluonic PDF, which is easiest to compare.
 
-To make \texttt{gepard} calculate only evolution of gluonic PDFs, we implemented special
-``renormalization scheme'' \texttt{SCHEME} = \texttt{EVOLG} which
+To make \texttt{gepard} calculate only evolution of gluonic PDFs, we use
+\texttt{SCHEME} = \texttt{ZEROG} which
 makes Wilson coefficient vector equal to $(C_{\Sigma}, C_G) = (0, 1)$
 to all orders. Then the same routine that normally calculates DIS form factor
 $F_2(x)$ gives $x g(x)$, up
@@ -767,7 +774,8 @@ the solution to RGE, one sets {\sc QCD-Pegasus} parameter \texttt{IMODEV = 3}, a
 manual \cite{Vogt:2004ns}. 
 Both at NLO and NNLO, we get excellent agreement, with relative differences to
 {\sc QCD-Pegasus} results being of the order of $10^{-7}$, as seen on
-Fig.~\ref{fig:PDFevol}.
+Fig.~\ref{fig:PDFevol}. \comminline{$x_B \to 1$ limit (not relevant
+for small-$x$ calculations) should be improved}
 
 
 \begin{figure}
@@ -845,10 +853,10 @@ be overriden by \emph{options}:
 \begin{minipage}{\textwidth}%
 \begin{tabular}{llp{8cm}}%
 \emph{option name} & \emph{default value} & \\ \hline
-\optboxitem{SPEED}{\emph{in GEPARD.INI}}{speed of execution} \\
-\optboxitem{P}{\emph{in GEPARD.INI}}{order of perturbation series N$^{P}$LO}\\
-\optboxitem{SCHEME}{\emph{in GEPARD.INI}}{factorization scheme (CSBAR, MSBND, \ldots)}\\
-\optboxitem{ANSATZ}{\emph{in GEPARD.INI}}{ansatz used (MMA, SPLICE, FIT, \ldots)}\\
+\optboxitem{SPEED}{in \emph{GEPARD.INI}}{speed of execution} \\
+\optboxitem{P}{in \emph{GEPARD.INI}}{order of perturbation series N$^{P}$LO}\\
+\optboxitem{SCHEME}{in \emph{GEPARD.INI}}{factorization scheme (CSBAR, MSBND, \ldots)}\\
+\optboxitem{ANSATZ}{in \emph{GEPARD.INI}}{ansatz used (MMA, SPLICE, FIT, \ldots)}\\
 \optboxitem{DATFILE}{\emph{fit}}{file DATFILE.dat specifies fitting datasets.}\\
 \optboxitem{OUTFILE}{\emph{fit}}{output to go to OUTFILE.out and OUTFILE.ps}
 \end{tabular}%
@@ -867,7 +875,7 @@ Moments of GPDs and PDFs have to be defined as a Mathematica two-element vector 
 \mmacomm{GPDMom[j\_,t\_,xi\_]} = \{\mmacomm{GPDMomQ}, \mmacomm{GPDMomG} \}  where 
 \mmacomm{GPDMomQ} and \mmacomm{GPDMomG} are expressions for (singlet) quark and gluon GPDs
 depending, apart from explicit arguments $j$, $t$, and $xi$, only on
-parameters \mmacomm{PAR[n]}, where $n$ corresponds to the first column of the \mmacomm{Parameters}
+parameters \mmacomm{PAR[n]}, where $n$ corresponds to the elements of first column of the \mmacomm{Parameters}
 array described below. (Same for PDFs with \mmacomm{GPD}$\to$\mmacomm{PDF} above.) 
 After defining this function, it has to be compiled by issuing command \mmacomm{CompileMoments[]}.
 
@@ -887,8 +895,8 @@ One writes explicitly Fortran code in subroutine 'HJ', following examples there.
 is usually not much faster than 'SPLICE', but can be used to put at ones disposal
 many different ansaetze at the same time, by just using additional names.
 (At the moment, name 'FIT' denotes the same ansatz as defined in example notebook fit.nb,
-name 'FITBP' denotes ansatz used in ``big paper'', 'HARD' and 'SOFT' denote ansaetze used in
-PLB paper etc.)
+name 'FITBP' denotes ansatz used in \cite{Kumericki:2007sa}, 'HARD' and 
+'SOFT' denote ansaetze used in \cite{Kumericki:2006xx} etc.)
 \end{description}
 
 Apart from speed, one advantage of ansaetze 'SPLICE' and 'FIT' is that they are
@@ -1028,8 +1036,9 @@ for a system with \emph{dof} degrees of freedom will be larger than or equal to 
 Calling graph of subroutines for executable \texttt{fit} is displayed on
 Fig.~\ref{fig:callgraph}. Each subroutine,
 function and main program is described in the extended \texttt{gepard-api.pdf} documentation,
-as well as hyperlinked HTML documentation produced by \texttt{robodoc} automatic
-documentation generator.
+as well as in hyperlinked HTML documentation 
+(\texttt{doc/html/masterindex.html}) produced by 
+\texttt{robodoc} automatic documentation generator.
 
 \begin{figure}[ht]
 \begin{center}

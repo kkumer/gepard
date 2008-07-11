@@ -16,7 +16,7 @@ allpdfs: gepard.pdf
 
 .PHONY: clean
 clean:
-	-rm -f gepard-api.* gepard.{log,aux,dvi,pdf,ps,toc,blg}
+	-rm -f gepard-api.* gepard.{log,aux,dvi,pdf,ps,toc,blg,out}
 
 realclean:
-	-rm -f gepard-api.* gepard.{log,aux,dvi,pdf,ps,blg,bbl}
+	-rm -f gepard-api.* gepard.{log,aux,dvi,pdf,ps,blg,out,bbl}

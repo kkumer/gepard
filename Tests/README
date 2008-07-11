@@ -1,4 +1,4 @@
-2008-07-10 
+2008-07-11 
 
 Accuracy and dependence on SPEED (from GEPARD.INI) can be studied by
 the following test programs.
@@ -9,14 +9,14 @@ obtained by SPEED=1.
 First test
 ----------
 For testing the DVCS and DIS observables for some test values of
-parameters, use executable 'test'.
+parameters, use executable './test'.
 
-Second test
+Second test (broken in the present version)
 -----------
 Testing the intermediate values of CFFs can be done using
-executable 'auxtest'. (Note that this is useful mostly for
+executable './auxtest'. (Note that this is useful mostly for
 debugging, if the first test comes out right, this one is
-certain to come out right as well.)
+certain to come out right as well.) 
 
 
 Third test
@@ -34,7 +34,7 @@ Or, better, diff -> vimdiff
 
 Fourth test
 -----------
-run ../src/houches and resulting files show relative difference with
+run executable ./houches and resulting files show relative difference with
 respect to evolution of Les Houches benchmark gluon PDF, as evaluated
 by QCD-Pegasus package. Plot it by
 xmgrace NLOACC.dat -batch acc.bat
@@ -43,7 +43,7 @@ xmgrace NNLOACC.dat -batch acc.bat
 
 Fifth test
 -----------
-run ../src/accuracy and resulting file shows relative difference with
+run executable ./accuracy and resulting file shows relative difference with
 respect to the most precise gepard DVCS result available (SPEED=1, ACC=6).
 Good for testing influence of SPEED parameter. Plot it by
 xmgrace acc.dat -batch acc.bat
@@ -51,6 +51,6 @@ xmgrace acc.dat -batch acc.bat
 
 ------------------------------------------------------------------------  
 
-The role of Mathematica part (in directory mma/) is explained in main README.
+The role of (obsolete) Mathematica part (in directory mma/) is explained in main README.
 
 
