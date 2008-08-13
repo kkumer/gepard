@@ -95,6 +95,49 @@ C
             PAR(18) = 0.0d0
             PAR(28) = 0.0d0
       ELSE IF (ANSATZ .EQ. 'FIT') THEN
+* Use first sum-rule constraint
+          PAR(21) = 0.6d0 - PAR(11)
+          ALPT(1) = PAR(12) + PAR(13)*DEL2
+          ALPT(2) = PAR(22) + PAR(23)*DEL2
+          JMA(1) = J - ALPT(1)
+          JMA(2) = J - ALPT(2)
+          CORR(1) = EXP(   CLNGAMMA(COMPLEX(7.0d0 + PAR(12), 0.0d0)) -
+     &           CLNGAMMA(COMPLEX(7.0d0 + ALPT(1), 0.0d0))   )
+          CORR(2) = EXP(   CLNGAMMA(COMPLEX(7.0d0 + PAR(22), 0.0d0)) -
+     &           CLNGAMMA(COMPLEX(7.0d0 + ALPT(2), 0.0d0))   )
+        IF ( PROCESS .EQ. 'DIS' ) THEN 
+          FCM(1) = PAR(11) * POCHHAMMER(COMPLEX(2.0d0 - PAR(12),0.0d0) 
+     &              , 8) / POCHHAMMER(1.0d0 - PAR(12)
+     &          + J , 8) * (1.0d0 - PAR(12) + J) / (1.0d0 + JMA(1))
+          FCM(2) = PAR(21) * POCHHAMMER(COMPLEX(2.0d0 - PAR(22),0.0d0)
+     &              , 6) / POCHHAMMER(1.0d0 - PAR(22)
+     &          + J , 6) * (1.0d0 - PAR(22) + J) / (1.0d0 + JMA(2))
+        ELSE  
+          FCM(1) = PAR(11) * POCHHAMMER(COMPLEX(2.0d0 - PAR(12),0.0d0)
+     &              , 8) / POCHHAMMER(1.0d0 - PAR(12)
+     &          + J , 8) * (1.0d0 - PAR(12) + J) / (1.0d0 + JMA(1)) /
+     &           (1.0d0 - DEL2/(PAR(14)+PAR(15)*J))**PAR(16) *
+     &        ( 1.0d0 - PAR(19)*PI*(XI/2.0d0)**(JMA(1)+1.0d0)*SQRT(PI)*
+     &         2.0d0**(-2.0d0*ALPT(1))*EXP( CLNGAMMA(1.0d0+J) +
+     &          CLNGAMMA(1.0d0+J+ALPT(1)) - CLNGAMMA(1.5d0+J) - 
+     &          CLNGAMMA(1.0d0+JMA(1)) - 2.0d0*CLNGAMMA(
+     &           COMPLEX(ALPT(1), 0.0d0)) ) / SIN(PI*ALPT(1)) *
+     &          (1.0d0 - (SIN(PI*ALPT(1)) -
+     &           SIN(J*PI))/SIN(PI*JMA(1)) ) * CORR(1)  )
+          FCM(2) = PAR(21) * POCHHAMMER(COMPLEX(2.0d0 - PAR(22),0.0d0)
+     &              , 6) / POCHHAMMER(1.0d0 - PAR(22)
+     &          + J , 6) * (1.0d0 - PAR(22) + J) / (1.0d0 + JMA(2)) /
+     &           (1.0d0 - DEL2/(PAR(24)+PAR(25)*J))**PAR(26) *
+     &        ( 1.0d0 - PAR(29)*PI*(XI/2.0d0)**(JMA(2)+1.0d0)*SQRT(PI)*
+     &         2.0d0**(-2.0d0*ALPT(2))*EXP( CLNGAMMA(1.0d0+J) +
+     &          CLNGAMMA(1.0d0+J+ALPT(2)) - CLNGAMMA(1.5d0+J) - 
+     &          CLNGAMMA(1.0d0+JMA(2)) - 2.0d0*CLNGAMMA(
+     &           COMPLEX(ALPT(2), 0.0d0)) ) / SIN(PI*ALPT(2)) *
+     &          (1.0d0 - (SIN(PI*ALPT(2)) -
+     &           SIN(J*PI))/SIN(PI*JMA(2)) ) * CORR(2) )
+        ENDIF
+      ELSE IF (ANSATZ .EQ. 'FITNG') THEN
+* Don't use first sum-rule constraint
           ALPT(1) = PAR(12) + PAR(13)*DEL2
           ALPT(2) = PAR(22) + PAR(23)*DEL2
           JMA(1) = J - ALPT(1)
@@ -135,6 +178,8 @@ C
      &           SIN(J*PI))/SIN(PI*JMA(2)) ) * CORR(2) )
         ENDIF
       ELSE IF (ANSATZ .EQ. 'FITEXP') THEN
+* Use first sum-rule constraint
+          PAR(21) = 0.6d0 - PAR(11)
           ALPT(1) = PAR(12) + PAR(13)*DEL2
           ALPT(2) = PAR(22) + PAR(23)*DEL2
           JMA(1) = J - ALPT(1)

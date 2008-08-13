@@ -81,29 +81,17 @@ C
 *   1 + 2*SPEED, ...) from the list DOWN
       
       DATA DOWN 
-     & / 0.D0, 0.01D0, 0.025D0, 0.067D0, 0.18D0, 
-     &         0.5D0, 1.3D0, 3.7D0, 10.D0, 
-     &         25.D0, 0.67D2, 1.8D2, 5.0D2 /
+     & / 0.D0, 0.01D0, 0.08D0, 0.15D0, 0.3D0, 
+     &         0.5D0, 1.0D0, 1.5D0, 2.0D0, 
+     &         4.0D0, 6.0D0, 8.0D0, 10.0D0 /
 
-
-*   For fast calculation it's better to compress integration region
-*   The value 1.3 below is optimized for small xi of cca. 10^-4
-! (but this was OK and needed when NINTG was 8, and integration went to
-!  10. It should be changed, if it's needed at all. FIXME)
-!      IF ( SPEED .GE. 4) THEN
-!        DOWN (NINTG + 1) = 1.3d0
-!      END IF
 
 *   Gaussian abscissae and weights:
 
       CALL INTEGRAF(ACC, SPEED, DOWN, NINTGMAX, Y, WG)
 
 
-*   If you suspect numerical problems and want to extend Mellin-Barnes
-*   integration fom 0..10  to 0..500, put 4 -> 0 below
-*   FIXME: this should be automatic
-
-      NPTS = 2**ACC * (NINTGMAX - 4) / SPEED
+      NPTS = 2**ACC * NINTGMAX / SPEED
 
 *   Calculating actual Mellin-Barnes contour points from Gaussian abscissae
 

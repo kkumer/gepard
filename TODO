@@ -1,4 +1,4 @@
-2008-07-10 
+2008-08-13 
 
 Physics: 
 -  t_cut of ZEUS data is infinity? DVCS[46].DAT
@@ -20,7 +20,9 @@ Computing:
 -  filenames setting should be separated from GepardInitInternal because
    this is not needed for cffEinternal and cffHinternal
 -  Numbers in fit.c should be changed by preprocesor variables
--  Implementing Talbot contour for MB integration (cf. e.g. hep-ph/0607122)
+-  datasets should be not read from files each FCN call but from memory!
+-  Should we use gamma or lngamma? (For lngamma we must implement P.V.)
+-  Check Lanczos algorithm for gamma for negative real part of argument
 
 
 Checks:
@@ -53,3 +55,5 @@ DONE:
 +  tmp.mma is a kludge
 +  FIT.INI should have optional name, changable by mma interface
 +  PrintMinuitCommand should inquire FILENAMES common block for filename
++  Implementing Talbot contour for MB integration (cf. e.g. hep-ph/0607122)
+   (works bad for our ansaetze which blow up for large negative real z)

@@ -1,4 +1,4 @@
-2008-07-11 
+2008-08-13 
 
 Open:
 -----
@@ -10,7 +10,6 @@ Open:
 
 3 -  Interactive mode might freeze on MS Windows
 
-4!-  fitres is behaving funny for C=0.25
 
 5!-  one must 'make clean' between making  gepard.exe and non-mma executables
      (and similarly with fit.exe with PGPLOT)
@@ -32,7 +31,9 @@ Open:
 
 11 - .mnt file is not named according to OUTFILE
 
-13! - numerics is not accurate for resummed ansatz (it is MB-phi dependent!)
+13! - Numerics is not perfectly stable. For PHI>>PI/2 resummed ansatz can
+      create problems, and for PHI = PI/2 convergence is not so perfect.
+      Results also depend on C more than they should.
 
 14 - auxtest is broken
 
@@ -72,4 +73,4 @@ Fixed:
 
 2006-08-02 - parameter P not used in the DIS part of fit.F 
 
-
+2008-08-13 4!-  fitres is behaving funny for C=0.25 (merged to bug 13)
