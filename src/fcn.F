@@ -20,7 +20,7 @@ C
       IMPLICIT NONE
       INTEGER NPAR, IFLAG
       DOUBLE PRECISION CHI2, FUTIL
-      INCLUDE 'header.f'
+#include "header.F"
       DOUBLE PRECISION A(NPARMAX),GIN(NPARMAX)
 C    
 C  INPUTS 
@@ -322,9 +322,9 @@ C
         CALL PGLAB('x', 'x\\gS(x)(blue), xg(x)(red)', 
      &       'Resulting PDFs')
 *        NORMSEA = PAR(11) / 
-*     &              CBETA(COMPLEX(2.0D0-PAR(12),0.0d0), (8.0d0,0.0d0))
+*     &              CBETA(DBLCMPLX(2.0D0-PAR(12),0.0d0), (8.0d0,0.0d0))
 *        NORMG = PAR(21) / 
-*     &              CBETA(COMPLEX(3.0D0-PAR(22),0.0d0), (6.0d0,0.0d0))
+*     &              CBETA(DBLCMPLX(3.0D0-PAR(22),0.0d0), (6.0d0,0.0d0))
         DO 40 LGXBJ = -4., -1., 0.02
           XBJ = 10**(LGXBJ)
 *          YS = NORMSEA * XBJ**(1.0d0-PAR(12)) * (1.0d0-XBJ)**7.0
@@ -454,7 +454,7 @@ C
       LOGICAL DRAW
       REAL LASTX, LASTY
 #endif
-      INCLUDE 'header.f'
+#include "header.F"
 
       CHISQPART = 0.d0
 

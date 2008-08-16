@@ -14,7 +14,12 @@
 
 
 # Compiler options
+## INTEL
+#FC = /opt/intel/fce/10.1.008/bin/ifort
+#FFLAGS = -nofor_main -I. -O 
+## G77
 FFLAGS =  -I. -O 
+
 CFLAGS =  -O2
 CPPFLAGS = -D NOPGPLOT
 
@@ -54,9 +59,7 @@ _FOBJS = $(patsubst %,$(FODIR)/%,$(FOBJS))
 # rule for compiling Fortran .f  files
 # (prefix "F" is used to avoid possible future clashes with
 #  C-wrappers with the same name)
-$(FODIR)/F%.o: %.f  header.f
-	$(FC) -c -o $@ $< $(FFLAGS)
-$(FODIR)/F%.o: %.F  header.f
+$(FODIR)/F%.o: %.F  header.F
 	$(FC) -c -o $@ $< $(FFLAGS) $(CPPFLAGS)
 
 # C object files
@@ -84,7 +87,7 @@ $(MMAODIR)/%.o: %.c  header.h
 
 
 # rule for compiling example Fortran programs
-$(EXFODIR)/%.o: $(EXDIR)/%.f header.f
+$(EXFODIR)/%.o: $(EXDIR)/%.F header.F
 	$(FC) -c -o $@ $< $(FFLAGS)
 
 # test and fit targets
