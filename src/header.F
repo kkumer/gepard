@@ -9,6 +9,7 @@ C     *******
 #elif defined(__INTEL_COMPILER) || defined(INTEL_COMPILER)
 #define DBLCMPLX(X, Y)  CMPLX(X, Y, KIND(1.0d0))
 #define REALPART(X) REAL(X)
+#define IMAGPART(X) IMAG(X)
 #endif
 
 *   Parameters
