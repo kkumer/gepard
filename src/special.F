@@ -7,6 +7,7 @@ C  NOTES
 C     - Using algorithm of P. Godfrey from http://my.fit.edu/~gabdo/gamma.txt
 C     *******
 
+
 C     ****f* special.f/CLNGAMMA
 C  NAME
 C     CLNGAMMA  --  logarithm of gamma function of complex argument
@@ -26,15 +27,8 @@ C     CLNGAMMA -- ln(Gamma(Z))
 C  NOTES
 C     Error for P=1 is strictly smaller than 2x10^(-10), and in practice is often
 C     less then 10^(-14). This is original Lanczos parameterization.
-C  NOTES
-C     Error for P=1 is strictly smaller than 2x10^(-10), and in practice is often
-C     less then 10^(-14). This is original Lanczos parameterization.
 C  PARENTS
 C     INIT, CBETA, HJ
-C  BUGS
-C     It should be programmed to calculate lngamma directly, and not by
-C     taking ln at the end. For this, restriction to P.V. of ln shold be
-C     implemented.
 C  SOURCE
 C
 
@@ -44,8 +38,7 @@ C
       INTEGER NMAX, NP
       PARAMETER (NMAX = 7, NP = 4)
       INTEGER NN(NP)
-      DOUBLE PRECISION INVEE, G(NP), COEF(NP, 0:NMAX-1)
-      PARAMETER (INVEE = 0.3678794411714423215955d0)
+      DOUBLE PRECISION G(NP), COEF(NP, 0:NMAX-1)
       DOUBLE COMPLEX TMP, X, YY, S
       SAVE NN, G, COEF
       DATA NN            /7, 3, 2, 1/
@@ -72,13 +65,21 @@ C
       X = Z
       YY = X - (1.d0, 0.0d0)
       TMP = Z - (0.5d0, 0.0d0)
-      TMP = ( (TMP + G(SPD)) * INVEE )**TMP
+      TMP = TMP * LOG( (TMP + G(SPD)) ) - TMP
       S = COEF(SPD, 0)
       DO 10 K = 1, NN(SPD)-1
       YY = YY + (1.d0, 0.0d0)
  10   S = S + COEF(SPD, K) / YY
 
-      CLNGAMMA = LOG(TMP * S)
+      CLNGAMMA = TMP + LOG(S)
+
+*     Taking principal value of logarithm: -Pi < Im(log()) <= Pi
+      DO WHILE ( IMAGPART(CLNGAMMA) .GT. PI )
+        CLNGAMMA = CLNGAMMA - TWOPII
+      END DO
+      DO WHILE ( IMAGPART(CLNGAMMA) .LE. (-PI) )
+        CLNGAMMA = CLNGAMMA + TWOPII
+      END DO
 
       RETURN
       END

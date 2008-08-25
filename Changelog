@@ -2,6 +2,9 @@
 
 Version 0.9.4  (unreleased yet)
 
+	- ADD: Evaluation of gamma function is also controlled by
+	       SPEED, saving significant time in fitting
+
 	{Merged from sid  67:85}
 	- ADD: Evolution of GPDs at eta=0 and eta=x
 	- ADD: Possibility of eta-dependent ansatz
@@ -13,8 +16,6 @@ Version 0.9.4  (unreleased yet)
 		   execution
 	- FIX: comparison to PEGASUS is OK at NNLO as well
 	- FIX: SPEED=3 should be used instead of SPEED=4 now
-	- ADD: Evaluation of gamma function is also controlled by
-	       SPEED, saving significant time in fitting
 
 Version 0.9.3  (2006-12-17)
 

@@ -165,8 +165,8 @@ C
      &          (1.0d0 - (SIN(PI*ALPT(1)) -
      &           SIN(J*PI))/SIN(PI*JMA(1)) ) )
           FCM(2) = PAR(21) * POCHHAMMER(DBLCMPLX(2.0d0 - PAR(22),0.0d0)
-     &              , 8) / POCHHAMMER(1.0d0 - PAR(22)
-     &          + J , 8) * (1.0d0 - PAR(22) + J) / (1.0d0 + JMA(2)) /
+     &              , 6) / POCHHAMMER(1.0d0 - PAR(22)
+     &          + J , 6) * (1.0d0 - PAR(22) + J) / (1.0d0 + JMA(2)) /
      &           (1.0d0 - DEL2/(PAR(24)+PAR(25)*J))**PAR(26) *
      &        ( 1.0d0 - PAR(29)*PI*(XI/2.0d0)**(JMA(2)+1.0d0)*SQRT(PI)*
      &         2.0d0**(-2.0d0*ALPT(2))*
@@ -207,8 +207,8 @@ C
      &          (1.0d0 - (SIN(PI*ALPT(1)) -
      &           SIN(J*PI))/SIN(PI*JMA(1)) ) * CORR(1)  )
           FCM(2) = PAR(21) * POCHHAMMER(DBLCMPLX(2.0d0 - PAR(22),0.0d0)
-     &              , 8) / POCHHAMMER(1.0d0 - PAR(22)
-     &          + J , 8) * (1.0d0 - PAR(22) + J) / (1.0d0 + JMA(2)) /
+     &              , 6) / POCHHAMMER(1.0d0 - PAR(22)
+     &          + J , 6) * (1.0d0 - PAR(22) + J) / (1.0d0 + JMA(2)) /
      &           (1.0d0 - DEL2/(PAR(24)+PAR(25)*J))**PAR(26) *
      &        ( 1.0d0 - PAR(29)*PI*(XI/2.0d0)**(JMA(2)+1.0d0)*SQRT(PI)*
      &         2.0d0**(-2.0d0*ALPT(2))*RATGAMMA(1.0d0+J, 1.5d0+J)*

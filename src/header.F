@@ -418,6 +418,8 @@ C     ***
       PARAMETER ( PIHALF = 1.5707 963267 948966 D0 )
       PARAMETER ( CF = 4.0d0 / 3.0d0, CA = 3.0d0, TF = 0.5d0 )
       PARAMETER ( MP2 = 0.880354d0 )
+      DOUBLE COMPLEX TWOPII
+      PARAMETER ( TWOPII = (0.0d0, 6.2831 853071 795865 D0) )
 
 *     - QCD beta function
       INTEGER NFMIN, NFMAX

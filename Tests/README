@@ -1,10 +1,16 @@
-2008-07-11 
+2008-08-25
 
 Accuracy and dependence on SPEED (from GEPARD.INI) can be studied by
 the following test programs.
 
 FIXME: Make sure to use AS0=0.05 in GEPARD.INI. Best agreement should be
 obtained by SPEED=1.
+Also note that by default GEPARD.INI uses Mellin-Barnes contour strictly
+perpendicular to real axis (PHI=PI/2). Much better accuracy is obtained
+by slanting this contour (e.g. PHI=1.9). However, then some numerical
+problems may surface (especially when using full non-diagonal MS-bar evolution)
+and results should be checked (although they will be fine 99% of times
+and this is why PHI=1.9 is default for fitting).
 
 First test
 ----------
