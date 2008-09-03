@@ -23,7 +23,7 @@ C
       PROGRAM HOUCHES
 
       IMPLICIT NONE
-      INTEGER K,  K1, K2, QIND
+      INTEGER K,  K1, QIND
       DOUBLE COMPLEX EPH, J, FPW
       DOUBLE PRECISION F2IMAG, RES, XG(4)
       DOUBLE PRECISION AS
@@ -254,10 +254,6 @@ C
  300  CONTINUE
 
  803  FORMAT (1X, E7.1, 8X, E20.9)
- 901  FORMAT (1X, 'x', 15X, 'x g(x)', 15X, 'rel. diff.', /
-     &  1X, 61('-'))
- 902  FORMAT (1X, E7.1, 8X, F9.4, 15X, E8.1)
- 903  FORMAT (1X, E7.1, 8X, E10.5, 15X, E8.1)
  904  FORMAT (1X, 'alpha_strong( P=', I1, ' ) =       ', F10.8)
 
       STOP

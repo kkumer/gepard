@@ -32,7 +32,7 @@ C  SOURCE
 C
 
       DOUBLE PRECISION LRF2
-      DOUBLE COMPLEX J, HS1, BIGC0(2), BIGC1(2)
+      DOUBLE COMPLEX J, HS1
 #include "header.F"
 
       J = N(K) - 1

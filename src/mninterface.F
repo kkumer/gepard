@@ -33,7 +33,10 @@ C
       CALL INITC
 
 *      File where MINUIT (and STDOUT) output is written
-        OPEN (UNIT = 6, FILE = 'fit.mnt', STATUS = 'UNKNOWN')
+      CLOSE(6)
+      OPEN (UNIT = 6, 
+     &    FILE = OUTFILE(1:INDEX(OUTFILE,'.out')-1) // '.mnt', 
+     &    STATUS = 'UNKNOWN')
 
 
       CALL MNINIT(5, 6, 7)
@@ -119,7 +122,9 @@ C
 
 *   First flush the fit.mnt file
       CLOSE(6)
-      OPEN(UNIT = 6, FILE = 'fit.mnt', STATUS = "OLD")
+      OPEN (UNIT = 6, 
+     &    FILE = OUTFILE(1:INDEX(OUTFILE,'.out')-1) // '.mnt', 
+     &    STATUS = 'OLD')
  10   READ(6, *, END=20)
       GOTO 10
  20   BACKSPACE (6)

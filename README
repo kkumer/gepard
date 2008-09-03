@@ -1,4 +1,4 @@
-2008-07-11 
+2008-09-03 
 
 gepard - Package for evolving conformal moments of GEneral PARton 
          Distributions and calculation of DVCS form factors and observables
@@ -279,13 +279,9 @@ fits/ - inputs needed for fitting to DVCS and DIS data
 ex/   - files for plotting example plots shown in big paper hep-ph/0703179
 
 
-3.3 Mathematica part (obsolete)
+3.3 Mathematica part
 --------------------
 
-Tests/mma/ directory contains Mathematica
-packages and notebooks that correspond to older version gepard-0.8* (which was
-used also for hep-ph/0605237 letter numerics). They are slow and actually not 
-needed here but are useful for checking and debugging of Fortran algorithms.
-
-They are also obsoleted by the new Mathematica interface, described in manual
-doc/tex/gepard.pdf
+fits/gepard.m  - userspace functions
+fits/gepard.exe/ - MathLink executables
+Mathematica interface is described in manual doc/tex/gepard.pdf

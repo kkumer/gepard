@@ -30,11 +30,10 @@ C  SOURCE
 C
 
       INTEGER K
-      INTEGER ORD, L, K1
       DOUBLE PRECISION R, ASQ02, ASMUR2, ASMUF2
-      DOUBLE COMPLEX CEVNS, CNDNS, CEV(2)
+      DOUBLE COMPLEX CEVNS, CEV(2)
       DOUBLE COMPLEX EVOLNSA(0:2)
-      DOUBLE COMPLEX J, EVOLA(0:2,2,2), FCM(2)
+      DOUBLE COMPLEX EVOLA(0:2,2,2)
 #include "header.F"
 
 * ASMUF2 = alpha_s/(2 pi) at factorization scale

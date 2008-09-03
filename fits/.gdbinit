@@ -7,14 +7,18 @@ define bj
     jump $arg0
 end
 
-define prparint
-    x/20d parint_
+define prkin
+    x/3fg kinematics_
 end
 define prcff
-    x/6f cff_
+    x/3fg cff_
+end
+define prpar
+    x/30fg par_
 end
 
 #break MAIN__
 #break  F2Internal
 #break  cffHInternal
-run -linkmode listen -linkname 5000
+#break cfff_
+#run -linkmode listen -linkname 5000

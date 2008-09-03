@@ -25,7 +25,7 @@ C
       INTEGER K
       DOUBLE PRECISION AUX
       DOUBLE PRECISION XIA(21), REF(21)
-      DOUBLE PRECISION PARSIGMA, SIGMA
+      DOUBLE PRECISION SIGMA
 #include "header.F"
 
 
@@ -93,14 +93,11 @@ C
         CALL EVOLC(1)
         AUX = SIGMA ()
         WRITE (11, 901) XI, ABS((AUX-REF(K))/REF(K))
-*       WRITE (11, 903) AUX
  20   CONTINUE
       WRITE (11, *) 
  30   CONTINUE
 
  901  FORMAT (1X, E7.1, 8X, E20.14)
- 902  FORMAT (1X, E7.1, 8X, E20.14)
- 903  FORMAT (1X, E22.16)
       STOP
       END
 C     ****

@@ -74,7 +74,6 @@ C      CB1F
 C  SOURCE
 C
 
-      INTEGER K1
       DOUBLE COMPLEX AUX
 #include "header.F"
 

@@ -1,4 +1,4 @@
-2008-08-13 
+2008-09-03 
 
 Open:
 -----
@@ -11,7 +11,7 @@ Open:
 3 -  Interactive mode might freeze on MS Windows
 
 
-5!-  one must 'make clean' between making  gepard.exe and non-mma executables
+5 -  one must 'make clean' between making  gepard.exe and non-mma executables
      (and similarly with fit.exe with PGPLOT)
     (Thus, 'make all' probably doesn't work as intended.)
 
@@ -29,15 +29,15 @@ Open:
 
 10 - incompatible with Mathematica 6 (probably fixed)
 
-11 - .mnt file is not named according to OUTFILE
-
 13! - Numerics is not perfectly stable. For PHI>>PI/2 resummed ansatz can
       create problems, and for PHI = PI/2 convergence is not so perfect.
       Results also depend on C more than they should.
 
 14 - auxtest is broken
 
-15 -  gepard-api.pdf is not generated
+16 - cffH[..., SCHEME->"ZERO?"] is problematic because
+     0^(negative + I something) seems not to be treated correctly by Fortran
+     compiler (both g77 and ifort). (Gives 0 instead of complex infinity.) 
 
 Fixed:
 ------
@@ -73,4 +73,8 @@ Fixed:
 
 2006-08-02 - parameter P not used in the DIS part of fit.F 
 
-2008-08-13 4!-  fitres is behaving funny for C=0.25 (merged to bug 13)
+2008-08-13 - 4!-  fitres is behaving funny for C=0.25 (merged to bug 13)
+
+2008-09-03 - 15 -  gepard-api.pdf is not generated (FIXED by removing latex code)
+
+2008-09-03 - 11 - .mnt file is not named according to OUTFILE (FIXED)

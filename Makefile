@@ -1,27 +1,25 @@
-# Master Makefile for gepard project 2008-07-11 
+# Master Makefile for gepard project 2008-09-03 
 
 # Interesting targets:
-# 	radcorr  -  program for producing Fig. 1 in hep-ph/0605237
-# 	scaledep -  program for producing Fig. 2 in hep-ph/0605237
-# 	auxns    -  comparing MSBAR and CSBAR schemes
 # 	test     -  tests both DVCS and DIS routines
-# 	auxtest  -  tests DVCS \mathcal{H} calculation
 # 	fit      -  fitting GPD ansatz to DVCS and DIS data
-# 	fit_nopgplot -  same as fit, but without plotting
 # 	gepard.exe - Mathematica interface
 # 	html     -  HTML documentation
 # 	pdf      -  LaTeX -> PDF documentation
+# 	radcorr  -  program for producing Fig. 1 in hep-ph/0605237
+# 	scaledep -  program for producing Fig. 2 in hep-ph/0605237
+# 	auxns    -  comparing MSBAR and CSBAR schemes
+# 	auxtest  -  tests DVCS \mathcal{H} calculation
 #
-# 	houches  -  comparison to Les Houches benchmark
-# 	accuracy -  Analysis of accuracy and SPEED
+# 	houches  -  comparison to Les Houches DIS benchmark
+# 	accuracy -  Analysis of accuracy and SPEED of DVCS calculation
 #
-# For compiling 'fit' without PGPLOT (no plotting) do
+# For compiling 'fit' and 'gepard.exe' without PGPLOT (no plotting) do
 # 	  make NOPGPLOT=1 fit
-# 	(This is what fit_nopgplot target does, but with
-# 	 different name for executable.)
 #
 # For debugging/profiling call like this:
-#     make FFLAGS='-g -pg' 
+#     make DEBUG=1 <target> 
+#     make PROFILE=1 <target> 
 #
 # For compiling without cygwin.dll dependency
 # 	  make FFLAGS='-O -mno-cygwin' CFLAGS='-O2 -mno-cygwin' test
@@ -31,10 +29,68 @@
 # ---- BEGIN of system dependent stuff (fix it by hand where needed!) ----
 # ------------------------------------------------------------------------  
 
+
+# -- 0. Compilation options
+#
+
+# Fortran compiler dependent options (uncomment only one)
+#
+## [--1--] GNU g77  (also cygwin)
+FC = g77
+CMP_FFLAGS = -Wall
+OPT_FFLAGS = -O3
+OPT_CFLAGS = -O3 
+
+## [--2--] GNU gfortran
+#FC = gfortran
+#CMP_FFLAGS = -Wall
+#OPT_FFLAGS = -O3 -ffast-math -funroll-all-loops  -ftree-vectorize
+#OPT_CFLAGS = -O3 
+
+## [--2b--] GNU gfortran + OpenMP parallelization
+#FC = gfortran
+#CMP_FFLAGS = -Wall
+#OPT_FFLAGS = -O3 -fopenmp
+#OPT_CFLAGS = -O3 
+
+## [--3--] INTEL + OpenMP parallelization
+#FC = ifort
+#CC = icc
+#CMP_FFLAGS = -warn all -nofor_main 
+#OPT_FFLAGS = -O3 -ipo -openmp
+#OPT_CFLAGS = -O3 -ipo
+
+# optimized, debug and profiling modes
+#
+ifdef DEBUG
+  OPT_FFLAGS = -g
+  OPT_CFLAGS = -g
+endif
+ifdef PROFILE
+  OPT_FFLAGS = -g -pg
+  OPT_CFLAGS = -g -pg
+endif
+# adding everything + compiler-specific options
+FFLAGS = -I. $(OPT_FFLAGS) $(CMP_FFLAGS)
+CFLAGS = $(OPT_CFLAGS)
+
+# Preprocessor options
+#CPPFLAGS = -D NOPGPLOT
+
+export FC CC FFLAGS CFLAGS 
+
+
 # -- 1. MINUIT related things
 #
 # Location and links to CERNLIB's kernlib and packlib
-export CERNLIBS =  -L$(HOME)/local/lib -lpacklib -lkernlib
+# FIXME: there is compiler dependence in these libs!
+export CERNLIBS =  -L$(HOME)/local/lib -lpacklib_$(FC) -lkernlib_$(FC) 
+ifdef DEBUG
+  export CERNLIBS =  -L$(HOME)/local/lib -lpacklib_$(FC)_dbg -lkernlib_$(FC)_dbg
+endif
+ifdef PROFILE
+  export CERNLIBS =  -L$(HOME)/local/lib -lpacklib_$(FC)_prof -lkernlib_$(FC)_prof
+endif
 
 # -- 2. MathLink related things
 #
@@ -70,7 +126,7 @@ endif
 # -- 3. PGPLOT related things
 #  
 # Location and links to pgplot libs (if you have them. 
-# If not, compile fit_nopgplot instead of fit'.)
+# If not, compile fit and gepard.exe with NOPGPLOT=1'.)
 export PGPLOTLIBS = -L$(HOME)/local/lib/pgplot -lpgplot
 # If you have pgplot libs, but without /XSERVE driver, comment 
 # out the next three lines (should be automatic on Windows)
@@ -78,7 +134,16 @@ ifndef WINDIR
   export X11LIBS = -L/usr/X11R6/lib -lX11 -lpng
 endif
 # All PGPLOT libs together for easier reference:
-export ALLPGPLOTLIBS = $(PGPLOTLIBS) $(X11LIBS)
+ifndef NOPGPLOT
+  export ALLPGPLOTLIBS = $(PGPLOTLIBS) $(X11LIBS)
+endif
+
+# -- 4. ADACF related things
+#  
+# Location and link to adacf library of DIS anomalous
+# dimensions and coefficient functions
+# FIXME: library and it's name is compiler dependent!
+export ADACFLIB = -L$(HOME)/local/lib -lgadacf_$(FC)
 
 # ------------------------------------------------------------------------  
 # ---- END of system dependent stuff                                  ----
@@ -95,11 +160,11 @@ export MMATARGETS = gepard.exe
 .PHONY: $(TESTTARGETS) $(EXTARGETS) $(FITTARGETS) $(MMATARGETS)
 DOCTARGETS = pdf html htmlnocss
 
-all: $(TESTTARGETS) $(EXTARGETS) fit fit_nopgplot  $(FITTARGETS) $(MMATARGETS) $(DOCTARGETS)
+all: $(TESTTARGETS) $(EXTARGETS) fit $(FITTARGETS) $(MMATARGETS) $(DOCTARGETS)
 
 tests: $(TESTTARGETS)
 
-$(TESTTARGETS) $(EXTARGETS) fit fit_nopgplot $(FITTARGETS) $(MMATARGETS):
+$(TESTTARGETS) $(EXTARGETS) fit $(FITTARGETS) $(MMATARGETS):
 	$(MAKE) -C src $@
 
 doc: html pdf

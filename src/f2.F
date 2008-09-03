@@ -14,19 +14,8 @@ C    calculates singlet F2 DIS form factor by numerical Mellin-Barnes
 C    integration 
 C    Unlike CFF, this is defined with the singlet charge factor Q_{S}^2
 C    included
-C         NB!! - only one of three F2(3) array elements, F2(P)
-C         is changed by single call to F2F!
-C    |latex  \begin{eqnarray*}
-C    |latex  {{F_2}^{\rm S}}(\xi,{\cal Q}^2)
-C    |latex  &\!\!\!=\!\!\!& \frac{Q_{S}^2}{2 \pi i}\int_{c-i \infty}^{c+ i \infty}\!
-C    |latex  dj\,\xi^{-j} 
-C    |latex  \mbox{\boldmath $C$}^{\rm DIS}_{j}(Q^2/\mu^2,\alpha_s(\mu)) 
-C    |latex  \mbox{\boldmath $H$}_{j} (\xi=0,\Delta^2=0,\mu^2) \\[2ex]
-C    |latex  &\!\!\!=\!\!\!& \frac{Q_{S}^2}{\pi} \xi^{-c}  
-C    |latex  \int_{0}^{\infty} dy\: \Im\! m\: e^{i\phi} \xi^{- y e^{i\phi}} 
-C    |latex  \texttt{FPW}(j) 
-C    |latex  \end{eqnarray*} 
-C    |latex  where $j=c+ye^{i\phi}$.
+C      NB!! - only one of three F2(3) array elements, F2(P)
+C      is changed by single call to F2F!
 C  SYNOPSIS
 
       SUBROUTINE F2F

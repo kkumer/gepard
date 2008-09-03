@@ -1,5 +1,4 @@
-allpdfs: gepard.pdf 
-#gepard-api.pdf
+allpdfs: gepard.pdf gepard-api.pdf
 
 %.pdf: %.dvi
 	dvipdf $^

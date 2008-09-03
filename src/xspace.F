@@ -31,9 +31,7 @@ C  SOURCE
 C
 
       INTEGER K, L
-      DOUBLE COMPLEX EPH, J, FCM(2)
-      DOUBLE PRECISION RESIMAG
-      DOUBLE PRECISION FIMAG
+      DOUBLE COMPLEX EPH, J
 #include "header.F"
 
       DEL2 = T

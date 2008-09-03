@@ -171,10 +171,27 @@ struct{
  */
 
 void cfff_();
+void f2f_();
 void readpar_();
 void init_();
 void initgpd_();
 void getmbgpdmma_();
+void getmbgpd_();
 void evolc_(long int *i, long int *j);
 void mpar_(long int *id, long int *siz, char* pnam, double *vstrt, double *stp, double *lo, double *hi, int ch_len);
 void mcom_(long int *siz, char* cmd, long int *ierflg, int cmd_len);
+void fitinit_();
+void parinit_(int *speed, int *p, 
+		      long int *schemesiz, char* scheme, 
+		      long int *ansatzsiz, char* ansatz,
+              long int *datfilesiz, char* datfile, 
+			  long int *outfilesiz, char* outfile, 
+              int schemelen, int ansatzlen, int datfilelen, int outfilelen);
+void flushout_();
+void getpar_(long int *id, double *val, double *error, long int *ivarbl);
+void mcont_(long int *num1, long int *num2, long int *npt, 
+		    double xpt[], double ypt[], int *nfound);
+void mnstat_(double *fmin, double *fedm, double *errdef, long int *npari, long int *nparx, long int *istat);
+void mnemat_(double emat[NPARMAX][NPARMAX], long int *ndim);
+void setproc_(long int *iproc); 
+

@@ -1,12 +1,12 @@
-2008-08-13 
+2008-09-03 
 
 Version 0.9.4  (unreleased yet)
 
 	- ADD: Evaluation of gamma function is also controlled by
 	       SPEED, saving significant time in fitting
-	- ADD: Compiles also with Intel ifort compiler (but then
-	       works only in interactive mode - not much speed
-		   improvement)
+	- ADD: Compiles also with Intel ifort and GNU gfortran compilers,
+	       including OpenMP parallelization.
+	       
 
 	{Merged from sid  67:85}
 	- ADD: Evolution of GPDs at eta=0 and eta=x

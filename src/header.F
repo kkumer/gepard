@@ -479,7 +479,6 @@ C     ***
 
 *     ----- Values on a particular contour point
       DOUBLE COMPLEX S1, S2, S3, S4
-      DOUBLE COMPLEX CNS0, CNS1, CNS2
 
 *     ----- Values on the whole contour
 

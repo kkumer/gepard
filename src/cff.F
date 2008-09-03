@@ -14,23 +14,6 @@ C    calculates singlet Compton form factor H by numerical Mellin-Barnes
 C    integration according to formula Eq. (58) from [Kumericki:2007sa]
 C      NB!! - only one of three CFF(0:2) array elements, CFF(P)
 C             is changed by single call to CFFF!
-C    |latex  \begin{eqnarray*}
-C    |latex  {{\cal H}^{\rm S}}(\xi,\Delta^2,{\cal Q}^2)
-C    |latex  &\!\!\!=\!\!\!& \frac{1}{2i}\int_{c-i \infty}^{c+ i \infty}\!
-C    |latex  dj\,\xi^{-j-1} \left[i + \tan \left(\frac{\pi j}{2}\right) \right]
-C    |latex  \mbox{\boldmath $C$}_{j}({\cal Q}^2/\mu^2,\alpha_s(\mu)) 
-C    |latex  \mbox{\boldmath $H$}_{j} (\xi,\Delta^2,\mu^2) \\[2ex]
-C    |latex  &\!\!\!=\!\!\!& \frac{(\xi/2)^{-c-1}}{\Gamma(3/2)}\Big\{i \Im\! m\: e^{i\phi} 
-C    |latex  \int_{0}^{\infty} dy  (\xi/2)^{- y e^{i\phi}} 
-C    |latex  \frac{\Gamma(5/2 + c + y e^{i\phi})}{\Gamma(3 + c + y e^{i\phi})}
-C    |latex  \texttt{FPW}(j) \\[2ex]
-C    |latex  & & + \Im\! m\:  e^{i\phi} 
-C    |latex  \int_{0}^{\infty} dy  (\xi/2)^{- y e^{i\phi}}
-C    |latex  \frac{\Gamma(5/2 + c + y e^{i\phi})}{\Gamma(3 + c + y e^{i\phi})}
-C    |latex  \tan\big(\frac{\pi(c + y e^{i\phi})}{2}\big)
-C    |latex  \texttt{FPW}(j)
-C    |latex  \end{eqnarray*} 
-C    |latex  where $j=c+ye^{i\phi}$.
 C  SYNOPSIS
 
       SUBROUTINE CFFF
@@ -46,7 +29,7 @@ C
       IMPLICIT NONE
       INTEGER K, QIND
       DOUBLE COMPLEX EPH, J, CFAC, FPWH, FPWE
-      DOUBLE COMPLEX DCTAN, FCM(2)
+      DOUBLE COMPLEX DCTAN
       DOUBLE PRECISION RESREALH, RESIMAGH
       DOUBLE PRECISION FREALH, FIMAGH
       DOUBLE PRECISION RESREALE, RESIMAGE
@@ -98,11 +81,11 @@ C
      &       + CGRID(QIND,K,2)*PAR(28)*MBGPD(K,2)
       END IF
 
-      FREALH = IMAG(CFAC * DCTAN(PIHALF*J) * FPWH)
-      FREALE = IMAG(CFAC * DCTAN(PIHALF*J) * FPWE)
+      FREALH = IMAGPART(CFAC * DCTAN(PIHALF*J) * FPWH)
+      FREALE = IMAGPART(CFAC * DCTAN(PIHALF*J) * FPWE)
 
-      FIMAGH = IMAG(CFAC * FPWH)
-      FIMAGE = IMAG(CFAC * FPWE)
+      FIMAGH = IMAGPART(CFAC * FPWH)
+      FIMAGE = IMAGPART(CFAC * FPWE)
 
       RESREALH = RESREALH + WG(K)*FREALH
       RESIMAGH = RESIMAGH + WG(K)*FIMAGH

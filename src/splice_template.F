@@ -26,11 +26,11 @@ C         FCM -- input scale singlet GPD H_{J}
 C  PARENTS
 C     HJ
 C  CHILDREN
-C     DCTAN, CLNGAMMA
+C     CLNGAMMA
 C  SOURCE
 C
 #include "header.F"
-      DOUBLE COMPLEX DCTAN, CLNGAMMA
+      DOUBLE COMPLEX CLNGAMMA
 
       IF ( PROCESS .EQ. 'DIS' ) THEN 
         <* PDFQsplice *> 

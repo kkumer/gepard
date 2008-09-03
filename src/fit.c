@@ -316,12 +316,11 @@ void cffHInternal(double xi, double t, double q2, double q02, int speed, int p, 
 *  SOURCE
 */
 {
-        int i, j, xint, dttype;
-        double xreal, xim, xre;
-        struct dblcomplex xc, nc;
-        double args[10], mt;
+        int i;
+        double xreal;
+        struct dblcomplex nc;
         long int nargs;
-        const char *fname, *sname;
+        const char *fname;
         long int evoli=1, evolj=1, iproc=1;
         char datfile[] = "DFLT";
         char outfile[] = "DFLT";
@@ -395,12 +394,11 @@ void cffEInternal(double xi, double t, double q2, double q02, int speed, int p, 
 *  SOURCE
 */
 {
-        int i, j, xint, dttype;
-        double xreal, xim, xre;
-        struct dblcomplex xc, nc;
-        double args[10], mt;
+        int i;
+        double xreal;
+        struct dblcomplex nc;
         long int nargs;
-        const char *fname, *sname;
+        const char *fname;
         long int evoli=1, evolj=1, iproc=1;
         char datfile[] = "DFLT";
         char outfile[] = "DFLT";
@@ -474,12 +472,11 @@ void F2Internal(double xbj, double q2, double q02, int speed, int p, char *schem
 *  SOURCE
 */
 {
-        int i, j, xint, dttype;
-        double xreal, xim, xre;
-        struct dblcomplex xc, nc;
-        double args[10], mt;
+        int i;
+        double xreal;
+        struct dblcomplex nc;
         long int nargs;
-        const char *fname, *sname;
+        const char *fname;
         long int evoli=1, evolj=1, iproc=2;
         char datfile[] = "DFLT";
         char outfile[] = "DFLT";
@@ -568,10 +565,10 @@ void getmbgpdmma_(void)
 */
 {
 
-        int i, j;
+        int i;
         double xr, xi;
-        struct dblcomplex nc, xc;
-        long int effacc, nargs;
+        struct dblcomplex xc;
+        long int nargs;
         const char *fname;
 
 /* calling Mathematica function GPD[{params}, DEL2, XI]  */

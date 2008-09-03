@@ -46,7 +46,7 @@ C
       PARAMETER (CON=1.4d0, CON2=CON*CON, BIG=1.d30, SAFE=2.0d0)
       EXTERNAL FUNC
 
-      IF (H .EQ. 0.0d0) PAUSE 
+      IF (H .EQ. 0.0d0) STOP
       HH = H
       A(1,1) = (FUNC(X+HH)-FUNC(X-HH))/(2.0d0*HH)
       ERR=BIG

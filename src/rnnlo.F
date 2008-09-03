@@ -31,7 +31,6 @@ C      EVOLNSF
 C  SOURCE
 C
 
-      INTEGER K1, L
       DOUBLE PRECISION INV
 #include "header.F"
 

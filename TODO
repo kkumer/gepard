@@ -22,6 +22,7 @@ Computing:
 -  Numbers in fit.c should be changed by preprocesor variables
 -  datasets should be not read from files each FCN call but from memory!
 -  Check Lanczos algorithm for gamma for negative real part of argument
+-  Improve compilation on gfortran and ifort (-Wall, ...)
 
 
 Checks:

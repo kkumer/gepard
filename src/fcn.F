@@ -46,8 +46,7 @@ C
       DOUBLE PRECISION CHISUBTOT, CHISQPART, HX(2), BH(2)
       CHARACTER*30 DATAFNAME, OUTFORMAT
       CHARACTER*20 FIGLABEL, XLABEL, YLABEL, XTYPE, YTYPE
-      CHARACTER TXT*45, CHTXT*15, CHTXTOT*60
-      DOUBLE COMPLEX CBETA
+      CHARACTER TXT*50, CHTXT*15, CHTXTOT*60
       REAL XMIN, XMAX, YMIN, YMAX, CHSIZE
       INTEGER IVAR
       CHARACTER*10 NAML, NAMR
@@ -61,11 +60,12 @@ C
       INTEGER PRPAR(PRPARMAX)
       DATA PRPAR / 1, 2, 4, 8, 9 /
 
-#ifndef NOPGPLOT
+#ifdef PGPLOT
       INTEGER PGBEG
       LOGICAL DRAW
-      REAL NORMG, NORMSEA
-      REAL XBJ, LGXBJ, LASTLGXBJ, YG, YS, LASTYG, LASTYS
+      REAL XBJ, LGXBJ, DELLGXBJ, LASTLGXBJ, YG, YS, LASTYG, LASTYS
+      PARAMETER (DELLGXBJ = 0.02)
+      DRAW = .FALSE.
 #endif
 
       CHTXTOT = ''
@@ -110,7 +110,7 @@ C
 
       OPEN (UNIT = 11, FILE = DATFILE, STATUS = 'OLD')
       READ (11, *) OUTFORMAT, XPANELS, YPANELS
-#ifndef NOPGPLOT
+#ifdef PGPLOT
 *    Initailization of plotting on a grid of panels
       IF (IFLAG .EQ. 3)  THEN
         IF (OUTFORMAT(:2) .EQ. '/X') THEN
@@ -158,7 +158,7 @@ C
           READ (11, *) FIGLABEL, XLABEL, YLABEL, 
      &      XMIN, XMAX, YMIN, YMAX, XTYPE, YTYPE
 *         start plotting panel
-#ifndef NOPGPLOT
+#ifdef PGPLOT
           IF (IFLAG .EQ. 3) THEN
 *         check if second X window is needed
             IPANEL = IPANEL + 1
@@ -200,7 +200,7 @@ C
             WRITE(21, 810) CHISQ(CHIN), NDATAPTS(CHIN)
 *         ... and to title of last panel
             WRITE(TXT, 810) CHISQ(CHIN), NDATAPTS(CHIN)
-#ifndef NOPGPLOT
+#ifdef PGPLOT
             CALL PGQCH(CHSIZE)
             CALL PGSCH(1.4)
             CALL PGTEXT (XMIN, YMAX+(YMAX-YMIN)/30., TXT)
@@ -208,7 +208,7 @@ C
 #endif
           END IF
         ELSE
-#ifndef NOPGPLOT
+#ifdef PGPLOT
           IF (IFLAG .EQ. 3)  THEN
             ICOL = ICOL + 1
             IF (ICOL .EQ. 5) ICOL = 1
@@ -219,7 +219,7 @@ C
           CALL PROCDATA (DATAFNAME, IFLAG, NN, CHISQPART)
           CHISQ(0) = CHISQ(0) + CHISQPART
           NDATAPTS(0) = NDATAPTS(0) + NN
-#ifndef NOPGPLOT
+#ifdef PGPLOT
           IF (IFLAG .EQ. 3)  THEN
             CALL PGSCI(1)
             CALL PGSLS(1)
@@ -263,7 +263,7 @@ C
         CALL BCA(BCA0)
         WRITE (21, *) 'BCA(PHI=0) = ', BCA0
         CLOSE (21)
-#ifndef NOPGPLOT
+#ifdef PGPLOT
 *     Write parameter values, chi-squares and BCA to plot
         CALL PGSCH(1.3)
         CALL PGPAGE
@@ -321,14 +321,9 @@ C
         CALL PGBOX ('BCLNST', 0.0, 0, 'BCNST1', 0.0, 0)
         CALL PGLAB('x', 'x\\gS(x)(blue), xg(x)(red)', 
      &       'Resulting PDFs')
-*        NORMSEA = PAR(11) / 
-*     &              CBETA(DBLCMPLX(2.0D0-PAR(12),0.0d0), (8.0d0,0.0d0))
-*        NORMG = PAR(21) / 
-*     &              CBETA(DBLCMPLX(3.0D0-PAR(22),0.0d0), (6.0d0,0.0d0))
-        DO 40 LGXBJ = -4., -1., 0.02
+        LGXBJ = -4.
+        DO WHILE (LGXBJ .LE. -1.)
           XBJ = 10**(LGXBJ)
-*          YS = NORMSEA * XBJ**(1.0d0-PAR(12)) * (1.0d0-XBJ)**7.0
-*          YG = NORMG * XBJ**(1.0d0-PAR(22)) * (1.0d0-XBJ)**5.0
           PROCESS = 'DIS'
           CALL XSPACE(HX, DBLE(XBJ), 0.0d0)
           YS = HX(1)
@@ -347,7 +342,8 @@ C
           LASTYG = YG
           LASTYS = YS
           DRAW = .TRUE.
- 40     CONTINUE
+          LGXBJ = LGXBJ + DELLGXBJ
+        END DO
 *     Draw plot of GPD slopes B(x)
         CALL PGSCH(1.8)
         CALL PGSCI(1)
@@ -358,7 +354,8 @@ C
         CALL PGBOX ('BCLNST', 0.0, 0, 'BCNST1', 0.0, 0)
         CALL PGLAB('x', 'slope B(x) (blue=q, red=g)', 
      &       'GPD slopes')
-        DO 50 LGXBJ = -4., -1., 0.02
+        LGXBJ = -4.
+        DO WHILE (LGXBJ .LE. -1.)
           XBJ = 10**(LGXBJ)
           CALL SLOPEH(BH, DBLE(XBJ))
           YS = BH(1)
@@ -377,7 +374,8 @@ C
           LASTYG = YG
           LASTYS = YS
           DRAW = .TRUE.
- 50     CONTINUE
+          LGXBJ = LGXBJ + DELLGXBJ
+        END DO
         CALL PGIDEN
         CALL PGEND
 #endif
@@ -390,9 +388,6 @@ C
 803   FORMAT (1X, /, 1X, '-----    ', A, '    -----', /)
 804   FORMAT (1X, 'SPEED = ', I1, 5X, 'P = ', I1, 5X, 'NF = ', I1)
 806   FORMAT (1X, 'SCHEME = ', A, 3X, 'Q02 = ', F5.1)
-807   FORMAT (1X,  A15, ' = ', 3X, G9.3)
-808   FORMAT (1X, 'd.o.f = ', I3, ' - ', I1, ' = ', I3, '   ',
-     &            '\\gx\\u2\\d = ', F8.1)
 809   FORMAT (3X,  A6, '=', 1X, G8.2, 5X, A6, '=', 1X, G8.2)
 810   FORMAT (1X, 'CHISQPART = ', F5.1, 3X, 'PTS = ', I3)
 811   FORMAT (1X, '[', F5.1, '/', I3, ']', 3X)
@@ -450,17 +445,18 @@ C
       DOUBLE PRECISION WIN, Q2IN
       DOUBLE PRECISION XBJ, XBJIN
       DOUBLE PRECISION PARSIGMA, SIGMA
-#ifndef NOPGPLOT
+#include "header.F"
+#ifdef PGPLOT
       LOGICAL DRAW
       REAL LASTX, LASTY
+      DRAW = .FALSE.
 #endif
-#include "header.F"
 
       CHISQPART = 0.d0
 
       IF (IFLAG .EQ. 3) THEN
         WRITE (21, 902) FNAME
-#ifndef NOPGPLOT
+#ifdef PGPLOT
         DRAW = .FALSE.
 #endif
       END IF
@@ -488,7 +484,7 @@ C
         IF (IFLAG .EQ. 3)  THEN
           DIFSG = (THY - YY) / DY
           WRITE (21, 901) X, THY, YY, DY, DIFSG
-#ifndef NOPGPLOT
+#ifdef PGPLOT
           CALL PGQLS(LS)
           CALL PGSLS(1)
           CALL PGERRY(1, SNGL(X), LOG10(SNGL(YY-DY)), 
@@ -534,7 +530,7 @@ C
         IF (IFLAG .EQ. 3)  THEN
           DIFSG = (THY - YY) / DY
           WRITE (21, 901) X, THY, YY, DY, DIFSG
-#ifndef NOPGPLOT
+#ifdef PGPLOT
           IF (WIN .LT. 0.) THEN
             CALL PGQLS(LS)
             CALL PGSLS(1)
@@ -587,6 +583,7 @@ C
           CALL ERROR ('GeParD', 'PROCDATA',
      &    'Either XBJ or Q2 in ' // FNAME // ' should be negative!',
      &    4, 2)
+          STOP
         END IF
         XI = XBJ
         CALL F2F
@@ -595,7 +592,7 @@ C
         IF (IFLAG .EQ. 3)  THEN
           DIFSG = (THY - YY) / DY
           WRITE (21, 901) X, THY, YY, DY, DIFSG
-#ifndef NOPGPLOT
+#ifdef PGPLOT
           CALL PGQLS(LS)
           CALL PGSLS(1)
           CALL PGERR1(6, SNGL(X), SNGL(YY), SNGL(DY), 3.0)
