@@ -6,10 +6,19 @@ C     *******
     
 #if defined(__GNUC__)
 #define DBLCMPLX(X, Y)  COMPLEX(X, Y)
+#define DCTAN  G77TAN
 #elif defined(__INTEL_COMPILER) || defined(INTEL_COMPILER)
 #define DBLCMPLX(X, Y)  CMPLX(X, Y, KIND(1.0d0))
 #define REALPART(X) REAL(X)
 #define IMAGPART(X) IMAG(X)
+#define DCTAN  TAN
+#elif defined(NAGf90Fortran)
+#define DBLCMPLX(X, Y)  CMPLX(X, Y, KIND(1.0d0))
+#define REALPART(X) REAL(X)
+#define IMAGPART(X) AIMAG(X)
+#define DCTAN  G77TAN
+#define IARGC COMMAND_ARGUMENT_COUNT
+#define GETARG GET_COMMAND_ARGUMENT
 #endif
 
 *   Parameters

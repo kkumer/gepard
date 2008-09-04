@@ -10,7 +10,7 @@ MMAODIR = Mobj
 EXFODIR = ex/obj
 
 ifndef NOPGPLOT
-  USEPGPLOT := -D PGPLOT
+  USEPGPLOT := -DPGPLOT
 endif
 
 # Fortran object files
@@ -61,7 +61,7 @@ $(TESTTARGETS): %: $(ALLOBJS) $(FODIR)/F%.o
 	$(FC) -o ../Tests/$@ $^ $(FFLAGS) $(ADACFLIB)
 
 # main fit target  (a variant withouth PGPLOT)
-fit: CPPFLAGS = $(USEPGPLOT)
+fit: CPPFLAGS += $(USEPGPLOT)
 fit: $(ALLOBJS) $(FODIR)/Ffcn.o $(FODIR)/Ffit.o
 	$(FC) -o ../fits/$@ $^ $(FFLAGS) $(CERNLIBS) $(ADACFLIB) $(ALLPGPLOTLIBS)
 
@@ -71,7 +71,7 @@ $(FITTARGETS): %: $(ALLOBJS) $(EXFODIR)/%.o
 
 # mma targets
 
-gepard.exe: CPPFLAGS := -D MMA  $(USEPGPLOT)
+gepard.exe: CPPFLAGS += -DMMA  $(USEPGPLOT)
 gepard.exe: $(ALLOBJS) $(FODIR)/Ffcn.o $(_MMAOBJS)  $(FODIR)/Fmninterface.o
 	$(FC) -o ../fits/$@/$(SYS)/$@ $^ $(FFLAGS) $(CERNLIBS) $(ADACFLIB) -L$(MLLIBDIR) -l$(MLLIB) $(ALLPGPLOTLIBS) $(MLEXTRA)
 

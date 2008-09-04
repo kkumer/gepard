@@ -36,11 +36,11 @@
 # Fortran compiler dependent options (uncomment only one)
 #
 ## [--1--] GNU g77  (also cygwin)
-FC = g77
-CMP_FFLAGS = -Wall
-OPT_FFLAGS = -O3
-OPT_CFLAGS = -O3 
-
+#FC = g77
+#CMP_FFLAGS = -Wall
+#OPT_FFLAGS = -O3
+#OPT_CFLAGS = -O3 
+#
 ## [--2--] GNU gfortran
 #FC = gfortran
 #CMP_FFLAGS = -Wall
@@ -54,11 +54,18 @@ OPT_CFLAGS = -O3
 #OPT_CFLAGS = -O3 
 
 ## [--3--] INTEL + OpenMP parallelization
-#FC = ifort
-#CC = icc
-#CMP_FFLAGS = -warn all -nofor_main 
-#OPT_FFLAGS = -O3 -ipo -openmp
-#OPT_CFLAGS = -O3 -ipo
+FC = ifort
+CC = icc
+CMP_FFLAGS = -warn all -nofor_main 
+OPT_FFLAGS = -O3 -ipo -openmp
+OPT_CFLAGS = -O3 -ipo
+
+## [--4--] NAG f95  
+#FC = f95
+#CMP_FFLAGS = -colour -w=x77 -w=obs
+#OPT_FFLAGS = -O3
+#OPT_CFLAGS = -O3 
+#CPPFLAGS = -DNAGf90Fortran
 
 # optimized, debug and profiling modes
 #
@@ -74,10 +81,7 @@ endif
 FFLAGS = -I. $(OPT_FFLAGS) $(CMP_FFLAGS)
 CFLAGS = $(OPT_CFLAGS)
 
-# Preprocessor options
-#CPPFLAGS = -D NOPGPLOT
-
-export FC CC FFLAGS CFLAGS 
+export FC CC FFLAGS CFLAGS CPPFLAGS
 
 
 # -- 1. MINUIT related things

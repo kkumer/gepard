@@ -47,7 +47,7 @@ C
       FCM(1) = HGRID(MTIND, K, 1)
       FCM(2) = HGRID(MTIND, K, 2)
       FPW = CGRIDDIS(QIND,K,1) * FCM(1) + CGRIDDIS(QIND,K,2) * FCM(2)
-      F2IMAG = IMAG( EPH / XI**J * FPW )
+      F2IMAG = IMAGPART( EPH / XI**J * FPW )
       RES = RES + WG(K)*F2IMAG
  123  CONTINUE
 

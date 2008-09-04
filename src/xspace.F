@@ -48,7 +48,7 @@ C
 
       J = N(K) - 1
 
- 10   HX(L) = HX(L) + WG(K) * IMAG(EPH * (1.0d0/X)**J * MBGPD(K,L))
+ 10   HX(L) = HX(L) + WG(K) * IMAGPART(EPH * (1.0d0/X)**J * MBGPD(K,L))
  20   HX(L) = HX(L) / PI
 
       RETURN

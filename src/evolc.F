@@ -63,7 +63,7 @@ C
         IF (P .GE. 1) THEN
 
           CEVNS = CEVNS + ASMUR2 * BIGCNS(K, 1) * EVOLNSA(0) +
-     &                  + ASMUF2 * BIGCNS(K, 0) * EVOLNSA(1) 
+     &                    ASMUF2 * BIGCNS(K, 0) * EVOLNSA(1) 
 
           IF (P .GE. 2) THEN
 
