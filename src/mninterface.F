@@ -85,7 +85,7 @@ C
 
       CALL MNPARM(ID, TPNAM, VSTRT, STP, LO, HI, IERFLG)
         IF (IERFLG .NE. 0) THEN
-          WRITE(6, '(A,I)') ' Unable to define parametr no. ', ID
+          WRITE(6, '(A,I3)') ' Unable to define parametr no. ', ID
           STOP
         END IF
 
@@ -259,10 +259,10 @@ C
 
       CALL MNCONT (FCN,NUM1,NUM2,NPT,XPT,YPT,NFOUND,0)
         IF (NFOUND .LT. 0) THEN
-          WRITE(6, '(A,I,I)') 
+          WRITE(6, '(A,I3,I3)') 
      &     'Cannot calculate contour for parameters ', NUM1, NUM2
         ELSE IF (NFOUND .LT. NPT) THEN
-          WRITE(6, '(A,I,I)') 
+          WRITE(6, '(A,I3,I3)') 
      &     'Problematic contour for parameters ', NUM1, NUM2
         END IF
 
