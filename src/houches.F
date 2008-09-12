@@ -1,11 +1,11 @@
-C     ****h* gepard/houches.f
+C     ****h* gepard/houches.F
 C  FILE DESCRIPTION
 C    Program for testing evolution
 C
-C    $Id: test.f 27 2006-07-21 21:36:05Z kuk05260 $
+C    $Id$
 C     *******
 
-C     ****p* houches.f/HOUCHES
+C     ****p* houches.F/HOUCHES
 C  NAME
 C    HOUCHES  --  Testing gepard routines
 C            

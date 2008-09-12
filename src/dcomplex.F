@@ -1,4 +1,4 @@
-C     ****h* gepard/dcomplex.f
+C     ****h* gepard/dcomplex.F
 C  FILE DESCRIPTION
 C    Tangent and argument of double complex number Z
 C
@@ -9,7 +9,7 @@ C    Adapted from SLATEC routines CTAN and CARG
 C     *******
 
 
-C     ****f* dcomplex.f/G77TAN
+C     ****f* dcomplex.F/G77TAN
 C  NAME
 C    G77TAN  --  tangent function
 C  SYNOPSIS
@@ -57,7 +57,7 @@ C     FIXME: This is a kludge
       END
 C     ***
 
-C     ****f* dcomplex.f/DCARG
+C     ****f* dcomplex.F/DCARG
 C  NAME
 C     DCARG  --   argument of a complex number
 C  SYNOPSIS

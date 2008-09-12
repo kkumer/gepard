@@ -1,4 +1,4 @@
-C     ****h* gepard/rnnlo.f
+C     ****h* gepard/rnnlo.F
 C  FILE DESCRIPTION
 C     Calculation of matrices R_1 and R_2, from my DIS-p61 
 C     - combination of gamma^(n) and beta_m needed in evolution operator 
@@ -7,7 +7,7 @@ C
 C    $Id$
 C     *******
 
-C     ****s* rnnlo.f/RNNLONSF
+C     ****s* rnnlo.F/RNNLONSF
 C  NAME
 C     RNNLONSF  --   R_1
 C  DESCRIPTION
@@ -54,7 +54,7 @@ C
 C     ****
 
 
-C     ****s* rnnlo.f/RNNLOF
+C     ****s* rnnlo.F/RNNLOF
 C  NAME
 C     RNNLOF  --   Matrices R_1 and R_2
 C  DESCRIPTION
@@ -118,7 +118,7 @@ C
       END
 C     ****
 
-C     ****s* rnnlo.f/PROJECTION
+C     ****s* rnnlo.F/PROJECTION
 C  NAME
 C     PROJECTION  --  matrix multiplication  PL . M . PR
 C  DESCRIPTION

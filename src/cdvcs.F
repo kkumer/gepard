@@ -1,4 +1,4 @@
-C     ****h* gepard/cdvcs.f
+C     ****h* gepard/cdvcs.F
 C  FILE DESCRIPTION
 C    calculation of singlet  Wilson coefficients for DVCS in CSbar scheme
 C    and DIS (where MSbar=CSbar)
@@ -7,7 +7,7 @@ C    $Id$
 C     *******
 
 
-C     ****s* cdvcs.f/CDVCSF
+C     ****s* cdvcs.F/CDVCSF
 C  NAME
 C     CDVCSF  --   singlet Wilson coefficients  "big C"
 C  DESCRIPTION
@@ -101,7 +101,7 @@ C
 C     *******
 
 
-C     ****s* cdvcs.f/VECMAT
+C     ****s* cdvcs.F/VECMAT
 C  NAME
 C     VECMAT  --   multiplies row vector with anomalous matrix
 C  SYNOPSIS

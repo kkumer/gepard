@@ -1,11 +1,11 @@
-C     ****h* gepard/init.f
+C     ****h* gepard/init.F
 C  FILE DESCRIPTION
 C    initialization routine
 C
-C    $Id: dvcs.f 11 2006-07-12 07:50:28Z kuk05260 $
+C    $Id$
 C     *******
 
-C     ****s* init.f/INIT
+C     ****s* init.F/INIT
 C  NAME
 C        INIT  --  basic initialization
 C  DESCRIPTION

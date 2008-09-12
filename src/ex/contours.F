@@ -76,7 +76,7 @@ C          PAR(21) =  0.527
 C          PAR(22) =  1.25
 C          PAR(24) =  0.263
 C*     NLO MSBAR
-C           SCHEME = 'MSBAR'
+C           SCHEME = 'MSBDI'
 C           P=1
 C           PAR(11) =  0.172
 C           PAR(12) =  1.14

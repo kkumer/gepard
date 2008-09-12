@@ -404,7 +404,7 @@ C
 C     ****
 
 
-C     ****s* fit.f/PROCDATA
+C     ****s* fit.F/PROCDATA
 C  NAME
 C    PROCDATA   --  Process a single data set
 C  DESCRIPTION

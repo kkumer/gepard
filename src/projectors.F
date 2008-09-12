@@ -1,4 +1,4 @@
-C     ****h* gepard/projectors.f
+C     ****h* gepard/projectors.F
 C  FILE DESCRIPTION
 C    projectors to eigenstates of the LO singlet 
 C    anomalous dimensions matrix.
@@ -7,7 +7,7 @@ C    $Id$
 C     *******
 
 
-C     ****s* projectors.f/PROJECTORSF
+C     ****s* projectors.F/PROJECTORSF
 C  NAME
 C     PROJECTORSF  --   projectors P^+ and P^-
 C  DESCRIPTION
@@ -56,7 +56,7 @@ C
       END
 C     ****
 
-C     ****s* projectors.f/PROJECTORSNDF
+C     ****s* projectors.F/PROJECTORSNDF
 C  NAME
 C     PROJECTORSNDF  --   projectors P^+ and P^-
 C  DESCRIPTION

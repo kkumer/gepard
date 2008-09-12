@@ -1,12 +1,12 @@
-C     ****h* gepard/accuracy.f
+C     ****h* gepard/accuracy.F
 C  FILE DESCRIPTION
 C    Program for measuring accuracy for various SPEED
 C    settings
 C
-C    $Id: test.f 27 2006-07-21 21:36:05Z kuk05260 $
+C    $Id: test.F 27 2006-07-21 21:36:05Z kuk05260 $
 C     *******
 
-C     ****p* accuracy.f/ACCURACY
+C     ****p* accuracy.F/ACCURACY
 C  NAME
 C    ACCURACY  --  Testing gepard routines
 C            

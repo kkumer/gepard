@@ -1,4 +1,4 @@
-C     ****h* gepard/bca.f
+C     ****h* gepard/bca.F
 C  FILE DESCRIPTION
 C    calculation of DVCS beam charge asymmetry (BCA)
 C    NB: Approximation of small XB is used!!!
@@ -7,7 +7,7 @@ C    $Id:$
 C     *******
 
 
-C     ****f* bca.f/BCA
+C     ****f* bca.F/BCA
 C  NAME
 C       BCA  --  DVCS beam charge asymmetry
 C  SYNOPSIS
@@ -54,7 +54,7 @@ C     ***
 
 
 
-C     ****f* bca.f/TBH2
+C     ****f* bca.F/TBH2
 C  NAME
 C       TBH2  --  Bethe-Heitler amplitude squared
 C  DESCRIPTION
@@ -88,7 +88,7 @@ C     ***
 
 
 
-C     ****f* bca.f/TDVCS2
+C     ****f* bca.F/TDVCS2
 C  NAME
 C       TDVCS2  --  DVCS amplitude squared
 C  DESCRIPTION
@@ -135,7 +135,7 @@ C
 C     ***
 
 
-C     ****f* bca.f/TINT
+C     ****f* bca.F/TINT
 C  NAME
 C       TINT  --  DVCS-BH interference amplitude
 C  DESCRIPTION
@@ -191,7 +191,7 @@ C
 C     ***
 
 
-C     ****f* bca.f/P1
+C     ****f* bca.F/P1
 C  NAME
 C       P1  --  Bethe-Heitler propagator factor
 C  DESCRIPTION
@@ -222,7 +222,7 @@ C
 C     ***
 
 
-C     ****f* bca.f/P2
+C     ****f* bca.F/P2
 C  NAME
 C       P2  --  Bethe-Heitler propagator factor
 C  DESCRIPTION
@@ -253,7 +253,7 @@ C
 C     ***
 
 
-C     ****f* bca.f/KKIN
+C     ****f* bca.F/KKIN
 C  NAME
 C       KKIN  --  Kinematical function K
 C  DESCRIPTION
@@ -277,7 +277,7 @@ C
 C     ***
 
 
-C     ****f* bca.f/F1NUCL
+C     ****f* bca.F/F1NUCL
 C  NAME
 C       F1NUCL  --  Nucleon elastic form factor F1
 C  DESCRIPTION
@@ -301,7 +301,7 @@ C
       END
 C     ***
 
-C     ****f* bca.f/F2NUCL
+C     ****f* bca.F/F2NUCL
 C  NAME
 C       F2NUCL  --  Nucleon elastic form factor F2
 C  DESCRIPTION

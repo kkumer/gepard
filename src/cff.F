@@ -1,4 +1,4 @@
-C     ****h* gepard/cff.f
+C     ****h* gepard/cff.F
 C  FILE DESCRIPTION
 C    calculation of Compton form factors
 C
@@ -6,7 +6,7 @@ C    $Id$
 C     *******
 
 
-C     ****s* cff.f/CFFF
+C     ****s* cff.F/CFFF
 C  NAME
 C     CFFF  --   Compton form factor \mathcal{H}
 C  DESCRIPTION

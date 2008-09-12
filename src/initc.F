@@ -1,11 +1,11 @@
-C     ****h* gepard/initc.f
+C     ****h* gepard/initc.F
 C  FILE DESCRIPTION
 C    Initialization of "evolved" Wilson coefficients
 C
-C    $Id: fit.F 63 2006-12-21 14:05:07Z kkumer $
+C    $Id$
 C     *******
 
-C     ****s* initc.f/INITC
+C     ****s* initc.F/INITC
 C  NAME
 C     INITC  --  initialize "evolved" Wilson coefficients
 C            

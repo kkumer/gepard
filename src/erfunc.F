@@ -1,11 +1,11 @@
-C     ****h* gepard/erfunc.f
+C     ****h* gepard/erfunc.F
 C  FILE DESCRIPTION
 C    calculation of scale dependent part of the evolution operator
 C
 C    $Id$
 C     *******
 
-C     ****s* erfunc.f/ERFUNCF
+C     ****s* erfunc.F/ERFUNCF
 C  NAME
 C     ERFUNCF  --   scale dependent part of the singlet evolution operator
 C  DESCRIPTION

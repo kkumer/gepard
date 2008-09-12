@@ -1,11 +1,11 @@
-C     ****h* gepard/evolc.f
+C     ****h* gepard/evolc.F
 C  FILE DESCRIPTION
 C    calculates "evolved" C's
 C
-C    $Id: parwav.f 71 2007-04-18 20:39:48Z kkumer $
+C    $Id$
 C     *******
 
-C     ****s* evolc.f/EVOLC
+C     ****s* evolc.F/EVOLC
 C  NAME
 C     EVOLC  --  "evolved" Wilson coefficients
 C  DESCRIPTION

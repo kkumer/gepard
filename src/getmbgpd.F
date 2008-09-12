@@ -1,11 +1,11 @@
-C     ****h* gepard/getmbgpd.f
+C     ****h* gepard/getmbgpd.F
 C  FILE DESCRIPTION
 C    Initialization of GPDs
 C
 C    $Id: fit.F 63 2006-12-21 14:05:07Z kkumer $
 C     *******
 
-C     ****s* getmbgpd.f/GETMBGPD
+C     ****s* getmbgpd.F/GETMBGPD
 C  NAME
 C     GETMBGPD  --  calculate GPD values on the all MB contour points
 C            

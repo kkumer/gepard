@@ -1,11 +1,11 @@
-C     ****h* gepard/integra.f
+C     ****h* gepard/integra.F
 C  FILE DESCRIPTION
 C    Gaussian integration between array of points
 C
-C    $Id: dvcs.f 11 2006-07-12 07:50:28Z kuk05260 $
+C    $Id$
 C     *******
 
-C     ****s* integra.f/INTEGRAF
+C     ****s* integra.F/INTEGRAF
 C  NAME
 C        INTEGRAF  -- Gaussian integration between array of points
 C  DESCRIPTION

@@ -103,7 +103,7 @@ C
       IF (LN .LE. 2) THEN
             SCHEME = 'CSBAR'
       ELSE
-            SCHEME = 'MSBND'
+            SCHEME = 'MSBAR'
       END IF
       IF ((LN .EQ. 1) .OR. (LN .EQ. 3)) THEN
 !          'HARD'

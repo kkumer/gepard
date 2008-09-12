@@ -1,4 +1,4 @@
-C     ****h* gepard/scaledep.f
+C     ****h* gepard/scaledep.F
 C  FILE DESCRIPTION
 C    calculation of relative change of scale dependence of {\cal H}
 C    singlet DVCS form factor.
@@ -8,7 +8,7 @@ C    $Id$
 C     *******
 
 
-C     ****p* scaledep.f/SCALEDEP
+C     ****p* scaledep.F/SCALEDEP
 C  NAME
 C     SCALEDEP  --  Main program
 C  DESCRIPTION
@@ -76,7 +76,7 @@ C
       OPEN (UNIT = 12, FILE = "FIG2B.dat", STATUS = "UNKNOWN")
 
       DO 5 NDEL = 1, 2
-  5         WRITE (10 + NDEL, *) '# Output of scaledep.f. See prolog of 
+  5         WRITE (10 + NDEL, *) '# Output of scaledep.F. See prolog of 
      & that program'
 
 *     Scales 
@@ -163,7 +163,7 @@ C
 C     ****
 
 
-C     ****f* scaledep.f/LOGABSH
+C     ****f* scaledep.F/LOGABSH
 C  NAME
 C    LOGABSH  --  ln(abs( CFF ))
 C  SYNOPSIS
@@ -193,7 +193,7 @@ C
 C     ****
 
 
-C     ****f* scaledep.f/ARGH
+C     ****f* scaledep.F/ARGH
 C  NAME
 C    ARGH  --  arg( CFF )
 C  SYNOPSIS

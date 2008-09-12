@@ -1,4 +1,4 @@
-C     ****h* gepard/deriv.f
+C     ****h* gepard/deriv.F
 C  FILE DESCRIPTION
 C    calculation of derivative of a function
 C
@@ -8,7 +8,7 @@ C    Adapted from Sect. 5.7 of Press et al., "Numerical Recipes".
 C     *******
 
 
-C     ****s* deriv.f/DERIV
+C     ****s* deriv.F/DERIV
 C  NAME
 C     DERIV  --   derivative of a function
 C  DESCRIPTION

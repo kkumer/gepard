@@ -1,11 +1,11 @@
-C     ****h* gepard/dvcs.f
+C     ****h* gepard/dvcs.F
 C  FILE DESCRIPTION
 C    calculation of partial and total DVCS cross sections
 C
 C    $Id$
 C     *******
 
-C     ****f* dvcs.f/PARSIGMA
+C     ****f* dvcs.F/PARSIGMA
 C  NAME
 C    PARSIGMA  --  calculation of partial DVCS cross section
 C                  d sigma / d t 
@@ -51,7 +51,7 @@ C
 C     ****
 
 
-C     ****f* dvcs.f/SIGMA
+C     ****f* dvcs.F/SIGMA
 C  NAME
 C       SIGMA  --  calculation of total DVCS cross section
 C  DESCRIPTION

@@ -2,7 +2,7 @@ C     ****h* gepard/evolutNS.f
 C  FILE DESCRIPTION
 C    evolution of {\cal H} non-singlet
 C    DVCS form factor
-C    Produces data files for Fig. ? of  KMPKS06b paper
+C    Produces data files for Fig. 8 of  KMPKS06b paper
 C
 C    $Id$
 C     *******
@@ -14,7 +14,7 @@ C     EVOLUTNS  --  Program producing data for Figure evolutNS
 C  DESCRIPTION
 C    evolution of NLO corrections to {\cal H} singlet
 C    DVCS form factor in CSBAR and MSBAR scheme
-C    Produces data files for Fig. ? of  KMPKS06b
+C    Produces data files for Fig. 8 of  KMPKS06b
 C  OUTPUT
 C       evolutNS[0-3].dat  --  4 files (one for each panel of Figure
 C                            evolutNS) with 4 sets of point coordinates
@@ -110,7 +110,7 @@ C
             SCHEME = 'CSBAR'
       ELSE
             P = 1
-            SCHEME = 'MSBAR'
+            SCHEME = 'MSBDI'
       END IF
       IF ((LN .EQ. 1) .OR. (LN .EQ. 3) .OR. (LN .EQ. 5)) THEN
 !          'HARD'

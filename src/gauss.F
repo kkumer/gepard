@@ -1,11 +1,11 @@
-C     ****h* gepard/gauss.f
+C     ****h* gepard/gauss.F
 C  FILE DESCRIPTION
 C    Gaussian integration data
 C
-C    $Id: dvcs.f 11 2006-07-12 07:50:28Z kuk05260 $
+C    $Id$
 C     *******
 
-C     ****s* gauss.f/GAUSS
+C     ****s* gauss.F/GAUSS
 C  NAME
 C        GAUSS  --  Gaussian integration data
 C  DESCRIPTION

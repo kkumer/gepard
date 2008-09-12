@@ -109,7 +109,7 @@ C
           SCHEME = 'MSBLO'
       ELSEIF (LN .EQ. 5) THEN
           CZERO = 0
-          SCHEME = 'MSBAR'
+          SCHEME = 'MSBDI'
       ELSEIF (LN .EQ. 6) THEN
           CZERO = 0
       ENDIF

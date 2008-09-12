@@ -1,13 +1,13 @@
-C     ****h* gepard/splice.f
+C     ****h* gepard/splice.F
 C  FILE DESCRIPTION
 C    Conformal moment obtained by Mathematica splicing into
-C    splice_template.f
+C    splice_template.F
 C
-C    $Id:$
+C    $Id$
 C     *******
 
 
-C     ****s* splice.f/SPLICE
+C     ****s* splice.F/SPLICE
 C  NAME
 C     SPLICE  --  conformal moment of input-scale singlet GPD  H_{J}
 C  DESCRIPTION

@@ -1,8 +1,8 @@
-C     ****h* gepard/error.f
+C     ****h* gepard/error.F
 C  FILE DESCRIPTION
 C    treating errors
 C
-C    $Id: erfunc.f 11 2006-07-12 07:50:28Z kuk05260 $
+C    $Id: erfunc.F 11 2006-07-12 07:50:28Z kuk05260 $
 C     *******
 
 

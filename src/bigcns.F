@@ -1,4 +1,4 @@
-C     ****h* gepard/bigcns.f
+C     ****h* gepard/bigcns.F
 C  FILE DESCRIPTION
 C    calculation of  Wilson coefficients for DVCS in CSbar scheme
 C    according to KMKPS06 paper
@@ -7,7 +7,7 @@ C    $Id$
 C     *******
 
 
-C     ****s* bigcns.f/BIGCNSF
+C     ****s* bigcns.F/BIGCNSF
 C  NAME
 C     BIGCNSF  --  "big C" Wilson coefficients (non-singlet)
 C  DESCRIPTION

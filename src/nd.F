@@ -1,11 +1,11 @@
-C     ****h* gepard/nd.f
+C     ****h* gepard/nd.F
 C  FILE DESCRIPTION
 C     Calculation of contribution of non-diagonal evolution 
 C
 C    $Id$
 C     *******
 
-C     ****s* nd.f/NDINTF
+C     ****s* nd.F/NDINTF
 C  NAME
 C        NDNINTF  --   non-diagonal part of evolution operator
 C  DESCRIPTION
@@ -91,7 +91,7 @@ C
 C     ****
 
 
-C     ****s* nd.f/CB1F
+C     ****s* nd.F/CB1F
 C  NAME
 C        CB1F  --  
 C  DESCRIPTION

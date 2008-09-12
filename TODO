@@ -1,38 +1,30 @@
-2008-08-18 
-
-Physics: 
--  t_cut of ZEUS data is infinity? DVCS[46].DAT
+2008-09-12 
 
 Computing:
 -  Go to www.hepforge.org?
 -  Make fancy C-MathLink communication function that recognizes input type
--  Remove unused variables (specially in adacf, or specially not there)?
 -  In fitting parameters should be non-squared quantities
 -  use autoconf and friends
--  MSBND -> MSBAR, MSBAR -> MSBDI
 -  Automatize putting Alekhin's PDFs into fitpdfs
 -  We don't need both HGRID and MBGPD, it seems. (Or HGRID memorises
    PDFs during fitting, so it's needed?)
 -  deriv.f should be copyright-cleared
 -  PAR(18) and (28) hardwired in CompileMoments[]
 -  Using GOTO statements in fcn.F should be avoided
--  Charge factor treatment should be improved
 -  filenames setting should be separated from GepardInitInternal because
    this is not needed for cffEinternal and cffHinternal
 -  Numbers in fit.c should be changed by preprocesor variables
 -  datasets should be not read from files each FCN call but from memory!
+   (not necessarily, this is not such performance hit as I thought)
 -  Check Lanczos algorithm for gamma for negative real part of argument
--  Improve compilation on gfortran and ifort (-Wall, ...)
 
 
 Checks:
--  Check F_2 of DIS beyond LO (compare to Vogt etc.). Why is BIGCF2 \neq CDIS2
+-  Why is BIGCF2 \neq CDIS2
 -  Check plotting of error-bars (Implement stat-syst as in 
    original papers and Dieter's femtoholographic paper?)
    It seems that grace is doing this wrong for log-y axis!
 
-Design:
--  Verbatim \ref in robodoc TeX?
 
 DONE:
 +  Transfer adacf Fortran routines to gepard to make it independent
@@ -55,7 +47,12 @@ DONE:
 +  tmp.mma is a kludge
 +  FIT.INI should have optional name, changable by mma interface
 +  PrintMinuitCommand should inquire FILENAMES common block for filename
++  Check F_2 of DIS beyond LO (compare to Vogt etc.). 
++  Remove unused variables (specially in adacf, or specially not there)?
 +  Implementing Talbot contour for MB integration (cf. e.g. hep-ph/0607122)
    (works bad for our ansaetze which blow up for large negative real z)
 +  Should we use gamma or lngamma? (For lngamma we must implement P.V.)
    (lngamma with P.V. implemented).
++  Charge factor treatment should be improved
++  Improve compilation on gfortran and ifort (-Wall, ...)
++  MSBND -> MSBAR, MSBAR -> MSBDI

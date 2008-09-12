@@ -1,4 +1,4 @@
-C     ****h* gepard/f2.f
+C     ****h* gepard/f2.F
 C  FILE DESCRIPTION
 C    calculation of F2 DIS form factor
 C
@@ -6,7 +6,7 @@ C    $Id$
 C     *******
 
 
-C     ****s* f2.f/F2F
+C     ****s* f2.F/F2F
 C  NAME
 C       F2F  --   singlet F2 DIS form factor
 C  DESCRIPTION

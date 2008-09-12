@@ -1,12 +1,12 @@
-C     ****h* gepard/hj.f
+C     ****h* gepard/hj.F
 C  FILE DESCRIPTION
 C    conformal moments of GPD ansaetze
 C
-C    $Id: parwav.f 71 2007-04-18 20:39:48Z kkumer $
+C    $Id: parwav.F 71 2007-04-18 20:39:48Z kkumer $
 C     *******
 
 
-C     ****s* hj.f/HJ
+C     ****s* hj.F/HJ
 C  NAME
 C     HJ  --  conformal moment of input-scale singlet GPD  H_{J}
 C  DESCRIPTION

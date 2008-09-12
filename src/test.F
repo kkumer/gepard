@@ -1,11 +1,11 @@
-C     ****h* gepard/test.f
+C     ****h* gepard/test.F
 C  FILE DESCRIPTION
 C    Simple program for testing.
 C
 C    $Id$
 C     *******
 
-C     ****p* test.f/TEST
+C     ****p* test.F/TEST
 C  NAME
 C    TEST  --  Testing gepard routines
 C            
@@ -59,7 +59,7 @@ C
         HGRID(0, K, 1) = MBGPD(K, 1) 
         HGRID(0, K, 2) = MBGPD(K, 2)
  11   CONTINUE
-      WRITE (*, *) "For values of test parameters see src/test.f"
+      WRITE (*, *) "For values of test parameters see src/test.F"
       WRITE (*, *) 
 
       WRITE (*, *) " ---  Test 1: Naive parton model F2 ---- "

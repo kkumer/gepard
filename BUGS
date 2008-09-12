@@ -1,4 +1,4 @@
-2008-09-03 
+2008-09-12 
 
 Open:
 -----
@@ -33,11 +33,13 @@ Open:
       create problems, and for PHI = PI/2 convergence is not so perfect.
       Results also depend on C more than they should.
 
-14 - auxtest is broken
-
 16 - cffH[..., SCHEME->"ZERO?"] is problematic because
      0^(negative + I something) seems not to be treated correctly by Fortran
-     compiler (both g77 and ifort). (Gives 0 instead of complex infinity.) 
+     compiler (especially ifort). (Gives 0 instead of complex infinity.) 
+     This situation seems not to occur for PHI=PI/2 MB contour so such contour
+     without slanting has to be presently used, sacrifing some accuracy.
+
+17 -  radcorr less accurate than it used to be?
 
 Fixed:
 ------
@@ -78,3 +80,6 @@ Fixed:
 2008-09-03 - 15 -  gepard-api.pdf is not generated (FIXED by removing latex code)
 
 2008-09-03 - 11 - .mnt file is not named according to OUTFILE (FIXED)
+
+2008-09-12 - 14 - auxtest is broken (FIXED by including CHARGEFAC)
+

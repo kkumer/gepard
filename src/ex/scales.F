@@ -2,7 +2,7 @@ C     ****h* gepard/scales.f
 C  FILE DESCRIPTION
 C    calculation of dependance on \mu_f and \mu_r of {\cal H} non-singlet
 C    DVCS form factor
-C    Produces data files for Table 1. of  KMPKS06b paper
+C    Produces data files for Table 2. of  KMPKS06b paper
 C
 C    $Id$
 C     *******
@@ -14,7 +14,7 @@ C     SCALES  --  Program producing data for Figure scales
 C  DESCRIPTION
 C    calculation of dependance on \mu_f and \mu_r of {\cal H} non-singlet
 C    DVCS form factor
-C    Produces data files for Table 1. of  KMPKS06b
+C    Produces data files for Table 2. of  KMPKS06b
 C  OUTPUT
 C       scales.dat  --  percent variations of H_S
 C
@@ -55,7 +55,7 @@ C
 
       OPEN (UNIT = 10, FILE = "scales.dat", STATUS = "UNKNOWN")
 
-      WRITE (10, *) '# Output of scales.f. See prolog of that program'
+      WRITE (10, *) '# Output of scales.F - Table 2 of hep-ph/0703179'
 
 *     Scales 
 
@@ -93,22 +93,22 @@ C
             FACR = 1.0
       ELSEIF (LN .EQ. 2) THEN
             P = 1
-            SCHEME = 'MSBND'
+            SCHEME = 'CSBAR'
             FACF = 2.0
             FACR = 1.0
       ELSEIF (LN .EQ. 3) THEN
             P = 1
-            SCHEME = 'CSBAR'
+            SCHEME = 'MSBAR'
             FACF = 2.0
             FACR = 1.0
       ELSEIF (LN .EQ. 4) THEN
             P = 1
-            SCHEME = 'MSBND'
+            SCHEME = 'CSBAR'
             FACF = 1.0
             FACR = 2.0
       ELSE
             P = 1
-            SCHEME = 'CSBAR'
+            SCHEME = 'MSBAR'
             FACF = 1.0
             FACR = 2.0
       END IF

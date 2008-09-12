@@ -1,4 +1,4 @@
-C     ****h* gepard/xspace.f
+C     ****h* gepard/xspace.F
 C  FILE DESCRIPTION
 C    calculation of x-space GPDs and PDFs
 C
@@ -6,7 +6,7 @@ C  BUGS
 C     *******
 
 
-C     ****s* xspace.f/XSPACE
+C     ****s* xspace.F/XSPACE
 C  NAME
 C     XSPACE  --   x-space GPDs and PDFs
 C  DESCRIPTION
@@ -55,7 +55,7 @@ C
       END
 C     ***
 
-C     ****s* xspace.f/SLOPEH
+C     ****s* xspace.F/SLOPEH
 C  NAME
 C     SLOPEH  --  Return slope B of GPD {\cal H}
 C  DESCRIPTION

@@ -93,7 +93,7 @@ C
           PAR(22) =  1.25
           PAR(24) =  0.263
         ELSE IF (LN .EQ. 2) THEN
-          SCHEME = 'MSBND'
+          SCHEME = 'MSBAR'
           P=1
           PAR(11) =  0.172
           PAR(12) =  1.14

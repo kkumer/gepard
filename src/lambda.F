@@ -1,4 +1,4 @@
-C     ****h* gepard/lambda.f
+C     ****h* gepard/lambda.F
 C  FILE DESCRIPTION
 C     eigenvalues of the LO singlet anomalous dimensions matrix
 C
@@ -6,7 +6,7 @@ C    $Id$
 C     *******
 
 
-C     ****s* lambda.f/LAMBDAF
+C     ****s* lambda.F/LAMBDAF
 C  NAME
 C     LAMBDAF  --  eigenvalues of the LO singlet anomalous dimensions matrix
 C  DESCRIPTION
@@ -49,7 +49,7 @@ C
 C     *****
 
 
-C     ****s* lambda.f/LAMBDANDF
+C     ****s* lambda.F/LAMBDANDF
 C  NAME
 C     LAMBDANDF  --  eigenvalues of the LO singlet anomalous dimensions matrix
 C  DESCRIPTION

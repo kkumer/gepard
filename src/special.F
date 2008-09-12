@@ -1,4 +1,4 @@
-C     ****h* gepard/special.f
+C     ****h* gepard/special.F
 C  FILE DESCRIPTION
 C    Double complex special functions (Gamma and Beta)
 C
@@ -8,7 +8,7 @@ C     - Using algorithm of P. Godfrey from http://my.fit.edu/~gabdo/gamma.txt
 C     *******
 
 
-C     ****f* special.f/CLNGAMMA
+C     ****f* special.F/CLNGAMMA
 C  NAME
 C     CLNGAMMA  --  logarithm of gamma function of complex argument
 C  DESCRIPTION
@@ -85,7 +85,7 @@ C
       END
 C     ***
 
-C     ****f* special.f/MULTIGAMMA
+C     ****f* special.F/MULTIGAMMA
 C  NAME
 C     MULTIGAMMA  --  Ratio of two gamma functions
 C  DESCRIPTION
@@ -184,7 +184,7 @@ C
       END
 C     ***
 
-C     ****f* special.f/RATGAMMA
+C     ****f* special.F/RATGAMMA
 C  NAME
 C     RATGAMMA  --  Ratio of two gamma functions
 C  DESCRIPTION
@@ -261,7 +261,7 @@ C
 C     ***
 
 
-** C     ****f* special.f/CLNGAMMA
+** C     ****f* special.F/CLNGAMMA
 ** C  NAME
 ** C     CLNGAMMA  --  logarithm of gamma function of complex argument
 ** C  DESCRIPTION
@@ -298,7 +298,7 @@ C     ***
 ** C     ***
 
 
-C     ****f* special.f/CBETA
+C     ****f* special.F/CBETA
 C  NAME
 C     CBETA  --  beta function of complex argument
 C  SYNOPSIS
@@ -326,7 +326,7 @@ C
       END
 C     ***
       
-C     ****f* special.f/POCHHAMMER
+C     ****f* special.F/POCHHAMMER
 C  NAME
 C     POCHHAMMER  --  Pochhammer symbol
 C  SYNOPSIS

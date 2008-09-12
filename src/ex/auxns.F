@@ -12,6 +12,21 @@ C  DESCRIPTION
 C             Calculates LO and NLO CFFs in both MSBAR
 C             and CSBAR schemes, with various choices
 C             for evolution.
+C
+C   Expected result:
+C      ANSATZ = NSFIT     DELTA^2 = -0.25    XI =  0.40000
+C
+C        evolution :  2.5 -->   4.0 GeV^2
+C
+C        LO (no evol) H =    -0.11 +     0.27 I
+C        LO (LO evol) H =    -0.09 +     0.26 I
+C    MS NLO (no evol) H =    -0.17 +     0.24 I
+C    MS NLO (LO evol) H =    -0.14 +     0.22 I
+C     MS NLO (evol D) H =     0.00 +     0.00 I
+C    MS NLO (evol ND) H =     0.00 +     0.00 I
+C    CS NLO (no evol) H =    -0.17 +     0.24 I
+C       CS NLO (evol) H =    -0.15 +     0.24 I
+C
 C  SYNOPSIS
 
       PROGRAM AUXNS
@@ -88,7 +103,7 @@ C
       WRITE (*,902) "MS NLO (LO evol)", CFF(1)
       TMP = CFF(1)
 
-      SCHEME = 'MSBAR'
+      SCHEME = 'MSBDI'
       CALL INIT
       QS(1) = Q2
       CALL EVOLC(1)
@@ -96,7 +111,7 @@ C
       WRITE (*,902) "MS NLO (evol D)", CFF(1) - TMP
       TMP = CFF(1)
 
-      SCHEME = 'MSBND'
+      SCHEME = 'MSBAR'
       CALL INIT
       QS(1) = Q2
       CALL EVOLC(1)

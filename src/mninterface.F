@@ -1,11 +1,11 @@
-C     ****h* gepard/mninterface.f
+C     ****h* gepard/mninterface.F
 C  FILE DESCRIPTION
 C    Mathematica - Minuit interface (Fortran)
 C
 C    $Id:$
 C     *******
 
-C     ****s* mninterface.f/FITINIT
+C     ****s* mninterface.F/FITINIT
 C  NAME
 C     FITINIT  --   Initialization of fitting procedure
 C  DESCRIPTION
@@ -49,7 +49,7 @@ C     ****
 
 
 
-C     ****s* mninterface.f/MPAR
+C     ****s* mninterface.F/MPAR
 C  NAME
 C     MPAR  --   Define a Minuit parameter and assigns it value
 C  SYNOPSIS
@@ -94,7 +94,7 @@ C
 C     ****
 
 
-C     ****s* mninterface.f/MCOM
+C     ****s* mninterface.F/MCOM
 C  NAME
 C     MCOM  --  Executes Minuit command (as a character string)
 C  SYNOPSIS
@@ -137,7 +137,7 @@ C
 C     ****
 
 
-C     ****s* mninterface.f/GETPAR
+C     ****s* mninterface.F/GETPAR
 C  NAME
 C     GETPAR  --  Gets the current value of the parameter
 C  SYNOPSIS
@@ -171,7 +171,7 @@ C
       END
 C     ****
 
-C     ****s* mninterface.f/PARINIT
+C     ****s* mninterface.F/PARINIT
 C  NAME
 C     PARINIT  --   sets optional parameters
 C  SYNOPSIS
@@ -230,7 +230,7 @@ C
       END
 C     ****
 
-C     ****s* mninterface.f/MCONT
+C     ****s* mninterface.F/MCONT
 C  NAME
 C     MCONT  --  parameter correlation contour
 C  SYNOPSIS
@@ -270,7 +270,7 @@ C
       END
 C     ****
 
-C     ****s* mninterface.f/SETPROC
+C     ****s* mninterface.F/SETPROC
 C  NAME
 C     SETPROC  --  Sets DVCS or DIS
 C  SYNOPSIS

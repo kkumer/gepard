@@ -1,11 +1,11 @@
-C     ****h* gepard/evol.f
+C     ****h* gepard/evol.F
 C  FILE DESCRIPTION
 C     calculates evolution operators
 C
 C    $Id$
 C     *******
 
-C     ****s* evol.f/EVOLNSF
+C     ****s* evol.F/EVOLNSF
 C  NAME
 C     EVOLNSF  --  non-singlet evolution operator
 C  DESCRIPTION
@@ -61,7 +61,7 @@ C
  10   EVOLNSA(ORD) = AUX(ORD) * R**( - GAMNS(K,0) / BETA0(NF) )
 
 *   Adding MSBAR non-diagonal NLO evolution (time consuming)
-      IF ( (P .EQ. 1) .AND. (SCHEME .EQ. 'MSBND') ) THEN
+      IF ( (P .EQ. 1) .AND. (SCHEME .EQ. 'MSBAR') ) THEN
         CALL NDINTF(K, R, NDINT, 0, 0)
         EVOLNSA(1) = EVOLNSA(1) + NDINT
       ENDIF
@@ -72,7 +72,7 @@ C
 C     *****
 
 
-C     ****s* evol.f/EVOLF
+C     ****s* evol.F/EVOLF
 C  NAME
 C     EVOLF  --   singlet evolution operator
 C  DESCRIPTION
@@ -153,7 +153,7 @@ C
  40   CONTINUE
 
 *   Adding MSBAR non-diagonal NLO evolution (time consuming)
-      IF ( (P .EQ. 1) .AND. (SCHEME .EQ. 'MSBND') ) THEN
+      IF ( (P .EQ. 1) .AND. (SCHEME .EQ. 'MSBAR') ) THEN
         DO 50 I = 1, 2
         DO 50 J = 1, 2
           CALL NDINTF(K, R, NDINT, I, J)
@@ -166,7 +166,7 @@ C
 C     *****
 
 
-C     ****f* evol.f/KRONECKER
+C     ****f* evol.F/KRONECKER
 C  NAME
 C    KRONECKER -- kronecker delta symbol
 C  SYNOPSIS

@@ -1,4 +1,4 @@
-C     ****h* gepard/msbar.f
+C     ****h* gepard/msbar.F
 C  FILE DESCRIPTION
 C    calculation of  singlet Wilson coefficients for DVCS in MSbar scheme
 C
@@ -6,7 +6,7 @@ C    $Id$
 C     *******
 
 
-C     ****s* msbar.f/MSBARF
+C     ****s* msbar.F/MSBARF
 C  NAME
 C     MSBARF  --   singlet Wilson coefficients (in MSbar scheme)
 C  DESCRIPTION

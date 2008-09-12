@@ -1,4 +1,4 @@
-C     ****h* gepard/radcorr.f
+C     ****h* gepard/radcorr.F
 C  FILE DESCRIPTION
 C    calculation of relative radiative corrections to {\cal H} singlet
 C    DVCS form factor
@@ -8,7 +8,7 @@ C    $Id$
 C     *******
 
 
-C     ****p* radcorr.f/RADCORR
+C     ****p* radcorr.F/RADCORR
 C  NAME
 C     RADCORR  --  Main program
 C  DESCRIPTION
@@ -67,7 +67,7 @@ C
       OPEN (UNIT = 14, FILE = "FIG1D.dat", STATUS = "UNKNOWN")
 
       DO 5 NDEL = 1, 4
-  5         WRITE (10 + NDEL, *) '# Output of radcorr.f. See prolog of 
+  5         WRITE (10 + NDEL, *) '# Output of radcorr.F. See prolog of 
      & that program'
 
 *     Scales 
@@ -99,7 +99,9 @@ C
             P = 1
       END IF
       IF ((LN .EQ. 3) .OR. (LN .EQ. 6)) THEN
-            SCHEME = 'MSBAR'
+*     At the time of writing this paper we didn't have non-diagonal
+*     MSBAR evolution, thus:
+            SCHEME = 'MSBDI'
       ELSE
             SCHEME = 'CSBAR'
       END IF

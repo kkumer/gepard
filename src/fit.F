@@ -1,11 +1,11 @@
-C     ****h* gepard/fit.f
+C     ****h* gepard/fit.F
 C  FILE DESCRIPTION
 C    Fitting of GPD model to DVCS and DIS  experimental data.
 C
 C    $Id: fit.F 76 2007-04-23 15:39:11Z kkumer $
 C     *******
 
-C     ****p* fit.f/FIT
+C     ****p* fit.F/FIT
 C  NAME
 C    FIT   --  Determines parameters of GPDs by fitting to DVCS and DIS
 C              experimental data.

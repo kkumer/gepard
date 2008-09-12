@@ -1,17 +1,33 @@
-C     ****h* gepard/auxsi.f
+C     ****h* gepard/auxsi.F
 C  FILE DESCRIPTION
 C    Auxilliary program for printing out non-singlet CFF's
 C
 C    $Id$
 C     *******
 
-C     ****p* auxsi.f/AUXSI
+C     ****p* auxsi.F/AUXSI
 C  NAME
 C    AUXSI  --  Auxilliary program for printing out singlet CFF's
 C  DESCRIPTION
 C             Calculates LO and NLO CFFs in both MSBAR
 C             and CSBAR schemes, with various choices
 C             for evolution.
+C
+C    Expected result:
+C
+C    ANSATZ = FITBP     DELTA^2 = -0.25    XI =  0.00100
+C   
+C    evolution :  2.5 -->   4.0 GeV^2
+C   
+C        LO (no evol) H =      297.88 +     3027.22 I
+C        LO (LO evol) H =      382.21 +     3314.32 I
+C    MS NLO (no evol) H =       37.54 +     1366.25 I
+C    MS NLO (LO evol) H =     -221.85 +     1105.77 I
+C     MS NLO (evol D) H =       22.76 +     1510.30 I
+C    MS NLO (evol ND) H =       84.80 +     1632.84 I
+C    CS NLO (no evol) H =       96.47 +     1775.06 I
+C       CS NLO (evol) H =      141.67 +     2013.85 I
+C   
 C  SYNOPSIS
 
       PROGRAM AUXSI
@@ -42,7 +58,7 @@ C
       Q2EXP = 4.0d0
       XI = 1.0d-3
       DEL2 = -0.25d0
-      SCHEME = 'MSBAR'
+      SCHEME = 'MSBDI'
       CZ = 1
       NQS = 1
 
@@ -100,7 +116,7 @@ C
       WRITE (*,902) "MS NLO (LO evol)", CFF(1)
       TMP = CFF(1)
 
-      SCHEME = 'MSBAR'
+      SCHEME = 'MSBDI'
       CALL INIT
       QS(1) = Q2
       CALL EVOLC(1)
@@ -109,7 +125,7 @@ C
       WRITE (*,902) "MS NLO (evol D)", CFF(1)
       TMP = CFF(1)
 
-      SCHEME = 'MSBND'
+      SCHEME = 'MSBAR'
       CALL INIT
       QS(1) = Q2
       CALL EVOLC(1)

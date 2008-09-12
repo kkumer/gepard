@@ -108,7 +108,7 @@ C
       P = 1
       Q02 = Q02IN
       Q2 = Q2EXP
-      SCHEME = 'MSBND'
+      SCHEME = 'MSBAR'
       CZERO = 1
       IF (LN .EQ. 2) THEN
           P = 0

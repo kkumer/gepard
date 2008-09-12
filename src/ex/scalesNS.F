@@ -55,7 +55,7 @@ C
 
       OPEN (UNIT = 10, FILE = "scalesNS.dat", STATUS = "UNKNOWN")
 
-      WRITE (10, *) '# Output of scalesNS.f. See prolog of that program'
+      WRITE (10, *) '# Output of scalesNS.f - Table 1 of hep-ph/0703179'
 
 *     Scales 
 
@@ -90,22 +90,22 @@ C
             FACR = 1.0
       ELSEIF (LN .EQ. 2) THEN
             P = 1
-            SCHEME = 'MSBAR'
+            SCHEME = 'CSBAR'
             FACF = 2.0
             FACR = 1.0
       ELSEIF (LN .EQ. 3) THEN
             P = 1
-            SCHEME = 'CSBAR'
+            SCHEME = 'MSBAR'
             FACF = 2.0
             FACR = 1.0
       ELSEIF (LN .EQ. 4) THEN
             P = 1
-            SCHEME = 'MSBAR'
+            SCHEME = 'CSBAR'
             FACF = 1.0
             FACR = 2.0
       ELSE
             P = 1
-            SCHEME = 'CSBAR'
+            SCHEME = 'MSBAR'
             FACF = 1.0
             FACR = 2.0
       END IF

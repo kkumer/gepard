@@ -1,11 +1,11 @@
-C     ****h* gepard/astrong.f
+C     ****h* gepard/astrong.F
 C  FILE DESCRIPTION
 C    running of QCD coupling constant
 C
 C    $Id$
 C     *******
 
-C     ****s* astrong.f/AS2PF
+C     ****s* astrong.F/AS2PF
 C  NAME
 C     AS2PF  --  alpha strong divided by 2 Pi
 C  DESCRIPTION

@@ -1,4 +1,4 @@
-C     ****h* gepard/beta.f
+C     ****h* gepard/beta.F
 C  FILE DESCRIPTION
 C    coefficients of beta function of QCD
 C
@@ -9,7 +9,7 @@ C    from package `QCD-Pegasus'  by  Andreas Vogt.
 C     *******
 
 
-C     ****s* beta.f/BETAF
+C     ****s* beta.F/BETAF
 C  NAME
 C     BETAF  --  coefficients of beta function of QCD
 C  DESCRIPTION
