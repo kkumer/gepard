@@ -46,6 +46,8 @@ Open:
 
 19! - There is some numerical pole in cffH (but not F2) for Q2->10 GeV^2
 
+20!! - gpdHtraj/zero gives P=0 result regardless of the value of P
+
 Fixed:
 ------
 

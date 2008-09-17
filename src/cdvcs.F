@@ -51,7 +51,7 @@ C
       LRR2 = LOG(RR2)
 
 
-      IF ( PROCESS(:3) .EQ. 'DVC' ) THEN
+      IF ( PROCESS(:4) .EQ. 'DVCS' ) THEN
         SHIFT1 = HS1(J + 1.5d0) - HS1(J + 2.0d0) + 2.0d0 * LOG(2.0d0)
      &        - LRF2
         SHIFT2 = SHIFT1*SHIFT1 - HS2(J + 1.5d0) + HS2(J + 2.0d0)
@@ -61,7 +61,7 @@ C
       END IF
 
 *     auxilliary W-coeffs "small C" at given point K
-      IF ( PROCESS(:3) .EQ. 'DVC' ) THEN
+      IF ( PROCESS(:4) .EQ. 'DVCS' ) THEN
         DO 30 L = 1, 2
           C0(L) = CDIS1(K, 0, L) 
           C1(L) = CDIS1(K, 1, L) 

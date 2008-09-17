@@ -182,11 +182,12 @@ void mpar_(long int *id, long int *siz, char* pnam, double *vstrt, double *stp, 
 void mcom_(long int *siz, char* cmd, long int *ierflg, int cmd_len);
 void fitinit_();
 void parinit_(int *speed, int *p, 
+		      long int *processsiz, char* process, 
 		      long int *schemesiz, char* scheme, 
 		      long int *ansatzsiz, char* ansatz,
               long int *datfilesiz, char* datfile, 
 			  long int *outfilesiz, char* outfile, 
-              int schemelen, int ansatzlen, int datfilelen, int outfilelen);
+              int processlen, int schemelen, int ansatzlen, int datfilelen, int outfilelen);
 void flushout_();
 void getpar_(long int *id, double *val, double *error, long int *ivarbl);
 void mcont_(long int *num1, long int *num2, long int *npt, 

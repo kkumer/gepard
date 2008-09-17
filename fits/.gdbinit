@@ -18,7 +18,8 @@ define prpar
 end
 
 #break MAIN__
+break GepardInitInternal 
 #break  F2Internal
 #break  cffHInternal
 #break cfff_
-#run -linkmode listen -linkname 5000
+run -linkmode listen -linkname 5000

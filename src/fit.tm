@@ -7,12 +7,12 @@
 :ReturnType:    Manual
 :End:
 
-:Evaluate: GepardInitInternal::usage = "GepardInitInternal[SPEED, P, SCHEME, ANSATZ, DATFILE, OUTFILE] performs initialization of GeParD parameters. It reads GEPARD.INI for default parameters which will then be overridden by the arguments with same name if they are positive numbers or strings different then 'DFLT'. *FILE default parameters are set in the GepardInitInternal routine code. This function is not ment to be called by user who should use GepardInit[] instead."
+:Evaluate: GepardInitInternal::usage = "GepardInitInternal[SPEED, P, PROCESS, SCHEME, ANSATZ, DATFILE, OUTFILE] performs initialization of GeParD parameters. It reads GEPARD.INI for default parameters which will then be overridden by the arguments with same name if they are positive numbers or strings different then 'DFLT'. *FILE default parameters are set in the GepardInitInternal routine code. This function is not ment to be called by user who should use GepardInit[] instead."
 :Begin:
 :Function:      GepardInitInternal
-:Pattern:       GepardInitInternal[speed_Integer, p_Integer, scheme_String, ansatz_String, datfile_String, outfile_String]
-:Arguments:     {speed, p, scheme, ansatz, datfile, outfile}
-:ArgumentTypes: {Integer, Integer, String, String, String, String}
+:Pattern:       GepardInitInternal[speed_Integer, p_Integer, process_String, scheme_String, ansatz_String, datfile_String, outfile_String]
+:Arguments:     {speed, p, process, scheme, ansatz, datfile, outfile}
+:ArgumentTypes: {Integer, Integer, String, String, String, String, String}
 :ReturnType:    Integer
 :End:
 
@@ -63,30 +63,30 @@
 :End:
 
 
-:Evaluate: cffHInternal::usage = "cffHInternal[xi, t, q2, q02, SPEED, P, SCHEME, ANSATZ] returns singlet CFF H(xi, t, q2, q02). This function is not ment to be called by user who should use cffH[] instead."
+:Evaluate: cffHInternal::usage = "cffHInternal[xi, t, q2, q02, SPEED, P, PROCESS, SCHEME, ANSATZ] returns singlet CFF H(xi, t, q2, q02). This function is not ment to be called by user who should use cffH[] instead."
 :Begin:
 :Function:      cffHInternal
-:Pattern:       cffHInternal[(xi_)?NumericQ, (t_)?NumericQ, (q2_)?NumericQ, (q02_)?NumericQ, speed_Integer, p_Integer, scheme_String, ansatz_String]
-:Arguments:     {xi, t, q2, q02, speed, p, scheme, ansatz}
-:ArgumentTypes: {Real, Real, Real, Real, Integer, Integer, String, String}
+:Pattern:       cffHInternal[(xi_)?NumericQ, (t_)?NumericQ, (q2_)?NumericQ, (q02_)?NumericQ, speed_Integer, p_Integer, process_String, scheme_String, ansatz_String]
+:Arguments:     {xi, t, q2, q02, speed, p, process, scheme, ansatz}
+:ArgumentTypes: {Real, Real, Real, Real, Integer, Integer, String, String, String}
 :ReturnType:    Manual
 :End:
 
-:Evaluate: cffEInternal::usage = "cffEInternal[xi, t, q2, q02, SPEED, P, SCHEME, ANSATZ] returns singlet CFF E(xi, t, q2, q02). This function is not ment to be called by user who should use cffE[] instead."
+:Evaluate: cffEInternal::usage = "cffEInternal[xi, t, q2, q02, SPEED, P, PROCESS, SCHEME, ANSATZ] returns singlet CFF E(xi, t, q2, q02). This function is not ment to be called by user who should use cffE[] instead."
 :Begin:
 :Function:      cffEInternal
-:Pattern:       cffEInternal[(xi_)?NumericQ, (t_)?NumericQ, (q2_)?NumericQ, (q02_)?NumericQ, speed_Integer, p_Integer, scheme_String, ansatz_String]
-:Arguments:     {xi, t, q2, q02, speed, p, scheme, ansatz}
-:ArgumentTypes: {Real, Real, Real, Real, Integer, Integer, String, String}
+:Pattern:       cffEInternal[(xi_)?NumericQ, (t_)?NumericQ, (q2_)?NumericQ, (q02_)?NumericQ, speed_Integer, p_Integer, process_String, scheme_String, ansatz_String]
+:Arguments:     {xi, t, q2, q02, speed, p, process, scheme, ansatz}
+:ArgumentTypes: {Real, Real, Real, Real, Integer, Integer, String, String, String}
 :ReturnType:    Manual
 :End:
 
-:Evaluate: F2Internal::usage = "F2Internal[xBJ, q2, q02, SPEED, P, SCHEME, ANSATZ] returns singlet DIS F2(xBJ, q2, q02). This function is not ment to be called by user who should use F2[] instead."
+:Evaluate: F2Internal::usage = "F2Internal[xBJ, q2, q02, SPEED, P, PROCESS, SCHEME, ANSATZ] returns singlet DIS F2(xBJ, q2, q02). This function is not ment to be called by user who should use F2[] instead."
 :Begin:
 :Function:      F2Internal
-:Pattern:       F2Internal[(xbj_)?NumericQ, (q2_)?NumericQ, (q02_)?NumericQ, speed_Integer, p_Integer, scheme_String, ansatz_String]
-:Arguments:     {xbj, q2, q02, speed, p, scheme, ansatz}
-:ArgumentTypes: {Real, Real, Real, Integer, Integer, String, String}
+:Pattern:       F2Internal[(xbj_)?NumericQ, (q2_)?NumericQ, (q02_)?NumericQ, speed_Integer, p_Integer, process_String, scheme_String, ansatz_String]
+:Arguments:     {xbj, q2, q02, speed, p, process, scheme, ansatz}
+:ArgumentTypes: {Real, Real, Real, Integer, Integer, String, String, String}
 :ReturnType:    Manual
 :End:
 

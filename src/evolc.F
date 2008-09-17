@@ -81,7 +81,7 @@ C
 
        CALL EVOLF ( K, R, EVOLA)
 
-       IF ( PROCESS(:3) .EQ. 'DVC' ) THEN
+       IF ( PROCESS(:4) .EQ. 'DVCS' ) THEN
 *      --- DVCS ---
 
         CEV(1) = ( BIGC(K,0,1) * EVOLA(0,1,1) + 

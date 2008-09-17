@@ -182,13 +182,13 @@ C     ****
 #include "header.F"
 
       LOC = 0
-      IF ( PROCESS .EQ. 'DVCS' ) THEN
-        DO 160 K = 1, NQS
-           IF ( QS(K) .EQ. Q2 ) LOC = K
+      IF ( PROCESS .EQ. 'DIS' ) THEN
+        DO 160 K = 1, NQSDIS
+           IF ( QSDIS(K) .EQ. Q2 ) LOC = K
  160    CONTINUE
       ELSE
-        DO 170 K = 1, NQSDIS
-           IF ( QSDIS(K) .EQ. Q2 ) LOC = K
+        DO 170 K = 1, NQS
+           IF ( QS(K) .EQ. Q2 ) LOC = K
  170    CONTINUE
       END IF
 

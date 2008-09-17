@@ -40,7 +40,7 @@ C
       LRF2 = LOG(RF2)
       LRR2 = LOG(RR2)
 
-      IF ( PROCESS(:3) .EQ. 'DVC' ) THEN
+      IF ( PROCESS(:4) .EQ. 'DVCS' ) THEN
         SHIFT1 = HS1(J + 1.5d0) - HS1(J + 2.0d0) + 2.0d0 * LOG(2.0d0)
      &        - LRF2
         SHIFT2 = SHIFT1*SHIFT1 - HS2(J + 1.5d0) + HS2(J + 2.0d0)

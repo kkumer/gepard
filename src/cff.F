@@ -47,7 +47,7 @@ C
 
       XIMEM = XI
 *     -- when calculating just GPDs at eta=0 --
-      IF ( SCHEME(:4) .EQ. 'ZERO' ) XI = 0
+      IF ( PROCESS(5:5) .EQ. 'Z' ) XI = 0
 
       CALL LOOKUPQ(QIND)
 #ifdef MMA

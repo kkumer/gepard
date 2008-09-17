@@ -4,7 +4,7 @@
 (*     ==============================    *)
 
 
-Print["GeParD - Mathematica interface (2008-09-14)"];
+Print["GeParD - Mathematica interface (2008-09-17)"];
 
 
 If[$VersionNumber<5.999,  (* Mathematica 5.*)
@@ -16,8 +16,8 @@ BeginPackage["gepard`", "Format`", "NumericalCalculus`", "Utilities`FilterOption
 
 
 GepardInit::usage = "GepardInit[] performs initialization of GeParD parameters. 
-It reads GEPARD.INI for default parameters. Parameters SPEED, P, SCHEME, ANSATZ,
-DATFILE and OUTFILE can be overriden by specifying corresponding options 
+It reads GEPARD.INI for default parameters. Parameters SPEED, P, PROCESS, SCHEME, 
+ANSATZ, DATFILE and OUTFILE can be overriden by specifying corresponding options 
 e.g. GepardInit[P->0, DATFILE->\"dvcs\"]."
 
 GepardInitInternal::usage = "MathLink function ..."
@@ -63,18 +63,25 @@ interface and should give GPD's for .... GPD[flavor, x, t, xi] gives value of x-
 GPDs (flavor: 1=Q, 2=G). It relies on moments GPDcurrent[j,t,xi] which have to be set up e.g.
 by GPDcurrent[j_, t_, xi_] = GPDMom[j, t, xi] /. PAR[n_] :> First[MinuitGetParameter[n]]"
 
-gpdHtraj::usage = "gpdHtraj[x, t, Q2, Q02, opts] returns singlet GPD H(x, eta=x, t, Q2), both
-quark and gluon.  Options are same as for GepardInit."
+gpdHtrajQ::usage = "gpdHtrajQ[x, t, Q2, Q02, opts] returns singlet quark 
+GPD H(x, eta=x, t, Q2).  Options are same as for GepardInit."
 
-gpdHzero::usage = "gpdHzero[x, t, Q2, Q02, opts] returns singlet GPD H(x, eta=0, t, Q2), both
-quark and gluon.  Options are same as for GepardInit."
+gpdHzeroQ::usage = "gpdHzeroQ[x, t, Q2, Q02, opts] returns singlet quark
+GPD H(x, eta=0, t, Q2).  Options are same as for GepardInit."
+
+gpdHtrajG::usage = "gpdHtrajQ[x, t, Q2, Q02, opts] returns singlet gluon 
+GPD H(x, eta=x, t, Q2).  Options are same as for GepardInit."
+
+gpdHzeroG::usage = "gpdHzeroQ[x, t, Q2, Q02, opts] returns singlet gluon
+GPD H(x, eta=0, t, Q2).  Options are same as for GepardInit."
 
 PDF::usage = "PDF[{val1, val2, ...}, t, xi] is a function that is contacted by MathLink Minuit
 interface and should give PDF's for .... "
 
-slope::usage = "slope[flavor, x] gives GPD slope at x for flavor 1=Q or 2=G"
+slopeQ::usage = "slopeQ[x, opts] gives quark GPD slope at x"
+slopeG::usage = "slopeG[x, opts] gives gluon GPD slope at x"
 
-plotslopes::usage = "plots slope[flavor, x] for flavor 1=Q or 2=G"
+plotslopes::usage = "plots slopes of quark and gluon GPDs"
 
 plotPDFs::usage = "plots GPD[flavor, x, 0, 0] for flavor 1=Q or 2=G"
 
@@ -108,6 +115,7 @@ size fontsize (values 4-10 are nice, 5 is default)."
 
 SPEED::usage = "GeParD parameter"
 P::usage = "GeParD parameter"
+PROCESS::usage = "GeParD parameter"
 SCHEME::usage = "GeParD parameter"
 ANSATZ::usage = "GeParD parameter"
 
@@ -179,34 +187,43 @@ SpliceToFortran[path_String, tfor_] :=
 
 lobj = Install["gepard.exe"]  (* Installing C and Fortran routines. *)
 
-defaultopts = {SPEED -> -1, P -> -1, SCHEME -> "DFLT", ANSATZ -> "DFLT", 
-  DATFILE -> "DFLT", OUTFILE -> "DFLT"};
-Options[GepardInit] = defaultopts;
-Options[cffH] = defaultopts;
-Options[cffE] = defaultopts;
-Options[F2] = defaultopts;
+defaultopts = {SPEED -> -1, P -> -1, SCHEME -> "DFLT", 
+              ANSATZ -> "DFLT", DATFILE -> "DFLT", OUTFILE -> "DFLT"};
+Options[GepardInit] = Join[defaultopts, {PROCESS -> "DFLT"}] 
+Options[cffH] = Join[defaultopts, {PROCESS -> "DVCS"}]
+Options[cffE] = Join[defaultopts, {PROCESS -> "DVCS"}]
+Options[F2] = Join[defaultopts, {PROCESS -> "DIS"}]
 
 GepardInit[(opts___)?OptionQ] := GepardInitInternal @@ ( 
-  {SPEED, P, SCHEME, ANSATZ, DATFILE, OUTFILE} 
+  {SPEED, P, PROCESS, SCHEME, ANSATZ, DATFILE, OUTFILE} 
         /. {opts} /. Options[GepardInit] )
 
 cffH[(xi_)?NumericQ, (t_)?NumericQ, (q2_)?NumericQ, (q02_)?NumericQ, (opts___)?OptionQ] := cffHInternal @@ ( {xi, t, q2, q02,
-		SPEED, P, SCHEME, ANSATZ} /. {opts} /. Options[cffH] )
+		SPEED, P, PROCESS, SCHEME, ANSATZ} /. {opts} /. Options[cffH] )
 
 cffE[(xi_)?NumericQ, (t_)?NumericQ, (q2_)?NumericQ, (q02_)?NumericQ, (opts___)?OptionQ] := cffEInternal @@ ( {xi, t, q2, q02,
-		SPEED, P, SCHEME, ANSATZ} /. {opts} /. Options[cffE] )
+		SPEED, P, PROCESS, SCHEME, ANSATZ} /. {opts} /. Options[cffE] )
 
-F2[(xbj_)?NumericQ, (q2_)?NumericQ, (q02_)?NumericQ, (opts___)?OptionQ] := F2Internal @@ ( {xbj, q2, q02, SPEED, P, SCHEME, ANSATZ} /. {opts} /. Options[F2] )
+F2[(xbj_)?NumericQ, (q2_)?NumericQ, (q02_)?NumericQ, (opts___)?OptionQ] := F2Internal @@ ( {xbj, q2, q02, SPEED, P, PROCESS, SCHEME, ANSATZ} /. {opts} /. Options[F2] )
 
 (* Formulas for GPDs and PDFs using LO Wilson coefs in formulas for CFFs and F2 *)
 
-gpdHzero[(x_)?NumericQ, (t_)?NumericQ, (q2_)?NumericQ, (q02_)?NumericQ, (opts___)?OptionQ] := Im[{
-  cffHInternal @@ ( {x, t, q2, q02, SPEED, P, SCHEME, ANSATZ} /. SCHEME->"ZEROQ" /. {opts} /. Options[cffH] ),
- x cffHInternal @@ ( {x, t, q2, q02, SPEED, P, SCHEME, ANSATZ} /. SCHEME->"ZEROG" /. {opts} /. Options[cffH] ) }] / Pi
+gpdHzeroQ[(x_)?NumericQ, (t_)?NumericQ, (q2_)?NumericQ, (q02_)?NumericQ, (opts___)?OptionQ] := Im[
+  cffHInternal @@ ( {x, t, q2, q02, SPEED, P, PROCESS, SCHEME, ANSATZ} 
+    /. PROCESS->"DVCSZQ" /. {opts} /. Options[cffH] ) ] / Pi
 
-gpdHtraj[(x_)?NumericQ, (t_)?NumericQ, (q2_)?NumericQ, (q02_)?NumericQ, (opts___)?OptionQ] := Im[{
-  cffHInternal @@ ( {x, t, q2, q02, SPEED, P, SCHEME, ANSATZ} /. SCHEME->"TRAJQ" /. {opts} /. Options[cffH] ),
- x cffHInternal @@ ( {x, t, q2, q02, SPEED, P, SCHEME, ANSATZ} /. SCHEME->"TRAJG" /. {opts} /. Options[cffH] ) }] / Pi
+gpdHzeroG[(x_)?NumericQ, (t_)?NumericQ, (q2_)?NumericQ, (q02_)?NumericQ, (opts___)?OptionQ] := Im[
+ x cffHInternal @@ ( {x, t, q2, q02, SPEED, P, PROCESS, SCHEME, ANSATZ} 
+    /. PROCESS->"DVCSZG" /. {opts} /. Options[cffH] ) ] / Pi
+
+gpdHtrajQ[(x_)?NumericQ, (t_)?NumericQ, (q2_)?NumericQ, (q02_)?NumericQ, (opts___)?OptionQ] := Im[
+  cffHInternal @@ ( {x, t, q2, q02, SPEED, P, PROCESS, SCHEME, ANSATZ} 
+    /. PROCESS->"DVCSTQ" /. {opts} /. Options[cffH] ) ] / Pi
+
+gpdHtrajG[(x_)?NumericQ, (t_)?NumericQ, (q2_)?NumericQ, (q02_)?NumericQ, (opts___)?OptionQ] := Im[
+ x cffHInternal @@ ( {x, t, q2, q02, SPEED, P, PROCESS, SCHEME, ANSATZ} 
+    /. PROCESS->"DVCSTG" /. {opts} /. Options[cffH] ) ] / Pi
+
 
 GepardFit[pars_, (opts___)?OptionQ] := Block[{varpars = ParameterID /@ pars, 
       allpars = First[Transpose[Parameters]], status, ierr, chis}, 
@@ -264,12 +281,15 @@ plotPDFs[] := LogLinearPlot[{GPD[1, x, 0, 0], GPD[2, x, 0, 0]},
       {{Thickness[0.01], RGBColor[0, 0, 1]}, {Thickness[0.01], 
         RGBColor[1, 0, 0]}}]
 
-slope[f_Integer, x_, (opts___)?OptionQ] := 
+slopeQ[x_, (opts___)?OptionQ] := 
   Module[{h = 0.000001}, 
-   (Log[gpdHzero[x, -h, 4, 4, opts][[f]]] - Log[gpdHzero[x, 0, 4, 4, opts][[f]]]) / (-h)]
+   (Log[gpdHzeroQ[x, -h, 4, 4, opts] - Log[gpdHzeroQ[x, 0, 4, 4, opts]]) / (-h)]
+slopeG[x_, (opts___)?OptionQ] := 
+  Module[{h = 0.000001}, 
+   (Log[gpdHzeroG[x, -h, 4, 4, opts] - Log[gpdHzeroG[x, 0, 4, 4, opts]]) / (-h)]
 
 plotslopes[(opts___)?OptionQ] := 
-  LogLinearPlot[{slope[1, x, opts], slope[2, x, opts]}, {x, 0.0001, 0.01}, 
+  LogLinearPlot[{slope[x, opts], slope[x, opts]}, {x, 0.0001, 0.01}, 
     PlotRange -> All, AxesLabel -> {"x", "B(x)"}, 
     PlotStyle -> {{Thickness[0.01], RGBColor[0, 0, 1]}, {Thickness[0.01], 
           RGBColor[1, 0, 0]}}]

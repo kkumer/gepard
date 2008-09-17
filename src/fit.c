@@ -58,20 +58,21 @@ void MinuitInit(int a)
 *  NAME
 *     GepardInitInternal  --   Optional overriding of GEPARD.INI
 *  DESCRIPTION
-*     Performs initialization of GeParD parameters. First reads default values
+*     Performs initialization of GeParD parameters. First it reads default values
 *     from GEPARD.INI, which are then overriden by the function arguments with
 *     the same name if they are positive numbers or strings different then
 *     'DFLT'.
 *  SYNOPSIS
 */
 
-int *GepardInitInternal(int speed, int p, char *scheme, char *ansatz, 
-    char *datfile, char *outfile)
+int *GepardInitInternal(int speed, int p, char *process,
+        char *scheme, char *ansatz, char *datfile, char *outfile)
  
 /*
 *  INPUTS 
 *           speed -- SPEED
 *               p -- P
+*          process -- PROCESS
 *          scheme -- SCHEME
 *          ansatz -- ANSATZ
 *          datfile -- DATFILE
@@ -83,16 +84,18 @@ int *GepardInitInternal(int speed, int p, char *scheme, char *ansatz,
 *  SOURCE
 */
 {
-        long int schemelen, ansatzlen, datfilelen, outfilelen;
+        long int processlen, schemelen, ansatzlen, datfilelen, outfilelen;
 
+        processlen = strlen(process);
         schemelen = strlen(scheme);
         ansatzlen = strlen(ansatz);
         datfilelen = strlen(datfile);
         outfilelen = strlen(outfile);
 
-        parinit_(&speed, &p, &schemelen, scheme, &ansatzlen, ansatz,
+        parinit_(&speed, &p, &processlen, process,
+                        &schemelen, scheme, &ansatzlen, ansatz,
                         &datfilelen, datfile, &outfilelen, outfile, 
-                        schemelen, ansatzlen, datfilelen, outfilelen);
+               processlen, schemelen, ansatzlen, datfilelen, outfilelen);
 
         return 0;
 };
@@ -305,12 +308,13 @@ void MinuitCovarianceMatrix(int adim)
 *  SYNOPSIS
 */
 
-void cffHInternal(double xi, double t, double q2, double q02, int speed, int p, char *scheme, char *ansatz) 
+void cffHInternal(double xi, double t, double q2, double q02, int speed, int p, 
+        char *process, char *scheme, char *ansatz) 
 
 /*
 *  INPUTS 
 *         xi -- XI;   t -- DEL2;  q2 -- Q2;  q02 -- Q02;
-*      speed -- SPEED; p -- P; scheme -- SCHEME; ansatz -- ANSATZ
+*      speed -- SPEED; p -- P; process -- PROCESS; scheme -- SCHEME; ansatz -- ANSATZ
 *  CHILDREN
 *     GepardInitInternal, SETPROC, INIT, EVOLC, CFFF, MLPut*
 *  SOURCE
@@ -321,12 +325,12 @@ void cffHInternal(double xi, double t, double q2, double q02, int speed, int p, 
         struct dblcomplex nc;
         long int nargs;
         const char *fname;
-        long int evoli=1, evolj=1, iproc=1;
+        long int evoli=1, evolj=1;
         char datfile[] = "DFLT";
         char outfile[] = "DFLT";
 
 
-        GepardInitInternal(speed, p, scheme, ansatz, datfile, outfile);
+        GepardInitInternal(speed, p, process, scheme, ansatz, datfile, outfile);
 
         kinematics_.xi = xi;
         kinematics_.del2 = t;
@@ -335,7 +339,6 @@ void cffHInternal(double xi, double t, double q2, double q02, int speed, int p, 
         qs_.qs[0] = kinematics_.q2;
         parflt_.q02 = q02;
 
-        setproc_(&iproc);  /* DVCS */
         init_();
 
         MLPutFunction(stdlink, "EvaluatePacket", 1);
@@ -383,12 +386,13 @@ cfff_();
 *  SYNOPSIS
 */
 
-void cffEInternal(double xi, double t, double q2, double q02, int speed, int p, char *scheme, char *ansatz) 
+void cffEInternal(double xi, double t, double q2, double q02, int speed, int p, 
+        char *process, char *scheme, char *ansatz) 
 
 /*
 *  INPUTS 
 *         xi -- XI;   t -- DEL2;  q2 -- Q2;  q02 -- Q02;
-*      speed -- SPEED; p -- P; scheme -- SCHEME; ansatz -- ANSATZ
+*      speed -- SPEED; p -- P; process -- PROCESS; scheme -- SCHEME; ansatz -- ANSATZ
 *  CHILDREN
 *     GepardInitInternal, SETPROC, INIT, EVOLC, CFFFE, MLPut*
 *  SOURCE
@@ -399,12 +403,12 @@ void cffEInternal(double xi, double t, double q2, double q02, int speed, int p, 
         struct dblcomplex nc;
         long int nargs;
         const char *fname;
-        long int evoli=1, evolj=1, iproc=1;
+        long int evoli=1, evolj=1;
         char datfile[] = "DFLT";
         char outfile[] = "DFLT";
 
 
-        GepardInitInternal(speed, p, scheme, ansatz, datfile, outfile);
+        GepardInitInternal(speed, p, process, scheme, ansatz, datfile, outfile);
 
         kinematics_.xi = xi;
         kinematics_.del2 = t;
@@ -413,7 +417,6 @@ void cffEInternal(double xi, double t, double q2, double q02, int speed, int p, 
         qs_.qs[0] = kinematics_.q2;
         parflt_.q02 = q02;
 
-        setproc_(&iproc);  /* DVCS */
         init_();
 
         MLPutFunction(stdlink, "EvaluatePacket", 1);
@@ -461,12 +464,13 @@ cfff_();
 *  SYNOPSIS
 */
 
-void F2Internal(double xbj, double q2, double q02, int speed, int p, char *scheme, char *ansatz) 
+void F2Internal(double xbj, double q2, double q02, int speed, int p, 
+        char *process, char *scheme, char *ansatz) 
 
 /*
 *  INPUTS 
 *         xbj -- X_BJ;   q2 -- Q2;  q02 -- Q02;
-*      speed -- SPEED; p -- P; scheme -- SCHEME; ansatz -- ANSATZ
+*      speed -- SPEED; p -- P; process -- PROCESS; scheme -- SCHEME; ansatz -- ANSATZ
 *  CHILDREN
 *     GepardInitInternal, SETPROC, INIT, EVOLC, F2, MLPut*
 *  SOURCE
@@ -477,12 +481,12 @@ void F2Internal(double xbj, double q2, double q02, int speed, int p, char *schem
         struct dblcomplex nc;
         long int nargs;
         const char *fname;
-        long int evoli=1, evolj=1, iproc=2;
+        long int evoli=1, evolj=1;
         char datfile[] = "DFLT";
         char outfile[] = "DFLT";
 
 
-        GepardInitInternal(speed, p, scheme, ansatz, datfile, outfile);
+        GepardInitInternal(speed, p, process, scheme, ansatz, datfile, outfile);
 
         kinematics_.xi = xbj;
         kinematics_.del2 = 0;
@@ -491,7 +495,6 @@ void F2Internal(double xbj, double q2, double q02, int speed, int p, char *schem
         qs_.qsdis[0] = kinematics_.q2;
         parflt_.q02 = q02;
 
-        setproc_(&iproc);  /* DIS */
         init_();
 
         MLPutFunction(stdlink, "EvaluatePacket", 1);
