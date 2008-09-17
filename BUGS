@@ -1,4 +1,4 @@
-2008-09-12 
+2008-09-17 
 
 Open:
 -----
@@ -40,6 +40,11 @@ Open:
      without slanting has to be presently used, sacrifing some accuracy.
 
 17 -  radcorr less accurate than it used to be?
+
+18! - Some Mathematica functions behave funny when parameter is integer as
+     opposed to float e.g. rSkewness[1, 10^-3 <--> 10.^-3, ...]
+
+19! - There is some numerical pole in cffH (but not F2) for Q2->10 GeV^2
 
 Fixed:
 ------

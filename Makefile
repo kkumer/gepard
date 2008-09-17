@@ -122,8 +122,13 @@ else
   export MPREP = $(MLDIR)/mprep
   export MLINCDIR = $(MLDIR)
   export MLLIBDIR = $(MLDIR)
-  export MLLIB = ML
-  export MLEXTRA = -lpthread
+  ifeq '$(MMAVERSION)' '6.0'
+    export MLLIB = ML64i3
+    export MLEXTRA = -lpthread -lrt
+  else
+    export MLLIB = ML
+    export MLEXTRA = -lpthread
+  endif
 endif
 
 

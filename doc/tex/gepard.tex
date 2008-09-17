@@ -96,7 +96,7 @@ GPD $\mbox{\boldmath $H$}_{j} (\xi,\Delta^2,\mu^2)$ should be specified
 by the user in subroutine \texttt{HJ}, as described in Sect. \ref{ssect:ansatz}, or
 within Mathematica session, as described in Sect. \ref{sec:mma}.
 
-In practice it is good to use Mellin-Barnes contour of the form displayed
+In practice it is sometimes advantageous to use Mellin-Barnes contour of the form displayed
 on Fig.~\ref{fig:MellinBarnes}, with point on the contour given
 by $j=c+ye^{i\phi}$, with real parameters $c$ and $\phi$.
 The usual textbook Mellin-Barnes contour is obtained by
@@ -105,16 +105,17 @@ convergence. As long as no poles are crossed value of the
 integral should not depend on the value of $c$. One can
 try different values of $c$ and $\phi$ to get best numerical
 properties. 
-For the default GPD ansatz (\texttt{ANSATZ = 'FIT'}), values of  $c$ = 0.5 or 0.25 are
-fine, as well as $\phi = 3\pi/4$. However if one uses different GPD ansatz, one should
-be aware of the position of the leading poles and choose $c$ accordingly 
-\comminline{In the
-future version one should implement some sort of automatic choosing of $c$ depending
-on the ansatz.}. Also, if
+For the default GPD ansatz (\texttt{ANSATZ = 'FIT'}), values of  $c$ = 0.5 or 0.35 are
+fine, as well as $\phi = 3\pi/4$.\footnote{There is a Fortran compiler bug, where
+$0^{z}$ with $Re(z)<0$ is not calculated correctly ($0$ is obtained instead of
+$-\infty$). Because of this, by default $\phi = \pi/2$, for which this bug 
+never occurs.}
+However if one uses different GPD ansatz, one should
+be aware of the position of the leading poles and choose $c$ accordingly. Also, if
 one uses $\overline{MS}$ scheme and \emph{non-diagonal evolution} (\texttt{SCHEME = 'MSBND'}),
 one should not make $\phi$ too big or one runs in the danger of hitting poles of
 the evolution operator. In this case $\phi$ only slightly larger than (or
-equal to $\pi/2$ is the safest choice.
+equal to) $\pi/2$ is the safest choice.
 
 \begin{figure}
 \begin{center}
@@ -390,8 +391,8 @@ the Mellin-Barnes contour used in the non-diagonal $\overline{MS}$ evolution.
 Can presently be 
 \begin{itemize}
 \item \texttt{'CSBAR'}: $\overline{CS}$
-\item \texttt{'MSBND'}: $\overline{MS}$, including non-diagonal evolution
-\item \texttt{'MSBAR'}: $\overline{MS}$, excluding non-diagonal evolution
+\item \texttt{'MSBAR'}: $\overline{MS}$, including non-diagonal evolution
+\item \texttt{'MSBDI'}: $\overline{MS}$, only diagonal evolution
 \item \texttt{'MSBLO'}: $\overline{MS}$, evolution is LO only
 \item \texttt{'ZEROQ'}, \texttt{'TRAJQ'}: $\mbox{\boldmath $C$} = (1,0)$ to all orders
 \item \texttt{'ZEROG', \texttt{'TRAJG'}}: $\mbox{\boldmath $C$} = (0,1)$ to all orders
@@ -408,7 +409,10 @@ It should correspond to one of  \texttt{IF\ldots ELSE IF} stanzas in subroutine
 \texttt{TOY} (used in some old development Mathematica notebooks), \texttt{SOFT} and \texttt{HARD},
 corresponding to ansaetze from \cite{Kumericki:2006xx}, \texttt{FITBP}, corresponding
 to ansatz used in \cite{Kumericki:2007sa}, and \texttt{FIT}, corresponding to a new
-ansatz including skewness dependence.
+ansatz including skewness dependence.\footnote{Presently, \texttt{FIT} has
+$\beta_S + 1 = 9$ and $\beta_{G}+1=7$, while most of the other ansaetze and \texttt{FIT86} have
+$\beta_S + 1 = 8$ and $\beta_{G}+1=6$.}
+
 
 There are also two special values for \texttt{ANSATZ}. First is \texttt{ANSATZ = 'MMA'}, which
 can be used if Mathematica interface is active, and
@@ -532,7 +536,7 @@ and \texttt{'STOP'} rows will be included in actual fits, while everything beyon
 \hrule
 \begin{verbatim}
 
-0   <--   1=INTERACTIVE   0=BATCH  (Must be 0 on Windows!)
+0   <--   1=INTERACTIVE   0=BATCH
 SET TITLE
        Fitting to ansatz: FIT
 PARAMETERS
@@ -690,7 +694,7 @@ placed one runs executable \texttt{fit}. When minimization is over, and results
 printed out (e.g. by Minuit commands \texttt{stop, return, cali 3, \dots}), one 
 usually gets three output files:
 \begin{itemize}
-\item \texttt{fit.mnt}  ---  Output of Minuit routines (When run in batch mode. When
+\item \texttt{OUTFILE.mnt}  ---  Output of Minuit routines (When run in batch mode. When
 run in the interactive mode one can somehow log the terminal output. For example,
 on Linux, by issuing command \texttt{script filename} before the run, and
 \texttt{exit} afterwards.)
@@ -710,7 +714,7 @@ By default \texttt{OUTFILE=fit}, but this can be changed by second command-line
 argument of fitting program \texttt{fit}. Thus \texttt{fit  dvcs dvcsnlo test}
 will use \texttt{dvcs.dat} instead of \texttt{fit.dat} for reading required
 datasets, Minuit commands will be read from \texttt{test.cmd} instead of
-\texttt{fit.cmd} and results will go to \texttt{dvcsnlo.out} and \texttt{dvcsnlo.ps} (as well as \texttt{fit.mnt}).
+\texttt{fit.cmd} and results will go to \texttt{dvcsnlo.out} and \texttt{dvcsnlo.ps} (as well as \texttt{OUTFILE.mnt}).
 
 
 

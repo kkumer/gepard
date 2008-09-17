@@ -4,7 +4,7 @@
 (*     ==============================    *)
 
 
-Print["GeParD - Mathematica interface (2008-06-10)"];
+Print["GeParD - Mathematica interface (2008-09-14)"];
 
 
 If[$VersionNumber<5.999,  (* Mathematica 5.*)
@@ -264,12 +264,16 @@ plotPDFs[] := LogLinearPlot[{GPD[1, x, 0, 0], GPD[2, x, 0, 0]},
       {{Thickness[0.01], RGBColor[0, 0, 1]}, {Thickness[0.01], 
         RGBColor[1, 0, 0]}}]
 
-plotslopes[] := LogLinearPlot[{slope[1, x], slope[2, x]}, {x, 1/10000, 0.01}, 
-     PlotRange -> All, AxesLabel -> {"x", "B(x)"}, 
-     PlotStyle -> {{Thickness[0.01], RGBColor[0, 0, 1]}, 
-       {Thickness[0.01], RGBColor[1, 0, 0]}}]
- 
-slope[f_Integer, x_] := - ND[Log[GPD[f, x, -t, 0]], t, 0]
+slope[f_Integer, x_, (opts___)?OptionQ] := 
+  Module[{h = 0.000001}, 
+   (Log[gpdHzero[x, -h, 4, 4, opts][[f]]] - Log[gpdHzero[x, 0, 4, 4, opts][[f]]]) / (-h)]
+
+plotslopes[(opts___)?OptionQ] := 
+  LogLinearPlot[{slope[1, x, opts], slope[2, x, opts]}, {x, 0.0001, 0.01}, 
+    PlotRange -> All, AxesLabel -> {"x", "B(x)"}, 
+    PlotStyle -> {{Thickness[0.01], RGBColor[0, 0, 1]}, {Thickness[0.01], 
+          RGBColor[1, 0, 0]}}]
+
  
 GPD[f_Integer, (x_)?NumericQ, (t_)?NumericQ, (xi_)?NumericQ] := 
     Chop[(1/(2*Pi))*NIntegrate[GPDcurrent[0.5 + I*y, t, xi][[f]]/
