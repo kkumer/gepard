@@ -195,4 +195,4 @@ void mcont_(long int *num1, long int *num2, long int *npt,
 void mnstat_(double *fmin, double *fedm, double *errdef, long int *npari, long int *nparx, long int *istat);
 void mnemat_(double emat[NPARMAX][NPARMAX], long int *ndim);
 void setproc_(long int *iproc); 
-
+void bca_(long int *i, double *wavg, double *q2avg, double *phiin, double *herabca );

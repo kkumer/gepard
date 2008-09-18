@@ -9,44 +9,64 @@ C     *******
 
 C     ****f* bca.F/BCA
 C  NAME
-C       BCA  --  DVCS beam charge asymmetry
+C       HERABCA  --  DVCS beam charge asymmetry for HERA s
 C  SYNOPSIS
 
-      SUBROUTINE BCA (BCA0)
+      SUBROUTINE BCA (FITFLAG, WAVG, Q2AVG, PHIIN, HERABCA)
 
       IMPLICIT NONE
-      DOUBLE PRECISION BCA0
+      INTEGER FITFLAG
+      DOUBLE PRECISION WAVG, Q2AVG, PHIIN, HERABCA
 
 C  PARENTS
 C     FCN
 C  CHILDREN
-C     TINT, TDVCS2, TBH2
+C     INTEGRAF, TINT, TDVCS2, TBH2
 C  SOURCE
 C
 
-      DOUBLE PRECISION SHERA, TAVG, Q2AVG, WAVG
-      PARAMETER ( SHERA = 101568.0d0, TAVG = -0.228096d0, 
-     &   Q2AVG = 8.0d0, WAVG = 82.0d0)
+      INTEGER K, NBNDMAX, NMINTS, EFFACC
+      PARAMETER ( NBNDMAX = 1 )
+      DOUBLE PRECISION SHERA
+      PARAMETER ( SHERA = 101568.0d0 )
       DOUBLE PRECISION TINT, TDVCS2, TBH2
+      DOUBLE PRECISION NUMER, DENOM
+      DOUBLE PRECISION BND(NBNDMAX+1), MINTS(64), MINTWG(64)
 #include "header.F"
 
+*     Integration over t similar to how it is done for total
+*     cross section. H1 have cut-off on  t=-0.05 GeV^2
+      DATA BND /0.05D0, 1.0D0/ 
+      EFFACC = ACC - SPEED + 1
+      NMINTS = 2**EFFACC
+      CALL INTEGRAF(EFFACC, 1, BND, NBNDMAX, MINTS, MINTWG)
+
       PROCESS = 'DVCS'
-      PHIAZ = 0.0d0
+      PHIAZ = PHIIN
 
       Q2 = Q2AVG
-*     NQS = 1
-*     QS(1) = Q2
-*     CALL EVOLC(1)
-*  FIXME: this works only if Q2AVG is already in QS()
+      IF ( FITFLAG .NE. 1) THEN
+*     We are not fitting, should set QS()
+        NQS = 1
+        QS(1) = Q2
+        CALL EVOLC(1)
+      END IF
 
-      DEL2 = TAVG
       W2 = WAVG**2
       XB = 2.0d0 * Q2AVG / (2.0d0*WAVG**2 + Q2AVG)
       YB = (W2 + Q2) / SHERA
-
       XI = XB / 2.0d0
 
-      BCA0 = - TINT() / ( TDVCS2() + TBH2() )
+*     Integrating over t
+      NUMER = 0.0d0
+      DENOM = 0.0d0
+      DO 10 K = 1, NMINTS
+          DEL2 = - MINTS(K)
+          NUMER = NUMER + MINTWG(K) * TINT()
+          DENOM = DENOM + MINTWG(K) * ( TDVCS2() + TBH2() )
+ 10   CONTINUE
+
+      HERABCA = - NUMER / DENOM
 
       RETURN
       END
@@ -110,20 +130,6 @@ C
 
       CALL CFFF
 
-*     Multiplying with charge factor
-
-      IF (NF .EQ. 3) THEN
-         CFF(P) = CFF(P) * 2.0D0 / 9.0D0
-         CFFE(P) = CFFE(P) * 2.0D0 / 9.0D0
-      ELSE IF (NF .EQ. 4) THEN
-         CFF(P) = CFF(P) * 5.0D0 / 18.0D0
-         CFFE(P) = CFFE(P) * 5.0D0 / 18.0D0
-      ELSE
-         CALL ERROR ('GeParD', '  CFF',
-     &   'NF is not integer equal to 3 or 4!                          ',
-     &   5, 3)
-      END IF
-
       CCALDVCS = ABS(CFF(P))**2 - (DEL2/(4.0d0*MP2)) * ABS(CFFE(P))**2
        
       C0DVCS = 2.0d0 * (2.0d0 - 2.0d0*YB + YB**2) * CCALDVCS
@@ -158,20 +164,6 @@ C
 #include "header.F"
 
       CALL CFFF
-
-*     Multiplying with charge factor
-
-      IF (NF .EQ. 3) THEN
-         CFF(P) = CFF(P) * 2.0D0 / 9.0D0
-         CFFE(P) = CFFE(P) * 2.0D0 / 9.0D0
-      ELSE IF (NF .EQ. 4) THEN
-         CFF(P) = CFF(P) * 5.0D0 / 18.0D0
-         CFFE(P) = CFFE(P) * 5.0D0 / 18.0D0
-      ELSE
-         CALL ERROR ('GeParD', '  CFF',
-     &   'NF is not integer equal to 3 or 4!                          ',
-     &   5, 3)
-      END IF
 
       CCALINT = F1NUCL(DEL2) * CFF(P) - 
      &             (DEL2/(4.0d0*MP2)) * F2NUCL(DEL2) * CFFE(P)

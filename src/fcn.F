@@ -262,7 +262,8 @@ C
         WRITE (21, *) 'D.O.F = ', NDATAPTS(0) - NPAR
         WRITE (21, *) 'CHISQ = ', CHISQ(0)
         WRITE (21, 803) 'Beam charge asymmetry'
-        CALL BCA(BCA0)
+*    FIXME: hardwired values for H1 here:
+        CALL BCA(1, 82.0d0, 8.0d0, 0.0d0, BCA0)
         WRITE (21, *) 'BCA(PHI=0) = ', BCA0
         CLOSE (21)
 #ifdef PGPLOT

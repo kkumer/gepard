@@ -648,6 +648,73 @@ void GetChiSquares(void)
 };
 /******/
 
+/****f* fit.c/BCAInternal
+*  NAME
+*     BCAInternal  --  calculates beam charge asymmetry
+*  SYNOPSIS
+*/
+
+void BCAInternal(double wavg, double q2avg, double phiin, 
+        int speed, int p, char *process, char *scheme, char *ansatz) 
+
+/*
+*  INPUTS 
+*         wavg -- average  W;  t -- DEL2;  q2avg -- average Q2;
+*      speed -- SPEED; p -- P; process -- PROCESS; scheme -- SCHEME; ansatz -- ANSATZ
+*  CHILDREN
+*     GepardInitInternal, INIT, EVOLC, BCA, MLPut*
+*  SOURCE
+*/
+{
+        int i;
+        double xreal, herabca;
+        struct dblcomplex nc;
+        long int nargs, fitflag=0;
+        const char *fname;
+        char datfile[] = "DFLT";
+        char outfile[] = "DFLT";
+
+
+        GepardInitInternal(speed, p, process, scheme, ansatz, datfile, outfile);
+
+        init_();
+
+        MLPutFunction(stdlink, "EvaluatePacket", 1);
+          MLPutFunction(stdlink, "Set", 2);
+            MLPutSymbol(stdlink, "jValues");
+            MLPutFunction(stdlink, "List", contour_.npts); /* passing MB points */
+              for (i = 0; i < contour_.npts; i++){
+                      nc = npoints_.n[i];
+                      MLPutFunction(stdlink, "Complex", 2);
+                        MLPutReal(stdlink, nc.dr - 1);
+                        MLPutReal(stdlink, nc.di);
+              }
+        MLEndPacket(stdlink);
+        MLNextPacket(stdlink);
+        MLNewPacket(stdlink);
+
+        MLPutFunction(stdlink, "EvaluatePacket", 1);
+          MLPutFunction(stdlink, "AllParameterValues", 0);
+        MLEndPacket(stdlink);
+
+        MLNextPacket(stdlink);
+        MLGetFunction(stdlink, &fname, &nargs); /* fname = List */
+            for (i = 0; i < NPARMAX; i++){
+                    MLGetReal(stdlink, &xreal);
+                    par_.par[i] = xreal;
+            }
+        MLEndPacket(stdlink);
+
+
+        bca_(&fitflag, &wavg, &q2avg, &phiin, &herabca);
+
+/* returning result via MathLink  */
+        MLPutReal(stdlink, herabca);
+
+        return;
+};
+/******/
+
 /****p* fit.c/main
 *  NAME
 *     main  --  main MathLink program

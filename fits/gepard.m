@@ -4,7 +4,7 @@
 (*     ==============================    *)
 
 
-Print["GeParD - Mathematica interface (2008-09-17)"];
+Print["GeParD - Mathematica interface (2008-09-18)"];
 
 
 If[$VersionNumber<5.999,  (* Mathematica 5.*)
@@ -145,9 +145,16 @@ Options are same as for GepardInit."
 F2::usage = "F2[xbj, q2, q02, options] returns singlet F2(xbj, q2, q02). 
 Options are same as for GepardInit."
 
+BCA::usage = "BCA[wavg, q2avg, t, phi, options] returns beam charge asymmetry. 
+Options are same as for GepardInit."
+
+BCAproj::usage = "BCAproj[wavg, q2avg, t, phi, options] returns Cos[phi] harmonic 
+of beam charge asymmetry.  Options are same as for GepardInit."
+
 cffHInternal::usage = "MathLink function ..."
 cffEInternal::usage = "MathLink function ..."
 F2Internal::usage = "MathLink function ..."
+BCAInternal::usage = "MathLink function ..."
 cInt::usage = "MathLink function ..."
 MinuitContour::usage = "MathLink function ..."
 
@@ -193,6 +200,7 @@ Options[GepardInit] = Join[defaultopts, {PROCESS -> "DFLT"}]
 Options[cffH] = Join[defaultopts, {PROCESS -> "DVCS"}]
 Options[cffE] = Join[defaultopts, {PROCESS -> "DVCS"}]
 Options[F2] = Join[defaultopts, {PROCESS -> "DIS"}]
+Options[BCA] = Join[defaultopts, {PROCESS -> "DVCS"}]
 
 GepardInit[(opts___)?OptionQ] := GepardInitInternal @@ ( 
   {SPEED, P, PROCESS, SCHEME, ANSATZ, DATFILE, OUTFILE} 
@@ -205,6 +213,12 @@ cffE[(xi_)?NumericQ, (t_)?NumericQ, (q2_)?NumericQ, (q02_)?NumericQ, (opts___)?O
 		SPEED, P, PROCESS, SCHEME, ANSATZ} /. {opts} /. Options[cffE] )
 
 F2[(xbj_)?NumericQ, (q2_)?NumericQ, (q02_)?NumericQ, (opts___)?OptionQ] := F2Internal @@ ( {xbj, q2, q02, SPEED, P, PROCESS, SCHEME, ANSATZ} /. {opts} /. Options[F2] )
+
+BCA[(w_)?NumericQ, (q2_)?NumericQ, (phi_)?NumericQ, (opts___)?OptionQ] := BCAInternal @@ ( {w, q2, phi,
+		SPEED, P, PROCESS, SCHEME, ANSATZ} /. {opts} /. Options[BCA] )
+
+BCAproj[w_, q2_, (opts___)?OptionQ] := NIntegrate[Cos[phi] BCA[w, q2, phi, opts], 
+   {phi, -Pi, Pi}] / Pi
 
 (* Formulas for GPDs and PDFs using LO Wilson coefs in formulas for CFFs and F2 *)
 
@@ -283,10 +297,10 @@ plotPDFs[] := LogLinearPlot[{GPD[1, x, 0, 0], GPD[2, x, 0, 0]},
 
 slopeQ[x_, (opts___)?OptionQ] := 
   Module[{h = 0.000001}, 
-   (Log[gpdHzeroQ[x, -h, 4, 4, opts] - Log[gpdHzeroQ[x, 0, 4, 4, opts]]) / (-h)]
+   (Log[gpdHzeroQ[x, -h, 4, 4, opts]] - Log[gpdHzeroQ[x, 0, 4, 4, opts]]) / (-h)]
 slopeG[x_, (opts___)?OptionQ] := 
   Module[{h = 0.000001}, 
-   (Log[gpdHzeroG[x, -h, 4, 4, opts] - Log[gpdHzeroG[x, 0, 4, 4, opts]]) / (-h)]
+   (Log[gpdHzeroG[x, -h, 4, 4, opts]] - Log[gpdHzeroG[x, 0, 4, 4, opts]]) / (-h)]
 
 plotslopes[(opts___)?OptionQ] := 
   LogLinearPlot[{slope[x, opts], slope[x, opts]}, {x, 0.0001, 0.01}, 

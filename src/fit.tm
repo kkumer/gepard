@@ -108,3 +108,11 @@
 :ReturnType:    Manual
 :End:
 
+:Evaluate: BCAInternal::usage = "BCAInternal[wavg, q2avg, phiin, SPEED, P, PROCESS, SCHEME, ANSATZ] returns BCA. This function is not meant to be called by user who should use BCA[] instead."
+:Begin:
+:Function:      BCAInternal
+:Pattern:       BCAInternal[(wavg_)?NumericQ, (q2avg_)?NumericQ, (phiin_)?NumericQ, speed_Integer, p_Integer, process_String, scheme_String, ansatz_String]
+:Arguments:     {wavg, q2avg, phiin, speed, p, process, scheme, ansatz}
+:ArgumentTypes: {Real, Real, Real, Integer, Integer, String, String, String}
+:ReturnType:    Manual
+:End:
