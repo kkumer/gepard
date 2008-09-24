@@ -17,6 +17,7 @@ Computing:
 -  datasets should be not read from files each FCN call but from memory!
    (not necessarily, this is not such performance hit as I thought)
 -  Check Lanczos algorithm for gamma for negative real part of argument
+-  Paralellize MSBAR and maybe all gpdH....[] functions
 
 
 Checks:

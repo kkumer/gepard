@@ -4,7 +4,7 @@
 (*     ==============================    *)
 
 
-Print["GeParD - Mathematica interface (2008-09-18)"];
+Print["GeParD - Mathematica interface (2008-09-20)"];
 
 
 If[$VersionNumber<5.999,  (* Mathematica 5.*)
@@ -131,7 +131,7 @@ FCM::usage = "Fortran format array holding the expressions for GPDs"
 
 j::usage = "j - complex conformal moment"
 t::usage = "t - Mandelstam variable. In Fortran represented as DEL2"
-xi::usage = "xi - DVCS kinematical variable."
+xi::usage = "xi[W, Q2]  - DVCS kinematical variable."
 xbj::usage = "xbj - DIS kinematical variable x_Bjorken."
 
 lobj::usage = "lobj - MathLink link"
@@ -145,7 +145,8 @@ Options are same as for GepardInit."
 F2::usage = "F2[xbj, q2, q02, options] returns singlet F2(xbj, q2, q02). 
 Options are same as for GepardInit."
 
-BCA::usage = "BCA[wavg, q2avg, t, phi, options] returns beam charge asymmetry. 
+BCA::usage = "BCA[w, q2, phi, options] returns beam charge asymmetry
+for asymuthal angle phi, integrated over t=-0.05..-1 GeV^2 (like for H1 data). 
 Options are same as for GepardInit."
 
 BCAproj::usage = "BCAproj[wavg, q2avg, t, phi, options] returns Cos[phi] harmonic 
@@ -450,6 +451,8 @@ PlotMinuitContourFixedAll[par1_Symbol, par2_Symbol, npts_Integer, (opts___)?Opti
 SaveParameters[] := Block[{},
 Parameters = Map[{#[[1]], #[[2]], 
   MinuitGetParameter[#[[1]]][[1]], #[[4]], #[[5]], #[[6]]}&, Parameters];]
+
+xi[W_, Q2_] := N[ Q2 / ( 2 W^2 + Q2 ) ]
 
 End[ ]
 

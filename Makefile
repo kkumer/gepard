@@ -36,16 +36,16 @@
 # Fortran compiler dependent options (uncomment only one)
 #
 ## [--1--] GNU g77  (also cygwin)
-#FC = g77
-#CMP_FFLAGS = -Wall
-#OPT_FFLAGS = -O3
-#OPT_CFLAGS = -O3 
+FC = g77
+CMP_FFLAGS = -Wall
+OPT_FFLAGS = -O3
+OPT_CFLAGS = -O3 
 #
 ## [--2--] GNU gfortran
-FC = gfortran
-CMP_FFLAGS = -Wall
-OPT_FFLAGS = -O3 -ffast-math -funroll-all-loops  -ftree-vectorize
-OPT_CFLAGS = -O3 
+#FC = gfortran
+#CMP_FFLAGS = -Wall
+#OPT_FFLAGS = -O3 -ffast-math -funroll-all-loops  -ftree-vectorize
+#OPT_CFLAGS = -O3 
 
 ## [--2b--] GNU gfortran + OpenMP parallelization
 #FC = gfortran
