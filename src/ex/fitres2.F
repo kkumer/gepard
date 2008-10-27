@@ -1,31 +1,31 @@
-C     ****h* gepard/fitres.f
+C     ****h* gepard/fitres2.f
 C  FILE DESCRIPTION
 C    calculation of Q^2 dependence of {\cal H} singlet
 C    DVCS form factor
-C    Produces data files for Fig. 14 of  hep-ph/0703179
+C    Produces data files for Fig. 1. of  smallx paper
 C
 C    $Id$
 C     *******
 
 
-C     ****p* fitres.f/FITRES
+C     ****p* fitres2.f/FITRES2
 C  NAME
-C     FITRES  --  Ploting final fit results
+C     FITRES2  --  Ploting final fit results
 C  SYNOPSIS
 
-      PROGRAM FITRES
+      PROGRAM FITRES2
 
 C  DESCRIPTION
-C    Produces data files for Fig. 14 of hep-ph/0703179
+C    Produces data files for Fig. 1 of smallx paper
 C  OUTPUT
-C       fitres[0-3].dat  --  4 files (one for each panel of Figure
-C                            fitres) with 1-3 sets of point coordinates
+C       fitres2[0-3].dat  --  4 files (one for each panel of Figure
+C                            fitres2) with 1-3 sets of point coordinates
 C                            corresponding to 1-3 lines on a graph
 C  IDENTIFIERS
 C          NPOINTS -- number of points on each line
 C              XS  -- array(NPOINTS), values of x-coordinates (-tt, Q2, W)
 C           POINTS -- array(4, 3, NPOINTS), holds results for
-C                     four panels (Fig ?, in order  a, b, c, d)
+C                 four panels (Fig ?, in order  a, b, c, d)
 C
 C                P -- approximation order N^{P}LO P=0,1,2
 C
@@ -55,26 +55,24 @@ C
       NQS = 1
       NQSDIS = 1
     
-      ANSATZ = 'FITBP'
-
 #include "ansatz.F"
 
 * ----  "RESULTING FIT" ----------------
 
 
 *    NNLO 
-      P = 2
-      SCHEME = 'CSBAR'
-
-      PAR(11)   =    0.1673
-      PAR(12)   =    1.14
-      PAR(14)   =    1.167
-      PAR(15)   =    0.0
-
-      PAR(21)   =    0.571
-      PAR(22)   =    1.068
-      PAR(24)   =    1.391
-      PAR(25)   =    0.0
+*      P = 2
+*      SCHEME = 'CSBAR'
+*
+*      PAR(11)   =    0.1673
+*      PAR(12)   =    1.14
+*      PAR(14)   =    1.167
+*      PAR(15)   =    0.0
+*
+*      PAR(21)   =    0.571
+*      PAR(22)   =    1.068
+*      PAR(24)   =    1.391
+*      PAR(25)   =    0.0
 
 *    NLO 
 *      P = 1
@@ -91,58 +89,58 @@ C
 *      PAR(25)   =     0.0
 
 *    LO 
-*      P = 0
-*      SCHEME = 'CSBAR'
-*
-*      PAR(11)   =    0.1546
-*      PAR(12)   =    1.1769
-*      PAR(13)   =    0.15
-*      PAR(14)   =    0.781
-*      PAR(15)   =    0.0
-*      PAR(16)   =    3.0
-*      PAR(18)   =    0.0
-*      PAR(19)   =   -8.356
-*
-*      PAR(21)   =    0.554
-*      PAR(22)   =    1.2
-*      PAR(23)   =    0.15
-*      PAR(24)   =    0.7
-*      PAR(25)   =    0.0
-*      PAR(26)   =    2.0
-*      PAR(28)   =    0.0
-*      PAR(29)   =  -27.09
+      P = 0
+      SCHEME = 'CSBAR'
 
+      PAR(11)   =    0.1520
+      PAR(12)   =    1.157506
+      PAR(13)   =    0.15
+      PAR(14)   =    0.35612
+      PAR(15)   =    0.0
+      PAR(16)   =    2.0
+      PAR(18)   =    0.0
+      PAR(19)   =   -9.8177889
 
-*   Removing valence quarks
-      PAR(31)   =     0.0d0
-      PAR(41)   =     0.0d0
+      PAR(22)   =    1.2473
+      PAR(23)   =    0.15
+      PAR(24)   =    0.7
+      PAR(25)   =    0.0
+      PAR(26)   =    2.0
+      PAR(28)   =    0.0
+      PAR(29)   =  -32.401
+
 
 *     Files that will hold results
 
-      OPEN (UNIT = 10, FILE = "fitres0.dat", STATUS = "UNKNOWN")
-      OPEN (UNIT = 11, FILE = "fitres1.dat", STATUS = "UNKNOWN")
-      OPEN (UNIT = 12, FILE = "fitres2.dat", STATUS = "UNKNOWN")
-      OPEN (UNIT = 13, FILE = "fitres3.dat", STATUS = "UNKNOWN")
+      OPEN (UNIT = 10, FILE = "fitres20.dat", STATUS = "UNKNOWN")
+      OPEN (UNIT = 11, FILE = "fitres21.dat", STATUS = "UNKNOWN")
+      OPEN (UNIT = 12, FILE = "fitres22.dat", STATUS = "UNKNOWN")
+      OPEN (UNIT = 13, FILE = "fitres23.dat", STATUS = "UNKNOWN")
 
       DO 5 PANEL = 0, 3
-  5         WRITE (10 + PANEL, *) '# Output of fitres.f. See prolog of 
+  5         WRITE (10 + PANEL, *) '# Output of fitres2.f. See prolog of 
      & that program'
 
 
 *   ------  PANEL 0  -------------------
-*     Looping over two choices for Q2
-      DO 20 LN =1, 2
+*     Looping over three choices for Q2
+      DO 20 LN =1, 3
 
         IF (LN .EQ. 1) THEN
-          Q2 = 4.0d0 
-          W = 71.d0
-          XI = Q2 / ( 2.0d0 * W**2 + Q2)
-          FNAME = 'DATA/DVCS_H1_1.DAT'
-        ELSE
           Q2 = 8.0d0 
           W = 82.d0
           XI = Q2 / ( 2.0d0 * W**2 + Q2)
-          FNAME = 'DATA/DVCS_H1_2.DAT'
+          FNAME = 'DATA/DVCS_H1_0506_06.DAT'
+        ELSE IF (LN .EQ. 2) THEN
+          Q2 = 15.5d0 
+          W = 82.d0
+          XI = Q2 / ( 2.0d0 * W**2 + Q2)
+          FNAME = 'DATA/DVCS_H1_0506_07.DAT'
+        ELSE
+          Q2 = 25.0d0 
+          W = 82.d0
+          XI = Q2 / ( 2.0d0 * W**2 + Q2)
+          FNAME = 'DATA/DVCS_H1_0506_08.DAT'
         END IF
         CALL PRINTDATA(10, FNAME)
 
@@ -167,17 +165,21 @@ C
  20   CONTINUE
 
 *   ------  PANEL 1  -------------------
-*     Looping over two choices for W
-      DO 30 LN =1, 2
+*     Looping over choices for W
+      DO 30 LN =1, 3
 
         IF (LN .EQ. 1) THEN
           W = 82.d0
           FNAME = 'DATA/DVCS_H1_3.DAT'
+        ELSE IF (LN .EQ. 2) THEN
+          W = 82.d0
+          FNAME = 'DATA/DVCS_H1_0506_01.DAT'
         ELSE
           W = 89.d0
           FNAME = 'DATA/DVCS_ZEUS_1.DAT'
         END IF
         CALL PRINTDATA(11, FNAME)
+
 
         CALL INIT
         
@@ -203,14 +205,14 @@ C
       DO 50 LN =1, 3
 
         IF (LN .EQ. 1) THEN
-          Q2 = 4.d0
-          FNAME = 'DATA/DVCS_H1_5.DAT'
-        ELSE IF (LN .EQ. 2) THEN
           Q2 = 8.d0
-          FNAME = 'DATA/DVCS_H1_6.DAT'
+          FNAME = 'DATA/DVCS_H1_0506_03.DAT'
+        ELSE IF (LN .EQ. 2) THEN
+          Q2 = 15.5d0
+          FNAME = 'DATA/DVCS_H1_0506_04.DAT'
         ELSE
-          Q2 = 9.6d0
-          FNAME = 'DATA/DVCS_ZEUS_2.DAT'
+          Q2 = 25.d0
+          FNAME = 'DATA/DVCS_H1_0506_05.DAT'
         END IF
         CALL PRINTDATA(12, FNAME)
 

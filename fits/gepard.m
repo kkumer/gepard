@@ -149,7 +149,7 @@ BCA::usage = "BCA[w, q2, phi, options] returns beam charge asymmetry
 for asymuthal angle phi, integrated over t=-0.05..-1 GeV^2 (like for H1 data). 
 Options are same as for GepardInit."
 
-BCAproj::usage = "BCAproj[wavg, q2avg, t, phi, options] returns Cos[phi] harmonic 
+BCAproj::usage = "BCAproj[w, q2, phi, options] returns Cos[phi] harmonic 
 of beam charge asymmetry.  Options are same as for GepardInit."
 
 cffHInternal::usage = "MathLink function ..."

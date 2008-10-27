@@ -163,7 +163,7 @@ export ADACFLIB = -L$(HOME)/local/lib -lgadacf_$(FC)
 export TESTTARGETS = radcorr scaledep test auxtest houches accuracy
 export EXTARGETS = auxsi auxns anatomyNS anatomy radNLONS radNLO evolutNS evolut radQ \
                    radNNLONS radNNLO scalesNS scales scalesNNLO
-export FITTARGETS = fitres fitpdfs slope contours
+export FITTARGETS = fitres fitres2 fitpdfs slope contours
 export MMATARGETS = gepard.exe
 
 .PHONY: $(TESTTARGETS) $(EXTARGETS) $(FITTARGETS) $(MMATARGETS)

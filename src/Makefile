@@ -67,7 +67,7 @@ fit: $(ALLOBJS) $(FODIR)/Ffcn.o $(FODIR)/Ffit.o
 
 # targets for processing/presenting GPDs resulting from fit
 $(FITTARGETS): %: $(ALLOBJS) $(EXFODIR)/%.o
-	$(FC) -o ../fits/$@ $^ $(FFLAGS)
+	$(FC) -o ../fits/$@ $^ $(FFLAGS) $(ADACFLIB) $(ALLPGPLOTLIBS)
 
 # mma targets
 

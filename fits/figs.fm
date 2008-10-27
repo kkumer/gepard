@@ -10,11 +10,16 @@
 \psfrag{slopeB}[tc]{\scriptsize $B(x, {\cal Q}^2 = 4\, \mbox{GeV}^2)$ [GeV$^{-2}$]}
 \psfrag{H1, placeholderpla Q2=4}{\scriptsize H1, $\mathcal{Q}^2 = 4 \,\mbox{GeV}^2$}
 \psfrag{H1, placeholderpla Q2=8}{\scriptsize H1, $\mathcal{Q}^2 = 8 \,\mbox{GeV}^2$}
+\psfrag{H1, placeholderpla Q2=15.5}{\scriptsize H1, $\mathcal{Q}^2 = 15.5 \,\mbox{GeV}^2$}
+\psfrag{H1, placeholderpla Q2=25}{\scriptsize H1, $\mathcal{Q}^2 = 25 \,\mbox{GeV}^2$}
 \psfrag{ZEUS, placeholderplace Q2=9.6}{\scriptsize ZEUS, $\mathcal{Q}^2 = 9.6 \,\mbox{GeV}^2$}
-\psfrag{H1, placeholderpla W=82}{\scriptsize H1, $W = 82 \,\mbox{GeV}$}
+\psfrag{H1, HI, placeholder W=82}{\scriptsize H1 (HERA I), $W = 82 \,\mbox{GeV}$}
+\psfrag{H1, HII, placeholder W=82}{\scriptsize H1 (HERA II), $W = 82 \,\mbox{GeV}$}
 \psfrag{ZEUS, placeholderpla W=89}{\scriptsize ZEUS, $W = 89 \,\mbox{GeV}$}
 \psfrag{PARSIGMA}[tc]{\scriptsize $d \sigma (\gamma^* p \to \gamma p)/ d t$ [nb/GeV$^2$]}
 \psfrag{SIGMA}[tc]{\scriptsize $\sigma(\gamma^* p \to \gamma p)$ [nb]}
 \psfrag{F2}[tc]{\scriptsize $F_{2}$}
 \psfrag{q=qS}{\scriptsize quarks}
 \psfrag{q=qG}{\scriptsize gluons}
+\psfrag{W = 82 GeV}{\scriptsize $W = 82 \,\mbox{GeV}$}
+\psfrag{legend: same as on (a)}{\scriptsize legend: same as on (a)}

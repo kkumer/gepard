@@ -34,7 +34,7 @@ C
       DOUBLE PRECISION NORMS
       DOUBLE COMPLEX CLNGAMMA, CBETA, POCHSEA, POCHG, POCHHAMMER
       DOUBLE COMPLEX RATGAMMA, JMA(2)
-      DOUBLE COMPLEX MULTIGAMMA, CORR(2)
+      DOUBLE COMPLEX MULTIGAMMA
       INTEGER LHBETA(4), LHBETAF(4)
       DOUBLE PRECISION LHA(4), LHLAM(4), ALPT(2)
 #include "header.F"
@@ -103,10 +103,6 @@ C
           ALPT(2) = PAR(22) + PAR(23)*DEL2
           JMA(1) = J - ALPT(1)
           JMA(2) = J - ALPT(2)
-          CORR(1) = EXP(   CLNGAMMA(DBLCMPLX(7.0d0 + PAR(12), 0.0d0)) -
-     &           CLNGAMMA(DBLCMPLX(7.0d0 + ALPT(1), 0.0d0))   )
-          CORR(2) = EXP(   CLNGAMMA(DBLCMPLX(7.0d0 + PAR(22), 0.0d0)) -
-     &           CLNGAMMA(DBLCMPLX(7.0d0 + ALPT(2), 0.0d0))   )
         IF ( PROCESS .EQ. 'DIS' ) THEN 
           FCM(1) = PAR(11) * POCHHAMMER(DBLCMPLX(2.0d0 - PAR(12),0.0d0) 
      &              , 9) / POCHHAMMER(1.0d0 - PAR(12)
@@ -125,7 +121,7 @@ C
      &          CLNGAMMA(1.0d0+JMA(1)) - 2.0d0*CLNGAMMA(
      &           DBLCMPLX(ALPT(1), 0.0d0)) ) / SIN(PI*ALPT(1)) *
      &          (1.0d0 - (SIN(PI*ALPT(1)) -
-     &           SIN(J*PI))/SIN(PI*JMA(1)) ) * CORR(1)  )
+     &           SIN(J*PI))/SIN(PI*JMA(1)) )   )
           FCM(2) = PAR(21) * POCHHAMMER(DBLCMPLX(2.0d0 - PAR(22),0.0d0)
      &              , 7) / POCHHAMMER(1.0d0 - PAR(22)
      &          + J , 7) * (1.0d0 - PAR(22) + J) / (1.0d0 + JMA(2)) /
@@ -136,7 +132,7 @@ C
      &          CLNGAMMA(1.0d0+JMA(2)) - 2.0d0*CLNGAMMA(
      &           DBLCMPLX(ALPT(2), 0.0d0)) ) / SIN(PI*ALPT(2)) *
      &          (1.0d0 - (SIN(PI*ALPT(2)) -
-     &           SIN(J*PI))/SIN(PI*JMA(2)) ) * CORR(2) )
+     &           SIN(J*PI))/SIN(PI*JMA(2)) )  )
         ENDIF
       ELSE IF (ANSATZ .EQ. 'FIT86') THEN
 * Use first sum-rule constraint
@@ -145,10 +141,6 @@ C
           ALPT(2) = PAR(22) + PAR(23)*DEL2
           JMA(1) = J - ALPT(1)
           JMA(2) = J - ALPT(2)
-          CORR(1) = EXP(   CLNGAMMA(DBLCMPLX(7.0d0 + PAR(12), 0.0d0)) -
-     &           CLNGAMMA(DBLCMPLX(7.0d0 + ALPT(1), 0.0d0))   )
-          CORR(2) = EXP(   CLNGAMMA(DBLCMPLX(7.0d0 + PAR(22), 0.0d0)) -
-     &           CLNGAMMA(DBLCMPLX(7.0d0 + ALPT(2), 0.0d0))   )
         IF ( PROCESS .EQ. 'DIS' ) THEN 
           FCM(1) = PAR(11) * POCHHAMMER(DBLCMPLX(2.0d0 - PAR(12),0.0d0) 
      &              , 8) / POCHHAMMER(1.0d0 - PAR(12)
@@ -167,7 +159,7 @@ C
      &          CLNGAMMA(1.0d0+JMA(1)) - 2.0d0*CLNGAMMA(
      &           DBLCMPLX(ALPT(1), 0.0d0)) ) / SIN(PI*ALPT(1)) *
      &          (1.0d0 - (SIN(PI*ALPT(1)) -
-     &           SIN(J*PI))/SIN(PI*JMA(1)) ) * CORR(1)  )
+     &           SIN(J*PI))/SIN(PI*JMA(1)) )  )
           FCM(2) = PAR(21) * POCHHAMMER(DBLCMPLX(2.0d0 - PAR(22),0.0d0)
      &              , 6) / POCHHAMMER(1.0d0 - PAR(22)
      &          + J , 6) * (1.0d0 - PAR(22) + J) / (1.0d0 + JMA(2)) /
@@ -178,7 +170,7 @@ C
      &          CLNGAMMA(1.0d0+JMA(2)) - 2.0d0*CLNGAMMA(
      &           DBLCMPLX(ALPT(2), 0.0d0)) ) / SIN(PI*ALPT(2)) *
      &          (1.0d0 - (SIN(PI*ALPT(2)) -
-     &           SIN(J*PI))/SIN(PI*JMA(2)) ) * CORR(2) )
+     &           SIN(J*PI))/SIN(PI*JMA(2)) ) )
         ENDIF
       ELSE IF (ANSATZ .EQ. 'FITMUL') THEN
 * Use first sum-rule constraint
@@ -227,10 +219,6 @@ C
           ALPT(2) = PAR(22) + PAR(23)*DEL2
           JMA(1) = J - ALPT(1)
           JMA(2) = J - ALPT(2)
-          CORR(1) = RATGAMMA(DBLCMPLX(7.0d0 + PAR(12), 0.0d0),
-     &           DBLCMPLX(7.0d0 + ALPT(1), 0.0d0))
-          CORR(2) = RATGAMMA(DBLCMPLX(7.0d0 + PAR(22), 0.0d0),
-     &           DBLCMPLX(7.0d0 + ALPT(2), 0.0d0))
         IF ( PROCESS .EQ. 'DIS' ) THEN 
           FCM(1) = PAR(11) * POCHHAMMER(DBLCMPLX(2.0d0 - PAR(12),0.0d0) 
      &              , 9) / POCHHAMMER(1.0d0 - PAR(12)
@@ -249,7 +237,7 @@ C
      &          EXP(- 2.0d0*CLNGAMMA(
      &           DBLCMPLX(ALPT(1), 0.0d0)) ) / SIN(PI*ALPT(1)) *
      &          (1.0d0 - (SIN(PI*ALPT(1)) -
-     &           SIN(J*PI))/SIN(PI*JMA(1)) ) * CORR(1)  )
+     &           SIN(J*PI))/SIN(PI*JMA(1)) )  )
           FCM(2) = PAR(21) * POCHHAMMER(DBLCMPLX(2.0d0 - PAR(22),0.0d0)
      &              , 7) / POCHHAMMER(1.0d0 - PAR(22)
      &          + J , 7) * (1.0d0 - PAR(22) + J) / (1.0d0 + JMA(2)) /
@@ -260,7 +248,7 @@ C
      &          EXP(- 2.0d0*CLNGAMMA(
      &           DBLCMPLX(ALPT(2), 0.0d0)) ) / SIN(PI*ALPT(2)) *
      &          (1.0d0 - (SIN(PI*ALPT(2)) -
-     &           SIN(J*PI))/SIN(PI*JMA(2)) ) * CORR(2)  )
+     &           SIN(J*PI))/SIN(PI*JMA(2)) )  )
         ENDIF
       ELSE IF (ANSATZ .EQ. 'FITNG') THEN
 * Don't use first sum-rule constraint (and not that pochs are different!)
@@ -268,10 +256,6 @@ C
           ALPT(2) = PAR(22) + PAR(23)*DEL2
           JMA(1) = J - ALPT(1)
           JMA(2) = J - ALPT(2)
-          CORR(1) = EXP(   CLNGAMMA(DBLCMPLX(7.0d0 + PAR(12), 0.0d0)) -
-     &           CLNGAMMA(DBLCMPLX(7.0d0 + ALPT(1), 0.0d0))   )
-          CORR(2) = EXP(   CLNGAMMA(DBLCMPLX(7.0d0 + PAR(22), 0.0d0)) -
-     &           CLNGAMMA(DBLCMPLX(7.0d0 + ALPT(2), 0.0d0))   )
         IF ( PROCESS .EQ. 'DIS' ) THEN 
           FCM(1) = PAR(11) * POCHHAMMER(DBLCMPLX(2.0d0 - PAR(12),0.0d0) 
      &              , 8) / POCHHAMMER(1.0d0 - PAR(12)
@@ -290,7 +274,7 @@ C
      &          CLNGAMMA(1.0d0+JMA(1)) - 2.0d0*CLNGAMMA(
      &           DBLCMPLX(ALPT(1), 0.0d0)) ) / SIN(PI*ALPT(1)) *
      &          (1.0d0 - (SIN(PI*ALPT(1)) -
-     &           SIN(J*PI))/SIN(PI*JMA(1)) ) * CORR(1)  )
+     &           SIN(J*PI))/SIN(PI*JMA(1)) )  )
           FCM(2) = PAR(21) * POCHHAMMER(DBLCMPLX(2.0d0 - PAR(22),0.0d0)
      &              , 6) / POCHHAMMER(1.0d0 - PAR(22)
      &          + J , 6) * (1.0d0 - PAR(22) + J) / (1.0d0 + JMA(2)) /
@@ -301,7 +285,7 @@ C
      &          CLNGAMMA(1.0d0+JMA(2)) - 2.0d0*CLNGAMMA(
      &           DBLCMPLX(ALPT(2), 0.0d0)) ) / SIN(PI*ALPT(2)) *
      &          (1.0d0 - (SIN(PI*ALPT(2)) -
-     &           SIN(J*PI))/SIN(PI*JMA(2)) ) * CORR(2) )
+     &           SIN(J*PI))/SIN(PI*JMA(2)) )  )
         ENDIF
       ELSE IF (ANSATZ .EQ. 'FITE86') THEN
 * Use first sum-rule constraint
@@ -310,10 +294,6 @@ C
           ALPT(2) = PAR(22) + PAR(23)*DEL2
           JMA(1) = J - ALPT(1)
           JMA(2) = J - ALPT(2)
-          CORR(1) = EXP(   CLNGAMMA(DBLCMPLX(7.0d0 + PAR(12), 0.0d0)) -
-     &           CLNGAMMA(DBLCMPLX(7.0d0 + ALPT(1), 0.0d0))   )
-          CORR(2) = EXP(   CLNGAMMA(DBLCMPLX(7.0d0 + PAR(22), 0.0d0)) -
-     &           CLNGAMMA(DBLCMPLX(7.0d0 + ALPT(2), 0.0d0))   )
         IF ( PROCESS .EQ. 'DIS' ) THEN 
           FCM(1) = PAR(11) * POCHHAMMER(DBLCMPLX(2.0d0 - PAR(12),0.0d0) 
      &              , 8) / POCHHAMMER(1.0d0 - PAR(12)
@@ -332,7 +312,7 @@ C
      &          CLNGAMMA(1.0d0+JMA(1)) - 2.0d0*CLNGAMMA(
      &           DBLCMPLX(ALPT(1), 0.0d0)) ) / SIN(PI*ALPT(1)) *
      &          (1.0d0 - (SIN(PI*ALPT(1)) -
-     &           SIN(J*PI))/SIN(PI*JMA(1)) ) * CORR(1)  )
+     &           SIN(J*PI))/SIN(PI*JMA(1)) )  )
           FCM(2) = PAR(21) * POCHHAMMER(DBLCMPLX(2.0d0 - PAR(22),0.0d0)
      &              , 6) / POCHHAMMER(1.0d0 - PAR(22)
      &          + J , 6) * (1.0d0 - PAR(22) + J) / (1.0d0 + JMA(2)) *
@@ -343,7 +323,7 @@ C
      &          CLNGAMMA(1.0d0+JMA(2)) - 2.0d0*CLNGAMMA(
      &           DBLCMPLX(ALPT(2), 0.0d0)) ) / SIN(PI*ALPT(2)) *
      &          (1.0d0 - (SIN(PI*ALPT(2)) -
-     &           SIN(J*PI))/SIN(PI*JMA(2)) ) * CORR(2) )
+     &           SIN(J*PI))/SIN(PI*JMA(2)) ) )
         ENDIF
       ELSE IF (ANSATZ .EQ. 'FITEXP') THEN
 * Use first sum-rule constraint
@@ -352,10 +332,6 @@ C
           ALPT(2) = PAR(22) + PAR(23)*DEL2
           JMA(1) = J - ALPT(1)
           JMA(2) = J - ALPT(2)
-          CORR(1) = EXP(   CLNGAMMA(DBLCMPLX(7.0d0 + PAR(12), 0.0d0)) -
-     &           CLNGAMMA(DBLCMPLX(7.0d0 + ALPT(1), 0.0d0))   )
-          CORR(2) = EXP(   CLNGAMMA(DBLCMPLX(7.0d0 + PAR(22), 0.0d0)) -
-     &           CLNGAMMA(DBLCMPLX(7.0d0 + ALPT(2), 0.0d0))   )
         IF ( PROCESS .EQ. 'DIS' ) THEN 
           FCM(1) = PAR(11) * POCHHAMMER(DBLCMPLX(2.0d0 - PAR(12),0.0d0) 
      &              , 9) / POCHHAMMER(1.0d0 - PAR(12)
@@ -374,7 +350,7 @@ C
      &          CLNGAMMA(1.0d0+JMA(1)) - 2.0d0*CLNGAMMA(
      &           DBLCMPLX(ALPT(1), 0.0d0)) ) / SIN(PI*ALPT(1)) *
      &          (1.0d0 - (SIN(PI*ALPT(1)) -
-     &           SIN(J*PI))/SIN(PI*JMA(1)) ) * CORR(1)  )
+     &           SIN(J*PI))/SIN(PI*JMA(1)) )  )
           FCM(2) = PAR(21) * POCHHAMMER(DBLCMPLX(2.0d0 - PAR(22),0.0d0)
      &              , 7) / POCHHAMMER(1.0d0 - PAR(22)
      &          + J , 7) * (1.0d0 - PAR(22) + J) / (1.0d0 + JMA(2)) *
@@ -385,7 +361,7 @@ C
      &          CLNGAMMA(1.0d0+JMA(2)) - 2.0d0*CLNGAMMA(
      &           DBLCMPLX(ALPT(2), 0.0d0)) ) / SIN(PI*ALPT(2)) *
      &          (1.0d0 - (SIN(PI*ALPT(2)) -
-     &           SIN(J*PI))/SIN(PI*JMA(2)) ) * CORR(2) )
+     &           SIN(J*PI))/SIN(PI*JMA(2)) )  )
         ENDIF
       ELSE IF (ANSATZ .EQ. 'SPLICE') THEN
               CALL SPLICE(J, FCM)
