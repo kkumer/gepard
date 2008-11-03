@@ -114,7 +114,7 @@ struct{
 } contour_;
 
 struct{
-        struct dblcomplex n[NPTSMAX];
+        struct dblcomplex n[NPTSMAX][2];
 } npoints_;
 
 /*

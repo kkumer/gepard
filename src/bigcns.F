@@ -35,7 +35,7 @@ C
       DOUBLE COMPLEX SHIFT1, SHIFT2
 #include "header.F"
 
-      J = N(K) - 1
+      J = N(1, K) - 1
 
       LRF2 = LOG(RF2)
       LRR2 = LOG(RR2)

@@ -13,10 +13,10 @@ C     Non-diagonal part of evolution operator according to Eq. (143) in
 C     [Kumericki:2007sa]
 C  SYNOPSIS
 
-      SUBROUTINE NDINTF (K, R, NDINT, NI, NJ)
+      SUBROUTINE NDINTF (SEC, K, R, NDINT, NI, NJ)
 
       IMPLICIT NONE
-      INTEGER  K, NI, NJ
+      INTEGER  SEC, K, NI, NJ
       DOUBLE PRECISION R
       DOUBLE COMPLEX NDINT
 
@@ -66,7 +66,7 @@ C
 
 *   Integrating over L->ZK, with fixed K->J
 
-      J = N(K) - 1.0d0
+      J = N(SEC, K) - 1.0d0
       NDINT = (0.0d0, 0.0d0)
       DO 100 L = 1, NPTSND
 

@@ -62,7 +62,7 @@ C
 
 *   Adding MSBAR non-diagonal NLO evolution (time consuming)
       IF ( (P .EQ. 1) .AND. (SCHEME .EQ. 'MSBAR') ) THEN
-        CALL NDINTF(K, R, NDINT, 0, 0)
+        CALL NDINTF(1, K, R, NDINT, 0, 0)
         EVOLNSA(1) = EVOLNSA(1) + NDINT
       ENDIF
 
@@ -79,10 +79,10 @@ C  DESCRIPTION
 C    calculates singlet evolution operator
 C  SYNOPSIS
 
-      SUBROUTINE EVOLF (K, R, EVOLA)
+      SUBROUTINE EVOLF (SEC, K, R, EVOLA)
 
       IMPLICIT NONE
-      INTEGER  K
+      INTEGER  K, SEC
       DOUBLE PRECISION R
       DOUBLE COMPLEX EVOLA(0:2,2,2)
 
@@ -110,9 +110,9 @@ C
       INTEGER KRONECKER
 #include "header.F"
 
-      CALL LAMBDAF( K, LAM)
+      CALL LAMBDAF(SEC, K, LAM)
       CALL ERFUNCF (R, LAM, LAM, ERFUNC1, ERFUNC2)
-      CALL RNNLOF ( K, LAM, PR, R1PROJ, R2PROJ)
+      CALL RNNLOF (SEC, K, LAM, PR, R1PROJ, R2PROJ)
 
       RINV = 1.0d0 / R
 
@@ -156,7 +156,7 @@ C
       IF ( (P .EQ. 1) .AND. (SCHEME .EQ. 'MSBAR') ) THEN
         DO 50 I = 1, 2
         DO 50 J = 1, 2
-          CALL NDINTF(K, R, NDINT, I, J)
+          CALL NDINTF(SEC, K, R, NDINT, I, J)
           EVOLA(1,I,J) = EVOLA(1,I,J) + NDINT
  50     CONTINUE
       ENDIF

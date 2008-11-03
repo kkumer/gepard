@@ -70,15 +70,22 @@ C
 
       DO 123 K = 1, NPTS
 
-      J = N(K) - 1
+      J = N(1,K) - 1
       CFAC = EPH / XI**(J+1.d0)
 
       IF ( FFTYPE(:7) .EQ. 'NONSING' ) THEN
         FPWH = CGRIDNS(QIND,K)*MBGPD(K,1)        
       ELSE
-        FPWH = CGRID(QIND,K,1)*MBGPD(K,1) + CGRID(QIND,K,2)*MBGPD(K,2)
-        FPWE = CGRID(QIND,K,1)*PAR(18)*MBGPD(K,1) 
-     &       + CGRID(QIND,K,2)*PAR(28)*MBGPD(K,2)
+        FPWH = CGRID(1,QIND,K,1)*MBGPD(K,1) + 
+     &         CGRID(1,QIND,K,2)*MBGPD(K,2)
+        FPWH = FPWH +  
+     &              PAR(19) * CGRID(2,QIND,K,1) * MBGPD(K,1) + 
+     &              PAR(29) * CGRID(2,QIND,K,2) * MBGPD(K,2)
+        FPWE = CGRID(1,QIND,K,1)*PAR(18)*MBGPD(K,1) 
+     &       + CGRID(1,QIND,K,2)*PAR(28)*MBGPD(K,2)
+        FPWE = FPWE +  
+     &            PAR(18) * PAR(19) * CGRID(2,QIND,K,1) * MBGPD(K,1) + 
+     &            PAR(28) * PAR(29) * CGRID(2,QIND,K,2) * MBGPD(K,2)
       END IF
 
       FREALH = IMAGPART(CFAC * DCTAN(PIHALF*J) * FPWH)

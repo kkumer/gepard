@@ -43,7 +43,7 @@ void MinuitInit(int a)
 
           MLPutFunction(stdlink, "List", contour_.npts); /* passing MB points */
             for (i = 0; i < contour_.npts; i++){
-                    nc = npoints_.n[i];
+                    nc = npoints_.n[i][0];
                     MLPutFunction(stdlink, "Complex", 2);
                       MLPutReal(stdlink, nc.dr - 1);
                       MLPutReal(stdlink, nc.di);
@@ -346,7 +346,7 @@ void cffHInternal(double xi, double t, double q2, double q02, int speed, int p,
             MLPutSymbol(stdlink, "jValues");
             MLPutFunction(stdlink, "List", contour_.npts); /* passing MB points */
               for (i = 0; i < contour_.npts; i++){
-                      nc = npoints_.n[i];
+                      nc = npoints_.n[i][0];
                       MLPutFunction(stdlink, "Complex", 2);
                         MLPutReal(stdlink, nc.dr - 1);
                         MLPutReal(stdlink, nc.di);
@@ -424,7 +424,7 @@ void cffEInternal(double xi, double t, double q2, double q02, int speed, int p,
             MLPutSymbol(stdlink, "jValues");
             MLPutFunction(stdlink, "List", contour_.npts); /* passing MB points */
               for (i = 0; i < contour_.npts; i++){
-                      nc = npoints_.n[i];
+                      nc = npoints_.n[i][0];
                       MLPutFunction(stdlink, "Complex", 2);
                         MLPutReal(stdlink, nc.dr - 1);
                         MLPutReal(stdlink, nc.di);
@@ -502,7 +502,7 @@ void F2Internal(double xbj, double q2, double q02, int speed, int p,
             MLPutSymbol(stdlink, "jValues");
             MLPutFunction(stdlink, "List", contour_.npts); /* passing MB points */
               for (i = 0; i < contour_.npts; i++){
-                      nc = npoints_.n[i];
+                      nc = npoints_.n[i][0];
                       MLPutFunction(stdlink, "Complex", 2);
                         MLPutReal(stdlink, nc.dr - 1);
                         MLPutReal(stdlink, nc.di);
@@ -684,7 +684,7 @@ void BCAInternal(double wavg, double q2avg, double phiin,
             MLPutSymbol(stdlink, "jValues");
             MLPutFunction(stdlink, "List", contour_.npts); /* passing MB points */
               for (i = 0; i < contour_.npts; i++){
-                      nc = npoints_.n[i];
+                      nc = npoints_.n[i][0];
                       MLPutFunction(stdlink, "Complex", 2);
                         MLPutReal(stdlink, nc.dr - 1);
                         MLPutReal(stdlink, nc.di);
