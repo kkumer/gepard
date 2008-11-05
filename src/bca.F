@@ -49,7 +49,8 @@ C
 *     We are not fitting, should set QS()
         NQS = 1
         QS(1) = Q2
-        CALL EVOLC(1)
+        CALL EVOLC(1,1)
+        CALL EVOLC(2,1)
       END IF
 
       W2 = WAVG**2
