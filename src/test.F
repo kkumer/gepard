@@ -45,6 +45,14 @@ C
       PAR(23) = 0.25d0
       PAR(24) = 1.2d0
 
+*   turn off second PW
+      PAR(17) = 0.0d0
+      PAR(27) = 0.0d0
+
+*   turn off GPD E
+      PAR(18) = 0.0d0
+      PAR(28) = 0.0d0
+
 *   turn off xi-dependence
       PAR(19) = 0.0d0
       PAR(29) = 0.0d0

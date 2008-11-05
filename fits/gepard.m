@@ -4,7 +4,7 @@
 (*     ==============================    *)
 
 
-Print["GeParD - Mathematica interface (2008-11-03)"];
+Print["GeParD - Mathematica interface (2008-11-04)"];
 
 
 If[$VersionNumber<5.999,  (* Mathematica 5.*)
@@ -338,22 +338,22 @@ CompileMoments[] := Block[{},
         GPDMomCompiledQ = 
             Compile[Evaluate[{rej, imj, t, xi}~Join~
                   Union[Cases[GPDMom[j, t, xi], PAR[n_], Infinity]~Join~{
-                PAR[18], PAR[19], PAR[28], PAR[29]}]], 
+                PAR[17], PAR[18], PAR[19], PAR[27], PAR[28], PAR[29]}]], 
               Evaluate[GPDMom[rej + I imj, t, xi][[1]]]];
         GPDMomCompiledG = 
             Compile[Evaluate[{rej, imj, t, xi}~Join~
                   Union[Cases[GPDMom[j, t, xi], PAR[n_], Infinity]~Join~{
-                PAR[18], PAR[19], PAR[28], PAR[29]}]], 
+                PAR[17], PAR[18], PAR[19], PAR[27], PAR[28], PAR[29]}]], 
               Evaluate[GPDMom[rej + I imj, t, xi][[2]]]];
         PDFMomCompiledQ = 
             Compile[Evaluate[{rej, imj, t, xi}~Join~
                   Union[Cases[GPDMom[j, t, xi], PAR[n_], Infinity]~Join~{
-                PAR[18], PAR[19], PAR[28], PAR[29]}]], 
+                PAR[17], PAR[18], PAR[19], PAR[27], PAR[28], PAR[29]}]], 
               Evaluate[PDFMom[rej + I imj, t, xi][[1]]]];
         PDFMomCompiledG = 
             Compile[Evaluate[{rej, imj, t, xi}~Join~
                   Union[Cases[GPDMom[j, t, xi], PAR[n_], Infinity]~Join~{
-                PAR[18], PAR[19], PAR[28], PAR[29]}]], 
+                PAR[17], PAR[18], PAR[19], PAR[27], PAR[28], PAR[29]}]], 
               Evaluate[PDFMom[rej + I imj, t, xi][[2]]]];
 ]
 
