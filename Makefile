@@ -99,14 +99,22 @@ endif
 # -- 2. MathLink related things
 #
 # Put your version of Mathematica here
-export MMAVERSION=5.2
+export MMAVERSION=6.0
 ifdef WINDIR
   export SYS = Windows
-  export MLDIR=/cygdrive/c/Program\ Files/Wolfram\ Research/Mathematica/$(MMAVERSION)/AddOns/MathLink/DeveloperKit/$(SYS)/CompilerAdditions/mldev32
+  ifeq '$(MMAVERSION)' '6.0'
+    export MLDIR=/cygdrive/c/Program\ Files/Wolfram\ Research/Mathematica/$(MMAVERSION)/SystemFiles/Links/MathLink/DeveloperKit/$(SYS)/CompilerAdditions/cygwin
+  else
+    export MLDIR=/cygdrive/c/Program\ Files/Wolfram\ Research/Mathematica/$(MMAVERSION)/AddOns/MathLink/DeveloperKit/$(SYS)/CompilerAdditions/mldev32
+  endif
   export MPREP = $(MLDIR)/bin/mprep
   export MLINCDIR = $(MLDIR)/include
   export MLLIBDIR = $(MLDIR)/lib 
-  export MLLIB = ml32i2w
+  ifeq '$(MMAVERSION)' '6.0'
+    export MLLIB = ML32i3
+  else
+    export MLLIB = ml32i2w
+  endif
   export MLEXTRA = -mwindows -DWIN32_MATHLINK
 else
   ifdef NOT64
