@@ -6,7 +6,6 @@
 
 Print["GeParD - Mathematica interface (2008-12-21)"];
 
-
 If[$VersionNumber<5.999,  (* Mathematica 5.*)
 BeginPackage["gepard`", "Format`", "NumericalMath`NLimit`", "Graphics`Graphics`",
                         "Utilities`FilterOptions`"], 
@@ -80,8 +79,8 @@ GPD H(x, eta=0, t, Q2).  Options are same as for GepardInit."
 PDF::usage = "PDF[{val1, val2, ...}, t, xi] is a function that is contacted by MathLink Minuit
 interface and should give PDF's for .... "
 
-slopeQ::usage = "slopeQ[x, opts] gives quark GPD slope at x"
-slopeG::usage = "slopeG[x, opts] gives gluon GPD slope at x"
+slopeQ::usage = "slopeQ[x, Q2, opts] gives quark GPD slope at x"
+slopeG::usage = "slopeG[x, Q2, opts] gives gluon GPD slope at x"
 
 plotslopes::usage = "plots slopes of quark and gluon GPDs"
 
@@ -298,15 +297,15 @@ plotPDFs[] := LogLinearPlot[{GPD[1, x, 0, 0], GPD[2, x, 0, 0]},
       {{Thickness[0.01], RGBColor[0, 0, 1]}, {Thickness[0.01], 
         RGBColor[1, 0, 0]}}]
 
-slopeQ[x_, (opts___)?OptionQ] := 
+slopeQ[x_, Q2_:4, (opts___)?OptionQ] := 
   Module[{h = 0.000001}, 
-   (Log[gpdHzeroQ[x, -h, 4, 4, opts]] - Log[gpdHzeroQ[x, 0, 4, 4, opts]]) / (-h)]
-slopeG[x_, (opts___)?OptionQ] := 
+   (Log[gpdHzeroQ[x, -h, Q2, 4, opts]] - Log[gpdHzeroQ[x, 0, Q2, 4, opts]]) / (-h)]
+slopeG[x_, Q2_:4, (opts___)?OptionQ] := 
   Module[{h = 0.000001}, 
-   (Log[gpdHzeroG[x, -h, 4, 4, opts]] - Log[gpdHzeroG[x, 0, 4, 4, opts]]) / (-h)]
+   (Log[gpdHzeroG[x, -h, Q2, 4, opts]] - Log[gpdHzeroG[x, 0, Q2, 4, opts]]) / (-h)]
 
-plotslopes[(opts___)?OptionQ] := 
-  LogLinearPlot[{slope[x, opts], slope[x, opts]}, {x, 0.0001, 0.01}, 
+plotslopes[Q2_:10, (opts___)?OptionQ] := 
+  LogLinearPlot[{slopeQ[x, Q2, opts], slopeG[x, Q2, opts]}, {x, 0.0001, 0.01}, 
     PlotRange -> All, AxesLabel -> {"x", "B(x)"}, 
     PlotStyle -> {{Thickness[0.01], RGBColor[0, 0, 1]}, {Thickness[0.01], 
           RGBColor[1, 0, 0]}}]

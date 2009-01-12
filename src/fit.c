@@ -325,7 +325,7 @@ void cffHInternal(double xi, double t, double q2, double q02, int speed, int p,
         struct dblcomplex nc;
         long int nargs;
         const char *fname;
-        long int evoli=1, evolj=1;
+        long int evoli=1, evolj=1, evols=2;
         char datfile[] = "DFLT";
         char outfile[] = "DFLT";
 
@@ -368,6 +368,7 @@ void cffHInternal(double xi, double t, double q2, double q02, int speed, int p,
         MLEndPacket(stdlink);
 
 evolc_(&evoli, &evolj);
+evolc_(&evols, &evolj);
 
 cfff_();
 
@@ -403,7 +404,7 @@ void cffEInternal(double xi, double t, double q2, double q02, int speed, int p,
         struct dblcomplex nc;
         long int nargs;
         const char *fname;
-        long int evoli=1, evolj=1;
+        long int evoli=1, evolj=1, evols=2;
         char datfile[] = "DFLT";
         char outfile[] = "DFLT";
 
@@ -446,6 +447,7 @@ void cffEInternal(double xi, double t, double q2, double q02, int speed, int p,
         MLEndPacket(stdlink);
 
 evolc_(&evoli, &evolj);
+evolc_(&evols, &evolj);
 
 cfff_();
 
