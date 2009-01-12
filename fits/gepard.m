@@ -4,7 +4,7 @@
 (*     ==============================    *)
 
 
-Print["GeParD - Mathematica interface (2008-11-04)"];
+Print["GeParD - Mathematica interface (2008-12-21)"];
 
 
 If[$VersionNumber<5.999,  (* Mathematica 5.*)
@@ -13,6 +13,8 @@ BeginPackage["gepard`", "Format`", "NumericalMath`NLimit`", "Graphics`Graphics`"
                      (* else Mathematica 6.* *)
 BeginPackage["gepard`", "Format`", "NumericalCalculus`", "Utilities`FilterOptions`"]]
 
+
+Unprotect[PDF];Remove[PDF];
 
 
 GepardInit::usage = "GepardInit[] performs initialization of GeParD parameters. 
@@ -262,7 +264,7 @@ GepardFit[pars_, (opts___)?OptionQ] := Block[{varpars = ParameterID /@ pars,
       Print["  ----    Parameter status :       ----- "]; 
       ParameterStatus = Select[Table[Join[Parameters[[n]], 
           (MinuitGetParameter /@ Transpose[Parameters][[1]])[[n]]], 
-         {n, Length[Parameters]}], Last[#1] != 0 & ]]
+         {n, Length[Parameters]}], Last[#1] != 0 & ]; TableForm[ParameterStatus]]
 
 PrettyStatus[] := Block[{status, chis},
        MinuitCommand["cali 3"]; status = MinuitStatus[]; 
