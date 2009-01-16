@@ -323,7 +323,7 @@ void cffHInternal(double xi, double t, double q2, double q02, int speed, int p,
         int i;
         double xreal;
         struct dblcomplex nc;
-        long int nargs;
+        int nargs;
         const char *fname;
         long int evoli=1, evolj=1, evols=2;
         char datfile[] = "DFLT";
@@ -402,7 +402,7 @@ void cffEInternal(double xi, double t, double q2, double q02, int speed, int p,
         int i;
         double xreal;
         struct dblcomplex nc;
-        long int nargs;
+        int nargs;
         const char *fname;
         long int evoli=1, evolj=1, evols=2;
         char datfile[] = "DFLT";
@@ -481,7 +481,7 @@ void F2Internal(double xbj, double q2, double q02, int speed, int p,
         int i;
         double xreal;
         struct dblcomplex nc;
-        long int nargs;
+        int nargs;
         const char *fname;
         long int evoli=1, evolj=1;
         char datfile[] = "DFLT";
@@ -573,7 +573,7 @@ void getmbgpdmma_(void)
         int i;
         double xr, xi;
         struct dblcomplex xc;
-        long int nargs;
+        int nargs;
         const char *fname;
 
 /* calling Mathematica function GPD[{params}, DEL2, XI]  */
@@ -671,7 +671,8 @@ void BCAInternal(double wavg, double q2avg, double phiin,
         int i;
         double xreal, herabca;
         struct dblcomplex nc;
-        long int nargs, fitflag=0;
+        int nargs; 
+        long int fitflag=0;
         const char *fname;
         char datfile[] = "DFLT";
         char outfile[] = "DFLT";

@@ -75,6 +75,10 @@ C
 
       IF ( FFTYPE(:7) .EQ. 'NONSING' ) THEN
         FPWH = CGRIDNS(QIND,K)*MBGPD(K,1)        
+*        FIXME: Following line could be wrong parameter no. It's ther
+*               just to avoid compiler warning ... NONSING is maybe
+*               broken!
+        FPWE = CGRIDNS(QIND,K)*PAR(18)*MBGPD(K,1)        
       ELSE
         FPWH = CGRID(1,QIND,K,1)*MBGPD(K,1) + 
      &         CGRID(1,QIND,K,2)*MBGPD(K,2)

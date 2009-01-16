@@ -4,7 +4,7 @@
 (*     ==============================    *)
 
 
-Print["GeParD - Mathematica interface (2008-12-21)"];
+Print["GeParD - Mathematica interface (2009-01-16)"];
 
 If[$VersionNumber<5.999,  (* Mathematica 5.*)
 BeginPackage["gepard`", "Format`", "NumericalMath`NLimit`", "Graphics`Graphics`",
@@ -57,24 +57,45 @@ into the list Parameters, preparing it thus for next fitting procedure."
 ParameterID::usage = "ParameterID[symbol] returns parameter number (id) of a parameter with
 name symbol, as specified by array Parameters."
 
+ParameterValue::usage = "ParameterValue[name, pars:Parameters] returns value of parameter
+name, as specified by array pars."
+
 ParameterName::usage = "ParameterName[id] returns name string corresponding to parameter number id, as specified by array Parameters."
 
 GPD::usage = "GPD[{val1, val2, ...}, t, xi] is a function that is contacted by MathLink Minuit
-interface and should give GPD's for .... GPD[flavor, x, t, xi] gives value of x-space
-GPDs (flavor: 1=Q, 2=G). It relies on moments GPDcurrent[j,t,xi] which have to be set up e.g.
-by GPDcurrent[j_, t_, xi_] = GPDMom[j, t, xi] /. PAR[n_] :> First[MinuitGetParameter[n]]"
+interface and should give GPD's"
+
+GPDzero::usage = "GPDzero[flavor, x, t] gives value of x-space GPDs (flavor: 1=Q, 2=G)
+at eta=0. It relies on moments GPDcurrent[j,t,xi] which have to be set up e.g.
+by GPDcurrent[j_, t_, xi_] = GPDMom[j, t, xi] /. PAR[n_] :>
+  First[MinuitGetParameter[n]] or
+by GPDcurrent[j_, t_, xi_] = GPDMom[j, t, xi] /. PAR[n_] :> 
+  ParameterValue[ToString[ParameterName[n]]]. Functions gpdHzeroQ and gpdHzeroG should be
+more numerically reliable than this one."
+
+GPDtraj::usage = "GPDtraj[flavor, x, t] gives value of x-space GPDs (flavor: 1=Q, 2=G)
+at eta=x trajectory. It relies on moments GPDcurrent[j,t,xi] which have to be set up e.g.
+by GPDcurrent[j_, t_, xi_] = GPDMom[j, t, xi] /. PAR[n_] :>
+  First[MinuitGetParameter[n]] or
+by GPDcurrent[j_, t_, xi_] = GPDMom[j, t, xi] /. PAR[n_] :> 
+  ParameterValue[ToString[ParameterName[n]]]. Functions gpdHtrajQ and gpdHtrajG should be
+more numerically reliable than this one. Additionally, this one is plain wrong for nl-PW
+model because it doesn't take second PW into account."
+
 
 gpdHtrajQ::usage = "gpdHtrajQ[x, t, Q2, Q02, opts] returns singlet quark 
 GPD H(x, eta=x, t, Q2).  Options are same as for GepardInit."
 
 gpdHzeroQ::usage = "gpdHzeroQ[x, t, Q2, Q02, opts] returns singlet quark
-GPD H(x, eta=0, t, Q2).  Options are same as for GepardInit."
+GPD H(x, eta=0, t, Q2).  Options are same as for GepardInit. Don't use
+it for nl-PW model because it's wrong there. Use GPDzero function."
 
-gpdHtrajG::usage = "gpdHtrajQ[x, t, Q2, Q02, opts] returns singlet gluon 
+gpdHtrajG::usage = "gpdHtrajG[x, t, Q2, Q02, opts] returns singlet gluon 
 GPD H(x, eta=x, t, Q2).  Options are same as for GepardInit."
 
-gpdHzeroG::usage = "gpdHzeroQ[x, t, Q2, Q02, opts] returns singlet gluon
-GPD H(x, eta=0, t, Q2).  Options are same as for GepardInit."
+gpdHzeroG::usage = "gpdHzeroG[x, t, Q2, Q02, opts] returns singlet gluon
+GPD H(x, eta=0, t, Q2).  Options are same as for GepardInit. Don't use
+it for nl-PW model because it's wrong there. Use GPDzero function."
 
 PDF::usage = "PDF[{val1, val2, ...}, t, xi] is a function that is contacted by MathLink Minuit
 interface and should give PDF's for .... "
@@ -291,7 +312,7 @@ JustCali3[pars_, (opts___)?OptionQ] := Block[{varpars = ParameterID /@ pars,
        GPDMom[j, t, xi] /. PAR[n_] :> First[MinuitGetParameter[n]]; 
       ]
 
-plotPDFs[] := LogLinearPlot[{GPD[1, x, 0, 0], GPD[2, x, 0, 0]}, 
+plotPDFs[] := LogLinearPlot[{x GPDzero[1, x, 0], GPDzero[2, x, 0]}, 
      {x, 1/10000, 0.1}, PlotRange -> All, AxesLabel -> 
       {"x", "xf(x)"}, PlotStyle -> 
       {{Thickness[0.01], RGBColor[0, 0, 1]}, {Thickness[0.01], 
@@ -311,14 +332,15 @@ plotslopes[Q2_:10, (opts___)?OptionQ] :=
           RGBColor[1, 0, 0]}}]
 
  
-GPD[f_Integer, (x_)?NumericQ, (t_)?NumericQ, (xi_)?NumericQ] := 
-    Chop[(1/(2*Pi))*NIntegrate[GPDcurrent[0.5 + I*y, t, xi][[f]]/
+GPDzero[f_Integer, (x_)?NumericQ, (t_)?NumericQ] := If[f==1,1/x,1]*
+    Chop[(1/(2*Pi))*NIntegrate[GPDcurrent[0.5 + I*y, t, 0][[f]]/
         x^(0.5 + I*y), {y, -10, -2, -0.5, 0, 0.5, 2, 10}]]
 
 GPDtraj[f_Integer, (x_)?NumericQ, (t_)?NumericQ] := 
-    Chop[(1/(2*Pi))*NIntegrate[2^(0.5+I*y+1) Gamma[0.5+I*y+5/2] / (
+    Chop[(1/(2*Pi))*NIntegrate[2^(0.5+I*y+1) If[f==1,1,2*x/(3+0.5+I*y)] *
+          Gamma[0.5+I*y+5/2] / (
             Gamma[3/2]*Gamma[0.5+I*y+3]) GPDcurrent[0.5 + I*y, t, x][[f]]/
-        x^(0.5 + I*y), {y, -10, -2, -0.5, 0, 0.5, 2, 10}]]
+        x^(1.5 + I*y), {y,  -10, -2, -0.5, 0, 0.5, 2, 10}]]
 
  
 GPD[pars_, t_, xi_] := 
@@ -361,6 +383,9 @@ CompileMoments[] := Block[{},
 
 ParameterID[symb_Symbol] := Select[Parameters, #1[[2]] == ToString[symb] & ][[
      1,1]]
+
+ParameterValue[name_String, pars_: Parameters] :=
+   If[(pos = Position[pars, name]) != {}, pars[[pos[[1, 1]], 3]], "N/A"]
 
 ParameterName[id_Integer] := ToString[Select[Parameters, #1[[1]] == id & ][[
      1,2]]]
