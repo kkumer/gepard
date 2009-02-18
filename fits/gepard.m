@@ -4,7 +4,7 @@
 (*     ==============================    *)
 
 
-Print["GeParD - Mathematica interface (2009-01-16)"];
+Print["GeParD - Mathematica interface (2009-02-17)"];
 
 If[$VersionNumber<5.999,  (* Mathematica 5.*)
 BeginPackage["gepard`", "Format`", "NumericalMath`NLimit`", "Graphics`Graphics`",
@@ -27,6 +27,8 @@ GepardFit::usage = "GepardFit[{par1, par2, ...}, options] does the complete
 fitting of data to variable parameter {par1, par2, ...}, using ansatz depending
 on the complete set of (variable and fixed) parameters specified in array
 Parameters. Options are the same as for GepardInit"
+
+GepardFitSilent::usage = "GepardFitSilent[{par1, par2, ...}, options] Same as GepardFit, but only simple MinuitStatus[] is outputed."
 
 PrettyStatus::usage = "PrettyStatus[] prints out the present status of fit and parameters in
 the \"pretty\" form."
@@ -261,6 +263,9 @@ gpdHtrajG[(x_)?NumericQ, (t_)?NumericQ, (q2_)?NumericQ, (q02_)?NumericQ, (opts__
  x cffHInternal @@ ( {x, t, q2, q02, SPEED, P, PROCESS, SCHEME, ANSATZ} 
     /. PROCESS->"DVCSTG" /. {opts} /. Options[cffH] ) ] / Pi
 
+SaveParameters[] := Block[{},
+Parameters = Map[{#[[1]], #[[2]], 
+  MinuitGetParameter[#[[1]]][[1]], #[[4]], #[[5]], #[[6]]}&, Parameters];]
 
 GepardFit[pars_, (opts___)?OptionQ] := Block[{varpars = ParameterID /@ pars, 
       allpars = First[Transpose[Parameters]], status, ierr, chis}, 
@@ -285,6 +290,25 @@ GepardFit[pars_, (opts___)?OptionQ] := Block[{varpars = ParameterID /@ pars,
       ParameterStatus = Select[Table[Join[Parameters[[n]], 
           (MinuitGetParameter /@ Transpose[Parameters][[1]])[[n]]], 
          {n, Length[Parameters]}], Last[#1] != 0 & ]; TableForm[ParameterStatus]]
+
+GepardFitSilent[pars_, (opts___)?OptionQ] := 
+ Block[{varpars = ParameterID /@ pars, 
+   allpars = First[Transpose[Parameters]], ierr}, 
+  fixedpars = Complement[allpars, varpars];
+  GepardInit[opts];
+  jValues = MinuitInit[1]; (MinuitSetParameter @@ #1 &) /@ 
+   Parameters;
+  MinuitCommand[
+   StringJoin["fix ", 
+    StringJoin[
+     Flatten[Table[{" ", ToString[fixedpars[[n]]]}, {n, 
+        Length[fixedpars]}]]]]];
+  ierr = MinuitCommand["migrad"]; MinuitCommand["cali 3"]; 
+  GPDcurrent[j_, t_, xi_] = 
+   GPDMom[j, t, xi] /. PAR[n_] :> First[MinuitGetParameter[n]];
+  MinuitStatus[]
+  ]
+
 
 PrettyStatus[] := Block[{status, chis},
        MinuitCommand["cali 3"]; status = MinuitStatus[]; 
@@ -478,9 +502,6 @@ PlotMinuitContourFixedAll[par1_Symbol, par2_Symbol, npts_Integer, (opts___)?Opti
     MinuitCommand["set param " <> ToString[contpars[[2]]] <> " " <> ToString[oldvals[[2]]]];
         ]
 
-SaveParameters[] := Block[{},
-Parameters = Map[{#[[1]], #[[2]], 
-  MinuitGetParameter[#[[1]]][[1]], #[[4]], #[[5]], #[[6]]}&, Parameters];]
 
 xi[W_, Q2_] := N[ Q2 / ( 2 W^2 + Q2 ) ]
 
