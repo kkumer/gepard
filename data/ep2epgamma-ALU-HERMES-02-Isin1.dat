@@ -1,0 +1,66 @@
+id = 29
+editor = KK
+
+process = ep2epgamma
+
+in1 = e
+in1energy = 27.6
+in1energyunit = GeV
+in1polarization = L
+
+in2 = p
+in2polarization = U
+
+out1 = e
+out2 = p
+out3 = gamma
+
+### Experiment
+
+collaboration = HERMES
+exptype = fixed target
+year = 2002
+reference =  F. Ellinghaus, QCD02
+reference2 = from DM's notebook
+
+### Observable 
+# A^{sin *phi}_{LU,I}  ??? CHECK!!
+
+y0 = ALUIsin1
+FTn = -1
+y0long = Beam Spin Azimuthal Asymmetry - Harmonic Sin^1 Phi
+y0unit = 1
+
+
+frame = Trento
+
+### x-axes
+
+x0 = xB
+x0unit = 1
+
+x1 = t
+x1unit = GeV^2
+
+x2 = Q2
+x2unit = GeV^2
+
+
+### Data
+
+# x_B   t     Q^2   asym   err
+################################
+0.06  -0.08  1.2   -0.2    0.1 
+0.08  -0.1   2     -0.195  0.08 
+0.11  -0.13  3     -0.28   0.12
+0.17  -0.19  5.2   -0.3    0.14 
+ 
+0.08  -0.075  1.9  -0.34  0.18 
+0.1   -0.125  2.5  -0.15  0.08 
+0.11  -0.3    2.9  -0.21  0.09 
+0.12  -0.44   3.5  -0.19  0.18
+ 
+0.05  -0.1   1.5  -0.18  0.17  
+0.085 -0.1   2.2  -0.22  0.11  
+0.12  -0.13  3.1  -0.14  0.16  
+0.17  -0.2   5    -0.25  0.14 

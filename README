@@ -1,0 +1,23 @@
+Python prototype for GPDfit software
+------------------------------------
+
+Usage:  
+------
+Start ipython shell and do '%run pype'
+(if you don't have ipython you can do 'python -i pype.py')
+Then proceed with interactive work e.g. 'plotHERMES(data, b, fitpars)'
+
+Files
+------
+ansatz.py - definition of CFFs
+Approach.py - classes for theoretical approaches to calculation of observables
+constants.py - constants
+data/  -  directory with data files
+Data.py -  classes for representation of data
+plots.py  - auxiliary functions for plotting results
+publish.py - script that publishes datafiles to www dir
+pype.py  - main script which does the fitting
+quadrature.py  - Gaussian quadrature routines
+README
+utils.py  - datafile parsing, dataset plotting and other auxilliary routines
+www - directory with HTML representation of data

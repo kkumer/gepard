@@ -1,0 +1,51 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+   "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<!-- <LINK rel=stylesheet href="../eskola.css" type="text/css"> -->
+
+<title>
+           GPDfit - available experimental datasets
+</title>
+</head>
+
+<body>
+
+<h1>GPDfit - available experimental datasets (incomplete!)</h1>
+
+<h3>Version: $version</h3>
+
+<b>Download everything:</b><a href="GPDfitdata-2009-08-21.tgz">GPDfitdata-2009-08-21.tgz</a>
+
+<p>
+
+<table border="1" cellpadding='8'>
+  <tr bgcolor='#ccff66'>
+    <th> id </td>
+    <th> process </td>
+    <th> collaboration </td>
+    <th> year </td>
+    <th> reference </td>
+    <th> observable </td>
+    <th> </a>
+    <th> </a>
+  <tr>
+#for $set in $datasets
+  <tr>
+    <td> $set.id </td>
+    <td> $set.process </td>
+    <td> $set.collaboration </td>
+    <td> $set.year </td>
+    <td> $set.reference </td>
+    <td> $set.y0 </td>
+    <td>  <a href="$set.figpath">fig</a>
+    <td>  <a href="$set.filepath">file</a>
+  <tr>
+#end for
+</table>
+
+</body>
+</html>
+
+

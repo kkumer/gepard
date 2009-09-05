@@ -1,0 +1,60 @@
+id = 26
+editor = KK
+
+process = ep2epgamma
+
+in1 = e
+in1energy = 5.75
+in1energyunit = GeV
+in1polarization = L
+
+in2 = p
+in2polarization = U
+
+out1 = e
+out2 = p
+out3 = gamma
+
+xB = 0.36
+
+### Experiment
+
+collaboration = HALLA
+exptype = fixed target
+year = 2006
+reference =  nucl-ex/0607029
+reference2 = DFT analysis with MC error propagation by KK
+
+### Observable 
+
+y0 = ImCI
+y0long = Im Part of Angular Harmonic Coefficient CI
+y0unit = 1
+
+
+### x-axes
+
+x0 = Q2
+x0unit = GeV^2
+
+x1 = t
+x1unit = GeV^2
+
+frame = Trento
+
+### Data
+
+# Q2    t     ImCI     err
+############################################
+1.5   -0.17   3.19   0.175
+1.5   -0.23   2.03   0.183
+1.5   -0.28   2.10   0.222
+1.5   -0.33   2.09   0.283
+1.9   -0.17   3.24   0.176
+1.9   -0.23   2.50   0.135
+1.9   -0.28   2.26   0.152
+1.9   -0.33   1.83   0.144
+2.3   -0.17   3.27   0.23
+2.3   -0.23   2.59   0.171
+2.3   -0.28   2.34   0.17
+2.3   -0.33   2.08   0.163
