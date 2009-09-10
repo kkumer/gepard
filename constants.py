@@ -16,6 +16,7 @@ GeV2nb = 389379.
 # Dictionary that maps variables to their LaTeX representation
 toTeX = {'mt' : '$-t$',  'xB' : '$x_{\\rm B}$', 'Q2' : '$Q^{2}$', 
      'phi' : '$\\phi$', 't' : '$t$',
+     'xi': '$\\xi$', 
      "TotalCrossSection" : '$\\sigma$',
      "PartialCrossSection" : '$d\\sigma / dt$',
      "ALUIsin1" : '$A_{LU,I}^{\\sin 1\\phi}$',

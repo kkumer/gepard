@@ -3,6 +3,7 @@ Classes for representing experimental data.
 
 DataPoint -- object containing one experimental measurement
 DataSet -- container holding `DataPoint` instances
+DummyPoint -- class for points which have just few relevant attributes
 
 """
 
@@ -42,6 +43,7 @@ class DataPoint(object):
     `dataset.xaxes` -- names of kinematical x-axes of data
     `dataset.collaboration` -- name of experimenatal collaboration
     `dataset.units` -- dictionary with pysical units of variables
+    `dataset.newunits` -- dictionary with internal pysical units of variables
      ...
 
     For user's and programmer's convenience, these `dataset` attributes 
@@ -121,6 +123,7 @@ class DataSet(list):
     `xaxes` -- names of kinematical x-axes of data
     `collaboration` -- name of experimenatal collaboration
     `units` -- dictionary with pysical units of variables
+    `newunits` -- dictionary with internal pysical units of variables
      ...
 
     """
@@ -159,6 +162,9 @@ class DataSet(list):
             # i.e.  {'phi' : 'degrees', 't' : 'GeV^2', ...}
             self.units = dict((preamble[key], preamble[key+'unit']) for key in xs)
             self.units[self.yaxis] = preamble['y0unit']
+            # Following dictionary will have units which are changed so that match
+            # units used for internal theoretical formulas
+            self.newunits = {}
     
     def __repr__(self):
         return "DataSet instance from '" + self.filename + "'"
@@ -193,3 +199,14 @@ class DataSet(list):
         return 
 
 
+class DummyPoint(object):
+    """This is only used for creating simple DataPoint-like objects"""
+
+    def has(self, name):
+        if self.__dict__.has_key(name):
+            return True
+        return False
+
+    def prepare(self, approach):
+        approach.prepare(self)
+        return

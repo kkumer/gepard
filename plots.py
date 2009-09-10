@@ -10,13 +10,15 @@ plotHALLA -- plots HALL-A data
 
 import os
 
+import numpy as np
 import pylab as plt
 from matplotlib.ticker import MultipleLocator
 
 import Data
 import utils
+from ansatz import *
 
-def plotHERMES(data, approach, pars, path=None, fmt='png'):
+def plotHERMES(data, fits=[], path=None, fmt='png'):
     """Makes plot of HERMES preliminary BCA and BSA data with fit line defined by pars"""
 
     #2: "data/ep2epgamma-BCA-HERMES-08-cos1_b.dat", 
@@ -35,7 +37,7 @@ def plotHERMES(data, approach, pars, path=None, fmt='png'):
             panel = 3*y + x + 1  # 1, 2, ..., 9
             ax = fig.add_subplot(3,3,panel)
             ax.yaxis.set_major_locator(MultipleLocator(0.1))  # tickmarks
-            utils.subplot(ax, data[ids[y]][x*6:x*6+6], xaxes[x], fits=[(approach, pars)])
+            utils.subplot(ax, data[ids[y]][x*6:x*6+6], xaxes[x], [], fits)
             apply(ax.set_ylim, ylims[y])
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
@@ -44,7 +46,7 @@ def plotHERMES(data, approach, pars, path=None, fmt='png'):
         fig.show()
     return fig
 
-def plotCLAS(data, approach, pars, path=None, fmt='png'):
+def plotCLAS(data, fits=[], path=None, fmt='png'):
     """Makes plot of CLAS BSA data with fit line defined by pars"""
 
     #datafile = "data/ep2epgamma-ALU-CLAS_KK-07.dat" # id = 25
@@ -73,7 +75,7 @@ def plotCLAS(data, approach, pars, path=None, fmt='png'):
         panelset = Data.DataSet(panelpoints)
         panelset.__dict__ = dataset.__dict__.copy()
         # ... and plot
-        utils.subplot(ax, panelset, 'mt', ['Q2', 'xB'], fits=[(approach, pars)])
+        utils.subplot(ax, panelset, 'mt', ['Q2', 'xB'], fits)
         plt.xlim(0.0, 0.6)
         plt.ylim(0.0, 0.4)
         ax.yaxis.set_major_locator(MultipleLocator(0.1))
@@ -84,16 +86,10 @@ def plotCLAS(data, approach, pars, path=None, fmt='png'):
         fig.show()
     return fig
 
-def plotHALLA(data, approach, pars, path=None, fmt='png'):
+def plotHALLA(data, fits=[], path=None, fmt='png'):
     """Makes plot of HALL-A data with fit line defined by pars"""
 
-     # "data/ep2epgamma-XLU-HALLA_KK-06-ImCI.dat",
-     # "data/ep2epgamma-XUU-HALLA_KK-06-ReCI.dat",
-     # "data/ep2epgamma-XUU-HALLA_KK-06-ReCpDCI.dat",
-     # "data/ep2epgamma-XLU-HALLA-06-Q2_19_t_028.dat",
-     # "data/ep2epgamma-XUU-HALLA-06-Q2_23_t_017.dat",
-     # "data/ep2epgamma-XUU-HALLA-06-Q2_23_t_033.dat"
-    ids = [26, 27, 28, 15, 17, 24]
+    ids = [9, 14, 20, 21, 23, 24]
     title = 'HALLA-06'
     fig = plt.figure()
     fig.canvas.set_window_title(title)
@@ -101,12 +97,8 @@ def plotHALLA(data, approach, pars, path=None, fmt='png'):
     panel = 1
     for id in ids:
         ax = fig.add_subplot(2,3,panel)
-        if panel<4:
-            utils.subplot(ax, data[id], 't', fits=[(approach, pars)])
-            ax.xaxis.set_major_locator(MultipleLocator(0.1))
-        else:
-            utils.subplot(ax, data[id], 'phi', ['Q2', 't'], fits=[(approach, pars)])
-            ax.xaxis.set_major_locator(MultipleLocator(120))
+        utils.subplot(ax, data[id], 'phi', ['Q2', 't'], fits)
+        ax.xaxis.set_major_locator(MultipleLocator(120))
         panel += 1
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
@@ -115,11 +107,62 @@ def plotHALLA(data, approach, pars, path=None, fmt='png'):
         fig.show()
     return fig
 
-def plotfit(pars):
-    plotHALLA(pars)
-    plotCLAS(pars)
-    plotHERMES(pars)
-    return
+def plotHBCSA(approach, parslist, path=None, fmt='png'):
+    title = 'Fig 15'
+    fig = plt.figure()
+    fig.canvas.set_window_title(title)
+    fig.suptitle(title)
+    fig.subplots_adjust(bottom=0.65)
+    # Left panel
+    pt = Data.DummyPoint()
+    ax = fig.add_subplot(1,2,1)
+    ax.set_xscale('log')  # x-axis to be logarithmic
+    xval = np.power(10., np.arange(-3.5, 0, 0.01)) 
+    linestyles = ['g--', 'b-', 'r-.']
+    pn = 0
+    for pars in parslist:
+        pt.t = 0.0
+        line1 = xval * ImcffH(pt, pars, xval) / np.pi
+        pt.t = -0.3
+        line2 = xval * ImcffH(pt, pars, xval) / np.pi
+        ax.plot(xval, line1, linestyles[pn])
+        ax.plot(xval, line2, linestyles[pn], linewidth=2) 
+        pn += 1
+    ax.set_ylim(0.0, 0.5)
+    ax.set_xlim(0.0005, 1.0)
+    #plt.ylim(0.0, 0.5)
+    # axes labels
+    ax.set_xlabel('$x$')
+    ax.set_ylabel('$x H(x, x, t)$')
+    # Right panel
+    pt = Data.DummyPoint()
+    pt.exptype = 'fixed target'
+    pt.in1energy = 160.
+    pt.xB = 0.05
+    pt.t = -0.2
+    pt.Q2 = 2.
+    pt.prepare(approach)
+    ax = fig.add_subplot(1,2,2)
+    ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
+    phi = np.arange(0., np.pi, 0.2)
+    linestyles = ['g--', 'b-', 'r-.']
+    labels = ['HERMES+CLAS', 'HERMES+CLAS+HALLA', '+HALLA(phi)']
+    pn = 0
+    for pars in parslist:
+        line = approach.BCSA(pt, np.pi - phi, pars)
+        ax.plot(phi, line, linestyles[pn], linewidth=2, label=labels[pn]) 
+        pn += 1
+    #ax.set_ylim(0.0, 0.5)
+    # axes labels
+    ax.set_xlabel('$\\phi$')
+    ax.set_ylabel('BCSA')
+    ax.legend()
+    if path:
+        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+    else:
+        fig.canvas.draw()
+        fig.show()
+    return fig
 
 # FIXME: doesn't work!
 

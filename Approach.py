@@ -155,9 +155,18 @@ class BMK(Approach):
     # {\cal C} coefficients
 
     def CCALDVCSunp(self, pt, pars):
-        """ BKM Eq. (66) - FIXME: only calH included """
-        HH = 4. * (1.-pt.xB) * ( RecffH(pt, pars)**2 + ImcffH(pt, pars)**2 )
-        return HH / (2.-pt.xB)**2
+        """ BKM Eq. (66) """
+
+        xB, t = pt.xB, pt.t
+        parenHH = ( RecffH(pt, pars)**2 + ImcffH(pt, pars)**2 
+                +  RecffHt(pt, pars)**2 + ImcffHt(pt, pars)**2 )
+        parenEH = 2.*( RecffE(pt, pars)*RecffH(pt, pars) + ImcffE(pt, pars)*ImcffH(pt, pars) 
+                +  RecffEt(pt, pars)*RecffHt(pt, pars) + ImcffEt(pt, pars)*ImcffHt(pt, pars) ) 
+        parenEE =  RecffE(pt, pars)**2 + ImcffE(pt, pars)**2 
+        parenEtEt = RecffEt(pt, pars)**2 + ImcffEt(pt, pars)**2
+        brace = 4. * (1.-xB) * parenHH - xB**2 * parenEH - (xB**2 
+                + (2.-xB)**2 * t/(4.*Mp2)) * parenEE - xB**2 * t/(4.*Mp2) * parenEtEt
+        return brace / (2.-xB)**2
            
     # DVCS amplitude squared Fourier coefficients
 
@@ -179,22 +188,30 @@ class BMK(Approach):
     #### Interference
 
     def ReCCALINTunp(self, pt, pars):
-        """ Real part of BKM Eq. (69) - FIXME: only calH """
-        return F1(pt.t) * RecffH(pt, pars)
+        """ Real part of BKM Eq. (69) """
+
+        return F1(pt.t)*RecffH(pt, pars) + pt.xB/(2.-pt.xB)*(F1(pt.t)+
+                F2(pt.t))*RecffHt(pt, pars) - pt.t/(4.*Mp2)*F2(pt.t)*RecffE(pt, pars)
 
     def ImCCALINTunp(self, pt, pars):
-        """ Imag part of BKM Eq. (69) - FIXME: only calH """
-        return F1(pt.t) * ImcffH(pt, pars)
+        """ Imag part of BKM Eq. (69) """
+
+        return F1(pt.t)*ImcffH(pt, pars) + pt.xB/(2.-pt.xB)*(F1(pt.t)+
+                F2(pt.t))*ImcffHt(pt, pars) - pt.t/(4.*Mp2)*F2(pt.t)*ImcffE(pt, pars)
 
     def ReDELCCALINTunp(self, pt, pars):
-        """ Real part of BKM Eq. (72) - FIXME: only calH """
+        """ Real part of BKM Eq. (72) """
+
         fx = pt.xB / (2. - pt.xB)
-        return - fx * (F1(pt.t)+F2(pt.t)) * fx * RecffH(pt, pars)
+        return - fx * (F1(pt.t)+F2(pt.t)) * ( fx *(RecffH(pt, pars) 
+            + RecffE(pt, pars)) + RecffHt(pt, pars) )
 
     def ImDELCCALINTunp(self, pt, pars):
-        """ Imag part of BKM Eq. (72) - FIXME: only calH """
+        """ Imag part of BKM Eq. (72) """
+
         fx = pt.xB / (2. - pt.xB)
-        return - fx * (F1(pt.t)+F2(pt.t)) * fx * ImcffH(pt, pars)
+        return - fx * (F1(pt.t)+F2(pt.t)) * ( fx *(ImcffH(pt, pars) 
+            + ImcffE(pt, pars)) + ImcffHt(pt, pars) )
 
     def ReCCALINTunpEFF(self, pt, pars):
         return 0
@@ -254,11 +271,12 @@ class BMK(Approach):
         if pt.has('phi'):
             if pt.units['phi'][:3]== 'deg': # deg, degree, degrees -> radians
                 pt.phi = pt.phi * pi / 180.
-                pt.units['phi'] = 'rad'
-        # C2. ... and in BKM convention. `frame` attribute is
+                pt.newunits['phi'] = 'rad'
+        # C2. ... and in BMK convention. `frame` attribute is
         # obligatory for phi-dependent data.
-            if pt.frame == 'Trento':  # Trento -> BKM
+            if pt.frame == 'Trento':  # Trento -> BMK
                 pt.phi = pi - pt.phi
+                pt.newframe = 'BMK'
         # Mandelstam s
         if pt.exptype == 'fixed target':
             pt.s = 2 * Mp * pt.in1energy + Mp2
@@ -293,6 +311,19 @@ class BMK(Approach):
             # First option is numerical, second is faster
             #pt.intP1P2 = Hquadrature(lambda phi: P1P2(pt, phi), 0, 2.0*pi)
             pt.intP1P2 = self.anintP1P2(pt)
+
+    def antiprepare(self, pt):
+        """Return """
+
+        # C1. azimutal angle phi should be in radians ...
+        if pt.has('phi'):
+            if pt.units['phi'][:3]== 'deg': # deg, degree, degrees -> radians
+                pt.phi = pt.phi * pi / 180.
+                pt.units['phi'] = 'rad'
+        # C2. ... and in BKM convention. `frame` attribute is
+        # obligatory for phi-dependent data.
+            if pt.frame == 'Trento':  # Trento -> BKM
+                pt.phi = pi - pt.phi
  
     def Xunp(self, pt, lam, pars, vars={}):
         """ 4-fold differential cross section for unpolarized target. 
@@ -323,6 +354,13 @@ class BMK(Approach):
 
         return  - self.TINTunp(pt, phi, 0, pars) / ( 
                        self.TBH2unp(pt, phi) + self.TDVCS2unp(pt, phi, pars) )
+
+    def BCSA(self, pt, phi, pars):
+        """Beam charge-spin asymmetry. """
+
+        return  - self.TINTunp(pt, phi, 0, pars) / ( 
+                      self.TBH2unp(pt, phi) + self.TDVCS2unp(pt, phi, pars) 
+                      + (self.TINTunp(pt, phi, 1, pars) - self.TINTunp(pt, phi, -1, pars))/2.)
 
     def BSA(self, pt, pars, vars={}):
         """Beam spin asymmetry a la HERMES i.e. for positrons - negative """
@@ -393,11 +431,11 @@ class BMK(Approach):
         return self.ReCCALINTunp(pt, pars) + self.ReDELCCALINTunp(pt, pars)
 
     def b1ovb0(self, pt, pars):
-        """Ratio of first two cos harmonics of w-weighted cross section."""
+        """Ratio of first two cos harmonics of w-weighted cross section. In BMK, not Trento??"""
 
         b0 = Hquadrature(lambda phi: self.w(pt, phi) * self.XUU(pt, pars, {'phi':phi}), 
                 0, 2.0*pi) / (2.0*pi)
-        b1 = - Hquadrature(lambda phi: self.w(pt, phi) * self.XUU(pt, pars, {'phi':phi}) * cos(phi), 
+        b1 = Hquadrature(lambda phi: self.w(pt, phi) * self.XUU(pt, pars, {'phi':phi}) * cos(phi), 
                 0, 2.0*pi) / pi
         return b1/b0
 

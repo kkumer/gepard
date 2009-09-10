@@ -95,7 +95,7 @@ def subplot(ax, dataset, xaxis=None, kinlabels=[], fits=[]):
         line = [getattr(approach, pt.yaxis)(pt, pars) for pt 
                 in dataset]
         #ax.plot(xval, line, 'r-')  # join symbols by line
-        ax.plot(xval, line, shapes[fitn], markersize=10, 
+        ax.plot(xval, line, shapes[fitn], markersize=5, 
                 markerfacecolor=colors[fitn], markeredgecolor='black')
         fitn += 1
     # axes labels
