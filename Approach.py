@@ -4,7 +4,7 @@ from numpy import sin, cos, pi, sqrt
 
 from quadrature import Hquadrature
 from constants import *
-from ansatz import *
+#from ansatz import *
 
 class Approach(object):
     """Class of approaches to calculation of observables.
@@ -24,7 +24,20 @@ class Approach(object):
 # 
 #         self.calH = calH
 
-    def __init__(self):
+    def __init__(self, ff):
+        global F1, F2 
+        global ImcffH, RecffH, ImcffE, RecffE
+        global ImcffHt, RecffHt, ImcffEt, RecffEt
+        F1 = ff.F1
+        F2 = ff.F2
+        ImcffH = ff.ImH
+        RecffH = ff.ReH
+        ImcffE = ff.ImE
+        RecffE = ff.ReE
+        ImcffHt = ff.ImHt
+        RecffHt = ff.ReHt
+        ImcffEt = ff.ImEt
+        RecffEt = ff.ReEt
         pass
 
 
