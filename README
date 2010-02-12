@@ -5,12 +5,14 @@ Usage:
 ------
 Start ipython shell and do '%run pype'
 (if you don't have ipython you can do 'python -i pype.py')
-Then proceed with interactive work e.g. 'plotHERMES(data, b, fitpars)'
+
+Then proceed with interactive work e.g. 'plotHERMES(data, fits=[(b, m.values)])'
+or 'plotHBCSA(ff, fits=[(b, m.values)])'
 
 Files
 ------
-ansatz.py - definition of CFFs
 Approach.py - classes for theoretical approaches to calculation of observables
+models.py - definition of CFFs and FFs
 constants.py - constants
 data/  -  directory with data files
 Data.py -  classes for representation of data
@@ -20,4 +22,4 @@ pype.py  - main script which does the fitting
 quadrature.py  - Gaussian quadrature routines
 README
 utils.py  - datafile parsing, dataset plotting and other auxilliary routines
-www - directory with HTML representation of data
+www/ - directory with HTML representation of data

@@ -16,7 +16,6 @@ from matplotlib.ticker import MultipleLocator
 
 import Data
 import utils
-from ansatz import *
 
 def plotHERMES(data, fits=[], path=None, fmt='png'):
     """Makes plot of HERMES preliminary BCA and BSA data with fit line defined by pars"""
@@ -25,7 +24,7 @@ def plotHERMES(data, fits=[], path=None, fmt='png'):
     #4: "data/ep2epgamma-BCA-HERMES-08-cos0_b.dat",
     #5: "data/ep2epgamma-ALU-HERMES-08-Isin1.dat"]
     ids = [2, 4, 5]
-    title = 'HERMES-08'
+    title = '' #'HERMES-08'
     fig = plt.figure()
     fig.canvas.set_window_title(title)
     fig.suptitle(title)
@@ -51,7 +50,7 @@ def plotCLAS(data, fits=[], path=None, fmt='png'):
 
     #datafile = "data/ep2epgamma-ALU-CLAS_KK-07.dat" # id = 25
     dataset = data[25]
-    title = 'CLAS-07'
+    title = '' # 'CLAS-07'
     fig = plt.figure()
     fig.canvas.set_window_title(title)
     fig.suptitle(title)
@@ -90,7 +89,7 @@ def plotHALLA(data, fits=[], path=None, fmt='png'):
     """Makes plot of HALL-A data with fit line defined by pars"""
 
     ids = [9, 14, 20, 21, 23, 24]
-    title = 'HALLA-06'
+    title = '' # 'HALLA-06'
     fig = plt.figure()
     fig.canvas.set_window_title(title)
     fig.suptitle(title)
@@ -107,8 +106,10 @@ def plotHALLA(data, fits=[], path=None, fmt='png'):
         fig.show()
     return fig
 
-def plotHBCSA(approach, parslist, path=None, fmt='png'):
-    title = 'Fig 15'
+def plotHBCSA(ff, fits=[], path=None, fmt='png'):
+    """Makes plot of Im(cffH) and COMPASS BCSA for FormFactors model ff."""
+
+    title = '' # 'Fig 15'
     fig = plt.figure()
     fig.canvas.set_window_title(title)
     fig.suptitle(title)
@@ -120,11 +121,12 @@ def plotHBCSA(approach, parslist, path=None, fmt='png'):
     xval = np.power(10., np.arange(-3.5, 0, 0.01)) 
     linestyles = ['g--', 'b-', 'r-.']
     pn = 0
-    for pars in parslist:
+    for (approach, pars) in fits:
         pt.t = 0.0
-        line1 = xval * ImcffH(pt, pars, xval) / np.pi
+        # kludge alert!
+        line1 = xval * ff.ImH(pt, pars, xval) / np.pi
         pt.t = -0.3
-        line2 = xval * ImcffH(pt, pars, xval) / np.pi
+        line2 = xval * ff.ImH(pt, pars, xval) / np.pi
         ax.plot(xval, line1, linestyles[pn])
         ax.plot(xval, line2, linestyles[pn], linewidth=2) 
         pn += 1
@@ -141,14 +143,15 @@ def plotHBCSA(approach, parslist, path=None, fmt='png'):
     pt.xB = 0.05
     pt.t = -0.2
     pt.Q2 = 2.
-    pt.prepare(approach)
     ax = fig.add_subplot(1,2,2)
     ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
     phi = np.arange(0., np.pi, 0.2)
     linestyles = ['g--', 'b-', 'r-.']
     labels = ['HERMES+CLAS', 'HERMES+CLAS+HALLA', '+HALLA(phi)']
+    #labels = ['GLO1 (DM)', 'GLO1 (KK)', '']
     pn = 0
-    for pars in parslist:
+    for (approach, pars) in fits:
+        pt.prepare(approach)
         line = approach.BCSA(pt, np.pi - phi, pars)
         ax.plot(phi, line, linestyles[pn], linewidth=2, label=labels[pn]) 
         pn += 1
@@ -164,6 +167,84 @@ def plotHBCSA(approach, parslist, path=None, fmt='png'):
         fig.show()
     return fig
 
+def plotH(ff, fits=[], path=None, fmt='png'):
+    """Makes plot of Im(cffH)."""
+
+    title = '' # 'Fig 15'
+    fig = plt.figure()
+    fig.canvas.set_window_title(title)
+    fig.suptitle(title)
+    fig.subplots_adjust(bottom=0.65)
+    # Left panel
+    pt = Data.DummyPoint()
+    ax = fig.add_subplot(1,1,1)
+    ax.set_xscale('log')  # x-axis to be logarithmic
+    xval = np.power(10., np.arange(-3.5, 0, 0.01)) 
+    linestyles = ['g--', 'b-', 'r-.']
+    labels = ['HERMES+CLAS', 'HERMES+CLAS+HALLA', '+HALLA(phi)']
+    pn = 0
+    for (approach, pars) in fits:
+        pt.t = 0.0
+        # kludge alert!
+        line1 = xval * ff.ImH(pt, pars, xval) / np.pi
+        pt.t = -0.3
+        line2 = xval * ff.ImH(pt, pars, xval) / np.pi
+        ax.plot(xval, line1, linestyles[pn], linewidth=2)
+        ax.plot(xval, line2, linestyles[pn], linewidth=4, label=labels[pn]) 
+        pn += 1
+    ax.set_ylim(0.0, 0.5)
+    ax.set_xlim(0.0005, 1.0)
+    #plt.ylim(0.0, 0.5)
+    # axes labels
+    ax.set_xlabel('$x$', fontsize=15)
+    ax.set_ylabel('$x H(x, x, t)$', fontsize=18)
+    ax.legend()
+    ax.text(0.001, 0.405, "t = 0")
+    ax.text(0.001, 0.12, "t = -0.3 GeV^2")
+    if path:
+        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+    else:
+        fig.canvas.draw()
+        fig.show()
+    return fig
+
+def plotBCSA(ff, fits=[], path=None, fmt='png'):
+    """Makes plot of COMPASS BCSA for FormFactors model ff."""
+
+    title = '' # 'Fig 15'
+    fig = plt.figure()
+    fig.canvas.set_window_title(title)
+    fig.suptitle(title)
+    fig.subplots_adjust(bottom=0.65)
+    pt = Data.DummyPoint()
+    pt.exptype = 'fixed target'
+    pt.in1energy = 160.
+    pt.xB = 0.05
+    pt.t = -0.2
+    pt.Q2 = 2.
+    ax = fig.add_subplot(1,1,1)
+    ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
+    phi = np.arange(0., np.pi, 0.2)
+    linestyles = ['g--', 'b-', 'r-.']
+    labels = ['HERMES+CLAS', 'HERMES+CLAS+HALLA', '+HALLA(phi)']
+    #labels = ['GLO1 (DM)', 'GLO1 (KK)', '']
+    pn = 0
+    for (approach, pars) in fits:
+        pt.prepare(approach)
+        line = approach.BCSA(pt, np.pi - phi, pars)
+        ax.plot(phi, line, linestyles[pn], linewidth=2, label=labels[pn]) 
+        pn += 1
+    #ax.set_ylim(0.0, 0.5)
+    # axes labels
+    ax.set_xlabel('$\\phi$')
+    ax.set_ylabel('BCSA')
+    ax.legend()
+    if path:
+        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+    else:
+        fig.canvas.draw()
+        fig.show()
+    return fig
 # FIXME: doesn't work!
 
 

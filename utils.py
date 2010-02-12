@@ -65,7 +65,7 @@ def subplot(ax, dataset, xaxis=None, kinlabels=[], fits=[]):
     dataset -- `DataSet` instance to be plotted
     xaxis -- abscissa variable; if None, last of dataset.xaxes is taken
     kinlabels -- list of constant kinematic variables whose values will
-                 be put on plott
+                 be put on plot
     fits -- list of parameter sets/tuples describing fit curves for
             plotting. 
 
@@ -99,8 +99,8 @@ def subplot(ax, dataset, xaxis=None, kinlabels=[], fits=[]):
                 markerfacecolor=colors[fitn], markeredgecolor='black')
         fitn += 1
     # axes labels
-    ax.set_xlabel(toTeX[xaxis])
-    ax.set_ylabel(toTeX[dataset.yaxis])
+    ax.set_xlabel(toTeX[xaxis], fontsize=15)
+    ax.set_ylabel(toTeX[dataset.yaxis], fontsize=18)
     ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
     # constant kinematic variables positioning
     labx = min(0, min(xval)) + (max(xval) - min(0, min(xval))) * 0.5
@@ -113,6 +113,7 @@ def subplot(ax, dataset, xaxis=None, kinlabels=[], fits=[]):
             # If dataset doesn't have it, all points should have it 
             labtxt += toTeX[lab] + ' = ' + str(getattr(dataset[0],lab)) + ', '
     ax.text(labx, laby, labtxt[:-2])
+    # ax.frame.set_linewidth(5) # ???
     return
 
 def npars(m):

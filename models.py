@@ -74,10 +74,12 @@ def dispargA(x, fun, pt, pars):
     res = u**ga * ( fun(pt, pars, u) - fun(pt, pars) )
     return (2.* pt.xi) / (pt.xi**2 - u**2) * res / (1.-ga)
 
+
 class Model(object):
     """Later some methods or attributes may be added here."""
 
     pass
+
 
 class FormFactors(Model):
     """Compton and elastic Form Factors.
@@ -176,10 +178,10 @@ class FormFactors(Model):
         t = pt.t
         twox = 2.*x / (1.+x)
         onex = (1.-x) / (1.+x)
-        val = ( (2.*4./9. + 1./9.) * p.Nv * p.rv * 
+        val = ( (2.*4./9. + 1./9.) * p.tNv * p.trv * 
             # Regge trajectory params taken from H:
             twox**(-self.H.alv-self.H.alpv*t) *
-                 onex**p.bv / (1. - onex*t/(p.Mv**2))  )
+                 onex**p.tbv / (1. - onex*t/(p.tMv**2))  )
         return pi * val / (1.+x)
 
     def ReHt(self, pt, pars={}):
