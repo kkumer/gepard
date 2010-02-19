@@ -11,6 +11,7 @@
 
 import re, os, sys, shutil
 
+
 from Cheetah.Template import Template
 import matplotlib
 matplotlib.use('AGG')
@@ -24,6 +25,29 @@ figdir = 'figs' # subdir of wwwdir for WWW-publishing of data
 indexfilename = 'index.html'
 version = '2009-09-04'
 
+def cleanup(excludelist, dirname, fnames):
+    """Remove all files (not directories) in dirname, apart
+    from those in excludelist."""
+
+    for item in excludelist:
+        try:
+            fnames.remove(item)
+        except ValueError:
+            pass
+    for item in fnames:
+        target = os.path.join(dirname, item)
+        if not os.path.isdir(target): # don't remove dirs
+            os.remove(target)
+
+if len(sys.argv) > 1: 
+    if sys.argv[1] == '-c':  #cleanup
+        # Remove all files in 'www' dir, apart from excludelist
+        excludelist = ['.svn', 'index.tmpl', 'expdata.tmpl']
+        os.path.walk('www', cleanup, excludelist)
+        sys.exit()
+    else:
+        sys.stderr.write('Unknown argument. Usage: publish.py [-c]\n')
+        sys.exit(1)
 
 # Select only *.dat files from the datadir for processing
 datafiles = []

@@ -15,6 +15,11 @@ class Approach(object):
     CFFs and FFs, so they contain complete algorithm for
     calculation of specific observable.
 
+    Boolean variable 'optimization' (default is False) controls
+    whether faster (but analytically more complicated) formulas
+    are used. This is for development purposes only. When
+    fitting optimization=True is better choice.
+
     Implemented subclases:  BMK, hotfixedBMK
     TODO: VGG, Guichon?
     """
@@ -24,7 +29,7 @@ class Approach(object):
 # 
 #         self.calH = calH
 
-    def __init__(self, ff):
+    def __init__(self, ff, optimization = False):
         global F1, F2 
         global ImcffH, RecffH, ImcffE, RecffE
         global ImcffHt, RecffHt, ImcffEt, RecffEt
@@ -38,6 +43,7 @@ class Approach(object):
         RecffHt = ff.ReHt
         ImcffEt = ff.ImEt
         RecffEt = ff.ReEt
+        self.optimization = optimization
         pass
 
 
@@ -260,21 +266,21 @@ class BMK(Approach):
         """ BKM Eq. (55) """
         return  16. * pt.K2 * pt.y / (2.-pt.xB) * self.ImCCALINTunpEFF(pt, pars)
 
-    def TINTunp(self, pt, phi, lam, pars):
+    def TINTunp(self, pt, phi, lam, charge, pars):
         """ BH-DVCS interference. BKM Eq. (27) - FIXME: only twist two """
-        return  self.PreFacINT(pt, phi) * ( self.cINT0unp(pt, pars)  
+        return  - charge * self.PreFacINT(pt, phi) * ( self.cINT0unp(pt, pars)  
                 + self.cINT1unp(pt, pars) * cos(phi)
                 #+ self.cINT2unp(pt, pars) * cos(2.*phi) 
                 + lam * self.sINT1unp(pt, pars) * sin(phi)
                 #+ lam * self.sINT2unp(pt, pars) * sin(2.*phi)
                 )
            
-    def TINTunpd(self, pt, phi, pars):
-        """ BH-DVCS interference. Part surviving after taking difference of two lepton 
-        longitudinal polarization states.
+    def TINTunpd(self, pt, phi, charge, pars):
+        """ BH-DVCS interference. (Normalized) part surviving after taking difference 
+        of two lepton longitudinal polarization states.
         BKM Eq. (27) - FIXME: only twist two """
-        return  ( self.sINT1unp(pt, pars) * sin(phi) ) / ( 
-                   pt.xB * pt.y**3 * pt.t * self.P1P2(pt, phi) )
+        return  - charge * self.PreFacINT(pt, phi) * self.sINT1unp(pt, pars) * sin(phi)
+
        
 
     def prepare(self, pt):
@@ -324,6 +330,12 @@ class BMK(Approach):
             # First option is numerical, second is faster
             #pt.intP1P2 = Hquadrature(lambda phi: P1P2(pt, phi), 0, 2.0*pi)
             pt.intP1P2 = self.anintP1P2(pt)
+        # charge of first particle
+        if pt.has('in1'):
+            if pt.in1 == 'ep':                      # positron
+                pt.charge = +1
+            elif pt.in1 == 'e' or pt.in1 == 'em':   # electron
+                pt.charge = -1
 
     def antiprepare(self, pt):
         """Return """
@@ -338,10 +350,11 @@ class BMK(Approach):
             if pt.frame == 'Trento':  # Trento -> BKM
                 pt.phi = pi - pt.phi
  
-    def Xunp(self, pt, lam, pars, vars={}):
+    def Xunp(self, pt, lam, charge, pars, vars={}):
         """ 4-fold differential cross section for unpolarized target. 
 
-        lam is lepton polarization \lambda 
+        lam is lepton polarization \lambda .
+        FIXME: Is this 'phi' bussiness below ugly?
         
         """
         if 'phi' in vars:
@@ -349,41 +362,81 @@ class BMK(Approach):
         else:
             phi = pt.phi
         return self.PreFacSigma(pt) * ( self.TBH2unp(pt, phi) 
-                + self.TINTunp(pt, phi, lam, pars) 
+                + self.TINTunp(pt, phi, lam, charge, pars) 
                 + self.TDVCS2unp(pt, phi, pars) )
 
     def XLU(self, pt, pars, vars={}):
         """4-fold helicity-dependent cross section measured by HALL A """
 
-        return ( self.Xunp(pt, 1, pars, vars) - self.Xunp(pt, -1, pars, vars) ) / 2.
+        return ( self.Xunp(pt, 1, pt.charge, pars, vars) 
+                - self.Xunp(pt, -1, pt.charge, pars, vars) ) / 2.
 
     def XUU(self, pt, pars, vars={}):
         """4-fold helicity-independent cross section measured by HALL A """
 
-        return ( self.Xunp(pt, 1, pars, vars) + self.Xunp(pt, -1, pars, vars) ) / 2.
+        return ( self.Xunp(pt, 1, pt.charge, pars, vars) 
+                + self.Xunp(pt, -1, pt.charge, pars, vars) ) / 2.
 
     def BCA(self, pt, phi, pars):
         """Beam charge asymmetry. """
 
-        return  - self.TINTunp(pt, phi, 0, pars) / ( 
-                       self.TBH2unp(pt, phi) + self.TDVCS2unp(pt, phi, pars) )
+        if not self.optimization:
+            # use defining formula:  (sigma+ - sigma-)/(sigma+ + sigma-)
+            # i.e. charge is not read from datafile!
+            return (
+               self.Xunp(pt, 0, 1, pars, {'phi':phi}) - self.Xunp(pt, 0, -1, pars, {'phi':phi}) )/(
+               self.Xunp(pt, 0, 1, pars, {'phi':phi}) + self.Xunp(pt, 0, -1, pars, {'phi':phi}) )
+        else:
+            # optimized formula (remove parts which cancel anyway)
+            return  self.TINTunp(pt, phi, 0, 1, pars) / ( 
+                           self.TBH2unp(pt, phi) + self.TDVCS2unp(pt, phi, pars) )
 
-    def BCSA(self, pt, phi, pars):
-        """Beam charge-spin asymmetry. """
+    def BCSD(self, pt, lam, pars, vars={}):
+        """4-fold beam charge-spin cross section difference measured by COMPASS """
 
-        return  - self.TINTunp(pt, phi, 0, pars) / ( 
-                      self.TBH2unp(pt, phi) + self.TDVCS2unp(pt, phi, pars) 
-                      + (self.TINTunp(pt, phi, 1, pars) - self.TINTunp(pt, phi, -1, pars))/2.)
+        # charge is not read from datafile!
+        return (self.Xunp(pt, lam, 1, pars, vars) - self.Xunp(pt, -lam, -1, pars, vars))/2.
+
+    def BCSS(self, pt, lam, pars, vars={}):
+        """4-fold beam charge-spin cross section sum measured by COMPASS. """
+
+        # charge is not read from datafile!
+        return (self.Xunp(pt, lam, 1, pars, vars) + self.Xunp(pt, -lam, -1, pars, vars))/2.
+
+    def BCSA(self, pt, lam, pars, vars={}):
+        """Beam charge-spin asymmetry as measured by COMPASS. """
+
+        if not self.optimization:
+            return  self.BCSD(pt, lam, pars, vars) / self.BCSS(pt, lam, pars, vars)
+        else:
+            if 'phi' in vars:
+                phi = vars['phi']
+            else:
+                phi = pt.phi
+            return  self.TINTunp(pt, phi, 0, 1, pars) / ( 
+                  self.TBH2unp(pt, phi) + self.TDVCS2unp(pt, phi, pars) 
+               + (self.TINTunp(pt, phi, lam, 1, pars) + self.TINTunp(pt, phi, -lam, -1, pars))/2.)
 
     def BSA(self, pt, pars, vars={}):
-        """Beam spin asymmetry a la HERMES i.e. for positrons - negative """
+        """Beam spin asymmetry. HERMES uses positron convention (charge=+1)
+           CLAS uses electron (charge=-1), so datafile has to provide this
+           information in the name of 'in1' particle."""
 
         if 'phi' in vars:
             phi = vars['phi']
         else:
             phi = pt.phi
-        return  - self.TINTunpd(pt, phi, pars) / ( self.TBH2unp(pt, phi) 
-            + self.TDVCS2unp(pt, phi, pars) + self.TINTunp(pt, phi, 0, pars) )
+        if not self.optimization:
+            # use defining formula:  
+            return (
+               self.Xunp(pt, 1, pt.charge, pars, {'phi':phi})  
+                     - self.Xunp(pt, -1, pt.charge, pars, {'phi':phi}) )/(
+               self.Xunp(pt, 1, pt.charge, pars, {'phi':phi}) 
+                     + self.Xunp(pt, -1, pt.charge, pars, {'phi':phi}) )
+        else:
+            # optimized formula (remove parts which cancel anyway)
+            return  self.TINTunpd(pt, phi, pt.charge, pars) / ( self.TBH2unp(pt, phi) 
+                + self.TDVCS2unp(pt, phi, pars) + self.TINTunp(pt, phi, 0, pt.charge, pars) )
 
     def PartialCrossSection4int(self, t, pt, pars):
         """Same as PartialCrossSection but with additional variable t 
@@ -421,12 +474,12 @@ class BMK(Approach):
         return  res / pi
 
     def ALUIsin1(self, pt, pars):
-        """FIXME: shortcut, charge conventions, ... for HERMES - negative"""
+        """FIXME: shortcut, charge conventions, ... for HERMES - negative. FIXED?"""
         return  self.BSA(pt, pars, {'phi':pi/2.}) 
 
     def ALUa(self, pt, pars):
-        """FIXME: charge conventions ... for CLAS - positive"""
-        return - self.BSA(pt, pars, {'phi':pi/2.}) 
+        """FIXME: charge conventions ... for CLAS - positive. FIXED?"""
+        return  self.BSA(pt, pars, {'phi':pi/2.}) 
 
     def BCA0minusr1(self, pt, pars):
         return self.BCAcos0(pt, pars) - pt.r * self.BCAcos1(pt, pars)
@@ -453,6 +506,7 @@ class BMK(Approach):
         return b1/b0
 
     # Dictionary that maps labels (string type) to functions:
+    # FIXME: not needed? delete this?
     observablefunction = {"TotalCrossSection" : TotalCrossSection,
                         "PartialCrossSection" : PartialCrossSection,
                                    "ALUIsin1" : ALUIsin1,

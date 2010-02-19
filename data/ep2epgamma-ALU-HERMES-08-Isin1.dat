@@ -3,7 +3,7 @@ editor = KK
 
 process = ep2epgamma
 
-in1 = e
+in1 = ep
 in1energy = 27.6
 in1energyunit = GeV
 in1polarization = L

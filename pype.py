@@ -41,7 +41,9 @@ fitpoints = data[1] + data[8] + data[29] + data[30]  # DM's GLO1 set
 
 ff = models.FormFactors()
 #bmk = Approach.BMK()
-b = Approach.hotfixedBMK(ff)
+bnoopt = Approach.hotfixedBMK(ff, optimization = False)
+bopt = Approach.hotfixedBMK(ff, optimization = True)
+b = bopt
 
 # Transform data into conventions of approach used, and 
 # pre-calculate what can be pre-calculated
@@ -167,3 +169,13 @@ m.maxcalls = 4000
 # [7] Print results
 
 printres()
+
+pt0 = Data.DummyPoint()
+pt0.exptype = 'fixed target'
+pt0.in1energy = 160.
+pt0.xB = 0.05
+pt0.t = -0.2
+pt0.Q2 = 2.
+
+ptf = fitpoints[0]
+ptf.phi = 0.

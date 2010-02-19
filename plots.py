@@ -106,6 +106,96 @@ def plotHALLA(data, fits=[], path=None, fmt='png'):
         fig.show()
     return fig
 
+def plotCOMPASS(ff, fits=[], path=None, fmt='png'):
+    """Makes plot of COMPASS BCS asymmetry and difference and summ of xs for FormFactors model ff."""
+
+    title = 'COMPASS BCSA (asymmetry), BCSD (difference) and BCSS (sum) of XS'
+    fig = plt.figure()
+    fig.canvas.set_window_title(title)
+    fig.suptitle(title)
+    #fig.subplots_adjust(bottom=0.35)
+    # Asymmetry panel
+    pt = Data.DummyPoint()
+    pt.exptype = 'fixed target'
+    pt.in1energy = 160.
+    pt.xB = 0.05
+    pt.t = -0.2
+    pt.Q2 = 2.
+    ax = fig.add_subplot(2,2,1)
+    ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
+    phi = np.arange(0., np.pi, 0.2)
+    linestyles = ['g--', 'b-', 'r-.']
+    labels = ['HERMES+CLAS', 'HERMES+CLAS+HALLA', '+HALLA(phi)']
+    #labels = ['GLO1 (DM)', 'GLO1 (KK)', '']
+    pn = 0
+    for (approach, pars) in fits:
+        pt.prepare(approach)
+        line = approach.BCSA(pt, 0.8, pars, {'phi':np.pi - phi})
+        ax.plot(phi, line, linestyles[pn], linewidth=2, label=labels[pn]) 
+        pn += 1
+    #ax.set_ylim(0.0, 0.5)
+    # axes labels
+    ax.set_xlabel('$\\phi$')
+    ax.set_ylabel('BCS Asymmetry')
+    ax.legend()
+    # Difference  panel
+    pt = Data.DummyPoint()
+    pt.exptype = 'fixed target'
+    pt.in1energy = 160.
+    pt.xB = 0.05
+    pt.t = -0.2
+    pt.Q2 = 2.
+    ax = fig.add_subplot(2,2,2)
+    ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
+    phi = np.arange(0., np.pi, 0.2)
+    linestyles = ['g--', 'b-', 'r-.']
+    labels = ['HERMES+CLAS', 'HERMES+CLAS+HALLA', '+HALLA(phi)']
+    #labels = ['GLO1 (DM)', 'GLO1 (KK)', '']
+    pn = 0
+    for (approach, pars) in fits:
+        pt.prepare(approach)
+        # nb converted to pb:
+        line = 1000. * approach.BCSD(pt, 0.8, pars, {'phi':np.pi - phi})
+        ax.plot(phi, line, linestyles[pn], linewidth=2, label=labels[pn]) 
+        pn += 1
+    #ax.set_ylim(0.0, 0.5)
+    # axes labels
+    ax.set_xlabel('$\\phi$')
+    ax.set_ylabel('BCS Difference  [pb]')
+    ax.legend()
+    # Sum pannel
+    pt = Data.DummyPoint()
+    pt.exptype = 'fixed target'
+    pt.in1energy = 160.
+    pt.xB = 0.05
+    pt.t = -0.2
+    pt.Q2 = 2.
+    ax = fig.add_subplot(2,2,3)
+    ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
+    phi = np.arange(0., np.pi, 0.2)
+    linestyles = ['g--', 'b-', 'r-.']
+    labels = ['HERMES+CLAS', 'HERMES+CLAS+HALLA', '+HALLA(phi)']
+    #labels = ['GLO1 (DM)', 'GLO1 (KK)', '']
+    pn = 0
+    for (approach, pars) in fits:
+        pt.prepare(approach)
+        # nb converted to pb:
+        line = 1000. * approach.BCSS(pt, 0.8, pars, {'phi':np.pi - phi})
+        ax.plot(phi, line, linestyles[pn], linewidth=2, label=labels[pn]) 
+        pn += 1
+    #ax.set_ylim(0.0, 0.5)
+    # axes labels
+    ax.set_xlabel('$\\phi$')
+    ax.set_ylabel('BCS Difference  [pb]')
+    ax.legend()
+    if path:
+        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+    else:
+        fig.canvas.draw()
+        fig.show()
+    return fig
+
+
 def plotHBCSA(ff, fits=[], path=None, fmt='png'):
     """Makes plot of Im(cffH) and COMPASS BCSA for FormFactors model ff."""
 

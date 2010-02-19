@@ -3,7 +3,8 @@ editor = KK
 
 process = ep2epgamma
 
-in1 = e
+# HERMES define BSA with respect to positron scattering
+in1 = ep
 in1energy = 27.6
 in1energyunit = GeV
 in1polarization = L
@@ -11,7 +12,7 @@ in1polarization = L
 in2 = p
 in2polarization = U
 
-out1 = e
+out1 = ep
 out2 = p
 out3 = gamma
 
