@@ -2,7 +2,8 @@
 
 import sys, os
 import matplotlib
-import numpy
+import copy
+import numpy as np
 
 # Loading needed pybrain modules
 from pybrain.tools.shortcuts import buildNetwork
@@ -17,6 +18,13 @@ import utils
 data = utils.loaddata()   # dictionary {1 : DataSet instance, ...}
 # While doing the development, we work with HERMES BSA
 datapoints = data[5]
+## Crude implementation of constraint H(xB=1, eta, Q2) = 0
+# ptx = copy.deepcopy(datapoints[0])
+# ptx.val = 0.
+# ptx.err = 0.0001
+# ptx.t = -0.3
+# ptx.xB  = 0.99
+# datapoints.append(ptx)
 
 # Some auxilliary functions
 
@@ -29,10 +37,13 @@ def artificialData(datapoints, dstrain, dstest):
 
     trainlength = 13
     i = 0
-    for pt in numpy.random.permutation(datapoints):
+    trans.map.clear()
+    for pt in np.random.permutation(datapoints):
         xs = [pt.xB, pt.t, pt.Q2]
         #FIXME: This '-' below is Trento->BKM. Should be done with pt.prepare(Approach)
-        y = [-pt.val]
+        # Rounding the number, to make matching of trans.map work regardless of 
+        # computer rounding behaviour
+        y = [-pt.val + round(np.random.normal(0, pt.err, 1)[0], 5)]
         trans.map[y[0]] = xs 
         if i < trainlength:
             dstrain.addSample(xs[:-1], y) # we don't use Q2 for training
@@ -40,17 +51,12 @@ def artificialData(datapoints, dstrain, dstest):
             dstest.addSample(xs[:-1], y)
         i += 1
 
-def test2file(net, npoints=100, file='nn.dat'):
+def test2file(net, file, npoints=100):
     """Prints neural network values for npoints x=0,...,1 into file."""
 
-    f = open(file, 'w')
     for x in [s/float(npoints) for s in range(1,npoints)]:
-        ## 1-D  case
-        #f.write('%s  %s\n' % (str(x), str(net.activate([x])[0])))
-        ## 2-D  case
-        f.write('%s  %s\n' % (str(x), str(x*net.activate([x, -0.0])[0])))
-        f.write('%s  %s\n' % (str(x), str(x*net.activate([x, -0.3])[0])))
-    f.close()
+        file.write('%s  %s\n' % (str(x), str(x*net.activate([x, -0.3])[0])))
+    file.write('\n')
 
 def testnet(net, ds):
     """Prints neural network values and target ones."""
@@ -65,29 +71,38 @@ def testnet(net, ds):
 
 # Loading data, building network, training and printout:
 
-dstrain = SupervisedDataSet(2, 1)
-dstest = SupervisedDataSet(2, 1)
-artificialData(datapoints, dstrain, dstest)
+def makenet(n):
+    """Creates trained net. """
 
-net = buildNetwork(2, 7, 1)
+    dstrain = SupervisedDataSet(2, 1)
+    dstest = SupervisedDataSet(2, 1)
+    artificialData(datapoints, dstrain, dstest)
 
-t = RPropMinusTrainer(net, learningrate = 0.9, lrdecay = 0.98, momentum = 0.0, 
-        batchlearning = True, verbose = False)
+    net = buildNetwork(2, 7, 1)
 
-# Train in batches of batchlen epochs and repeat nbatch times
-nbatch = 40
-batchlen = 5
-memerr = 1.  # large initial error, certain to be bettered
-f = open('errors.dat', 'w')
-for n in range(nbatch):
-    t.trainOnDataset(dstrain, batchlen)
-    trainerr, testerr = (t.testOnData(dstrain), t.testOnData(dstest))
-    print "Epoch: %6i   ---->    Error: %8.3g  TestError: %8.3g" % (
-            t.epoch, trainerr, testerr)
-    f.write('%i %s  %s\n' % (n, str(trainerr), str(testerr) ) )
-    if testerr < memerr:
-        memerr = testerr
-        test2file(net)
-        testnet(net, dstest)
+    t = RPropMinusTrainer(net, learningrate = 0.9, lrdecay = 0.98, momentum = 0.0, 
+            batchlearning = True, verbose = False)
+
+    # Train in batches of batchlen epochs and repeat nbatch times
+    nbatch = 50
+    batchlen = 5
+    memerr = 1.  # large initial error, certain to be bettered
+    for k in range(nbatch):
+        t.trainOnDataset(dstrain, batchlen)
+        trainerr, testerr = (t.testOnData(dstrain), t.testOnData(dstest))
+        if testerr < memerr:
+            memerr = testerr
+            memnet = net
+            if verbose:
+                print "Epoch: %6i   ---->    Error: %8.3g  TestError: %8.3g" % (
+                        t.epoch, trainerr, testerr)
+    print "Net No. %2i  --->  TestError: %8.3g" % (n, memerr)
+    return net
     
-f.close()
+if __name__ == '__main__':
+    verbose = 0
+    f = open('H.dat', 'w')
+    for n in range(20):
+        net = makenet(n)
+        test2file(net, f, 200)
+    f.close()
