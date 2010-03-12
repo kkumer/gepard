@@ -12,41 +12,7 @@ from numpy import log, pi
 from numpy import ndarray
 
 from quadrature import PVquadrature
-
-class AttrDict(dict):
-	"""A dictionary with attribute-style access. It maps attribute access to
-	the real dictionary.  
-    By Keith Darth, http://code.activestate.com/recipes/473786/
-    """
-	def __init__(self, init={}):
-		dict.__init__(self, init)
-
-	def __getstate__(self):
-		return self.__dict__.items()
-
-	def __setstate__(self, items):
-		for key, val in items:
-			self.__dict__[key] = val
-
-	def __repr__(self):
-		return "%s(%s)" % (self.__class__.__name__, dict.__repr__(self))
-
-	def __setitem__(self, key, value):
-		return super(AttrDict, self).__setitem__(key, value)
-
-	def __getitem__(self, name):
-		return super(AttrDict, self).__getitem__(name)
-
-	def __delitem__(self, name):
-		return super(AttrDict, self).__delitem__(name)
-
-	__getattr__ = __getitem__
-	__setattr__ = __setitem__
-
-	def copy(self):
-		ch = AttrDict(self)
-		return ch
-
+from utils import AttrDict
 
 def dispargV(x, fun, pt, pars):
     """ Integrand of the dispersion integral (vector case) 
@@ -122,6 +88,7 @@ class FormFactors(Model):
         """Imaginary part of CFF H."""
 
         # override defaults (FIXME: should this be permanent?)
+        # FIXME: Is it costly to do this update for every call of ImH?
         self.H.update(pars) 
         p = self.H # shortcut
 

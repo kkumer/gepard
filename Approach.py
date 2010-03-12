@@ -203,7 +203,6 @@ class BMK(Approach):
         """ DVCS amplitude squared. BKM Eq. (26) - FIXME: only twist two now """
         return  self.PreFacDVCS(pt) * self.cDVCS0unp(pt, pars)
 
-
     #### Interference
 
     def ReCCALINTunp(self, pt, pars):
@@ -284,7 +283,11 @@ class BMK(Approach):
        
 
     def prepare(self, pt):
-        """Precalculate everything that is known and attach it to data point"""
+        """Precalculate everything that is known and attach it to data point.
+        FIXME: some of the stuff here, like completing kinematics info should
+        be in parent class or somewhere else, because it is not BMK-specific.
+
+        """
 
         # C1. azimutal angle phi should be in radians ...
         if pt.has('phi'):
@@ -349,7 +352,9 @@ class BMK(Approach):
         # obligatory for phi-dependent data.
             if pt.frame == 'Trento':  # Trento -> BKM
                 pt.phi = pi - pt.phi
- 
+
+## Observables ##
+
     def Xunp(self, pt, lam, charge, pars, vars={}):
         """ 4-fold differential cross section for unpolarized target. 
 
@@ -504,21 +509,6 @@ class BMK(Approach):
         b1 = Hquadrature(lambda phi: self.w(pt, phi) * self.XUU(pt, pars, {'phi':phi}) * cos(phi), 
                 0, 2.0*pi) / pi
         return b1/b0
-
-    # Dictionary that maps labels (string type) to functions:
-    # FIXME: not needed? delete this?
-    observablefunction = {"TotalCrossSection" : TotalCrossSection,
-                        "PartialCrossSection" : PartialCrossSection,
-                                   "ALUIsin1" : ALUIsin1,
-                                       "ALUa" : ALUa,
-                                        "XLU" : XLU,
-                                        "XUU" : XUU,
-                                       "ImCI" : ImCI,
-                                       "ReCI" : ReCI,
-                                    "ReCpDCI" : ReCpDCI,
-                                    "BCAcos0" : BCAcos0,
-                                    "b1ovb0"  : b1ovb0,
-                                    "BCAcos1" : BCAcos1}
 
 
 class hotfixedBMK(BMK):

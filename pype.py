@@ -95,49 +95,49 @@ def fcn(NS, alS, alpS, MS, rS, bS, Nv, alv, alpv, Mv, rv, bv, C, MC, tNv, tMv, t
 
 
 # DMGLO1
-## m = Minuit(fcn,
-##   NS = 1.5,         fix_NS = True,
-##  alS = 1.13,       fix_alS = True,
-## alpS = 0.15,      fix_alpS = True, 
-##   MS = 0.707107,   fix_MS = True,     
-##   rS = 1.0,         fix_rS = True,
-##   bS = 2.00203,     fix_bS = False,      limit_bS = (1.5, 2.5),
-##   Nv = 1.35,        fix_Nv = True,
-##  alv = 0.43,       fix_alv = True,
-## alpv = 0.85,      fix_alpv = True, 
-##   Mv = 1.01097,     fix_Mv = False,    limit_Mv = (0.2, 5.),
-##   rv = 0.496383,      fix_rv = False,    limit_rv = (0.3, 0.7),
-##   bv = 2.15682,       fix_bv = False,    limit_bv = (1.2, 2.8),
-##    C = 6.90484,        fix_C = False,    limit_C = (6., 8.),
-##   MC = 1.33924,   fix_MC = False,    limit_MC = (0., 15.),
-##  tNv = 0.6,          fix_tNv = True,
-##  tMv = 2.69667,    fix_tMv = False,    limit_tMv = (4., 9.),
-##  trv = 5.97923,      fix_trv = False,    limit_trv = (5., 7.),
-##  tbv = 3.25607,      fix_tbv = False,    limit_tbv = (2., 4.)
-## )
-
-
-# DMGLO
 m = Minuit(fcn,
   NS = 1.5,         fix_NS = True,
  alS = 1.13,       fix_alS = True,
 alpS = 0.15,      fix_alpS = True, 
-  MS = 0.707107,    fix_MS = True,     
+  MS = 0.707107,   fix_MS = True,     
   rS = 1.0,         fix_rS = True,
-  bS = 2.25,        fix_bS = False,      limit_bS = (3.1, 3.3),
+  bS = 2.00203,     fix_bS = False,      limit_bS = (1.5, 2.5),
   Nv = 1.35,        fix_Nv = True,
  alv = 0.43,       fix_alv = True,
 alpv = 0.85,      fix_alpv = True, 
-  Mv = 0.683,         fix_Mv = False,    limit_Mv = (0.9, 1.1),
-  rv = 0.684,          fix_rv = True,    limit_rv = (0.6, 0.8),
-  bv = 0.5,           fix_bv = True,    limit_bv = (0.4, 0.6),
-   C = 1.12,           fix_C = False,    limit_C = (1.4, 1.5),
-  MC = 1.22,          fix_MC = False,    limit_MC = (1.1, 1.3),
- tNv = 0.0,          fix_tNv = True,
- tMv = 2.69667,      fix_tMv = True,    limit_tMv = (4., 9.),
- trv = 5.97923,      fix_trv = True,    limit_trv = (5., 7.),
- tbv = 3.25607,      fix_tbv = True,    limit_tbv = (2., 4.)
+  Mv = 1.01097,     fix_Mv = False,    limit_Mv = (0.2, 5.),
+  rv = 0.496383,      fix_rv = False,    limit_rv = (0.3, 0.7),
+  bv = 2.15682,       fix_bv = False,    limit_bv = (1.2, 2.8),
+   C = 6.90484,        fix_C = False,    limit_C = (6., 8.),
+  MC = 1.33924,   fix_MC = False,    limit_MC = (0., 15.),
+ tNv = 0.6,          fix_tNv = True,
+ tMv = 2.69667,    fix_tMv = False,    limit_tMv = (4., 9.),
+ trv = 5.97923,      fix_trv = False,    limit_trv = (5., 7.),
+ tbv = 3.25607,      fix_tbv = False,    limit_tbv = (2., 4.)
 )
+
+
+# DMGLO
+## m = Minuit(fcn,
+##   NS = 1.5,         fix_NS = True,
+##  alS = 1.13,       fix_alS = True,
+## alpS = 0.15,      fix_alpS = True, 
+##   MS = 0.707107,    fix_MS = True,     
+##   rS = 1.0,         fix_rS = True,
+##   bS = 2.25,        fix_bS = False,      limit_bS = (3.1, 3.3),
+##   Nv = 1.35,        fix_Nv = True,
+##  alv = 0.43,       fix_alv = True,
+## alpv = 0.85,      fix_alpv = True, 
+##   Mv = 0.683,         fix_Mv = False,    limit_Mv = (0.9, 1.1),
+##   rv = 0.684,          fix_rv = True,    limit_rv = (0.6, 0.8),
+##   bv = 0.5,           fix_bv = True,    limit_bv = (0.4, 0.6),
+##    C = 1.12,           fix_C = False,    limit_C = (1.4, 1.5),
+##   MC = 1.22,          fix_MC = False,    limit_MC = (1.1, 1.3),
+##  tNv = 0.0,          fix_tNv = True,
+##  tMv = 2.69667,      fix_tMv = True,    limit_tMv = (4., 9.),
+##  trv = 5.97923,      fix_trv = True,    limit_trv = (5., 7.),
+##  tbv = 3.25607,      fix_tbv = True,    limit_tbv = (2., 4.)
+## )
 
 # GENERIC
 ## m = Minuit(fcn,
@@ -182,10 +182,10 @@ def printres(points=fitpoints, pars=m.values, nfreepars=utils.npars(m), printsig
 #m.tol = 20.0
 #m.strategy = 2
 m.printMode = 0
-m.maxcalls = 4000
+m.maxcalls = 400
 
 #m.migrad()
-#print "ncalls = ", m.ncalls
+#rint "ncalls = ", m.ncalls
 
 
 # [7] Print results
@@ -194,10 +194,15 @@ printres()
 
 pt0 = Data.DummyPoint()
 pt0.exptype = 'fixed target'
+pt0.in1 = 'e'
 pt0.in1energy = 160.
 pt0.xB = 0.05
 pt0.t = -0.2
 pt0.Q2 = 2.
+pt0.prepare(b)
+pt0.phi = 1.
 
 ptf = fitpoints[0]
 ptf.phi = 0.
+
+pta = Data.DummyPoint({'exptype':'fixed target', 'in1':'e', 'xB':0.05})

@@ -49,7 +49,7 @@ class DataPoint(object):
     For user's and programmer's convenience, these `dataset` attributes 
     are also inherited by `DataPoint` objects, so 
         point.dataset.yaxis == point.yaxis 
-    (Is this type of ineritance, know also as aquisition good idea?)
+    (Is this type of ineritance, know also as "aquisition", good idea?)
 
     Methods:
     has(name) -- Does it (or its dataset) have attribute `name`
@@ -67,20 +67,24 @@ class DataPoint(object):
 
         (Further elements are ignored.)
         `dataset` is container `DataSet` that is to contain this `DataPoint`
+        FIXME: this passing of higher-level DataSet as argument sounds wrong!
+                (See comment about aquisition in class docstring.|
 
         """
 
         # 1. Put reference to container into attribute
         self.dataset = dataset
         # 2. Put data into attributes
-        # 2a. x-axes
+        # 2a. first acquire also attributes of parent DataSet
+        self.__dict__.update(dataset.__dict__)
+        # 2b. x-axes
         i = 0 # index of our position on gridline
         for xaxis in self.xaxes:
             setattr(self, xaxis, gridline[i])
             i = i + 1
-        # 2b. y-axis 
+        # 2c. y-axis 
         self.val = gridline[i]
-        # 2c. y-axis errors
+        # 2d. y-axis errors
         try:
             self.stat = gridline[i+1]
             self.syst = gridline[i+2]
@@ -88,11 +92,6 @@ class DataPoint(object):
         except IndexError: # we have just one error number
             self.err = gridline[i+1]
         return
-
-    def __getattr__(self, name):
-        # (called when the usual attribute lookup didn't succeed)
-        # FIXME: Maybe self.__dict__.update(self.dataset.__dict__) ??
-        return getattr(self.dataset, name)
 
     def __repr__(self):
         return "DataPoint. Measurement: " + self.yaxis + " = " + str(self.val)
@@ -151,10 +150,6 @@ class DataSet(list):
             xs.sort()  # xs = ['x0', 'x1', ...]
             self.xaxes = [preamble[key] for key in xs]  # xaxes = ['t', 'xB', ...]
 
-
-            for gridline in data:
-                self.append(DataPoint(gridline, self))
-
             # Good to have:
             self.yaxis = preamble['y0']
             self.filename = os.path.split(datafile)[-1]
@@ -165,6 +160,9 @@ class DataSet(list):
             # Following dictionary will have units which are changed so that match
             # units used for internal theoretical formulas
             self.newunits = {}
+
+            for gridline in data:
+                self.append(DataPoint(gridline, self))
     
     def __repr__(self):
         return "DataSet instance from '" + self.filename + "'"
@@ -201,6 +199,10 @@ class DataSet(list):
 
 class DummyPoint(object):
     """This is only used for creating simple DataPoint-like objects"""
+
+    def __init__(self, init=None):
+        if init:
+            self.__dict__.update(init)
 
     def has(self, name):
         if self.__dict__.has_key(name):

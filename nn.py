@@ -4,6 +4,7 @@ import sys, os
 import matplotlib
 import copy
 import numpy as np
+import pickle
 
 # Loading needed pybrain modules
 from pybrain.tools.shortcuts import buildNetwork
@@ -18,13 +19,6 @@ import utils
 data = utils.loaddata()   # dictionary {1 : DataSet instance, ...}
 # While doing the development, we work with HERMES BSA
 datapoints = data[5]
-## Crude implementation of constraint H(xB=1, eta, Q2) = 0
-# ptx = copy.deepcopy(datapoints[0])
-# ptx.val = 0.
-# ptx.err = 0.0001
-# ptx.t = -0.3
-# ptx.xB  = 0.99
-# datapoints.append(ptx)
 
 # Some auxilliary functions
 
@@ -39,11 +33,13 @@ def artificialData(datapoints, dstrain, dstest):
     i = 0
     trans.map.clear()
     for pt in np.random.permutation(datapoints):
+        if pt.has('mt'):
+            pt.t = - pt.mt
         xs = [pt.xB, pt.t, pt.Q2]
-        #FIXME: This '-' below is Trento->BKM. Should be done with pt.prepare(Approach)
+        #FIXME: This abs() below is for HERMES->BKM. Should be done using info from .dat
         # Rounding the number, to make matching of trans.map work regardless of 
         # computer rounding behaviour
-        y = [-pt.val + round(np.random.normal(0, pt.err, 1)[0], 5)]
+        y = [np.abs(pt.val) + round(np.random.normal(0, pt.err, 1)[0], 5)]
         trans.map[y[0]] = xs 
         if i < trainlength:
             dstrain.addSample(xs[:-1], y) # we don't use Q2 for training
@@ -54,8 +50,9 @@ def artificialData(datapoints, dstrain, dstest):
 def test2file(net, file, npoints=100):
     """Prints neural network values for npoints x=0,...,1 into file."""
 
-    for x in [s/float(npoints) for s in range(1,npoints)]:
-        file.write('%s  %s\n' % (str(x), str(x*net.activate([x, -0.3])[0])))
+    for x in np.linspace(0, 1, npoints)[1:-1]: # boundary points removed
+        # note constraint CFF(xB=1)=0 implementation below
+        file.write('%s  %s\n' % (str(x), str(x*(1-x)*net.activate([x, -0.3])[0])))
     file.write('\n')
 
 def testnet(net, ds):
@@ -84,7 +81,7 @@ def makenet(n):
             batchlearning = True, verbose = False)
 
     # Train in batches of batchlen epochs and repeat nbatch times
-    nbatch = 50
+    nbatch = 20
     batchlen = 5
     memerr = 1.  # large initial error, certain to be bettered
     for k in range(nbatch):
@@ -102,7 +99,13 @@ def makenet(n):
 if __name__ == '__main__':
     verbose = 0
     f = open('H.dat', 'w')
-    for n in range(20):
+    nets = []
+    for n in range(12):
         net = makenet(n)
         test2file(net, f, 200)
+        nets.append(net)
     f.close()
+    f = open('nets.pkl', 'w')   # all the nets
+    pickle.dump(nets, f)
+    f.close()
+

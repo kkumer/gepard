@@ -75,7 +75,7 @@ def BSA(ImcffH, xB, t, Q2):
 
 def trans(x, args):
     xB, t, Q2 = args
-    return BSA(x, xB, t, Q2)
+    return BSA((1-xB)*x, xB, t, Q2) # implementing constraint CFF(xB=1)=0
 
 
 map = {}
