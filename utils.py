@@ -42,12 +42,17 @@ class AttrDict(dict):
 	def __delitem__(self, name):
 		return super(AttrDict, self).__delitem__(name)
 
+
 	__getattr__ = __getitem__
 	__setattr__ = __setitem__
 
 	def copy(self):
 		ch = AttrDict(self)
 		return ch
+
+	def has(self, name):
+        # Just an alias for has_key for compatibility with DataPoint
+		return self.has_key(name)
 
 
 def loaddata(datadir='data'):

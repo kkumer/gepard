@@ -11,12 +11,13 @@ plotHALLA -- plots HALL-A data
 import os
 
 import numpy as np
+import math
 import pylab as plt
 from matplotlib.ticker import MultipleLocator
 
 import Data
 import utils
-from constants import toTeX
+from constants import toTeX, Mp2, Mp
 
 def plotHERMES(data, fits=[], path=None, fmt='png'):
     """Makes plot of HERMES preliminary BCA and BSA data with fit line defined by pars"""
@@ -108,7 +109,10 @@ def plotHALLA(data, fits=[], path=None, fmt='png'):
     return fig
 
 def plotCOMPASS(ff, fits=[], path=None, fmt='png'):
-    """Makes plot of COMPASS BCS asymmetry and difference and summ of xs for FormFactors model ff."""
+    """Plot COMPASS BCS asymmetry and difference and summ of xs for FormFactors model ff.
+    
+    FIXME: kinematic completion explicit here
+    """
 
     title = 'COMPASS BCSA (asymmetry), BCSD (difference) and BCSS (sum) of XS'
     fig = plt.figure()
@@ -122,6 +126,9 @@ def plotCOMPASS(ff, fits=[], path=None, fmt='png'):
     pt.xB = 0.05
     pt.t = -0.2
     pt.Q2 = 2.
+    pt.W = math.sqrt(pt.Q2 / pt.xB - pt.Q2 + Mp2)
+    pt.xi = pt.xB / (2. - pt.xB)
+    pt.s = 2 * Mp * pt.in1energy + Mp2
     ax = fig.add_subplot(2,2,1)
     ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
     phi = np.arange(0., np.pi, 0.2)
@@ -146,6 +153,9 @@ def plotCOMPASS(ff, fits=[], path=None, fmt='png'):
     pt.xB = 0.05
     pt.t = -0.2
     pt.Q2 = 2.
+    pt.W = math.sqrt(pt.Q2 / pt.xB - pt.Q2 + Mp2)
+    pt.xi = pt.xB / (2. - pt.xB)
+    pt.s = 2 * Mp * pt.in1energy + Mp2
     ax = fig.add_subplot(2,2,2)
     ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
     phi = np.arange(0., np.pi, 0.2)
@@ -171,6 +181,9 @@ def plotCOMPASS(ff, fits=[], path=None, fmt='png'):
     pt.xB = 0.05
     pt.t = -0.2
     pt.Q2 = 2.
+    pt.W = math.sqrt(pt.Q2 / pt.xB - pt.Q2 + Mp2)
+    pt.xi = pt.xB / (2. - pt.xB)
+    pt.s = 2 * Mp * pt.in1energy + Mp2
     ax = fig.add_subplot(2,2,3)
     ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
     phi = np.arange(0., np.pi, 0.2)
@@ -222,10 +235,14 @@ def plotCOMPASSt(ff, fits=[], path=None, fmt='png'):
                 pt.in1energy = 160.
                 pt.xB = xB
                 pt.Q2 = Q2
+                pt.W = math.sqrt(pt.Q2 / pt.xB - pt.Q2 + Mp2)
+                pt.xi = pt.xB / (2. - pt.xB)
+                pt.s = 2 * Mp * pt.in1energy + Mp2
                 pt.phi = 0.
                 pt.units = {'phi' : 'radian'}
                 pt.frame = 'Trento'
                 pt.mt = mt
+                pt.t = - pt.mt
                 pt.prepare(approach)
                 line.append(approach.BCSA(pt, 0.8, pars))
             ax.plot(mtvals, line, linestyles[pn], linewidth=2, 

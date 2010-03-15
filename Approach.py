@@ -4,7 +4,7 @@ from numpy import sin, cos, pi, sqrt
 
 from quadrature import Hquadrature
 from constants import *
-#from ansatz import *
+from utils import AttrDict
 
 class Approach(object):
     """Class of approaches to calculation of observables.
@@ -331,13 +331,27 @@ class BMK(Approach):
         FIXME: Is this 'phi' bussiness below ugly?
         
         """
-        if 'phi' in vars:
+        if vars:
+            # copy kinematics into new dict and update
+            kin = AttrDict()
+            for key in ['xB', 't', 'mt', 'Q2', 'W', 'xi', 's', 'phi']:
+                if pt.__dict__.has_key(key):
+                    kin[key] = pt.__getattribute__(key)
+            kin.update(vars)
+            if kin.has('xB') and kin.has('Q2'):
+                kin.W = sqrt(kin.Q2 / kin.xB - kin.Q2 + Mp2)
+            kin.xi = kin.xB / (2. - kin.xB)
+            self.prepare(kin)
             phi = vars['phi']
         else:
+            # just pass references
+            kin = pt
             phi = pt.phi
-        return self.PreFacSigma(pt) * ( self.TBH2unp(pt, phi) 
-                + self.TINTunp(pt, phi, lam, charge, pars) 
-                + self.TDVCS2unp(pt, phi, pars) )
+            pass
+
+        return self.PreFacSigma(kin) * ( self.TBH2unp(kin, phi) 
+                + self.TINTunp(kin, phi, lam, charge, pars) 
+                + self.TDVCS2unp(kin, phi, pars) )
 
     def XLU(self, pt, pars, vars={}):
         """Calculate 4-fold helicity-dependent cross section measured by HALL A """
@@ -396,19 +410,19 @@ class BMK(Approach):
            CLAS uses electron (charge=-1), so datafile has to provide this
            information in the name of 'in1' particle."""
 
-        if 'phi' in vars:
-            phi = vars['phi']
-        else:
-            phi = pt.phi
         if not self.optimization:
             # use defining formula:  
             return (
-               self.Xunp(pt, 1, pt.charge, pars, {'phi':phi})  
-                     - self.Xunp(pt, -1, pt.charge, pars, {'phi':phi}) )/(
-               self.Xunp(pt, 1, pt.charge, pars, {'phi':phi}) 
-                     + self.Xunp(pt, -1, pt.charge, pars, {'phi':phi}) )
+               self.Xunp(pt, 1, pt.charge, pars, vars)  
+                     - self.Xunp(pt, -1, pt.charge, pars, vars) )/(
+               self.Xunp(pt, 1, pt.charge, pars, vars) 
+                     + self.Xunp(pt, -1, pt.charge, pars, vars) )
         else:
             # optimized formula (by removing parts which cancel anyway)
+            if 'phi' in vars:
+                phi = vars['phi']
+            else:
+                phi = pt.phi
             return  self.TINTunpd(pt, phi, pt.charge, pars) / ( self.TBH2unp(pt, phi) 
                 + self.TDVCS2unp(pt, phi, pars) + self.TINTunp(pt, phi, 0, pt.charge, pars) )
 
