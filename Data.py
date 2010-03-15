@@ -52,10 +52,6 @@ class DataPoint(object):
         point.dataset.yaxis == point.yaxis 
     (Is this type of ineritance, know also as "aquisition", good idea?)
 
-    Methods:
-    has(name) -- Does it (or its dataset) have attribute `name`
-    prepare(approach) -- Precalculate everything in `approach`
-
     """ 
 
     def __init__(self, gridline, dataset):
@@ -106,8 +102,6 @@ class DataPoint(object):
             self.mt = - self.t
         elif self.has('mt'):
             self.t = - self.mt
-        # y is always just derived from other variables
-        self.y = (self.W**2 + self.Q2 - Mp2) / (self.s - Mp2)
         return
 
     def __repr__(self):
@@ -115,14 +109,15 @@ class DataPoint(object):
 
     def has(self, name):
         """Does point (or dataset) have attribute `name`?"""
-
         if self.dataset.__dict__.has_key(name) or self.__dict__.has_key(name):
             return True
         return False
 
-    def prepare(self, approach):
-        """Precalculate everything that is known in given `approach`"""
+    def to_conventions(self, approach):
+        approach.to_conventions(self)
+        return
 
+    def prepare(self, approach):
         approach.prepare(self)
         return
 

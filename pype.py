@@ -51,6 +51,7 @@ b = bopt
 ## Prepare just fitpoints ...
 # [pt.prepare(b) for pt in fitpoints]
 ## ... or prepare ALL available datapoints
+[[pt.to_conventions(b) for pt in set] for set in data.values()]
 [[pt.prepare(b) for pt in set] for set in data.values()]
 
 # [4] Define function to be minimized i.e. chi-square
@@ -192,17 +193,18 @@ m.maxcalls = 400
 
 printres()
 
-pt0 = Data.DummyPoint()
-pt0.exptype = 'fixed target'
-pt0.in1 = 'e'
-pt0.in1energy = 160.
-pt0.xB = 0.05
-pt0.t = -0.2
-pt0.Q2 = 2.
-pt0.prepare(b)
-pt0.phi = 1.
-
-ptf = fitpoints[0]
-ptf.phi = 0.
-
-pta = Data.DummyPoint({'exptype':'fixed target', 'in1':'e', 'xB':0.05})
+# pt0 = Data.DummyPoint()
+# pt0.exptype = 'fixed target'
+# pt0.in1 = 'e'
+# pt0.in1energy = 160.
+# pt0.xB = 0.05
+# pt0.t = -0.2
+# pt0.Q2 = 2.
+# pt0.to_conventions(b)
+# pt0.prepare(b)
+# pt0.phi = 1.
+# 
+# ptf = fitpoints[0]
+# ptf.phi = 0.
+# 
+# pta = Data.DummyPoint({'exptype':'fixed target', 'in1':'e', 'xB':0.05})

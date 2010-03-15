@@ -282,13 +282,8 @@ class BMK(Approach):
 
        
 
-    def prepare(self, pt):
-        """Precalculate everything that is known and attach it to data point.
-        FIXME: some of the stuff here, like completing kinematics info should
-        be in parent class or somewhere else, because it is not BMK-specific.
-
-        """
-
+    def to_conventions(self, pt):
+        """Transform stuff into Approach's conventions."""
         ##  --- go to BMK conventions ----
         # C1. azimutal angle phi should be in radians ...
         if pt.has('phi'):
@@ -300,7 +295,22 @@ class BMK(Approach):
             if pt.frame == 'Trento':  # Trento -> BMK
                 pt.phi = pi - pt.phi
                 pt.newframe = 'BMK'
-        ##  --- pre-calculate BMK kinematical constants ----
+
+    def from_conventions(self, pt):
+        """Transform stuff from Approach's conventions into original data's."""
+        # C1. azimutal angle phi should be in radians ...
+        if pt.has('phi'):
+            if pt.units['phi'][:3]== 'deg': # deg, degree, degrees -> radians
+                pt.phi = pt.phi * pi / 180.
+                pt.units['phi'] = 'rad'
+        # C2. ... and in BKM convention. `frame` attribute is
+        # obligatory for phi-dependent data.
+            if pt.frame == 'Trento':  # Trento -> BKM
+                pt.phi = pi - pt.phi
+
+    def prepare(self, pt):
+        """Pre-calculate GPD-independent kinamatical constants and functions."""
+        pt.y = (pt.W**2 + pt.Q2 - Mp2) / (pt.s - Mp2)
         pt.eps = 2. * pt.xB * Mp / sqrt(pt.Q2)
         pt.eps2 = pt.eps**2
         if pt.has('t'):
@@ -311,19 +321,6 @@ class BMK(Approach):
             # First option is numerical, second is analytical and faster
             #pt.intP1P2 = Hquadrature(lambda phi: P1P2(pt, phi), 0, 2.0*pi)
             pt.intP1P2 = self.anintP1P2(pt)
-
-    def antiprepare(self, pt):
-        """Return """
-
-        # C1. azimutal angle phi should be in radians ...
-        if pt.has('phi'):
-            if pt.units['phi'][:3]== 'deg': # deg, degree, degrees -> radians
-                pt.phi = pt.phi * pi / 180.
-                pt.units['phi'] = 'rad'
-        # C2. ... and in BKM convention. `frame` attribute is
-        # obligatory for phi-dependent data.
-            if pt.frame == 'Trento':  # Trento -> BKM
-                pt.phi = pi - pt.phi
 
 ## Observables ##
 

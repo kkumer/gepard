@@ -15,6 +15,7 @@ b = Approach.hotfixedBMK(ff, optimization = False)
 
 data = utils.loaddata()  #FIXME: write tests without dependence on data
 pt0 = data[1][0]
+pt0.to_conventions(b)
 pt0.prepare(b)
 
 def test_CFF():
