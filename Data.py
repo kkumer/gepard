@@ -20,6 +20,7 @@ import pylab as plt
 from numpy import sqrt
 
 import utils
+from constants import Mp, Mp2
 
 
 class DataPoint(object):
@@ -160,6 +161,19 @@ class DataSet(list):
             # Following dictionary will have units which are changed so that match
             # units used for internal theoretical formulas
             self.newunits = {}
+            # charge of first particle FIXME: just electron treated
+            if self.in1 == 'ep':                      # positron
+                self.charge = +1
+            elif self.in1 == 'e' or self.in1 == 'em':   # electron
+                self.charge = -1
+            # Mandelstam s
+            if self.exptype == 'fixed target':
+                self.s = 2 * Mp * self.in1energy + Mp2
+            elif self.exptype == 'collider':
+                self.s = 2 * self.in1energy * (self.in2energy + sqrt(
+                    self.in2energy**2 - Mp2)) + Mp2
+            else:
+                pass # FIXME: raise error
 
             for gridline in data:
                 self.append(DataPoint(gridline, self))

@@ -289,6 +289,7 @@ class BMK(Approach):
 
         """
 
+        ##  --- go to BMK conventions ----
         # C1. azimutal angle phi should be in radians ...
         if pt.has('phi'):
             if pt.units['phi'][:3]== 'deg': # deg, degree, degrees -> radians
@@ -299,18 +300,11 @@ class BMK(Approach):
             if pt.frame == 'Trento':  # Trento -> BMK
                 pt.phi = pi - pt.phi
                 pt.newframe = 'BMK'
-        # Mandelstam s
-        if pt.exptype == 'fixed target':
-            pt.s = 2 * Mp * pt.in1energy + Mp2
-        elif pt.exptype == 'collider':
-            self.s = 2 * self.in1energy * (self.in2energy + sqrt(
-                self.in2energy**2 - Mp2)) + Mp2
-        else:
-            pass # FIXME: raise error
+        ## --- calculate standard kinematical variables ---
         # completing kinematics info
-        if pt.has('W') and pt.has('Q2'):
-            pt.xB = pt.Q2 / (pt.W**2 + pt.Q2 - Mp2)
-        elif pt.has('xB') and pt.has('Q2'):
+        #if pt.has('W') and pt.has('Q2'):  # it never happens
+        #    pt.xB = pt.Q2 / (pt.W**2 + pt.Q2 - Mp2)
+        if pt.has('xB') and pt.has('Q2'):
             pt.W = sqrt(pt.Q2 / pt.xB - pt.Q2 + Mp2)
         if pt.has('xB'):
             # There are t/Q2 corrections, cf. BMK Eq. (4), but they are 
@@ -321,6 +315,7 @@ class BMK(Approach):
             pt.mt = - pt.t
         elif pt.has('mt'):
             pt.t = - pt.mt
+        ##  --- pre-calculate BMK kinematical constants ----
         # derived kinematics
         pt.y = (pt.W**2 + pt.Q2 - Mp2) / (pt.s - Mp2)
         pt.eps = 2. * pt.xB * Mp / sqrt(pt.Q2)
@@ -333,12 +328,6 @@ class BMK(Approach):
             # First option is numerical, second is faster
             #pt.intP1P2 = Hquadrature(lambda phi: P1P2(pt, phi), 0, 2.0*pi)
             pt.intP1P2 = self.anintP1P2(pt)
-        # charge of first particle
-        if pt.has('in1'):
-            if pt.in1 == 'ep':                      # positron
-                pt.charge = +1
-            elif pt.in1 == 'e' or pt.in1 == 'em':   # electron
-                pt.charge = -1
 
     def antiprepare(self, pt):
         """Return """
@@ -439,7 +428,7 @@ class BMK(Approach):
                self.Xunp(pt, 1, pt.charge, pars, {'phi':phi}) 
                      + self.Xunp(pt, -1, pt.charge, pars, {'phi':phi}) )
         else:
-            # optimized formula (remove parts which cancel anyway)
+            # optimized formula (by removing parts which cancel anyway)
             return  self.TINTunpd(pt, phi, pt.charge, pars) / ( self.TBH2unp(pt, phi) 
                 + self.TDVCS2unp(pt, phi, pars) + self.TINTunp(pt, phi, 0, pt.charge, pars) )
 
