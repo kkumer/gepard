@@ -92,6 +92,22 @@ class DataPoint(object):
             self.err = sqrt( self.stat**2 + self.syst**2 )
         except IndexError: # we have just one error number
             self.err = gridline[i+1]
+        # 2e. calculate standard kinematical variables
+        if self.has('W') and self.has('Q2'):
+            self.xB = self.Q2 / (self.W**2 + self.Q2 - Mp2)
+        if self.has('xB') and self.has('Q2'):
+            self.W = sqrt(self.Q2 / self.xB - self.Q2 + Mp2)
+        if self.has('xB'):
+            # There are t/Q2 corrections, cf. BMK Eq. (4), but they are 
+            # formally higher twist and it is maybe sensible to DEFINE xi, 
+            # the argument of CFF, as follows:
+            self.xi = self.xB / (2. - self.xB)
+        if self.has('t'):
+            self.mt = - self.t
+        elif self.has('mt'):
+            self.t = - self.mt
+        # y is always just derived from other variables
+        self.y = (self.W**2 + self.Q2 - Mp2) / (self.s - Mp2)
         return
 
     def __repr__(self):

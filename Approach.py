@@ -300,24 +300,7 @@ class BMK(Approach):
             if pt.frame == 'Trento':  # Trento -> BMK
                 pt.phi = pi - pt.phi
                 pt.newframe = 'BMK'
-        ## --- calculate standard kinematical variables ---
-        # completing kinematics info
-        #if pt.has('W') and pt.has('Q2'):  # it never happens
-        #    pt.xB = pt.Q2 / (pt.W**2 + pt.Q2 - Mp2)
-        if pt.has('xB') and pt.has('Q2'):
-            pt.W = sqrt(pt.Q2 / pt.xB - pt.Q2 + Mp2)
-        if pt.has('xB'):
-            # There are t/Q2 corrections, cf. BMK Eq. (4), but they are 
-            # formally higher twist and it is maybe sensible to DEFINE xi, 
-            # the argument of CFF, as follows:
-            pt.xi = pt.xB / (2. - pt.xB)
-        if pt.has('t'):
-            pt.mt = - pt.t
-        elif pt.has('mt'):
-            pt.t = - pt.mt
         ##  --- pre-calculate BMK kinematical constants ----
-        # derived kinematics
-        pt.y = (pt.W**2 + pt.Q2 - Mp2) / (pt.s - Mp2)
         pt.eps = 2. * pt.xB * Mp / sqrt(pt.Q2)
         pt.eps2 = pt.eps**2
         if pt.has('t'):
@@ -325,7 +308,7 @@ class BMK(Approach):
             pt.K2 = self.K2(pt.Q2, pt.xB, pt.t, pt.y, pt.eps2)
             pt.K = sqrt(pt.K2)
             pt.r = self.r(pt.Q2, pt.xB, pt.t, pt.y, pt.eps2)
-            # First option is numerical, second is faster
+            # First option is numerical, second is analytical and faster
             #pt.intP1P2 = Hquadrature(lambda phi: P1P2(pt, phi), 0, 2.0*pi)
             pt.intP1P2 = self.anintP1P2(pt)
 
@@ -345,7 +328,7 @@ class BMK(Approach):
 ## Observables ##
 
     def Xunp(self, pt, lam, charge, pars, vars={}):
-        """ 4-fold differential cross section for unpolarized target. 
+        """ Calculate 4-fold differential cross section for unpolarized target. 
 
         lam is lepton polarization \lambda .
         FIXME: Is this 'phi' bussiness below ugly?
@@ -360,7 +343,7 @@ class BMK(Approach):
                 + self.TDVCS2unp(pt, phi, pars) )
 
     def XLU(self, pt, pars, vars={}):
-        """4-fold helicity-dependent cross section measured by HALL A """
+        """Calculate 4-fold helicity-dependent cross section measured by HALL A """
 
         return ( self.Xunp(pt, 1, pt.charge, pars, vars) 
                 - self.Xunp(pt, -1, pt.charge, pars, vars) ) / 2.
