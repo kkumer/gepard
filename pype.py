@@ -43,7 +43,7 @@ ff = models.FormFactors()
 #bmk = Approach.BMK()
 bnoopt = Approach.hotfixedBMK(ff, optimization = False)  # no optimizations
 bopt = Approach.hotfixedBMK(ff, optimization = True)     # optimized formulas
-b = bopt
+b = bnoopt
 
 # Transform data into conventions of approach used, and 
 # pre-calculate what can be pre-calculated

@@ -123,21 +123,21 @@ def plotCOMPASS(ff, fits=[], path=None, fmt='png'):
     pt = Data.DummyPoint()
     pt.exptype = 'fixed target'
     pt.in1energy = 160.
+    pt.s = 2 * Mp * pt.in1energy + Mp2
     pt.xB = 0.05
     pt.t = -0.2
     pt.Q2 = 2.
-    pt.W = math.sqrt(pt.Q2 / pt.xB - pt.Q2 + Mp2)
-    pt.xi = pt.xB / (2. - pt.xB)
-    pt.s = 2 * Mp * pt.in1energy + Mp2
     ax = fig.add_subplot(2,2,1)
     ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
     phi = np.arange(0., np.pi, 0.2)
+    utils.fill_kinematics(pt)
     linestyles = ['g--', 'b-', 'r-.']
     labels = ['HERMES+CLAS', 'HERMES+CLAS+HALLA', '+HALLA(phi)']
     #labels = ['GLO1 (DM)', 'GLO1 (KK)', '']
     pn = 0
     for (approach, pars) in fits:
-        pt.prepare(approach)
+        approach.to_conventions(pt)
+        approach.prepare(pt)
         line = approach.BCSA(pt, 0.8, pars, {'phi':np.pi - phi})
         ax.plot(phi, line, linestyles[pn], linewidth=2, label=labels[pn]) 
         pn += 1
@@ -150,21 +150,21 @@ def plotCOMPASS(ff, fits=[], path=None, fmt='png'):
     pt = Data.DummyPoint()
     pt.exptype = 'fixed target'
     pt.in1energy = 160.
+    pt.s = 2 * Mp * pt.in1energy + Mp2
     pt.xB = 0.05
     pt.t = -0.2
     pt.Q2 = 2.
-    pt.W = math.sqrt(pt.Q2 / pt.xB - pt.Q2 + Mp2)
-    pt.xi = pt.xB / (2. - pt.xB)
-    pt.s = 2 * Mp * pt.in1energy + Mp2
     ax = fig.add_subplot(2,2,2)
     ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
     phi = np.arange(0., np.pi, 0.2)
+    utils.fill_kinematics(pt)
     linestyles = ['g--', 'b-', 'r-.']
     labels = ['HERMES+CLAS', 'HERMES+CLAS+HALLA', '+HALLA(phi)']
     #labels = ['GLO1 (DM)', 'GLO1 (KK)', '']
     pn = 0
     for (approach, pars) in fits:
-        pt.prepare(approach)
+        approach.to_conventions(pt)
+        approach.prepare(pt)
         # nb converted to pb:
         line = 1000. * approach.BCSD(pt, 0.8, pars, {'phi':np.pi - phi})
         ax.plot(phi, line, linestyles[pn], linewidth=2, label=labels[pn]) 
@@ -178,12 +178,11 @@ def plotCOMPASS(ff, fits=[], path=None, fmt='png'):
     pt = Data.DummyPoint()
     pt.exptype = 'fixed target'
     pt.in1energy = 160.
+    pt.s = 2 * Mp * pt.in1energy + Mp2
     pt.xB = 0.05
     pt.t = -0.2
     pt.Q2 = 2.
-    pt.W = math.sqrt(pt.Q2 / pt.xB - pt.Q2 + Mp2)
-    pt.xi = pt.xB / (2. - pt.xB)
-    pt.s = 2 * Mp * pt.in1energy + Mp2
+    utils.fill_kinematics(pt)
     ax = fig.add_subplot(2,2,3)
     ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
     phi = np.arange(0., np.pi, 0.2)
@@ -192,7 +191,8 @@ def plotCOMPASS(ff, fits=[], path=None, fmt='png'):
     #labels = ['GLO1 (DM)', 'GLO1 (KK)', '']
     pn = 0
     for (approach, pars) in fits:
-        pt.prepare(approach)
+        approach.to_conventions(pt)
+        approach.prepare(pt)
         # nb converted to pb:
         line = 1000. * approach.BCSS(pt, 0.8, pars, {'phi':np.pi - phi})
         ax.plot(phi, line, linestyles[pn], linewidth=2, label=labels[pn]) 
@@ -233,17 +233,16 @@ def plotCOMPASSt(ff, fits=[], path=None, fmt='png'):
                 pt = Data.DummyPoint()
                 pt.exptype = 'fixed target'
                 pt.in1energy = 160.
+                pt.s = 2 * Mp * pt.in1energy + Mp2
                 pt.xB = xB
                 pt.Q2 = Q2
-                pt.W = math.sqrt(pt.Q2 / pt.xB - pt.Q2 + Mp2)
-                pt.xi = pt.xB / (2. - pt.xB)
-                pt.s = 2 * Mp * pt.in1energy + Mp2
                 pt.phi = 0.
                 pt.units = {'phi' : 'radian'}
                 pt.frame = 'Trento'
                 pt.mt = mt
-                pt.t = - pt.mt
-                pt.prepare(approach)
+                utils.fill_kinematics(pt)
+                approach.to_conventions(pt)
+                approach.prepare(pt)
                 line.append(approach.BCSA(pt, 0.8, pars))
             ax.plot(mtvals, line, linestyles[pn], linewidth=2, 
                     label=labels[pn]) 
@@ -298,19 +297,22 @@ def plotHBCSA(ff, fits=[], path=None, fmt='png'):
     pt = Data.DummyPoint()
     pt.exptype = 'fixed target'
     pt.in1energy = 160.
+    pt.s = 2 * Mp * pt.in1energy + Mp2
     pt.xB = 0.05
     pt.t = -0.2
     pt.Q2 = 2.
     ax = fig.add_subplot(1,2,2)
     ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
     phi = np.arange(0., np.pi, 0.2)
+    utils.fill_kinematics(pt)
     linestyles = ['g--', 'b-', 'r-.']
     labels = ['HERMES+CLAS', 'HERMES+CLAS+HALLA', '+HALLA(phi)']
     #labels = ['GLO1 (DM)', 'GLO1 (KK)', '']
     pn = 0
     for (approach, pars) in fits:
-        pt.prepare(approach)
-        line = approach.BCSA(pt, np.pi - phi, pars)
+        approach.to_conventions(pt)
+        approach.prepare(pt)
+        line = approach.BCSA(pt, 1, pars, {'phi':np.pi - phi})
         ax.plot(phi, line, linestyles[pn], linewidth=2, label=labels[pn]) 
         pn += 1
     #ax.set_ylim(0.0, 0.5)
@@ -377,19 +379,22 @@ def plotBCSA(ff, fits=[], path=None, fmt='png'):
     pt = Data.DummyPoint()
     pt.exptype = 'fixed target'
     pt.in1energy = 160.
+    pt.s = 2 * Mp * pt.in1energy + Mp2
     pt.xB = 0.05
     pt.t = -0.2
     pt.Q2 = 2.
     ax = fig.add_subplot(1,1,1)
     ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
     phi = np.arange(0., np.pi, 0.2)
+    utils.fill_kinematics(pt)
     linestyles = ['g--', 'b-', 'r-.']
     labels = ['HERMES+CLAS', 'HERMES+CLAS+HALLA', '+HALLA(phi)']
     #labels = ['GLO1 (DM)', 'GLO1 (KK)', '']
     pn = 0
     for (approach, pars) in fits:
-        pt.prepare(approach)
-        line = approach.BCSA(pt, np.pi - phi, pars)
+        approach.to_conventions(pt)
+        approach.prepare(pt)
+        line = approach.BCSA(pt, 1, pars, {'phi':np.pi - phi})
         ax.plot(phi, line, linestyles[pn], linewidth=2, label=labels[pn]) 
         pn += 1
     #ax.set_ylim(0.0, 0.5)
@@ -403,9 +408,9 @@ def plotBCSA(ff, fits=[], path=None, fmt='png'):
         fig.canvas.draw()
         fig.show()
     return fig
+
+
 # FIXME: doesn't work!
-
-
 def plotHALLAphi(pars):
     """Makes plot of HALL-A cross-section data with fit line defined by pars"""
     datafiles = [

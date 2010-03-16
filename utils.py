@@ -3,6 +3,7 @@ Some utility stuff needed all over the application
 
 AttrDict -- dictionary with attribute-style access
 loaddata -- loads datafiles from directory
+fill_kinematics --- calculates missing kinematical variables
 parse -- parses datafiles
 subplot -- creates subplot for matplotlib plot
 npars -- number of free (not fixed) parameters of minuit object
@@ -11,9 +12,13 @@ prettyprint -- formatted printout of numbers
 """
 
 import os, re, string
+import numpy as np
 
 import Data
-from constants import toTeX
+from constants import toTeX, Mp, Mp2
+
+class KinematicsError(Exception):
+    pass
 
 class AttrDict(dict):
 	"""A dictionary with attribute-style access. It maps attribute access to
@@ -50,20 +55,87 @@ class AttrDict(dict):
 		ch = AttrDict(self)
 		return ch
 
-	def has(self, name):
-        # Just an alias for has_key for compatibility with DataPoint
-		return self.has_key(name)
-
 
 def loaddata(datadir='data'):
     """Return dictionary {id : `DataSet`, ...}  out of datadir/*dat files."""
-
     data = {}
     for file in os.listdir(datadir):
         if os.path.splitext(file)[1] == ".dat":
             dataset = Data.DataSet(datafile=os.path.join(datadir, file))
             data[dataset.id] = dataset
     return data
+
+def _complete_xBWQ2(kin):
+    """Make trio {xB, W, Q2} complete if two of them are given in 'kin'."""
+    if kin.has_key('W') and kin.has_key('Q2') and not kin.has_key('xB'):
+        kin.xB = kin.Q2 / (kin.W**2 + kin.Q2 - Mp2)
+    elif kin.has_key('xB') and kin.has_key('Q2') and not kin.has_key('W'):
+        kin.W = np.sqrt(kin.Q2 / kin.xB - kin.Q2 + Mp2)
+    elif kin.has_key('xB') and kin.has_key('W') and not kin.has_key('Q2'):
+        kin.Q2 = kin.xB * (kin.W**2 - Mp2) / (1. - kin.xB)
+    else:
+        raise KinematicsError, 'Exactly two of {xB, W, Q2} should be given.'
+    return
+
+def _complete_tmt(kin):
+    """Make duo {t, mt} complete if one of them is given in 'kin'."""
+    if kin.has_key('t') and not kin.has_key('mt'):
+        assert kin.t <= 0
+        kin.mt = - kin.t
+    elif kin.has_key('mt') and not kin.has_key('t'):
+        assert kin.mt >= 0
+        kin.t = - kin.mt
+    else:
+        raise KinematicsError, 'Exactly one of {t, mt} should be given.'
+    return
+
+def fill_kinematics(kin, old={}):
+    """Return complete up-to-date kinematical dictionary.
+    
+    Complete set of kinematical variables is {xB, t, Q2, W, s, xi, mt, phi}.
+    Using standard identities, missing values are calculated, if possible, first
+    solely from values given in 'kin', and then, second, using values in 'old',
+    if provided.
+
+    """
+    kkeys = set(kin.keys())
+    trio = set(['xB', 'W', 'Q2'])
+    if len(trio.intersection(kkeys)) == 3:
+        raise KinematicsError, 'Overdetermined set {xB, W, Q2} given.'
+    elif len(trio.intersection(kkeys)) == 2:
+        _complete_xBWQ2(kin)
+    elif len(trio.intersection(kkeys)) == 1 and old:
+        given = trio.intersection(kkeys).pop() # one variable given in 'kin'
+        # We treat only the case when one of {xB, Q2} is given and second is
+        # then taken from 'old'
+        if given == 'xB':
+            kin.Q2 = old.Q2
+        elif given == 'Q2':
+            kin.xB = old.xB
+    else:
+        # We have zero givens, so take all three from 'old'
+        if old:
+            for key in trio:
+                kin.__setattr__(key, old.__getattribute__(key))
+    # FIXME: xi is just fixed by xB - it cannot be given by user
+    # There are t/Q2 corrections, cf. BMK Eq. (4), but they are 
+    # formally higher twist and it is maybe sensible to DEFINE xi, 
+    # the argument of CFF, as follows:
+    kin.xi = kin.xB / (2. - kin.xB)
+    duo = set(['t', 'mt'])
+    if len(duo.intersection(kkeys)) == 2:
+        raise KinematicsError, 'Overdetermined set {t, mt=-t} given.'
+    elif len(duo.intersection(kkeys)) == 1:
+        _complete_tmt(kin)
+    else:
+        # We have zero givens, so take both from 'old'
+        if old:
+            for key in duo:
+                kin.__setattr__(key, old.__getattribute__(key))
+    # s is just copied from old, if there is one
+    if old and old.has_key('s'):
+        kin.s = old.s
+    return
 
 def parse(datafile):
     """Parse `datafile` and return tuple (preamble, data).

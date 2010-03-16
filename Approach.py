@@ -286,7 +286,7 @@ class BMK(Approach):
         """Transform stuff into Approach's conventions."""
         ##  --- go to BMK conventions ----
         # C1. azimutal angle phi should be in radians ...
-        if pt.has('phi'):
+        if pt.has_key('phi'):
             if pt.units['phi'][:3]== 'deg': # deg, degree, degrees -> radians
                 pt.phi = pt.phi * pi / 180.
                 pt.newunits['phi'] = 'rad'
@@ -299,7 +299,7 @@ class BMK(Approach):
     def from_conventions(self, pt):
         """Transform stuff from Approach's conventions into original data's."""
         # C1. azimutal angle phi should be in radians ...
-        if pt.has('phi'):
+        if pt.has_key('phi'):
             if pt.units['phi'][:3]== 'deg': # deg, degree, degrees -> radians
                 pt.phi = pt.phi * pi / 180.
                 pt.units['phi'] = 'rad'
@@ -313,7 +313,7 @@ class BMK(Approach):
         pt.y = (pt.W**2 + pt.Q2 - Mp2) / (pt.s - Mp2)
         pt.eps = 2. * pt.xB * Mp / sqrt(pt.Q2)
         pt.eps2 = pt.eps**2
-        if pt.has('t'):
+        if pt.has_key('t'):
             pt.J = self.J(pt.Q2, pt.xB, pt.t, pt.y, pt.eps2)
             pt.K2 = self.K2(pt.Q2, pt.xB, pt.t, pt.y, pt.eps2)
             pt.K = sqrt(pt.K2)
@@ -332,13 +332,13 @@ class BMK(Approach):
         
         """
         if vars:
-            # copy kinematics into new dict and update
+            # copy kinematics into new dict and update it from vars
             kin = AttrDict()
             for key in ['xB', 't', 'mt', 'Q2', 'W', 'xi', 's', 'phi']:
-                if pt.__dict__.has_key(key):
+                if pt.has_key(key):
                     kin[key] = pt.__getattribute__(key)
             kin.update(vars)
-            if kin.has('xB') and kin.has('Q2'):
+            if kin.has_key('xB') and kin.has_key('Q2'):
                 kin.W = sqrt(kin.Q2 / kin.xB - kin.Q2 + Mp2)
             kin.xi = kin.xB / (2. - kin.xB)
             self.prepare(kin)

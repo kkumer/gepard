@@ -67,6 +67,7 @@ class DataPoint(object):
         FIXME: this passing of higher-level DataSet as argument sounds wrong!
                 (See comment about aquisition in class docstring.|
 
+        FIXME: Should DataPoint be subclas of dict?
         """
 
         # 1. Put reference to container into attribute
@@ -89,29 +90,21 @@ class DataPoint(object):
         except IndexError: # we have just one error number
             self.err = gridline[i+1]
         # 2e. calculate standard kinematical variables
-        if self.has('W') and self.has('Q2'):
-            self.xB = self.Q2 / (self.W**2 + self.Q2 - Mp2)
-        if self.has('xB') and self.has('Q2'):
-            self.W = sqrt(self.Q2 / self.xB - self.Q2 + Mp2)
-        if self.has('xB'):
-            # There are t/Q2 corrections, cf. BMK Eq. (4), but they are 
-            # formally higher twist and it is maybe sensible to DEFINE xi, 
-            # the argument of CFF, as follows:
-            self.xi = self.xB / (2. - self.xB)
-        if self.has('t'):
-            self.mt = - self.t
-        elif self.has('mt'):
-            self.t = - self.mt
+        utils.fill_kinematics(self)
         return
 
     def __repr__(self):
         return "DataPoint. Measurement: " + self.yaxis + " = " + str(self.val)
 
-    def has(self, name):
+    def has_key(self, name):
         """Does point (or dataset) have attribute `name`?"""
-        if self.dataset.__dict__.has_key(name) or self.__dict__.has_key(name):
+        if self.__dict__.has_key(name):
             return True
         return False
+
+    def keys(self):
+        """Simulate dictionary."""
+        return self.__dict__.keys()
 
     def to_conventions(self, approach):
         approach.to_conventions(self)
@@ -229,10 +222,14 @@ class DummyPoint(object):
         if init:
             self.__dict__.update(init)
 
-    def has(self, name):
+    def has_key(self, name):
         if self.__dict__.has_key(name):
             return True
         return False
+
+    def keys(self):
+        """Simulate dictionary."""
+        return self.__dict__.keys()
 
     def prepare(self, approach):
         approach.prepare(self)
