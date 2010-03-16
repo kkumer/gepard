@@ -4,7 +4,7 @@ from numpy import sin, cos, pi, sqrt
 
 from quadrature import Hquadrature
 from constants import *
-from utils import AttrDict
+from utils import AttrDict, fill_kinematics
 
 class Approach(object):
     """Class of approaches to calculation of observables.
@@ -29,7 +29,7 @@ class Approach(object):
 # 
 #         self.calH = calH
 
-    def __init__(self, ff, optimization = False):
+    def __init__(self, ff, optimization=False):
         global F1, F2 
         global ImcffH, RecffH, ImcffE, RecffE
         global ImcffHt, RecffHt, ImcffEt, RecffEt
@@ -332,17 +332,9 @@ class BMK(Approach):
         
         """
         if vars:
-            # copy kinematics into new dict and update it from vars
-            kin = AttrDict()
-            for key in ['xB', 't', 'mt', 'Q2', 'W', 'xi', 's', 'phi']:
-                if pt.has_key(key):
-                    kin[key] = pt.__getattribute__(key)
-            kin.update(vars)
-            if kin.has_key('xB') and kin.has_key('Q2'):
-                kin.W = sqrt(kin.Q2 / kin.xB - kin.Q2 + Mp2)
-            kin.xi = kin.xB / (2. - kin.xB)
+            kin = fill_kinematics(vars, old=pt)
             self.prepare(kin)
-            phi = vars['phi']
+            phi = kin.phi
         else:
             # just pass references
             kin = pt

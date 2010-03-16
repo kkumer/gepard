@@ -98,6 +98,8 @@ def fill_kinematics(kin, old={}):
     if provided.
 
     """
+    if not (isinstance(kin, Data.DataPoint) or isinstance(kin, AttrDict)):
+        kin = AttrDict(kin)  # fixing kin
     kkeys = set(kin.keys())
     trio = set(['xB', 'W', 'Q2'])
     if len(trio.intersection(kkeys)) == 3:
@@ -112,6 +114,7 @@ def fill_kinematics(kin, old={}):
             kin.Q2 = old.Q2
         elif given == 'Q2':
             kin.xB = old.xB
+        _complete_xBWQ2(kin)
     else:
         # We have zero givens, so take all three from 'old'
         if old:
@@ -135,7 +138,10 @@ def fill_kinematics(kin, old={}):
     # s is just copied from old, if there is one
     if old and old.has_key('s'):
         kin.s = old.s
-    return
+    # phi is copied from old, if possible and necessary
+    if not kin.has_key('phi') and old.has_key('phi'):
+        kin.phi = old.phi
+    return kin
 
 def parse(datafile):
     """Parse `datafile` and return tuple (preamble, data).
