@@ -29,17 +29,18 @@ data = utils.loaddata()   # dictionary {1 : DataSet instance, ...}
 
 # [2] Choose datapoints for fitting
 
-fitpoints = data[1] + data[8] + data[29]  # DM's GLO set
+#fitpoints = data[1] + data[8] + data[29]  # DM's GLO set
 #fitpoints = data[1] + data[5] + data[25]  # KK's set
 #fitpoints = data[4][:3] + data[8][:3]  # test set
 #fitpoints = data[1] + data[8] + data[29] + data[30]  # DM's GLO1 set
 #fitpoints = data[2] + data[5] + data[25] + data[26] + data[27] + data[28]  # KK's global set
-#fitpoints = data[5]
+fitpoints = data[5]
 
 
 # [3] Choose theoretical approach
 
-ff = models.FormFactors()
+#ff = models.FormFactors()
+ff = models.NNFormFactors()
 #bmk = Approach.BMK()
 bnoopt = Approach.hotfixedBMK(ff, optimization = False)  # no optimizations
 bopt = Approach.hotfixedBMK(ff, optimization = True)     # optimized formulas
@@ -191,7 +192,13 @@ m.maxcalls = 1000
 
 # [7] Print results
 
-printres()
+#printres()
+
+#pt0 = data[1][0]
+
+#print b.XUU(pt0, DMGLO1, {'phi':1})
+
+#plotnnH(ff)
 
 # pt0 = Data.DummyPoint()
 # pt0.exptype = 'fixed target'

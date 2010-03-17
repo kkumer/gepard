@@ -38,8 +38,28 @@ def plotHERMES(data, fits=[], path=None, fmt='png'):
             panel = 3*y + x + 1  # 1, 2, ..., 9
             ax = fig.add_subplot(3,3,panel)
             ax.yaxis.set_major_locator(MultipleLocator(0.1))  # tickmarks
-            utils.subplot(ax, data[ids[y]][x*6:x*6+6], xaxes[x], [], fits)
+            utils.subplot(ax, [data[ids[y]][x*6:x*6+6]], xaxes[x], [], fits)
             apply(ax.set_ylim, ylims[y])
+    if path:
+        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+    else:
+        fig.canvas.draw()
+        fig.show()
+    return fig
+
+def plotHERMESBSA(data, nn, path=None, fmt='png'):
+    """Plot HERMES BSA and neural net result."""
+    title = 'HERMES vs NeuralNets'
+    fig = plt.figure()
+    fig.canvas.set_window_title(title)
+    fig.suptitle(title)
+    xaxes = ['mt', 'xB', 'Q2']
+    # we have 3x6 points
+    for x in range(3):
+        ax = fig.add_subplot(3, 1, x+1)
+        ax.yaxis.set_major_locator(MultipleLocator(0.1))  # tickmarks
+        utils.subplot(ax, [data[5][x*6:x*6+6]], xaxes[x], [], [])
+        #apply(ax.set_ylim, ylims[(-0.30, 0.05)])
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
@@ -472,3 +492,131 @@ def pminustest(pars):
         print "% 1.3f % 1.3f  |  % 1.3f  |  % 1.3f  | % 1.3f" % (p0.val, p1.val, p1.r, 
                 p0.val - p1.r*p1.val, BCA0minusr1(p0, pars))
 
+
+def plotnnBSA(data, nnapproach, path=None, fmt='png'):
+    """Plot HERMES BSA and neural net result."""
+    title = 'HERMES (blue) vs NeuralNets (black)'
+    fig = plt.figure()
+    fig.canvas.set_window_title(title)
+    fig.suptitle(title)
+    xaxes = ['mt', 'xB', 'Q2']
+    # we have 3x6 points
+    for x in range(3):
+        datapoints = data[5][x*6:x*6+6]
+        ax = fig.add_subplot(3, 1, x+1)
+        ax.yaxis.set_major_locator(MultipleLocator(0.1))  # tickmarks
+        nnpoints = []
+        for pt in datapoints:
+            nnpt = Data.DummyPoint(pt.__dict__.copy())
+            nnres = nnapproach.ALUIsin1(pt, {})
+            nnpt.val = nnres.mean()
+            nnpt.err = nnres.std()
+            nnpoints.append(nnpt)
+        utils.subplot(ax, [datapoints, nnpoints], xaxes[x], [], [])
+    if path:
+        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+    else:
+        fig.canvas.draw()
+        fig.show()
+    return fig
+
+def plotnnH(ff, path=None, fmt='png'):
+    """Makes plot of Im(cffH)."""
+
+    title = 'GPD H by neural nets (fit to HERMES BSA only!)'
+    fig = plt.figure()
+    fig.canvas.set_window_title(title)
+    fig.suptitle(title)
+    fig.subplots_adjust(bottom=0.35)
+    pt = Data.DummyPoint()
+    ax = fig.add_subplot(2,1,1)
+    ax.set_xscale('log')  # x-axis to be logarithmic
+    xvals = np.power(10., np.arange(-3.5, 0, 0.01)) 
+    pt.t = 0.0
+    up = []
+    down = []
+    for x in xvals:
+        pt.xB = x
+        nnres = x * ff.ImH(pt, {}) / np.pi
+        mean = nnres.mean()
+        std = nnres.std()
+        up.append(mean + std/2.)
+        down.append(mean - std/2.)
+    up = np.array(up)
+    down = np.array(down)
+    x = plt.concatenate( (xvals, xvals[::-1]) )
+    y = plt.concatenate( (up, down[::-1]) )
+    ax.fill(x, y, facecolor='g', alpha=0.5)
+    ####
+    pt.t = -0.3
+    up = []
+    down = []
+    for x in xvals:
+        pt.xB = x
+        nnres = x * ff.ImH(pt, {}) / np.pi
+        mean = nnres.mean()
+        std = nnres.std()
+        up.append(mean + std/2.)
+        down.append(mean - std/2.)
+    up = np.array(up)
+    down = np.array(down)
+    x = plt.concatenate( (xvals, xvals[::-1]) )
+    y = plt.concatenate( (up, down[::-1]) )
+    ax.fill(x, y, facecolor='r', alpha=0.5)
+    #ax.set_ylim(0.0, 0.5)
+    #ax.set_xlim(0.0005, 1.0)
+    #plt.ylim(0.0, 0.5)
+    # axes labels
+    ax.set_xlabel('$x$', fontsize=15)
+    ax.set_ylabel('$x H(x, x, t)$', fontsize=18)
+    #ax.legend()
+    ax.text(0.001, 0.405, "t = 0")
+    ax.text(0.001, 0.12, "t = -0.3 GeV^2")
+    ax = fig.add_subplot(2,1,2)
+    xvals = np.linspace(0.05, 0.2, 20)
+    pt.t = 0.0
+    up = []
+    down = []
+    for x in xvals:
+        pt.xB = x
+        nnres = x * ff.ImH(pt, {}) / np.pi
+        mean = nnres.mean()
+        std = nnres.std()
+        up.append(mean + std/2.)
+        down.append(mean - std/2.)
+    up = np.array(up)
+    down = np.array(down)
+    x = plt.concatenate( (xvals, xvals[::-1]) )
+    y = plt.concatenate( (up, down[::-1]) )
+    ax.fill(x, y, facecolor='g', alpha=0.5)
+    ####
+    pt.t = -0.3
+    up = []
+    down = []
+    for x in xvals:
+        pt.xB = x
+        nnres = x * ff.ImH(pt, {}) / np.pi
+        mean = nnres.mean()
+        std = nnres.std()
+        up.append(mean + std/2.)
+        down.append(mean - std/2.)
+    up = np.array(up)
+    down = np.array(down)
+    x = plt.concatenate( (xvals, xvals[::-1]) )
+    y = plt.concatenate( (up, down[::-1]) )
+    ax.fill(x, y, facecolor='r', alpha=0.5)
+    #ax.set_ylim(0.0, 0.5)
+    #ax.set_xlim(0.0005, 1.0)
+    #plt.ylim(0.0, 0.5)
+    # axes labels
+    ax.set_xlabel('$x$', fontsize=15)
+    ax.set_ylabel('$x H(x, x, t)$', fontsize=18)
+    #ax.legend()
+    ax.text(0.1, 0.405, "t = 0")
+    ax.text(0.1, 0.12, "t = -0.3 GeV^2")
+    if path:
+        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+    else:
+        fig.canvas.draw()
+        fig.show()
+    return fig

@@ -181,7 +181,7 @@ def parse(datafile):
     return desc, data
 
 
-def subplot(ax, dataset, xaxis=None, kinlabels=[], fits=[]):
+def subplot(ax, datasets, xaxis=None, kinlabels=[], fits=[]):
     """Plot datapoints together with fit/theory line(s).
 
     ax -- subplot of matplotlib's figure i.e. ax = figure.add_subplot(..)
@@ -203,12 +203,19 @@ def subplot(ax, dataset, xaxis=None, kinlabels=[], fits=[]):
     if not isinstance(kinlabels, list): kinlabels = [kinlabels]
     if not isinstance(fits, list): fits = [fits]
     if not xaxis: xaxis = dataset.xaxes[-1]
-    xval = []; yval = []; yerr = []
-    for pt in dataset:
-        xval.append(getattr(pt, xaxis)) 
-        yval.append(pt.val)
-        yerr.append(pt.err)
-    ax.errorbar(xval, yval, yerr, linestyle='None', marker='o', color='b')
+    # Data sets (or fits with errorbars)
+    setshapes = ['o', 's']  # first circles, then squares ...
+    setcolors = ['blue', 'black']  # circles are blue, squares are black, ...
+    setn = 0
+    for dataset in datasets:
+        xval = []; yval = []; yerr = []
+        for pt in dataset:
+            xval.append(getattr(pt, xaxis)) 
+            yval.append(pt.val)
+            yerr.append(pt.err)
+        ax.errorbar(xval, yval, yerr, linestyle='None', 
+                marker=setshapes[setn], color=setcolors[setn])
+        setn += 1
     # Fit lines
     shapes = ['s', '^', 'd', 'h']  # first squares, then triangles, diamonds, hexagons
     colors = ['red', 'green', 'brown', 'purple']  # squares are red, etc.
@@ -223,7 +230,7 @@ def subplot(ax, dataset, xaxis=None, kinlabels=[], fits=[]):
         fitn += 1
     # axes labels
     ax.set_xlabel(toTeX[xaxis], fontsize=15)
-    ax.set_ylabel(toTeX[dataset.yaxis], fontsize=18)
+    ax.set_ylabel(toTeX[dataset[0].yaxis], fontsize=18)
     ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
     # constant kinematic variables positioning
     labx = min(0, min(xval)) + (max(xval) - min(0, min(xval))) * 0.5

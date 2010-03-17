@@ -22,30 +22,42 @@ datapoints = data[5]
 
 # Some auxilliary functions
 
-def artificialData(datapoints, dstrain, dstest):
-    """Randomizes datapoints and divides them into two SupervisedDataSet instances: 
-       training and testing.  'datapoints' can be DataSet or list of DataPoints
-       TODO: create artificial data using numpy.random.normal
+def artificialData(datapoints, trainsize=13):
+    """Create artificial data replica.
+    
+    Replica is created by randomly picking value around mean value taken from
+    original data, using normal Gaussian distribution with width equal to
+    uncertainty of the original data point. Resulting set of artificial
+    datapoints is then shuffled and divided into two SupervisedDataSet
+    instances: training and testing, which are returned.
+    Input datapoints can be DataSet instance or just a list of DataPoints
+    instances.
+
+    Keyword arguments:
+    trainsize -- size of subset used for training (rest is for testing)
+
        
     """
-
-    trainlength = 13
+    training = SupervisedDataSet(2, 1)  # FIXME: get size from data
+    testing = SupervisedDataSet(2, 1)
     i = 0
     trans.map.clear()
     for pt in np.random.permutation(datapoints):
-        if pt.has('mt'):
+        if pt.has_key('mt'):
             pt.t = - pt.mt
         xs = [pt.xB, pt.t, pt.Q2]
-        #FIXME: This abs() below is for HERMES->BKM. Should be done using info from .dat
-        # Rounding the number, to make matching of trans.map work regardless of 
-        # computer rounding behaviour
+        # FIXME: This abs() below is for HERMES->BKM. Should be done using info
+        # from .dat Rounding the number, to make matching of trans.map work
+        # regardless of computer rounding behaviour
         y = [np.abs(pt.val) + round(np.random.normal(0, pt.err, 1)[0], 5)]
         trans.map[y[0]] = xs 
-        if i < trainlength:
-            dstrain.addSample(xs[:-1], y) # we don't use Q2 for training
+        # FIXME: trainsize should be specified by percentage and not by value
+        if i < trainsize:
+            training.addSample(xs[:-1], y) # we don't use Q2 for training
         else:
-            dstest.addSample(xs[:-1], y)
+            testing.addSample(xs[:-1], y)
         i += 1
+    return training, testing
 
 def test2file(net, file, npoints=100):
     """Prints neural network values for npoints x=0,...,1 into file."""
@@ -71,9 +83,7 @@ def testnet(net, ds):
 def makenet(n):
     """Creates trained net. """
 
-    dstrain = SupervisedDataSet(2, 1)
-    dstest = SupervisedDataSet(2, 1)
-    artificialData(datapoints, dstrain, dstest)
+    dstrain, dstest = artificialData(datapoints)
 
     net = buildNetwork(2, 7, 1)
 

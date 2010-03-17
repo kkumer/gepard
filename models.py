@@ -4,12 +4,15 @@ can be provided by minimization routine in the fitting procedure).
 Theoretical "approach", when given an instance of a model and
 parameter values can calculate observables.
 Classes:
-    Model - base class
+    Model -- base class
+    FormFactors(Model) -- dipole FFs and dispersion-relation CFFs
+                          with ansatz as in arXiv:0904.0458
 
 """
+import pickle, sys
 
 from numpy import log, pi
-from numpy import ndarray
+from numpy import ndarray, array
 
 from quadrature import PVquadrature
 from utils import AttrDict
@@ -193,4 +196,44 @@ class FormFactors(Model):
 
         """
         return 3.2 / ((0.71 - t)**2 * (3.53 - t))
+
+
+class NNFormFactors(FormFactors):
+    """Neural network CFF H.
+    F1 and F2 are taken from FormFactors. Im(CFF H) is given by neural
+    nets, while Re(CFF H) and other GPDs are zero.
+    
+    """
+    def __init__(self):
+        global nets
+        nets = pickle.load(open('nets.pkl', 'r'))
+        sys.stderr.write('Neural nets loaded from nets.pkl')
+    
+    def ImH(self, pt, pars={}, xi=0):
+        ar = []
+        for net in nets:
+            ar.append(net.activate([pt.xB, pt.t]))
+        return array(ar).flatten()
+
+
+    def ReH(self, pt, pars={}):
+        return 0
+
+    def ImHt(self, pt, pars={}, xi=0):
+        return 0
+
+    def ReHt(self, pt, pars={}):
+        return 0
+
+    def ImE(self, pt, pars={}):
+        return 0
+
+    def ReE(self, pt, pars={}):
+        return 0
+
+    def ImEt(self, pt, pars={}):
+        return 0
+
+    def ReEt(self, pt, pars={}):
+        return 0
 
