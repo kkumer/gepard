@@ -21,9 +21,12 @@ class KinematicsError(Exception):
     pass
 
 class AttrDict(dict):
-	"""A dictionary with attribute-style access. It maps attribute access to
-	the real dictionary.  
+	"""A dictionary with attribute-style access. 
+    
+    It maps attribute access to the real dictionary.  
     By Keith Darth, http://code.activestate.com/recipes/473786/
+    FIXME: Using this is bad for performance. __getitem__ is called 
+    way to many times.
     """
 	def __init__(self, init={}):
 		dict.__init__(self, init)
@@ -98,7 +101,8 @@ def fill_kinematics(kin, old={}):
     if provided.
 
     """
-    if not (isinstance(kin, Data.DataPoint) or isinstance(kin, AttrDict)):
+    if not (isinstance(kin, Data.DataPoint) or 
+            isinstance(kin, Data.DummyPoint) or isinstance(kin, AttrDict)):
         kin = AttrDict(kin)  # fixing kin
     kkeys = set(kin.keys())
     trio = set(['xB', 'W', 'Q2'])

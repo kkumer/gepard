@@ -76,10 +76,10 @@ class BMK(Approach):
         brace = (2.-y)**2 * K / (1.-y) + (1./K)*(t/Q2)*(1.-y)*(2.-xB)
         return - (2.-y) / (2.-2.*y+y**2) * brace
 
-    def P1P2(self, pt, phi):
+    def P1P2(self, pt):
         """ Product of Bethe-Heitler propagators, Eq(32) """
         P1 = - ( self.J(pt.Q2, pt.xB, pt.t, pt.y, pt.eps2) + 2. * 
-                sqrt(self.K2(pt.Q2, pt.xB, pt.t, pt.y, pt.eps2)) * cos(phi) ) / (
+                sqrt(self.K2(pt.Q2, pt.xB, pt.t, pt.y, pt.eps2)) * cos(pt.phi) ) / (
                         pt.y * (1. + pt.eps2) )
         P2 = 1. + pt.t / pt.Q2  - P1
         return P1 * P2
@@ -96,22 +96,22 @@ class BMK(Approach):
         and times y/Q2 because of dy -> dQ2. Convert to nanobarns."""
         return alpha**3 * pt.xB * pt.y**2 / (8. * pi * pt.Q2**2 * sqrt(1.+pt.eps2)) * GeV2nb
 
-    def PreFacBH(self, pt, phi):
+    def PreFacBH(self, pt):
         """ Prefactor from Eq. (25), without e^6 """
-        return 1./(pt.xB**2 * pt.y**2 * (1.+pt.eps2)**2 * pt.t * self.P1P2(pt, phi))
+        return 1./(pt.xB**2 * pt.y**2 * (1.+pt.eps2)**2 * pt.t * self.P1P2(pt))
 
     def PreFacDVCS(self, pt):
         """ Prefactor from Eq. (26), without e^6 """
         return 1./(pt.y**2 * pt.Q2 )
 
-    def PreFacINT(self, pt, phi):
+    def PreFacINT(self, pt):
         """ Prefactor from Eq. (27), without e^6 """
-        return 1./(pt.xB * pt.y**3 * pt.t * self.P1P2(pt, phi))
+        return 1./(pt.xB * pt.y**3 * pt.t * self.P1P2(pt))
 
-    def w(self, pt, phi):
+    def w(self, pt):
         """ Weight factor removing BH propagators from INT and BH amplitudes. 
         It is normalized to \int_0^2pi w = 1, and not 2pi as in BMK. """
-        return self.P1P2(pt, phi) / self.anintP1P2(pt)
+        return self.P1P2(pt) / self.anintP1P2(pt)
 
 
     ################################################
@@ -163,10 +163,10 @@ class BMK(Approach):
         brace = 4.*Mp2/t * FE2 + 2. * FM2
         return 8. * xB**2 * pt.K2 * brace
 
-    def TBH2unp(self, pt, phi):
+    def TBH2unp(self, pt):
         """ Bethe-Heitler amplitude squared. BKM Eq. (25)  """
-        return  self.PreFacBH(pt, phi) * ( self.cBH0unp(pt) + 
-                   self.cBH1unp(pt)*cos(phi) + self.cBH2unp(pt)*cos(2.*phi) )
+        return  self.PreFacBH(pt) * ( self.cBH0unp(pt) + 
+                   self.cBH1unp(pt)*cos(pt.phi) + self.cBH2unp(pt)*cos(2.*pt.phi) )
 
 
     #### DVCS
@@ -199,7 +199,7 @@ class BMK(Approach):
         """ BKM Eq. (43) """
         return self.CDVCSunpPP(pt) * self.CCALDVCSunp(pt, pars)
 
-    def TDVCS2unp(self, pt, phi, pars):
+    def TDVCS2unp(self, pt, pars):
         """ DVCS amplitude squared. BKM Eq. (26) - FIXME: only twist two now """
         return  self.PreFacDVCS(pt) * self.cDVCS0unp(pt, pars)
 
@@ -265,20 +265,20 @@ class BMK(Approach):
         """ BKM Eq. (55) """
         return  16. * pt.K2 * pt.y / (2.-pt.xB) * self.ImCCALINTunpEFF(pt, pars)
 
-    def TINTunp(self, pt, phi, lam, charge, pars):
+    def TINTunp(self, pt, lam, charge, pars):
         """ BH-DVCS interference. BKM Eq. (27) - FIXME: only twist two """
-        return  - charge * self.PreFacINT(pt, phi) * ( self.cINT0unp(pt, pars)  
-                + self.cINT1unp(pt, pars) * cos(phi)
-                #+ self.cINT2unp(pt, pars) * cos(2.*phi) 
-                + lam * self.sINT1unp(pt, pars) * sin(phi)
-                #+ lam * self.sINT2unp(pt, pars) * sin(2.*phi)
+        return  - charge * self.PreFacINT(pt) * ( self.cINT0unp(pt, pars)  
+                + self.cINT1unp(pt, pars) * cos(pt.phi)
+                #+ self.cINT2unp(pt, pars) * cos(2.*pt.phi) 
+                + lam * self.sINT1unp(pt, pars) * sin(pt.phi)
+                #+ lam * self.sINT2unp(pt, pars) * sin(2.*pt.phi)
                 )
            
-    def TINTunpd(self, pt, phi, charge, pars):
+    def TINTunpd(self, pt, charge, pars):
         """ BH-DVCS interference. (Normalized) part surviving after taking difference 
         of two lepton longitudinal polarization states.
         BKM Eq. (27) - FIXME: only twist two """
-        return  - charge * self.PreFacINT(pt, phi) * self.sINT1unp(pt, pars) * sin(phi)
+        return  - charge * self.PreFacINT(pt) * self.sINT1unp(pt, pars) * sin(pt.phi)
 
        
 
@@ -324,7 +324,7 @@ class BMK(Approach):
 
 ## Observables ##
 
-    def Xunp(self, pt, lam, charge, pars, vars={}):
+    def Xunp(self, pt, lam, charge, pars, vars={}, weighted=False):
         """ Calculate 4-fold differential cross section for unpolarized target. 
 
         lam is lepton polarization \lambda .
@@ -334,16 +334,19 @@ class BMK(Approach):
         if vars:
             kin = fill_kinematics(vars, old=pt)
             self.prepare(kin)
-            phi = kin.phi
         else:
-            # just pass references
+            # just pass as reference to DataPoint
             kin = pt
-            phi = pt.phi
             pass
 
-        return self.PreFacSigma(kin) * ( self.TBH2unp(kin, phi) 
-                + self.TINTunp(kin, phi, lam, charge, pars) 
-                + self.TDVCS2unp(kin, phi, pars) )
+        if weighted:
+            wgh = self.w(kin)
+        else:
+            wgh = 1
+
+        return wgh * self.PreFacSigma(kin) * ( self.TBH2unp(kin) 
+                + self.TINTunp(kin, lam, charge, pars) 
+                + self.TDVCS2unp(kin, pars) )
 
     def XLU(self, pt, pars, vars={}):
         """Calculate 4-fold helicity-dependent cross section measured by HALL A """
@@ -351,72 +354,59 @@ class BMK(Approach):
         return ( self.Xunp(pt, 1, pt.charge, pars, vars) 
                 - self.Xunp(pt, -1, pt.charge, pars, vars) ) / 2.
 
-    def XUU(self, pt, pars, vars={}):
+    def XUU(self, pt, pars, vars={}, weighted=False):
         """4-fold helicity-independent cross section measured by HALL A """
 
-        return ( self.Xunp(pt, 1, pt.charge, pars, vars) 
-                + self.Xunp(pt, -1, pt.charge, pars, vars) ) / 2.
+        return ( self.Xunp(pt, 1, pt.charge, pars, vars, weighted) 
+                + self.Xunp(pt, -1, pt.charge, pars, vars, weighted) ) / 2.
 
-    def BCA(self, pt, phi, pars):
-        """Beam charge asymmetry. """
+    def BCA(self, pt, pars, vars={}):
+        """Calculate beam charge asymmetry (BCA)."""
 
-        if not self.optimization:
-            # use defining formula:  (sigma+ - sigma-)/(sigma+ + sigma-)
-            # i.e. charge is not read from datafile!
-            return (
-               self.Xunp(pt, 0, 1, pars, {'phi':phi}) - self.Xunp(pt, 0, -1, pars, {'phi':phi}) )/(
-               self.Xunp(pt, 0, 1, pars, {'phi':phi}) + self.Xunp(pt, 0, -1, pars, {'phi':phi}) )
-        else:
-            # optimized formula (remove parts which cancel anyway)
-            return  self.TINTunp(pt, phi, 0, 1, pars) / ( 
-                           self.TBH2unp(pt, phi) + self.TDVCS2unp(pt, phi, pars) )
+        # use defining formula:  (sigma+ - sigma-)/(sigma+ + sigma-)
+        # i.e. charge is not read from datafile!
+        return (
+           self.Xunp(pt, 0, 1, pars, vars) - self.Xunp(pt, 0, -1, pars, vars) )/(
+           self.Xunp(pt, 0, 1, pars, vars) + self.Xunp(pt, 0, -1, pars, vars) )
+        # optimized formula (remove parts which cancel anyway)
+        # return  self.TINTunp(pt, phi, 0, 1, pars) / ( 
+        #               self.TBH2unp(pt, phi) + self.TDVCS2unp(pt, phi, pars) )
 
     def BCSD(self, pt, lam, pars, vars={}):
         """4-fold beam charge-spin cross section difference measured by COMPASS """
-
         # charge is not read from datafile!
         return (self.Xunp(pt, lam, 1, pars, vars) - self.Xunp(pt, -lam, -1, pars, vars))/2.
 
     def BCSS(self, pt, lam, pars, vars={}):
         """4-fold beam charge-spin cross section sum measured by COMPASS. """
-
         # charge is not read from datafile!
         return (self.Xunp(pt, lam, 1, pars, vars) + self.Xunp(pt, -lam, -1, pars, vars))/2.
 
     def BCSA(self, pt, lam, pars, vars={}):
         """Beam charge-spin asymmetry as measured by COMPASS. """
-
-        if not self.optimization:
-            return  self.BCSD(pt, lam, pars, vars) / self.BCSS(pt, lam, pars, vars)
-        else:
-            if 'phi' in vars:
-                phi = vars['phi']
-            else:
-                phi = pt.phi
-            return  self.TINTunp(pt, phi, 0, 1, pars) / ( 
-                  self.TBH2unp(pt, phi) + self.TDVCS2unp(pt, phi, pars) 
-               + (self.TINTunp(pt, phi, lam, 1, pars) + self.TINTunp(pt, phi, -lam, -1, pars))/2.)
+        return  self.BCSD(pt, lam, pars, vars) / self.BCSS(pt, lam, pars, vars)
+        ## optimized formula
+        # return  self.TINTunp(pt, phi, 0, 1, pars) / ( 
+        #       self.TBH2unp(pt, phi) + self.TDVCS2unp(pt, phi, pars) 
+        #    + (self.TINTunp(pt, phi, lam, 1, pars) + self.TINTunp(pt, phi, -lam, -1, pars))/2.)
 
     def BSA(self, pt, pars, vars={}):
-        """Beam spin asymmetry. HERMES uses positron convention (charge=+1)
-           CLAS uses electron (charge=-1), so datafile has to provide this
-           information in the name of 'in1' particle."""
-
-        if not self.optimization:
-            # use defining formula:  
-            return (
-               self.Xunp(pt, 1, pt.charge, pars, vars)  
-                     - self.Xunp(pt, -1, pt.charge, pars, vars) )/(
-               self.Xunp(pt, 1, pt.charge, pars, vars) 
-                     + self.Xunp(pt, -1, pt.charge, pars, vars) )
-        else:
-            # optimized formula (by removing parts which cancel anyway)
-            if 'phi' in vars:
-                phi = vars['phi']
-            else:
-                phi = pt.phi
-            return  self.TINTunpd(pt, phi, pt.charge, pars) / ( self.TBH2unp(pt, phi) 
-                + self.TDVCS2unp(pt, phi, pars) + self.TINTunp(pt, phi, 0, pt.charge, pars) )
+        """Calculate beam spin asymmetry (BSA). 
+        
+        HERMES uses positron convention (charge=+1)
+        CLAS uses electron (charge=-1), so datafile has to provide this
+        information in the name of 'in1' particle.
+        
+        """
+        # use defining formula:  
+        return (
+           self.Xunp(pt, 1, pt.charge, pars, vars)  
+                 - self.Xunp(pt, -1, pt.charge, pars, vars) )/(
+           self.Xunp(pt, 1, pt.charge, pars, vars) 
+                 + self.Xunp(pt, -1, pt.charge, pars, vars) )
+        # optimized formula (by removing parts which cancel anyway)
+        #return  self.TINTunpd(pt, phi, pt.charge, pars) / ( self.TBH2unp(pt, phi) 
+        #    + self.TDVCS2unp(pt, phi, pars) + self.TINTunp(pt, phi, 0, pt.charge, pars) )
 
     def PartialCrossSection4int(self, t, pt, pars):
         """Same as PartialCrossSection but with additional variable t 
@@ -442,11 +432,11 @@ class BMK(Approach):
         return res
 
     def BCAcos0(self, pt, pars):
-        res = Hquadrature(lambda phi: self.BCA(pt, phi, pars), 0, 2.0*pi)
+        res = Hquadrature(lambda phi: self.BCA(pt, pars, {'phi':phi}), 0, 2.0*pi)
         return res / (2.0*pi)
 
     def BCAcos1(self, pt, pars):
-        res = Hquadrature(lambda phi: self.BCA(pt, phi, pars) * cos(phi), 0, 2*pi)
+        res = Hquadrature(lambda phi: self.BCA(pt, pars, {'phi':phi}) * cos(phi), 0, 2*pi)
         return  - res / pi
 
     def ALUIsin1orig(self, pt, pars):
@@ -479,9 +469,9 @@ class BMK(Approach):
     def b1ovb0(self, pt, pars):
         """Ratio of first two cos harmonics of w-weighted cross section. In BMK, not Trento??"""
 
-        b0 = Hquadrature(lambda phi: self.w(pt, phi) * self.XUU(pt, pars, {'phi':phi}), 
+        b0 = Hquadrature(lambda phi: self.XUU(pt, pars, vars={'phi':phi}, weighted=True), 
                 0, 2.0*pi) / (2.0*pi)
-        b1 = Hquadrature(lambda phi: self.w(pt, phi) * self.XUU(pt, pars, {'phi':phi}) * cos(phi), 
+        b1 = Hquadrature(lambda phi: self.XUU(pt, pars, vars={'phi':phi}, weighted=True) * cos(phi), 
                 0, 2.0*pi) / pi
         return b1/b0
 
