@@ -564,14 +564,15 @@ def plotnnH(ff, path=None, fmt='png'):
     y = plt.concatenate( (up, down[::-1]) )
     ax.fill(x, y, facecolor='r', alpha=0.5)
     #ax.set_ylim(0.0, 0.5)
-    #ax.set_xlim(0.0005, 1.0)
+    ax.set_xlim(0.001, 1.0)
     #plt.ylim(0.0, 0.5)
     # axes labels
     ax.set_xlabel('$x$', fontsize=15)
     ax.set_ylabel('$x H(x, x, t)$', fontsize=18)
     #ax.legend()
-    ax.text(0.001, 0.405, "t = 0")
-    ax.text(0.001, 0.12, "t = -0.3 GeV^2")
+    ax.text(0.01, 0.405, "t = 0")
+    ax.text(0.01, -0.1, "t = -0.3 GeV^2")
+    ####  --- SECOND PANEL ---
     ax = fig.add_subplot(2,1,2)
     xvals = np.linspace(0.05, 0.2, 20)
     pt.t = 0.0

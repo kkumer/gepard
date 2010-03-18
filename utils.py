@@ -213,7 +213,7 @@ def subplot(ax, datasets, xaxis=None, kinlabels=[], fits=[]):
             xval.append(getattr(pt, xaxis)) 
             yval.append(pt.val)
             yerr.append(pt.err)
-        ax.errorbar(xval, yval, yerr, linestyle='None', 
+        ax.errorbar(xval, yval, yerr, linestyle='None', elinewidth=setn+1, 
                 marker=setshapes[setn], color=setcolors[setn])
         setn += 1
     # Fit lines
@@ -225,7 +225,7 @@ def subplot(ax, datasets, xaxis=None, kinlabels=[], fits=[]):
         line = [getattr(approach, pt.yaxis)(pt, pars) for pt 
                 in dataset]
         #ax.plot(xval, line, 'r-')  # join symbols by line
-        ax.plot(xval, line, shapes[fitn], markersize=5, 
+        ax.plot(xval, line, shapes[fitn], markersize=5,
                 markerfacecolor=colors[fitn], markeredgecolor='black')
         fitn += 1
     # axes labels
