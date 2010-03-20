@@ -360,7 +360,7 @@ class BMK(Approach):
         return ( self.Xunp(pt, 1, pt.charge, pars, vars, weighted) 
                 + self.Xunp(pt, -1, pt.charge, pars, vars, weighted) ) / 2.
 
-    def BCA(self, pt, pars, vars={}):
+    def BCAdef(self, pt, pars, vars={}):
         """Calculate beam charge asymmetry (BCA)."""
 
         # use defining formula:  (sigma+ - sigma-)/(sigma+ + sigma-)
@@ -390,7 +390,7 @@ class BMK(Approach):
         #       self.TBH2unp(pt, phi) + self.TDVCS2unp(pt, phi, pars) 
         #    + (self.TINTunp(pt, phi, lam, 1, pars) + self.TINTunp(pt, phi, -lam, -1, pars))/2.)
 
-    def BSA(self, pt, pars, vars={}):
+    def BSAdef(self, pt, pars, vars={}):
         """Calculate beam spin asymmetry (BSA). 
         
         HERMES uses positron convention (charge=+1)
@@ -431,21 +431,36 @@ class BMK(Approach):
         res = PartialCrossSection4int(-0.22, pt, pars)
         return res
 
-    def BCAcos0(self, pt, pars):
-        res = Hquadrature(lambda phi: self.BCA(pt, pars, {'phi':phi}), 0, 2.0*pi)
-        return res / (2.0*pi)
-
-    def BCAcos1(self, pt, pars):
-        res = Hquadrature(lambda phi: self.BCA(pt, pars, {'phi':phi}) * cos(phi), 0, 2*pi)
-        return  - res / pi
+    def BCA(self, pt, pars):
+        """Calculate beam charge asymmetry (BCA) or its harmonics."""
+        if pt.has_key('phi'):
+            return self.BCAdef(pt, pars, vars)
+        elif pt.has_key('FTn') and pt.FTn == 0:
+            res = Hquadrature(lambda phi: 
+                    self.BCAdef(pt, pars, {'phi':phi}), 0, 2.0*pi)
+            return res / (2.0*pi)
+        elif pt.has_key('FTn') and pt.FTn == 1:
+            res = Hquadrature(lambda phi: 
+                    self.BCAdef(pt, pars, {'phi':phi}) * cos(phi), 0, 2*pi)
+            return  - res / pi
 
     def ALUIsin1orig(self, pt, pars):
         res = Hquadrature(lambda phi: self.BSA(pt, pars, {'phi':phi}) * sin(phi), 0, 2*pi)
         return  res / pi
 
-    def ALUIsin1(self, pt, pars):
-        """FIXME: shortcut, charge conventions, ... for HERMES - negative. FIXED?"""
-        return  self.BSA(pt, pars, {'phi':pi/2.}) 
+
+    def BSA(self, pt, pars):
+        """Calculate beam spin asymmetry (BSA) or its harmonics."""
+        if pt.has_key('phi'):
+            return self.BSAdef(pt, pars, vars)
+        elif pt.has_key('FTn') and pt.FTn == -1:
+            # FIXME: faster shortcut (approximate!)
+            return  self.BSAdef(pt, pars, {'phi':pi/2.}) 
+        ### Exact but slower:
+        #elif pt.has_key('FTn') and pt.FTn == -1:
+        #    res = Hquadrature(lambda phi: 
+        #            self.BSAdef(pt, pars, {'phi':phi}) * sin(phi), 0, 2*pi)
+        #    return  res / pi
 
     def ALUa(self, pt, pars):
         """FIXME: charge conventions ... for CLAS - positive. FIXED?"""

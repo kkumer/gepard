@@ -1,7 +1,8 @@
 """ 
-Auxilliary plotting functions written for ad-hoc plotting
-of some specific datasets. Note that actual plotting algorithm
-is in `utils` module.
+Plotting functions written for ad-hoc plotting
+of some specific datasets and CFFs. Note that actual dataset
+plotting algorithm is utils.subplot() and here only choice
+of points and axes decoration etc. is done
 
 plotHALLA -- plots HALL-A data
 
@@ -9,15 +10,67 @@ plotHALLA -- plots HALL-A data
 
 
 import os
-
 import numpy as np
-import math
+
+import matplotlib
+if os.sys.platform == 'win32':
+    matplotlib.use('WxAgg')
+else: #linux
+    matplotlib.use('TkAgg')
 import pylab as plt
-from matplotlib.ticker import MultipleLocator
+
 
 import Data
 import utils
 from constants import toTeX, Mp2, Mp
+
+
+def HERMESBCA(data, path=None, fmt='png'):
+    """Plot HERMES BSA and neural net result."""
+    id = 32 
+    title = 'HERMES BCA'
+    fig = plt.figure()
+    fig.canvas.set_window_title(title)
+    fig.suptitle(title)
+    xaxes = ['mt', 'xB', 'Q2']
+    # we have 3x6 points
+    for x in range(3):
+        ax = fig.add_subplot(3, 1, x+1)
+        ax.yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))  # tickmarks
+        utils.subplot(ax, [data[id][x*6+18:x*6+6+18]], xaxes[x], [], [])
+        #apply(ax.set_ylim, ylims[(-0.30, 0.05)])
+    if path:
+        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+    else:
+        fig.canvas.draw()
+        fig.show()
+    return fig
+
+def HERMES09(data, fits=[], path=None, fmt='png'):
+    """Plot HERMES 0909.3587 BCA and BSA data with fit lines."""
+
+    ids = [2, 4, 5]
+    title = '' #'HERMES-08'
+    fig = plt.figure()
+    fig.canvas.set_window_title(title)
+    fig.suptitle(title)
+    xaxes = ['mt', 'xB', 'Q2']
+    ylims = [(-0.05, 0.24), (-0.15, 0.05), (-0.30, 0.05)]
+    # we have 3x18=54 points to be separated in nine panels six points each:
+    for y, id, shift in zip(range(3), [32, 32, 5], [18, 0, 0]):
+        for x in range(3):
+            panel = 3*y + x + 1  # 1, 2, ..., 9
+            ax = fig.add_subplot(3,3,panel)
+            ax.yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))  # tickmarks
+            utils.subplot(ax, [data[id][x*6+shift:x*6+6+shift]], xaxes[x], [], fits)
+            apply(ax.set_ylim, ylims[y])
+    if path:
+        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+    else:
+        fig.canvas.draw()
+        fig.show()
+    return fig
+
 
 def plotHERMES(data, fits=[], path=None, fmt='png'):
     """Makes plot of HERMES preliminary BCA and BSA data with fit line defined by pars"""
@@ -37,7 +90,7 @@ def plotHERMES(data, fits=[], path=None, fmt='png'):
         for x in range(3):
             panel = 3*y + x + 1  # 1, 2, ..., 9
             ax = fig.add_subplot(3,3,panel)
-            ax.yaxis.set_major_locator(MultipleLocator(0.1))  # tickmarks
+            ax.yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))  # tickmarks
             utils.subplot(ax, [data[ids[y]][x*6:x*6+6]], xaxes[x], [], fits)
             apply(ax.set_ylim, ylims[y])
     if path:
@@ -57,7 +110,7 @@ def plotHERMESBSA(data, nn, path=None, fmt='png'):
     # we have 3x6 points
     for x in range(3):
         ax = fig.add_subplot(3, 1, x+1)
-        ax.yaxis.set_major_locator(MultipleLocator(0.1))  # tickmarks
+        ax.yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))  # tickmarks
         utils.subplot(ax, [data[5][x*6:x*6+6]], xaxes[x], [], [])
         #apply(ax.set_ylim, ylims[(-0.30, 0.05)])
     if path:
@@ -96,10 +149,10 @@ def plotCLAS(data, fits=[], path=None, fmt='png'):
         panelset = Data.DataSet(panelpoints)
         panelset.__dict__ = dataset.__dict__.copy()
         # ... and plot
-        utils.subplot(ax, panelset, 'mt', ['Q2', 'xB'], fits)
+        utils.subplot(ax, [panelset], 'mt', ['Q2', 'xB'], fits)
         plt.xlim(0.0, 0.6)
         plt.ylim(0.0, 0.4)
-        ax.yaxis.set_major_locator(MultipleLocator(0.1))
+        ax.yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
@@ -118,8 +171,8 @@ def plotHALLA(data, fits=[], path=None, fmt='png'):
     panel = 1
     for id in ids:
         ax = fig.add_subplot(2,3,panel)
-        utils.subplot(ax, data[id], 'phi', ['Q2', 't'], fits)
-        ax.xaxis.set_major_locator(MultipleLocator(120))
+        utils.subplot(ax, [data[id]], 'phi', ['Q2', 't'], fits)
+        ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(120))
         panel += 1
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
@@ -504,7 +557,7 @@ def plotnnBSA(data, nnapproach, path=None, fmt='png'):
     for x in range(3):
         datapoints = data[5][x*6:x*6+6]
         ax = fig.add_subplot(3, 1, x+1)
-        ax.yaxis.set_major_locator(MultipleLocator(0.1))  # tickmarks
+        ax.yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))  # tickmarks
         nnpoints = []
         for pt in datapoints:
             nnpt = Data.DummyPoint(pt.__dict__.copy())

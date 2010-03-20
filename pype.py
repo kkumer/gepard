@@ -1,31 +1,26 @@
 #!/usr/bin/env python
 
 import sys, os
-import matplotlib
 
-if os.sys.platform == 'win32':
-    from minuit import *
-    matplotlib.use('WxAgg')
-else: #linux
-    try:
-        from minuit2 import Minuit2 as Minuit
-    except:
-        from minuit import *
-    matplotlib.use('TkAgg')
+try: # if you have ROOT you might want minuit2
+    from minuit2 import Minuit2 as Minuit
+except:
+    from minuit import Minuit
 
 from scipy.special import gammainc
 
 
+import plots
 import utils 
 import models
 import Approach
+
 from constants import *
-from plots import *
 from fits import *
 
 # [1] Load data
 
-data = utils.loaddata()   # dictionary {1 : DataSet instance, ...}
+data = utils.loaddata('data/ep2epgamma')   # dictionary {1 : DataSet instance, ...}
 
 # [2] Choose datapoints for fitting
 
@@ -39,8 +34,8 @@ fitpoints = data[5]
 
 # [3] Choose theoretical approach
 
-#ff = models.FormFactors()
-ff = models.NNFormFactors()
+ff = models.FormFactors()
+#ff = models.NNFormFactors()
 #bmk = Approach.BMK()
 bnoopt = Approach.hotfixedBMK(ff, optimization = False)  # no optimizations
 bopt = Approach.hotfixedBMK(ff, optimization = True)     # optimized formulas
@@ -50,6 +45,7 @@ b = bnoopt
 # pre-calculate what can be pre-calculated
 
 ## Prepare just fitpoints ...
+# [pt.to_conventions(b) for pt in fitpoints]
 # [pt.prepare(b) for pt in fitpoints]
 ## ... or prepare ALL available datapoints
 [[pt.to_conventions(b) for pt in set] for set in data.values()]
@@ -68,6 +64,8 @@ def fcnSimple(*args):
     return chisq
 
 # Function with all explicit args
+# FIXME: instance of Model class should have its parameters as an attribute,
+#        and arguments of fcn should be extracted from there
 def fcn(NS, alS, alpS, MS, rS, bS, Nv, alv, alpv, Mv, rv, bv, C, MC, tNv, tMv, trv, tbv):
    pars = {'NS': NS, 'alS': alS, 'alpS': alpS, 'MS': MS, 'rS': rS, 'bS': bS, 
            'Nv': Nv, 'alv': alv, 'alpv': alpv, 'Mv': Mv, 'rv': rv, 'bv': bv, 

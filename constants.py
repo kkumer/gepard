@@ -28,6 +28,8 @@ toTeX = {'mt' : '$-t$',  'xB' : '$x_{\\rm B}$', 'Q2' : '$Q^{2}$',
      "ReCI" : '$Re\\mathcal{C}^{I}$',
      "ReCpDCI" : '$Re(\\mathcal{C}^{I}+\\Delta\\mathcal{C}^{I})$',
      "b1ovb0" : '$b_{1}/b_{0}$',
+     "BCA" : '$BCA$',
+     "BSA" : '$BSA$',
      "BCAcos0" : '$A_{C}^{\\cos 0\\phi}$',
      "BCAcos1" : '$A_{C}^{\\cos 1\\phi}$'
      }

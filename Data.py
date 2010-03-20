@@ -14,10 +14,9 @@ DummyPoint -- class for points which have just few relevant attributes
 # FIXME: Could use __slots__ to optimize DataPoint and the
 # number and names of attributes
 
-import os, re 
+import os, re, math
 
 import pylab as plt
-from numpy import sqrt
 
 import utils
 from constants import Mp, Mp2
@@ -76,19 +75,22 @@ class DataPoint(object):
         # 2a. first acquire also attributes of parent DataSet
         self.__dict__.update(dataset.__dict__)
         # 2b. x-axes
-        i = 0 # index of our position on gridline
-        for xaxis in self.xaxes:
-            setattr(self, xaxis, gridline[i])
-            i = i + 1
+        # FIXME: include processing of 'x0value = 13.4'
+        for name in self.xnames:
+            index = int(name[1:].split('name')[0])  # index = 1, 0, 2, ...
+            setattr(self, getattr(self, name), gridline[index])  # pt.xB = gridline[1]
         # 2c. y-axis 
-        self.val = gridline[i]
+        self.val = gridline[int(self.y0value.split('column')[1])]
         # 2d. y-axis errors
-        try:
-            self.stat = gridline[i+1]
-            self.syst = gridline[i+2]
-            self.err = sqrt( self.stat**2 + self.syst**2 )
-        except IndexError: # we have just one error number
-            self.err = gridline[i+1]
+        if self.has_key('y0error'):  # we are given total error already
+            self.err = gridline[int(self.y0error.split('column')[1])]
+        else:  # we have to add stat and syst in quadrature
+            self.stat = gridline[int(self.y0errorstatistic.split('column')[1])]
+            try:
+                self.syst = gridline[int(self.y0errorsystematic.split('column')[1])]
+                self.err = math.sqrt( self.stat**2 + self.syst**2 )
+            except AttributeError:  # syst error not given, assumed zero
+                self.err = self.stat
         # 2e. calculate standard kinematical variables
         utils.fill_kinematics(self)
         return
@@ -150,31 +152,32 @@ class DataSet(list):
                 except ValueError: # rest stays as is
                     setattr(self, key, preamble[key])
 
-            #  Extracting x-axes variables 
-            xs = [key for key in preamble if re.match('^x\d$', key)]
-            xs.sort()  # xs = ['x0', 'x1', ...]
-            self.xaxes = [preamble[key] for key in xs]  # xaxes = ['t', 'xB', ...]
+            #  Extracting names of x-axes variables 
+            #  xnames = ['x0name', 'x1name', ...], not necessarily sorted!
+            #  xaxes = ['t', 'xB', ...]
+            self.xnames = [key for key in preamble if re.match('^x\dname$', key)]
+            self.xaxes = [preamble[key] for key in self.xnames]
 
             # Good to have:
-            self.yaxis = preamble['y0']
+            self.yaxis = preamble['y0name']
             self.filename = os.path.split(datafile)[-1]
             # Following dictionary will contain units for everything
             # i.e.  {'phi' : 'degrees', 't' : 'GeV^2', ...}
-            self.units = dict((preamble[key], preamble[key+'unit']) for key in xs)
+            self.units = dict((preamble[key], preamble[key[:2]+'unit']) for key in self.xnames)
             self.units[self.yaxis] = preamble['y0unit']
             # Following dictionary will have units which are changed so that match
             # units used for internal theoretical formulas
             self.newunits = {}
             # charge of first particle FIXME: just electron treated
-            if self.in1 == 'ep':                      # positron
+            if self.in1particle == 'ep':                      # positron
                 self.charge = +1
-            elif self.in1 == 'e' or self.in1 == 'em':   # electron
+            elif self.in1particle == 'e' or self.in1particle == 'em':   # electron
                 self.charge = -1
             # Mandelstam s
             if self.exptype == 'fixed target':
                 self.s = 2 * Mp * self.in1energy + Mp2
             elif self.exptype == 'collider':
-                self.s = 2 * self.in1energy * (self.in2energy + sqrt(
+                self.s = 2 * self.in1energy * (self.in2energy + math.sqrt(
                     self.in2energy**2 - Mp2)) + Mp2
             else:
                 pass # FIXME: raise error
@@ -206,7 +209,7 @@ class DataSet(list):
         fig.canvas.set_window_title(title)
         fig.suptitle(title)
         ax = fig.add_subplot(111)
-        utils.subplot(ax, self, xaxis, kinlabels, fits)
+        utils.subplot(ax, [self], xaxis, kinlabels, fits)
         if path:
             fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
         else:
