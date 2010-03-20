@@ -13,8 +13,8 @@ from fits import DMGLO1  #use some testpars here?
 ff = models.FormFactors()
 b = Approach.hotfixedBMK(ff, optimization = False)
 
-data = utils.loaddata()  #FIXME: write tests without dependence on data
-pt0 = data[1][0]
+data = utils.loaddata('data/ep2epgamma')  #FIXME: write tests without dependence on data
+pt0 = data[31][12]  # was data[1][0]
 pt0.to_conventions(b)
 pt0.prepare(b)
 
