@@ -20,7 +20,7 @@ reference2 = from DM's notebook
 
 frame = Trento
 
-in1particle = em
+in1particle = ep
 in1energy = 27.6
 in1energyunit = GeV
 in1polarizationvector = L

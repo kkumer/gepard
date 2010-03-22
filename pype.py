@@ -24,12 +24,13 @@ data = utils.loaddata('data/ep2epgamma')   # dictionary {1 : DataSet instance, .
 
 # [2] Choose datapoints for fitting
 
+fitpoints = data[31][12:] + data[8] + data[29]  # DM's GLO set
 #fitpoints = data[1] + data[8] + data[29]  # DM's GLO set
 #fitpoints = data[1] + data[5] + data[25]  # KK's set
 #fitpoints = data[4][:3] + data[8][:3]  # test set
 #fitpoints = data[1] + data[8] + data[29] + data[30]  # DM's GLO1 set
 #fitpoints = data[2] + data[5] + data[25] + data[26] + data[27] + data[28]  # KK's global set
-fitpoints = data[5]
+fitpoints = data[31][12:] + data[8] + data[29] + data[30]  # DM's GLO set
 
 
 # [3] Choose theoretical approach
@@ -190,7 +191,7 @@ m.maxcalls = 1000
 
 # [7] Print results
 
-#printres()
+printres()
 
 #pt0 = data[1][0]
 

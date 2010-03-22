@@ -51,7 +51,7 @@ test_Xunp4.newfeature = 1
 
 def test_fit():
     """Testing set of fitting observables."""
-    fitpoints = data[1] + data[8] + data[29] + data[30]  # DM's GLO1 set
+    fitpoints = data[31][12:] + data[8] + data[29] + data[30]  # DM's GLO1 set
     [pt.prepare(b) for pt in fitpoints]
     chisq = 0.
     for pt in fitpoints:

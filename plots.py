@@ -580,7 +580,7 @@ def plotnnH(ff, path=None, fmt='png'):
     fig = plt.figure()
     fig.canvas.set_window_title(title)
     fig.suptitle(title)
-    fig.subplots_adjust(bottom=0.35)
+    #fig.subplots_adjust(bottom=0.35)
     pt = Data.DummyPoint()
     ax = fig.add_subplot(2,1,1)
     ax.set_xscale('log')  # x-axis to be logarithmic

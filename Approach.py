@@ -481,7 +481,7 @@ class BMK(Approach):
         """ As defined by HALL A """
         return self.ReCCALINTunp(pt, pars) + self.ReDELCCALINTunp(pt, pars)
 
-    def b1ovb0(self, pt, pars):
+    def XwA(self, pt, pars):
         """Ratio of first two cos harmonics of w-weighted cross section. In BMK, not Trento??"""
 
         b0 = Hquadrature(lambda phi: self.XUU(pt, pars, vars={'phi':phi}, weighted=True), 
