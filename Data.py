@@ -21,7 +21,6 @@ import pylab as plt
 import utils
 from constants import Mp, Mp2
 
-
 class DataPoint(object):
 
     """One experimental measurement with all necessary information 
@@ -75,10 +74,15 @@ class DataPoint(object):
         # 2a. first acquire also attributes of parent DataSet
         self.__dict__.update(dataset.__dict__)
         # 2b. x-axes
-        # FIXME: include processing of 'x0value = 13.4'
         for name in self.xnames:
-            index = int(name[1:].split('name')[0])  # index = 1, 0, 2, ...
-            setattr(self, getattr(self, name), gridline[index])  # pt.xB = gridline[1]
+            nameindex = int(name[1:].split('name')[0])  # = 1, 0, 2, ...
+            xname = getattr(self, name)  # = 't', 'xB', ...
+            xval = getattr(self, 'x' + str(nameindex) + 'value') #  = 'table0column1' or 0.1
+            if isinstance(xval, float): # we have global instead of grid value
+                setattr(self, xname, float(xval))    # pt.xB = 0.1
+            else: # take value from the grid 
+                columnindex = int(xval[1:].split('column')[1])  # = 1, 0, 2, ...
+                setattr(self, xname, gridline[columnindex])  # pt.xB = gridline[1]
         # 2c. y-axis 
         self.val = gridline[int(self.y0value.split('column')[1])]
         # 2d. y-axis errors
