@@ -9,9 +9,11 @@ subplot -- creates subplot for matplotlib plot
 npars -- number of free (not fixed) parameters of minuit object
 str2num -- transforms string to float or int
 prettyprint -- formatted printout of numbers
+flatten -- flattens tuples
+listFiles -- listfiles in subdirs matching pattern
 """
 
-import os, re, string
+import os, re, string, fnmatch
 import numpy as np
 
 import Data
@@ -295,4 +297,38 @@ def flatten(T):
     if not isinstance(T, tuple): return (T,)
     elif len(T) == 0: return ()
     else: return flatten(T[0]) + flatten(T[1:]) 
+
+
+def listFiles(root, patterns='*', recurse=1, return_folders=0):
+    """Return the list of files matching patterns, recursively.
+
+    From 4.19 Walking Directory Trees in Python Cookbook
+
+    """
+    # Expand patterns from semicolon-separated string to list
+    pattern_list = patterns.split(';')
+    # Collect input and output arguments into one bunch
+    class Bunch:
+        def __init__(self, **kwds):
+            self.__dict__.update(kwds)
+
+    arg = Bunch(recurse=recurse, pattern_list=pattern_list,
+            return_folders=return_folders, results=[])
+
+    def visit(arg, dirname, files):
+        # Append to arg.results all relevant files (and perhaps folders)
+        for name in files:
+            fullname = os.path.normpath(os.path.join(dirname, name))
+            if arg.return_folders or os.path.isfile(fullname):
+                for pattern in arg.pattern_list:
+                    if fnmatch.fnmatch(name, pattern):
+                        arg.results.append(fullname)
+                        break
+        # Block recursion if recursion was disallowed
+        if not arg.recurse: files[:]=[]
+
+    os.path.walk(root, visit, arg)
+
+    return arg.results
+
 

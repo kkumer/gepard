@@ -1,9 +1,12 @@
 #!/usr/bin/env python
 
 import os, re, string
+import utils
 
 # files with ".dat" extension
-datafiles = [f for f in os.listdir(os.path.curdir) if f.split('.')[-1]=="dat"]
+#datafiles = [f for f in os.listdir(os.path.curdir) if f.split('.')[-1]=="dat"]
+datafiles = utils.listFiles('data', '*dat') 
+
 
 ids = []
 for file in datafiles:

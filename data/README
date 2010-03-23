@@ -1,0 +1,18 @@
+This directory holds available experimental data
+
+ep2epgamma/ - relevant experimental data for e p --> e p gamma
+old/ - old data files
+
+Note:
+There should be unique correspondence between id number of datafile
+(specified at its beginning), and the grid of numbers in that
+file. Thus, 
+
+1) If you do something to numbers, create new file and new ID !
+2) If you just edit information in preamble, you may keep old ID,
+   but if you have doubts, create new file with new ID - there 
+   are plenty of integers available
+3) Do not delete old datafiles - just move it to directory 'old',
+   maybe with putting some comment into them
+
+This makes it much easier to reproduce old results.
