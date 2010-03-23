@@ -14,7 +14,7 @@ GeV2nb = 389379.
 
 
 # Dictionary that maps variables to their LaTeX representation
-toTeX = {'mt' : '$-t$',  'xB' : '$x_{\\rm B}$', 'Q2' : '$Q^{2}$', 
+toTeX = {'tm' : '$-t$',  'xB' : '$x_{\\rm B}$', 'Q2' : '$Q^{2}$', 
      'phi' : '$\\phi$', 't' : '$t$',
      'xi': '$\\xi$', 
      "TotalCrossSection" : '$\\sigma$',

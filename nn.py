@@ -43,8 +43,8 @@ def artificialData(datapoints, trainsize=13):
     i = 0
     trans.map.clear()
     for pt in np.random.permutation(datapoints):
-        if pt.has_key('mt'):
-            pt.t = - pt.mt
+        if pt.has_key('tm'):
+            pt.t = - pt.tm
         xs = [pt.xB, pt.t, pt.Q2]
         # FIXME: This abs() below is for HERMES->BKM. Should be done using info
         # from .dat Rounding the number, to make matching of trans.map work

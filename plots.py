@@ -32,7 +32,7 @@ def HERMESBCA(data, path=None, fmt='png'):
     fig = plt.figure()
     fig.canvas.set_window_title(title)
     fig.suptitle(title)
-    xaxes = ['mt', 'xB', 'Q2']
+    xaxes = ['tm', 'xB', 'Q2']
     # we have 3x6 points
     for x in range(3):
         ax = fig.add_subplot(3, 1, x+1)
@@ -54,7 +54,7 @@ def HERMES09(data, fits=[], path=None, fmt='png'):
     fig = plt.figure()
     fig.canvas.set_window_title(title)
     fig.suptitle(title)
-    xaxes = ['mt', 'xB', 'Q2']
+    xaxes = ['tm', 'xB', 'Q2']
     ylims = [(-0.05, 0.24), (-0.15, 0.05), (-0.30, 0.05)]
     # we have 3x18=54 points to be separated in nine panels six points each:
     for y, id, shift in zip(range(3), [32, 32, 5], [18, 0, 0]):
@@ -83,7 +83,7 @@ def plotHERMES(data, fits=[], path=None, fmt='png'):
     fig = plt.figure()
     fig.canvas.set_window_title(title)
     fig.suptitle(title)
-    xaxes = ['mt', 'xB', 'Q2']
+    xaxes = ['tm', 'xB', 'Q2']
     ylims = [(-0.05, 0.24), (-0.15, 0.05), (-0.30, 0.05)]
     # we have 3x18=54 points to be separated in nine panels six points each:
     for y in range(3):
@@ -106,7 +106,7 @@ def plotHERMESBSA(data, nn, path=None, fmt='png'):
     fig = plt.figure()
     fig.canvas.set_window_title(title)
     fig.suptitle(title)
-    xaxes = ['mt', 'xB', 'Q2']
+    xaxes = ['tm', 'xB', 'Q2']
     # we have 3x6 points
     for x in range(3):
         ax = fig.add_subplot(3, 1, x+1)
@@ -149,7 +149,7 @@ def plotCLAS(data, fits=[], path=None, fmt='png'):
         panelset = Data.DataSet(panelpoints)
         panelset.__dict__ = dataset.__dict__.copy()
         # ... and plot
-        utils.subplot(ax, [panelset], 'mt', ['Q2', 'xB'], fits)
+        utils.subplot(ax, [panelset], 'tm', ['Q2', 'xB'], fits)
         plt.xlim(0.0, 0.6)
         plt.ylim(0.0, 0.4)
         ax.yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))
@@ -300,9 +300,9 @@ def plotCOMPASSt(ff, fits=[], path=None, fmt='png'):
         pn = 0
         for (approach, pars) in fits:
             line = []
-            mtvals = []
-            for mt in np.arange(0.05, 0.6, 0.02):
-                mtvals.append(mt)
+            tmvals = []
+            for tm in np.arange(0.05, 0.6, 0.02):
+                tmvals.append(tm)
                 pt = Data.DummyPoint()
                 pt.exptype = 'fixed target'
                 pt.in1energy = 160.
@@ -312,12 +312,12 @@ def plotCOMPASSt(ff, fits=[], path=None, fmt='png'):
                 pt.phi = 0.
                 pt.units = {'phi' : 'radian'}
                 pt.frame = 'Trento'
-                pt.mt = mt
+                pt.tm = tm
                 utils.fill_kinematics(pt)
                 approach.to_conventions(pt)
                 approach.prepare(pt)
                 line.append(approach.BCSA(pt, 0.8, pars))
-            ax.plot(mtvals, line, linestyles[pn], linewidth=2, 
+            ax.plot(tmvals, line, linestyles[pn], linewidth=2, 
                     label=labels[pn]) 
             pn += 1
         ax.set_xlim(0.0, 0.8)
@@ -552,7 +552,7 @@ def plotnnBSA(data, nnapproach, path=None, fmt='png'):
     fig = plt.figure()
     fig.canvas.set_window_title(title)
     fig.suptitle(title)
-    xaxes = ['mt', 'xB', 'Q2']
+    xaxes = ['tm', 'xB', 'Q2']
     # we have 3x6 points
     for x in range(3):
         datapoints = data[5][x*6:x*6+6]

@@ -81,21 +81,21 @@ def _complete_xBWQ2(kin):
     return
 
 def _complete_tmt(kin):
-    """Make duo {t, mt} complete if one of them is given in 'kin'."""
-    if kin.has_key('t') and not kin.has_key('mt'):
+    """Make duo {t, tm} complete if one of them is given in 'kin'."""
+    if kin.has_key('t') and not kin.has_key('tm'):
         assert kin.t <= 0
-        kin.mt = - kin.t
-    elif kin.has_key('mt') and not kin.has_key('t'):
-        assert kin.mt >= 0
-        kin.t = - kin.mt
+        kin.tm = - kin.t
+    elif kin.has_key('tm') and not kin.has_key('t'):
+        assert kin.tm >= 0
+        kin.t = - kin.tm
     else:
-        raise KinematicsError, 'Exactly one of {t, mt} should be given.'
+        raise KinematicsError, 'Exactly one of {t, tm} should be given.'
     return
 
 def fill_kinematics(kin, old={}):
     """Return complete up-to-date kinematical dictionary.
     
-    Complete set of kinematical variables is {xB, t, Q2, W, s, xi, mt, phi}.
+    Complete set of kinematical variables is {xB, t, Q2, W, s, xi, tm, phi}.
     Using standard identities, missing values are calculated, if possible, first
     solely from values given in 'kin', and then, second, using values in 'old',
     if provided.
@@ -129,9 +129,9 @@ def fill_kinematics(kin, old={}):
     # formally higher twist and it is maybe sensible to DEFINE xi, 
     # the argument of CFF, as follows:
     kin.xi = kin.xB / (2. - kin.xB)
-    duo = set(['t', 'mt'])
+    duo = set(['t', 'tm'])
     if len(duo.intersection(kkeys)) == 2:
-        raise KinematicsError, 'Overdetermined set {t, mt=-t} given.'
+        raise KinematicsError, 'Overdetermined set {t, tm=-t} given.'
     elif len(duo.intersection(kkeys)) == 1:
         _complete_tmt(kin)
     else:

@@ -53,7 +53,7 @@ x1name = Q2
 x1unit = GeV^2
 x1value = table0column1
 
-x2name = mt
+x2name = tm
 x2unit = GeV^2
 x2value = table0column2
 
