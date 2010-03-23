@@ -427,8 +427,7 @@ class BMK(Approach):
     def TotalCrossSection(self, pt, pars):
         """Total DVCS cross section."""
 
-        #res = Hquadrature(lambda t: self.PartialCrossSection4int(t, pt, pars), 0, 1)
-        res = PartialCrossSection4int(-0.22, pt, pars)
+        res = Hquadrature(lambda t: self.PartialCrossSection4int(t, pt, pars), 0, 1)
         return res
 
     def BCA(self, pt, pars):
@@ -444,10 +443,6 @@ class BMK(Approach):
                     self.BCAdef(pt, pars, {'phi':phi}) * cos(phi), 0, 2*pi)
             return  - res / pi
 
-    def ALUIsin1orig(self, pt, pars):
-        res = Hquadrature(lambda phi: self.BSA(pt, pars, {'phi':phi}) * sin(phi), 0, 2*pi)
-        return  res / pi
-
 
     def BSA(self, pt, pars):
         """Calculate beam spin asymmetry (BSA) or its harmonics."""
@@ -462,9 +457,6 @@ class BMK(Approach):
         #            self.BSAdef(pt, pars, {'phi':phi}) * sin(phi), 0, 2*pi)
         #    return  res / pi
 
-    def ALUa(self, pt, pars):
-        """FIXME: charge conventions ... for CLAS - positive. FIXED?"""
-        return  self.BSA(pt, pars, {'phi':pi/2.}) 
 
     def BCA0minusr1(self, pt, pars):
         return self.BCAcos0(pt, pars) - pt.r * self.BCAcos1(pt, pars)
