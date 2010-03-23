@@ -78,9 +78,11 @@ class DataPoint(object):
             nameindex = int(name[1:].split('name')[0])  # = 1, 0, 2, ...
             xname = getattr(self, name)  # = 't', 'xB', ...
             xval = getattr(self, 'x' + str(nameindex) + 'value') #  = 'table0column1' or 0.1
-            if isinstance(xval, float): # we have global instead of grid value
-                setattr(self, xname, float(xval))    # pt.xB = 0.1
-            else: # take value from the grid 
+            if isinstance(xval, float) or isinstance(xval, int): 
+                # we have global instead of grid value
+                setattr(self, xname, xval)    # pt.xB = 0.1, pt.FTn = 1, ...
+            else: 
+                # take value from the grid 
                 columnindex = int(xval[1:].split('column')[1])  # = 1, 0, 2, ...
                 setattr(self, xname, gridline[columnindex])  # pt.xB = gridline[1]
         # 2c. y-axis 

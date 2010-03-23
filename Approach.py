@@ -348,13 +348,13 @@ class BMK(Approach):
                 + self.TINTunp(kin, lam, charge, pars) 
                 + self.TDVCS2unp(kin, pars) )
 
-    def XLU(self, pt, pars, vars={}):
+    def BSD(self, pt, pars, vars={}):
         """Calculate 4-fold helicity-dependent cross section measured by HALL A """
 
         return ( self.Xunp(pt, 1, pt.charge, pars, vars) 
                 - self.Xunp(pt, -1, pt.charge, pars, vars) ) / 2.
 
-    def XUU(self, pt, pars, vars={}, weighted=False):
+    def BSS(self, pt, pars, vars={}, weighted=False):
         """4-fold helicity-independent cross section measured by HALL A """
 
         return ( self.Xunp(pt, 1, pt.charge, pars, vars, weighted) 
@@ -452,7 +452,7 @@ class BMK(Approach):
     def BSA(self, pt, pars):
         """Calculate beam spin asymmetry (BSA) or its harmonics."""
         if pt.has_key('phi'):
-            return self.BSAdef(pt, pars, vars)
+            return self.BSAdef(pt, pars)
         elif pt.has_key('FTn') and pt.FTn == -1:
             # FIXME: faster shortcut (approximate!)
             return  self.BSAdef(pt, pars, {'phi':pi/2.}) 
@@ -469,24 +469,29 @@ class BMK(Approach):
     def BCA0minusr1(self, pt, pars):
         return self.BCAcos0(pt, pars) - pt.r * self.BCAcos1(pt, pars)
 
-    def ImCI(self, pt, pars):
-        """ As defined by HALL A """
+    def BSDw2C(self, pt, pars):
+        """Im(C^I) as defined by HALL A """
         return self.ImCCALINTunp(pt, pars)
 
-    def ReCI(self, pt, pars):
-        """ As defined by HALL A """
-        return self.ReCCALINTunp(pt, pars)
+    def BSSw2C(self, pt, pars):
+        """Re(C^I) or Re(C^I + Del C^I) as defined by HALL A.
 
-    def ReCpDCI(self, pt, pars):
-        """ As defined by HALL A """
-        return self.ReCCALINTunp(pt, pars) + self.ReDELCCALINTunp(pt, pars)
+        FIXME: Name of this fun is funny. Also, check agreement with exp,
+        might be horrible.
+
+        """
+        if pt.FTn == 0:
+            return self.ReCCALINTunp(pt, pars) + self.ReDELCCALINTunp(pt, pars)
+        elif pt.FTn == 1:
+            return self.ReCCALINTunp(pt, pars)
+
 
     def XwA(self, pt, pars):
         """Ratio of first two cos harmonics of w-weighted cross section. In BMK, not Trento??"""
 
-        b0 = Hquadrature(lambda phi: self.XUU(pt, pars, vars={'phi':phi}, weighted=True), 
+        b0 = Hquadrature(lambda phi: self.BSS(pt, pars, vars={'phi':phi}, weighted=True), 
                 0, 2.0*pi) / (2.0*pi)
-        b1 = Hquadrature(lambda phi: self.XUU(pt, pars, vars={'phi':phi}, weighted=True) * cos(phi), 
+        b1 = Hquadrature(lambda phi: self.BSS(pt, pars, vars={'phi':phi}, weighted=True) * cos(phi), 
                 0, 2.0*pi) / pi
         return b1/b0
 

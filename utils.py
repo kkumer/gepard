@@ -174,7 +174,14 @@ def parse(datafile):
             desc[desctpl[0]] = desctpl[1] 
         if re.match(r'([ ]*[-\.\d]+[ \r]+)+', dataFileLine):
             # FIXME: TAB-delimited columns are not handled! Only spaces are OK.
-            numbers = re.findall(r'[-\.\d]+', dataFileLine)
+            snumbers = re.findall(r'[-\.\d]+', dataFileLine)
+            numbers = []
+            for s in snumbers:
+                f = float(s)
+                if (f - int(f)) == 0:  # we have integer
+                    numbers.append(int(f))
+                else:
+                    numbers.append(f)
             data.append(map(float, numbers))
         dataFileLine = dataFile.readline()
 
@@ -282,4 +289,10 @@ def prettyprint(all_numbers):
         padding = ' '*(left_total - l)
         print '%s%s' % (padding, s)
     return
+
+def flatten(T):
+    """Flatten the tuple."""
+    if not isinstance(T, tuple): return (T,)
+    elif len(T) == 0: return ()
+    else: return flatten(T[0]) + flatten(T[1:]) 
 

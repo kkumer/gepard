@@ -24,7 +24,6 @@ data = utils.loaddata('data/ep2epgamma')   # dictionary {1 : DataSet instance, .
 
 # [2] Choose datapoints for fitting
 
-fitpoints = data[31][12:] + data[8] + data[29]  # DM's GLO set
 #fitpoints = data[1] + data[8] + data[29]  # DM's GLO set
 #fitpoints = data[1] + data[5] + data[25]  # KK's set
 #fitpoints = data[4][:3] + data[8][:3]  # test set
@@ -36,6 +35,7 @@ fitpoints = data[31][12:] + data[8] + data[29] + data[30]  # DM's GLO set
 # [3] Choose theoretical approach
 
 ff = models.FormFactors()
+#ff = models.Hdominance()
 #ff = models.NNFormFactors()
 #bmk = Approach.BMK()
 bnoopt = Approach.hotfixedBMK(ff, optimization = False)  # no optimizations
@@ -96,49 +96,49 @@ def fcn(NS, alS, alpS, MS, rS, bS, Nv, alv, alpv, Mv, rv, bv, C, MC, tNv, tMv, t
 
 
 # DMGLO1
-## m = Minuit(fcn,
-##   NS = 1.5,         fix_NS = True,
-##  alS = 1.13,       fix_alS = True,
-## alpS = 0.15,      fix_alpS = True, 
-##   MS = 0.707107,   fix_MS = True,     
-##   rS = 1.0,         fix_rS = True,
-##   bS = 2.00203,     fix_bS = False,      limit_bS = (1.5, 2.5),
-##   Nv = 1.35,        fix_Nv = True,
-##  alv = 0.43,       fix_alv = True,
-## alpv = 0.85,      fix_alpv = True, 
-##   Mv = 1.01097,     fix_Mv = True,    limit_Mv = (0.2, 5.),
-##   rv = 0.496383,      fix_rv = False,    limit_rv = (0.3, 0.7),
-##   bv = 2.15682,       fix_bv = False,    limit_bv = (1.2, 2.8),
-##    C = 6.90484,        fix_C = False,    limit_C = (6., 8.),
-##   MC = 1.33924,   fix_MC = False,    limit_MC = (0., 15.),
-##  tNv = 0.6,          fix_tNv = True,
-##  tMv = 2.69667,    fix_tMv = False,    limit_tMv = (4., 9.),
-##  trv = 5.97923,      fix_trv = False,    limit_trv = (5., 7.),
-##  tbv = 3.25607,      fix_tbv = False,    limit_tbv = (2., 4.)
-## )
-
-
-# DMGLO
 m = Minuit(fcn,
   NS = 1.5,         fix_NS = True,
  alS = 1.13,       fix_alS = True,
 alpS = 0.15,      fix_alpS = True, 
-  MS = 0.707107,    fix_MS = True,     
+  MS = 0.707107,   fix_MS = True,     
   rS = 1.0,         fix_rS = True,
-  bS = 2.25,        fix_bS = False,      limit_bS = (3.1, 3.3),
+  bS = 2.00203,     fix_bS = False,      limit_bS = (1.5, 2.5),
   Nv = 1.35,        fix_Nv = True,
  alv = 0.43,       fix_alv = True,
 alpv = 0.85,      fix_alpv = True, 
-  Mv = 0.683,         fix_Mv = False,    limit_Mv = (0.9, 1.1),
-  rv = 0.684,          fix_rv = True,    limit_rv = (0.6, 0.8),
-  bv = 0.5,           fix_bv = True,    limit_bv = (0.4, 0.6),
-   C = 1.12,           fix_C = False,    limit_C = (1.4, 1.5),
-  MC = 1.22,          fix_MC = False,    limit_MC = (1.1, 1.3),
- tNv = 0.0,          fix_tNv = True,
- tMv = 2.69667,      fix_tMv = True,    limit_tMv = (4., 9.),
- trv = 5.97923,      fix_trv = True,    limit_trv = (5., 7.),
- tbv = 3.25607,      fix_tbv = True,    limit_tbv = (2., 4.)
+  Mv = 1.01097,     fix_Mv = True,    limit_Mv = (0.2, 5.),
+  rv = 0.496383,      fix_rv = False,    limit_rv = (0.3, 0.7),
+  bv = 2.15682,       fix_bv = False,    limit_bv = (1.2, 2.8),
+   C = 6.90484,        fix_C = False,    limit_C = (6., 8.),
+  MC = 1.33924,   fix_MC = False,    limit_MC = (0., 15.),
+ tNv = 0.6,          fix_tNv = True,
+ tMv = 2.69667,    fix_tMv = False,    limit_tMv = (4., 9.),
+ trv = 5.97923,      fix_trv = False,    limit_trv = (5., 7.),
+ tbv = 3.25607,      fix_tbv = False,    limit_tbv = (2., 4.)
 )
+
+
+# DMGLO
+## m = Minuit(fcn,
+##   NS = 1.5,         fix_NS = True,
+##  alS = 1.13,       fix_alS = True,
+## alpS = 0.15,      fix_alpS = True, 
+##   MS = 0.707107,    fix_MS = True,     
+##   rS = 1.0,         fix_rS = True,
+##   bS = 2.25,        fix_bS = False,      limit_bS = (3.1, 3.3),
+##   Nv = 1.35,        fix_Nv = True,
+##  alv = 0.43,       fix_alv = True,
+## alpv = 0.85,      fix_alpv = True, 
+##   Mv = 0.683,         fix_Mv = False,    limit_Mv = (0.9, 1.1),
+##   rv = 0.684,          fix_rv = True,    limit_rv = (0.6, 0.8),
+##   bv = 0.5,           fix_bv = True,    limit_bv = (0.4, 0.6),
+##    C = 1.12,           fix_C = False,    limit_C = (1.4, 1.5),
+##   MC = 1.22,          fix_MC = False,    limit_MC = (1.1, 1.3),
+##  tNv = 0.0,          fix_tNv = True,
+##  tMv = 2.69667,      fix_tMv = True,    limit_tMv = (4., 9.),
+##  trv = 5.97923,      fix_trv = True,    limit_trv = (5., 7.),
+##  tbv = 3.25607,      fix_tbv = True,    limit_tbv = (2., 4.)
+## )
 
 # GENERIC
 ## m = Minuit(fcn,

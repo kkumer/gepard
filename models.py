@@ -15,7 +15,7 @@ from numpy import log, pi
 from numpy import ndarray, array
 
 from quadrature import PVquadrature
-from utils import AttrDict
+from utils import AttrDict, flatten
 
 def dispargV(x, fun, pt, pars):
     """ Integrand of the dispersion integral (vector case) 
@@ -47,7 +47,13 @@ def dispargA(x, fun, pt, pars):
 class Model(object):
     """Later some methods or attributes may be added here."""
 
-    pass
+    def printCFFs(self, pt, pars={}):
+        cffs = ['ImH', 'ReH', 'ImE', 'ReE', 'ImHt', 'ReHt', 'ImEt', 'ReEt']
+        vals = map(lambda cff: str(getattr(self, cff)(pt, pars)), cffs)
+        s = "{" + 8*"%s -> %s, "
+        s = s[:-2] + "}"
+        return s % flatten(tuple(zip(cffs, vals)))
+
 
 
 class FormFactors(Model):
@@ -237,3 +243,10 @@ class NNFormFactors(FormFactors):
     def ReEt(self, pt, pars={}):
         return 0
 
+class Hdominance(FormFactors):
+
+    def ReE(self, pt, pars={}):
+        return 0
+
+    def ReEt(self, pt, pars={}):
+        return 0
