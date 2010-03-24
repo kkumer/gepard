@@ -176,9 +176,9 @@ class DataSet(list):
             self.newunits = {}
             # charge of first particle FIXME: just electron treated
             if self.in1particle == 'ep':                      # positron
-                self.charge = +1
+                self.in1charge = +1
             elif self.in1particle == 'e' or self.in1particle == 'em':   # electron
-                self.charge = -1
+                self.in1charge = -1
             # Mandelstam s
             if self.exptype == 'fixed target':
                 self.s = 2 * Mp * self.in1energy + Mp2
