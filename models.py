@@ -17,6 +17,7 @@ from numpy import ndarray, array
 from quadrature import PVquadrature
 from utils import AttrDict, flatten
 
+
 def dispargV(x, fun, pt, pars):
     """ Integrand of the dispersion integral (vector case) 
     

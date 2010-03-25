@@ -401,19 +401,14 @@ class BMK(Approach):
     def _BCA(self, pt, pars, **kwargs):
         """Calculate beam charge asymmetry (BCA)."""
 
-        # FIXME: horrible
-        NL = kwargs.copy()
-        NR = kwargs.copy()
-        NR.update({'flip':'in1charge'})
-        DL = kwargs.copy()
-        DL.update({'zeropolarized':True})
-        DR = kwargs.copy()
-        DR.update({'flip':'in1charge', 'zeropolarized':True})
+        kwargs.update({'zeropolarized':True})
+        R = kwargs.copy()
+        R.update({'flip':'in1charge'})
         return (
-           self.Xunp(pt, pars, **NL) 
-             - self.Xunp(pt, pars, **NR) )/(
-           self.Xunp(pt, pars, **DL )
-             + self.Xunp(pt, pars, **DR) )
+           self.Xunp(pt, pars, **kwargs) 
+             - self.Xunp(pt, pars, **R) )/(
+           self.Xunp(pt, pars, **kwargs )
+             + self.Xunp(pt, pars, **R) )
         # optimized formula (remove parts which cancel anyway)
         # return  self.TINTunp(pt, phi, 0, 1, pars) / ( 
         #               self.TBH2unp(pt, phi) + self.TDVCS2unp(pt, phi, pars) )
