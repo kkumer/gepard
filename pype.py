@@ -30,9 +30,8 @@ fitpoints = data[31][12:] + data[8] + data[29]  # DM's GLO set
 
 # [3] Choose theoretical approach
 
-ff = models.FormFactors()
-#ff = models.Hdominance()
-#ff = models.NNFormFactors()
+ff = models.ModelDR()
+#ff = models.ModelNN()
 #bmk = Approach.BMK()
 bnoopt = Approach.hotfixedBMK(ff, optimization = False)  # no optimizations
 bopt = Approach.hotfixedBMK(ff, optimization = True)     # optimized formulas

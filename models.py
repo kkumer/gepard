@@ -1,12 +1,9 @@
-""" Here are definitions of models. "Model" is a set of functions
-(typically CFFs or GPDs) which depend on parameters (some of which
-can be provided by minimization routine in the fitting procedure).
-Theoretical "approach", when given an instance of a model and
-parameter values can calculate observables.
-Classes:
-    Model -- base class
-    FormFactors(Model) -- dipole FFs and dispersion-relation CFFs
-                          with ansatz as in arXiv:0904.0458
+""" Definitions of models. 
+
+"Model" is a set of functions (typically CFFs or GPDs) which depend on
+parameters (some of which can be provided by minimization routine in the
+fitting procedure).  Theoretical "approach", when given an instance of a model
+and parameter values can calculate observables.
 
 """
 import pickle, sys
@@ -18,55 +15,149 @@ from quadrature import PVquadrature
 from utils import AttrDict, flatten
 
 
-def dispargV(x, fun, pt, pars):
-    """ Integrand of the dispersion integral (vector case) 
-    
-    fun -- Im(CFF)
-    With variable change x->x^(1/(1-ga))=u in
-    order to tame the singularity at x=0. 
-    
-    """
-    ga = 0.9  # Nice value obtained by experimentation in Mathematica
-    u = x**(1./(1.-ga))
-    res = u**ga * ( fun(pt, pars, u) - fun(pt, pars) )
-    return (2.*u) / (pt.xi**2 - u**2) * res / (1.-ga)
-
-def dispargA(x, fun, pt, pars):
-    """ Integrand of the dispersion integral (axial-vector case)
-    
-    fun -- Im(CFF)
-    With variable change x->x^(1/(1-ga))=u in
-    order to tame the singularity at x=0. 
-    
-    """
-    ga = 0.9  # Value same as for V-case (FIXME: is this the best choice?)
-    u = x**(1./(1.-ga))
-    res = u**ga * ( fun(pt, pars, u) - fun(pt, pars) )
-    return (2.* pt.xi) / (pt.xi**2 - u**2) * res / (1.-ga)
-
-
 class Model(object):
     """Later some methods or attributes may be added here."""
 
-    def printCFFs(self, pt, pars={}):
-        cffs = ['ImH', 'ReH', 'ImE', 'ReE', 'ImHt', 'ReHt', 'ImEt', 'ReEt']
-        vals = map(lambda cff: str(getattr(self, cff)(pt, pars)), cffs)
+
+class ElasticFormFactors(Model):
+    """Dirac and Pauli elastic form factors F_1 and F_2."""
+
+
+class ElasticDipole(ElasticFormFactors):
+    """Dipole approximation from DM's notebook."""
+
+    def F1(self, t):
+        """Dirac elastic form factor."""
+        return (1.41 * (1.26 - t))/((0.71 - t)**2 * (3.53 - t))
+
+    def F2(self, t):
+        """Pauli elastic form factor."""
+        return 3.2 / ((0.71 - t)**2 * (3.53 - t))
+
+
+class ComptonFormFactors(Model):
+    """Twist-two, no-transversity set of 4 CFFs.
+
+    They are set to be zero here. Actual models are built by subclassing this.
+
+    """
+    funcnames = ['ImH', 'ReH', 'ImE', 'ReE', 'ImHt', 'ReHt', 'ImEt', 'ReEt']
+    # Initial definition of CFFs. All just return zero.
+    for name in funcnames:
+        exec('def %s(self, pt, pars={}): return 0.' % name)
+
+
+    def values(self, pt, pars={}):
+        """Print values of CFFs. Pastable into Mathematica."""
+        vals = map(lambda cff: str(getattr(self, cff)(pt, pars)), self.funcnames)
         s = "{" + 8*"%s -> %s, "
         s = s[:-2] + "}"
-        return s % flatten(tuple(zip(cffs, vals)))
+        return s % flatten(tuple(zip(self.funcnames, vals)))
 
 
+class ComptonDispersionRelations(ComptonFormFactors):
+    """Use dispersion relations for ReH and ReE
 
-class FormFactors(Model):
-    """Compton and elastic Form Factors.
-
-    methods: ImH, ReH, ImE, ReE, ImHt, ReHt, ImEt, ReEt, F1, F2
-    attributes:  H, E, Ht, Et
+    methods: ReH, ReE, ReHt, ReEt, subtraction
+    Subclass should implement ansaetze for ImH, ImE, ImHt, ImEt 
+    and subtraction. This class implements just dispersion integrals.
     
     """
 
-    # Attribute-access parameter dictionaries with default values
-    H = AttrDict({
+    def dispargV(self, x, fun, pt, pars):
+        """ Integrand of the dispersion integral (vector case) 
+        
+        fun -- Im(CFF)
+        With variable change x->x^(1/(1-ga))=u in
+        order to tame the singularity at x=0. 
+        
+        """
+        ga = 0.9  # Nice value obtained by experimentation in Mathematica
+        u = x**(1./(1.-ga))
+        res = u**ga * ( fun(pt, pars, u) - fun(pt, pars) )
+        return (2.*u) / (pt.xi**2 - u**2) * res / (1.-ga)
+
+    def dispargA(self, x, fun, pt, pars):
+        """ Integrand of the dispersion integral (axial-vector case)
+        
+        fun -- Im(CFF)
+        With variable change x->x^(1/(1-ga))=u in
+        order to tame the singularity at x=0. 
+        
+        """
+        ga = 0.9  # Value same as for V-case (FIXME: is this the best choice?)
+        u = x**(1./(1.-ga))
+        res = u**ga * ( fun(pt, pars, u) - fun(pt, pars) )
+        return (2.* pt.xi) / (pt.xi**2 - u**2) * res / (1.-ga)
+
+    def subtraction(self, pt, pars={}):
+        return 0  # default
+
+    def ReH(self, pt, pars={}):
+        """ Real part of CFF H, 
+        
+        Given by dispersion integral over ImH - subtraction constant.
+        
+        """
+        # override defaults (FIXME: should this be permanent?)
+        self.pars.update(pars) 
+        p = self.pars # shortcut
+
+        res = PVquadrature(self.dispargV, 0, 1, (self.ImH, pt, p))
+        pv = res + log(pt.xi**2 / (1.-pt.xi**2)) * self.ImH(pt, p)
+        # P.V./pi - subtraction constant C/(1-t/MC^2)^2
+        return pv/pi - self.subtraction(pt, p)
+
+    def ReHt(self, pt, pars={}):
+        """ Real part of CFF Ht. 
+        
+        Given by dispersion integral over ImHt
+
+        """
+        # override defaults 
+        self.pars.update(pars) 
+        p = self.pars # shortcut
+
+        res = PVquadrature(self.dispargA, 0, 1, (self.ImHt, pt, p))
+        pv = res + log((1.+pt.xi)/(1.-pt.xi)) * self.ImHt(pt, p)
+        return pv/pi   # this is P.V./pi 
+
+    def ReE(self, pt, pars={}):
+        """Real part of CFF E.
+        
+        Given by dispersion integral over ImE + subtraction constant.
+        
+        """
+        # override defaults 
+        self.pars.update(pars) 
+        p = self.pars # shortcut
+
+        res = PVquadrature(self.dispargV, 0, 1, (self.ImE, pt, p))
+        pv = res + log(pt.xi**2 / (1.-pt.xi**2)) * self.ImE(pt, p)
+        # This is same subtraction constant
+        # as for H, but with opposite sign
+        return pv/pi + self.subtraction(pt, p)
+
+    def ReEt(self, pt, pars={}):
+        """ Real part of CFF Et. 
+        
+        Given by dispersion integral over ImEt
+
+        """
+        # override defaults 
+        self.pars.update(pars) 
+        p = self.pars # shortcut
+
+        res = PVquadrature(self.dispargA, 0, 1, (self.ImEt, pt, p))
+        pv = res + log((1.+pt.xi)/(1.-pt.xi)) * self.ImEt(pt, p)
+        return pv/pi   # this is P.V./pi 
+
+
+class ComptonModelDR(ComptonDispersionRelations):
+    """Model for CFFs as in arXiv:0904.0458."""
+
+    # Attribute-access parameter dictionary with default values
+    pars = AttrDict({
           'NS' : 1.5,       
          'alS' : 1.13,      
         'alpS' : 0.15,      
@@ -80,27 +171,23 @@ class FormFactors(Model):
           'rv' : 0.496383,  
           'bv' : 2.15682,   
            'C' : 6.90484,   
-          'MC' : 1.33924
+          'MC' : 1.33924,
+          'tNv' : 0.6,      
+          'tMv' : 2.69667,
+          'trv' : 5.97923,  
+          'tbv' : 3.25607
           })
 
-    Ht = AttrDict({
-          'Nv' : 0.6,      
-          'Mv' : 2.69667,
-          'rv' : 5.97923,  
-          'bv' : 3.25607
-          })
-    #parsE = AttrDict() # not needed
-    #parsEt = AttrDict() # not needed
-    pars = AttrDict({'H':H, 'Ht':Ht}) # this one holds all parameter dicts
+    def subtraction(self, pt, pars={}):
+        return pars.C/(1.-pt.t/pars.MC**2)**2
 
-    
     def ImH(self, pt, pars={}, xi=0):
         """Imaginary part of CFF H."""
 
         # override defaults (FIXME: should this be permanent?)
         # FIXME: Is it costly to do this update for every call of ImH?
-        self.H.update(pars) 
-        p = self.H # shortcut
+        self.pars.update(pars) 
+        p = self.pars # shortcut
 
         # FIXME: The following solution is not elegant
         if isinstance(xi, ndarray):
@@ -121,27 +208,12 @@ class FormFactors(Model):
                  onex**p.bS / (1. - onex*t/(p.MS**2))**2 )
         return pi * (val + sea) / (1.+x)
 
-    def ReH(self, pt, pars={}):
-        """ Real part of CFF H, 
-        
-        obtained from imaginary part using dispersion relation.
-        
-        """
-        # override defaults (FIXME: should this be permanent?)
-        self.H.update(pars) 
-        p = self.H # shortcut
-
-        res = PVquadrature(dispargV, 0, 1, (self.ImH, pt, pars))
-        pv = res + log(pt.xi**2 / (1.-pt.xi**2)) * self.ImH(pt, pars)
-        # P.V./pi - subtraction constant C/(1-t/MC^2)^2
-        return pv/pi - p.C/(1.-pt.t/p.MC**2)**2  
-
     def ImHt(self, pt, pars={}, xi=0):
         """Imaginary part of CFF Ht i.e. \tilde{H}."""
 
         # override defaults 
-        self.Ht.update(pars) 
-        p = self.Ht # shortcut
+        self.pars.update(pars) 
+        p = self.pars # shortcut
 
         if isinstance(xi, ndarray):
             # function was called with third argument that is xi nd array
@@ -157,58 +229,27 @@ class FormFactors(Model):
         onex = (1.-x) / (1.+x)
         val = ( (2.*4./9. + 1./9.) * p.tNv * p.trv * 
             # Regge trajectory params taken from H:
-            twox**(-self.H.alv-self.H.alpv*t) *
+            twox**(-p.alv-p.alpv*t) *
                  onex**p.tbv / (1. - onex*t/(p.tMv**2))  )
         return pi * val / (1.+x)
 
-    def ReHt(self, pt, pars={}):
-        """ Real part of CFF Ht. 
-        
-        Obtained from imaginary part using dispersion relation.
-
-        """
-        res = PVquadrature(dispargA, 0, 1, (self.ImHt, pt, pars))
-        pv = res + log((1.+pt.xi)/(1.-pt.xi)) * self.ImHt(pt, pars)
-        return pv/pi   # this is P.V./pi 
-
-    def ImE(self, pt, pars={}):
-        return 0
-
-    def ReE(self, pt, pars={}):
-        """Real part of CFF {\cal E}."""
-
-        # This is same subtraction constant C/(1-t/M2c)^2
-        # as for H, but with opposite sign
-        return self.H.C/(1.-pt.t/self.H.MC**2)**2 
-
-    def ImEt(self, pt, pars={}):
+    def ImE(self, pt, pars={}, xi=0):
+        """Imaginary part of CFF E."""
+        # Just changing function signature w.r.t. ComptonFormFactors
+        # to make it compatible for dispersion integral
         return 0
 
     def ReEt(self, pt, pars={}):
-            return (2.2390424 * (1. - (1.7*(0.0196 - pt.t))/(1. 
-                - pt.t/2.)**2))/((0.0196 - pt.t)*pt.xi)
-
-    def F1(self, t):
-        """Dirac elastic form factor. 
-        
-        Dipole approximation from DM's notebook.
-        
-        """
-        return (1.41 * (1.26 - t))/((0.71 - t)**2 * (3.53 - t))
-
-    def F2(self, t):
-        """Pauli elastic form factor.
-        
-        Dipole approximation from DM's notebook.
-
-        """
-        return 3.2 / ((0.71 - t)**2 * (3.53 - t))
+        """Instead of disp. rel. use pole formula."""
+        return (2.2390424 * (1. - (1.7*(0.0196 - pt.t))/(1. 
+            - pt.t/2.)**2))/((0.0196 - pt.t)*pt.xi)
 
 
-class NNFormFactors(FormFactors):
+class ComptonNNH(ComptonFormFactors):
     """Neural network CFF H.
-    F1 and F2 are taken from FormFactors. Im(CFF H) is given by neural
-    nets, while Re(CFF H) and other GPDs are zero.
+
+    Im(CFF H) is given by neural nets in file 'nets.pkl', while 
+    Re(CFF H) and other GPDs are zero.
     
     """
     def __init__(self):
@@ -223,31 +264,12 @@ class NNFormFactors(FormFactors):
         return array(ar).flatten()
 
 
-    def ReH(self, pt, pars={}):
-        return 0
+##  --- Complete models built from the above components ---
 
-    def ImHt(self, pt, pars={}, xi=0):
-        return 0
+class ModelDR(ComptonModelDR, ElasticDipole):
+    """Complete model as in arXiv:0904.0458.."""
 
-    def ReHt(self, pt, pars={}):
-        return 0
 
-    def ImE(self, pt, pars={}):
-        return 0
+class ModelNN(ComptonNNH, ElasticDipole):
+    """Complete model."""
 
-    def ReE(self, pt, pars={}):
-        return 0
-
-    def ImEt(self, pt, pars={}):
-        return 0
-
-    def ReEt(self, pt, pars={}):
-        return 0
-
-class Hdominance(FormFactors):
-
-    def ReE(self, pt, pars={}):
-        return 0
-
-    def ReEt(self, pt, pars={}):
-        return 0

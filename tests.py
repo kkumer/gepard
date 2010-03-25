@@ -10,7 +10,7 @@ import numpy as np
 import utils, models, Approach
 from fits import DMGLO1  #use some testpars here?
 
-ff = models.FormFactors()
+ff = models.ModelDR()
 b = Approach.hotfixedBMK(ff, optimization = False)
 
 data = utils.loaddata('data/ep2epgamma')  #FIXME: write tests without dependence on data
