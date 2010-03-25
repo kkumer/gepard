@@ -320,15 +320,16 @@ class BMK(Approach):
 
 ## Observables ##
 
-    def Xunp(self, pt, pars, vars={}, weighted=False, zeropolarized=False, flip=None):
+    #def Xunp(self, pt, pars, vars={}, weighted=False, zeropolarized=False, flip=None):
+    def Xunp(self, pt, pars, **kwargs):
         """ Calculate 4-fold differential cross section for unpolarized target. 
 
         lam is lepton polarization \lambda .
         FIXME: Is this 'phi' bussiness below ugly?
         
         """
-        if vars:
-            kin = fill_kinematics(vars, old=pt)
+        if kwargs.has_key('vars'):
+            kin = fill_kinematics(kwargs['vars'], old=pt)
             self.prepare(kin)
         else:
             # just pass as reference to DataPoint
@@ -347,16 +348,16 @@ class BMK(Approach):
             # FIXME: hack
             pass
 
-        if zeropolarized:
+        if kwargs.has_key('zeropolarized') and kwargs['zeropolarized']:
             # FIXME: check that this makes sense
             kin.in1polarization = 0
 
-        if flip:
+        if kwargs.has_key('flip') and kwargs['flip']:
+            # FIXME: check that this makes sense
             # FIXME: polarization AND charge flip
-            setattr(kin, flip, - getattr(pt, flip))
+            setattr(kin, kwargs['flip'], - getattr(pt, kwargs['flip']))
 
-
-        if weighted:
+        if kwargs.has_key('weighted') and kwargs['weighted']:
             wgh = self.w(kin)
         else:
             wgh = 1
@@ -365,21 +366,24 @@ class BMK(Approach):
                 + self.TINTunp(kin, pars) 
                 + self.TDVCS2unp(kin, pars) )
 
-    def BSD(self, pt, pars, vars={}):
+    def BSD(self, pt, pars, **kwargs):
         """Calculate 4-fold helicity-dependent cross section measured by HALL A """
 
-        return ( self.Xunp(pt, pars, vars) 
-                - self.Xunp(pt, pars, vars, flip='in1polarization') ) / 2.
+        R = kwargs.copy()
+        R.update({'flip':'in1polarization'})
+        return ( self.Xunp(pt, pars, **kwargs) 
+                - self.Xunp(pt, pars, **R) ) / 2.
 
-    def BSS(self, pt, pars, vars={}, weighted=False):
+    def BSS(self, pt, pars, **kwargs):
         """4-fold helicity-independent cross section measured by HALL A """
+        R = kwargs.copy()
+        R.update({'flip':'in1polarization'})
+        return ( self.Xunp(pt, pars, **kwargs) 
+                + self.Xunp(pt, pars, **R) ) / 2.
 
-        return ( self.Xunp(pt, pars, vars, weighted) 
-                + self.Xunp(pt, pars, vars, weighted, flip='in1polarization') ) / 2.
-
-    def _BSA(self, pt, pars, vars={}):
+    def _BSA(self, pt, pars, **kwargs):
         """Calculate beam spin asymmetry (BSA)."""
-        return self.BSD(pt, pars, vars) / self.BSS(pt, pars, vars)
+        return self.BSD(pt, pars, **kwargs) / self.BSS(pt, pars, **kwargs)
 
     def BSA(self, pt, pars):
         """Calculate beam spin asymmetry (BSA) or its harmonics."""
@@ -387,23 +391,29 @@ class BMK(Approach):
             return self._BSA(pt, pars)
         elif pt.has_key('FTn') and pt.FTn == -1:
             # FIXME: faster shortcut (approximate!)
-            return  self._BSA(pt, pars, {'phi':pi/2.}) 
+            return  self._BSA(pt, pars, vars={'phi':pi/2.}) 
         ### Exact but slower:
         #elif pt.has_key('FTn') and pt.FTn == -1:
         #    res = Hquadrature(lambda phi: 
         #            self._BSA(pt, pars, {'phi':phi}) * sin(phi), 0, 2*pi)
         #    return  res / pi
 
-    def _BCA(self, pt, pars, vars={}):
+    def _BCA(self, pt, pars, **kwargs):
         """Calculate beam charge asymmetry (BCA)."""
 
-        # use defining formula:  (sigma+ - sigma-)/(sigma+ + sigma-)
-        # i.e. charge is not read from datafile!
+        # FIXME: horrible
+        NL = kwargs.copy()
+        NR = kwargs.copy()
+        NR.update({'flip':'in1charge'})
+        DL = kwargs.copy()
+        DL.update({'zeropolarized':True})
+        DR = kwargs.copy()
+        DR.update({'flip':'in1charge', 'zeropolarized':True})
         return (
-           self.Xunp(pt, pars, vars, zeropolarized=True) 
-             - self.Xunp(pt, pars, vars, zeropolarized=True, flip='in1charge') )/(
-           self.Xunp(pt, pars, vars, zeropolarized=True) 
-             + self.Xunp(pt, pars, vars, zeropolarized=True, flip='in1charge') )
+           self.Xunp(pt, pars, **NL) 
+             - self.Xunp(pt, pars, **NR) )/(
+           self.Xunp(pt, pars, **DL )
+             + self.Xunp(pt, pars, **DR) )
         # optimized formula (remove parts which cancel anyway)
         # return  self.TINTunp(pt, phi, 0, 1, pars) / ( 
         #               self.TBH2unp(pt, phi) + self.TDVCS2unp(pt, phi, pars) )
@@ -411,31 +421,33 @@ class BMK(Approach):
     def BCA(self, pt, pars):
         """Calculate beam charge asymmetry (BCA) or its harmonics."""
         if pt.has_key('phi'):
-            return self._BCA(pt, pars, vars)
+            return self._BCA(pt, pars)
         elif pt.has_key('FTn') and pt.FTn == 0:
             res = Hquadrature(lambda phi: 
-                    self._BCA(pt, pars, {'phi':phi}), 0, 2.0*pi)
+                    self._BCA(pt, pars, vars={'phi':phi}), 0, 2.0*pi)
             return res / (2.0*pi)
         elif pt.has_key('FTn') and pt.FTn == 1:
             res = Hquadrature(lambda phi: 
-                    self._BCA(pt, pars, {'phi':phi}) * cos(phi), 0, 2*pi)
+                    self._BCA(pt, pars, vars={'phi':phi}) * cos(phi), 0, 2*pi)
             return  - res / pi
 
-    def BCSD(self, pt, pars, vars={}):
+    def BCSD(self, pt, pars, **kwargs):
         """4-fold beam charge-spin cross section difference measured by COMPASS """
-        # charge is not read from datafile!
-        return (self.Xunp(pt, pars, vars) 
-                - self.Xunp(pt, pars, vars, flip='in1polarization and in1charge'))/2.
+        R = kwargs.copy()
+        R.update({'flip':'in1polarization and in1charge'})
+        return (self.Xunp(pt, pars, **kwargs) 
+                - self.Xunp(pt, pars, **R))/2.
 
-    def BCSS(self, pt, pars, vars={}):
+    def BCSS(self, pt, pars, **kwargs):
         """4-fold beam charge-spin cross section sum measured by COMPASS. """
-        # charge is not read from datafile!
-        return (self.Xunp(pt, pars, vars) 
-                + self.Xunp(pt, pars, vars, flip='in1polarization and in1charge'))/2.
+        R = kwargs.copy()
+        R.update({'flip':'in1polarization and in1charge'})
+        return (self.Xunp(pt, pars, **kwargs) 
+                + self.Xunp(pt, pars, **R))/2.
 
-    def BCSA(self, pt, pars, vars={}):
+    def BCSA(self, pt, pars, **kwargs):
         """Beam charge-spin asymmetry as measured by COMPASS. """
-        return  self.BCSD(pt, pars, vars) / self.BCSS(pt, pars, vars)
+        return  self.BCSD(pt, pars, **kwargs) / self.BCSS(pt, pars, **kwargs)
         ## optimized formula
         # return  self.TINTunp(pt, phi, 0, 1, pars) / ( 
         #       self.TBH2unp(pt, phi) + self.TDVCS2unp(pt, phi, pars) 
