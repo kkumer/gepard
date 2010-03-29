@@ -42,13 +42,9 @@ def fcn(%s):
                 (getattr(approach, pt.yaxis)(pt, pars) - pt.val)**2 / pt.err**2 )
     return chisq
 """ % (fcnargs, pardict), locals(),locals())
-
-        # DMGLO
         self.m = Minuit(fcn, **model.parameter_dict)
-        self.m.tol = 0.01
-        #self.m.strategy = 2
-        self.m.printMode = 0
-        #self.m.maxcalls = 350
+        for key in kwargs:
+            setattr(self.m, key, kwargs[key])
 
 
     def printres(self, printsigmas=0):
@@ -68,5 +64,6 @@ def fcn(%s):
     def fit(self):
         self.m.migrad()
         print "ncalls = ", self.m.ncalls
+        print printres()
 
 

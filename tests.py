@@ -16,7 +16,7 @@ ff.parameter_dict.update(DMGLO1)
 ff.parameter_dict.update({'fix_C':True, 'fix_MC':True})
 b = Approach.hotfixedBMK(ff, optimization = False)
 
-data = utils.loaddata('data/ep2epgamma')  #FIXME: write tests without dependence on data
+data = utils.loaddata('data/ep2epgamma', approach=b)  
 # testing data point
 pt0 = copy.deepcopy(data[31][12])  # was data[1][0]
 pt0.in1polarization = 1
@@ -25,12 +25,8 @@ pt0.to_conventions(b)
 pt0.prepare(b)
 # testing data set
 testpoints = [data[31][12]] + [data[8][1]] + [data[29][2]] + [data[30][3]]
-[pt.to_conventions(b) for pt in testpoints]
-[pt.prepare(b) for pt in testpoints]
 # testing data set for fits
 fitpoints = data[31][12:14] + data[8][1:3] + data[30][2:4]
-[pt.to_conventions(b) for pt in fitpoints]
-[pt.prepare(b) for pt in fitpoints]
 
 def test_CFF():
     assert_almost_equal(ff.ImH(pt0), 17.695607175490565)
@@ -79,6 +75,6 @@ def test_fit2():
     """Testing actual fitting by FitterMinuit."""
     f = fit.FitterMinuit(fitpoints, b, ff)
     f.fit()
-    assert_almost_equal(f.m.fval, 6.7638634368267949)
+    assert_almost_equal(f.m.fval, 6.7638634368267949, 4)
 
 test_fit2.long = 1
