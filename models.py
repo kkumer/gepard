@@ -156,27 +156,38 @@ class ComptonDispersionRelations(ComptonFormFactors):
 class ComptonModelDR(ComptonDispersionRelations):
     """Model for CFFs as in arXiv:0904.0458."""
 
-    # Attribute-access parameter dictionary with default values
-    pars = AttrDict({
-          'NS' : 1.5,       
-         'alS' : 1.13,      
-        'alpS' : 0.15,      
-          'MS' : 0.707,       
-          'rS' : 1.0,       
-          'bS' : 2.0,   
-          'Nv' : 1.35,      
-         'alv' : 0.43,      
-        'alpv' : 0.85,      
-          'Mv' : 1.011,
-          'rv' : 0.496383,  
-          'bv' : 2.15682,   
-           'C' : 6.90484,   
-          'MC' : 1.33924,
-          'tNv' : 0.6,      
-          'tMv' : 2.69667,
-          'trv' : 5.97923,  
-          'tbv' : 3.25607
-          })
+    # initial values of parameters, whether they are fixed and their limits
+    parameter_dict = {
+          'NS' : 1.5,      'fix_NS' : True,                                
+         'alS' : 1.13,    'fix_alS' : True,                              
+        'alpS' : 0.15,   'fix_alpS' : True,                              
+          'MS' : 0.707,    'fix_MS' : True,                                
+          'rS' : 1.0,      'fix_rS' : True,                              
+          'bS' : 2.0,      'fix_bS' : False,   'limit_bS' : (0.4, 5.0),
+          'Nv' : 1.35,     'fix_Nv' : True,                              
+         'alv' : 0.43,    'fix_alv' : True,                              
+        'alpv' : 0.85,   'fix_alpv' : True,                              
+          'Mv' : 1.0,      'fix_Mv' : False,   'limit_Mv' : (0.9, 1.1),
+          'rv' : 0.5,      'fix_rv' : True,    'limit_rv' : (0., 8.),
+          'bv' : 2.2,      'fix_bv' : True,    'limit_bv' : (0.4, 5.),
+           'C' : 7.0,       'fix_C' : False,    'limit_C' : (-10., 10.),
+          'MC' : 1.3,      'fix_MC' : False,   'limit_MC' : (0.4, 2.),
+         'tNv' : 0.0,     'fix_tNv' : True,                            
+         'tMv' : 2.7,     'fix_tMv' : True,   'limit_tMv' : (0.4, 2.),
+         'trv' : 6.0,     'fix_trv' : True,   'limit_trv' : (0., 8.),
+         'tbv' : 3.0,     'fix_tbv' : True,   'limit_tbv' : (0.4, 5.)   }
+
+    # order matters to fit.MinuitFitter, so it is defined by:
+    parameter_names = ['NS', 'alS', 'alpS', 'MS', 'rS', 'bS',
+                       'Nv', 'alv', 'alpv', 'Mv', 'rv', 'bv',
+                       'C', 'MC',
+                       'tNv', 'tMv', 'trv', 'tbv']
+
+    # FIXME: Following dict is used by model, while the above one is used
+    # by fitter fcn function. This should be unified somehow
+    pars = AttrDict([(n, parameter_dict[n]) for n in parameter_names])
+    #parameter_values = [pars[key] for key in parameter_names]
+
 
     def subtraction(self, pt, pars={}):
         return pars.C/(1.-pt.t/pars.MC**2)**2

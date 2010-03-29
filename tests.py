@@ -4,25 +4,40 @@ Just run 'nosetest' in the pype directory.
 
 """
 
+import copy
 from nose.tools import *
 import numpy as np
 
-import utils, models, Approach
-from fits import DMGLO1  #use some testpars here?
+import utils, models, Approach, fit
+from results import DMGLO1  #use some testpars here?
 
 ff = models.ModelDR()
+ff.parameter_dict.update(DMGLO1)
+ff.parameter_dict.update({'fix_C':True, 'fix_MC':True})
 b = Approach.hotfixedBMK(ff, optimization = False)
 
 data = utils.loaddata('data/ep2epgamma')  #FIXME: write tests without dependence on data
-pt0 = data[31][12]  # was data[1][0]
+# testing data point
+pt0 = copy.deepcopy(data[31][12])  # was data[1][0]
 pt0.in1polarization = 1
 pt0.in1charge = -1
 pt0.to_conventions(b)
 pt0.prepare(b)
+# testing data set
+testpoints = [data[31][12]] + [data[8][1]] + [data[29][2]] + [data[30][3]]
+[pt.to_conventions(b) for pt in testpoints]
+[pt.prepare(b) for pt in testpoints]
+# testing data set for fits
+fitpoints = data[31][12:14] + data[8][1:3] + data[30][2:4]
+[pt.to_conventions(b) for pt in fitpoints]
+[pt.prepare(b) for pt in fitpoints]
 
 def test_CFF():
-    assert_almost_equal(ff.ImH(pt0), 17.681527454585797)
-    assert_almost_equal(ff.ReH(pt0), -2.471928504474433)
+    assert_almost_equal(ff.ImH(pt0), 17.695607175490565)
+    assert_almost_equal(ff.ReH(pt0), -2.529020432735325)
+    # Old non-generic model
+    #assert_almost_equal(ff.ImH(pt0), 17.681527454585797)
+    #assert_almost_equal(ff.ReH(pt0), -2.471928504474433)
 
 def test_Xunp():
     assert_almost_equal(b.Xunp(pt0, DMGLO1, vars={'phi':1.}), 1.8934179005138172)
@@ -53,13 +68,17 @@ test_Xunp4.newfeature = 1
 
 def test_fit():
     """Testing set of fitting observables."""
-    fitpoints = [data[31][12]] + [data[8][1]] + [data[29][2]] + [data[30][3]]
-    pt0.in1charge = 1
-    [pt.prepare(b) for pt in fitpoints]
     chisq = 0.
-    for pt in fitpoints:
+    for pt in testpoints:
         chisq = chisq + (
                 (getattr(b, pt.yaxis)(pt, DMGLO1) - pt.val)**2 / pt.err**2 )
     assert_almost_equal(chisq, 5.115294374919535)
 
-test_fit.slow = 5
+
+def test_fit2():
+    """Testing actual fitting by FitterMinuit."""
+    f = fit.FitterMinuit(fitpoints, b, ff)
+    f.fit()
+    assert_almost_equal(f.m.fval, 6.7638634368267949)
+
+test_fit2.long = 1
