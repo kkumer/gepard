@@ -1,9 +1,12 @@
 #!/usr/bin/env python
 
+import pickle
+
 import utils 
 import models
 import Approach
 import fit
+import plots
 
 from constants import *
 from results import *
@@ -28,7 +31,7 @@ fitpoints = data[31][12:14] + data[8][1:3] + data[30][2:4]  # test set
 # [4] Do the fit
 
 ff.parameter_dict.update(DMGLO1)
-ff.parameter_dict.update({'fix_C':True, 'fix_MC':True})
+ff.parameter_dict.update(
+        {'fix_bS':False, 'fix_Mv':False, 'fix_C':True, 'fix_MC':True})
 f = fit.FitterMinuit(fitpoints, b, ff)
-#f.fit()
-f.printres()
+#toy = f.fit()

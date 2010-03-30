@@ -8,9 +8,6 @@ try: # if you have ROOT you might want minuit2
 except:
     from minuit import Minuit
 
-import utils 
-from scipy.special import gammainc
-
 
 class Fitter(object):
     """Superclass for fitting procedures/algorithms."""
@@ -24,6 +21,7 @@ class FitterMinuit(Fitter):
     def __init__(self, fitpoints, approach, model, **kwargs):
         self.fitpoints = fitpoints
         self.approach = approach
+        self.model = model
 
         # FIXME: ugly hack because Minuit counts the arguments of fcn so 'self'
         #        is not allowed
@@ -47,23 +45,10 @@ def fcn(%s):
             setattr(self.m, key, kwargs[key])
 
 
-    def printres(self, printsigmas=0):
-        """Print out the fitting result (chi-squares)."""
-        nfreepars=utils.npars(self.m)
-        dof = len(self.fitpoints) - nfreepars
-        sigmas = [(getattr(self.approach, pt.yaxis)(pt, self.m.values) - pt.val) / pt.err for
-                    pt in self.fitpoints]
-        chi = sum(s*s for s in sigmas)  # equal to m.fval if minuit fit is done
-        fitprob = (1.-gammainc(dof/2., chi/2.)) # probability of this chi-sq
-        fitres = (chi, dof, fitprob)
-        print 'P(chi-square, d.o.f) = P(%1.2f, %2d) = %5.4f' % fitres
-        if printsigmas:
-            print sigmas
-            utils.prettyprint(sigmas)
-
     def fit(self):
         self.m.migrad()
         print "ncalls = ", self.m.ncalls
-        print printres()
+        print self.model.prettyprint(self.fitpoints, self.approach)
+        return self.model
 
 

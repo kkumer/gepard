@@ -16,7 +16,7 @@ DummyPoint -- class for points which have just few relevant attributes
 
 import os, re, math
 
-import pylab as plt
+# import pylab as plt
 
 import utils
 from constants import Mp, Mp2
@@ -202,26 +202,26 @@ class DataSet(list):
         tmp.__dict__ = self.__dict__.copy() # transfer the attributes
         return tmp
 
-    def plot(self, xaxis=None, kinlabels=[], fits=[], path=None, fmt='png'):
-        """Plot the dataset, with fit lines if needed.
+    #def plot(self, xaxis=None, kinlabels=[], fits=[], path=None, fmt='png'):
+    #    """Plot the dataset, with fit lines if needed.
 
-        Named arguments correspond to those of `utils.subplot`.
-        If path to directory is given, figure is saved there in format `fmt`.
+    #    Named arguments correspond to those of `utils.subplot`.
+    #    If path to directory is given, figure is saved there in format `fmt`.
 
-        """
+    #    """
 
-        title = self.filename
-        fig = plt.figure()
-        fig.canvas.set_window_title(title)
-        fig.suptitle(title)
-        ax = fig.add_subplot(111)
-        utils.subplot(ax, [self], xaxis, kinlabels, fits)
-        if path:
-            fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
-        else:
-            fig.canvas.draw()
-            fig.show()
-        return 
+    #    title = self.filename
+    #    fig = plt.figure()
+    #    fig.canvas.set_window_title(title)
+    #    fig.suptitle(title)
+    #    ax = fig.add_subplot(111)
+    #    utils.subplot(ax, [self], xaxis, kinlabels, fits)
+    #    if path:
+    #        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+    #    else:
+    #        fig.canvas.draw()
+    #        fig.show()
+    #    return 
 
 
 class DummyPoint(object):

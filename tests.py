@@ -13,7 +13,7 @@ from results import DMGLO1  #use some testpars here?
 
 ff = models.ModelDR()
 ff.parameter_dict.update(DMGLO1)
-ff.parameter_dict.update({'fix_C':True, 'fix_MC':True})
+ff.parameter_dict.update({'fix_bS':False, 'fix_Mv':False})
 b = Approach.hotfixedBMK(ff, optimization = False)
 
 data = utils.loaddata('data/ep2epgamma', approach=b)  
