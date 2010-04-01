@@ -1,10 +1,12 @@
+from IPython.Debugger import Tracer; debug_here = Tracer()
 
+import copy
 
 from numpy import sin, cos, pi, sqrt
 
+import utils
 from quadrature import Hquadrature
 from constants import *
-from utils import AttrDict, fill_kinematics
 
 class Approach(object):
     """Class of approaches to calculation of observables.
@@ -329,33 +331,31 @@ class BMK(Approach):
         
         """
         if kwargs.has_key('vars'):
-            kin = fill_kinematics(kwargs['vars'], old=pt)
+            kin = utils.fill_kinematics(kwargs['vars'], old=pt)
             self.prepare(kin)
         else:
-            # just pass as reference to DataPoint
-            kin = pt
-            pass
+            # just copy everything from pt
+            kin = utils.fill_kinematics({}, old=pt)
+            self.prepare(kin)
+            ## Nothing seems to be gained by following approach:
+            #kin = dict((i, getattr(pt, i)) for i in 
+            #        ['xB', 'Q2', 'W', 's', 't', 'mt', 'phi', 'in1charge',
+            #            'in1polarization', 'in2particle'])
 
-        try:
-            kin.in1charge = pt.in1charge
-        except:
-            # FIXME: hack
-            pass
-
-        try:
-            kin.in1polarization = pt.in1polarization
-        except:
-            # FIXME: hack
-            pass
+        # copy non-kinematical info
+        for atr in ['in1charge', 'in1polarization', 'in2particle']:
+            if pt.has_key(atr):
+                setattr(kin, atr, getattr(pt, atr))
 
         if kwargs.has_key('zeropolarized') and kwargs['zeropolarized']:
-            # FIXME: check that this makes sense
             kin.in1polarization = 0
 
         if kwargs.has_key('flip') and kwargs['flip']:
-            # FIXME: check that this makes sense
-            # FIXME: polarization AND charge flip
-            setattr(kin, kwargs['flip'], - getattr(pt, kwargs['flip']))
+            if isinstance(kwargs['flip'], list):
+                for item in kwargs['flip']:
+                    setattr(kin, item, - getattr(pt, item))
+            else:
+                setattr(kin, kwargs['flip'], - getattr(pt, kwargs['flip']))
 
         if kwargs.has_key('weighted') and kwargs['weighted']:
             wgh = self.w(kin)
@@ -429,14 +429,14 @@ class BMK(Approach):
     def BCSD(self, pt, pars, **kwargs):
         """4-fold beam charge-spin cross section difference measured by COMPASS """
         R = kwargs.copy()
-        R.update({'flip':'in1polarization and in1charge'})
+        R.update({'flip':['in1polarization', 'in1charge']})
         return (self.Xunp(pt, pars, **kwargs) 
                 - self.Xunp(pt, pars, **R))/2.
 
     def BCSS(self, pt, pars, **kwargs):
         """4-fold beam charge-spin cross section sum measured by COMPASS. """
         R = kwargs.copy()
-        R.update({'flip':'in1polarization and in1charge'})
+        R.update({'flip':['in1polarization', 'in1charge']})
         return (self.Xunp(pt, pars, **kwargs) 
                 + self.Xunp(pt, pars, **R))/2.
 

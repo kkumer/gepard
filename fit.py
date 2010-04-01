@@ -2,7 +2,9 @@
 
 import sys
 
-#FIXME: this is needed only for FitterMinuit
+#FIXME: this is needed only for FitterMinuit. It should
+# not raise exception on systems without pyminuit installed
+# after another Fitter is implemented, say NN
 try: # if you have ROOT you might want minuit2
     from minuit2 import Minuit2 as Minuit
 except:
@@ -48,7 +50,8 @@ def fcn(%s):
     def fit(self):
         self.m.migrad()
         print "ncalls = ", self.m.ncalls
-        print self.model.prettyprint(self.fitpoints, self.approach)
+        self.model.print_chisq(self.fitpoints, self.approach)
+        self.model.print_parameters()
         return self.model
 
 

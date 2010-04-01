@@ -207,18 +207,12 @@ def subplot(ax, datasets, xaxis=None, kinlabels=[], fits=[]):
     """Plot datapoints together with fit/theory line(s).
 
     ax -- subplot of matplotlib's figure i.e. ax = figure.add_subplot(..)
-    dataset -- `DataSet` instance to be plotted
+    datasets --  list of `DataSet` instances to be plotted
     xaxis -- abscissa variable; if None, last of dataset.xaxes is taken
     kinlabels -- list of constant kinematic variables whose values will
                  be put on plot
     fits -- list of parameter sets/tuples describing fit curves for
             plotting. 
-
-    TODO: - fits should take some sort of model specifications
-          - fit should be real line i.e. not evaluated just at datapoints
-          - coloring second, third etc. dataset and fit differently
-          - different treatment of stat and syst errors
-          - multiple datasets on the same panel
 
     """
     # first, fix the input if needed
@@ -241,14 +235,17 @@ def subplot(ax, datasets, xaxis=None, kinlabels=[], fits=[]):
     # Fit lines
     shapes = ['s', '^', 'd', 'h']  # first squares, then triangles, diamonds, hexagons
     colors = ['red', 'green', 'brown', 'purple']  # squares are red, etc.
+    styles = ['-', '--', '-.', ':']
     fitn = 0
     for (approach, pars) in fits:
         # take abscissae from dataset
         line = [getattr(approach, pt.yaxis)(pt, pars) for pt 
-                in dataset]
-        #ax.plot(xval, line, 'r-')  # join symbols by line
-        ax.plot(xval, line, shapes[fitn], markersize=5,
-                markerfacecolor=colors[fitn], markeredgecolor='black')
+                in datasets[0]]
+        ## join the dots
+        ax.plot(xval, line, color=colors[fitn], linestyle=styles[fitn], linewidth=2)
+        ## put symbols on dots
+        #ax.plot(xval, line, shapes[fitn], markersize=5,
+        #        markerfacecolor=colors[fitn], markeredgecolor='black')
         fitn += 1
     # axes labels
     ax.set_xlabel(toTeX[xaxis], fontsize=15)
@@ -311,7 +308,6 @@ def flatten(T):
     elif len(T) == 0: return ()
     else: return flatten(T[0]) + flatten(T[1:]) 
 
-
 def listFiles(root, patterns='*', recurse=1, return_folders=0):
     """Return the list of files matching patterns, recursively.
 
@@ -344,4 +340,28 @@ def listFiles(root, patterns='*', recurse=1, return_folders=0):
 
     return arg.results
 
+
+def select(dataset, criteria=[], logic='AND'):
+    """Return list (not DataSet) of DataPoints satisfying criteria.
+
+    logic='OR': select points satisfying any
+    of the list of criteria.
+    Example: criteria=['xB > 0.1', 'y0name == BSA']
+    
+    """
+    selected = []
+    for pt in dataset:
+        if logic == 'OR':
+            for criterion in criteria:
+                if eval('pt.'+criterion):
+                    selected.append(pt)
+        elif logic == 'AND':
+            ok = True
+            for criterion in criteria:
+                if not eval('pt.'+criterion):
+                    ok = False
+                    break
+            if ok:
+                selected.append(pt)
+    return selected
 

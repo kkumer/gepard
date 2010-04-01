@@ -11,6 +11,7 @@ import pickle, sys
 from numpy import log, pi
 from numpy import ndarray, array
 from scipy.special import gammainc
+from termcolor import colored
 
 from quadrature import PVquadrature
 from utils import AttrDict, flatten, npars
@@ -19,14 +20,87 @@ from utils import AttrDict, flatten, npars
 class Model(object):
     """Base class for all models."""
 
+    def __init__(self):
+        # Intially all parameters are fixed and should be released by user
+        exec('self.fixed = {' + ", ".join(map(lambda x: "'fix_%s': %s" % x, 
+                    zip(self.parameter_names, len(self.parameter_names)*['True']))) + '}')
+        self.parameter_dict.update(self.fixed)
+
+        # FIXME: self.pars dict is used by Model, while self.parameter_dict
+        # by Fitter fcn function. This should be unified somehow
+        self.pars = AttrDict([(n, self.parameter_dict[n]) for n in self.parameter_names])
+        #parameter_values = [pars[key] for key in parameter_names]
+
     def dump(self, filename='model.pkl'):
         sys.stderr.write("WARNING: pickling Models isn't working atm!")
         f = open(filename, 'w')
         pickle.dump(self, f)
         f.close()
 
+    def release_parameters(self, *args):
+        """Release parameters for fitting.
 
-    def prettyprint(self, points, approach):
+        If allowed ranges have to be changed from default, user needs
+        to modify parameters_dict dictionary directly.
+
+        """
+        for par in args:
+            if par not in self.parameter_names:
+                raise ValueError('Parameter "%s" is not defined in model %s' 
+                        % (par, self))
+            self.fixed['fix_'+par] = False
+        self.parameter_dict.update(self.fixed)
+
+    def fix_parameters(self, *args):
+        """Fix parameters so they are not fitting variables."""
+        if args[0] == 'ALL':
+            # fix 'em all
+            for par in self.parameter_names:
+                self.fixed['fix_'+par] = True
+        else:
+            for par in args:
+                if par not in self.parameter_names:
+                    raise ValueError('Parameter "%s" is not defined in model %s' 
+                            % (par, self))
+                self.fixed['fix_'+par] = True
+        self.parameter_dict.update(self.fixed)
+
+    def print_parameters(self, compare_with=[]):
+        """Pretty-print parameters and their values.
+
+        Variable parameters are printed green, while parameters with values
+        at the limits of their range are printed red.
+        If additional models are given in compare_with list, their parameter
+        values are also printed and differences larger than 5% are denoted
+        by blue and red coloring.
+
+        """
+        s = ""
+        for name in self.parameter_names:
+            value = self.pars[name]
+            row = '%4s -> %-5.3g' % (name, value)
+            #if self.fixed['fix_'+name] == False:
+            if self.parameter_dict.has_key('limit_'+name):
+                lo, hi = self.parameter_dict['limit_'+name]
+                if (abs((lo-value)*(hi-value)) < 0.001):
+                    row = colored(row, 'red')
+            if self.parameter_dict['fix_'+name] == False:
+                row = colored(row, 'green')
+            for model in compare_with:
+                value2 =  model.pars[name]
+                app = '   %-5.3g' % value2
+                diff = (value - value2)/abs(value)
+                if diff > 0.05:
+                    app = colored(app, 'red')
+                elif diff < -0.05:
+                    app = colored(app, 'blue')
+                row += app
+            row += '\n'
+            s += row
+        print s
+
+
+    def print_chisq(self, points, approach):
         """Pretty-print the chi-square and parameter values."""
         nfreepars=npars(self)
         dof = len(points) - nfreepars
@@ -173,42 +247,37 @@ class ComptonDispersionRelations(ComptonFormFactors):
 class ComptonModelDR(ComptonDispersionRelations):
     """Model for CFFs as in arXiv:0904.0458."""
 
-    # initial values of parameters and limits on their values
-    parameter_dict = {
-          'NS' : 1.5,                                 
-         'alS' : 1.13,                              
-        'alpS' : 0.15,                              
-          'MS' : 0.707,                               
-          'rS' : 1.0,                               
-          'bS' : 2.0,     'limit_bS' : (0.4, 5.0),
-          'Nv' : 1.35,                              
-         'alv' : 0.43,                              
-        'alpv' : 0.85,                              
-          'Mv' : 1.0,     'limit_Mv' : (0.9, 1.1),
-          'rv' : 0.5,     'limit_rv' : (0., 8.),
-          'bv' : 2.2,     'limit_bv' : (0.4, 5.),
-           'C' : 7.0,      'limit_C' : (-10., 10.),
-          'MC' : 1.3,     'limit_MC' : (0.4, 2.),
-         'tNv' : 0.0,                             
-         'tMv' : 2.7,    'limit_tMv' : (0.4, 2.),
-         'trv' : 6.0,    'limit_trv' : (0., 8.),
-         'tbv' : 3.0,    'limit_tbv' : (0.4, 5.)   }
+    def __init__(self):
+        # initial values of parameters and limits on their values
+        self.parameter_dict = {
+              'NS' : 1.5,                                 
+             'alS' : 1.13,                              
+            'alpS' : 0.15,                              
+              'MS' : 0.707,                               
+              'rS' : 1.0,                               
+              'bS' : 2.0,     'limit_bS' : (0.4, 5.0),
+              'Nv' : 1.35,                              
+             'alv' : 0.43,                              
+            'alpv' : 0.85,                              
+              'Mv' : 1.0,     'limit_Mv' : (0.9, 1.1),
+              'rv' : 0.5,     'limit_rv' : (0., 8.),
+              'bv' : 2.2,     'limit_bv' : (0.4, 5.),
+               'C' : 7.0,      'limit_C' : (-10., 10.),
+              'MC' : 1.3,     'limit_MC' : (0.4, 2.),
+             'tNv' : 0.0,                             
+             'tMv' : 2.7,    'limit_tMv' : (0.4, 2.),
+             'trv' : 6.0,    'limit_trv' : (0., 8.),
+             'tbv' : 3.0,    'limit_tbv' : (0.4, 5.)   }
 
-    # order matters to fit.MinuitFitter, so it is defined by:
-    parameter_names = ['NS', 'alS', 'alpS', 'MS', 'rS', 'bS',
-                       'Nv', 'alv', 'alpv', 'Mv', 'rv', 'bv',
-                       'C', 'MC',
-                       'tNv', 'tMv', 'trv', 'tbv']
+        # order matters to fit.MinuitFitter, so it is defined by:
+        self.parameter_names = ['NS', 'alS', 'alpS', 'MS', 'rS', 'bS',
+                                'Nv', 'alv', 'alpv', 'Mv', 'rv', 'bv',
+                                'C', 'MC',
+                                'tNv', 'tMv', 'trv', 'tbv']
 
-    # Intially all parameters are fixed and should be released by user
-    exec('fixed = {' + ", ".join(map(lambda x: "'fix_%s': %s" % x, 
-                zip(parameter_names, len(parameter_names)*['True']))) + '}')
-    parameter_dict.update(fixed)
+        # now do whatever else is necessary
+        Model.__init__(self)
 
-    # FIXME: Following dict is used by model, while the above one is used
-    # by fitter fcn function. This should be unified somehow
-    pars = AttrDict([(n, parameter_dict[n]) for n in parameter_names])
-    #parameter_values = [pars[key] for key in parameter_names]
 
 
     def subtraction(self, pt, pars={}):
