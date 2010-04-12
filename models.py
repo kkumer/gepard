@@ -352,15 +352,30 @@ class ComptonNNH(ComptonFormFactors):
     
     """
     def __init__(self):
-        global nets
-        nets = pickle.load(open('nets.pkl', 'r'))
-        sys.stderr.write('Neural nets loaded from nets.pkl')
+        #self.nets = pickle.load(open('nets.pkl', 'r'))
+        #sys.stderr.write('Neural nets loaded from nets.pkl')
+        # single parameter is net index
+        self.parameter_dict = {'nnet':0}
+        self.parameter_names = ['nnet']
+        # now do whatever else is necessary
+        Model.__init__(self)
     
     def ImH(self, pt, pars={}, xi=0):
         ar = []
-        for net in nets:
+        for net in self.nets:
             ar.append(net.activate([pt.xB, pt.t]))
-        return array(ar).flatten()
+        all = array(ar).flatten()
+        if pars.has_key('nnet'):
+            if pars['nnet'] == 'ALL':
+                return all
+            else: # we want particular net
+                try:
+                    return all[pars['nnet']]
+                except IndexError:
+                    raise IndexError, str(self)+' has only '+str(len(self.nets))+' nets!'
+        # by default, we get mean value
+        else:
+            return all.mean()
 
 
 ##  --- Complete models built from the above components ---

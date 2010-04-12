@@ -321,7 +321,6 @@ class BMK(Approach):
 
 ## Observables ##
 
-    #def Xunp(self, pt, pars, vars={}, weighted=False, zeropolarized=False, flip=None):
     def Xunp(self, pt, pars, **kwargs):
         """ Calculate 4-fold differential cross section for unpolarized target. 
 
