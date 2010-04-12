@@ -30,12 +30,7 @@ class Model(object):
         # by Fitter fcn function. This should be unified somehow
         self.pars = AttrDict([(n, self.parameter_dict[n]) for n in self.parameter_names])
         #parameter_values = [pars[key] for key in parameter_names]
-
-    def dump(self, filename='model.pkl'):
-        sys.stderr.write("WARNING: pickling Models isn't working atm!")
-        f = open(filename, 'w')
-        pickle.dump(self, f)
-        f.close()
+        self.description = 'N/A'  # something human-understandable
 
     def release_parameters(self, *args):
         """Release parameters for fitting.
@@ -89,7 +84,10 @@ class Model(object):
             for model in compare_with:
                 value2 =  model.pars[name]
                 app = '   %-5.3g' % value2
-                diff = (value - value2)/abs(value)
+                # calculate relative diff, or absolute if value is zero
+                diff = value - value2
+                if value != 0:
+                    diff = diff/abs(value)
                 if diff > 0.05:
                     app = colored(app, 'red')
                 elif diff < -0.05:
@@ -98,7 +96,6 @@ class Model(object):
             row += '\n'
             s += row
         print s
-
 
     def print_chisq(self, points, approach):
         """Pretty-print the chi-square and parameter values."""

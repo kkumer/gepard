@@ -11,6 +11,8 @@ str2num -- transforms string to float or int
 prettyprint -- formatted printout of numbers
 flatten -- flattens tuples
 listFiles -- listfiles in subdirs matching pattern
+select -- selecting DataPoints according to criteria
+listdb --  listing the content of database of models
 """
 
 import os, re, string, fnmatch
@@ -365,3 +367,6 @@ def select(dataset, criteria=[], logic='AND'):
                 selected.append(pt)
     return selected
 
+def listdb(db):
+    for key in db:
+        print "%-8s --  %s" % (key, db[key].description)

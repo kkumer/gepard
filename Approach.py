@@ -4,8 +4,7 @@ import copy
 
 from numpy import sin, cos, pi, sqrt
 
-import utils
-from quadrature import Hquadrature
+import utils, quadrature
 from constants import *
 
 class Approach(object):
@@ -317,7 +316,7 @@ class BMK(Approach):
             pt.K = sqrt(pt.K2)
             pt.r = self.r(pt.Q2, pt.xB, pt.t, pt.y, pt.eps2)
             # First option is numerical, second is analytical and faster
-            #pt.intP1P2 = Hquadrature(lambda phi: P1P2(pt, phi), 0, 2.0*pi)
+            #pt.intP1P2 = quadrature.Hquadrature(lambda phi: P1P2(pt, phi), 0, 2.0*pi)
             pt.intP1P2 = self.anintP1P2(pt)
 
 ## Observables ##
@@ -394,7 +393,7 @@ class BMK(Approach):
             return  self._BSA(pt, pars, vars={'phi':pi/2.}) 
         ### Exact but slower:
         #elif pt.has_key('FTn') and pt.FTn == -1:
-        #    res = Hquadrature(lambda phi: 
+        #    res = quadrature.Hquadrature(lambda phi: 
         #            self._BSA(pt, pars, {'phi':phi}) * sin(phi), 0, 2*pi)
         #    return  res / pi
 
@@ -418,11 +417,11 @@ class BMK(Approach):
         if pt.has_key('phi'):
             return self._BCA(pt, pars)
         elif pt.has_key('FTn') and pt.FTn == 0:
-            res = Hquadrature(lambda phi: 
+            res = quadrature.Hquadrature(lambda phi: 
                     self._BCA(pt, pars, vars={'phi':phi}), 0, 2.0*pi)
             return res / (2.0*pi)
         elif pt.has_key('FTn') and pt.FTn == 1:
-            res = Hquadrature(lambda phi: 
+            res = quadrature.Hquadrature(lambda phi: 
                     self._BCA(pt, pars, vars={'phi':phi}) * cos(phi), 0, 2*pi)
             return  - res / pi
 
@@ -467,7 +466,7 @@ class BMK(Approach):
     def TotalCrossSection(self, pt, pars):
         """Total DVCS cross section."""
 
-        res = Hquadrature(lambda t: self.PartialCrossSection4int(t, pt, pars), 0, 1)
+        res = quadrature.Hquadrature(lambda t: self.PartialCrossSection4int(t, pt, pars), 0, 1)
         return res
 
     def BCA0minusr1(self, pt, pars):
@@ -492,9 +491,9 @@ class BMK(Approach):
     def XwA(self, pt, pars):
         """Ratio of first two cos harmonics of w-weighted cross section. In BMK, not Trento??"""
 
-        b0 = Hquadrature(lambda phi: self.BSS(pt, pars, vars={'phi':phi}, weighted=True), 
+        b0 = quadrature.Hquadrature(lambda phi: self.BSS(pt, pars, vars={'phi':phi}, weighted=True), 
                 0, 2.0*pi) / (2.0*pi)
-        b1 = Hquadrature(lambda phi: self.BSS(pt, pars, vars={'phi':phi}, weighted=True) * cos(phi), 
+        b1 = quadrature.Hquadrature(lambda phi: self.BSS(pt, pars, vars={'phi':phi}, weighted=True) * cos(phi), 
                 0, 2.0*pi) / pi
         return b1/b0
 
