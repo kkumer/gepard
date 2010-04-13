@@ -22,8 +22,8 @@ data = utils.loaddata('data/ep2epgamma', approach=b)
 pt0 = copy.deepcopy(data[31][12])  # was data[1][0]
 pt0.in1polarization = 1
 pt0.in1charge = -1
-pt0.to_conventions(b)
-pt0.prepare(b)
+pt0.to_conventions(Approach.BMK)
+pt0.prepare(Approach.BMK)
 # testing data set
 testpoints = [data[31][12]] + [data[8][1]] + [data[29][2]] + [data[30][3]]
 # testing data set for fits

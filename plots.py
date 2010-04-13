@@ -171,8 +171,8 @@ def COMPASS(fits=[], path=None, fmt='png'):
     #labels = ['GLO1 (DM)', 'GLO1 (KK)', '']
     pn = 0
     for (approach, pars) in fits:
-        approach.to_conventions(pt)
-        approach.prepare(pt)
+        approach.__class__.to_conventions(pt)
+        approach.__class__.prepare(pt)
         line = approach.BCSA(pt, pars, vars={'phi':np.pi - phi})
         ax.plot(phi, line, linestyles[pn], linewidth=2, label=labels[pn]) 
         pn += 1
@@ -202,8 +202,8 @@ def COMPASS(fits=[], path=None, fmt='png'):
     #labels = ['GLO1 (DM)', 'GLO1 (KK)', '']
     pn = 0
     for (approach, pars) in fits:
-        approach.to_conventions(pt)
-        approach.prepare(pt)
+        approach.__class__.to_conventions(pt)
+        approach.__class__.prepare(pt)
         # nb converted to pb:
         line = 1000. * approach.BCSD(pt, pars, vars={'phi':np.pi - phi})
         ax.plot(phi, line, linestyles[pn], linewidth=2, label=labels[pn]) 
@@ -234,8 +234,8 @@ def COMPASS(fits=[], path=None, fmt='png'):
     #labels = ['GLO1 (DM)', 'GLO1 (KK)', '']
     pn = 0
     for (approach, pars) in fits:
-        approach.to_conventions(pt)
-        approach.prepare(pt)
+        approach.__class__.to_conventions(pt)
+        approach.__class__.prepare(pt)
         # nb converted to pb:
         line = 1000. * approach.BCSS(pt, pars, vars={'phi':np.pi - phi})
         ax.plot(phi, line, linestyles[pn], linewidth=2, label=labels[pn]) 
@@ -288,8 +288,8 @@ def COMPASSt(fits=[], path=None, fmt='png'):
                 pt.frame = 'Trento'
                 pt.tm = tm
                 utils.fill_kinematics(pt)
-                approach.to_conventions(pt)
-                approach.prepare(pt)
+                approach.__class__.to_conventions(pt)
+                approach.__class__.prepare(pt)
                 line.append(approach.BCSA(pt, pars))
             ax.plot(tmvals, line, linestyles[pn], linewidth=2, 
                     label=labels[pn]) 
@@ -346,8 +346,8 @@ def EIC(fits=[], path=None, fmt='png'):
     labels = ['polarized model1', 'polarized model2']
     pn = 0
     for (approach, pars) in fits:
-        approach.to_conventions(pt)
-        approach.prepare(pt)
+        approach.__class__.to_conventions(pt)
+        approach.__class__.prepare(pt)
         line = approach.Xunp(pt, pars, vars={'phi':phi})
         ax.plot(phi, line, linestyles[pn], linewidth=1, label=labels[pn]) 
         pn += 1
@@ -355,8 +355,8 @@ def EIC(fits=[], path=None, fmt='png'):
     labels = ['unpolarized model1', 'unpolarized model2']
     pn = 0
     for (approach, pars) in fits:
-        approach.to_conventions(pt)
-        approach.prepare(pt)
+        approach.__class__.to_conventions(pt)
+        approach.__class__.prepare(pt)
         lineBSS = approach.BSS(pt, pars, vars={'phi':phi})
         ax.plot(phi, lineBSS, linestyles[pn], linewidth=2, label=labels[pn]) 
         pn += 1
@@ -467,8 +467,8 @@ def HBCSA(ff, fits=[], path=None, fmt='png'):
     #labels = ['GLO1 (DM)', 'GLO1 (KK)', '']
     pn = 0
     for (approach, pars) in fits:
-        approach.to_conventions(pt)
-        approach.prepare(pt)
+        approach.__class__.to_conventions(pt)
+        approach.__class__.prepare(pt)
         line = approach.BCSA(pt, pars, vars={'phi':np.pi - phi})
         ax.plot(phi, line, linestyles[pn], linewidth=2, label=labels[pn]) 
         pn += 1

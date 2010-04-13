@@ -49,44 +49,51 @@ class BMK(Approach):
     """Implementation of formulas from hep-ph/0112108  (BMK)"""
 
     ### Kinematics ###
+    # (implemented as static and class methods)
 
-    def tmin(self, Q2, xB, eps2):
-        """BKM Eq. (31)"""
+    def tmin(Q2, xB, eps2):
+        """BMK Eq. (31)"""
         return -Q2 * ( 2. * (1.-xB)*(1. - sqrt(1.+eps2)) + eps2 ) / (
                 4. * xB * (1.-xB) + eps2 )
+    tmin = staticmethod(tmin)
 
-    def K2(self, Q2, xB, t, y, eps2):
-        """BKM Eq. (30)"""
-        tm = self.tmin(Q2, xB, eps2)
+    def K2(Q2, xB, t, y, eps2):
+        """BMK Eq. (30)"""
+        tm = BMK.tmin(Q2, xB, eps2)
         brace = sqrt(1.+eps2) + (4. * xB * (1.-xB) + eps2 ) / (
                 4. * (1.-xB) ) * (t - tm) / Q2
         return -(t/Q2) * (1.-xB) * (1.-y-y*y*eps2/4.) * (
                 1. - tm / t ) * brace
+    K2 = staticmethod(K2)
 
-    def J(self, Q2, xB, t, y, eps2):
-        """BKM below Eq. (32)"""
+    def J(Q2, xB, t, y, eps2):
+        """BMK below Eq. (32)"""
         return (1.-y-y*eps2/2.) * (1. + t/Q2) - (1.-xB)*(2.-y)*t/Q2
+    J = staticmethod(J)
 
-    def r(self, Q2, xB, t, y, eps2):
+    def r(Q2, xB, t, y, eps2):
         """DM's fitting notes, below Eq. (13)"""
-        K = sqrt(self.K2(Q2, xB, t, y, eps2))
+        K = sqrt(BMK.K2(Q2, xB, t, y, eps2))
         brace = (2.-y)**2 * K / (1.-y) + (1./K)*(t/Q2)*(1.-y)*(2.-xB)
         return - (2.-y) / (2.-2.*y+y**2) * brace
+    r = staticmethod(r)
 
-    def P1P2(self, pt):
+    def P1P2(pt):
         """ Product of Bethe-Heitler propagators, Eq(32) """
-        P1 = - ( self.J(pt.Q2, pt.xB, pt.t, pt.y, pt.eps2) + 2. * 
-                sqrt(self.K2(pt.Q2, pt.xB, pt.t, pt.y, pt.eps2)) * cos(pt.phi) ) / (
+        P1 = - ( BMK.J(pt.Q2, pt.xB, pt.t, pt.y, pt.eps2) + 2. * 
+                sqrt(BMK.K2(pt.Q2, pt.xB, pt.t, pt.y, pt.eps2)) * cos(pt.phi) ) / (
                         pt.y * (1. + pt.eps2) )
         P2 = 1. + pt.t / pt.Q2  - P1
         return P1 * P2
+    P1P2 = staticmethod(P1P2)
 
-    def anintP1P2(self, pt):
+    def anintP1P2(pt):
         """ Analitical integral of \int P1 P2 d\phi """
         xB, Q2, t, y, eps2, K2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2, pt.K2
         brace = ( (1 - y - (1+eps2/2.) * y**2 * eps2/2.) * (1. + t/Q2)**2 +
                   2.*K2 - (1.-xB)*(2.-y)**2 * (1. + xB*t/Q2) * t/Q2 )
         return -2. * pi * brace / (1+eps2)**2 / y**2
+    anintP1P2 = staticmethod(anintP1P2)
 
     def PreFacSigma(self, pt):
         """ Prefactor of 4-fold xs. Take prefactor in Eq(22) times 2\pi because of proton Phi integration
@@ -95,7 +102,7 @@ class BMK(Approach):
 
     def PreFacBH(self, pt):
         """ Prefactor from Eq. (25), without e^6 """
-        return 1./(pt.xB**2 * pt.y**2 * (1.+pt.eps2)**2 * pt.t * self.P1P2(pt))
+        return 1./(pt.xB**2 * pt.y**2 * (1.+pt.eps2)**2 * pt.t * pt.P1P2)
 
     def PreFacDVCS(self, pt):
         """ Prefactor from Eq. (26), without e^6 """
@@ -103,12 +110,57 @@ class BMK(Approach):
 
     def PreFacINT(self, pt):
         """ Prefactor from Eq. (27), without e^6 """
-        return 1./(pt.xB * pt.y**3 * pt.t * self.P1P2(pt))
+        return 1./(pt.xB * pt.y**3 * pt.t * pt.P1P2)
 
     def w(self, pt):
         """ Weight factor removing BH propagators from INT and BH amplitudes. 
         It is normalized to \int_0^2pi w = 1, and not 2pi as in BMK. """
-        return self.P1P2(pt) / self.anintP1P2(pt)
+        return pt.P1P2 / pt.intP1P2
+
+    def to_conventions(pt):
+        """Transform stuff into Approach's conventions."""
+        ##  --- go to BMK conventions ----
+        # C1. azimutal angle phi should be in radians ...
+        if pt.has_key('phi'):
+            if pt.units['phi'][:3]== 'deg': # deg, degree, degrees -> radians
+                pt.phi = pt.phi * pi / 180.
+                pt.newunits['phi'] = 'rad'
+        # C2. ... and in BMK convention. `frame` attribute is
+        # obligatory for phi-dependent data.
+            if pt.frame == 'Trento':  # Trento -> BMK
+                pt.phi = pi - pt.phi
+                pt.newframe = 'BMK'
+    to_conventions = staticmethod(to_conventions)
+
+    def from_conventions(pt):
+        """Transform stuff from Approach's conventions into original data's."""
+        # C1. azimutal angle phi should be in radians ...
+        if pt.has_key('phi'):
+            if pt.units['phi'][:3]== 'deg': # deg, degree, degrees -> radians
+                pt.phi = pt.phi * pi / 180.
+                pt.units['phi'] = 'rad'
+        # C2. ... and in BKM convention. `frame` attribute is
+        # obligatory for phi-dependent data.
+            if pt.frame == 'Trento':  # Trento -> BKM
+                pt.phi = pi - pt.phi
+    from_conventions = staticmethod(from_conventions)
+
+    def prepare(pt):
+        """Pre-calculate GPD-independent kinamatical constants and functions."""
+        pt.y = (pt.W**2 + pt.Q2 - Mp2) / (pt.s - Mp2)
+        pt.eps = 2. * pt.xB * Mp / sqrt(pt.Q2)
+        pt.eps2 = pt.eps**2
+        if pt.has_key('t'):
+            pt.J = BMK.J(pt.Q2, pt.xB, pt.t, pt.y, pt.eps2)
+            pt.K2 = BMK.K2(pt.Q2, pt.xB, pt.t, pt.y, pt.eps2)
+            pt.K = sqrt(pt.K2)
+            pt.r = BMK.r(pt.Q2, pt.xB, pt.t, pt.y, pt.eps2)
+            # First option is numerical, second is analytical and faster
+            #pt.intP1P2 = quadrature.Hquadrature(lambda phi: P1P2(pt, phi), 0, 2.0*pi)
+            pt.intP1P2 = BMK.anintP1P2(pt)
+        if pt.has_key('phi'):
+            pt.P1P2 = BMK.P1P2(pt)
+    prepare = staticmethod(prepare)
 
 
     ################################################
@@ -277,48 +329,6 @@ class BMK(Approach):
     #    BKM Eq. (27) - FIXME: only twist two """
     #    return  - pt.in1charge * self.PreFacINT(pt) * self.sINT1unp(pt, pars) * sin(pt.phi)
 
-       
-
-    def to_conventions(self, pt):
-        """Transform stuff into Approach's conventions."""
-        ##  --- go to BMK conventions ----
-        # C1. azimutal angle phi should be in radians ...
-        if pt.has_key('phi'):
-            if pt.units['phi'][:3]== 'deg': # deg, degree, degrees -> radians
-                pt.phi = pt.phi * pi / 180.
-                pt.newunits['phi'] = 'rad'
-        # C2. ... and in BMK convention. `frame` attribute is
-        # obligatory for phi-dependent data.
-            if pt.frame == 'Trento':  # Trento -> BMK
-                pt.phi = pi - pt.phi
-                pt.newframe = 'BMK'
-
-    def from_conventions(self, pt):
-        """Transform stuff from Approach's conventions into original data's."""
-        # C1. azimutal angle phi should be in radians ...
-        if pt.has_key('phi'):
-            if pt.units['phi'][:3]== 'deg': # deg, degree, degrees -> radians
-                pt.phi = pt.phi * pi / 180.
-                pt.units['phi'] = 'rad'
-        # C2. ... and in BKM convention. `frame` attribute is
-        # obligatory for phi-dependent data.
-            if pt.frame == 'Trento':  # Trento -> BKM
-                pt.phi = pi - pt.phi
-
-    def prepare(self, pt):
-        """Pre-calculate GPD-independent kinamatical constants and functions."""
-        pt.y = (pt.W**2 + pt.Q2 - Mp2) / (pt.s - Mp2)
-        pt.eps = 2. * pt.xB * Mp / sqrt(pt.Q2)
-        pt.eps2 = pt.eps**2
-        if pt.has_key('t'):
-            pt.J = self.J(pt.Q2, pt.xB, pt.t, pt.y, pt.eps2)
-            pt.K2 = self.K2(pt.Q2, pt.xB, pt.t, pt.y, pt.eps2)
-            pt.K = sqrt(pt.K2)
-            pt.r = self.r(pt.Q2, pt.xB, pt.t, pt.y, pt.eps2)
-            # First option is numerical, second is analytical and faster
-            #pt.intP1P2 = quadrature.Hquadrature(lambda phi: P1P2(pt, phi), 0, 2.0*pi)
-            pt.intP1P2 = self.anintP1P2(pt)
-
 ## Observables ##
 
     def Xunp(self, pt, pars, **kwargs):
@@ -330,11 +340,11 @@ class BMK(Approach):
         """
         if kwargs.has_key('vars'):
             kin = utils.fill_kinematics(kwargs['vars'], old=pt)
-            self.prepare(kin)
+            BMK.prepare(kin)
         else:
             # just copy everything from pt
             kin = utils.fill_kinematics({}, old=pt)
-            self.prepare(kin)
+            BMK.prepare(kin)
             ## Nothing seems to be gained by following approach:
             #kin = dict((i, getattr(pt, i)) for i in 
             #        ['xB', 'Q2', 'W', 's', 't', 'mt', 'phi', 'in1charge',
