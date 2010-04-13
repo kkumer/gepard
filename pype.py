@@ -11,18 +11,23 @@ import plots
 from constants import *
 from results import *
 
+# [1] Load data and models
+
+data = utils.loaddata('data/ep2epgamma')  # dictionary {1 : DataSet instance, ...}
+db = shelve.open('models.db')
+
+DMGLO = db['DMGLO']
+DMGLO1 = db['DMGLO1']
+KKGLO1 = db['KKGLO1']
+
 # [1] Choose theoretical approach
 
 mDR = models.ModelDR()
 mNN = models.ModelNN()
 #bmk = Approach.BMK()
-bDR = Approach.hotfixedBMK(mDR, optimization = False)  # no optimizations
-#bNN = Approach.hotfixedBMK(mNN, optimization = False)  # no optimizations
+t = Approach.hotfixedBMK(mDR)
+#tNN = Approach.hotfixedBMK(mNN)
 
-# [2] Load data and models
-
-data = utils.loaddata('data/ep2epgamma', approach=bDR)  # dictionary {1 : DataSet instance, ...}
-db = shelve.open('models.db')
 
 ## [3] Choose subset of datapoints for fitting
 

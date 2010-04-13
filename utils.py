@@ -18,7 +18,7 @@ listdb --  listing the content of database of models
 import os, re, string, fnmatch
 import numpy as np
 
-import Data
+import Data, Approach
 from constants import toTeX, Mp, Mp2
 
 #from IPython.Debugger import Tracer; debug_here = Tracer()
@@ -73,8 +73,13 @@ class AttrDict(dict):
         return ch
 
 
-def loaddata(datadir='data', approach=None):
-    """Return dictionary {id : `DataSet`, ...}  out of datadir/*dat files."""
+def loaddata(datadir='data', approach=Approach.hotfixedBMK):
+    """Return dictionary {id : `DataSet`, ...}  out of datadir/*dat files.
+    
+    approach defines conventions for frame, kinematics etc. to which data
+    is adapted. By default it is hotfixedBMK (Belitsky, Mueller).
+    
+    """
     data = {}
     for file in os.listdir(datadir):
         if os.path.splitext(file)[1] == ".dat":

@@ -11,12 +11,13 @@ import numpy as np
 import utils, models, Approach, fit
 from results import DMGLO1  #use some testpars here?
 
+data = utils.loaddata('data/ep2epgamma')  
+
 m = models.ModelDR()
 m.parameters.update(DMGLO1)
 m.release_parameters('bS', 'Mv')
 t = Approach.hotfixedBMK(m, optimization = False)
 
-data = utils.loaddata('data/ep2epgamma', approach=t)  
 # testing data point
 pt0 = copy.deepcopy(data[31][12])  # was data[1][0]
 pt0.in1polarization = 1
