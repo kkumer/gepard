@@ -239,9 +239,9 @@ def subplot(ax, datasets, xaxis=None, kinlabels=[], fits=[]):
     colors = ['red', 'green', 'brown', 'purple']  # squares are red, etc.
     styles = ['-', '--', '-.', ':']
     fitn = 0
-    for (approach, pars) in fits:
+    for theory in fits:
         # take abscissae from dataset
-        line = [getattr(approach, pt.yaxis)(pt, pars) for pt 
+        line = [getattr(theory, pt.yaxis)(pt) for pt 
                 in datasets[0]]
         ## join the dots
         ax.plot(xval, line, color=colors[fitn], linestyle=styles[fitn], linewidth=2)

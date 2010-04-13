@@ -20,38 +20,37 @@ class FitterMinuit(Fitter):
 
 
 
-    def __init__(self, fitpoints, approach, model, **kwargs):
+    def __init__(self, fitpoints, theory, **kwargs):
         self.fitpoints = fitpoints
-        self.approach = approach
-        self.model = model
+        self.theory = theory
 
         # FIXME: ugly hack because Minuit counts the arguments of fcn so 'self'
         #        is not allowed
         # fcnargs = "NS, alS, ..."
         # pardict = "'NS': NS, 'alS': alS, ..."
-        fcnargs = ", ".join(model.parameter_names) 
+        fcnargs = ", ".join(theory.model.parameter_names) 
         pardict = ", ".join(map(lambda x: "'%s': %s" % x, 
-                          zip(model.parameter_names, model.parameter_names)))
+                          zip(theory.model.parameter_names, theory.model.parameter_names)))
         exec(
 """
 def fcn(%s):
-    pars = {%s}
+    theory.model.parameters.update({%s})
     chisq = 0.
     for pt in fitpoints:
         chisq = chisq + (
-                (getattr(approach, pt.yaxis)(pt, pars) - pt.val)**2 / pt.err**2 )
+                (getattr(theory, pt.yaxis)(pt) - pt.val)**2 / pt.err**2 )
     return chisq
 """ % (fcnargs, pardict), locals(),locals())
-        self.m = Minuit(fcn, **model.parameter_dict)
+        self.minuit = Minuit(fcn, **theory.model.parameters)
         for key in kwargs:
-            setattr(self.m, key, kwargs[key])
+            setattr(self.minuit, key, kwargs[key])
 
 
     def fit(self):
-        self.m.migrad()
-        print "ncalls = ", self.m.ncalls
-        self.model.print_chisq(self.fitpoints, self.approach)
-        self.model.print_parameters()
-        return self.model
+        self.minuit.migrad()
+        print "ncalls = ", self.minuit.ncalls
+        self.theory.model.print_chisq(self.fitpoints, self.theory)
+        self.theory.model.print_parameters()
+        return self.theory.model
 
 

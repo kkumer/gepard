@@ -32,7 +32,7 @@ fitpoints = data[31][12:14] + data[8][1:3] + data[30][2:4]  # test set
 
 ## [4] Do the fit
 
-#ff.parameter_dict.update(DMGLO1)
+#ff.parameters.update(DMGLO1)
 #ff.release_parameters('bS', 'Mv')
 #f = fit.FitterMinuit(fitpoints, b, ff)
 ##toy = f.fit()

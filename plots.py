@@ -72,7 +72,7 @@ def HERMES09(data, fits=[], path=None, fmt='png'):
     return fig
 
 def CLAS(data, fits=[], path=None, fmt='png'):
-    """Makes plot of CLAS BSA data with fit line defined by pars"""
+    """Makes plot of CLAS BSA data with fit lines"""
 
     #datafile = "data/ep2epgamma-ALU-CLAS_KK-07.dat" # id = 25
     dataset = data[25]
@@ -112,7 +112,7 @@ def CLAS(data, fits=[], path=None, fmt='png'):
     return fig
 
 def HALLA(data, fits=[], path=None, fmt='png'):
-    """Makes plot of HALL-A data with fit line defined by pars"""
+    """Makes plot of HALL-A data with fit lines"""
 
     ids = [9, 14, 20, 21, 23, 24]
     subsets = {}
@@ -170,10 +170,10 @@ def COMPASS(fits=[], path=None, fmt='png'):
     labels = ['HERMES+CLAS', 'HERMES+CLAS+HALLA', '+HALLA(phi)']
     #labels = ['GLO1 (DM)', 'GLO1 (KK)', '']
     pn = 0
-    for (approach, pars) in fits:
+    for approach in fits:
         approach.__class__.to_conventions(pt)
         approach.__class__.prepare(pt)
-        line = approach.BCSA(pt, pars, vars={'phi':np.pi - phi})
+        line = approach.BCSA(pt, vars={'phi':np.pi - phi})
         ax.plot(phi, line, linestyles[pn], linewidth=2, label=labels[pn]) 
         pn += 1
     #ax.set_ylim(0.0, 0.5)
@@ -201,11 +201,11 @@ def COMPASS(fits=[], path=None, fmt='png'):
     labels = ['HERMES+CLAS', 'HERMES+CLAS+HALLA', '+HALLA(phi)']
     #labels = ['GLO1 (DM)', 'GLO1 (KK)', '']
     pn = 0
-    for (approach, pars) in fits:
+    for approach in fits:
         approach.__class__.to_conventions(pt)
         approach.__class__.prepare(pt)
         # nb converted to pb:
-        line = 1000. * approach.BCSD(pt, pars, vars={'phi':np.pi - phi})
+        line = 1000. * approach.BCSD(pt, vars={'phi':np.pi - phi})
         ax.plot(phi, line, linestyles[pn], linewidth=2, label=labels[pn]) 
         pn += 1
     #ax.set_ylim(0.0, 0.5)
@@ -233,11 +233,11 @@ def COMPASS(fits=[], path=None, fmt='png'):
     labels = ['HERMES+CLAS', 'HERMES+CLAS+HALLA', '+HALLA(phi)']
     #labels = ['GLO1 (DM)', 'GLO1 (KK)', '']
     pn = 0
-    for (approach, pars) in fits:
+    for approach in fits:
         approach.__class__.to_conventions(pt)
         approach.__class__.prepare(pt)
         # nb converted to pb:
-        line = 1000. * approach.BCSS(pt, pars, vars={'phi':np.pi - phi})
+        line = 1000. * approach.BCSS(pt, vars={'phi':np.pi - phi})
         ax.plot(phi, line, linestyles[pn], linewidth=2, label=labels[pn]) 
         pn += 1
     #ax.set_ylim(0.0, 0.5)
@@ -268,7 +268,7 @@ def COMPASSt(fits=[], path=None, fmt='png'):
         linestyles = ['g--', 'b-', 'r-.']
         labels = ['HERMES+CLAS', 'HERMES+CLAS+HALLA', '+HALLA(phi)']
         pn = 0
-        for (approach, pars) in fits:
+        for approach in fits:
             line = []
             tmvals = []
             for tm in np.arange(0.05, 0.6, 0.02):
@@ -290,7 +290,7 @@ def COMPASSt(fits=[], path=None, fmt='png'):
                 utils.fill_kinematics(pt)
                 approach.__class__.to_conventions(pt)
                 approach.__class__.prepare(pt)
-                line.append(approach.BCSA(pt, pars))
+                line.append(approach.BCSA(pt))
             ax.plot(tmvals, line, linestyles[pn], linewidth=2, 
                     label=labels[pn]) 
             pn += 1
@@ -345,19 +345,19 @@ def EIC(fits=[], path=None, fmt='png'):
     linestyles = ['g--', 'b-']
     labels = ['polarized model1', 'polarized model2']
     pn = 0
-    for (approach, pars) in fits:
+    for approach in fits:
         approach.__class__.to_conventions(pt)
         approach.__class__.prepare(pt)
-        line = approach.Xunp(pt, pars, vars={'phi':phi})
+        line = approach.Xunp(pt, vars={'phi':phi})
         ax.plot(phi, line, linestyles[pn], linewidth=1, label=labels[pn]) 
         pn += 1
     linestyles = ['r-.', 'p:']
     labels = ['unpolarized model1', 'unpolarized model2']
     pn = 0
-    for (approach, pars) in fits:
+    for approach in fits:
         approach.__class__.to_conventions(pt)
         approach.__class__.prepare(pt)
-        lineBSS = approach.BSS(pt, pars, vars={'phi':phi})
+        lineBSS = approach.BSS(pt, vars={'phi':phi})
         ax.plot(phi, lineBSS, linestyles[pn], linewidth=2, label=labels[pn]) 
         pn += 1
     #ax.set_ylim(0.0, 0.5)
@@ -391,12 +391,12 @@ def H(ff, fits=[], path=None, fmt='png'):
     linestyles = ['g--', 'b-', 'r-.']
     labels = ['HERMES+CLAS', 'HERMES+CLAS+HALLA', '+HALLA(phi)']
     pn = 0
-    for (approach, pars) in fits:
+    for approach in fits:
         pt.t = 0.0
         # kludge alert!
-        line1 = xval * ff.ImH(pt, pars, xval) / np.pi
+        line1 = xval * ff.ImH(pt, xval) / np.pi
         pt.t = -0.3
-        line2 = xval * ff.ImH(pt, pars, xval) / np.pi
+        line2 = xval * ff.ImH(pt, xval) / np.pi
         ax.plot(xval, line1, linestyles[pn], linewidth=2)
         ax.plot(xval, line2, linestyles[pn], linewidth=4, label=labels[pn]) 
         pn += 1
@@ -431,12 +431,12 @@ def HBCSA(ff, fits=[], path=None, fmt='png'):
     xval = np.power(10., np.arange(-3.5, 0, 0.01)) 
     linestyles = ['g--', 'b-', 'r-.']
     pn = 0
-    for (approach, pars) in fits:
+    for approach in fits:
         pt.t = 0.0
         # kludge alert!
-        line1 = xval * ff.ImH(pt, pars, xval) / np.pi
+        line1 = xval * ff.ImH(pt, xval) / np.pi
         pt.t = -0.3
-        line2 = xval * ff.ImH(pt, pars, xval) / np.pi
+        line2 = xval * ff.ImH(pt, xval) / np.pi
         ax.plot(xval, line1, linestyles[pn])
         ax.plot(xval, line2, linestyles[pn], linewidth=2) 
         pn += 1
@@ -466,10 +466,10 @@ def HBCSA(ff, fits=[], path=None, fmt='png'):
     labels = ['HERMES+CLAS', 'HERMES+CLAS+HALLA', '+HALLA(phi)']
     #labels = ['GLO1 (DM)', 'GLO1 (KK)', '']
     pn = 0
-    for (approach, pars) in fits:
+    for approach in fits:
         approach.__class__.to_conventions(pt)
         approach.__class__.prepare(pt)
-        line = approach.BCSA(pt, pars, vars={'phi':np.pi - phi})
+        line = approach.BCSA(pt, vars={'phi':np.pi - phi})
         ax.plot(phi, line, linestyles[pn], linewidth=2, label=labels[pn]) 
         pn += 1
     #ax.set_ylim(0.0, 0.5)

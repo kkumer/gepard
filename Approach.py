@@ -26,20 +26,22 @@ class Approach(object):
     """
 
 
-    def __init__(self, ff, optimization=False):
+    def __init__(self, m, optimization=False):
+        """Initialize with m as instance of Model class."""
+        self.model = m
         global F1, F2 
         global ImcffH, RecffH, ImcffE, RecffE
         global ImcffHt, RecffHt, ImcffEt, RecffEt
-        F1 = ff.F1
-        F2 = ff.F2
-        ImcffH = ff.ImH
-        RecffH = ff.ReH
-        ImcffE = ff.ImE
-        RecffE = ff.ReE
-        ImcffHt = ff.ImHt
-        RecffHt = ff.ReHt
-        ImcffEt = ff.ImEt
-        RecffEt = ff.ReEt
+        F1 = m.F1
+        F2 = m.F2
+        ImcffH = m.ImH
+        RecffH = m.ReH
+        ImcffE = m.ImE
+        RecffE = m.ReE
+        ImcffHt = m.ImHt
+        RecffHt = m.ReHt
+        ImcffEt = m.ImEt
+        RecffEt = m.ReEt
         self.optimization = optimization
         pass
 
@@ -222,16 +224,16 @@ class BMK(Approach):
 
     # {\cal C} coefficients
 
-    def CCALDVCSunp(self, pt, pars):
+    def CCALDVCSunp(self, pt):
         """ BKM Eq. (66) """
 
         xB, t = pt.xB, pt.t
-        parenHH = ( RecffH(pt, pars)**2 + ImcffH(pt, pars)**2 
-                +  RecffHt(pt, pars)**2 + ImcffHt(pt, pars)**2 )
-        parenEH = 2.*( RecffE(pt, pars)*RecffH(pt, pars) + ImcffE(pt, pars)*ImcffH(pt, pars) 
-                +  RecffEt(pt, pars)*RecffHt(pt, pars) + ImcffEt(pt, pars)*ImcffHt(pt, pars) ) 
-        parenEE =  RecffE(pt, pars)**2 + ImcffE(pt, pars)**2 
-        parenEtEt = RecffEt(pt, pars)**2 + ImcffEt(pt, pars)**2
+        parenHH = ( RecffH(pt)**2 + ImcffH(pt)**2 
+                +  RecffHt(pt)**2 + ImcffHt(pt)**2 )
+        parenEH = 2.*( RecffE(pt)*RecffH(pt) + ImcffE(pt)*ImcffH(pt) 
+                +  RecffEt(pt)*RecffHt(pt) + ImcffEt(pt)*ImcffHt(pt) ) 
+        parenEE =  RecffE(pt)**2 + ImcffE(pt)**2 
+        parenEtEt = RecffEt(pt)**2 + ImcffEt(pt)**2
         brace = 4. * (1.-xB) * parenHH - xB**2 * parenEH - (xB**2 
                 + (2.-xB)**2 * t/(4.*Mp2)) * parenEE - xB**2 * t/(4.*Mp2) * parenEtEt
         return brace / (2.-xB)**2
@@ -244,94 +246,94 @@ class BMK(Approach):
         return 2. * (2. - 2.*pt.y + pt.y**2)
 
 
-    def cDVCS0unp(self, pt, pars):
+    def cDVCS0unp(self, pt):
         """ BKM Eq. (43) """
-        return self.CDVCSunpPP(pt) * self.CCALDVCSunp(pt, pars)
+        return self.CDVCSunpPP(pt) * self.CCALDVCSunp(pt)
 
-    def TDVCS2unp(self, pt, pars):
+    def TDVCS2unp(self, pt):
         """ DVCS amplitude squared. BKM Eq. (26) - FIXME: only twist two now """
-        return  self.PreFacDVCS(pt) * self.cDVCS0unp(pt, pars)
+        return  self.PreFacDVCS(pt) * self.cDVCS0unp(pt)
 
     #### Interference
 
-    def ReCCALINTunp(self, pt, pars):
+    def ReCCALINTunp(self, pt):
         """ Real part of BKM Eq. (69) """
 
-        return F1(pt.t)*RecffH(pt, pars) + pt.xB/(2.-pt.xB)*(F1(pt.t)+
-                F2(pt.t))*RecffHt(pt, pars) - pt.t/(4.*Mp2)*F2(pt.t)*RecffE(pt, pars)
+        return F1(pt.t)*RecffH(pt) + pt.xB/(2.-pt.xB)*(F1(pt.t)+
+                F2(pt.t))*RecffHt(pt) - pt.t/(4.*Mp2)*F2(pt.t)*RecffE(pt)
 
-    def ImCCALINTunp(self, pt, pars):
+    def ImCCALINTunp(self, pt):
         """ Imag part of BKM Eq. (69) """
 
-        return F1(pt.t)*ImcffH(pt, pars) + pt.xB/(2.-pt.xB)*(F1(pt.t)+
-                F2(pt.t))*ImcffHt(pt, pars) - pt.t/(4.*Mp2)*F2(pt.t)*ImcffE(pt, pars)
+        return F1(pt.t)*ImcffH(pt) + pt.xB/(2.-pt.xB)*(F1(pt.t)+
+                F2(pt.t))*ImcffHt(pt) - pt.t/(4.*Mp2)*F2(pt.t)*ImcffE(pt)
 
-    def ReDELCCALINTunp(self, pt, pars):
+    def ReDELCCALINTunp(self, pt):
         """ Real part of BKM Eq. (72) """
 
         fx = pt.xB / (2. - pt.xB)
-        return - fx * (F1(pt.t)+F2(pt.t)) * ( fx *(RecffH(pt, pars) 
-            + RecffE(pt, pars)) + RecffHt(pt, pars) )
+        return - fx * (F1(pt.t)+F2(pt.t)) * ( fx *(RecffH(pt) 
+            + RecffE(pt)) + RecffHt(pt) )
 
-    def ImDELCCALINTunp(self, pt, pars):
+    def ImDELCCALINTunp(self, pt):
         """ Imag part of BKM Eq. (72) """
 
         fx = pt.xB / (2. - pt.xB)
-        return - fx * (F1(pt.t)+F2(pt.t)) * ( fx *(ImcffH(pt, pars) 
-            + ImcffE(pt, pars)) + ImcffHt(pt, pars) )
+        return - fx * (F1(pt.t)+F2(pt.t)) * ( fx *(ImcffH(pt) 
+            + ImcffE(pt)) + ImcffHt(pt) )
 
-    def ReCCALINTunpEFF(self, pt, pars):
+    def ReCCALINTunpEFF(self, pt):
         return 0
 
-    def ImCCALINTunpEFF(self, pt, pars):
+    def ImCCALINTunpEFF(self, pt):
         return 0
 
-    def cINT0unpSX(self, pt, pars):
+    def cINT0unpSX(self, pt):
         """ BKM Eq. (53) - small-x approximation!! """
         return -8. * (2. - pt.y) * (2. - 2. * pt.y + pt.y**2) *  (
-                -pt.t/pt.Q2) * self.ReCCALINTunp(pt, pars)
+                -pt.t/pt.Q2) * self.ReCCALINTunp(pt)
 
-    def cINT0unp(self, pt, pars):
+    def cINT0unp(self, pt):
         """ BKM Eq. (53) """
         return -8. * (2. - pt.y) * (
-                   (2.-pt.y)**2 * pt.K2 * self.ReCCALINTunp(pt, pars) / (1.-pt.y) + 
+                   (2.-pt.y)**2 * pt.K2 * self.ReCCALINTunp(pt) / (1.-pt.y) + 
                    (pt.t/pt.Q2) * (1.-pt.y) * (2.-pt.xB) * 
-                      ( self.ReCCALINTunp(pt, pars) + self.ReDELCCALINTunp(pt, pars) ) )
+                      ( self.ReCCALINTunp(pt) + self.ReDELCCALINTunp(pt) ) )
 
-    def cINT1unp(self, pt, pars):
+    def cINT1unp(self, pt):
         """ BKM Eq. (54) """
-        return -8. * pt.K * (2. - 2. * pt.y + pt.y**2) * self.ReCCALINTunp(pt, pars)
+        return -8. * pt.K * (2. - 2. * pt.y + pt.y**2) * self.ReCCALINTunp(pt)
 
-    def sINT1unp(self, pt, pars):
+    def sINT1unp(self, pt):
         """ BKM Eq. (54) """
-        return  8. * pt.K * pt.y * (2.-pt.y) * self.ImCCALINTunp(pt, pars)
+        return  8. * pt.K * pt.y * (2.-pt.y) * self.ImCCALINTunp(pt)
 
-    def cINT2unp(self, pt, pars):
+    def cINT2unp(self, pt):
         """ BKM Eq. (55) """
-        return  -16. * pt.K2 * (2. - pt.y) / (2.-pt.xB) * self.ReCCALINTunpEFF(pt, pars)
+        return  -16. * pt.K2 * (2. - pt.y) / (2.-pt.xB) * self.ReCCALINTunpEFF(pt)
 
-    def sINT2unp(self, pt, pars):
+    def sINT2unp(self, pt):
         """ BKM Eq. (55) """
-        return  16. * pt.K2 * pt.y / (2.-pt.xB) * self.ImCCALINTunpEFF(pt, pars)
+        return  16. * pt.K2 * pt.y / (2.-pt.xB) * self.ImCCALINTunpEFF(pt)
 
-    def TINTunp(self, pt, pars):
+    def TINTunp(self, pt):
         """ BH-DVCS interference. BKM Eq. (27) - FIXME: only twist two """
-        return  - pt.in1charge * self.PreFacINT(pt) * ( self.cINT0unp(pt, pars)  
-                + self.cINT1unp(pt, pars) * cos(pt.phi)
-                #+ self.cINT2unp(pt, pars) * cos(2.*pt.phi) 
-                + pt.in1polarization * self.sINT1unp(pt, pars) * sin(pt.phi)
-                #+ lam * self.sINT2unp(pt, pars) * sin(2.*pt.phi)
+        return  - pt.in1charge * self.PreFacINT(pt) * ( self.cINT0unp(pt)  
+                + self.cINT1unp(pt) * cos(pt.phi)
+                #+ self.cINT2unp(pt) * cos(2.*pt.phi) 
+                + pt.in1polarization * self.sINT1unp(pt) * sin(pt.phi)
+                #+ lam * self.sINT2unp(pt) * sin(2.*pt.phi)
                 )
            
-    #def TINTunpd(self, pt, pars):
+    #def TINTunpd(self, pt):
     #    """ BH-DVCS interference. (Normalized) part surviving after taking difference 
     #    of two lepton longitudinal polarization states.
     #    BKM Eq. (27) - FIXME: only twist two """
-    #    return  - pt.in1charge * self.PreFacINT(pt) * self.sINT1unp(pt, pars) * sin(pt.phi)
+    #    return  - pt.in1charge * self.PreFacINT(pt) * self.sINT1unp(pt) * sin(pt.phi)
 
 ## Observables ##
 
-    def Xunp(self, pt, pars, **kwargs):
+    def Xunp(self, pt, **kwargs):
         """ Calculate 4-fold differential cross section for unpolarized target. 
 
         lam is lepton polarization \lambda .
@@ -371,121 +373,121 @@ class BMK(Approach):
             wgh = 1
 
         return wgh * self.PreFacSigma(kin) * ( self.TBH2unp(kin) 
-                + self.TINTunp(kin, pars) 
-                + self.TDVCS2unp(kin, pars) )
+                + self.TINTunp(kin) 
+                + self.TDVCS2unp(kin) )
 
-    def BSD(self, pt, pars, **kwargs):
+    def BSD(self, pt, **kwargs):
         """Calculate 4-fold helicity-dependent cross section measured by HALL A """
 
         R = kwargs.copy()
         R.update({'flip':'in1polarization'})
-        return ( self.Xunp(pt, pars, **kwargs) 
-                - self.Xunp(pt, pars, **R) ) / 2.
+        return ( self.Xunp(pt, **kwargs) 
+                - self.Xunp(pt, **R) ) / 2.
 
-    def BSS(self, pt, pars, **kwargs):
+    def BSS(self, pt, **kwargs):
         """4-fold helicity-independent cross section measured by HALL A """
         R = kwargs.copy()
         R.update({'flip':'in1polarization'})
-        return ( self.Xunp(pt, pars, **kwargs) 
-                + self.Xunp(pt, pars, **R) ) / 2.
+        return ( self.Xunp(pt, **kwargs) 
+                + self.Xunp(pt, **R) ) / 2.
 
-    def _BSA(self, pt, pars, **kwargs):
+    def _BSA(self, pt, **kwargs):
         """Calculate beam spin asymmetry (BSA)."""
-        return self.BSD(pt, pars, **kwargs) / self.BSS(pt, pars, **kwargs)
+        return self.BSD(pt, **kwargs) / self.BSS(pt, **kwargs)
 
-    def BSA(self, pt, pars):
+    def BSA(self, pt):
         """Calculate beam spin asymmetry (BSA) or its harmonics."""
         if pt.has_key('phi'):
-            return self._BSA(pt, pars)
+            return self._BSA(pt)
         elif pt.has_key('FTn') and pt.FTn == -1:
             # FIXME: faster shortcut (approximate!)
-            return  self._BSA(pt, pars, vars={'phi':pi/2.}) 
+            return  self._BSA(pt, vars={'phi':pi/2.}) 
         ### Exact but slower:
         #elif pt.has_key('FTn') and pt.FTn == -1:
         #    res = quadrature.Hquadrature(lambda phi: 
-        #            self._BSA(pt, pars, {'phi':phi}) * sin(phi), 0, 2*pi)
+        #            self._BSA(pt, {'phi':phi}) * sin(phi), 0, 2*pi)
         #    return  res / pi
 
-    def _BCA(self, pt, pars, **kwargs):
+    def _BCA(self, pt, **kwargs):
         """Calculate beam charge asymmetry (BCA)."""
 
         kwargs.update({'zeropolarized':True})
         R = kwargs.copy()
         R.update({'flip':'in1charge'})
         return (
-           self.Xunp(pt, pars, **kwargs) 
-             - self.Xunp(pt, pars, **R) )/(
-           self.Xunp(pt, pars, **kwargs )
-             + self.Xunp(pt, pars, **R) )
+           self.Xunp(pt, **kwargs) 
+             - self.Xunp(pt, **R) )/(
+           self.Xunp(pt, **kwargs )
+             + self.Xunp(pt, **R) )
         # optimized formula (remove parts which cancel anyway)
-        # return  self.TINTunp(pt, phi, 0, 1, pars) / ( 
-        #               self.TBH2unp(pt, phi) + self.TDVCS2unp(pt, phi, pars) )
+        # return  self.TINTunp(pt, phi, 0, 1) / ( 
+        #               self.TBH2unp(pt, phi) + self.TDVCS2unp(pt, phi) )
 
-    def BCA(self, pt, pars):
+    def BCA(self, pt):
         """Calculate beam charge asymmetry (BCA) or its harmonics."""
         if pt.has_key('phi'):
-            return self._BCA(pt, pars)
+            return self._BCA(pt)
         elif pt.has_key('FTn') and pt.FTn == 0:
             res = quadrature.Hquadrature(lambda phi: 
-                    self._BCA(pt, pars, vars={'phi':phi}), 0, 2.0*pi)
+                    self._BCA(pt, vars={'phi':phi}), 0, 2.0*pi)
             return res / (2.0*pi)
         elif pt.has_key('FTn') and pt.FTn == 1:
             res = quadrature.Hquadrature(lambda phi: 
-                    self._BCA(pt, pars, vars={'phi':phi}) * cos(phi), 0, 2*pi)
+                    self._BCA(pt, vars={'phi':phi}) * cos(phi), 0, 2*pi)
             return  - res / pi
 
-    def BCSD(self, pt, pars, **kwargs):
+    def BCSD(self, pt, **kwargs):
         """4-fold beam charge-spin cross section difference measured by COMPASS """
         R = kwargs.copy()
         R.update({'flip':['in1polarization', 'in1charge']})
-        return (self.Xunp(pt, pars, **kwargs) 
-                - self.Xunp(pt, pars, **R))/2.
+        return (self.Xunp(pt, **kwargs) 
+                - self.Xunp(pt, **R))/2.
 
-    def BCSS(self, pt, pars, **kwargs):
+    def BCSS(self, pt, **kwargs):
         """4-fold beam charge-spin cross section sum measured by COMPASS. """
         R = kwargs.copy()
         R.update({'flip':['in1polarization', 'in1charge']})
-        return (self.Xunp(pt, pars, **kwargs) 
-                + self.Xunp(pt, pars, **R))/2.
+        return (self.Xunp(pt, **kwargs) 
+                + self.Xunp(pt, **R))/2.
 
-    def BCSA(self, pt, pars, **kwargs):
+    def BCSA(self, pt, **kwargs):
         """Beam charge-spin asymmetry as measured by COMPASS. """
-        return  self.BCSD(pt, pars, **kwargs) / self.BCSS(pt, pars, **kwargs)
+        return  self.BCSD(pt, **kwargs) / self.BCSS(pt, **kwargs)
         ## optimized formula
-        # return  self.TINTunp(pt, phi, 0, 1, pars) / ( 
-        #       self.TBH2unp(pt, phi) + self.TDVCS2unp(pt, phi, pars) 
-        #    + (self.TINTunp(pt, phi, lam, 1, pars) + self.TINTunp(pt, phi, -lam, -1, pars))/2.)
+        # return  self.TINTunp(pt, phi, 0, 1) / ( 
+        #       self.TBH2unp(pt, phi) + self.TDVCS2unp(pt, phi) 
+        #    + (self.TINTunp(pt, phi, lam, 1) + self.TINTunp(pt, phi, -lam, -1))/2.)
 
-    def PartialCrossSection4int(self, t, pt, pars):
+    def PartialCrossSection4int(self, t, pt):
         """Same as PartialCrossSection but with additional variable t 
         to facilitate integration over it.
         
         """
         pt.t = t
-        return PartialCrossSection(pt, pars)
+        return PartialCrossSection(pt)
 
-    def PartialCrossSection(self, pt, pars):
+    def PartialCrossSection(self, pt):
         """Partial DVCS cross section w.r.t. Mandelstam t."""
 
         W2 = pt.W * pt.W
-        return 260.5633976788416 * W2 * (ImcffH(pt, pars)**2 
-                + RecffH(pt, pars)**2)  / (
+        return 260.5633976788416 * W2 * (ImcffH(pt)**2 
+                + RecffH(pt)**2)  / (
             (W2 + pt.Q2) * (2.0 * W2 + pt.Q2)**2 )
 
-    def TotalCrossSection(self, pt, pars):
+    def TotalCrossSection(self, pt):
         """Total DVCS cross section."""
 
-        res = quadrature.Hquadrature(lambda t: self.PartialCrossSection4int(t, pt, pars), 0, 1)
+        res = quadrature.Hquadrature(lambda t: self.PartialCrossSection4int(t, pt), 0, 1)
         return res
 
-    def BCA0minusr1(self, pt, pars):
-        return self.BCAcos0(pt, pars) - pt.r * self.BCAcos1(pt, pars)
+    def BCA0minusr1(self, pt):
+        return self.BCAcos0(pt) - pt.r * self.BCAcos1(pt)
 
-    def BSDw2C(self, pt, pars):
+    def BSDw2C(self, pt):
         """Im(C^I) as defined by HALL A """
-        return self.ImCCALINTunp(pt, pars)
+        return self.ImCCALINTunp(pt)
 
-    def BSSw2C(self, pt, pars):
+    def BSSw2C(self, pt):
         """Re(C^I) or Re(C^I + Del C^I) as defined by HALL A.
 
         FIXME: Name of this fun is funny. Also, check agreement with exp,
@@ -493,16 +495,16 @@ class BMK(Approach):
 
         """
         if pt.FTn == 0:
-            return self.ReCCALINTunp(pt, pars) + self.ReDELCCALINTunp(pt, pars)
+            return self.ReCCALINTunp(pt) + self.ReDELCCALINTunp(pt)
         elif pt.FTn == 1:
-            return self.ReCCALINTunp(pt, pars)
+            return self.ReCCALINTunp(pt)
 
-    def XwA(self, pt, pars):
+    def XwA(self, pt):
         """Ratio of first two cos harmonics of w-weighted cross section. In BMK, not Trento??"""
 
-        b0 = quadrature.Hquadrature(lambda phi: self.BSS(pt, pars, vars={'phi':phi}, weighted=True), 
+        b0 = quadrature.Hquadrature(lambda phi: self.BSS(pt, vars={'phi':phi}, weighted=True), 
                 0, 2.0*pi) / (2.0*pi)
-        b1 = quadrature.Hquadrature(lambda phi: self.BSS(pt, pars, vars={'phi':phi}, weighted=True) * cos(phi), 
+        b1 = quadrature.Hquadrature(lambda phi: self.BSS(pt, vars={'phi':phi}, weighted=True) * cos(phi), 
                 0, 2.0*pi) / pi
         return b1/b0
 
@@ -566,16 +568,16 @@ class hotfixedBMK(BMK):
          )
 
 
-    def cINT0unp(self, pt, pars):
+    def cINT0unp(self, pt):
         """ hotfixed BKM Eq. (53) """
-        return (self.CINTunpPP0(pt) * self.ReCCALINTunp(pt, pars)
-                + self.CINTunpPP0q(pt) * self.ReDELCCALINTunp(pt, pars))
+        return (self.CINTunpPP0(pt) * self.ReCCALINTunp(pt)
+                + self.CINTunpPP0q(pt) * self.ReDELCCALINTunp(pt))
 
-    def cINT1unp(self, pt, pars):
+    def cINT1unp(self, pt):
         """ hotfixed BKM Eq. (54) """
-        return self.CINTunpPP1(pt) * self.ReCCALINTunp(pt, pars)
+        return self.CINTunpPP1(pt) * self.ReCCALINTunp(pt)
 
-    def sINT1unp(self, pt, pars):
+    def sINT1unp(self, pt):
         """ hotfixed BKM Eq. (54) """
-        return self.SINTunpPP1(pt) * self.ImCCALINTunp(pt, pars)
+        return self.SINTunpPP1(pt) * self.ImCCALINTunp(pt)
 

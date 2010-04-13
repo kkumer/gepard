@@ -24,12 +24,7 @@ class Model(object):
         # Intially all parameters are fixed and should be released by user
         exec('self.fixed = {' + ", ".join(map(lambda x: "'fix_%s': %s" % x, 
                     zip(self.parameter_names, len(self.parameter_names)*['True']))) + '}')
-        self.parameter_dict.update(self.fixed)
-
-        # FIXME: self.pars dict is used by Model, while self.parameter_dict
-        # by Fitter fcn function. This should be unified somehow
-        self.pars = AttrDict([(n, self.parameter_dict[n]) for n in self.parameter_names])
-        #parameter_values = [pars[key] for key in parameter_names]
+        self.parameters.update(self.fixed)
         self.description = 'N/A'  # something human-understandable
 
     def release_parameters(self, *args):
@@ -44,7 +39,7 @@ class Model(object):
                 raise ValueError('Parameter "%s" is not defined in model %s' 
                         % (par, self))
             self.fixed['fix_'+par] = False
-        self.parameter_dict.update(self.fixed)
+        self.parameters.update(self.fixed)
 
     def fix_parameters(self, *args):
         """Fix parameters so they are not fitting variables."""
@@ -58,7 +53,7 @@ class Model(object):
                     raise ValueError('Parameter "%s" is not defined in model %s' 
                             % (par, self))
                 self.fixed['fix_'+par] = True
-        self.parameter_dict.update(self.fixed)
+        self.parameters.update(self.fixed)
 
     def print_parameters(self, compare_with=[]):
         """Pretty-print parameters and their values.
@@ -72,17 +67,17 @@ class Model(object):
         """
         s = ""
         for name in self.parameter_names:
-            value = self.pars[name]
+            value = self.parameters[name]
             row = '%4s -> %-5.3g' % (name, value)
             #if self.fixed['fix_'+name] == False:
-            if self.parameter_dict.has_key('limit_'+name):
-                lo, hi = self.parameter_dict['limit_'+name]
+            if self.parameters.has_key('limit_'+name):
+                lo, hi = self.parameters['limit_'+name]
                 if (abs((lo-value)*(hi-value)) < 0.001):
                     row = colored(row, 'red')
-            if self.parameter_dict['fix_'+name] == False:
+            if self.parameters['fix_'+name] == False:
                 row = colored(row, 'green')
             for model in compare_with:
-                value2 =  model.pars[name]
+                value2 =  model.parameters[name]
                 app = '   %-5.3g' % value2
                 # calculate relative diff, or absolute if value is zero
                 diff = value - value2
@@ -101,7 +96,7 @@ class Model(object):
         """Pretty-print the chi-square and parameter values."""
         nfreepars=npars(self)
         dof = len(points) - nfreepars
-        sigmas = [(getattr(approach, pt.yaxis)(pt, self.pars) - pt.val) / pt.err for
+        sigmas = [(getattr(approach, pt.yaxis)(pt) - pt.val) / pt.err for
                     pt in points]
         chi = sum(s*s for s in sigmas)  # equal to m.fval if minuit fit is done
         fitprob = (1.-gammainc(dof/2., chi/2.)) # probability of this chi-sq
@@ -132,12 +127,12 @@ class ComptonFormFactors(Model):
     funcnames = ['ImH', 'ReH', 'ImE', 'ReE', 'ImHt', 'ReHt', 'ImEt', 'ReEt']
     # Initial definition of CFFs. All just return zero.
     for name in funcnames:
-        exec('def %s(self, pt, pars={}): return 0.' % name)
+        exec('def %s(self, pt): return 0.' % name)
 
 
-    def CFFvalues(self, pt, pars={}):
+    def CFFvalues(self, pt):
         """Print values of CFFs. Pastable into Mathematica."""
-        vals = map(lambda cff: str(getattr(self, cff)(pt, pars)), self.funcnames)
+        vals = map(lambda cff: str(getattr(self, cff)(pt)), self.funcnames)
         s = "{" + 8*"%s -> %s, "
         s = s[:-2] + "}"
         return s % flatten(tuple(zip(self.funcnames, vals)))
@@ -152,7 +147,7 @@ class ComptonDispersionRelations(ComptonFormFactors):
     
     """
 
-    def dispargV(self, x, fun, pt, pars):
+    def dispargV(self, x, fun, pt):
         """ Integrand of the dispersion integral (vector case) 
         
         fun -- Im(CFF)
@@ -162,10 +157,10 @@ class ComptonDispersionRelations(ComptonFormFactors):
         """
         ga = 0.9  # Nice value obtained by experimentation in Mathematica
         u = x**(1./(1.-ga))
-        res = u**ga * ( fun(pt, pars, u) - fun(pt, pars) )
+        res = u**ga * ( fun(pt, u) - fun(pt) )
         return (2.*u) / (pt.xi**2 - u**2) * res / (1.-ga)
 
-    def dispargA(self, x, fun, pt, pars):
+    def dispargA(self, x, fun, pt):
         """ Integrand of the dispersion integral (axial-vector case)
         
         fun -- Im(CFF)
@@ -175,69 +170,54 @@ class ComptonDispersionRelations(ComptonFormFactors):
         """
         ga = 0.9  # Value same as for V-case (FIXME: is this the best choice?)
         u = x**(1./(1.-ga))
-        res = u**ga * ( fun(pt, pars, u) - fun(pt, pars) )
+        res = u**ga * ( fun(pt, u) - fun(pt) )
         return (2.* pt.xi) / (pt.xi**2 - u**2) * res / (1.-ga)
 
-    def subtraction(self, pt, pars={}):
+    def subtraction(self, pt):
         return 0  # default
 
-    def ReH(self, pt, pars={}):
+    def ReH(self, pt):
         """ Real part of CFF H, 
         
         Given by dispersion integral over ImH - subtraction constant.
         
         """
-        # override defaults (FIXME: should this be permanent?)
-        self.pars.update(pars) 
-        p = self.pars # shortcut
-
-        res = PVquadrature(self.dispargV, 0, 1, (self.ImH, pt, p))
-        pv = res + log(pt.xi**2 / (1.-pt.xi**2)) * self.ImH(pt, p)
+        res = PVquadrature(self.dispargV, 0, 1, (self.ImH, pt))
+        pv = res + log(pt.xi**2 / (1.-pt.xi**2)) * self.ImH(pt)
         # P.V./pi - subtraction constant C/(1-t/MC^2)^2
-        return pv/pi - self.subtraction(pt, p)
+        return pv/pi - self.subtraction(pt)
 
-    def ReHt(self, pt, pars={}):
+    def ReHt(self, pt):
         """ Real part of CFF Ht. 
         
         Given by dispersion integral over ImHt
 
         """
-        # override defaults 
-        self.pars.update(pars) 
-        p = self.pars # shortcut
 
-        res = PVquadrature(self.dispargA, 0, 1, (self.ImHt, pt, p))
-        pv = res + log((1.+pt.xi)/(1.-pt.xi)) * self.ImHt(pt, p)
+        res = PVquadrature(self.dispargA, 0, 1, (self.ImHt, pt))
+        pv = res + log((1.+pt.xi)/(1.-pt.xi)) * self.ImHt(pt)
         return pv/pi   # this is P.V./pi 
 
-    def ReE(self, pt, pars={}):
+    def ReE(self, pt):
         """Real part of CFF E.
         
         Given by dispersion integral over ImE + subtraction constant.
         
         """
-        # override defaults 
-        self.pars.update(pars) 
-        p = self.pars # shortcut
-
-        res = PVquadrature(self.dispargV, 0, 1, (self.ImE, pt, p))
-        pv = res + log(pt.xi**2 / (1.-pt.xi**2)) * self.ImE(pt, p)
+        res = PVquadrature(self.dispargV, 0, 1, (self.ImE, pt))
+        pv = res + log(pt.xi**2 / (1.-pt.xi**2)) * self.ImE(pt)
         # This is same subtraction constant
         # as for H, but with opposite sign
-        return pv/pi + self.subtraction(pt, p)
+        return pv/pi + self.subtraction(pt)
 
-    def ReEt(self, pt, pars={}):
+    def ReEt(self, pt):
         """ Real part of CFF Et. 
         
         Given by dispersion integral over ImEt
 
         """
-        # override defaults 
-        self.pars.update(pars) 
-        p = self.pars # shortcut
-
-        res = PVquadrature(self.dispargA, 0, 1, (self.ImEt, pt, p))
-        pv = res + log((1.+pt.xi)/(1.-pt.xi)) * self.ImEt(pt, p)
+        res = PVquadrature(self.dispargA, 0, 1, (self.ImEt, pt))
+        pv = res + log((1.+pt.xi)/(1.-pt.xi)) * self.ImEt(pt)
         return pv/pi   # this is P.V./pi 
 
 
@@ -246,7 +226,7 @@ class ComptonModelDR(ComptonDispersionRelations):
 
     def __init__(self):
         # initial values of parameters and limits on their values
-        self.parameter_dict = {
+        self.parameters = AttrDict({
               'NS' : 1.5,                                 
              'alS' : 1.13,                              
             'alpS' : 0.15,                              
@@ -264,7 +244,7 @@ class ComptonModelDR(ComptonDispersionRelations):
              'tNv' : 0.0,                             
              'tMv' : 2.7,    'limit_tMv' : (0.4, 2.),
              'trv' : 6.0,    'limit_trv' : (0., 8.),
-             'tbv' : 3.0,    'limit_tbv' : (0.4, 5.)   }
+             'tbv' : 3.0,    'limit_tbv' : (0.4, 5.)   })
 
         # order matters to fit.MinuitFitter, so it is defined by:
         self.parameter_names = ['NS', 'alS', 'alpS', 'MS', 'rS', 'bS',
@@ -277,17 +257,12 @@ class ComptonModelDR(ComptonDispersionRelations):
 
 
 
-    def subtraction(self, pt, pars={}):
-        return pars.C/(1.-pt.t/pars.MC**2)**2
+    def subtraction(self, pt):
+        return self.parameters['C']/(1.-pt.t/self.parameters['MC']**2)**2
 
-    def ImH(self, pt, pars={}, xi=0):
+    def ImH(self, pt, xi=0):
         """Imaginary part of CFF H."""
-
-        # override defaults (FIXME: should this be permanent?)
-        # FIXME: Is it costly to do this update for every call of ImH?
-        self.pars.update(pars) 
-        p = self.pars # shortcut
-
+        p = self.parameters # just a shortcut
         # FIXME: The following solution is not elegant
         if isinstance(xi, ndarray):
             # function was called with third argument that is xi nd array
@@ -307,13 +282,10 @@ class ComptonModelDR(ComptonDispersionRelations):
                  onex**p.bS / (1. - onex*t/(p.MS**2))**2 )
         return pi * (val + sea) / (1.+x)
 
-    def ImHt(self, pt, pars={}, xi=0):
+    def ImHt(self, pt, xi=0):
         """Imaginary part of CFF Ht i.e. \tilde{H}."""
-
-        # override defaults 
-        self.pars.update(pars) 
-        p = self.pars # shortcut
-
+        p = self.parameters # just a shortcut
+        # FIXME: The following solution is not elegant
         if isinstance(xi, ndarray):
             # function was called with third argument that is xi nd array
             x = xi
@@ -332,13 +304,13 @@ class ComptonModelDR(ComptonDispersionRelations):
                  onex**p.tbv / (1. - onex*t/(p.tMv**2))  )
         return pi * val / (1.+x)
 
-    def ImE(self, pt, pars={}, xi=0):
+    def ImE(self, pt, xi=0):
         """Imaginary part of CFF E."""
         # Just changing function signature w.r.t. ComptonFormFactors
         # to make it compatible for dispersion integral
         return 0
 
-    def ReEt(self, pt, pars={}):
+    def ReEt(self, pt):
         """Instead of disp. rel. use pole formula."""
         return (2.2390424 * (1. - (1.7*(0.0196 - pt.t))/(1. 
             - pt.t/2.)**2))/((0.0196 - pt.t)*pt.xi)
@@ -355,22 +327,22 @@ class ComptonNNH(ComptonFormFactors):
         #self.nets = pickle.load(open('nets.pkl', 'r'))
         #sys.stderr.write('Neural nets loaded from nets.pkl')
         # single parameter is net index
-        self.parameter_dict = {'nnet':0}
+        self.parameters = {'nnet':0}
         self.parameter_names = ['nnet']
         # now do whatever else is necessary
         Model.__init__(self)
     
-    def ImH(self, pt, pars={}, xi=0):
+    def ImH(self, pt, xi=0):
         ar = []
         for net in self.nets:
             ar.append(net.activate([pt.xB, pt.t]))
         all = array(ar).flatten()
-        if pars.has_key('nnet'):
-            if pars['nnet'] == 'ALL':
+        if self.parameters.has_key('nnet'):
+            if self.parameters['nnet'] == 'ALL':
                 return all
             else: # we want particular net
                 try:
-                    return all[pars['nnet']]
+                    return all[self.parameters['nnet']]
                 except IndexError:
                     raise IndexError, str(self)+' has only '+str(len(self.nets))+' nets!'
         # by default, we get mean value
