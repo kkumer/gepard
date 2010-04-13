@@ -29,21 +29,8 @@ class Approach(object):
     def __init__(self, m, optimization=False):
         """Initialize with m as instance of Model class."""
         self.model = m
-        global F1, F2 
-        global ImcffH, RecffH, ImcffE, RecffE
-        global ImcffHt, RecffHt, ImcffEt, RecffEt
-        F1 = m.F1
-        F2 = m.F2
-        ImcffH = m.ImH
-        RecffH = m.ReH
-        ImcffE = m.ImE
-        RecffE = m.ReE
-        ImcffHt = m.ImHt
-        RecffHt = m.ReHt
-        ImcffEt = m.ImEt
-        RecffEt = m.ReEt
+        self.m = self.model  # shortcut
         self.optimization = optimization
-        pass
 
 
 
@@ -177,15 +164,15 @@ class BMK(Approach):
     def cBH0unpSX(self, pt):
         """ BKM Eq. (35) - small-x approximation """
         return 16. * pt.K2 * (pt.Q2/pt.t) * ( 
-                F1(pt.t)**2 - (pt.t/(4.0*Mp2)) * F2(pt.t)**2 
+                self.m.F1(pt.t)**2 - (pt.t/(4.0*Mp2)) * self.m.F2(pt.t)**2 
                   ) + 8. * (2. - pt.y)**2 * ( 
-                F1(pt.t)**2 - (pt.t/(4.0*Mp2)) * F2(pt.t)**2 )
+                self.m.F1(pt.t)**2 - (pt.t/(4.0*Mp2)) * self.m.F2(pt.t)**2 )
 
     def cBH0unp(self, pt):
         """ BKM Eq. (35) """
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
-        FE2 = F1(t)**2 - t * F2(t)**2 / (4.0 * Mp2) 
-        FM2 = (F1(t) + F2(t))**2
+        FE2 = self.m.F1(t)**2 - t * self.m.F2(t)**2 / (4.0 * Mp2) 
+        FM2 = (self.m.F1(t) + self.m.F2(t))**2
         # braces are expressions in {..} in Eq. (35)
         brace1 = (2.+3.*eps2) * (Q2/t) * FE2 + 2.* xB**2 * FM2
         brace2 = (  (2.+eps2)*( (4.*xB**2*Mp2/t)*(1.+t/Q2)**2 +
@@ -200,8 +187,8 @@ class BMK(Approach):
     def cBH1unp(self, pt):
         """ BKM Eq. (36) """
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
-        FE2 = F1(t)**2 - t * F2(t)**2 / (4.0 * Mp2) 
-        FM2 = (F1(t) + F2(t))**2
+        FE2 = self.m.F1(t)**2 - t * self.m.F2(t)**2 / (4.0 * Mp2) 
+        FM2 = (self.m.F1(t) + self.m.F2(t))**2
         brace = ( (4.*xB**2*Mp2/t - 2.*xB - eps2) * FE2 + 
                    2.*xB**2*(1.-(1.-2.*xB)*t/Q2) * FM2 )
         return 8. * pt.K * (2.-y) * brace
@@ -209,8 +196,8 @@ class BMK(Approach):
     def cBH2unp(self, pt):
         """ BKM Eq. (37) """
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
-        FE2 = F1(t)**2 - t * F2(t)**2 / (4.0 * Mp2) 
-        FM2 = (F1(t) + F2(t))**2
+        FE2 = self.m.F1(t)**2 - t * self.m.F2(t)**2 / (4.0 * Mp2) 
+        FM2 = (self.m.F1(t) + self.m.F2(t))**2
         brace = 4.*Mp2/t * FE2 + 2. * FM2
         return 8. * xB**2 * pt.K2 * brace
 
@@ -228,12 +215,12 @@ class BMK(Approach):
         """ BKM Eq. (66) """
 
         xB, t = pt.xB, pt.t
-        parenHH = ( RecffH(pt)**2 + ImcffH(pt)**2 
-                +  RecffHt(pt)**2 + ImcffHt(pt)**2 )
-        parenEH = 2.*( RecffE(pt)*RecffH(pt) + ImcffE(pt)*ImcffH(pt) 
-                +  RecffEt(pt)*RecffHt(pt) + ImcffEt(pt)*ImcffHt(pt) ) 
-        parenEE =  RecffE(pt)**2 + ImcffE(pt)**2 
-        parenEtEt = RecffEt(pt)**2 + ImcffEt(pt)**2
+        parenHH = ( self.m.ReH(pt)**2 + self.m.ImH(pt)**2 
+                +  self.m.ReHt(pt)**2 + self.m.ImHt(pt)**2 )
+        parenEH = 2.*( self.m.ReE(pt)*self.m.ReH(pt) + self.m.ImE(pt)*self.m.ImH(pt) 
+                +  self.m.ReEt(pt)*self.m.ReHt(pt) + self.m.ImEt(pt)*self.m.ImHt(pt) ) 
+        parenEE =  self.m.ReE(pt)**2 + self.m.ImE(pt)**2 
+        parenEtEt = self.m.ReEt(pt)**2 + self.m.ImEt(pt)**2
         brace = 4. * (1.-xB) * parenHH - xB**2 * parenEH - (xB**2 
                 + (2.-xB)**2 * t/(4.*Mp2)) * parenEE - xB**2 * t/(4.*Mp2) * parenEtEt
         return brace / (2.-xB)**2
@@ -259,28 +246,28 @@ class BMK(Approach):
     def ReCCALINTunp(self, pt):
         """ Real part of BKM Eq. (69) """
 
-        return F1(pt.t)*RecffH(pt) + pt.xB/(2.-pt.xB)*(F1(pt.t)+
-                F2(pt.t))*RecffHt(pt) - pt.t/(4.*Mp2)*F2(pt.t)*RecffE(pt)
+        return self.m.F1(pt.t)*self.m.ReH(pt) + pt.xB/(2.-pt.xB)*(self.m.F1(pt.t)+
+                self.m.F2(pt.t))*self.m.ReHt(pt) - pt.t/(4.*Mp2)*self.m.F2(pt.t)*self.m.ReE(pt)
 
     def ImCCALINTunp(self, pt):
         """ Imag part of BKM Eq. (69) """
 
-        return F1(pt.t)*ImcffH(pt) + pt.xB/(2.-pt.xB)*(F1(pt.t)+
-                F2(pt.t))*ImcffHt(pt) - pt.t/(4.*Mp2)*F2(pt.t)*ImcffE(pt)
+        return self.m.F1(pt.t)*self.m.ImH(pt) + pt.xB/(2.-pt.xB)*(self.m.F1(pt.t)+
+                self.m.F2(pt.t))*self.m.ImHt(pt) - pt.t/(4.*Mp2)*self.m.F2(pt.t)*self.m.ImE(pt)
 
     def ReDELCCALINTunp(self, pt):
         """ Real part of BKM Eq. (72) """
 
         fx = pt.xB / (2. - pt.xB)
-        return - fx * (F1(pt.t)+F2(pt.t)) * ( fx *(RecffH(pt) 
-            + RecffE(pt)) + RecffHt(pt) )
+        return - fx * (self.m.F1(pt.t)+self.m.F2(pt.t)) * ( fx *(self.m.ReH(pt) 
+            + self.m.ReE(pt)) + self.m.ReHt(pt) )
 
     def ImDELCCALINTunp(self, pt):
         """ Imag part of BKM Eq. (72) """
 
         fx = pt.xB / (2. - pt.xB)
-        return - fx * (F1(pt.t)+F2(pt.t)) * ( fx *(ImcffH(pt) 
-            + ImcffE(pt)) + ImcffHt(pt) )
+        return - fx * (self.m.F1(pt.t)+self.m.F2(pt.t)) * ( fx *(self.m.ImH(pt) 
+            + self.m.ImE(pt)) + self.m.ImHt(pt) )
 
     def ReCCALINTunpEFF(self, pt):
         return 0
@@ -470,8 +457,8 @@ class BMK(Approach):
         """Partial DVCS cross section w.r.t. Mandelstam t."""
 
         W2 = pt.W * pt.W
-        return 260.5633976788416 * W2 * (ImcffH(pt)**2 
-                + RecffH(pt)**2)  / (
+        return 260.5633976788416 * W2 * (self.m.ImH(pt)**2 
+                + self.m.ReH(pt)**2)  / (
             (W2 + pt.Q2) * (2.0 * W2 + pt.Q2)**2 )
 
     def TotalCrossSection(self, pt):
