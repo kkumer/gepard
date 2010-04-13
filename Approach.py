@@ -3,6 +3,7 @@ from IPython.Debugger import Tracer; debug_here = Tracer()
 import copy
 
 from numpy import sin, cos, pi, sqrt
+from scipy.special import gammainc
 
 import utils, quadrature
 from constants import *
@@ -31,8 +32,22 @@ class Approach(object):
         self.model = m
         self.m = self.model  # shortcut
         self.optimization = optimization
+        self.description = 'N/A'  # something human-understandable
 
 
+    def __repr__(self):
+        return "<Theory: %s + %s>" % \
+            (str(self.__class__).split()[1][1:-2], str(self.model).split()[0][1:])
+
+    def print_chisq(self, points):
+        """Pretty-print the chi-square and parameter values."""
+        nfreepars=utils.npars(self.model)
+        dof = len(points) - nfreepars
+        sigmas = [(getattr(self, pt.yaxis)(pt) - pt.val) / pt.err for
+                    pt in points]
+        chi = sum(s*s for s in sigmas)  # equal to m.fval if minuit fit is done
+        fitprob = (1.-gammainc(dof/2., chi/2.)) # probability of this chi-sq
+        print 'P(chi-square, d.o.f) = P(%1.2f, %2d) = %5.4f' % (chi, dof, fitprob)
 
 class BMK(Approach):
     """Implementation of formulas from hep-ph/0112108  (BMK)"""
