@@ -34,10 +34,14 @@ class Approach(object):
         self.optimization = optimization
         self.description = 'N/A'  # something human-understandable
 
-
     def __repr__(self):
-        return "<Theory: %s + %s>" % \
-            (str(self.__class__).split()[1][1:-2], str(self.model).split()[0][1:])
+        return "<Theory: %s + %s at %s>" % utils.flatten(
+                (str(self.__class__).split()[1][1:-2],
+                  tuple(str(self.model).split()[::3])))
+
+    def copy(self):
+        """Return deep copy of itself."""
+        return copy.deepcopy(self)
 
     def print_chisq(self, points):
         """Pretty-print the chi-square and parameter values."""

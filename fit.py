@@ -49,8 +49,8 @@ def fcn(%s):
     def fit(self):
         self.minuit.migrad()
         print "ncalls = ", self.minuit.ncalls
-        self.theory.model.print_chisq(self.fitpoints, self.theory)
+        self.theory.print_chisq(self.fitpoints)
         self.theory.model.print_parameters()
-        return self.theory.model
+        return self.theory
 
 

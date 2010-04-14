@@ -372,7 +372,7 @@ def EIC(fits=[], path=None, fmt='png'):
         fig.show()
     return fig
 
-def H(ff, fits=[], path=None, fmt='png'):
+def H(theories=[], path=None, fmt='png'):
     """Makes plot of Im(cffH).
     
     TODO: This should be a method of Model.
@@ -382,23 +382,24 @@ def H(ff, fits=[], path=None, fmt='png'):
     fig = plt.figure()
     fig.canvas.set_window_title(title)
     fig.suptitle(title)
-    fig.subplots_adjust(bottom=0.65)
+    fig.subplots_adjust(bottom=0.45)
     # Left panel
     pt = Data.DummyPoint()
     ax = fig.add_subplot(1,1,1)
     ax.set_xscale('log')  # x-axis to be logarithmic
     xval = np.power(10., np.arange(-3.5, 0, 0.01)) 
-    linestyles = ['g--', 'b-', 'r-.']
-    labels = ['HERMES+CLAS', 'HERMES+CLAS+HALLA', '+HALLA(phi)']
+    colors = ['red', 'green', 'brown', 'purple']
+    styles = ['-', '--', '-.', ':']
+    labels = ['model 1', 'model 2', 'model 3', 'model 4']
     pn = 0
-    for approach in fits:
+    for t in theories:
         pt.t = 0.0
         # kludge alert!
-        line1 = xval * ff.ImH(pt, xval) / np.pi
+        line1 = xval * t.model.ImH(pt, xval) / np.pi
         pt.t = -0.3
-        line2 = xval * ff.ImH(pt, xval) / np.pi
-        ax.plot(xval, line1, linestyles[pn], linewidth=2)
-        ax.plot(xval, line2, linestyles[pn], linewidth=4, label=labels[pn]) 
+        line2 = xval * t.model.ImH(pt, xval) / np.pi
+        ax.plot(xval, line1, color=colors[pn], linestyle=styles[pn], linewidth=2)
+        ax.plot(xval, line2, color=colors[pn], linestyle=styles[pn], linewidth=4, label=labels[pn]) 
         pn += 1
     ax.set_ylim(0.0, 0.5)
     ax.set_xlim(0.0005, 1.0)
