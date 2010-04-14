@@ -5,7 +5,6 @@ AttrDict -- dictionary with attribute-style access
 loaddata -- loads datafiles from directory
 fill_kinematics --- calculates missing kinematical variables
 parse -- parses datafiles
-subplot -- creates subplot for matplotlib plot
 npars -- number of free (not fixed) parameters of minuit object
 str2num -- transforms string to float or int
 prettyprint -- formatted printout of numbers
@@ -19,7 +18,7 @@ import os, re, string, fnmatch
 import numpy as np
 
 import Data, Approach
-from constants import toTeX, Mp, Mp2
+from constants import Mp, Mp2
 
 #from IPython.Debugger import Tracer; debug_here = Tracer()
 
@@ -71,7 +70,6 @@ class AttrDict(dict):
     def copy(self):
         ch = AttrDict(self)
         return ch
-
 
 def loaddata(datadir='data', approach=Approach.hotfixedBMK):
     """Return dictionary {id : `DataSet`, ...}  out of datadir/*dat files.
@@ -208,69 +206,6 @@ def parse(datafile):
         dataFileLine = dataFile.readline()
 
     return desc, data
-
-
-def subplot(ax, datasets, xaxis=None, kinlabels=[], fits=[]):
-    """Plot datapoints together with fit/theory line(s).
-
-    ax -- subplot of matplotlib's figure i.e. ax = figure.add_subplot(..)
-    datasets --  list of `DataSet` instances to be plotted
-    xaxis -- abscissa variable; if None, last of dataset.xaxes is taken
-    kinlabels -- list of constant kinematic variables whose values will
-                 be put on plot
-    fits -- list of parameter sets/tuples describing fit curves for
-            plotting. 
-
-    """
-    # first, fix the input if needed
-    if not isinstance(kinlabels, list): kinlabels = [kinlabels]
-    if not isinstance(fits, list): fits = [fits]
-    if not xaxis: xaxis = dataset.xaxes[-1]
-    # Data sets (or fits with errorbars)
-    setshapes = ['o', 's']  # first circles, then squares ...
-    setcolors = ['blue', 'black']  # circles are blue, squares are black, ...
-    setn = 0
-    for dataset in datasets:
-        xval = []; yval = []; yerr = []
-        for pt in dataset:
-            xval.append(getattr(pt, xaxis)) 
-            yval.append(pt.val)
-            yerr.append(pt.err)
-        ax.errorbar(xval, yval, yerr, linestyle='None', elinewidth=setn+1, 
-                marker=setshapes[setn], color=setcolors[setn])
-        setn += 1
-    # Fit lines
-    shapes = ['s', '^', 'd', 'h']  # first squares, then triangles, diamonds, hexagons
-    colors = ['red', 'green', 'brown', 'purple']  # squares are red, etc.
-    styles = ['-', '--', '-.', ':']
-    fitn = 0
-    for theory in fits:
-        # take abscissae from dataset
-        line = [getattr(theory, pt.yaxis)(pt) for pt 
-                in datasets[0]]
-        ## join the dots
-        ax.plot(xval, line, color=colors[fitn], linestyle=styles[fitn], linewidth=2)
-        ## put symbols on dots
-        #ax.plot(xval, line, shapes[fitn], markersize=5,
-        #        markerfacecolor=colors[fitn], markeredgecolor='black')
-        fitn += 1
-    # axes labels
-    ax.set_xlabel(toTeX[xaxis], fontsize=15)
-    ax.set_ylabel(toTeX[dataset[0].yaxis], fontsize=18)
-    ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
-    # constant kinematic variables positioning
-    labx = min(0, min(xval)) + (max(xval) - min(0, min(xval))) * 0.5
-    laby = min(0, min(yval)) + (max(yval) - min(0, min(yval))) * 0.05
-    labtxt = ""
-    for lab in kinlabels:
-        try:
-            labtxt += toTeX[lab] + ' = ' + str(getattr(dataset,lab)) + ', '
-        except AttributeError:
-            # If dataset doesn't have it, all points should have it 
-            labtxt += toTeX[lab] + ' = ' + str(getattr(dataset[0],lab)) + ', '
-    ax.text(labx, laby, labtxt[:-2])
-    # ax.frame.set_linewidth(5) # ???
-    return
 
 def npars(m):
     """Return number of free (not fixed) parameters of MINUIT object m."""

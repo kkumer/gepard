@@ -1,15 +1,10 @@
 """ 
 Plotting functions written for ad-hoc plotting
-of some specific datasets and CFFs. Note that actual dataset
-plotting algorithm is utils.subplot() and here only choice
-of points and axes decoration etc. is done
-
-plotHALLA -- plots HALL-A data
+of some specific datasets and CFFs.
 
 """
 
-
-import os, math
+import sys, os, math
 import numpy as np
 
 import matplotlib
@@ -25,9 +20,101 @@ import utils
 from constants import toTeX, Mp2, Mp
 
 
-def HERMESBCA(data, path=None, fmt='png'):
+def subplot(ax, sets, lines=[], band=[], xaxis=None, kinlabels=[], plotlines=True):
+    """Plot datapoints together with fit/theory line(s).
+
+    ax -- subplot of matplotlib's figure i.e. ax = figure.add_subplot(..)
+    sets --  list of `DataSet` instances to be plotted.
+             First set defines abscissa. 
+    lines -- list of 'theories' describing curves for plotting.
+    band  -- neural network 'theory' or a list of 'theories' defining 
+             band by their mean and standard deviation
+    xaxis -- abscissa variable; if None, last of sets.xaxes is taken
+    kinlabels -- list of constant kinematic variables whose values will
+                 be put on plot as annotation
+    TODO: legend
+
+    """
+    # first, fix the input if needed
+    if not isinstance(kinlabels, list): kinlabels = [kinlabels]
+    if not isinstance(lines, list): lines = [lines]
+    if not xaxis: xaxis = sets[-1].xaxes[-1]
+    # [1] Data sets (or fits with errorbars)
+    setshapes = ['o', 's']  # first circles, then squares ...
+    setcolors = ['blue', 'black']  # circles are blue, squares are black, ...
+    setn = 0
+    for set in sets:
+        xval = []; yval = []; yerr = []
+        for pt in set:
+            xval.append(getattr(pt, xaxis)) 
+            yval.append(pt.val)
+            yerr.append(pt.err)
+        ax.errorbar(xval, yval, yerr, linestyle='None', elinewidth=setn+1, 
+                marker=setshapes[setn], color=setcolors[setn])
+        setn += 1
+    # [2] Theory lines
+    lineshapes = ['s', '^', 'd', 'h']  # first squares, then triangles, diamonds, hexagons
+    linecolors = ['red', 'green', 'brown', 'purple']  # squares are red, etc.
+    linestyles = ['-', '--', '-.', ':']  # solid, dashed, dot-dashed, dotted
+    linen = 0
+    for theory in lines:
+        # take abscissae from the first set
+        line = [theory.predict(pt) for pt in sets[-1]]
+        if plotlines:
+            # join the dots (xval belongs to last set)
+            ax.plot(xval, line, color=linecolors[linen], 
+                    linestyle=linestyles[linen], linewidth=2)
+        else:
+            # put symbols on dots
+            ax.plot(xval, line, lineshapes[linen], markersize=5,
+                    markerfacecolor=linecolors[linen], markeredgecolor='black')
+        linen += 1
+    # [3] Theory band
+    up = []
+    down = []
+    for pt in sets[-1]:
+        if isinstance(band, list):
+            # we have list of theories
+            res = np.array([theory.predict(pt) for theory in band])
+        else:
+            # we have neural network.
+            try:
+                res = band.predict(pt, parameters={'nnet':'ALL'})
+            except ValueError:  # shape mismatch so we have to go one by one
+                res = np.array([band.predict(pt, parameters={'nnet':nnet}) for 
+                    nnet in range(len(band.model.nets))])
+        mean = res.mean()
+        std = res.std()
+        up.append(mean + std/2.)
+        down.append(mean - std/2.)
+    up = np.array(up)
+    down = np.array(down)
+    # xval belongs to last set after loop above
+    x = plt.concatenate( (xval, xval[::-1]) )
+    y = plt.concatenate( (up, down[::-1]) )
+    ax.fill(x, y, facecolor='g', alpha=0.5)
+    # [4] Axes 
+    ax.set_xlabel(toTeX[xaxis], fontsize=15)
+    ax.set_ylabel(toTeX[sets[-1][0].yaxis], fontsize=18)
+    ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
+    # [5] Annotations
+    # constant kinematic variables positioning
+    labx = min(0, min(xval)) + (max(xval) - min(0, min(xval))) * 0.5
+    laby = min(0, min(yval)) + (max(yval) - min(0, min(yval))) * 0.05
+    labtxt = ""
+    for lab in kinlabels:
+        try:
+            labtxt += toTeX[lab] + ' = ' + str(getattr(sets[0],lab)) + ', '
+        except AttributeError:
+            # If dataset doesn't have it, all points should have it 
+            labtxt += toTeX[lab] + ' = ' + str(getattr(sets[0][0],lab)) + ', '
+    ax.text(labx, laby, labtxt[:-2])
+    # ax.frame.set_linewidth(5) # ???
+    return
+
+def HERMESBCA(data, lines=[], band=[], path=None, fmt='png'):
     """Plot HERMES BCA."""
-    id = 32 
+    id = 32
     title = 'HERMES BCA'
     fig = plt.figure()
     fig.canvas.set_window_title(title)
@@ -37,7 +124,7 @@ def HERMESBCA(data, path=None, fmt='png'):
     for x in range(3):
         ax = fig.add_subplot(3, 1, x+1)
         ax.yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))  # tickmarks
-        utils.subplot(ax, [data[id][x*6+18:x*6+6+18]], xaxes[x], [], [])
+        subplot(ax, [data[id][x*6+18:x*6+6+18]], lines, band, xaxes[x], [])
         #apply(ax.set_ylim, ylims[(-0.30, 0.05)])
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
@@ -46,7 +133,27 @@ def HERMESBCA(data, path=None, fmt='png'):
         fig.show()
     return fig
 
-def HERMES09(data, fits=[], path=None, fmt='png'):
+def HERMESBSA(data, lines=[], band=[], path=None, fmt='png'):
+    """Plot HERMES BSA."""
+    id = 5
+    title = 'HERMES BSA'
+    fig = plt.figure()
+    fig.canvas.set_window_title(title)
+    fig.suptitle(title)
+    xaxes = ['tm', 'xB', 'Q2']
+    # we have 3x6 points
+    for x in range(3):
+        ax = fig.add_subplot(3, 1, x+1)
+        ax.yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))  # tickmarks
+        subplot(ax, [data[5][x*6:x*6+6]], lines, band, xaxes[x], [])
+    if path:
+        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+    else:
+        fig.canvas.draw()
+        fig.show()
+    return fig
+
+def HERMES09(data, lines=[], band=[], path=None, fmt='png'):
     """Plot HERMES 0909.3587 BCA and BSA data with fit lines."""
 
     ids = [2, 4, 5]
@@ -62,7 +169,7 @@ def HERMES09(data, fits=[], path=None, fmt='png'):
             panel = 3*y + x + 1  # 1, 2, ..., 9
             ax = fig.add_subplot(3,3,panel)
             ax.yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))  # tickmarks
-            utils.subplot(ax, [data[id][x*6+shift:x*6+6+shift]], xaxes[x], [], fits)
+            subplot(ax, [data[id][x*6+shift:x*6+6+shift]], lines, band, xaxes[x], [])
             apply(ax.set_ylim, ylims[y])
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
@@ -71,7 +178,7 @@ def HERMES09(data, fits=[], path=None, fmt='png'):
         fig.show()
     return fig
 
-def CLAS(data, fits=[], path=None, fmt='png'):
+def CLAS(data, lines=[], band=[], path=None, fmt='png'):
     """Makes plot of CLAS BSA data with fit lines"""
 
     #datafile = "data/ep2epgamma-ALU-CLAS_KK-07.dat" # id = 25
@@ -100,7 +207,7 @@ def CLAS(data, fits=[], path=None, fmt='png'):
         panelset = Data.DataSet(panelpoints)
         panelset.__dict__ = dataset.__dict__.copy()
         # ... and plot
-        utils.subplot(ax, [panelset], 'tm', ['Q2', 'xB'], fits)
+        subplot(ax, [panelset], lines, band, 'tm', ['Q2', 'xB'])
         plt.xlim(0.0, 0.6)
         plt.ylim(0.0, 0.4)
         ax.yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))
@@ -111,7 +218,7 @@ def CLAS(data, fits=[], path=None, fmt='png'):
         fig.show()
     return fig
 
-def HALLA(data, fits=[], path=None, fmt='png'):
+def HALLA(data, lines=[], band=[], path=None, fmt='png'):
     """Makes plot of HALL-A data with fit lines"""
 
     ids = [9, 14, 20, 21, 23, 24]
@@ -129,7 +236,7 @@ def HALLA(data, fits=[], path=None, fmt='png'):
     panel = 1
     for id in ids:
         ax = fig.add_subplot(2,3,panel)
-        utils.subplot(ax, [subsets[id]], 'phi', ['Q2', 't'], fits)
+        subplot(ax, [subsets[id]], lines, band, 'phi', ['Q2', 't'])
         ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(120))
         panel += 1
     if path:
@@ -139,7 +246,7 @@ def HALLA(data, fits=[], path=None, fmt='png'):
         fig.show()
     return fig
 
-def COMPASS(fits=[], path=None, fmt='png'):
+def COMPASS(lines=[], band=[], path=None, fmt='png'):
     """Plot COMPASS BCS asymmetry and difference and summ of xs for FormFactors model ff.
     
     FIXME: kinematic completion, charge etc. must be explicit here
@@ -170,7 +277,7 @@ def COMPASS(fits=[], path=None, fmt='png'):
     labels = ['HERMES+CLAS', 'HERMES+CLAS+HALLA', '+HALLA(phi)']
     #labels = ['GLO1 (DM)', 'GLO1 (KK)', '']
     pn = 0
-    for approach in fits:
+    for approach in lines:
         approach.__class__.to_conventions(pt)
         approach.__class__.prepare(pt)
         line = approach.BCSA(pt, vars={'phi':np.pi - phi})
@@ -201,7 +308,7 @@ def COMPASS(fits=[], path=None, fmt='png'):
     labels = ['HERMES+CLAS', 'HERMES+CLAS+HALLA', '+HALLA(phi)']
     #labels = ['GLO1 (DM)', 'GLO1 (KK)', '']
     pn = 0
-    for approach in fits:
+    for approach in lines:
         approach.__class__.to_conventions(pt)
         approach.__class__.prepare(pt)
         # nb converted to pb:
@@ -233,7 +340,7 @@ def COMPASS(fits=[], path=None, fmt='png'):
     labels = ['HERMES+CLAS', 'HERMES+CLAS+HALLA', '+HALLA(phi)']
     #labels = ['GLO1 (DM)', 'GLO1 (KK)', '']
     pn = 0
-    for approach in fits:
+    for approach in lines:
         approach.__class__.to_conventions(pt)
         approach.__class__.prepare(pt)
         # nb converted to pb:
@@ -478,33 +585,6 @@ def HBCSA(ff, fits=[], path=None, fmt='png'):
     ax.set_xlabel('$\\phi$')
     ax.set_ylabel('BCSA')
     ax.legend()
-    if path:
-        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
-    else:
-        fig.canvas.draw()
-        fig.show()
-    return fig
-
-def nnBSA(data, nnapproach, path=None, fmt='png'):
-    """Plot HERMES BSA and neural net result."""
-    title = 'HERMES (blue) vs NeuralNets (black)'
-    fig = plt.figure()
-    fig.canvas.set_window_title(title)
-    fig.suptitle(title)
-    xaxes = ['tm', 'xB', 'Q2']
-    # we have 3x6 points
-    for x in range(3):
-        datapoints = data[5][x*6:x*6+6]
-        ax = fig.add_subplot(3, 1, x+1)
-        ax.yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))  # tickmarks
-        nnpoints = []
-        for pt in datapoints:
-            nnpt = Data.DummyPoint(pt.__dict__.copy())
-            nnres = nnapproach.BSA(pt, {})
-            nnpt.val = nnres.mean()
-            nnpt.err = nnres.std()
-            nnpoints.append(nnpt)
-        utils.subplot(ax, [datapoints, nnpoints], xaxes[x], [], [])
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:

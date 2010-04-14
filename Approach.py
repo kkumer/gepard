@@ -53,6 +53,32 @@ class Approach(object):
         fitprob = (1.-gammainc(dof/2., chi/2.)) # probability of this chi-sq
         print 'P(chi-square, d.o.f) = P(%1.2f, %2d) = %5.4f' % (chi, dof, fitprob)
 
+    def predict(self, pt, **kwargs):
+        """Give prediction for DataPoint pt.
+
+        Keyword arguments:
+        observable - string. Default is pt.yaxis
+        parameters - dictionary which will update model's one
+
+        """
+        if kwargs.has_key('observable'):
+            obs = kwargs['observable']
+        else:
+            obs = pt.yaxis
+
+        if kwargs.has_key('parameters'):
+            old = self.model.parameters.copy()
+            self.model.parameters.update(kwargs['parameters'])
+
+        result = getattr(self, obs)(pt)
+
+        if kwargs.has_key('parameters'):
+            # restore old values
+            self.model.parameters.update(old)
+
+        return result
+
+
 class BMK(Approach):
     """Implementation of formulas from hep-ph/0112108  (BMK)"""
 
