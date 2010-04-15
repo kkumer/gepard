@@ -73,9 +73,13 @@ def BSA(ImcffH, xB, t, Q2):
            Q2))
       )
 
-def trans(x, args):
+def trans_old(x, args):
     xB, t, Q2 = args
     return BSA((1-xB)*x, xB, t, Q2) # implementing constraint CFF(xB=1)=0
 
+def trans(x, theory_and_pt):
+    theory, pt = theory_and_pt
+    xB, t, Q2 = pt.xB, pt.t, pt.Q2
+    return theory.predict(pt, parameters={'outputvalue':(1-xB)*x})
 
 map = {}

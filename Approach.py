@@ -427,13 +427,17 @@ class BMK(Approach):
         """Calculate beam spin asymmetry (BSA)."""
         return self.BSD(pt, **kwargs) / self.BSS(pt, **kwargs)
 
-    def BSA(self, pt):
+    def BSA(self, pt, **kwargs):
         """Calculate beam spin asymmetry (BSA) or its harmonics."""
         if pt.has_key('phi'):
-            return self._BSA(pt)
+            return self._BSA(pt, **kwargs)
         elif pt.has_key('FTn') and pt.FTn == -1:
             # FIXME: faster shortcut (approximate!)
-            return  self._BSA(pt, vars={'phi':pi/2.}) 
+            if kwargs.has_key('vars'):
+                kwargs['vars'].update({'phi':pi/2.})
+            else:
+                kwargs['vars'] = {'phi':pi/2.}
+            return  self._BSA(pt, **kwargs) 
         ### Exact but slower:
         #elif pt.has_key('FTn') and pt.FTn == -1:
         #    res = quadrature.Hquadrature(lambda phi: 

@@ -411,12 +411,15 @@ class ComptonNNH(ComptonFormFactors):
         self.nets = []
         #sys.stderr.write('Neural nets loaded from nets.pkl')
         # single parameter is net index
-        self.parameters = {'nnet':0}
-        self.parameter_names = ['nnet']
+        self.parameters = {'nnet':0, 'outputvalue':None}
+        self.parameter_names = ['nnet', 'outputvalue']
         # now do whatever else is necessary
         Model.__init__(self)
     
-    def ImH(self, pt, xi=0):
+    def ImH(self, pt, outputvalue=None):
+        if self.parameters['outputvalue']:
+            # this occurs during training
+            return self.parameters['outputvalue']
         ar = []
         for net in self.nets:
             ar.append(net.activate([pt.xB, pt.t]))
