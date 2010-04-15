@@ -73,13 +73,16 @@ def BSA(ImcffH, xB, t, Q2):
            Q2))
       )
 
-def trans_old(x, args):
-    xB, t, Q2 = args
-    return BSA((1-xB)*x, xB, t, Q2) # implementing constraint CFF(xB=1)=0
 
 def trans(x, theory_and_pt):
     theory, pt = theory_and_pt
     xB, t, Q2 = pt.xB, pt.t, pt.Q2
-    return theory.predict(pt, parameters={'outputvalue':(1-xB)*x})
+    # multiplying with (1-xB) implements constraint CFF(xB=1) = 0
+    res = theory.predict(pt, parameters={'outputvalue':(1-xB)*x})
+    #res = - BSA((1-xB)*x, xB, t, Q2) 
+    return res
 
-map = {}
+# FIXME: this map2pt dictionary is attribute of the trans module but it would
+# be natural that it is attribute of Fitter instance, related to its artificial
+# data. But than it is not clear how to make it visible to brain.*
+map2pt = {}

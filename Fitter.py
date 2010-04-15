@@ -85,14 +85,14 @@ class FitterBrain(Fitter):
         training = brain.SupervisedDataSetTransformed(2, 1)  # FIXME: get size from data
         testing = brain.SupervisedDataSetTransformed(2, 1)
         i = 0
-        trans.map.clear()
+        trans.map2pt.clear()
         for pt in np.random.permutation(datapoints):
             xs = [pt.xB, pt.t, pt.Q2]
             # FIXME: This abs() below is for HERMES->BKM. Should be done using info
-            # from .dat Rounding the number, to make matching of trans.map work
+            # from .dat Rounding the number, to make matching of trans.map2pt work
             # regardless of computer rounding behaviour
-            y = [np.abs(pt.val) + round(np.random.normal(0, pt.err, 1)[0], 5)]
-            trans.map[y[0]] = (self.theory, pt)
+            y = [pt.val + round(np.random.normal(0, pt.err, 1)[0], 5)]
+            trans.map2pt[y[0]] = (self.theory, pt)
             # FIXME: trainsize should be specified by percentage and not by value
             if i < trainsize:
                 training.addSample(xs[:-1], y) # we don't use Q2 for training

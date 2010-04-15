@@ -410,7 +410,8 @@ class ComptonNNH(ComptonFormFactors):
     def __init__(self):
         self.nets = []
         #sys.stderr.write('Neural nets loaded from nets.pkl')
-        # single parameter is net index
+        # nnet -  net index
+        # outputvalue - given by neural net during training
         self.parameters = {'nnet':0, 'outputvalue':None}
         self.parameter_names = ['nnet', 'outputvalue']
         # now do whatever else is necessary

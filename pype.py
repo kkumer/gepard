@@ -27,7 +27,7 @@ data = utils.loaddata('data/ep2epgamma')  # dictionary {1 : DataSet instance, ..
 GLOpoints = data[32][12:] + data[8] + data[29]  # DM's GLO set
 GLO1points = data[31][12:] + data[8] + data[29] + data[30]  # DM's GLO1 set
 fitpoints = data[31][12:14] + data[8][1:3] + data[30][2:4]  # test set
-
+ptl = GLOpoints[-1]
 ## [4] Do the fit
 
 #t = DMGLO1.copy()
@@ -37,4 +37,4 @@ fitpoints = data[31][12:14] + data[8][1:3] + data[30][2:4]  # test set
 
 m = Model.ModelNN()
 t = Approach.hotfixedBMK(m)
-f = Fitter.FitterBrain(data[5], t)
+f = Fitter.FitterBrain(data[25], t)
