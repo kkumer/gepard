@@ -8,12 +8,12 @@ import copy
 from nose.tools import *
 import numpy as np
 
-import utils, models, Approach, fit
+import utils, Model, Approach, Fitter
 from results import DMGLO1  #use some testpars here?
 
 data = utils.loaddata('data/ep2epgamma')  
 
-m = models.ModelDR()
+m = Model.ModelDR()
 m.parameters.update(DMGLO1)
 m.release_parameters('bS', 'Mv')
 t = Approach.hotfixedBMK(m, optimization = False)
@@ -73,7 +73,7 @@ def test_fit():
 
 def test_fit2():
     """Testing actual fitting by FitterMinuit."""
-    f = fit.FitterMinuit(fitpoints, t)
+    f = Fitter.FitterMinuit(fitpoints, t)
     f.fit()
     assert_almost_equal(f.minuit.fval, 6.7638634368267949, 4)
 

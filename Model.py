@@ -403,7 +403,7 @@ class ComptonModelDR(ComptonDispersionRelations):
 class ComptonNNH(ComptonFormFactors):
     """Neural network CFF H.
 
-    Im(CFF H) is given by neural nets in file 'nets.pkl', while 
+    Im(CFF H) is given by neural nets to be created by FitterBrain, while 
     Re(CFF H) and other GPDs are zero.
     
     """

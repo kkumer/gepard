@@ -1,4 +1,4 @@
-"""Classes and other stuff for fitting."""
+"""Classes for fitting."""
 
 import sys
 
@@ -12,11 +12,8 @@ try: # if you have ROOT you might want minuit2
 except:
     from minuit import Minuit
 
-# Loading needed pybrain modules
 from pybrain.tools.shortcuts import buildNetwork
-from pybrain.datasets import SupervisedDataSet
-from pybrain.supervised import BackpropTrainer, RPropMinusTrainer
-
+import brain
 import trans  # output layer transformation for FitterBrain
 
 
@@ -85,8 +82,8 @@ class FitterBrain(Fitter):
 
            
         """
-        training = SupervisedDataSet(2, 1)  # FIXME: get size from data
-        testing = SupervisedDataSet(2, 1)
+        training = brain.SupervisedDataSetTransformed(2, 1)  # FIXME: get size from data
+        testing = brain.SupervisedDataSetTransformed(2, 1)
         i = 0
         trans.map.clear()
         for pt in np.random.permutation(datapoints):
@@ -113,8 +110,8 @@ class FitterBrain(Fitter):
 
         net = buildNetwork(2, 7, 1)
 
-        t = RPropMinusTrainer(net, learningrate = 0.9, lrdecay = 0.98, momentum = 0.0, 
-                batchlearning = True, verbose = False)
+        t = brain.RPropMinusTrainerTransformed(net, learningrate = 0.9, lrdecay = 0.98, 
+                momentum = 0.0, batchlearning = True, verbose = False)
 
         # Train in batches of batchlen epochs and repeat nbatch times
         nbatch = 20
