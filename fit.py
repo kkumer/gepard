@@ -2,6 +2,8 @@
 
 import sys
 
+import numpy as np
+
 #FIXME: this is needed only for FitterMinuit. It should
 # not raise exception on systems without pyminuit installed
 # after another Fitter is implemented, say NN
@@ -10,6 +12,13 @@ try: # if you have ROOT you might want minuit2
 except:
     from minuit import Minuit
 
+# Loading needed pybrain modules
+from pybrain.tools.shortcuts import buildNetwork
+from pybrain.datasets import SupervisedDataSet
+from pybrain.supervised import BackpropTrainer, RPropMinusTrainer
+
+import trans  # output layer transformation for FitterBrain
+
 
 class Fitter(object):
     """Superclass for fitting procedures/algorithms."""
@@ -17,8 +26,6 @@ class Fitter(object):
 
 class FitterMinuit(Fitter):
     """Fits using pyminuit."""
-
-
 
     def __init__(self, fitpoints, theory, **kwargs):
         self.fitpoints = fitpoints
@@ -53,4 +60,82 @@ def fcn(%s):
         self.theory.model.print_parameters()
         return self.theory
 
+
+class FitterBrain(Fitter):
+    """Fits using PyBrain neural net library."""
+
+    def __init__(self, fitpoints, theory, **kwargs):
+        self.fitpoints = fitpoints
+        self.theory = theory
+        self.verbose = 0
+
+    def artificialData(self, datapoints, trainsize=13):
+        """Create artificial data replica.
+        
+        Replica is created by randomly picking value around mean value taken from
+        original data, using normal Gaussian distribution with width equal to
+        uncertainty of the original data point. Resulting set of artificial
+        datapoints is then shuffled and divided into two SupervisedDataSet
+        instances: training and testing, which are returned.
+        Input datapoints can be DataSet instance or just a list of DataPoints
+        instances.
+
+        Keyword arguments:
+        trainsize -- size of subset used for training (rest is for testing)
+
+           
+        """
+        training = SupervisedDataSet(2, 1)  # FIXME: get size from data
+        testing = SupervisedDataSet(2, 1)
+        i = 0
+        trans.map.clear()
+        for pt in np.random.permutation(datapoints):
+            if pt.has_key('tm'):
+                pt.t = - pt.tm
+            xs = [pt.xB, pt.t, pt.Q2]
+            # FIXME: This abs() below is for HERMES->BKM. Should be done using info
+            # from .dat Rounding the number, to make matching of trans.map work
+            # regardless of computer rounding behaviour
+            y = [np.abs(pt.val) + round(np.random.normal(0, pt.err, 1)[0], 5)]
+            trans.map[y[0]] = xs 
+            # FIXME: trainsize should be specified by percentage and not by value
+            if i < trainsize:
+                training.addSample(xs[:-1], y) # we don't use Q2 for training
+            else:
+                testing.addSample(xs[:-1], y)
+            i += 1
+        return training, testing
+
+    def makenet(self, datapoints):
+        """Create trained net and return tuple (net, error)."""
+
+        dstrain, dstest = self.artificialData(datapoints)
+
+        net = buildNetwork(2, 7, 1)
+
+        t = RPropMinusTrainer(net, learningrate = 0.9, lrdecay = 0.98, momentum = 0.0, 
+                batchlearning = True, verbose = False)
+
+        # Train in batches of batchlen epochs and repeat nbatch times
+        nbatch = 20
+        batchlen = 5
+        memerr = 1.  # large initial error, certain to be bettered
+        for k in range(nbatch):
+            t.trainOnDataset(dstrain, batchlen)
+            trainerr, testerr = (t.testOnData(dstrain), t.testOnData(dstest))
+            if testerr < memerr:
+                memerr = testerr
+                memnet = net
+                if self.verbose:
+                    print "Epoch: %6i   ---->    Error: %8.3g  TestError: %8.3g" % (
+                            t.epoch, trainerr, testerr)
+        return net, memerr
+    
+    def fit(self, nnets=12):
+        """Create and train nnets (default: 12) neural networks."""
+        for n in range(nnets):
+            net, memerr = self.makenet(self.fitpoints)
+            print "Net No. %2i  --->  TestError: %8.3g" % (n, memerr)
+            self.theory.model.nets.append(net)
+        return self.theory
 

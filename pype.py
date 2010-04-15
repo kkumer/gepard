@@ -37,3 +37,7 @@ fitpoints = data[31][12:14] + data[8][1:3] + data[30][2:4]  # test set
 #f = fit.FitterMinuit(GLOpoints, t)
 #newDMGLO = f.fit()
 
+m = models.ModelNN()
+t = Approach.hotfixedBMK(m)
+f = fit.FitterBrain(data[5], t)
+

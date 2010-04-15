@@ -599,6 +599,8 @@ def nnH(ff, path=None, fmt='png'):
     fig.canvas.set_window_title(title)
     fig.suptitle(title)
     #fig.subplots_adjust(bottom=0.35)
+    old = ff.parameters['nnet']
+    ff.parameters['nnet'] = 'ALL'
     pt = Data.DummyPoint()
     ax = fig.add_subplot(2,1,1)
     ax.set_xscale('log')  # x-axis to be logarithmic
@@ -608,7 +610,7 @@ def nnH(ff, path=None, fmt='png'):
     down = []
     for x in xvals:
         pt.xB = x
-        nnres = x * ff.ImH(pt, {}) / np.pi
+        nnres = x * ff.ImH(pt) / np.pi
         mean = nnres.mean()
         std = nnres.std()
         up.append(mean + std/2.)
@@ -624,7 +626,7 @@ def nnH(ff, path=None, fmt='png'):
     down = []
     for x in xvals:
         pt.xB = x
-        nnres = x * ff.ImH(pt, {}) / np.pi
+        nnres = x * ff.ImH(pt) / np.pi
         mean = nnres.mean()
         std = nnres.std()
         up.append(mean + std/2.)
@@ -651,7 +653,7 @@ def nnH(ff, path=None, fmt='png'):
     down = []
     for x in xvals:
         pt.xB = x
-        nnres = x * ff.ImH(pt, {}) / np.pi
+        nnres = x * ff.ImH(pt) / np.pi
         mean = nnres.mean()
         std = nnres.std()
         up.append(mean + std/2.)
@@ -667,7 +669,7 @@ def nnH(ff, path=None, fmt='png'):
     down = []
     for x in xvals:
         pt.xB = x
-        nnres = x * ff.ImH(pt, {}) / np.pi
+        nnres = x * ff.ImH(pt) / np.pi
         mean = nnres.mean()
         std = nnres.std()
         up.append(mean + std/2.)
@@ -686,6 +688,7 @@ def nnH(ff, path=None, fmt='png'):
     #ax.legend()
     ax.text(0.1, 0.405, "t = 0")
     ax.text(0.1, 0.12, "t = -0.3 GeV^2")
+    ff.parameters['nnet'] = old
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:

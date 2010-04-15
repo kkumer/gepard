@@ -408,7 +408,7 @@ class ComptonNNH(ComptonFormFactors):
     
     """
     def __init__(self):
-        #self.nets = pickle.load(open('nets.pkl', 'r'))
+        self.nets = []
         #sys.stderr.write('Neural nets loaded from nets.pkl')
         # single parameter is net index
         self.parameters = {'nnet':0}
