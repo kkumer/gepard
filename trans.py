@@ -73,12 +73,11 @@ def BSA(ImcffH, xB, t, Q2):
            Q2))
       )
 
-
-def trans(x, theory_and_pt):
-    theory, pt = theory_and_pt
+def trans(x, theory_and_pt_and_deriv):
+    theory, pt, deriv = theory_and_pt_and_deriv
     xB, t, Q2 = pt.xB, pt.t, pt.Q2
     # multiplying with (1-xB) implements constraint CFF(xB=1) = 0
-    res = theory.predict(pt, parameters={'outputvalue':(1-xB)*x})
+    res = theory.predict(pt, parameters={'outputvalue':x})
     #res = - BSA((1-xB)*x, xB, t, Q2) 
     return res
 

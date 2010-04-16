@@ -92,7 +92,10 @@ class FitterBrain(Fitter):
             # from .dat Rounding the number, to make matching of trans.map2pt work
             # regardless of computer rounding behaviour
             y = [pt.val + round(np.random.normal(0, pt.err, 1)[0], 5)]
-            trans.map2pt[y[0]] = (self.theory, pt)
+            # Numerical derivative of transformation function w.r.t. net output:
+            deriv = (self.theory.predict(pt, parameters={'outputvalue':1.2}) -
+                     self.theory.predict(pt, parameters={'outputvalue':1.0})) / 0.2
+            trans.map2pt[y[0]] = (self.theory, pt, deriv)
             # FIXME: trainsize should be specified by percentage and not by value
             if i < trainsize:
                 training.addSample(xs[:-1], y) # we don't use Q2 for training
@@ -110,6 +113,9 @@ class FitterBrain(Fitter):
 
         t = brain.RPropMinusTrainerTransformed(net, learningrate = 0.9, lrdecay = 0.98, 
                 momentum = 0.0, batchlearning = True, verbose = False)
+
+        #t = brain.BackpropTrainerTransformed(net, learningrate = 0.7, lrdecay = 0.98,
+        #        momentum = 0.1 , batchlearning = False, verbose = False)
 
         # Train in batches of batchlen epochs and repeat nbatch times
         nbatch = 20
