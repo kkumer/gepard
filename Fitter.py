@@ -66,7 +66,7 @@ class FitterBrain(Fitter):
         self.theory = theory
         self.verbose = 0
 
-    def artificialData(self, datapoints, trainsize=13):
+    def artificialData(self, datapoints, trainpercentage=70):
         """Create artificial data replica.
         
         Replica is created by randomly picking value around mean value taken from
@@ -78,12 +78,13 @@ class FitterBrain(Fitter):
         instances.
 
         Keyword arguments:
-        trainsize -- size of subset used for training (rest is for testing)
+        trainpercentage -- size of subset used for training (rest is for testing)
 
            
         """
-        training = brain.SupervisedDataSetTransformed(2, 1)  # FIXME: get size from data
+        training = brain.SupervisedDataSetTransformed(2, 1) 
         testing = brain.SupervisedDataSetTransformed(2, 1)
+        trainsize = int(len(datapoints) * trainpercentage / 100.)
         i = 0
         trans.map2pt.clear()
         for pt in np.random.permutation(datapoints):
