@@ -37,4 +37,4 @@ ptl = GLOpoints[-1]
 
 m = Model.ModelNN()
 t = Approach.hotfixedBMK(m)
-f = Fitter.FitterBrain(data[25], t)
+f = Fitter.FitterBrain(data[34]+data[8], t)

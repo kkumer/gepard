@@ -64,6 +64,9 @@ class FitterBrain(Fitter):
     def __init__(self, fitpoints, theory, **kwargs):
         self.fitpoints = fitpoints
         self.theory = theory
+        self.outputs = 2  # For ImH and ReH
+        if self.theory.model.justImH: self.outputs = 1
+        self.inputs = 2 # for xB and t
         self.verbose = 0
 
     def artificialData(self, datapoints, trainpercentage=70):
@@ -82,26 +85,34 @@ class FitterBrain(Fitter):
 
            
         """
-        training = brain.SupervisedDataSetTransformed(2, 1) 
-        testing = brain.SupervisedDataSetTransformed(2, 1)
+        training = brain.SupervisedDataSetTransformed(self.inputs, self.outputs) 
+        testing = brain.SupervisedDataSetTransformed(self.inputs, self.outputs)
         trainsize = int(len(datapoints) * trainpercentage / 100.)
         i = 0
         trans.map2pt.clear()
         for pt in np.random.permutation(datapoints):
-            xs = [pt.xB, pt.t, pt.Q2]
-            # FIXME: This abs() below is for HERMES->BKM. Should be done using info
-            # from .dat Rounding the number, to make matching of trans.map2pt work
+            xs = [pt.xB, pt.t]
+            ys = self.outputs * [0]
+            # Rounding the number, to make matching of trans.map2pt work
             # regardless of computer rounding behaviour
-            y = [pt.val + round(np.random.normal(0, pt.err, 1)[0], 5)]
+            ys[0] = pt.val + round(np.random.normal(0, pt.err, 1)[0], 5)
+            # ys[1] is zero and never used.
             # Numerical derivative of transformation function w.r.t. net output:
-            deriv = (self.theory.predict(pt, parameters={'outputvalue':1.2}) -
-                     self.theory.predict(pt, parameters={'outputvalue':1.0})) / 0.2
-            trans.map2pt[y[0]] = (self.theory, pt, deriv)
-            # FIXME: trainsize should be specified by percentage and not by value
-            if i < trainsize:
-                training.addSample(xs[:-1], y) # we don't use Q2 for training
+            # FIXME: bit of a hack
+            if self.outputs == 1:
+                deriv = np.array([(self.theory.predict(pt, parameters={'outputvalue':(1.2,)}) -
+                         self.theory.predict(pt, parameters={'outputvalue':(1.0,)})) / 0.2])
             else:
-                testing.addSample(xs[:-1], y)
+                deriv1 = (self.theory.predict(pt, parameters={'outputvalue':(1.2, 1.0)}) -
+                         self.theory.predict(pt, parameters={'outputvalue':(1.0, 1.0)})) / 0.2
+                deriv2 = (self.theory.predict(pt, parameters={'outputvalue':(1.0, 1.2)}) -
+                         self.theory.predict(pt, parameters={'outputvalue':(1.0, 1.0)})) / 0.2
+                deriv = np.array([deriv1, deriv2])
+            trans.map2pt[ys[0]] = (self.theory, pt, deriv)
+            if i < trainsize:
+                training.addSample(xs, ys)
+            else:
+                testing.addSample(xs, ys)
             i += 1
         return training, testing
 
@@ -110,13 +121,10 @@ class FitterBrain(Fitter):
 
         dstrain, dstest = self.artificialData(datapoints)
 
-        net = buildNetwork(2, 7, 1)
+        net = buildNetwork(self.inputs, 7, self.outputs)
 
         t = brain.RPropMinusTrainerTransformed(net, learningrate = 0.9, lrdecay = 0.98, 
                 momentum = 0.0, batchlearning = True, verbose = False)
-
-        #t = brain.BackpropTrainerTransformed(net, learningrate = 0.7, lrdecay = 0.98,
-        #        momentum = 0.1 , batchlearning = False, verbose = False)
 
         # Train in batches of batchlen epochs and repeat nbatch times
         nbatch = 20

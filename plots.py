@@ -81,6 +81,7 @@ def subplot(ax, sets, lines=[], band=[], xaxis=None, kinlabels=[], plotlines=Tru
             try:
                 res = band.predict(pt, parameters={'nnet':'ALL'})
             except ValueError:  # shape mismatch so we have to go one by one
+                #FIXME: if len(band.model.nets)==5 exception will NOT occur!
                 res = np.array([band.predict(pt, parameters={'nnet':nnet}) for 
                     nnet in range(len(band.model.nets))])
         mean = res.mean()
@@ -593,8 +594,8 @@ def HBCSA(ff, fits=[], path=None, fmt='png'):
     return fig
 
 def nnH(ff, path=None, fmt='png'):
-    """Make plot of Im(cffH)."""
-    title = 'GPD H by neural nets (fit to HERMES BSA only!)'
+    """Make plot of Im(cffH) and Re(cffH)."""
+    title = 'GPD H by neural nets'
     fig = plt.figure()
     fig.canvas.set_window_title(title)
     fig.suptitle(title)
@@ -602,7 +603,7 @@ def nnH(ff, path=None, fmt='png'):
     old = ff.parameters['nnet']
     ff.parameters['nnet'] = 'ALL'
     pt = Data.DummyPoint()
-    ax = fig.add_subplot(2,1,1)
+    ax = fig.add_subplot(2,2,1)
     ax.set_xscale('log')  # x-axis to be logarithmic
     xvals = np.power(10., np.arange(-3.5, 0, 0.01)) 
     pt.t = 0.0
@@ -641,12 +642,12 @@ def nnH(ff, path=None, fmt='png'):
     #plt.ylim(0.0, 0.5)
     # axes labels
     ax.set_xlabel('$x$', fontsize=15)
-    ax.set_ylabel('$x H(x, x, t)$', fontsize=18)
+    ax.set_ylabel('$x\, H(x, x, t)$', fontsize=18)
     #ax.legend()
-    ax.text(0.01, 0.405, "t = 0")
-    ax.text(0.01, -0.1, "t = -0.3 GeV^2")
+    ax.text(0.01, 0.3, "$t = 0$")
+    ax.text(0.1, 0.05, "$t = -0.3 GeV^2$")
     ####  --- SECOND PANEL ---
-    ax = fig.add_subplot(2,1,2)
+    ax = fig.add_subplot(2,2,2)
     xvals = np.linspace(0.05, 0.2, 20)
     pt.t = 0.0
     up = []
@@ -684,10 +685,91 @@ def nnH(ff, path=None, fmt='png'):
     #plt.ylim(0.0, 0.5)
     # axes labels
     ax.set_xlabel('$x$', fontsize=15)
-    ax.set_ylabel('$x H(x, x, t)$', fontsize=18)
+    ax.set_ylabel('$x\, H(x, x, t)$', fontsize=18)
     #ax.legend()
-    ax.text(0.1, 0.405, "t = 0")
-    ax.text(0.1, 0.12, "t = -0.3 GeV^2")
+    ####  --- THIRD PANEL ---
+    ax = fig.add_subplot(2,2,3)
+    ax.set_xscale('log')  # x-axis to be logarithmic
+    xvals = np.power(10., np.arange(-3.5, 0, 0.01)) 
+    pt.t = 0.0
+    up = []
+    down = []
+    for x in xvals:
+        pt.xB = x
+        nnres = x * ff.ReH(pt)
+        mean = nnres.mean()
+        std = nnres.std()
+        up.append(mean + std/2.)
+        down.append(mean - std/2.)
+    up = np.array(up)
+    down = np.array(down)
+    x = plt.concatenate( (xvals, xvals[::-1]) )
+    y = plt.concatenate( (up, down[::-1]) )
+    ax.fill(x, y, facecolor='g', alpha=0.5)
+    ####
+    pt.t = -0.3
+    up = []
+    down = []
+    for x in xvals:
+        pt.xB = x
+        nnres = x * ff.ReH(pt)
+        mean = nnres.mean()
+        std = nnres.std()
+        up.append(mean + std/2.)
+        down.append(mean - std/2.)
+    up = np.array(up)
+    down = np.array(down)
+    x = plt.concatenate( (xvals, xvals[::-1]) )
+    y = plt.concatenate( (up, down[::-1]) )
+    ax.fill(x, y, facecolor='r', alpha=0.5)
+    #ax.set_ylim(0.0, 0.5)
+    ax.set_xlim(0.001, 1.0)
+    #plt.ylim(0.0, 0.5)
+    # axes labels
+    ax.set_xlabel('$x$', fontsize=15)
+    ax.set_ylabel('$x\; \Re e\, \mathcal{H}(x, t)$', fontsize=18)
+    #ax.legend()
+    ####  --- FOURTH PANEL ---
+    ax = fig.add_subplot(2,2,4)
+    xvals = np.linspace(0.05, 0.2, 20)
+    pt.t = 0.0
+    up = []
+    down = []
+    for x in xvals:
+        pt.xB = x
+        nnres = x * ff.ReH(pt)
+        mean = nnres.mean()
+        std = nnres.std()
+        up.append(mean + std/2.)
+        down.append(mean - std/2.)
+    up = np.array(up)
+    down = np.array(down)
+    x = plt.concatenate( (xvals, xvals[::-1]) )
+    y = plt.concatenate( (up, down[::-1]) )
+    ax.fill(x, y, facecolor='g', alpha=0.5)
+    ####
+    pt.t = -0.3
+    up = []
+    down = []
+    for x in xvals:
+        pt.xB = x
+        nnres = x * ff.ReH(pt) 
+        mean = nnres.mean()
+        std = nnres.std()
+        up.append(mean + std/2.)
+        down.append(mean - std/2.)
+    up = np.array(up)
+    down = np.array(down)
+    x = plt.concatenate( (xvals, xvals[::-1]) )
+    y = plt.concatenate( (up, down[::-1]) )
+    ax.fill(x, y, facecolor='r', alpha=0.5)
+    #ax.set_ylim(0.0, 0.5)
+    #ax.set_xlim(0.0005, 1.0)
+    #plt.ylim(0.0, 0.5)
+    # axes labels
+    ax.set_xlabel('$x$', fontsize=15)
+    ax.set_ylabel('$x\; \Re e\, \mathcal{H}(x, t)$', fontsize=18)
+    #ax.legend()
     ff.parameters['nnet'] = old
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)

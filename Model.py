@@ -401,13 +401,10 @@ class ComptonModelDR(ComptonDispersionRelations):
 
 
 class ComptonNNH(ComptonFormFactors):
-    """Neural network CFF H.
+    """Neural network CFF H -- both imaginary and real part given by nets."""
 
-    Im(CFF H) is given by neural nets to be created by FitterBrain, while 
-    Re(CFF H) and other GPDs are zero.
-    
-    """
-    def __init__(self):
+    def __init__(self, justImH=False):
+        self.justImH = justImH
         self.nets = []
         #sys.stderr.write('Neural nets loaded from nets.pkl')
         # nnet -  net index
@@ -416,14 +413,14 @@ class ComptonNNH(ComptonFormFactors):
         self.parameter_names = ['nnet', 'outputvalue']
         # now do whatever else is necessary
         Model.__init__(self)
-    
+
     def ImH(self, pt, outputvalue=None):
-        if self.parameters['outputvalue']:
+        if self.parameters['outputvalue'] != None:
             # this occurs during training
-            return self.parameters['outputvalue']
+            return self.parameters['outputvalue'][0]
         ar = []
         for net in self.nets:
-            ar.append(net.activate([pt.xB, pt.t]))
+            ar.append(net.activate([pt.xB, pt.t])[0])
         all = array(ar).flatten()
         if self.parameters.has_key('nnet'):
             if self.parameters['nnet'] == 'ALL':
@@ -437,6 +434,27 @@ class ComptonNNH(ComptonFormFactors):
         else:
             return all.mean()
 
+    def ReH(self, pt, outputvalue=None):
+        if self.justImH:
+            return 0
+        if self.parameters['outputvalue'] != None:
+            # this occurs during training
+            return self.parameters['outputvalue'][1]
+        ar = []
+        for net in self.nets:
+            ar.append(net.activate([pt.xB, pt.t])[1])
+        all = array(ar).flatten()
+        if self.parameters.has_key('nnet'):
+            if self.parameters['nnet'] == 'ALL':
+                return all
+            else: # we want particular net
+                try:
+                    return all[self.parameters['nnet']]
+                except IndexError:
+                    raise IndexError, str(self)+' has only '+str(len(self.nets))+' nets!'
+        # by default, we get mean value
+        else:
+            return all.mean()
 
 ##  --- Complete models built from the above components ---
 
