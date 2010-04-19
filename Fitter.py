@@ -66,6 +66,18 @@ class FitterBrain(Fitter):
         self.inputs = theory.model.architecture[0]
         self.outputs = theory.model.architecture[-1]
         self.verbose = 0
+        # Numerical derivative of transformation function w.r.t. net output:
+        left = self.outputs * [1.0]
+        right = self.outputs * [1.0]
+        for pt in self.fitpoints:
+            deriv = []
+            for k in range(self.outputs):
+                left[k] = 1.2
+                deriv.append((theory.predict(pt, parameters={'outputvalue':tuple(left)}) -
+                         theory.predict(pt, parameters={'outputvalue':tuple(right)})) / 0.2)
+                # return left to default value of [1, 1, ...]
+                left[k] = 1.0
+            pt.deriv = np.array(deriv)
 
     def artificialData(self, datapoints, trainpercentage=70):
         """Create artificial data replica.
@@ -95,27 +107,7 @@ class FitterBrain(Fitter):
             # regardless of computer rounding behaviour
             ys[0] = pt.val + round(np.random.normal(0, pt.err, 1)[0], 5)
             # ys[1:] are zero and are never used.
-            # Numerical derivative of transformation function w.r.t. net output:
-            # FIXME: bit of a hack and SHOULD NOT BE REDONE for every makenet!!
-            left = self.outputs * [1.0]
-            right = tuple(self.outputs * [1.0])
-            deriv = []
-            for k in range(self.outputs):
-                left[k] = 1.2
-                deriv.append((self.theory.predict(pt, parameters={'outputvalue':tuple(left)}) -
-                         self.theory.predict(pt, parameters={'outputvalue':right})) / 0.2)
-                left[k] = 1.0
-            deriv = np.array(deriv)
-            #if self.outputs == 1:
-            #    deriv = np.array([(self.theory.predict(pt, parameters={'outputvalue':(1.2,)}) -
-            #             self.theory.predict(pt, parameters={'outputvalue':(1.0,)})) / 0.2])
-            #else:
-            #    deriv1 = (self.theory.predict(pt, parameters={'outputvalue':(1.2, 1.0)}) -
-            #             self.theory.predict(pt, parameters={'outputvalue':(1.0, 1.0)})) / 0.2
-            #    deriv2 = (self.theory.predict(pt, parameters={'outputvalue':(1.0, 1.2)}) -
-            #             self.theory.predict(pt, parameters={'outputvalue':(1.0, 1.0)})) / 0.2
-            #    deriv = np.array([deriv1, deriv2])
-            trans.map2pt[ys[0]] = (self.theory, pt, deriv)
+            trans.map2pt[ys[0]] = (self.theory, pt)
             if i < trainsize:
                 training.addSample(xs, ys)
             else:

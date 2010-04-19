@@ -404,6 +404,7 @@ class ComptonNNH(ComptonFormFactors):
     """Neural network CFF H -- both imaginary and real part given by nets."""
 
     def __init__(self, justImH=False):
+        self.architecture = [2, 7, 2]
         self.justImH = justImH
         self.nets = []
         #sys.stderr.write('Neural nets loaded from nets.pkl')
@@ -460,6 +461,11 @@ class ComptonNNH(ComptonFormFactors):
         else:
             return all.mean()
 
+    funcnames = ['ImE', 'ReE', 'ImHt', 'ReHt', 'ImEt', 'ReEt']
+    # Initial definition of other CFFs. All just return zero.
+    for name in funcnames:
+        exec('def %s(self, pt): return 0.' % name)
+
 class ComptonNeuralNets(ComptonFormFactors):
     """Neural network CFFs"""
 
@@ -498,12 +504,14 @@ class ComptonNeuralNets(ComptonFormFactors):
 
     def CFF(self, pt, outputvalue=None):
         ind = self.output_layer.index(self.curname)
-        #sys.stderr.write('ind, ov = ', ind, self.parameters['outputvalue'])
         if self.parameters['outputvalue'] != None:
-            # this occurs during training
+            # this occurs during training: value is set by training
+            # routine by calling with outputvalue set by training routine
             return self.parameters['outputvalue'][ind]
         ar = []
         for net in self.nets:
+            #FIXME: network is unneccessarily run for each CFF. This could
+            # be optimized by running it just once for each pt.
             ar.append(net.activate([pt.xB, pt.t])[ind])
         all = array(ar).flatten()
         if self.parameters.has_key('nnet'):

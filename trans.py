@@ -1,7 +1,7 @@
 # Output layer transformation function
 
-def trans(x, theory_and_pt_and_deriv):
-    theory, pt, deriv = theory_and_pt_and_deriv
+def trans(x, theory_and_pt):
+    theory, pt = theory_and_pt
     # could be multiplying with (1-xB) to implement constraint CFF(xB=1) = 0
     res = theory.predict(pt, parameters={'outputvalue':x})
     return res

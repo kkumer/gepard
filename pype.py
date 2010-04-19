@@ -2,6 +2,9 @@
 
 import shelve
 
+import numpy as np
+#np.random.seed(68)
+
 import Model, Approach, Fitter
 import utils 
 import plots
@@ -29,12 +32,13 @@ fitpoints = data[31][12:14] + data[8][1:3] + data[30][2:4]  # test set
 HA17 = utils.select(data[34], criteria=['t == -0.17'])
 HA33 = utils.select(data[34], criteria=['t == -0.33'])
 #fitpoints = GLO1points + 6*data[30]
-fitpoints = GLO1points
+fitpoints = GLOpoints
 #fitpoints = data[5]
 
 ## [3] Create a theory
 
-m = Model.ModelNN(output_layer=['ImH', 'ReH', 'ReHt'])
+m = Model.ModelNNH()
+#m = Model.ModelNN(output_layer=['ImH', 'ReH', 'ImHt', 'ReHt'])
 t = Approach.hotfixedBMK(m)
 
 #m = Model.ModelDR()

@@ -28,7 +28,7 @@ class RPropMinusTrainerTransformed(RPropMinusTrainer):
             # weigh the error DON'T - it's taken care by data replicas
             #outerr = outerr / trans.map2pt[float(target[0])][1].err
             # multiply outerr with d trans/d output !!
-            outerr = outerr * trans.map2pt[float(target[0])][2]
+            outerr = outerr * trans.map2pt[float(target[0])][1].deriv
             if len(sample) > 2:
                 importance = sample[2]
                 error += 0.5 * dot(importance, outerr ** 2)
