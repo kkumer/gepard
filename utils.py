@@ -308,5 +308,7 @@ def select(dataset, criteria=[], logic='AND'):
     return selected
 
 def listdb(db):
+    print "%-8s  |  %s" % ('name', 'description')
+    print "%-8s--+--%s" % (8*'-', 60*'-')
     for key in db:
-        print "%-8s --  %s" % (key, db[key].description)
+        print "%-8s  |  %s" % (key, db[key].description)

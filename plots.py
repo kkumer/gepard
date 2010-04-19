@@ -222,7 +222,8 @@ def CLAS(data, lines=[], band=[], path=None, fmt='png'):
 def HALLA(data, lines=[], band=[], path=None, fmt='png'):
     """Makes plot of HALL-A data with fit lines"""
 
-    ids = [9, 14, 20, 21, 23, 24]
+    #ids = [9, 14, 20, 21, 23, 24]
+    ids = [9, 20, 21, 23, 24]
     subsets = {}
     subsets[9] = utils.select(data[33], criteria=['Q2 == 1.5', 't == -0.17'])
     subsets[14] = utils.select(data[33], criteria=['Q2 == 1.9', 't == -0.23'])
@@ -238,8 +239,11 @@ def HALLA(data, lines=[], band=[], path=None, fmt='png'):
     for id in ids:
         ax = fig.add_subplot(2,3,panel)
         subplot(ax, [subsets[id]], lines, band, 'phi', ['Q2', 't'])
-        ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(120))
+        ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(2.))
         panel += 1
+    ax = fig.add_subplot(2,3,6)
+    subplot(ax, [data[30]], lines, band, xaxis='t')
+    ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.06))
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
@@ -451,7 +455,7 @@ def EIC(fits=[], path=None, fmt='png'):
     phi = np.arange(0., 2*np.pi, 0.2)
     utils.fill_kinematics(pt)
     linestyles = ['g--', 'b-']
-    labels = ['polarized model1', 'polarized model2']
+    labels = ['polarized ' + t.name for t in fits]
     pn = 0
     for approach in fits:
         approach.__class__.to_conventions(pt)
@@ -460,7 +464,7 @@ def EIC(fits=[], path=None, fmt='png'):
         ax.plot(phi, line, linestyles[pn], linewidth=1, label=labels[pn]) 
         pn += 1
     linestyles = ['r-.', 'p:']
-    labels = ['unpolarized model1', 'unpolarized model2']
+    labels = ['unpolarized ' + t.name for t in fits]
     pn = 0
     for approach in fits:
         approach.__class__.to_conventions(pt)
@@ -498,7 +502,6 @@ def H(theories=[], path=None, fmt='png'):
     xval = np.power(10., np.arange(-3.5, 0, 0.01)) 
     colors = ['red', 'green', 'brown', 'purple']
     styles = ['-', '--', '-.', ':']
-    labels = ['model 1', 'model 2', 'model 3', 'model 4']
     pn = 0
     for t in theories:
         pt.t = 0.0
@@ -507,7 +510,7 @@ def H(theories=[], path=None, fmt='png'):
         pt.t = -0.3
         line2 = xval * t.model.ImH(pt, xval) / np.pi
         ax.plot(xval, line1, color=colors[pn], linestyle=styles[pn], linewidth=2)
-        ax.plot(xval, line2, color=colors[pn], linestyle=styles[pn], linewidth=4, label=labels[pn]) 
+        ax.plot(xval, line2, color=colors[pn], linestyle=styles[pn], linewidth=4, label=t.name) 
         pn += 1
     ax.set_ylim(0.0, 0.5)
     ax.set_xlim(0.0005, 1.0)
@@ -572,14 +575,12 @@ def HBCSA(ff, fits=[], path=None, fmt='png'):
     phi = np.arange(0., np.pi, 0.2)
     utils.fill_kinematics(pt)
     linestyles = ['g--', 'b-', 'r-.']
-    labels = ['HERMES+CLAS', 'HERMES+CLAS+HALLA', '+HALLA(phi)']
-    #labels = ['GLO1 (DM)', 'GLO1 (KK)', '']
     pn = 0
     for approach in fits:
         approach.__class__.to_conventions(pt)
         approach.__class__.prepare(pt)
         line = approach.BCSA(pt, vars={'phi':np.pi - phi})
-        ax.plot(phi, line, linestyles[pn], linewidth=2, label=labels[pn]) 
+        ax.plot(phi, line, linestyles[pn], linewidth=2, label=approach.name) 
         pn += 1
     #ax.set_ylim(0.0, 0.5)
     # axes labels

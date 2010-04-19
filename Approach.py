@@ -32,6 +32,7 @@ class Approach(object):
         self.model = m
         self.m = self.model  # shortcut
         self.optimization = optimization
+        self.name = 'N/A'  # to be used as identifier in theory database
         self.description = 'N/A'  # something human-understandable
 
     def __repr__(self):
@@ -43,6 +44,10 @@ class Approach(object):
         """Return deep copy of itself."""
         return copy.deepcopy(self)
 
+    def save(self, db):
+        """Save theory to database."""
+        db[self.name] = self
+
     def print_chisq(self, points):
         """Pretty-print the chi-square and parameter values."""
         nfreepars=utils.npars(self.model)
@@ -52,6 +57,7 @@ class Approach(object):
         chi = sum(s*s for s in sigmas)  # equal to m.fval if minuit fit is done
         fitprob = (1.-gammainc(dof/2., chi/2.)) # probability of this chi-sq
         print 'P(chi-square, d.o.f) = P(%1.2f, %2d) = %5.4f' % (chi, dof, fitprob)
+        #return sigmas
 
     def predict(self, pt, **kwargs):
         """Give prediction for DataPoint pt.

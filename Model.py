@@ -113,18 +113,14 @@ class ComptonFormFactors(Model):
     They are set to be zero here. Actual models are built by subclassing this.
 
     """
-    funcnames = ['ImH', 'ReH', 'ImE', 'ReE', 'ImHt', 'ReHt', 'ImEt', 'ReEt']
-    # Initial definition of CFFs. All just return zero.
-    for name in funcnames:
-        exec('def %s(self, pt): return 0.' % name)
-
 
     def CFFvalues(self, pt):
         """Print values of CFFs. Pastable into Mathematica."""
-        vals = map(lambda cff: str(getattr(self, cff)(pt)), self.funcnames)
+        funcnames = ['ImH', 'ReH', 'ImE', 'ReE', 'ImHt', 'ReHt', 'ImEt', 'ReEt']
+        vals = map(lambda cff: str(getattr(self, cff)(pt)), funcnames)
         s = "{" + 8*"%s -> %s, "
         s = s[:-2] + "}"
-        return s % flatten(tuple(zip(self.funcnames, vals)))
+        return s % flatten(tuple(zip(funcnames, vals)))
 
 
 class ComptonDispersionRelations(ComptonFormFactors):
@@ -209,6 +205,10 @@ class ComptonDispersionRelations(ComptonFormFactors):
         pv = res + log((1.+pt.xi)/(1.-pt.xi)) * self.ImEt(pt)
         return pv/pi   # this is P.V./pi 
 
+    funcnames = ['ImH', 'ImE', 'ImHt', 'ImEt']
+    # Initial definition of other CFFs. All just return zero.
+    for name in funcnames:
+        exec('def %s(self, pt): return 0.' % name)
 
 class ComptonModelDRdict(ComptonDispersionRelations):
     """Model for CFFs as in arXiv:0904.0458."""
@@ -425,12 +425,14 @@ class ComptonNNH(ComptonFormFactors):
         if self.parameters.has_key('nnet'):
             if self.parameters['nnet'] == 'ALL':
                 return all
+            elif self.parameters['nnet'] == 'AVG':
+                return all.mean()
             else: # we want particular net
                 try:
                     return all[self.parameters['nnet']]
                 except IndexError:
                     raise IndexError, str(self)+' has only '+str(len(self.nets))+' nets!'
-        # by default, we get mean value
+        # by default, we get mean value (FIXME:this should never occurr?)
         else:
             return all.mean()
 
@@ -447,6 +449,8 @@ class ComptonNNH(ComptonFormFactors):
         if self.parameters.has_key('nnet'):
             if self.parameters['nnet'] == 'ALL':
                 return all
+            elif self.parameters['nnet'] == 'AVG':
+                return all.mean()
             else: # we want particular net
                 try:
                     return all[self.parameters['nnet']]
@@ -456,12 +460,75 @@ class ComptonNNH(ComptonFormFactors):
         else:
             return all.mean()
 
+class ComptonNeuralNets(ComptonFormFactors):
+    """Neural network CFFs"""
+
+    def __init__(self, hidden_layers=[7], output_layer=['ImH', 'ReH']):
+        """Model CFFs by neural networks.
+        
+        Neural network, created actually by Fitter instance, will have
+        architecture:
+        input layer: two neurons for xB and t
+        hidden_layers: keyword argument hidden_layers is a list specifying
+                       number of neurons in consequtive hidden layers (so
+                       default is just one hidden layer with 7 neurons)
+        output_layer:  keyword argument output_layer is a list specifying
+                       names of CFFs will be given by neural nets. Rest are
+                       zero.
+        
+        """
+        self.architecture = [2] + hidden_layers + [len(output_layer)]
+        self.output_layer = output_layer
+        self.nets = []
+        self.parameters = {'nnet':0, 'outputvalue':None}
+        self.parameter_names = ['nnet', 'outputvalue']
+        # now do whatever else is necessary
+        Model.__init__(self)
+
+    def __getattr__(self, name):
+        if name in self.output_layer:
+            self.curname = name
+            return self.CFF
+        else:
+            # if asked for CFF which is not in output_layer, return 0
+            return self.zero
+
+    def zero(self, *args, **kwargs):
+        return 0
+
+    def CFF(self, pt, outputvalue=None):
+        ind = self.output_layer.index(self.curname)
+        #sys.stderr.write('ind, ov = ', ind, self.parameters['outputvalue'])
+        if self.parameters['outputvalue'] != None:
+            # this occurs during training
+            return self.parameters['outputvalue'][ind]
+        ar = []
+        for net in self.nets:
+            ar.append(net.activate([pt.xB, pt.t])[ind])
+        all = array(ar).flatten()
+        if self.parameters.has_key('nnet'):
+            if self.parameters['nnet'] == 'ALL':
+                return all
+            elif self.parameters['nnet'] == 'AVG':
+                return all.mean()
+            else: # we want particular net
+                try:
+                    return all[self.parameters['nnet']]
+                except IndexError:
+                    raise IndexError, str(self)+' has only '+str(len(self.nets))+' nets!'
+        # by default, we get mean value (FIXME:this should never occurr?)
+        else:
+            return all.mean()
+
 ##  --- Complete models built from the above components ---
 
 class ModelDR(ComptonModelDR, ElasticDipole):
     """Complete model as in arXiv:0904.0458.."""
 
 
-class ModelNN(ComptonNNH, ElasticDipole):
+class ModelNN(ComptonNeuralNets, ElasticDipole):
     """Complete model."""
+
+class ModelNNH(ComptonNNH, ElasticDipole):
+    """Complete model - devel version with just ImH and ReH."""
 

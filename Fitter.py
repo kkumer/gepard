@@ -55,7 +55,6 @@ def fcn(%s):
         print "ncalls = ", self.minuit.ncalls
         self.theory.print_chisq(self.fitpoints)
         self.theory.model.print_parameters()
-        return self.theory
 
 
 class FitterBrain(Fitter):
@@ -64,9 +63,8 @@ class FitterBrain(Fitter):
     def __init__(self, fitpoints, theory, **kwargs):
         self.fitpoints = fitpoints
         self.theory = theory
-        self.outputs = 2  # For ImH and ReH
-        if self.theory.model.justImH: self.outputs = 1
-        self.inputs = 2 # for xB and t
+        self.inputs = theory.model.architecture[0]
+        self.outputs = theory.model.architecture[-1]
         self.verbose = 0
 
     def artificialData(self, datapoints, trainpercentage=70):
@@ -96,18 +94,27 @@ class FitterBrain(Fitter):
             # Rounding the number, to make matching of trans.map2pt work
             # regardless of computer rounding behaviour
             ys[0] = pt.val + round(np.random.normal(0, pt.err, 1)[0], 5)
-            # ys[1] is zero and never used.
+            # ys[1:] are zero and are never used.
             # Numerical derivative of transformation function w.r.t. net output:
-            # FIXME: bit of a hack
-            if self.outputs == 1:
-                deriv = np.array([(self.theory.predict(pt, parameters={'outputvalue':(1.2,)}) -
-                         self.theory.predict(pt, parameters={'outputvalue':(1.0,)})) / 0.2])
-            else:
-                deriv1 = (self.theory.predict(pt, parameters={'outputvalue':(1.2, 1.0)}) -
-                         self.theory.predict(pt, parameters={'outputvalue':(1.0, 1.0)})) / 0.2
-                deriv2 = (self.theory.predict(pt, parameters={'outputvalue':(1.0, 1.2)}) -
-                         self.theory.predict(pt, parameters={'outputvalue':(1.0, 1.0)})) / 0.2
-                deriv = np.array([deriv1, deriv2])
+            # FIXME: bit of a hack and SHOULD NOT BE REDONE for every makenet!!
+            left = self.outputs * [1.0]
+            right = tuple(self.outputs * [1.0])
+            deriv = []
+            for k in range(self.outputs):
+                left[k] = 1.2
+                deriv.append((self.theory.predict(pt, parameters={'outputvalue':tuple(left)}) -
+                         self.theory.predict(pt, parameters={'outputvalue':right})) / 0.2)
+                left[k] = 1.0
+            deriv = np.array(deriv)
+            #if self.outputs == 1:
+            #    deriv = np.array([(self.theory.predict(pt, parameters={'outputvalue':(1.2,)}) -
+            #             self.theory.predict(pt, parameters={'outputvalue':(1.0,)})) / 0.2])
+            #else:
+            #    deriv1 = (self.theory.predict(pt, parameters={'outputvalue':(1.2, 1.0)}) -
+            #             self.theory.predict(pt, parameters={'outputvalue':(1.0, 1.0)})) / 0.2
+            #    deriv2 = (self.theory.predict(pt, parameters={'outputvalue':(1.0, 1.2)}) -
+            #             self.theory.predict(pt, parameters={'outputvalue':(1.0, 1.0)})) / 0.2
+            #    deriv = np.array([deriv1, deriv2])
             trans.map2pt[ys[0]] = (self.theory, pt, deriv)
             if i < trainsize:
                 training.addSample(xs, ys)
