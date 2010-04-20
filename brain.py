@@ -26,7 +26,7 @@ class RPropMinusTrainerTransformed(RPropMinusTrainer):
             outerr = target[0] - trans.trans(self.module.outputbuffer[offset], 
                     trans.map2pt[float(target[0])])
             # weigh the error DON'T - it's taken care by data replicas
-            #outerr = outerr / trans.map2pt[float(target[0])][1].err
+            outerr = outerr / trans.map2pt[float(target[0])][1].err
             # multiply outerr with d trans/d output !!
             outerr = outerr * trans.map2pt[float(target[0])][1].deriv
             if len(sample) > 2:
@@ -56,7 +56,9 @@ class SupervisedDataSetTransformed(SupervisedDataSet):
         for input, target in seq:
             #res = f(input)
             res = trans.trans(f(input), trans.map2pt[float(target[0])])
-            e = 0.5 * sum((target[0]-res).flatten()**2)
+            auxe = (target[0]-res)
+            auxe = auxe / trans.map2pt[float(target[0])][1].err
+            e = 0.5 * sum(auxe.flatten()**2)
             totalError += e
             ponderation += len(target)
             if verbose:

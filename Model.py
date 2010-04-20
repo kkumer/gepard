@@ -304,7 +304,6 @@ class ComptonModelDRdict(ComptonDispersionRelations):
         return (2.2390424 * (1. - (1.7*(0.0196 - pt.t))/(1. 
             - pt.t/2.)**2))/((0.0196 - pt.t)*pt.xi)
 
-
 class ComptonModelDR(ComptonDispersionRelations):
     """Model for CFFs as in arXiv:0904.0458. -- no AttrDict!"""
 

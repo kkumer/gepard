@@ -48,16 +48,26 @@ class Approach(object):
         """Save theory to database."""
         db[self.name] = self
 
-    def print_chisq(self, points):
-        """Pretty-print the chi-square and parameter values."""
+    def chisq(self, points, sigmas=False):
+        """Return tuple (chi-square, d.o.f., probability).."""
         nfreepars=utils.npars(self.model)
         dof = len(points) - nfreepars
-        sigmas = [(getattr(self, pt.yaxis)(pt) - pt.val) / pt.err for
+        allsigmas = [(getattr(self, pt.yaxis)(pt) - pt.val) / pt.err for
                     pt in points]
-        chi = sum(s*s for s in sigmas)  # equal to m.fval if minuit fit is done
+        chi = sum(s*s for s in allsigmas)  # equal to m.fval if minuit fit is done
         fitprob = (1.-gammainc(dof/2., chi/2.)) # probability of this chi-sq
-        print 'P(chi-square, d.o.f) = P(%1.2f, %2d) = %5.4f' % (chi, dof, fitprob)
-        #return sigmas
+        if sigmas:
+            return allsigmas
+        else:
+            return (chi, dof, fitprob)
+
+    def print_chisq(self, points, sigmas=False):
+        """Pretty-print the chi-square."""
+        if sigmas:
+            print self.chisq(points, sigmas=True)
+        else:
+            print 'P(chi-square, d.o.f) = P(%1.2f, %2d) = %5.4f' % self.chisq(points)
+
 
     def predict(self, pt, **kwargs):
         """Give prediction for DataPoint pt.
@@ -532,8 +542,8 @@ class BMK(Approach):
     def BSSw2C(self, pt):
         """Re(C^I) or Re(C^I + Del C^I) as defined by HALL A.
 
-        FIXME: Name of this fun is funny. Also, check agreement with exp,
-        might be horrible.
+        FIXME: Although it is attributed to FTn=0, Re(C^I + Del C^I)
+        is only a part of zeroth harmonic. 
 
         """
         if pt.FTn == 0:

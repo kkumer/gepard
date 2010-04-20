@@ -7,7 +7,6 @@ Just run 'nosetest' in the pype directory.
 import copy
 from nose.tools import *
 import numpy as np
-np.random.seed(68)
 
 import utils, Model, Approach, Fitter
 from results import DMGLO1  #use some testpars here?
@@ -84,6 +83,7 @@ test_fit2.long = 1
 
 def test_fit_neural():
     """Testing neural network fitting by FitterBrain."""
+    np.random.seed(68)
     mNN = Model.ModelNN()
     tNN = Approach.hotfixedBMK(mNN)
     fNN = Fitter.FitterBrain(fitpoints, tNN)

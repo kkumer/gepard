@@ -17,10 +17,10 @@ data = utils.loaddata('data/ep2epgamma')  # dictionary {1 : DataSet instance, ..
 db = shelve.open('theories.db', 'r')
 
 ## some shortcuts
-#DMGLO = db['DMGLO']
-#DMGLO1 = db['DMGLO1']
+tDMGLO = db['DMGLO']
+tDMGLO1 = db['DMGLO1']
 #KKGLO = db['KKGLO']
-#KKGLO1 = db['KKGLO1']
+tKKGLO1 = db['KKGLO1']
 #NN1 = db['NN1']
 
 
@@ -30,15 +30,20 @@ GLOpoints = data[32][12:] + data[8] + data[29]  # DM's GLO set
 GLO1points = data[31][12:] + data[8] + data[29] + data[30]  # DM's GLO1 set
 fitpoints = data[31][12:14] + data[8][1:3] + data[30][2:4]  # test set
 HA17 = utils.select(data[34], criteria=['t == -0.17'])
+HA28 = utils.select(data[34], criteria=['t == -0.28'])
 HA33 = utils.select(data[34], criteria=['t == -0.33'])
 #fitpoints = GLO1points + 6*data[30]
-fitpoints = GLOpoints
-#fitpoints = data[5]
+fitpoints = GLOpoints + HA17[::4] + HA33[::4]
+#fitpoints = data[26]
+#fitpoints = GLOpoints + HA17
+ptSS = HA17[11]
 
 ## [3] Create a theory
 
-m = Model.ModelNNH()
-#m = Model.ModelNN(output_layer=['ImH', 'ReH', 'ImHt', 'ReHt'])
+#m = Model.ModelNN()
+#m = Model.ModelNN(output_layer=['ImH', 'ReH', 'ImHt', 'ReHt', 'ImE', 'ReE', 'ImEt', 'ReEt'])
+m = Model.ModelNN(output_layer=['ImH', 'ReH', 'ImHt', 'ReHt'])
+#m = Model.ModelNN(output_layer=['ImH'])
 t = Approach.hotfixedBMK(m)
 
 #m = Model.ModelDR()
@@ -48,7 +53,7 @@ t = Approach.hotfixedBMK(m)
 #t.description = 'DM fit to HERMES and CLAS BSA/BCA data. Only CFF H.'
 #t.save(db)
 #del m, t
-
+#
 #m = Model.ModelDR()
 #m.parameters.update(DMGLO1)
 #t = Approach.hotfixedBMK(m)
@@ -57,13 +62,14 @@ t = Approach.hotfixedBMK(m)
 #t.save(db)
 #db['DMGLO1'] = t
 #del m, t
-
+#
 #db.close()
 
 ## [4] Do the fit
 
-#t = db['DMGLO'].copy()
-#t.model.release_parameters('bS', 'rv', 'bv', 'C', 'MC') #, 'trv')
-#f = Fitter.FitterMinuit(GLOpoints, t)
+#t = db['DMGLO1'].copy()
+#t.model.release_parameters('bS', 'rv', 'bv', 'C', 'MC', 'trv')
+#f = Fitter.FitterMinuit(fitpoints, t)
 
 f = Fitter.FitterBrain(fitpoints, t)
+f.fit(nnets=4)

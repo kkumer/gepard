@@ -1,4 +1,5 @@
 """Classes for fitting."""
+#from IPython.Debugger import Tracer; debug_here = Tracer()
 
 import sys
 
@@ -118,33 +119,39 @@ class FitterBrain(Fitter):
     def makenet(self, datapoints):
         """Create trained net and return tuple (net, error)."""
 
-        dstrain, dstest = self.artificialData(datapoints)
+        self.dstrain, self.dstest = self.artificialData(datapoints)
 
         net = buildNetwork(self.inputs, 7, self.outputs)
 
-        t = brain.RPropMinusTrainerTransformed(net, learningrate = 0.9, lrdecay = 0.98, 
-                momentum = 0.0, batchlearning = True, verbose = False)
+        self.trainer = brain.RPropMinusTrainerTransformed(net, learningrate = 0.9, 
+                lrdecay = 0.98, momentum = 0.0, batchlearning = True, verbose = False)
 
         # Train in batches of batchlen epochs and repeat nbatch times
-        nbatch = 20
+        nbatch = 200
         batchlen = 5
+        #nbatch = 1
+        #batchlen = 1
         memerr = 1.  # large initial error, certain to be bettered
         for k in range(nbatch):
-            t.trainOnDataset(dstrain, batchlen)
-            trainerr, testerr = (t.testOnData(dstrain), t.testOnData(dstest))
+            self.trainer.trainOnDataset(self.dstrain, batchlen)
+            trainerr, testerr = (self.trainer.testOnData(self.dstrain), 
+                    self.trainer.testOnData(self.dstest))
             if testerr < memerr:
                 memerr = testerr
-                memnet = net
+                memnet = net.copy()
                 if self.verbose:
                     print "Epoch: %6i   ---->    Error: %8.3g  TestError: %8.3g" % (
-                            t.epoch, trainerr, testerr)
-        return net, memerr
+                            self.trainer.epoch, trainerr, testerr)
+        return memnet, memerr
     
     def fit(self, nnets=12):
         """Create and train nnets (default: 12) neural networks."""
         for n in range(nnets):
             net, memerr = self.makenet(self.fitpoints)
-            print "Net No. %2i  --->  TestError: %8.3g" % (n, memerr)
             self.theory.model.nets.append(net)
+            self.theory.model.parameters['nnet'] = n
+            chi, dof, fitprob = self.theory.chisq(self.fitpoints)
+            print "Net %2i ---> TestError: %8.3g  ---> P(chisq = %1.2f) = %5.4f " % (
+                    n, memerr, chi, fitprob)
         return self.theory
 

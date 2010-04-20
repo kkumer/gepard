@@ -222,8 +222,34 @@ def CLAS(data, lines=[], band=[], path=None, fmt='png'):
 def HALLA(data, lines=[], band=[], path=None, fmt='png'):
     """Makes plot of HALL-A data with fit lines"""
 
-    #ids = [9, 14, 20, 21, 23, 24]
-    ids = [9, 20, 21, 23, 24]
+    subsets = {}
+    subsets[1] = utils.select(data[26], criteria=['Q2 == 1.9'])
+    subsets[2] = utils.select(data[35], criteria=['FTn == 1'])
+    subsets[3] = utils.select(data[35], criteria=['FTn == 0'])
+    subsets[4] = data[30]
+    title = 'HALL-A'
+    fig = plt.figure()
+    fig.canvas.set_window_title(title)
+    fig.suptitle(title)
+    for panel in range(1,5):
+        ax = fig.add_subplot(2,3,panel)
+        subplot(ax, [subsets[panel]], lines, band, 't')
+        if panel == 2:
+            ax.set_ylabel(toTeX['ReCI'], fontsize=18)
+        elif panel == 3:
+            ax.set_ylabel(toTeX['ReCpDCI'], fontsize=18)
+        ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))
+    if path:
+        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+    else:
+        fig.canvas.draw()
+        fig.show()
+    return fig
+
+def HALLAphi(data, lines=[], band=[], path=None, fmt='png'):
+    """Makes plot of HALL-A data with fit lines"""
+
+    ids = [9, 14, 20, 21, 23, 24]
     subsets = {}
     subsets[9] = utils.select(data[33], criteria=['Q2 == 1.5', 't == -0.17'])
     subsets[14] = utils.select(data[33], criteria=['Q2 == 1.9', 't == -0.23'])
@@ -241,9 +267,6 @@ def HALLA(data, lines=[], band=[], path=None, fmt='png'):
         subplot(ax, [subsets[id]], lines, band, 'phi', ['Q2', 't'])
         ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(2.))
         panel += 1
-    ax = fig.add_subplot(2,3,6)
-    subplot(ax, [data[30]], lines, band, xaxis='t')
-    ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.06))
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
