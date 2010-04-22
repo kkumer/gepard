@@ -65,9 +65,7 @@ class Approach(object):
         """Pretty-print the chi-square."""
         if sigmas:
             print self.chisq(points, sigmas=True)
-        else:
-            print 'P(chi-square, d.o.f) = P(%1.2f, %2d) = %5.4f' % self.chisq(points)
-
+        print 'P(chi-square, d.o.f) = P(%1.2f, %2d) = %5.4f' % self.chisq(points)
 
     def predict(self, pt, **kwargs):
         """Give prediction for DataPoint pt.

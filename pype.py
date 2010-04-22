@@ -14,14 +14,7 @@ import plots
 # [1] Load experimental data and theoretical models
 
 data = utils.loaddata('data/ep2epgamma')  # dictionary {1 : DataSet instance, ...}
-db = shelve.open('theories.db', 'r')
-
-## some shortcuts
-tDMGLO = db['DMGLO']
-tDMGLO1 = db['DMGLO1']
-#KKGLO = db['KKGLO']
-tKKGLO1 = db['KKGLO1']
-#NN1 = db['NN1']
+db = shelve.open('theories.db')
 
 
 ## [2] Choose subset of datapoints for fitting
@@ -33,16 +26,16 @@ HA17 = utils.select(data[34], criteria=['t == -0.17'])
 HA28 = utils.select(data[34], criteria=['t == -0.28'])
 HA33 = utils.select(data[34], criteria=['t == -0.33'])
 #fitpoints = GLO1points + 6*data[30]
-fitpoints = GLOpoints + HA17[::4] + HA33[::4]
+fitpoints = GLOpoints + HA17[::4] + HA33[::4] + data[30]
 #fitpoints = data[26]
-#fitpoints = GLOpoints + HA17
+#fitpoints = GLOpoints
 ptSS = HA17[11]
 
 ## [3] Create a theory
 
-#m = Model.ModelNN()
-#m = Model.ModelNN(output_layer=['ImH', 'ReH', 'ImHt', 'ReHt', 'ImE', 'ReE', 'ImEt', 'ReEt'])
-m = Model.ModelNN(output_layer=['ImH', 'ReH', 'ImHt', 'ReHt'])
+m = Model.ModelNN()
+m = Model.ModelNN(hidden_layers = [11, 9], output_layer=['ImH', 'ReH', 'ImHt', 'ReHt', 'ImE', 'ReE', 'ImEt', 'ReEt'])
+#m = Model.ModelNN(output_layer=['ImH', 'ReH', 'ImHt', 'ReHt', 'ImE', 'ReE'])
 #m = Model.ModelNN(output_layer=['ImH'])
 t = Approach.hotfixedBMK(m)
 
@@ -71,5 +64,5 @@ t = Approach.hotfixedBMK(m)
 #t.model.release_parameters('bS', 'rv', 'bv', 'C', 'MC', 'trv')
 #f = Fitter.FitterMinuit(fitpoints, t)
 
-f = Fitter.FitterBrain(fitpoints, t)
-f.fit(nnets=4)
+f = Fitter.FitterBrain(fitpoints, t, nnets=6, nbatch=50, verbose=1)
+f.fit()

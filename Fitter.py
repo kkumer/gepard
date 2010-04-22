@@ -21,6 +21,10 @@ import trans  # output layer transformation for FitterBrain
 class Fitter(object):
     """Superclass for fitting procedures/algorithms."""
 
+    def __init__(self, **kwargs):
+        for key in kwargs:
+            setattr(self, key, kwargs[key])
+
 
 class FitterMinuit(Fitter):
     """Fits using pyminuit."""
@@ -49,6 +53,7 @@ def fcn(%s):
         self.minuit = Minuit(fcn, **theory.model.parameters)
         for key in kwargs:
             setattr(self.minuit, key, kwargs[key])
+        Fitter.__init__(self, **kwargs)
 
 
     def fit(self):
@@ -59,14 +64,25 @@ def fcn(%s):
 
 
 class FitterBrain(Fitter):
-    """Fits using PyBrain neural net library."""
+    """Fits using PyBrain neural net library.
+    
+    Named arguments:
+    nnets = int (default 4) -- number of neural nets created
+    nbatch = int (default 20) -- number of training batches
+    batchlen = int (default 5) -- number of epochs in batch 
+    verbose = int (default 0) -- verbosity
+    (Architecture of the net is specified by Model instance.)
 
+    """
     def __init__(self, fitpoints, theory, **kwargs):
         self.fitpoints = fitpoints
         self.theory = theory
+        self.nnets = 4
+        self.nbatch = 20
+        self.batchlen = 5
+        self.verbose = 0
         self.inputs = theory.model.architecture[0]
         self.outputs = theory.model.architecture[-1]
-        self.verbose = 0
         # Numerical derivative of transformation function w.r.t. net output:
         left = self.outputs * [1.0]
         right = self.outputs * [1.0]
@@ -79,6 +95,7 @@ class FitterBrain(Fitter):
                 # return left to default value of [1, 1, ...]
                 left[k] = 1.0
             pt.deriv = np.array(deriv)
+        Fitter.__init__(self, **kwargs)
 
     def artificialData(self, datapoints, trainpercentage=70):
         """Create artificial data replica.
@@ -121,19 +138,15 @@ class FitterBrain(Fitter):
 
         self.dstrain, self.dstest = self.artificialData(datapoints)
 
-        net = buildNetwork(self.inputs, 7, self.outputs)
+        net = buildNetwork(*self.theory.model.architecture)
 
         self.trainer = brain.RPropMinusTrainerTransformed(net, learningrate = 0.9, 
                 lrdecay = 0.98, momentum = 0.0, batchlearning = True, verbose = False)
 
-        # Train in batches of batchlen epochs and repeat nbatch times
-        nbatch = 200
-        batchlen = 5
-        #nbatch = 1
-        #batchlen = 1
         memerr = 1.  # large initial error, certain to be bettered
-        for k in range(nbatch):
-            self.trainer.trainOnDataset(self.dstrain, batchlen)
+        memnet = net.copy()
+        for k in range(self.nbatch):
+            self.trainer.trainOnDataset(self.dstrain, self.batchlen)
             trainerr, testerr = (self.trainer.testOnData(self.dstrain), 
                     self.trainer.testOnData(self.dstest))
             if testerr < memerr:
@@ -144,9 +157,9 @@ class FitterBrain(Fitter):
                             self.trainer.epoch, trainerr, testerr)
         return memnet, memerr
     
-    def fit(self, nnets=12):
-        """Create and train nnets (default: 12) neural networks."""
-        for n in range(nnets):
+    def fit(self):
+        """Create and train neural networks."""
+        for n in range(self.nnets):
             net, memerr = self.makenet(self.fitpoints)
             self.theory.model.nets.append(net)
             self.theory.model.parameters['nnet'] = n

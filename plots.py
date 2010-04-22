@@ -19,6 +19,9 @@ import Data
 import utils
 from constants import toTeX, Mp2, Mp
 
+# load experimental data
+data = utils.loaddata('data/ep2epgamma')  # dictionary {1 : DataSet instance, ...}
+
 
 def subplot(ax, sets, lines=[], band=[], xaxis=None, kinlabels=[], plotlines=True):
     """Plot datapoints together with fit/theory line(s).
@@ -113,7 +116,7 @@ def subplot(ax, sets, lines=[], band=[], xaxis=None, kinlabels=[], plotlines=Tru
     # ax.frame.set_linewidth(5) # ???
     return
 
-def HERMESBCA(data, lines=[], band=[], path=None, fmt='png'):
+def HERMESBCA(lines=[], band=[], path=None, fmt='png'):
     """Plot HERMES BCA."""
     id = 32
     title = 'HERMES BCA'
@@ -134,7 +137,7 @@ def HERMESBCA(data, lines=[], band=[], path=None, fmt='png'):
         fig.show()
     return fig
 
-def HERMESBSA(data, lines=[], band=[], path=None, fmt='png'):
+def HERMESBSA(lines=[], band=[], path=None, fmt='png'):
     """Plot HERMES BSA."""
     id = 5
     title = 'HERMES BSA'
@@ -154,7 +157,7 @@ def HERMESBSA(data, lines=[], band=[], path=None, fmt='png'):
         fig.show()
     return fig
 
-def HERMES09(data, lines=[], band=[], path=None, fmt='png'):
+def HERMES09(lines=[], band=[], path=None, fmt='png'):
     """Plot HERMES 0909.3587 BCA and BSA data with fit lines."""
 
     ids = [2, 4, 5]
@@ -179,7 +182,7 @@ def HERMES09(data, lines=[], band=[], path=None, fmt='png'):
         fig.show()
     return fig
 
-def CLAS(data, lines=[], band=[], path=None, fmt='png'):
+def CLAS(lines=[], band=[], path=None, fmt='png'):
     """Makes plot of CLAS BSA data with fit lines"""
 
     #datafile = "data/ep2epgamma-ALU-CLAS_KK-07.dat" # id = 25
@@ -219,7 +222,7 @@ def CLAS(data, lines=[], band=[], path=None, fmt='png'):
         fig.show()
     return fig
 
-def HALLA(data, lines=[], band=[], path=None, fmt='png'):
+def HALLA(lines=[], band=[], path=None, fmt='png'):
     """Makes plot of HALL-A data with fit lines"""
 
     subsets = {}
@@ -246,7 +249,7 @@ def HALLA(data, lines=[], band=[], path=None, fmt='png'):
         fig.show()
     return fig
 
-def HALLAphi(data, lines=[], band=[], path=None, fmt='png'):
+def HALLAphi(lines=[], band=[], path=None, fmt='png'):
     """Makes plot of HALL-A data with fit lines"""
 
     ids = [9, 14, 20, 21, 23, 24]

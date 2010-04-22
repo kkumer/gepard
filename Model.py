@@ -6,6 +6,7 @@ fitting procedure).  Theoretical "approach", when given an instance of a model
 and parameter values can calculate observables.
 
 """
+#from IPython.Debugger import Tracer; debug_here = Tracer()
 import pickle, sys
 
 from numpy import log, pi
@@ -113,14 +114,19 @@ class ComptonFormFactors(Model):
     They are set to be zero here. Actual models are built by subclassing this.
 
     """
+    def __init__(self):
+        self.allCFFs = ['ImH', 'ReH', 'ImE', 'ReE', 'ImHt', 'ReHt', 'ImEt', 'ReEt']
+        # now do whatever else is necessary
+        Model.__init__(self)
+
+
 
     def CFFvalues(self, pt):
         """Print values of CFFs. Pastable into Mathematica."""
-        funcnames = ['ImH', 'ReH', 'ImE', 'ReE', 'ImHt', 'ReHt', 'ImEt', 'ReEt']
-        vals = map(lambda cff: str(getattr(self, cff)(pt)), funcnames)
+        vals = map(lambda cff: str(getattr(self, cff)(pt)), self.allCFFs)
         s = "{" + 8*"%s -> %s, "
         s = s[:-2] + "}"
-        return s % flatten(tuple(zip(funcnames, vals)))
+        return s % flatten(tuple(zip(self.allCFFs, vals)))
 
 
 class ComptonDispersionRelations(ComptonFormFactors):
@@ -210,6 +216,7 @@ class ComptonDispersionRelations(ComptonFormFactors):
     for name in funcnames:
         exec('def %s(self, pt): return 0.' % name)
 
+
 class ComptonModelDRdict(ComptonDispersionRelations):
     """Model for CFFs as in arXiv:0904.0458."""
 
@@ -242,7 +249,7 @@ class ComptonModelDRdict(ComptonDispersionRelations):
                                 'tNv', 'tMv', 'trv', 'tbv']
 
         # now do whatever else is necessary
-        Model.__init__(self)
+        ComptonDispersionRelations.__init__(self)
 
 
 
@@ -304,6 +311,7 @@ class ComptonModelDRdict(ComptonDispersionRelations):
         return (2.2390424 * (1. - (1.7*(0.0196 - pt.t))/(1. 
             - pt.t/2.)**2))/((0.0196 - pt.t)*pt.xi)
 
+
 class ComptonModelDR(ComptonDispersionRelations):
     """Model for CFFs as in arXiv:0904.0458. -- no AttrDict!"""
 
@@ -336,7 +344,7 @@ class ComptonModelDR(ComptonDispersionRelations):
                                 'tNv', 'tMv', 'trv', 'tbv']
 
         # now do whatever else is necessary
-        Model.__init__(self)
+        ComptonFormFactors.__init__(self)
 
 
 
@@ -412,7 +420,7 @@ class ComptonNNH(ComptonFormFactors):
         self.parameters = {'nnet':0, 'outputvalue':None}
         self.parameter_names = ['nnet', 'outputvalue']
         # now do whatever else is necessary
-        Model.__init__(self)
+        ComptonFormFactors.__init__(self)
 
     def ImH(self, pt, outputvalue=None):
         if self.parameters['outputvalue'] != None:
@@ -465,6 +473,7 @@ class ComptonNNH(ComptonFormFactors):
     for name in funcnames:
         exec('def %s(self, pt): return 0.' % name)
 
+
 class ComptonNeuralNets(ComptonFormFactors):
     """Neural network CFFs"""
 
@@ -488,15 +497,21 @@ class ComptonNeuralNets(ComptonFormFactors):
         self.parameters = {'nnet':0, 'outputvalue':None}
         self.parameter_names = ['nnet', 'outputvalue']
         # now do whatever else is necessary
-        Model.__init__(self)
+        ComptonFormFactors.__init__(self)
 
     def __getattr__(self, name):
-        if name in self.output_layer:
+        """Return appropriate CFF function object."""
+        # FIXME: I don't understand why I have to use this:
+        if name in object.__getattribute__(self, 'output_layer'):
+        # and this creates infinite recursion:
+        #if name in self.output_layer:
             self.curname = name
             return self.CFF
-        else:
+        elif name in self.allCFFs:
             # if asked for CFF which is not in output_layer, return 0
             return self.zero
+        else:
+            raise AttributeError
 
     def zero(self, *args, **kwargs):
         return 0
@@ -535,6 +550,7 @@ class ModelDR(ComptonModelDR, ElasticDipole):
 
 class ModelNN(ComptonNeuralNets, ElasticDipole):
     """Complete model."""
+
 
 class ModelNNH(ComptonNNH, ElasticDipole):
     """Complete model - devel version with just ImH and ReH."""

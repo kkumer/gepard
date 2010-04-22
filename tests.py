@@ -77,7 +77,8 @@ def test_fit2():
     """Testing actual fitting by FitterMinuit."""
     f = Fitter.FitterMinuit(fitpoints, t)
     f.fit()
-    assert_almost_equal(f.minuit.fval, 6.7638634368267949, 4)
+    chisq = t.chisq(fitpoints)[0]
+    assert_almost_equal(chisq, 6.7638690027046771)
 
 test_fit2.long = 1
 
@@ -86,12 +87,9 @@ def test_fit_neural():
     np.random.seed(68)
     mNN = Model.ModelNN()
     tNN = Approach.hotfixedBMK(mNN)
-    fNN = Fitter.FitterBrain(fitpoints, tNN)
-    fNN.fit(nnets=1)
-    chisq = 0.
-    for pt in fitpoints:
-        chisq = chisq + (
-                (getattr(t, pt.yaxis)(pt) - pt.val)**2 / pt.err**2 )
-    assert_almost_equal(chisq, 7.5464238699131956)
+    fNN = Fitter.FitterBrain(2*fitpoints, tNN, nnets=1, nbatch=6)
+    fNN.fit()
+    chisq = tNN.chisq(2*fitpoints)[0]
+    assert_almost_equal(chisq, 20.894673139809264)
 
-#test_fit_neural.long = 2
+test_fit_neural.long = 1
