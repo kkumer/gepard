@@ -65,4 +65,4 @@ t = Approach.hotfixedBMK(m)
 #f = Fitter.FitterMinuit(fitpoints, t)
 
 f = Fitter.FitterBrain(fitpoints, t, nnets=6, nbatch=50, verbose=1)
-f.fit()
+#f.fit()

@@ -407,73 +407,6 @@ class ComptonModelDR(ComptonDispersionRelations):
             - pt.t/2.)**2))/((0.0196 - pt.t)*pt.xi)
 
 
-class ComptonNNH(ComptonFormFactors):
-    """Neural network CFF H -- both imaginary and real part given by nets."""
-
-    def __init__(self, justImH=False):
-        self.architecture = [2, 7, 2]
-        self.justImH = justImH
-        self.nets = []
-        #sys.stderr.write('Neural nets loaded from nets.pkl')
-        # nnet -  net index
-        # outputvalue - given by neural net during training
-        self.parameters = {'nnet':0, 'outputvalue':None}
-        self.parameter_names = ['nnet', 'outputvalue']
-        # now do whatever else is necessary
-        ComptonFormFactors.__init__(self)
-
-    def ImH(self, pt, outputvalue=None):
-        if self.parameters['outputvalue'] != None:
-            # this occurs during training
-            return self.parameters['outputvalue'][0]
-        ar = []
-        for net in self.nets:
-            ar.append(net.activate([pt.xB, pt.t])[0])
-        all = array(ar).flatten()
-        if self.parameters.has_key('nnet'):
-            if self.parameters['nnet'] == 'ALL':
-                return all
-            elif self.parameters['nnet'] == 'AVG':
-                return all.mean()
-            else: # we want particular net
-                try:
-                    return all[self.parameters['nnet']]
-                except IndexError:
-                    raise IndexError, str(self)+' has only '+str(len(self.nets))+' nets!'
-        # by default, we get mean value (FIXME:this should never occurr?)
-        else:
-            return all.mean()
-
-    def ReH(self, pt, outputvalue=None):
-        if self.justImH:
-            return 0
-        if self.parameters['outputvalue'] != None:
-            # this occurs during training
-            return self.parameters['outputvalue'][1]
-        ar = []
-        for net in self.nets:
-            ar.append(net.activate([pt.xB, pt.t])[1])
-        all = array(ar).flatten()
-        if self.parameters.has_key('nnet'):
-            if self.parameters['nnet'] == 'ALL':
-                return all
-            elif self.parameters['nnet'] == 'AVG':
-                return all.mean()
-            else: # we want particular net
-                try:
-                    return all[self.parameters['nnet']]
-                except IndexError:
-                    raise IndexError, str(self)+' has only '+str(len(self.nets))+' nets!'
-        # by default, we get mean value
-        else:
-            return all.mean()
-
-    funcnames = ['ImE', 'ReE', 'ImHt', 'ReHt', 'ImEt', 'ReEt']
-    # Initial definition of other CFFs. All just return zero.
-    for name in funcnames:
-        exec('def %s(self, pt): return 0.' % name)
-
-
 class ComptonNeuralNets(ComptonFormFactors):
     """Neural network CFFs"""
 
@@ -516,31 +449,52 @@ class ComptonNeuralNets(ComptonFormFactors):
     def zero(self, *args, **kwargs):
         return 0
 
-    def CFF(self, pt, outputvalue=None):
+    def CFF(self, pt, outputvalue=None, xi=0):
+        # FIXME: This function is HEAVILY sub-optimal and non-pythonic!
         ind = self.output_layer.index(self.curname)
         if self.parameters['outputvalue'] != None:
             # this occurs during training: value is set by training
             # routine by calling with outputvalue set by training routine
             return self.parameters['outputvalue'][ind]
-        ar = []
-        for net in self.nets:
-            #FIXME: network is unneccessarily run for each CFF. This could
-            # be optimized by running it just once for each pt.
-            ar.append(net.activate([pt.xB, pt.t])[ind])
-        all = array(ar).flatten()
-        if self.parameters.has_key('nnet'):
-            if self.parameters['nnet'] == 'ALL':
-                return all
-            elif self.parameters['nnet'] == 'AVG':
-                return all.mean()
-            else: # we want particular net
-                try:
-                    return all[self.parameters['nnet']]
-                except IndexError:
-                    raise IndexError, str(self)+' has only '+str(len(self.nets))+' nets!'
-        # by default, we get mean value (FIXME:this should never occurr?)
+        if isinstance(xi, ndarray):
+            # function was called with third argument that is xi nd array
+            x = xi
+        elif xi != 0:
+            # function was called with third argument that is xi number
+            x = array((xi,))
         else:
-            return all.mean()
+            # xi should be taken from pt object
+            if isinstance(pt.xi, ndarray):
+                x = pt.xi
+            else:
+                x = array((pt.xi,))
+        xBs = 2.*x/(1.+x)
+        res = []
+        for xB in xBs:
+            ar = []
+            for net in self.nets:
+                ar.append(net.activate([xB, pt.t])[ind])
+            all = array(ar).flatten()
+            if self.parameters.has_key('nnet'):
+                if self.parameters['nnet'] == 'ALL':
+                    res.append(all)
+                elif self.parameters['nnet'] == 'AVG':
+                    res.append(all.mean())
+                else: # we want particular net
+                    try:
+                        res.append(all[self.parameters['nnet']])
+                    except IndexError:
+                        raise IndexError, str(self)+' has only '+str(len(self.nets))+' nets!'
+            # by default, we get mean value (FIXME:this should never occurr?)
+            else:
+                res.append(all.mean())
+        res = array(res)
+        if res.shape == (1,):
+            # returns number
+            return res[0]  
+        else:
+            # returns ndarray
+            return res.transpose()
 
 ##  --- Complete models built from the above components ---
 
@@ -550,8 +504,3 @@ class ModelDR(ComptonModelDR, ElasticDipole):
 
 class ModelNN(ComptonNeuralNets, ElasticDipole):
     """Complete model."""
-
-
-class ModelNNH(ComptonNNH, ElasticDipole):
-    """Complete model - devel version with just ImH and ReH."""
-

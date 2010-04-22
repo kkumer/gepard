@@ -28,7 +28,6 @@ def subplot(ax, sets, lines=[], band=[], xaxis=None, kinlabels=[], plotlines=Tru
 
     ax -- subplot of matplotlib's figure i.e. ax = figure.add_subplot(..)
     sets --  list of `DataSet` instances to be plotted.
-             First set defines abscissa. 
     lines -- list of 'theories' describing curves for plotting.
     band  -- neural network 'theory' or a list of 'theories' defining 
              band by their mean and standard deviation
@@ -620,184 +619,59 @@ def HBCSA(ff, fits=[], path=None, fmt='png'):
         fig.show()
     return fig
 
-def nnH(ff, path=None, fmt='png'):
-    """Make plot of Im(cffH) and Re(cffH)."""
-    title = 'GPD H by neural nets'
+def _axband(ax, tm, xvals, fun, color='g'):
+    """Make a band of x*fun defined by ndarray-valued fun."""
+    pt = Data.DummyPoint()
+    pt.t = -tm
+    pt.xi = xvals
+    up = []
+    down = []
+    res = xvals * fun(pt)
+    mean = res.mean(axis=0)
+    std = res.std(axis=0)
+    up = mean + std/2.
+    down = mean - std/2.
+    x = plt.concatenate( (xvals, xvals[::-1]) )
+    y = plt.concatenate( (up, down[::-1]) )
+    ax.fill(x, y, facecolor=color, alpha=0.5)
+
+def CFF(t, cffs=None, path=None, fmt='png'):
+    """Makes plot of cffs given by theories in lines and band.
+    
+    t     -- Neural network 'theory', or a list of 'theories' defining 
+             band by their mean and standard deviation
+    cffs  -- List of CFFs to be plotted. Each produces two panels.
+
+    """
+    if not cffs:
+        cffs = t.model.output_layer
+    old = t.model.parameters['nnet']
+    t.model.parameters['nnet'] = 'ALL'
+    title = 'Compton Form Factors'
     fig = plt.figure()
     fig.canvas.set_window_title(title)
     fig.suptitle(title)
-    #fig.subplots_adjust(bottom=0.35)
-    old = ff.parameters['nnet']
-    ff.parameters['nnet'] = 'ALL'
-    pt = Data.DummyPoint()
-    ax = fig.add_subplot(2,2,1)
-    ax.set_xscale('log')  # x-axis to be logarithmic
-    xvals = np.power(10., np.arange(-3.5, 0, 0.01)) 
-    pt.t = 0.0
-    up = []
-    down = []
-    for x in xvals:
-        pt.xB = x
-        nnres = x * ff.ImH(pt) / np.pi
-        mean = nnres.mean()
-        std = nnres.std()
-        up.append(mean + std/2.)
-        down.append(mean - std/2.)
-    up = np.array(up)
-    down = np.array(down)
-    x = plt.concatenate( (xvals, xvals[::-1]) )
-    y = plt.concatenate( (up, down[::-1]) )
-    ax.fill(x, y, facecolor='g', alpha=0.5)
-    ####
-    pt.t = -0.3
-    up = []
-    down = []
-    for x in xvals:
-        pt.xB = x
-        nnres = x * ff.ImH(pt) / np.pi
-        mean = nnres.mean()
-        std = nnres.std()
-        up.append(mean + std/2.)
-        down.append(mean - std/2.)
-    up = np.array(up)
-    down = np.array(down)
-    x = plt.concatenate( (xvals, xvals[::-1]) )
-    y = plt.concatenate( (up, down[::-1]) )
-    ax.fill(x, y, facecolor='r', alpha=0.5)
-    #ax.set_ylim(0.0, 0.5)
-    ax.set_xlim(0.001, 1.0)
-    #plt.ylim(0.0, 0.5)
-    # axes labels
-    ax.set_xlabel('$x$', fontsize=15)
-    ax.set_ylabel('$x\, H(x, x, t)$', fontsize=18)
-    #ax.legend()
-    ax.text(0.01, 0.3, "$t = 0$")
-    ax.text(0.1, 0.05, "$t = -0.3 GeV^2$")
-    ####  --- SECOND PANEL ---
-    ax = fig.add_subplot(2,2,2)
-    xvals = np.linspace(0.05, 0.2, 20)
-    pt.t = 0.0
-    up = []
-    down = []
-    for x in xvals:
-        pt.xB = x
-        nnres = x * ff.ImH(pt) / np.pi
-        mean = nnres.mean()
-        std = nnres.std()
-        up.append(mean + std/2.)
-        down.append(mean - std/2.)
-    up = np.array(up)
-    down = np.array(down)
-    x = plt.concatenate( (xvals, xvals[::-1]) )
-    y = plt.concatenate( (up, down[::-1]) )
-    ax.fill(x, y, facecolor='g', alpha=0.5)
-    ####
-    pt.t = -0.3
-    up = []
-    down = []
-    for x in xvals:
-        pt.xB = x
-        nnres = x * ff.ImH(pt) / np.pi
-        mean = nnres.mean()
-        std = nnres.std()
-        up.append(mean + std/2.)
-        down.append(mean - std/2.)
-    up = np.array(up)
-    down = np.array(down)
-    x = plt.concatenate( (xvals, xvals[::-1]) )
-    y = plt.concatenate( (up, down[::-1]) )
-    ax.fill(x, y, facecolor='r', alpha=0.5)
-    #ax.set_ylim(0.0, 0.5)
-    #ax.set_xlim(0.0005, 1.0)
-    #plt.ylim(0.0, 0.5)
-    # axes labels
-    ax.set_xlabel('$x$', fontsize=15)
-    ax.set_ylabel('$x\, H(x, x, t)$', fontsize=18)
-    #ax.legend()
-    ####  --- THIRD PANEL ---
-    ax = fig.add_subplot(2,2,3)
-    ax.set_xscale('log')  # x-axis to be logarithmic
-    xvals = np.power(10., np.arange(-3.5, 0, 0.01)) 
-    pt.t = 0.0
-    up = []
-    down = []
-    for x in xvals:
-        pt.xB = x
-        nnres = x * ff.ReH(pt)
-        mean = nnres.mean()
-        std = nnres.std()
-        up.append(mean + std/2.)
-        down.append(mean - std/2.)
-    up = np.array(up)
-    down = np.array(down)
-    x = plt.concatenate( (xvals, xvals[::-1]) )
-    y = plt.concatenate( (up, down[::-1]) )
-    ax.fill(x, y, facecolor='g', alpha=0.5)
-    ####
-    pt.t = -0.3
-    up = []
-    down = []
-    for x in xvals:
-        pt.xB = x
-        nnres = x * ff.ReH(pt)
-        mean = nnres.mean()
-        std = nnres.std()
-        up.append(mean + std/2.)
-        down.append(mean - std/2.)
-    up = np.array(up)
-    down = np.array(down)
-    x = plt.concatenate( (xvals, xvals[::-1]) )
-    y = plt.concatenate( (up, down[::-1]) )
-    ax.fill(x, y, facecolor='r', alpha=0.5)
-    #ax.set_ylim(0.0, 0.5)
-    ax.set_xlim(0.001, 1.0)
-    #plt.ylim(0.0, 0.5)
-    # axes labels
-    ax.set_xlabel('$x$', fontsize=15)
-    ax.set_ylabel('$x\; \Re e\, \mathcal{H}(x, t)$', fontsize=18)
-    #ax.legend()
-    ####  --- FOURTH PANEL ---
-    ax = fig.add_subplot(2,2,4)
-    xvals = np.linspace(0.05, 0.2, 20)
-    pt.t = 0.0
-    up = []
-    down = []
-    for x in xvals:
-        pt.xB = x
-        nnres = x * ff.ReH(pt)
-        mean = nnres.mean()
-        std = nnres.std()
-        up.append(mean + std/2.)
-        down.append(mean - std/2.)
-    up = np.array(up)
-    down = np.array(down)
-    x = plt.concatenate( (xvals, xvals[::-1]) )
-    y = plt.concatenate( (up, down[::-1]) )
-    ax.fill(x, y, facecolor='g', alpha=0.5)
-    ####
-    pt.t = -0.3
-    up = []
-    down = []
-    for x in xvals:
-        pt.xB = x
-        nnres = x * ff.ReH(pt) 
-        mean = nnres.mean()
-        std = nnres.std()
-        up.append(mean + std/2.)
-        down.append(mean - std/2.)
-    up = np.array(up)
-    down = np.array(down)
-    x = plt.concatenate( (xvals, xvals[::-1]) )
-    y = plt.concatenate( (up, down[::-1]) )
-    ax.fill(x, y, facecolor='r', alpha=0.5)
-    #ax.set_ylim(0.0, 0.5)
-    #ax.set_xlim(0.0005, 1.0)
-    #plt.ylim(0.0, 0.5)
-    # axes labels
-    ax.set_xlabel('$x$', fontsize=15)
-    ax.set_ylabel('$x\; \Re e\, \mathcal{H}(x, t)$', fontsize=18)
-    #ax.legend()
-    ff.parameters['nnet'] = old
+    colors = ['red', 'green', 'brown', 'purple']
+    tms = [0.0, 0.3]
+    # Define abscissas
+    logxvals = np.power(10., np.arange(-3.5, 0, 0.1))  # left panel
+    xvals = np.linspace(0.05, 0.2, 20) # right panel
+    # Plot panels
+    for n in range(len(cffs)):
+        cff = cffs[n]
+        # all-x logarithmic
+        ax = fig.add_subplot(len(cffs), 2, 2*n+1)
+        ax.set_xscale('log')  # x-axis to be logarithmic
+        for tm in tms :
+            _axband(ax, tm, logxvals, getattr(t.model, cff), color=colors[tms.index(tm)])
+        ax.set_xlabel('$\\xi$', fontsize=15)
+        ax.set_ylabel('x %s' % cff, fontsize=18)
+        # measured x linear
+        ax = fig.add_subplot(len(cffs), 2, 2*n+2)
+        for tm in tms:
+            _axband(ax, tm, xvals, getattr(t.model, cff), color=colors[tms.index(tm)])
+        ax.set_xlabel('$\\xi$', fontsize=15)
+    t.model.parameters['nnet'] = old
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
