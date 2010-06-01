@@ -186,7 +186,7 @@ def CLAS(lines=[], band=[], path=None, fmt='png'):
 
     #datafile = "data/ep2epgamma-ALU-CLAS_KK-07.dat" # id = 25
     dataset = data[25]
-    title = 'CLAS-07_KK'
+    title = ''
     fig = plt.figure()
     fig.canvas.set_window_title(title)
     fig.suptitle(title)
