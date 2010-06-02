@@ -9,12 +9,14 @@ and parameter values can calculate observables.
 #from IPython.Debugger import Tracer; debug_here = Tracer()
 import pickle, sys
 
-from numpy import log, pi
+from numpy import log, pi, imag, real
 from numpy import ndarray, array
 from termcolor import colored
 
 from quadrature import PVquadrature
 from utils import AttrDict, flatten
+
+import gepard as g
 
 
 class Model(object):
@@ -114,20 +116,19 @@ class ComptonFormFactors(Model):
     They are set to be zero here. Actual models are built by subclassing this.
 
     """
-    def __init__(self):
-        self.allCFFs = ['ImH', 'ReH', 'ImE', 'ReE', 'ImHt', 'ReHt', 'ImEt', 'ReEt']
-        # now do whatever else is necessary
-        Model.__init__(self)
 
-
+    allCFFs = ['ImH', 'ReH', 'ImE', 'ReE', 'ImHt', 'ReHt', 'ImEt', 'ReEt']
 
     def CFFvalues(self, pt):
         """Print values of CFFs. Pastable into Mathematica."""
-        vals = map(lambda cff: str(getattr(self, cff)(pt)), self.allCFFs)
+        vals = map(lambda cff: str(getattr(self, cff)(pt)), ComptonFormFactors.allCFFs)
         s = "{" + 8*"%s -> %s, "
         s = s[:-2] + "}"
-        return s % flatten(tuple(zip(self.allCFFs, vals)))
+        return s % flatten(tuple(zip(ComptonFormFactors.allCFFs, vals)))
 
+    # Initial definition of all CFFs. All just return zero.
+    for name in allCFFs:
+        exec('def %s(self, pt): return 0.' % name)
 
 class ComptonDispersionRelations(ComptonFormFactors):
     """Use dispersion relations for ReH and ReE
@@ -211,10 +212,6 @@ class ComptonDispersionRelations(ComptonFormFactors):
         pv = res + log((1.+pt.xi)/(1.-pt.xi)) * self.ImEt(pt)
         return pv/pi   # this is P.V./pi 
 
-    funcnames = ['ImH', 'ImE', 'ImHt', 'ImEt']
-    # Initial definition of other CFFs. All just return zero.
-    for name in funcnames:
-        exec('def %s(self, pt): return 0.' % name)
 
 
 class ComptonModelDRdict(ComptonDispersionRelations):
@@ -440,7 +437,7 @@ class ComptonNeuralNets(ComptonFormFactors):
         #if name in self.output_layer:
             self.curname = name
             return self.CFF
-        elif name in self.allCFFs:
+        elif name in ComptonFormFactors.allCFFs:
             # if asked for CFF which is not in output_layer, return 0
             return self.zero
         else:
@@ -495,6 +492,143 @@ class ComptonNeuralNets(ComptonFormFactors):
         else:
             # returns ndarray
             return res.transpose()
+
+
+class ComptonGepard(ComptonFormFactors):
+    """CFFs as implemented in gepard."""
+
+    def __init__(self):
+        # initial values of parameters and limits on their values
+        self.parameters = AttrDict({
+               'NS' : 0.15,
+             'AL0S' : 1.0,
+             'ALPS' : 0.15,
+             'M02S' : 1.0,
+           'DELM2S' : 0.0,
+               'PS' : 2.0,
+             'SECS' : 0.0,
+             'KAPS' : 0.0,
+            'SKEWS' : 0.0,
+               'NG' : 0.4,
+             'AL0G' : 1.1,
+             'ALPG' : 0.15,
+             'M02G' : 0.7,
+           'DELM2G' : 0.0,
+               'PG' : 2.0,
+             'SECG' : 0.0,
+             'KAPG' : 0.0,
+            'SKEWG' : 0.0   })
+
+
+        # gepard needs indices, not parameter names
+        self.parameters_index = {
+             11 : 'NS',
+             12 : 'AL0S',
+             13 : 'ALPS',
+             14 : 'M02S',
+             15 : 'DELM2S',
+             16 : 'PS',
+             17 : 'SECS',
+             18 : 'KAPS',
+             19 : 'SKEWS',
+             21 : 'NG',
+             22 : 'AL0G',
+             23 : 'ALPG',
+             24 : 'M02G',
+             25 : 'DELM2G',
+             26 : 'PG',
+             27 : 'SECG',
+             28 : 'KAPG',
+             29 : 'SKEWG' }
+
+        # order matters to fit.MinuitFitter, so it is defined by:
+        self.parameter_names = [ 
+           'NS', 'AL0S', 'ALPS', 'M02S',
+           'DELM2S', 'PS', 'SECS', 'KAPS', 'SKEWS',
+                 'AL0G', 'ALPG', 'M02G',
+           'DELM2G', 'PG', 'SECG', 'KAPG', 'SKEWG']
+
+        g.readpar()
+        g.parchr.fftype = array([c for c in 'SINGLET   '])
+        g.parchr.process = array([c for c in 'DVCS  '])
+        g.parint.p = 0
+        g.init()
+        
+
+        self.g = g
+        # now do whatever else is necessary
+        ComptonFormFactors.__init__(self)
+
+
+    def ImH(self, pt):
+        """Imaginary part of CFF H."""
+        for i in self.parameters_index:
+            g.par.par[i-1] = self.parameters[self.parameters_index[i]]
+
+        g.kinematics.w2 = pt.W*pt.W
+        g.kinematics.q2 = pt.Q2
+        g.kinematics.xi = pt.xi
+
+        g.nqs.nqs = 1
+        g.qs.qs[0] = g.kinematics.q2
+        g.evolc(1,1)
+        
+        g.mt.mtind = 0 # FIXME: hardwired
+
+        g.cfff()
+        return imag(g.cff.cff[g.parint.p])
+
+    def ReH(self, pt):
+        """Real part of CFF H."""
+        for i in self.parameters_index:
+            g.par.par[i-1] = self.parameters[self.parameters_index[i]]
+
+        g.kinematics.w2 = pt.W*pt.W
+        g.kinematics.q2 = pt.Q2
+        g.kinematics.xi = pt.xi
+
+        g.nqs.nqs = 1
+        g.qs.qs[0] = g.kinematics.q2
+        g.evolc(1,1)
+        
+        g.mt.mtind = 0 # FIXME: hardwired
+
+        g.cfff()
+        return real(g.cff.cff[g.parint.p])
+
+    def ImE(self, pt):
+        """Imaginary part of CFF E."""
+        # ... TODO: forward this to gepard
+
+        g.kinematics.w2 = pt.W*pt.W
+        g.kinematics.q2 = pt.Q2
+        g.kinematics.xi = pt.xi
+
+        g.nqs.nqs = 1
+        g.qs.qs[0] = g.kinematics.q2
+        g.evolc(1,1)
+        
+        g.mt.mtind = 0 # FIXME: hardwired
+
+        g.cfff()
+        return imag(g.cff.cffe[g.parint.p])
+
+    def ReE(self, pt):
+        """Real part of CFF E."""
+        # ... TODO: forward this to gepard
+
+        g.kinematics.w2 = pt.W*pt.W
+        g.kinematics.q2 = pt.Q2
+        g.kinematics.xi = pt.xi
+
+        g.nqs.nqs = 1
+        g.qs.qs[0] = g.kinematics.q2
+        g.evolc(1,1)
+        
+        g.mt.mtind = 0 # FIXME: hardwired
+
+        g.cfff()
+        return real(g.cff.cffe[g.parint.p])
 
 ##  --- Complete models built from the above components ---
 

@@ -520,9 +520,11 @@ class BMK(Approach):
         """Partial DVCS cross section w.r.t. Mandelstam t."""
 
         W2 = pt.W * pt.W
-        return 260.5633976788416 * W2 * (self.m.ImH(pt)**2 
-                + self.m.ReH(pt)**2)  / (
+        return 260.5633976788416 * W2 * ( 
+                (self.m.ImH(pt)**2 + self.m.ReH(pt)**2)
+                - pt.t/(4.*Mp2)*(self.m.ReE(pt)**2 + self.m.ImE(pt)**2)) / (
             (W2 + pt.Q2) * (2.0 * W2 + pt.Q2)**2 )
+
 
     def TotalCrossSection(self, pt):
         """Total DVCS cross section."""
