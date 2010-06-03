@@ -2,7 +2,7 @@ from IPython.Debugger import Tracer; debug_here = Tracer()
 
 import copy
 
-from numpy import sin, cos, pi, sqrt
+from numpy import sin, cos, pi, sqrt, array
 from scipy.special import gammainc
 
 import utils, quadrature
@@ -513,8 +513,15 @@ class BMK(Approach):
         to facilitate integration over it.
         
         """
-        pt.t = t
-        return PartialCrossSection(pt)
+        aux = []
+        for t_single in t:
+            pt.t = t_single
+            res = self.PartialCrossSection(pt)
+            #if debug == 2: print "t = %s  =>  dsig/dt = %s" % (t_single, res)
+            aux.append(res)
+
+        return array(aux)
+
 
     def PartialCrossSection(self, pt):
         """Partial DVCS cross section w.r.t. Mandelstam t."""
@@ -529,7 +536,7 @@ class BMK(Approach):
     def TotalCrossSection(self, pt):
         """Total DVCS cross section."""
 
-        res = quadrature.Hquadrature(lambda t: self.PartialCrossSection4int(t, pt), 0, 1)
+        res = quadrature.tquadrature(lambda t: self.PartialCrossSection4int(t, pt), -1, 0)
         return res
 
     def BCA0minusr1(self, pt):

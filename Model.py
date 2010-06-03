@@ -495,8 +495,10 @@ class ComptonNeuralNets(ComptonFormFactors):
 
 
 class ComptonGepard(ComptonFormFactors):
-    """CFFs as implemented in gepard."""
-
+    """CFFs as implemented in gepard.
+    
+    FIXME: completely unnecessary duplication of stuff below!
+    """
     def __init__(self):
         # initial values of parameters and limits on their values
         self.parameters = AttrDict({
@@ -551,9 +553,6 @@ class ComptonGepard(ComptonFormFactors):
         g.readpar()
         g.parchr.fftype = array([c for c in 'SINGLET   '])
         g.parchr.process = array([c for c in 'DVCS  '])
-        g.parint.p = 0
-        g.init()
-        
 
         self.g = g
         # now do whatever else is necessary
@@ -568,12 +567,15 @@ class ComptonGepard(ComptonFormFactors):
         g.kinematics.w2 = pt.W*pt.W
         g.kinematics.q2 = pt.Q2
         g.kinematics.xi = pt.xi
+        g.kinematics.del2 = pt.t
 
         g.nqs.nqs = 1
-        g.qs.qs[0] = g.kinematics.q2
+        g.qs.qs[0] = pt.Q2
         g.evolc(1,1)
         
-        g.mt.mtind = 0 # FIXME: hardwired
+        g.mt.nmts = 1
+        g.mt.mtind = 0 
+        g.mts.mts[0] = - pt.t
 
         g.cfff()
         return imag(g.cff.cff[g.parint.p])
@@ -586,46 +588,57 @@ class ComptonGepard(ComptonFormFactors):
         g.kinematics.w2 = pt.W*pt.W
         g.kinematics.q2 = pt.Q2
         g.kinematics.xi = pt.xi
+        g.kinematics.del2 = pt.t
 
         g.nqs.nqs = 1
-        g.qs.qs[0] = g.kinematics.q2
+        g.qs.qs[0] = pt.Q2
         g.evolc(1,1)
         
-        g.mt.mtind = 0 # FIXME: hardwired
+        g.mt.nmts = 1
+        g.mt.mtind = 0 
+        g.mts.mts[0] = - pt.t
 
         g.cfff()
         return real(g.cff.cff[g.parint.p])
 
     def ImE(self, pt):
         """Imaginary part of CFF E."""
-        # ... TODO: forward this to gepard
+        for i in self.parameters_index:
+            g.par.par[i-1] = self.parameters[self.parameters_index[i]]
 
         g.kinematics.w2 = pt.W*pt.W
         g.kinematics.q2 = pt.Q2
         g.kinematics.xi = pt.xi
+        g.kinematics.del2 = pt.t
 
         g.nqs.nqs = 1
-        g.qs.qs[0] = g.kinematics.q2
+        g.qs.qs[0] = pt.Q2
         g.evolc(1,1)
         
-        g.mt.mtind = 0 # FIXME: hardwired
+        g.mt.nmts = 1
+        g.mt.mtind = 0 
+        g.mts.mts[0] = - pt.t
 
         g.cfff()
         return imag(g.cff.cffe[g.parint.p])
 
     def ReE(self, pt):
         """Real part of CFF E."""
-        # ... TODO: forward this to gepard
+        for i in self.parameters_index:
+            g.par.par[i-1] = self.parameters[self.parameters_index[i]]
 
         g.kinematics.w2 = pt.W*pt.W
         g.kinematics.q2 = pt.Q2
         g.kinematics.xi = pt.xi
+        g.kinematics.del2 = pt.t
 
         g.nqs.nqs = 1
-        g.qs.qs[0] = g.kinematics.q2
+        g.qs.qs[0] = pt.Q2
         g.evolc(1,1)
         
-        g.mt.mtind = 0 # FIXME: hardwired
+        g.mt.nmts = 1
+        g.mt.mtind = 0 
+        g.mts.mts[0] = - pt.t
 
         g.cfff()
         return real(g.cff.cffe[g.parint.p])

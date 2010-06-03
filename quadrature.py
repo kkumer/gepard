@@ -4,6 +4,9 @@ from numpy import sum, ones, add, diff, isinf, isscalar, \
      asarray, real, trapz, arange, empty, ndarray
 from scipy.special.orthogonal import p_roots
 
+[roots4, weights4] = p_roots(4)  # roots and weigths for 4-th order quadrature
+roots4 = real(roots4)
+
 [roots5, weights5] = p_roots(5)  # roots and weigths for 5-th order quadrature
 roots5 = real(roots5)
 
@@ -49,9 +52,18 @@ def quadSciPy5(func,a,b,args=()):
     y = (b-a)*(roots5+1)/2.0 + a
     return (b-a)/2.0*sum(weights5*func(y,*args),0)
 
+def quadSciPy4(func,a,b,args=()):
+    """Compute a definite integral using fifth-order Gaussian quadrature.
+    Adapted from scipy."""
+    y = (b-a)*(roots4+1)/2.0 + a
+    return (b-a)/2.0*sum(weights4*func(y,*args),0)
+
 # Choice of routine used for P.V. integration
 PVquadrature = quadSciPy18
 
 # Choice of routine used for harmonic projection
 Hquadrature = quadSciPy5
+
+# Choice of routine used for t-integration
+tquadrature = quadSciPy5
 
