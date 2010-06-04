@@ -21,7 +21,34 @@ import os, re, math
 import utils
 from constants import Mp, Mp2
 
-class DataPoint(object):
+
+class DummyPoint(object):
+    """This is only used for creating simple DataPoint-like objects"""
+
+    def __init__(self, init=None):
+        if init:
+            self.__dict__.update(init)
+
+    def has_key(self, name):
+        """Does point (or dataset) have attribute `name`?"""
+        if self.__dict__.has_key(name):
+            return True
+        return False
+
+    def keys(self):
+        """Simulate dictionary."""
+        return self.__dict__.keys()
+
+    def to_conventions(self, approach):
+        approach.to_conventions(self)
+        return
+
+    def prepare(self, approach):
+        approach.prepare(self)
+        return
+
+
+class DataPoint(DummyPoint):
 
     """One experimental measurement with all necessary information 
     about kinematics, all contained in attributes. E.g.
@@ -104,24 +131,6 @@ class DataPoint(object):
     def __repr__(self):
         return "DataPoint. Measurement: " + self.yaxis + " = " + str(self.val)
 
-    def has_key(self, name):
-        """Does point (or dataset) have attribute `name`?"""
-        if self.__dict__.has_key(name):
-            return True
-        return False
-
-    def keys(self):
-        """Simulate dictionary."""
-        return self.__dict__.keys()
-
-    def to_conventions(self, approach):
-        approach.to_conventions(self)
-        return
-
-    def prepare(self, approach):
-        approach.prepare(self)
-        return
-
 
 class DataSet(list):
 
@@ -180,13 +189,14 @@ class DataSet(list):
             elif self.in1particle == 'e' or self.in1particle == 'em':   # electron
                 self.in1charge = -1
             # Mandelstam s
-            if self.exptype == 'fixed target':
-                self.s = 2 * Mp * self.in1energy + Mp2
-            elif self.exptype == 'collider':
-                self.s = 2 * self.in1energy * (self.in2energy + math.sqrt(
-                    self.in2energy**2 - Mp2)) + Mp2
-            else:
-                pass # FIXME: raise error
+            if self.process == 'ep2epgamma':
+                if self.exptype == 'fixed target':
+                    self.s = 2 * Mp * self.in1energy + Mp2
+                elif self.exptype == 'collider':
+                    self.s = 2 * self.in1energy * (self.in2energy + math.sqrt(
+                        self.in2energy**2 - Mp2)) + Mp2
+                else:
+                    pass # FIXME: raise error
 
             for gridline in data:
                 self.append(DataPoint(gridline, self))
@@ -224,22 +234,3 @@ class DataSet(list):
     #    return 
 
 
-class DummyPoint(object):
-    """This is only used for creating simple DataPoint-like objects"""
-
-    def __init__(self, init=None):
-        if init:
-            self.__dict__.update(init)
-
-    def has_key(self, name):
-        if self.__dict__.has_key(name):
-            return True
-        return False
-
-    def keys(self):
-        """Simulate dictionary."""
-        return self.__dict__.keys()
-
-    def prepare(self, approach):
-        approach.prepare(self)
-        return

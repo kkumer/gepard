@@ -82,7 +82,7 @@ def loaddata(datadir='data', approach=Approach.hotfixedBMK):
     for file in os.listdir(datadir):
         if os.path.splitext(file)[1] == ".dat":
             dataset = Data.DataSet(datafile=os.path.join(datadir, file))
-            if approach:
+            if approach and dataset.process == 'ep2epgamma':
                 [pt.to_conventions(approach) for pt in dataset]
                 [pt.prepare(approach) for pt in dataset]
             data[dataset.id] = dataset

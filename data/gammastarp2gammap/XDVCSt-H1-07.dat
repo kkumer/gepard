@@ -7,7 +7,7 @@ editor = KK
 ### Experiment
 
 collaboration = H1
-process = ep2epgamma
+process = gammastarp2gammap
 exptype = collider
 year = 2007
 reference = arXiv:0709.4114 [hep-ex]
@@ -16,17 +16,11 @@ reference2 = Table 3
 
 ### Scattering Process
 
-in1particle = ep
-in1energy = 27.6
-in1energyunit = GeV
-
+in1particle = gammastart
 in2particle = p
-in2energy = 920
-in2energyunit = GeV
 
-out1particle = ep
+out1particle = gamma
 out2particle = p
-out3particle = gamma
 
 # 145 1/pb data taken in 2005 and 2006
 
