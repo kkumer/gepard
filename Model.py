@@ -576,7 +576,6 @@ class ComptonGepard(ComptonFormFactors):
         g.mt.nmts = 1
         g.mt.mtind = 0 
         g.mts.mts[0] = - pt.t
-
         g.cfff()
         return imag(g.cff.cff[g.parint.p])
 

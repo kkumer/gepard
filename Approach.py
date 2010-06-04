@@ -508,35 +508,36 @@ class BMK(Approach):
         #       self.TBH2unp(pt, phi) + self.TDVCS2unp(pt, phi) 
         #    + (self.TINTunp(pt, phi, lam, 1) + self.TINTunp(pt, phi, -lam, -1))/2.)
 
-    def PartialCrossSection4int(self, t, pt):
-        """Same as PartialCrossSection but with additional variable t 
+    def _XDVCSt4int(self, t, pt):
+        """Same as XDVCSt but with additional variable t 
         to facilitate integration over it.
         
         """
         aux = []
         for t_single in t:
             pt.t = t_single
-            res = self.PartialCrossSection(pt)
+            res = self.XDVCSt(pt)
             #if debug == 2: print "t = %s  =>  dsig/dt = %s" % (t_single, res)
             aux.append(res)
 
         return array(aux)
 
 
-    def PartialCrossSection(self, pt):
+    def XDVCSt(self, pt):
         """Partial DVCS cross section w.r.t. Mandelstam t."""
 
         W2 = pt.W * pt.W
+        # Simplified formula used also in Fortran gepard code
         return 260.5633976788416 * W2 * ( 
                 (self.m.ImH(pt)**2 + self.m.ReH(pt)**2)
                 - pt.t/(4.*Mp2)*(self.m.ReE(pt)**2 + self.m.ImE(pt)**2)) / (
             (W2 + pt.Q2) * (2.0 * W2 + pt.Q2)**2 )
 
 
-    def TotalCrossSection(self, pt):
+    def XDVCS(self, pt):
         """Total DVCS cross section."""
 
-        res = quadrature.tquadrature(lambda t: self.PartialCrossSection4int(t, pt), -1, 0)
+        res = quadrature.tquadrature(lambda t: self._XDVCSt4int(t, pt), -1, 0)
         return res
 
     def BCA0minusr1(self, pt):

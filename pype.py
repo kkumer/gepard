@@ -9,12 +9,12 @@ import Model, Approach, Fitter
 import utils 
 import plots
 
-#from results import *
+from results import *
 
 # [1] Load experimental data and theoretical models
 
 data = utils.loaddata('data/ep2epgamma')  # dictionary {1 : DataSet instance, ...}
-db = shelve.open('theories.db')
+#db = shelve.open('theories.db')
 
 
 ## [2] Choose subset of datapoints for fitting
@@ -28,41 +28,19 @@ HA33 = utils.select(data[34], criteria=['t == -0.33'])
 #fitpoints = GLO1points + 6*data[30]
 #fitpoints = GLOpoints + HA17[::4] + HA33[::4] + data[30]
 #fitpoints = data[26]
-fitpoints = GLO1points
+fitpoints = GLOpoints
 ptSS = HA17[11]
 
 ## [3] Create a theory
 
-#m = Model.ModelNN()
-#m = Model.ModelNN(hidden_layers = [9, 13] , output_layer=['ImH', 'ReH', 'ImHt', 'ReHt', 'ImE', 'ReE', 'ImEt', 'ReEt'])
-#m = Model.ModelNN(output_layer=['ImH', 'ReH', 'ImHt', 'ReHt', 'ImE', 'ReE'])
-#m = Model.ModelNN(output_layer=['ImH'])
-#t = Approach.hotfixedBMK(m)
-
-#m = Model.ModelDR()
-#m.parameters.update(DMGLO)
-#t = Approach.hotfixedBMK(m)
-#t.name = 'DMGLO'
-#t.description = 'DM fit to HERMES and CLAS BSA/BCA data. Only CFF H.'
-#t.save(db)
-#del m, t
-#
-#m = Model.ModelDR()
-#m.parameters.update(DMGLO1)
-#t = Approach.hotfixedBMK(m)
-#t.name = 'DMGLO1'
-#t.description = 'DM fit to HERMES and CLAS BSA/BCA data, and HALL-A. With large CFF Htilde'
-#t.save(db)
-#db['DMGLO1'] = t
-#del m, t
-#
-#db.close()
+m = Model.ModelDR()
+m.parameters.update(DMGLO)
+t = Approach.hotfixedBMK(m)
 
 ## [4] Do the fit
 
-#t = db['DMGLO1'].copy()
-#t.model.release_parameters('bS', 'rv', 'bv', 'C', 'MC', 'trv')
-#f = Fitter.FitterMinuit(fitpoints, t)
+t.model.release_parameters('bS', 'rv')
+f = Fitter.FitterMinuit(fitpoints, t)
 
 #f = Fitter.FitterBrain(fitpoints, t, nnets=12, nbatch=150, verbose=1)
 #f.fit()

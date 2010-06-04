@@ -1,19 +1,17 @@
 
-import copy, math
+import shutil, copy, math
 from nose.tools import *
 import numpy as np
 
 import gepard as g
 
-#import utils, Model, Approach, Fitter
-import utils, Model, Approach, Data
+import utils, Model, Approach, Data, Fitter
 
 from constants import Mp, Mp2
 
-#data = utils.loaddata('data/ep2epgamma')  
-# testing data set for fits
-#fitpoints = data[36]
+data = utils.loaddata('data/ep2epgamma')  
 
+shutil.copy2('test/GEPARD.INI.TEST', 'GEPARD.INI')
 m = Model.ComptonGepard()
 t = Approach.hotfixedBMK(m)
 
@@ -48,55 +46,21 @@ def test_gepardXDVCSt():
     pt.xi = pt.Q2 / ( 2.0 * pt.W * pt.W + pt.Q2)
     t.m.g.parint.p = 0
     t.m.g.init()
-    aux = t.PartialCrossSection(pt)
+    aux = t.XDVCSt(pt)
     assert_almost_equal(aux, 5607.5998541187819, 2)
 
 def test_gepardXDVCSevol():
-    """Calculate basic NLO DVCS cross section using gepard (+evolution)."""
-    pt.W = 3.5
-    pt.Q2 = 3.
+    """Calculate NLO DVCS cross section using gepard (+evolution)."""
+    pt.W = 3.5          
+    pt.Q2 = 3.          
     pt.t = 0.0
     pt.xi = pt.Q2 / ( 2.0 * pt.W * pt.W + pt.Q2)
     t.m.g.parint.p = 1
     t.m.g.init()
-    aux = t.TotalCrossSection(pt)
+    aux = t.XDVCS(pt)
     assert_almost_equal(aux, 6.8606314494041793)
     # To get complete agreement with Fortran take
     # (slower) tquadrature = quadSciPy10 and:
     # assert_almost_equal(aux, 6.8612469682766850, 5)
 
-#test_gepardXDVCSevol.newfeature = 1
 
-def test_gepardfitsimple():
-    """Test simple fitting to H1 DVCS (one dataset) via gepard"""
-    # fitpoints = data[36] dataset
-    f = Fitter.FitterMinuit(fitpoints, t)
-    f.fit()
-    chisq = t.chisq(fitpoints)[0]
-    assert_almost_equal(chisq, 0.2665403, 5)
-
-test_gepardfitsimple.newfeature = 1
-
-def test_gepardfitDIS():
-    """Test fitting to H1 DIS via gepard"""
-    # DISpoints = all data from gepard's dis.dat
-    t.model.release_parameters('NS', 'AL0S', 'AL0G')
-    f = Fitter.FitterMinuit(DISpoints, t)
-    f.fit()
-    chisq = t.chisq(fitpoints)[0]
-    assert_almost_equal(chisq, 49.7312, 5)
-
-test_gepardfitDIS.newfeature = 1
-
-def test_gepardfitDVCS():
-    """Test fitting to H1 DVCS via gepard"""
-    # DVCSpoints = all data from gepard's dvcs.dat
-    # model parameters from DIS fit should be fixed
-    t.model.fix_parameters('NS', 'AL0S', 'AL0G')
-    t.model.release_parameters('M02S','SKEWS','SKEWG')
-    f = Fitter.FitterMinuit(DVCSpoints, t)
-    f.fit()
-    chisq = t.chisq(fitpoints)[0]
-    assert_almost_equal(chisq, 101.094, 5)
-
-test_gepardfitDVCS.newfeature = 1
