@@ -63,4 +63,19 @@ def test_gepardXDVCSevol():
     # (slower) tquadrature = quadSciPy10 and:
     # assert_almost_equal(aux, 6.8612469682766850, 5)
 
+def test_GepardDR():
+    """GepardDR with switched-off DR should be same as Gepard."""
+    mDR = Model.ComptonModelDR()
+    mBoth = Model.ComptonGepardDR(m, mDR)
+    tBoth = Approach.hotfixedBMK(mBoth)
+    tBoth.m.parameters['Nv'] = 0
+    tBoth.m.parameters['Nsea'] = 0
+    pt.W = 82.
+    pt.Q2 = 1.
+    pt.t = 0.0
+    pt.xi = pt.Q2 / ( 2.0 * pt.W * pt.W + pt.Q2)
+    tBoth.m.g.parint.p = 0
+    tBoth.m.g.init()
+    aux = tBoth.XDVCSt(pt)/1.e4
+    assert_almost_equal(aux, 0.56075998541187819, 3)
 

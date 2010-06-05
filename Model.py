@@ -14,7 +14,7 @@ from numpy import ndarray, array
 from termcolor import colored
 
 from quadrature import PVquadrature
-from utils import AttrDict, flatten
+from utils import flatten, hubDict
 
 import gepard as g
 
@@ -130,6 +130,7 @@ class ComptonFormFactors(Model):
     for name in allCFFs:
         exec('def %s(self, pt): return 0.' % name)
 
+
 class ComptonDispersionRelations(ComptonFormFactors):
     """Use dispersion relations for ReH and ReE
 
@@ -213,109 +214,13 @@ class ComptonDispersionRelations(ComptonFormFactors):
         return pv/pi   # this is P.V./pi 
 
 
-
-class ComptonModelDRdict(ComptonDispersionRelations):
+class ComptonModelDR(ComptonDispersionRelations):
     """Model for CFFs as in arXiv:0904.0458."""
 
     def __init__(self):
         # initial values of parameters and limits on their values
-        self.parameters = AttrDict({
-              'NS' : 1.5,                                 
-             'alS' : 1.13,                              
-            'alpS' : 0.15,                              
-              'MS' : 0.707,                               
-              'rS' : 1.0,                               
-              'bS' : 2.0,     'limit_bS' : (0.4, 5.0),
-              'Nv' : 1.35,                              
-             'alv' : 0.43,                              
-            'alpv' : 0.85,                              
-              'Mv' : 1.0,     'limit_Mv' : (0.9, 1.1),
-              'rv' : 0.5,     'limit_rv' : (0., 8.),
-              'bv' : 2.2,     'limit_bv' : (0.4, 5.),
-               'C' : 7.0,      'limit_C' : (-10., 10.),
-              'MC' : 1.3,     'limit_MC' : (0.4, 2.),
-             'tNv' : 0.0,                             
-             'tMv' : 2.7,    'limit_tMv' : (0.4, 2.),
-             'trv' : 6.0,    'limit_trv' : (0., 8.),
-             'tbv' : 3.0,    'limit_tbv' : (0.4, 5.)   })
-
-        # order matters to fit.MinuitFitter, so it is defined by:
-        self.parameter_names = ['NS', 'alS', 'alpS', 'MS', 'rS', 'bS',
-                                'Nv', 'alv', 'alpv', 'Mv', 'rv', 'bv',
-                                'C', 'MC',
-                                'tNv', 'tMv', 'trv', 'tbv']
-
-        # now do whatever else is necessary
-        ComptonDispersionRelations.__init__(self)
-
-
-
-    def subtraction(self, pt):
-        return self.parameters['C']/(1.-pt.t/self.parameters['MC']**2)**2
-
-    def ImH(self, pt, xi=0):
-        """Imaginary part of CFF H."""
-        p = self.parameters # just a shortcut
-        # FIXME: The following solution is not elegant
-        if isinstance(xi, ndarray):
-            # function was called with third argument that is xi nd array
-            x = xi
-        elif xi != 0:
-            # function was called with third argument that is xi number
-            x = xi
-        else:
-            # xi should be taken from pt object
-            x = pt.xi
-        t = pt.t
-        twox = 2.*x / (1.+x)
-        onex = (1.-x) / (1.+x)
-        val = ( (2.*4./9. + 1./9.) * p.Nv * p.rv * twox**(-p.alv-p.alpv*t) *
-                 onex**p.bv / (1. - onex*t/(p.Mv**2))  )
-        sea = ( (2./9.) * p.NS * p.rS * twox**(-p.alS-p.alpS*t) *
-                 onex**p.bS / (1. - onex*t/(p.MS**2))**2 )
-        return pi * (val + sea) / (1.+x)
-
-    def ImHt(self, pt, xi=0):
-        """Imaginary part of CFF Ht i.e. \tilde{H}."""
-        p = self.parameters # just a shortcut
-        # FIXME: The following solution is not elegant
-        if isinstance(xi, ndarray):
-            # function was called with third argument that is xi nd array
-            x = xi
-        elif xi != 0:
-            # function was called with third argument that is xi number
-            x = xi
-        else:
-            # xi should be taken from pt object
-            x = pt.xi
-        t = pt.t
-        twox = 2.*x / (1.+x)
-        onex = (1.-x) / (1.+x)
-        val = ( (2.*4./9. + 1./9.) * p.tNv * p.trv * 
-            # Regge trajectory params taken from H:
-            twox**(-p.alv-p.alpv*t) *
-                 onex**p.tbv / (1. - onex*t/(p.tMv**2))  )
-        return pi * val / (1.+x)
-
-    def ImE(self, pt, xi=0):
-        """Imaginary part of CFF E."""
-        # Just changing function signature w.r.t. ComptonFormFactors
-        # to make it compatible for dispersion integral
-        return 0
-
-    def ReEt(self, pt):
-        """Instead of disp. rel. use pole formula."""
-        return (2.2390424 * (1. - (1.7*(0.0196 - pt.t))/(1. 
-            - pt.t/2.)**2))/((0.0196 - pt.t)*pt.xi)
-
-
-class ComptonModelDR(ComptonDispersionRelations):
-    """Model for CFFs as in arXiv:0904.0458. -- no AttrDict!"""
-
-    def __init__(self):
-        # initial values of parameters and limits on their values
         self.parameters = {
-              'NS' : 1.5,                                 
+              'Nsea' : 1.5,                                 
              'alS' : 1.13,                              
             'alpS' : 0.15,                              
               'MS' : 0.707,                               
@@ -335,7 +240,7 @@ class ComptonModelDR(ComptonDispersionRelations):
              'tbv' : 3.0,    'limit_tbv' : (0.4, 5.)   }
 
         # order matters to fit.MinuitFitter, so it is defined by:
-        self.parameter_names = ['NS', 'alS', 'alpS', 'MS', 'rS', 'bS',
+        self.parameter_names = ['Nsea', 'alS', 'alpS', 'MS', 'rS', 'bS',
                                 'Nv', 'alv', 'alpv', 'Mv', 'rv', 'bv',
                                 'C', 'MC',
                                 'tNv', 'tMv', 'trv', 'tbv']
@@ -366,7 +271,7 @@ class ComptonModelDR(ComptonDispersionRelations):
         onex = (1.-x) / (1.+x)
         val = ( (2.*4./9. + 1./9.) * p['Nv'] * p['rv'] * twox**(-p['alv']-p['alpv']*t) *
                  onex**p['bv'] / (1. - onex*t/(p['Mv']**2))  )
-        sea = ( (2./9.) * p['NS'] * p['rS'] * twox**(-p['alS']-p['alpS']*t) *
+        sea = ( (2./9.) * p['Nsea'] * p['rS'] * twox**(-p['alS']-p['alpS']*t) *
                  onex**p['bS'] / (1. - onex*t/(p['MS']**2))**2 )
         return pi * (val + sea) / (1.+x)
 
@@ -501,7 +406,7 @@ class ComptonGepard(ComptonFormFactors):
     """
     def __init__(self):
         # initial values of parameters and limits on their values
-        self.parameters = AttrDict({
+        self.parameters = {
                'NS' : 0.15,
              'AL0S' : 1.0,
              'ALPS' : 0.15,
@@ -519,7 +424,7 @@ class ComptonGepard(ComptonFormFactors):
                'PG' : 2.0,
              'SECG' : 0.0,
              'KAPG' : 0.0,
-            'SKEWG' : 0.0   })
+            'SKEWG' : 0.0   }
 
 
         # gepard needs indices, not parameter names
@@ -557,7 +462,6 @@ class ComptonGepard(ComptonFormFactors):
         self.g = g
         # now do whatever else is necessary
         ComptonFormFactors.__init__(self)
-
 
     def ImH(self, pt):
         """Imaginary part of CFF H."""
@@ -641,6 +545,34 @@ class ComptonGepard(ComptonFormFactors):
 
         g.cfff()
         return real(g.cff.cffe[g.parint.p])
+
+class ComptonGepardDR(ComptonGepard):
+    """This combines DR model for valence xB and gepard for small xB."""
+
+    def __init__(self, instGepard, instDR):
+        self.Gepard = instGepard  # instance of ComptonGepard
+        self.DR = instDR  # instance of ComptonModelDR
+
+        self.parameters = hubDict(self.Gepard.parameters, self.DR.parameters)
+        self.parameter_names = self.Gepard.parameter_names + self.DR.parameter_names
+
+        self.g = g
+        # now do whatever else is necessary
+        ComptonFormFactors.__init__(self)
+
+
+    def ImH(self, pt, xi=0):
+        return  self.Gepard.ImH(pt) + self.DR.ImH(pt, xi)
+
+    def ReH(self, pt):
+        return  self.Gepard.ReH(pt) + self.DR.ReH(pt)
+
+    def ImE(self, pt, xi=0):
+        return  self.Gepard.ImE(pt) + self.DR.ImE(pt, xi)
+
+    def ReE(self, pt):
+        return  self.Gepard.ReE(pt) + self.DR.ReE(pt)
+
 
 ##  --- Complete models built from the above components ---
 

@@ -12,6 +12,7 @@ flatten -- flattens tuples
 listFiles -- listfiles in subdirs matching pattern
 select -- selecting DataPoints according to criteria
 listdb --  listing the content of database of models
+hubDict -- merges two dicts, but not actually but by forwarding
 """
 
 import os, re, string, fnmatch
@@ -32,7 +33,7 @@ class AttrDict(dict):
     It maps attribute access to the real dictionary.  
     By Keith Darth, http://code.activestate.com/recipes/473786/
     FIXME: Using this is bad for performance. __getitem__ is called 
-    way to many times.
+    way to many times. (I'm not using it any longer!)
     """
     def __init__(self, init={}):
         dict.__init__(self, init)
@@ -312,3 +313,44 @@ def listdb(db):
     print "%-8s--+--%s" % (8*'-', 60*'-')
     for key in db:
         print "%-8s  |  %s" % (key, db[key].description)
+
+
+class hubDict(dict):
+    """Merges two dictionaries, but not actually but just by forwarding."""
+
+    def __init__(self, da, db):
+        self.d1 = da
+        self.d2 = db
+
+    def __getitem__(self, name):
+        if self.d1.has_key(name):
+            return self.d1[name]
+        else:
+            return self.d2[name]
+
+    def __setitem__(self, name, value):
+        if self.d1.has_key(name):
+            self.d1[name] = value
+        else:
+            self.d2[name] = value
+
+    def has_key(self, name):
+        if self.d1.has_key(name) or self.d2.has_key(name):
+            return True
+        else:
+            return False
+
+    def keys(self):
+        self.d1.keys() + self.d2.keys()
+
+    def copy(self):
+        print "Can't copy hubDict yet!!!"
+
+    def update(self, d):
+        for key in d:
+            self.__setitem__(key, d[key])
+
+    def __repr__(self):
+        return 'First: %s\nSecond: %s' % (
+                self.d1.__repr__(), self.d2.__repr__())
+
