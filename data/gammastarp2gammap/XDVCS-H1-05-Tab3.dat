@@ -1,0 +1,61 @@
+id = 43
+editor = KK
+
+# equivalent to union of DVCS_H1_5.DAT and DVCS_H1_6.DAT
+
+### Experiment
+
+collaboration = H1
+process = gammastarp2gammap
+exptype = collider
+year = 2005
+reference = hep-ex/0505061
+reference2 = Table 1
+reference3 = Eur.Phys.J. C44 (2005) 1-11
+
+### Scattering Process
+
+in1particle = gammastar
+in2particle = p
+
+out1particle = gamma
+out2particle = p
+
+# 46.5 1/pb data taken in 1996-2000
+# 11.5 1/pb in (1996-1997) and 35 1/pb in (1999-2000)
+# colliding 27.6 GeV positrons with 
+# 820 GeV (1996-1997) and 920 GeV (1999-2000) protons
+# 1243 events in total
+
+### Observable 
+
+y0name = XDVCS
+y0namelong = DVCS cross section
+y0unit = nb
+y0value = column2
+y0errorstatistic = column3
+y0errorsystematic = column4
+
+
+### x-axes
+x0name = Q2
+x0unit = GeV^2
+x0value = column0
+
+x1name = W
+x1unit = GeV
+x1value = column1
+
+
+# Q2  W  sig   stat   syst
+######################################
+4.  45    6.5   0.8   1.1
+4.  70    8.9   1.3   1.6
+4.  90   11.1   2.2   2.7
+4.  110  10.1   4.7   4.6
+
+8.  45    2.56  0.36  0.32
+8.  70    2.93  0.63  0.46
+8.  90    4.45  0.83  0.82
+8.  110   5.3   1.4   1.4
+8.  130   6.4   2.5   2.7

@@ -1,0 +1,72 @@
+id = 37
+editor = KK
+
+# equivalent to union of
+# DVCS_H1_0506_09.DAT
+# DVCS_H1_0506_10.DAT
+# DVCS_H1_0506_11.DAT
+
+
+### Experiment
+
+collaboration = H1
+process = gammastarp2gammap
+exptype = collider
+year = 2007
+reference = arXiv:0709.4114 [hep-ex]
+reference2 = Table 3 - lower half
+
+
+### Scattering Process
+
+in1particle = gammastar
+in2particle = p
+
+out1particle = gamma
+out2particle = p
+
+# 145 1/pb data taken in 2005 and 2006
+# colliding 27.6 GeV electrons with 920 GeV protons
+
+### Observable 
+
+y0name = XDVCSt
+y0namelong = DVCS cross section differential in t
+y0unit = nb/GeV^2
+y0value = column2
+y0errorstatistic = column3
+y0errorsystematic = column4
+
+
+### x-axes
+
+x0name = Q2
+x0unit = GeV^2
+x0value = 10.
+
+x1name = W
+x1unit = GeV
+x1value = column0
+
+x2name = tm
+x2unit = GeV^2
+x2value = column1
+
+
+# W    -t   dsig/dt  stat   syst
+######################################
+ 40.  0.10   4.99    0.66   0.54 
+ 40.  0.30   1.45    0.29   0.18 
+ 40.  0.50   0.49    0.14   0.08 
+ 40.  0.80   0.12    0.03   0.03 
+
+ 70.  0.10   7.78    0.69   0.87
+ 70.  0.30   2.74    0.31   0.30
+ 70.  0.50   0.81    0.14   0.11
+ 70.  0.80   0.19    0.03   0.03
+
+100.  0.10   10.9    1.14   2.36
+100.  0.30   3.47    0.42   0.53
+100.  0.50   1.49    0.21   0.24
+100.  0.80   0.19    0.04   0.06
+

@@ -9,8 +9,6 @@ import utils, Model, Approach, Data, Fitter
 
 from constants import Mp, Mp2
 
-data = utils.loaddata('data/gammastarp2gammap')  
-
 shutil.copy2('test/GEPARD.INI.TEST', 'GEPARD.INI')
 m = Model.ComptonGepard()
 t = Approach.hotfixedBMK(m)
