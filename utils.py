@@ -15,7 +15,7 @@ listdb --  listing the content of database of models
 hubDict -- merges two dicts, but not actually but by forwarding
 """
 
-import os, re, string, fnmatch
+import os, re, string, fnmatch, itertools
 import numpy as np
 
 import Data, Approach
@@ -318,6 +318,8 @@ def listdb(db):
 class hubDict(dict):
     """Merges two dictionaries, but not actually but just by forwarding."""
 
+# most of the methods below are probably not necessary
+
     def __init__(self, da, db):
         self.d1 = da
         self.d2 = db
@@ -334,6 +336,9 @@ class hubDict(dict):
         else:
             self.d2[name] = value
 
+    def __iter__(self):
+        return itertools.chain(self.d1.__iter__(), self.d2.__iter__())
+
     def has_key(self, name):
         if self.d1.has_key(name) or self.d2.has_key(name):
             return True
@@ -341,7 +346,19 @@ class hubDict(dict):
             return False
 
     def keys(self):
-        self.d1.keys() + self.d2.keys()
+        return self.d1.keys() + self.d2.keys()
+
+    def items(self):
+        return self.d1.items() + self.d2.items()
+
+    def iteritems(self):
+        return itertools.chain(self.d1.iteritems(), self.d2.iteritems())
+
+    def iterkeys(self):
+        return itertools.chain(self.d1.iterkeys(), self.d2.iterkeys())
+
+    def itervalues(self):
+        return itertools.chain(self.d1.itervalues(), self.d2.itervalues())
 
     def copy(self):
         print "Can't copy hubDict yet!!!"
@@ -349,6 +366,12 @@ class hubDict(dict):
     def update(self, d):
         for key in d:
             self.__setitem__(key, d[key])
+
+    def popitem(self):
+        try:
+            return self.d1.popitem()
+        except KeyError:
+            return self.d2.popitem()
 
     def __repr__(self):
         return 'First: %s\nSecond: %s' % (

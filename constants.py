@@ -34,5 +34,6 @@ toTeX = {'tm' : '$-t$',  'xB' : '$x_{\\rm B}$', 'Q2' : '$Q^{2}$',
      "BSD" : '$BSD$',
      "BSS" : '$BSS$',
      "BCAcos0" : '$A_{C}^{\\cos 0\\phi}$',
-     "BCAcos1" : '$A_{C}^{\\cos 1\\phi}$'
+     "BCAcos1" : '$A_{C}^{\\cos 1\\phi}$',
+     "XDVCSt" : '$d\\sigma / dt$'
      }

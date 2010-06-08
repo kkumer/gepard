@@ -21,6 +21,7 @@ from constants import toTeX, Mp2, Mp
 
 # load experimental data
 data = utils.loaddata('data/ep2epgamma')  # dictionary {1 : DataSet instance, ...}
+data.update(utils.loaddata('data/gammastarp2gammap')) 
 
 
 def subplot(ax, sets, lines=[], band=[], xaxis=None, kinlabels=[], plotlines=True):
@@ -678,3 +679,21 @@ def CFF(t, cffs=None, path=None, fmt='png'):
         fig.canvas.draw()
         fig.show()
     return fig
+
+def H1(lines=[], band=[], path=None, fmt='png'):
+    """Plot H1 cross section"""
+    id = 36
+    title = 'H1 DVCS cross section'
+    fig = plt.figure()
+    fig.canvas.set_window_title(title)
+    fig.suptitle(title)
+    ax = fig.add_subplot(1, 1, 1)
+    #ax.yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))  # tickmarks
+    subplot(ax, [data[36]], lines, band, 't', [])
+    if path:
+        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+    else:
+        fig.canvas.draw()
+        fig.show()
+    return fig
+

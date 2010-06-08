@@ -16,6 +16,7 @@ except:
 from pybrain.tools.shortcuts import buildNetwork
 import brain
 import trans  # output layer transformation for FitterBrain
+import utils
 
 
 class Fitter(object):
@@ -50,7 +51,13 @@ def fcn(%s):
                 (getattr(theory, pt.yaxis)(pt) - pt.val)**2 / pt.err**2 )
     return chisq
 """ % (fcnargs, pardict), locals(),locals())
-        self.minuit = Minuit(fcn, **theory.model.parameters)
+        if isinstance(theory.model.parameters, utils.hubDict):
+            # This is needed because in Python <=2.5 ** operator
+            # requires dict as an argument, i.e. my hubDict wouldn't work:
+            auxdict = dict((it for it in theory.model.parameters.items()))
+            self.minuit = Minuit(fcn, **auxdict)
+        else:
+            self.minuit = Minuit(fcn, **theory.model.parameters)
         for key in kwargs:
             setattr(self.minuit, key, kwargs[key])
         Fitter.__init__(self, **kwargs)
