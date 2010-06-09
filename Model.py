@@ -458,10 +458,20 @@ class ComptonGepard(ComptonFormFactors):
         g.readpar()
         g.parchr.fftype = array([c for c in 'SINGLET   '])
         g.parchr.process = array([c for c in 'DVCS  '])
+        g.nqs.nqs = 0
+        self.qdict = {}
 
         self.g = g
         # now do whatever else is necessary
         ComptonFormFactors.__init__(self)
+
+    def _evolve(self, pt):
+        """Calculate evolution operator, if not already calculated before"""
+        self.g.nqs.nqs += 1
+        nqs = self.g.nqs.nqs
+        self.g.qs.qs[nqs-1] = pt.Q2
+        self.g.evolc(1, nqs)
+        self.qdict[pt.Q2] = nqs
 
     def ImH(self, pt):
         """Imaginary part of CFF H."""
@@ -473,10 +483,9 @@ class ComptonGepard(ComptonFormFactors):
         g.kinematics.xi = pt.xi
         g.kinematics.del2 = pt.t
 
-        g.nqs.nqs = 1
-        g.qs.qs[0] = pt.Q2
-        g.evolc(1,1)
-        
+        if not self.qdict.has_key(pt.Q2):
+            self._evolve(pt)
+
         g.mt.nmts = 1
         g.mt.mtind = 0 
         g.mts.mts[0] = - pt.t
@@ -493,9 +502,8 @@ class ComptonGepard(ComptonFormFactors):
         g.kinematics.xi = pt.xi
         g.kinematics.del2 = pt.t
 
-        g.nqs.nqs = 1
-        g.qs.qs[0] = pt.Q2
-        g.evolc(1,1)
+        if not self.qdict.has_key(pt.Q2):
+            self._evolve(pt)
         
         g.mt.nmts = 1
         g.mt.mtind = 0 
@@ -514,9 +522,8 @@ class ComptonGepard(ComptonFormFactors):
         g.kinematics.xi = pt.xi
         g.kinematics.del2 = pt.t
 
-        g.nqs.nqs = 1
-        g.qs.qs[0] = pt.Q2
-        g.evolc(1,1)
+        if not self.qdict.has_key(pt.Q2):
+            self._evolve(pt)
         
         g.mt.nmts = 1
         g.mt.mtind = 0 
@@ -535,9 +542,8 @@ class ComptonGepard(ComptonFormFactors):
         g.kinematics.xi = pt.xi
         g.kinematics.del2 = pt.t
 
-        g.nqs.nqs = 1
-        g.qs.qs[0] = pt.Q2
-        g.evolc(1,1)
+        if not self.qdict.has_key(pt.Q2):
+            self._evolve(pt)
         
         g.mt.nmts = 1
         g.mt.mtind = 0 
@@ -545,6 +551,7 @@ class ComptonGepard(ComptonFormFactors):
 
         g.cfff()
         return real(g.cff.cffe[g.parint.p])
+
 
 class ComptonGepardDR(ComptonGepard, ElasticDipole):
     """This combines DR model for valence xB and gepard for small xB."""
