@@ -546,7 +546,7 @@ class ComptonGepard(ComptonFormFactors):
         g.cfff()
         return real(g.cff.cffe[g.parint.p])
 
-class ComptonGepardDR(ComptonGepard):
+class ComptonGepardDR(ComptonGepard, ElasticDipole):
     """This combines DR model for valence xB and gepard for small xB."""
 
     def __init__(self, instGepard, instDR):
