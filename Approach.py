@@ -1,6 +1,6 @@
 from IPython.Debugger import Tracer; debug_here = Tracer()
 
-import copy
+import copy, sys
 
 from numpy import sin, cos, pi, sqrt, array
 from scipy.special import gammainc
@@ -527,11 +527,14 @@ class BMK(Approach):
         """Partial DVCS cross section w.r.t. Mandelstam t."""
 
         W2 = pt.W * pt.W
+        self.m.g.newcall = 1
         # Simplified formula used also in Fortran gepard code
-        return 260.5633976788416 * W2 * ( 
+        res = 260.5633976788416 * W2 * ( 
                 (self.m.ImH(pt)**2 + self.m.ReH(pt)**2)
                 - pt.t/(4.*Mp2)*(self.m.ReE(pt)**2 + self.m.ImE(pt)**2)) / (
             (W2 + pt.Q2) * (2.0 * W2 + pt.Q2)**2 )
+        #sys.stderr.write('%s\n' % (res,))
+        return res
 
 
     def XDVCS(self, pt):

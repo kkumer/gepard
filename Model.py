@@ -461,6 +461,7 @@ class ComptonGepard(ComptonFormFactors):
         g.nqs.nqs = 0
         self.qdict = {}
 
+        g.newcall = 1
         self.g = g
         # now do whatever else is necessary
         ComptonFormFactors.__init__(self)
@@ -473,8 +474,8 @@ class ComptonGepard(ComptonFormFactors):
         self.g.evolc(1, nqs)
         self.qdict[pt.Q2] = nqs
 
-    def ImH(self, pt):
-        """Imaginary part of CFF H."""
+    def _GepardCFFs(self, pt):
+        """Call gepard routine that calculates CFFs"""
         for i in self.parameters_index:
             g.par.par[i-1] = self.parameters[self.parameters_index[i]]
 
@@ -489,67 +490,32 @@ class ComptonGepard(ComptonFormFactors):
         g.mt.nmts = 1
         g.mt.mtind = 0 
         g.mts.mts[0] = - pt.t
+
         g.cfff()
+        g.newcall = 0
+
+    def ImH(self, pt):
+        """Imaginary part of CFF H."""
+        if self.g.newcall:
+            self._GepardCFFs(pt)
         return imag(g.cff.cff[g.parint.p])
 
     def ReH(self, pt):
         """Real part of CFF H."""
-        for i in self.parameters_index:
-            g.par.par[i-1] = self.parameters[self.parameters_index[i]]
-
-        g.kinematics.w2 = pt.W*pt.W
-        g.kinematics.q2 = pt.Q2
-        g.kinematics.xi = pt.xi
-        g.kinematics.del2 = pt.t
-
-        if not self.qdict.has_key(pt.Q2):
-            self._evolve(pt)
-        
-        g.mt.nmts = 1
-        g.mt.mtind = 0 
-        g.mts.mts[0] = - pt.t
-
-        g.cfff()
+        if self.g.newcall:
+            self._GepardCFFs(pt)
         return real(g.cff.cff[g.parint.p])
 
     def ImE(self, pt):
         """Imaginary part of CFF E."""
-        for i in self.parameters_index:
-            g.par.par[i-1] = self.parameters[self.parameters_index[i]]
-
-        g.kinematics.w2 = pt.W*pt.W
-        g.kinematics.q2 = pt.Q2
-        g.kinematics.xi = pt.xi
-        g.kinematics.del2 = pt.t
-
-        if not self.qdict.has_key(pt.Q2):
-            self._evolve(pt)
-        
-        g.mt.nmts = 1
-        g.mt.mtind = 0 
-        g.mts.mts[0] = - pt.t
-
-        g.cfff()
+        if self.g.newcall:
+            self._GepardCFFs(pt)
         return imag(g.cff.cffe[g.parint.p])
 
     def ReE(self, pt):
         """Real part of CFF E."""
-        for i in self.parameters_index:
-            g.par.par[i-1] = self.parameters[self.parameters_index[i]]
-
-        g.kinematics.w2 = pt.W*pt.W
-        g.kinematics.q2 = pt.Q2
-        g.kinematics.xi = pt.xi
-        g.kinematics.del2 = pt.t
-
-        if not self.qdict.has_key(pt.Q2):
-            self._evolve(pt)
-        
-        g.mt.nmts = 1
-        g.mt.mtind = 0 
-        g.mts.mts[0] = - pt.t
-
-        g.cfff()
+        if self.g.newcall:
+            self._GepardCFFs(pt)
         return real(g.cff.cffe[g.parint.p])
 
 
