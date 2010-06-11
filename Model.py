@@ -519,13 +519,13 @@ class ComptonGepard(ComptonFormFactors):
         return real(g.cff.cffe[g.parint.p])
 
 
-class ComptonGepardDR(ComptonGepard, ElasticDipole):
-    """This combines DR model for valence xB and gepard for small xB."""
+class ComptonHybrid(ComptonGepard):
+    """This combines gepard for small xB and DR model for valence xB."""
 
     def __init__(self, instGepard, instDR):
         self.Gepard = instGepard  # instance of ComptonGepard
         self.DR = instDR  # instance of ComptonModelDR
-
+        self.DR.parameters['Nsea'] = 0  # sea comes from Gepard part
         self.parameters = hubDict(self.Gepard.parameters, self.DR.parameters)
         self.parameter_names = self.Gepard.parameter_names + self.DR.parameter_names
 
@@ -555,3 +555,8 @@ class ModelDR(ComptonModelDR, ElasticDipole):
 
 class ModelNN(ComptonNeuralNets, ElasticDipole):
     """Complete model."""
+
+
+class Hybrid(ComptonHybrid, ElasticDipole):
+    """Complete hybrid model."""
+

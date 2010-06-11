@@ -1,6 +1,7 @@
 This directory holds available experimental data
 
 ep2epgamma/ - relevant experimental data for e p --> e p gamma
+gammastarp2gammap/ - data for \gamma^* p --> \gamma p  i.e. DVCS
 old/ - old data files
 
 Note:
