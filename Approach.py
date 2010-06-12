@@ -2,7 +2,7 @@ from IPython.Debugger import Tracer; debug_here = Tracer()
 
 import copy, sys
 
-from numpy import sin, cos, pi, sqrt, array
+from numpy import sin, cos, pi, sqrt, array, linspace
 from scipy.special import gammainc
 
 import utils, quadrature
@@ -60,6 +60,17 @@ class Approach(object):
             return allsigmas
         else:
             return (chi, dof, fitprob)
+
+    def scan(self, parname, points, npoints=5):
+        """Scan chi-square dependence on single parameter."""
+        mem = self.m.parameters[parname]
+        chis = []
+        for val in linspace(0.5*mem, 1.5 * mem, npoints):
+            self.m.parameters[parname] = val
+            chi, dof, fitprob = self.chisq(points)
+            print '%s  ->  %s' % (val, chi)
+        self.m.parameters[parname] = mem  # restore original value
+
 
     def print_chisq(self, points, sigmas=False):
         """Pretty-print the chi-square."""
@@ -417,6 +428,9 @@ class BMK(Approach):
             wgh = self.w(kin)
         else:
             wgh = 1
+
+        # Gepard needs resetting
+        if self.model.__dict__.has_key('Gepard'): self.m.g.newcall = 1
 
         return wgh * self.PreFacSigma(kin) * ( self.TBH2unp(kin) 
                 + self.TINTunp(kin) 

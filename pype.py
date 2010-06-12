@@ -17,7 +17,7 @@ data = utils.loaddata('data/ep2epgamma')  # dictionary {1 : DataSet instance, ..
 data.update(utils.loaddata('data/gammastarp2gammap'))
 db = shelve.open('theories.db')
 
-shutil.copy2('test/GEPARD.INI.TEST', 'GEPARD.INI')
+shutil.copy2('test/GEPARD.INI.FIT', 'GEPARD.INI')
 
 
 ## [2] Choose subset of datapoints for fitting
@@ -32,9 +32,12 @@ DVCSpoints = data[36] + data[37] + data[38] + data[39] + \
   data[40] + data[41] + data[42] + data[43] + data[44] + \
   data[45]
 
+testpoints = GLOpoints[-6:]
+testpoints = GLOpoints[16:24]
 allpoints = GLOpoints + DVCSpoints
 
 #ptSS = HA17[11]
+ptt = testpoints[1]
 
 ## [3] Create a theory
 
@@ -78,18 +81,19 @@ setpar(25,  0.)
 setpar(26,  2.)
 setpar(27,  0.)
 setpar(28,  0.)
-setpar(29,  0.)
+setpar(29,  -30.)
 
 setpar(19,  -10.)
 # Killing the gpard contrib:
 #setpar(11,  0.)
 #setpar(21,  0.)
 
-#t.m.g.parint.p = 0
-#.m.g.init()
+t.m.g.parint.p = 0
+t.m.g.init()
 
-tDR.m.release_parameters('bS', 'Mv')
+#tDR.m.release_parameters('bS', 'Mv')
+#f = Fitter.FitterMinuit(testpoints, tDR)
 
-f = Fitter.FitterMinuit(testpoints, tDR)
-#f = Fitter.FitterMinuit(DVCSpoints, t)
+t.m.release_parameters('M02S', 'SKEWS', 'SKEWG', 'C', 'Mv')
+f = Fitter.FitterMinuit(GLOpoints, t)
 

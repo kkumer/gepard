@@ -410,7 +410,7 @@ class ComptonGepard(ComptonFormFactors):
                'NS' : 0.15,
              'AL0S' : 1.0,
              'ALPS' : 0.15,
-             'M02S' : 1.0,
+             'M02S' : 1.0,    'limit_M02S' : (0.3, 1.5),
            'DELM2S' : 0.0,
                'PS' : 2.0,
              'SECS' : 0.0,
@@ -419,7 +419,7 @@ class ComptonGepard(ComptonFormFactors):
                'NG' : 0.4,
              'AL0G' : 1.1,
              'ALPG' : 0.15,
-             'M02G' : 0.7,
+             'M02G' : 0.7,    'limit_M02G' : (0.3, 1.5),
            'DELM2G' : 0.0,
                'PG' : 2.0,
              'SECG' : 0.0,
@@ -458,8 +458,13 @@ class ComptonGepard(ComptonFormFactors):
         g.readpar()
         g.parchr.fftype = array([c for c in 'SINGLET   '])
         g.parchr.process = array([c for c in 'DVCS  '])
-        g.nqs.nqs = 0
-        self.qdict = {}
+        # Cutting-off evolution at input scale Q02.
+        # Evaluate evolved C at this scale now.
+        self.cutq2 = float(g.parflt.q02)
+        g.nqs.nqs = 1
+        g.qs.qs[0] = self.cutq2
+        g.evolc(1, 1)
+        self.qdict = {self.cutq2 : 1}
 
         g.newcall = 1
         self.g = g
@@ -467,15 +472,19 @@ class ComptonGepard(ComptonFormFactors):
         ComptonFormFactors.__init__(self)
 
     def _evolve(self, pt):
-        """Calculate evolution operator, if not already calculated before"""
+        """Calculate evolution operator."""
         self.g.nqs.nqs += 1
-        nqs = self.g.nqs.nqs
+        nqs = int(self.g.nqs.nqs)
         self.g.qs.qs[nqs-1] = pt.Q2
-        self.g.evolc(1, nqs)
-        self.qdict[pt.Q2] = nqs
+        if pt.Q2 < self.cutq2:
+            # just refer to cutq2 value
+            self.qdict[pt.Q2] = 1
+        else:
+            self.g.evolc(1, nqs)
+            self.qdict[pt.Q2] = nqs
 
     def _GepardCFFs(self, pt):
-        """Call gepard routine that calculates CFFs"""
+        """Call gepard routine that calculates CFFs."""
         for i in self.parameters_index:
             g.par.par[i-1] = self.parameters[self.parameters_index[i]]
 
@@ -535,10 +544,10 @@ class ComptonHybrid(ComptonGepard):
 
 
     def ImH(self, pt, xi=0):
-        return  self.Gepard.ImH(pt) + self.DR.ImH(pt, xi)
+        return  self.Gepard.ImH(pt) * (1-pt.xi) + self.DR.ImH(pt, xi)
 
     def ReH(self, pt):
-        return  self.Gepard.ReH(pt) + self.DR.ReH(pt)
+        return  self.Gepard.ReH(pt) * (1-pt.xi) + self.DR.ReH(pt)
 
     def ImE(self, pt, xi=0):
         return  self.Gepard.ImE(pt) + self.DR.ImE(pt, xi)
