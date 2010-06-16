@@ -17,8 +17,8 @@ mGepard = Model.ComptonGepard()
 tGepard = Approach.hotfixedBMK(mGepard)
 
 # Hybrid: Gepard+DR (can reuse above Gepard)
-mDR = Model.ComptonModelDR()
-m = Model.Hybrid(mGepard, mDR)
+mDRsea = Model.ComptonModelDRsea()
+m = Model.Hybrid(mGepard, mDRsea)
 t = Approach.hotfixedBMK(m)
 
 # Shortcut for seting gepard model parameters
@@ -122,7 +122,7 @@ def test_hybridfitGepard():
     f = Fitter.FitterMinuit(fitpoints, t)
     f.fit()
     chisq = t.chisq(fitpoints)[0]
-    assert_almost_equal(chisq, 5.1423271052023196, 3)
+    assert_almost_equal(chisq, 5.1423271052023196, 2)
 
 def test_hybridfitDR():
     """Test simple hybrid fitting via gepard + DR (gepard=0)"""

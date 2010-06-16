@@ -17,7 +17,7 @@ data = utils.loaddata('data/ep2epgamma')  # dictionary {1 : DataSet instance, ..
 data.update(utils.loaddata('data/gammastarp2gammap'))
 db = shelve.open('theories.db')
 
-shutil.copy2('test/GEPARD.INI.FIT', 'GEPARD.INI')
+#shutil.copy2('test/GEPARD.INI.FIT', 'GEPARD.INI')
 
 
 ## [2] Choose subset of datapoints for fitting
@@ -38,6 +38,11 @@ allpoints = GLOpoints + DVCSpoints
 
 #ptSS = HA17[11]
 ptt = testpoints[1]
+pt0 = GLOpoints[0]
+pt4 = GLOpoints[4]
+pt5 = GLOpoints[5]
+pt9 = GLOpoints[9]
+pt26 = GLOpoints[26]
 
 ## [3] Create a theory
 
@@ -49,13 +54,19 @@ tGepard = Approach.hotfixedBMK(mGepard)
 mDRonly = Model.ModelDR()
 tDR = Approach.hotfixedBMK(mDRonly)
 
-# Hybrid: Gepard+DR (can reuse above Gepard)
-mDR = Model.ComptonModelDR()
-m = Model.Hybrid(mGepard, mDR)
-t = Approach.hotfixedBMK(m)
 
-tDR.m.parameters.update(DMGLO1)
-t.m.parameters.update(DMGLO1)
+# Hybrid: Gepard+DR (can reuse above Gepard)
+mDRsea = Model.ComptonModelDRsea()
+m = Model.Hybrid(mGepard, mDRsea)
+t = Approach.hotfixedBMK(m)
+g = t.m.g
+
+tDR.m.parameters.update(DMGLO)
+t.m.parameters.update(DMGLO)
+
+#tDR.m.parameters['NS'] = 0.59
+#tDR.m.parameters['alS'] = 1.276
+#tDR.m.parameters['MS'] = 0.646
 
 def setpar(i, val):
     mGepard.parameters[mGepard.parameters_index[i]] = val
@@ -68,12 +79,12 @@ def setpar(i, val):
 setpar(11,  0.15203911208796006)
 setpar(12,  1.1575060246398083)
 setpar(13,  0.15)
-setpar(14,  1.)
+setpar(14,  0.41768649210641556)
 setpar(15,  0.)
 setpar(16,  2.)
 setpar(17,  0.)
 setpar(18,  0.)
-setpar(19,  0.)
+setpar(19,  -10.5)
 setpar(22,  1.247316701070471)
 setpar(23,  0.15)
 setpar(24,  0.7)
@@ -81,9 +92,8 @@ setpar(25,  0.)
 setpar(26,  2.)
 setpar(27,  0.)
 setpar(28,  0.)
-setpar(29,  -30.)
+setpar(29,  -31.89)
 
-setpar(19,  -10.)
 # Killing the gpard contrib:
 #setpar(11,  0.)
 #setpar(21,  0.)
@@ -94,6 +104,6 @@ t.m.g.init()
 #tDR.m.release_parameters('bS', 'Mv')
 #f = Fitter.FitterMinuit(testpoints, tDR)
 
-t.m.release_parameters('M02S', 'SKEWS', 'SKEWG', 'C', 'Mv')
-f = Fitter.FitterMinuit(GLOpoints, t)
+#t.m.release_parameters('M02S', 'SKEWS', 'SKEWG', 'C', 'Mv')
+#f = Fitter.FitterMinuit(GLOpoints, t)
 
