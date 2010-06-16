@@ -6,7 +6,7 @@ fitting procedure).  Theoretical "approach", when given an instance of a model
 and parameter values can calculate observables.
 
 """
-from IPython.Debugger import Tracer; debug_here = Tracer()
+#from IPython.Debugger import Tracer; debug_here = Tracer()
 import pickle, sys
 
 from numpy import log, pi, imag, real
@@ -152,7 +152,7 @@ class ComptonDispersionRelations(ComptonFormFactors):
         order to tame the singularity at x=0. 
         
         """
-        ga = 0.0  # Nice value obtained by experimentation in Mathematica
+        ga = 0.9  # Nice value obtained by experimentation in Mathematica
         u = x**(1./(1.-ga))
         res = u**ga * ( fun(pt, u) - fun(pt) )
         #print x, fun(pt, u), fun(pt)
@@ -234,7 +234,7 @@ class ComptonModelDR(ComptonDispersionRelations):
               'Nv' : 1.35,                              
              'alv' : 0.43,                              
             'alpv' : 0.85,                              
-              'Mv' : 1.0,     'limit_Mv' : (0.9, 1.1),
+              'Mv' : 1.0,     'limit_Mv' : (0.4, 1.5),
               'rv' : 0.5,     'limit_rv' : (0., 8.),
               'bv' : 2.2,     'limit_bv' : (0.4, 5.),
                'C' : 7.0,      'limit_C' : (-10., 10.),
@@ -329,7 +329,7 @@ class ComptonModelDRsea(ComptonDispersionRelations):
               'Nv' : 1.35,                              
              'alv' : 0.43,                              
             'alpv' : 0.85,                              
-              'Mv' : 1.0,     'limit_Mv' : (0.9, 1.1),
+              'Mv' : 1.0,     'limit_Mv' : (0.4, 1.5),
               'rv' : 0.5,     'limit_rv' : (0., 8.),
               'bv' : 2.2,     'limit_bv' : (0.4, 5.),
                'C' : 7.0,      'limit_C' : (-10., 10.),
@@ -353,7 +353,7 @@ class ComptonModelDRsea(ComptonDispersionRelations):
     def subtraction(self, pt):
         return self.parameters['C']/(1.-pt.t/self.parameters['MC']**2)**2
 
-    def ImH(self, pt, xi=0):
+    def ImH(self, pt, xi=0, **kwargs):
         """Imaginary part of CFF H."""
         p = self.parameters # just a shortcut
         # FIXME: The following solution is not elegant
@@ -373,6 +373,7 @@ class ComptonModelDRsea(ComptonDispersionRelations):
                  onex**p['bv'] / (1. - onex*t/(p['Mv']**2))  )
         sea = ( (2./9.) * p['Nsea'] * p['rS'] * twox**(-p['alS']-p['alpS']*t) *
                  onex**p['bS'] / (1. - onex*t/(p['MS']**2))**2 )
+        if kwargs.has_key('onlysea'): val=0
         return pi * (val + sea) / (1.+x)
 
     def ImHt(self, pt, xi=0):
@@ -500,10 +501,7 @@ class ComptonNeuralNets(ComptonFormFactors):
 
 
 class ComptonGepard(ComptonFormFactors):
-    """CFFs as implemented in gepard.
-    
-    FIXME: completely unnecessary duplication of stuff below!
-    """
+    """CFFs as implemented in gepard.  """
     def __init__(self):
         # initial values of parameters and limits on their values
         self.parameters = {
@@ -516,6 +514,7 @@ class ComptonGepard(ComptonFormFactors):
              'SECS' : 0.0,
              'KAPS' : 0.0,
             'SKEWS' : 0.0,
+               'NG' : 0.5,
              'AL0G' : 1.1,
              'ALPG' : 0.15,
              'M02G' : 0.7,    'limit_M02G' : (0.3, 1.5),
@@ -537,6 +536,7 @@ class ComptonGepard(ComptonFormFactors):
              17 : 'SECS',
              18 : 'KAPS',
              19 : 'SKEWS',
+             21 : 'NG',  
              22 : 'AL0G',
              23 : 'ALPG',
              24 : 'M02G',
@@ -550,7 +550,7 @@ class ComptonGepard(ComptonFormFactors):
         self.parameter_names = [ 
            'NS', 'AL0S', 'ALPS', 'M02S',
            'DELM2S', 'PS', 'SECS', 'KAPS', 'SKEWS',
-                 'AL0G', 'ALPG', 'M02G',
+           'NG', 'AL0G', 'ALPG', 'M02G',
            'DELM2G', 'PG', 'SECG', 'KAPG', 'SKEWG']
 
         g.readpar()
@@ -586,14 +586,24 @@ class ComptonGepard(ComptonFormFactors):
         else:
             self.g.evolc(1, nqs)
 
-    def _GepardCFFs(self, pt):
+    def _GepardCFFs(self, pt, xi=0):
         """Call gepard routine that calculates CFFs."""
         for i in self.parameters_index:
             g.par.par[i-1] = self.parameters[self.parameters_index[i]]
 
-        g.kinematics.w2 = pt.W*pt.W
+        # FIXME: The following solution is not elegant
+        if isinstance(xi, ndarray):
+            # function was called with third argument that is xi nd array
+            x = xi
+        elif xi != 0:
+            # function was called with third argument that is xi number
+            x = xi
+        else:
+            # xi should be taken from pt object
+            x = pt.xi
+
         g.kinematics.q2 = pt.Q2
-        g.kinematics.xi = pt.xi
+        g.kinematics.xi = x
         g.kinematics.del2 = pt.t
 
         if not self.qdict.has_key(pt.Q2):
@@ -606,10 +616,10 @@ class ComptonGepard(ComptonFormFactors):
         g.cfff()
         g.newcall = 0
 
-    def ImH(self, pt):
+    def ImH(self, pt, xi=0):
         """Imaginary part of CFF H."""
         if self.g.newcall:
-            self._GepardCFFs(pt)
+            self._GepardCFFs(pt, xi)
         return imag(g.cff.cff[g.parint.p])
 
     def ReH(self, pt):
@@ -647,7 +657,7 @@ class ComptonHybrid(ComptonGepard):
 
 
     def ImH(self, pt, xi=0):
-        return  self.Gepard.ImH(pt) + self.DR.ImH(pt, xi)
+        return  self.Gepard.ImH(pt, xi) + self.DR.ImH(pt, xi)
 
     def ReH(self, pt):
         return  self.Gepard.ReH(pt) + self.DR.ReH(pt)

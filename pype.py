@@ -15,7 +15,7 @@ from results import *
 
 data = utils.loaddata('data/ep2epgamma')  # dictionary {1 : DataSet instance, ...}
 data.update(utils.loaddata('data/gammastarp2gammap'))
-db = shelve.open('theories.db')
+#db = shelve.open('theories.db')
 
 #shutil.copy2('test/GEPARD.INI.FIT', 'GEPARD.INI')
 
@@ -53,20 +53,26 @@ tGepard = Approach.hotfixedBMK(mGepard)
 # DR only
 mDRonly = Model.ModelDR()
 tDR = Approach.hotfixedBMK(mDRonly)
+tDR.name = 'DR model'
 
 
 # Hybrid: Gepard+DR (can reuse above Gepard)
 mDRsea = Model.ComptonModelDRsea()
 m = Model.Hybrid(mGepard, mDRsea)
 t = Approach.hotfixedBMK(m)
+t.name = 'DR + Gepard sea'
 g = t.m.g
 
 tDR.m.parameters.update(DMGLO)
 t.m.parameters.update(DMGLO)
 
-#tDR.m.parameters['NS'] = 0.59
-#tDR.m.parameters['alS'] = 1.276
-#tDR.m.parameters['MS'] = 0.646
+#tDR.m.parameters['NS'] = 0.6
+#tDR.m.parameters['alS'] = 1.25
+#tDR.m.parameters['MS'] = 0.846
+
+# "CORRECT 1+eps"
+#tDR.m.parameters['bS'] = 1.6 
+#tDR.m.parameters['Mv'] = 1.5
 
 def setpar(i, val):
     mGepard.parameters[mGepard.parameters_index[i]] = val
@@ -94,6 +100,11 @@ setpar(27,  0.)
 setpar(28,  0.)
 setpar(29,  -31.89)
 
+# "INCORRECT 1+eps"
+t.m.parameters['Mv'] = 1.5
+t.m.parameters['C'] = 10.
+t.m.parameters['MC'] = 0.318
+
 # Killing the gpard contrib:
 #setpar(11,  0.)
 #setpar(21,  0.)
@@ -101,9 +112,9 @@ setpar(29,  -31.89)
 t.m.g.parint.p = 0
 t.m.g.init()
 
-#tDR.m.release_parameters('bS', 'Mv')
-#f = Fitter.FitterMinuit(testpoints, tDR)
+tDR.m.release_parameters('bS', 'Mv')
+fDR = Fitter.FitterMinuit(GLOpoints, tDR)
 
-#t.m.release_parameters('M02S', 'SKEWS', 'SKEWG', 'C', 'Mv')
-#f = Fitter.FitterMinuit(GLOpoints, t)
+t.m.release_parameters('C', 'Mv', 'MC')
+f = Fitter.FitterMinuit(GLOpoints, t)
 

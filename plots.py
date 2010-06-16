@@ -523,6 +523,7 @@ def H(theories=[], path=None, fmt='png'):
     fig.subplots_adjust(bottom=0.45)
     # Left panel
     pt = Data.DummyPoint()
+    pt.Q2 = 2.
     ax = fig.add_subplot(1,1,1)
     ax.set_xscale('log')  # x-axis to be logarithmic
     xval = np.power(10., np.arange(-3.5, 0, 0.01)) 
@@ -530,11 +531,19 @@ def H(theories=[], path=None, fmt='png'):
     styles = ['-', '--', '-.', ':']
     pn = 0
     for t in theories:
-        pt.t = 0.0
+        pt.t = -0.1
         # kludge alert!
-        line1 = xval * t.model.ImH(pt, xval) / np.pi
+        ImHvals = []
+        for xi in xval:
+            if t.model.__dict__.has_key('Gepard'): t.m.g.newcall = 1
+            ImHvals.append(t.model.ImH(pt, xi))
+        line1 = xval * np.array(ImHvals) / np.pi
         pt.t = -0.3
-        line2 = xval * t.model.ImH(pt, xval) / np.pi
+        ImHvals = []
+        for xi in xval:
+            if t.model.__dict__.has_key('Gepard'): t.m.g.newcall = 1
+            ImHvals.append(t.model.ImH(pt, xi))
+        line2 = xval * ImHvals / np.pi
         ax.plot(xval, line1, color=colors[pn], linestyle=styles[pn], linewidth=2)
         ax.plot(xval, line2, color=colors[pn], linestyle=styles[pn], linewidth=4, label=t.name) 
         pn += 1
@@ -545,7 +554,8 @@ def H(theories=[], path=None, fmt='png'):
     ax.set_xlabel('$x$', fontsize=15)
     ax.set_ylabel('$x H(x, x, t)$', fontsize=18)
     ax.legend()
-    ax.text(0.001, 0.405, "t = 0")
+    #ax.text(0.001, 0.405, "t = 0")
+    ax.text(0.001, 0.30, "t = -0.1 GeV^2")
     ax.text(0.001, 0.12, "t = -0.3 GeV^2")
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
