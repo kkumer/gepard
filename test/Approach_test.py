@@ -29,23 +29,23 @@ test_CFF.one = 1
 
 def test_Xunp():
     """Calculate basic cross section Xunp."""
-    assert_almost_equal(t.Xunp(pt0, vars={'phi':1.}), 1.8934179005138172)
+    assert_almost_equal(t.Xunp(pt0, vars={'phi':1.}),1.8872296859809268)
     ar = t.Xunp(pt0, vars={'phi':np.array([0.3, 1.1])})
     assert isinstance(ar, np.ndarray)
-    assert_almost_equal(ar[0], 1.4431498922585635)
-    assert_almost_equal(ar[1], 1.9830803062066602)
+    assert_almost_equal(ar[0], 1.4412915895026261)
+    assert_almost_equal(ar[1], 1.976296757099798)
 
 def test_Xunp2():
     """Any kinematic variable can be in vars."""
     assert_almost_equal(t.Xunp(pt0, 
-        vars={'phi':1., 'xB':0.07}), 3.0240991086297577)
+        vars={'phi':1., 'xB':0.07}), 3.0167858349753569)
 
 def test_Xunp3():
     """ndarray of Q2 could be in vars."""
     ar = t.Xunp(pt0, vars={'phi':1, 'Q2':np.array([2.3, 2.5])})
     assert isinstance(ar, np.ndarray)
-    assert_almost_equal(ar[0], 1.9818420283023106)
-    assert_almost_equal(ar[1], 2.0973314901673334)
+    assert_almost_equal(ar[0], 1.9769620102137611)
+    assert_almost_equal(ar[1], 2.0929037204130285)
 
 def test_Xunp4():
     """New feature: ndarray of any kinematical variable could be in vars."""

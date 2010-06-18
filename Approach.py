@@ -641,7 +641,7 @@ class hotfixedBMK(BMK):
         return (
                 # OLD INCORRECT: (1. + eps2)**2*((8.*pt.K*(2. - y)*y)/(1. + eps2))*
                 # CORRECT: ((8.*pt.K*(2. - y)*y)/(1. + eps2))*
-                 (1. + eps2)**2*((8.*pt.K*(2. - y)*y)/(1. + eps2))*
+                ((8.*pt.K*(2. - y)*y)/(1. + eps2))*
          (1. + ((t - self.tmin(Q2, xB, eps2))*(1. - xB + 0.5*(-1. + sqrt(1. + eps2))))/
            (Q2*(1. + eps2)))
          )

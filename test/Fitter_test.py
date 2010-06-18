@@ -26,7 +26,7 @@ def test_fit():
     for pt in testpoints:
         chisq = chisq + (
                 (getattr(t, pt.yaxis)(pt) - pt.val)**2 / pt.err**2 )
-    assert_almost_equal(chisq, 5.115294374919535)
+    assert_almost_equal(chisq, 8.5683742574814694)
 
 
 def test_fit2():
@@ -34,7 +34,7 @@ def test_fit2():
     f = Fitter.FitterMinuit(fitpoints, t)
     f.fit()
     chisq = t.chisq(fitpoints)[0]
-    assert_almost_equal(chisq, 6.7638690027046771, 5)
+    assert_almost_equal(chisq, 8.1467195035040003, 5)
 
 test_fit2.long = 1
 
