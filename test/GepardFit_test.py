@@ -2,6 +2,8 @@
 import shutil, copy, math
 from nose.tools import *
 
+import numpy as np
+
 import utils, Model, Approach, Fitter
 
 data = utils.loaddata('data/ep2epgamma')  
@@ -23,6 +25,11 @@ t = Approach.hotfixedBMK(m)
 def setpar(i, val):
     mGepard.parameters[mGepard.parameters_index[i]] = val
 
+# DVCSpoints = all data from gepard's dvcs.dat
+# model parameters from DIS fit should be fixed
+DVCSpoints = data[36] + data[37] + data[38] + data[39] + \
+  data[40] + data[41] + data[42] + data[43] + data[44] + \
+  data[45]
 
 
 def test_gepardfitsimple():
@@ -59,11 +66,6 @@ def test_gepardfitDVCS():
     
     This should give same results as in smallx-final.nb,
     section 1-[sum]."""
-    # DVCSpoints = all data from gepard's dvcs.dat
-    # model parameters from DIS fit should be fixed
-    DVCSpoints = data[36] + data[37] + data[38] + data[39] + \
-      data[40] + data[41] + data[42] + data[43] + data[44] + \
-      data[45]
     setpar(11,  0.15203911208796006)
     setpar(12,  1.1575060246398083)
     setpar(13,  0.15)
@@ -90,11 +92,14 @@ def test_gepardfitDVCS():
     assert_almost_equal(chisq, 101.094, 1)
 
 test_gepardfitDVCS.long = 1
+# It's not a 'new feature' - test passes but the test
+# from GepardFitNLO_test.py is more comprehensive
+test_gepardfitDVCS.newfeature = 1
+
     
 def test_hybridfitGepard():
     """Test simple hybrid fitting via gepard + DR (DR=0)"""
     fitpoints = data[36][:4]
-    setpar(21, 0.5)   
     setpar(11, 0.15)  
     setpar(12, 1.16)  
     setpar(13, 0.15)  
@@ -115,6 +120,7 @@ def test_hybridfitGepard():
     t.m.parameters['Nv'] = 0
     t.m.parameters['C'] = 0
     t.m.g.parint.p = 0
+    t.m.g.parchr.scheme = np.array([c for c in 'CSBAR'])
     t.m.g.init()
     t.m.release_parameters('M02S', 'SKEWS')
     f = Fitter.FitterMinuit(fitpoints, t)
@@ -137,11 +143,6 @@ def test_hybridfitDVCS():
     
     This should give same results as in smallx-final.nb,
     section 1.-[sum]."""
-    # DVCSpoints = all data from gepard's dvcs.dat
-    # model parameters from DIS fit should be fixed
-    DVCSpoints = data[36] + data[37] + data[38] + data[39] + \
-      data[40] + data[41] + data[42] + data[43] + data[44] + \
-      data[45]
     setpar(11,  0.15203911208796006)
     setpar(12,  1.1575060246398083)
     setpar(13,  0.15)
@@ -162,6 +163,7 @@ def test_hybridfitDVCS():
     t.m.parameters['Nv'] = 0
     t.m.parameters['C'] = 0
     t.m.g.parint.p = 0
+    t.m.g.parchr.scheme = np.array([c for c in 'CSBAR'])
     t.m.g.init()
     t.m.release_parameters('M02S','SKEWS','SKEWG')
     f = Fitter.FitterMinuit(DVCSpoints, t)

@@ -554,7 +554,6 @@ class ComptonGepard(ComptonFormFactors):
            'NG', 'AL0G', 'ALPG', 'M02G',
            'DELM2G', 'PG', 'SECG', 'KAPG', 'SKEWG']
 
-        #g.readpar()
         # this was in Gepard's GEPARD.INI, which is not needed now
         # but look at it for documentation of what parameters below are
         g.parint.speed = 1
@@ -579,8 +578,8 @@ class ComptonGepard(ComptonFormFactors):
         g.parchr.ansatz = array([c for c in 'FIT   ']) # array(6)
 
         # following two items usually came from driver file
-        g.parchr.process = array([c for c in 'DVCS  '])
-        g.parchr.fftype = array([c for c in 'SINGLET   '])
+        g.parchr.process = array([c for c in 'DVCS  '])  # array(6)
+        g.parchr.fftype = array([c for c in 'SINGLET   ']) # array(10)
 
         g.init()
         # Cutting-off evolution  at Q2 = cutq2
@@ -590,6 +589,7 @@ class ComptonGepard(ComptonFormFactors):
         g.qs.qs[0] = self.cutq2
         g.kinematics.q2 = self.cutq2
         g.evolc(1, 1)
+        g.evolc(2, 1)
         self.qdict = {self.cutq2 : 1}
 
         g.newcall = 1
@@ -608,10 +608,14 @@ class ComptonGepard(ComptonFormFactors):
         if pt.Q2 < self.cutq2:
             # just copy the evolved C from Q2=cutq2
             for k in range(self.g.npts):
-                # FIXME: quarks only and SEC=1 only !!!
+                # both partial waves; for quarks and gluons:
                 self.g.cgrid.cgrid[0,nqs-1,k,0] = self.g.cgrid.cgrid[0,0,k,0]
+                self.g.cgrid.cgrid[1,nqs-1,k,0] = self.g.cgrid.cgrid[1,0,k,0]
+                self.g.cgrid.cgrid[0,nqs-1,k,1] = self.g.cgrid.cgrid[0,0,k,1]
+                self.g.cgrid.cgrid[1,nqs-1,k,1] = self.g.cgrid.cgrid[1,0,k,1]
         else:
             self.g.evolc(1, nqs)
+            self.g.evolc(2, nqs)
 
     def _GepardCFFs(self, pt, xi=0):
         """Call gepard routine that calculates CFFs."""

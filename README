@@ -1,4 +1,4 @@
-Python prototype for GPDfit software
+Python version of GPDfit software
 ------------------------------------
 
 Usage:  
@@ -9,17 +9,20 @@ Start ipython shell and do '%run pype'
 Then proceed with interactive work e.g. 'plotHERMES(data, fits=[(b, m.values)])'
 or 'plotHBCSA(ff, fits=[(b, m.values)])'
 
+See test directory for examples. To run tests, install nosetests
+
 Files
 ------
 Approach.py - classes for theoretical approaches to calculation of observables
-models.py - definition of CFFs and FFs
+Model.py - definition of CFFs and FFs
 constants.py - constants
 data/  -  directory with data files
 Data.py -  classes for representation of data
 plots.py  - auxiliary functions for plotting results
 publish.py - script that publishes datafiles to www dir
-pype.py  - main script which does the fitting
+pype.py  - main driver script for experimentation
 quadrature.py  - Gaussian quadrature routines
 README
+test - test units. Use nosetest for elegant testing.
+theories.db - database of 'theories' (theory = model + approach)
 utils.py  - datafile parsing, dataset plotting and other auxilliary routines
-www/ - directory with HTML representation of data
