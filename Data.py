@@ -129,7 +129,7 @@ class DataPoint(DummyPoint):
         return
 
     def __repr__(self):
-        return "DataPoint. Measurement: " + self.yaxis + " = " + str(self.val)
+        return "DataPoint: " + self.yaxis + " = " + str(self.val)
 
 
 class DataSet(list):

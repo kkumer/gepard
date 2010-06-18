@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import shelve, shutil
+import shelve
 
 import numpy as np
 #np.random.seed(68)
@@ -15,15 +15,13 @@ from results import *
 
 data = utils.loaddata('data/ep2epgamma')  # dictionary {1 : DataSet instance, ...}
 data.update(utils.loaddata('data/gammastarp2gammap'))
-#db = shelve.open('theories.db')
-
-#shutil.copy2('test/GEPARD.INI.FIT', 'GEPARD.INI')
+db = shelve.open('theories.db')
 
 
 ## [2] Choose subset of datapoints for fitting
 
-GLOpoints = data[32][12:] + data[8] + data[29]  # DM's GLO set
-#GLO1points = data[31][12:] + data[8] + data[29] + data[30]  # DM's GLO1 set
+GLOpoints = data[31][12:] + data[8] + data[29]  # DM's GLO set
+GLO1points = data[31][12:] + data[8] + data[29] + data[30]  # DM's GLO1 set
 testpoints = data[31][12:14] + data[8][1:3] + data[30][2:4]  # test set
 #HA17 = utils.select(data[34], criteria=['t == -0.17'])
 #HA28 = utils.select(data[34], criteria=['t == -0.28'])
@@ -55,6 +53,9 @@ mDRonly = Model.ModelDR()
 tDR = Approach.hotfixedBMK(mDRonly)
 tDR.name = 'DR model'
 
+mDRonly1 = Model.ModelDR()
+tDR1 = Approach.hotfixedBMK(mDRonly1)
+tDR1.name = 'DR model 1'
 
 # Hybrid: Gepard+DR (can reuse above Gepard)
 mDRsea = Model.ComptonModelDRsea()
@@ -63,16 +64,20 @@ t = Approach.hotfixedBMK(m)
 t.name = 'DR + Gepard sea'
 g = t.m.g
 
-tDR.m.parameters.update(DMGLO)
-t.m.parameters.update(DMGLO)
+tDR.m.parameters.update(DMepsGLO)
+tDR1.m.parameters.update(DMepsGLO1)
+
+#tDR.m.parameters.update(DMGLO)
+#tDR1.m.parameters.update(DMGLO1)
+
+t.m.parameters.update(DMepsGLO)
 
 #tDR.m.parameters['NS'] = 0.6
 #tDR.m.parameters['alS'] = 1.25
 #tDR.m.parameters['MS'] = 0.846
 
-# "CORRECT 1+eps"
-#tDR.m.parameters['bS'] = 1.6 
 #tDR.m.parameters['Mv'] = 1.5
+
 
 def setpar(i, val):
     mGepard.parameters[mGepard.parameters_index[i]] = val
@@ -99,22 +104,28 @@ setpar(26,  2.)
 setpar(27,  0.)
 setpar(28,  0.)
 setpar(29,  -31.89)
-
-# "INCORRECT 1+eps"
-t.m.parameters['Mv'] = 1.5
-t.m.parameters['C'] = 10.
-t.m.parameters['MC'] = 0.318
-
-# Killing the gpard contrib:
-#setpar(11,  0.)
-#setpar(21,  0.)
-
 t.m.g.parint.p = 0
+
+#setpar(11, 0.1678)
+#setpar(12, 1.12835)
+#setpar(14, 0.565539)
+#setpar(19, 0.)
+#setpar(22, 1.099)
+#setpar(24, 0.7)
+#setpar(29, 0.)
+#t.m.g.parint.p = 1
+
+
+
 t.m.g.init()
 
-tDR.m.release_parameters('bS', 'Mv')
+tDR.m.release_parameters('bS', 'rv', 'bv', 'C', 'MC')
 fDR = Fitter.FitterMinuit(GLOpoints, tDR)
 
-t.m.release_parameters('C', 'Mv', 'MC')
-f = Fitter.FitterMinuit(GLOpoints, t)
+tDR1.m.release_parameters('bS', 'rv', 'bv', 'C', 'MC', 'trv', 'tbv')
+fDR1 = Fitter.FitterMinuit(GLO1points, tDR1)
+
+#t.m.parameters['bv'] = 0.5
+#t.m.release_parameters('rv', 'Mv', 'C', 'MC', 'tNv')
+#f = Fitter.FitterMinuit(GLOpoints, t)
 

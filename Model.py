@@ -253,8 +253,6 @@ class ComptonModelDR(ComptonDispersionRelations):
         # now do whatever else is necessary
         ComptonFormFactors.__init__(self)
 
-
-
     def subtraction(self, pt):
         return self.parameters['C']/(1.-pt.t/self.parameters['MC']**2)**2
 
@@ -277,7 +275,6 @@ class ComptonModelDR(ComptonDispersionRelations):
         val = ( (2.*4./9. + 1./9.) * p['Nv'] * p['rv'] * twox**(-p['alv']-p['alpv']*t) *
                  onex**p['bv'] / (1. - onex*t/(p['Mv']**2))  )
         sea = ( (2./9.) * p['NS'] * p['rS'] * twox**(-p['alS']-p['alpS']*t) *
-                 #    2.**(p['alS']+p['alpS']*t) *
                  onex**p['bS'] / (1. - onex*t/(p['MS']**2))**2 )
         return pi * (val + sea) / (1.+x)
 
@@ -501,8 +498,12 @@ class ComptonNeuralNets(ComptonFormFactors):
 
 
 class ComptonGepard(ComptonFormFactors):
-    """CFFs as implemented in gepard.  """
-    def __init__(self):
+    """CFFs as implemented in gepard. 
+
+    cutq2 - Q2 at which evolution is frozen (default = 0 GeV^2)
+    
+    """
+    def __init__(self, cutq2=0.0):
         # initial values of parameters and limits on their values
         self.parameters = {
                'NS' : 0.15,
@@ -553,13 +554,38 @@ class ComptonGepard(ComptonFormFactors):
            'NG', 'AL0G', 'ALPG', 'M02G',
            'DELM2G', 'PG', 'SECG', 'KAPG', 'SKEWG']
 
-        g.readpar()
-        g.parchr.fftype = array([c for c in 'SINGLET   '])
+        #g.readpar()
+        # this was in Gepard's GEPARD.INI, which is not needed now
+        # but look at it for documentation of what parameters below are
+        g.parint.speed = 1
+        g.parint.acc = 3
+        g.parint.p = 0
+        g.parint.nf = 4
+        g.parint.czero = 1
+
+        g.astrong.mu02 = 2.5
+        g.astrong.asp = array([0.0606, 0.0518, 0.0488])
+
+        g.parflt.q02 = 4.0
+        g.parflt.rf2 = 1.0
+        g.parflt.rr2 = 1.0
+
+        g.mbcont.c = 0.35
+        g.mbcont.phi = 1.57079632
+        g.mbcont.cnd = -0.25
+        g.mbcont.phind = 1.57
+
+        g.parchr.scheme = array([c for c in 'CSBAR'])  # array(5)
+        g.parchr.ansatz = array([c for c in 'FIT   ']) # array(6)
+
+        # following two items usually came from driver file
         g.parchr.process = array([c for c in 'DVCS  '])
+        g.parchr.fftype = array([c for c in 'SINGLET   '])
+
         g.init()
-        # Cutting-off evolution 
+        # Cutting-off evolution  at Q2 = cutq2
         # Evaluate evolved C at this scale now.
-        self.cutq2 = 0.5
+        self.cutq2 = cutq2
         g.nqs.nqs = 1
         g.qs.qs[0] = self.cutq2
         g.kinematics.q2 = self.cutq2
@@ -567,6 +593,7 @@ class ComptonGepard(ComptonFormFactors):
         self.qdict = {self.cutq2 : 1}
 
         g.newcall = 1
+        # number of points on MB contour
         g.npts = 2**g.parint.acc * 12 / g.parint.speed
         self.g = g
         # now do whatever else is necessary
@@ -641,7 +668,7 @@ class ComptonGepard(ComptonFormFactors):
         return real(g.cff.cffe[g.parint.p])
 
 
-class ComptonHybrid(ComptonGepard):
+class ComptonHybrid(ComptonFormFactors):
     """This combines gepard for small xB and DR model for valence xB."""
 
     def __init__(self, instGepard, instDR):
@@ -668,6 +695,19 @@ class ComptonHybrid(ComptonGepard):
     def ReE(self, pt):
         return  self.Gepard.ReE(pt) + self.DR.ReE(pt)
 
+    # tildes are not provided by Gepard
+
+    def ImHt(self, pt, xi=0):
+        return  self.DR.ImHt(pt, xi)
+
+    def ReHt(self, pt):
+        return  self.DR.ReHt(pt)
+
+    def ImEt(self, pt):
+        return  self.DR.ImEt(pt)
+
+    def ReEt(self, pt):
+        return  self.DR.ReEt(pt)
 
 ##  --- Complete models built from the above components ---
 

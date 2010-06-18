@@ -639,9 +639,9 @@ class hotfixedBMK(BMK):
         """ Obtained by saving from DM's notebook """
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
         return (
-                # INCORRECT: (1. + eps2)**2*((8.*pt.K*(2. - y)*y)/(1. + eps2))*
+                # OLD INCORRECT: (1. + eps2)**2*((8.*pt.K*(2. - y)*y)/(1. + eps2))*
                 # CORRECT: ((8.*pt.K*(2. - y)*y)/(1. + eps2))*
-                (1. + eps2)**2*((8.*pt.K*(2. - y)*y)/(1. + eps2))*
+                 (1. + eps2)**2*((8.*pt.K*(2. - y)*y)/(1. + eps2))*
          (1. + ((t - self.tmin(Q2, xB, eps2))*(1. - xB + 0.5*(-1. + sqrt(1. + eps2))))/
            (Q2*(1. + eps2)))
          )

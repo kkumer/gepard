@@ -1,20 +1,18 @@
 
 import shutil, copy, math
 from nose.tools import *
-import numpy as np
-
-import gepard as g
 
 import utils, Model, Approach, Fitter
 
 data = utils.loaddata('data/ep2epgamma')  
 data.update(utils.loaddata('data/gammastarp2gammap'))
 
-shutil.copy2('test/GEPARD.INI.FIT', 'GEPARD.INI')
-
 # Gepard only
 mGepard = Model.ComptonGepard()
 tGepard = Approach.hotfixedBMK(mGepard)
+# removing some limits for compatibility with old Gepard
+del mGepard.parameters['limit_M02S']
+del mGepard.parameters['limit_M02G']
 
 # Hybrid: Gepard+DR (can reuse above Gepard)
 mDRsea = Model.ComptonModelDRsea()

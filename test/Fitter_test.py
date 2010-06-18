@@ -10,6 +10,7 @@ data = utils.loaddata('data/ep2epgamma')
 
 m = Model.ModelDR()
 m.parameters.update(DMGLO1)
+m.parameters['limit_Mv'] = (0.9, 1.1)  # for compatibility with old g.
 m.release_parameters('bS', 'Mv')
 t = Approach.hotfixedBMK(m, optimization = False)
 

@@ -3,15 +3,19 @@ import shutil, copy, math
 from nose.tools import *
 import numpy as np
 
-import gepard as g
-
 import utils, Model, Approach, Data, Fitter
 
 from constants import Mp, Mp2
 
-shutil.copy2('test/GEPARD.INI.TEST', 'GEPARD.INI')
 m = Model.ComptonGepard()
 t = Approach.hotfixedBMK(m)
+
+# Setting gepard to test values
+t.m.g.parint.p = 1
+t.m.g.parint.nf = 3
+t.m.g.astrong.asp = np.array([0.05, 0.05, 0.05])
+t.m.g.parflt.q02 = 1.0
+t.m.g.parchr.ansatz = np.array([c for c in 'TEST  ']) # array(6)
 
 # Seting model parameters to be as in test.F
 def setpar(i, val):
