@@ -350,7 +350,7 @@ class ComptonModelDRsea(ComptonDispersionRelations):
     def subtraction(self, pt):
         return self.parameters['C']/(1.-pt.t/self.parameters['MC']**2)**2
 
-    def ImH(self, pt, xi=0, **kwargs):
+    def ImH(self, pt, xi=0):
         """Imaginary part of CFF H."""
         p = self.parameters # just a shortcut
         # FIXME: The following solution is not elegant
@@ -370,7 +370,6 @@ class ComptonModelDRsea(ComptonDispersionRelations):
                  onex**p['bv'] / (1. - onex*t/(p['Mv']**2))  )
         sea = ( (2./9.) * p['Nsea'] * p['rS'] * twox**(-p['alS']-p['alpS']*t) *
                  onex**p['bS'] / (1. - onex*t/(p['MS']**2))**2 )
-        if kwargs.has_key('onlysea'): val=0
         return pi * (val + sea) / (1.+x)
 
     def ImHt(self, pt, xi=0):
@@ -513,6 +512,7 @@ class ComptonGepard(ComptonFormFactors):
            'DELM2S' : 0.0,
                'PS' : 2.0,
              'SECS' : 0.0,
+             'THIS' : 0.0,
              'KAPS' : 0.0,
             'SKEWS' : 0.0,
                'NG' : 0.5,
@@ -522,6 +522,7 @@ class ComptonGepard(ComptonFormFactors):
            'DELM2G' : 0.0,
                'PG' : 2.0,
              'SECG' : 0.0,
+             'THIG' : 0.0,
              'KAPG' : 0.0,
             'SKEWG' : 0.0   }
 
@@ -545,14 +546,16 @@ class ComptonGepard(ComptonFormFactors):
              26 : 'PG',
              27 : 'SECG',
              28 : 'KAPG',
-             29 : 'SKEWG' }
+             29 : 'SKEWG',
+             32 : 'THIS',
+             42 : 'THIG' }
 
         # order matters to fit.MinuitFitter, so it is defined by:
         self.parameter_names = [ 
            'NS', 'AL0S', 'ALPS', 'M02S',
-           'DELM2S', 'PS', 'SECS', 'KAPS', 'SKEWS',
+           'DELM2S', 'PS', 'SECS', 'THIS', 'KAPS', 'SKEWS',
            'NG', 'AL0G', 'ALPG', 'M02G',
-           'DELM2G', 'PG', 'SECG', 'KAPG', 'SKEWG']
+           'DELM2G', 'PG', 'SECG', 'THIG', 'KAPG', 'SKEWG']
 
         # this was in Gepard's GEPARD.INI, which is not needed now
         # but look at it for documentation of what parameters below are

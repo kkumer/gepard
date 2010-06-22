@@ -85,7 +85,9 @@ class DataPoint(DummyPoint):
         `gridline` is a list constructed from one row of data grid in data file.
         It is assumed that data gridline is of the form:
 
-              x0  x1 ....   y0  y0stat y0syst 
+              x0  x1 ....   y0  y0stat y0syst  
+
+        where y0syst need not be present, or can have one or two values, syst+ and syst-
 
         (Further elements are ignored.)
         `dataset` is container `DataSet` that is to contain this `DataPoint`
@@ -119,10 +121,17 @@ class DataPoint(DummyPoint):
             self.err = gridline[int(self.y0error.split('column')[1])]
         else:  # we have to add stat and syst in quadrature
             self.stat = gridline[int(self.y0errorstatistic.split('column')[1])]
-            try:
+            if self.has_key('y0errorsystematic'):
                 self.syst = gridline[int(self.y0errorsystematic.split('column')[1])]
                 self.err = math.sqrt( self.stat**2 + self.syst**2 )
-            except AttributeError:  # syst error not given, assumed zero
+            elif self.has_key('y0errorsystematicplus'): 
+                # we have syst+ and syst-. Taking the larger one as a systematic error.
+                # TODO: This should be, of course, treated in a assymetric way
+                self.systplus = gridline[int(self.y0errorsystematicplus.split('column')[1])]
+                self.systminus = gridline[int(self.y0errorsystematicminus.split('column')[1])]
+                self.syst = max(self.systplus, -self.systminus)
+                self.err = math.sqrt( self.stat**2 + self.syst**2 )
+            else:  # syst error not given, assumed zero
                 self.err = self.stat
         # 2e. calculate standard kinematical variables
         utils.fill_kinematics(self)

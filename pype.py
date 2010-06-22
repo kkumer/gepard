@@ -23,9 +23,11 @@ db = shelve.open('theories.db')
 testpoints = data[31][12:14] + data[8][1:3] + data[30][2:4]  # test set
 GLOpoints = data[31][12:] + data[8] + data[29]  # DM's GLO set
 GLO1points = data[31][12:] + data[8] + data[29] + data[30]  # DM's GLO1 set
-#HA17 = utils.select(data[34], criteria=['t == -0.17'])
-#HA28 = utils.select(data[34], criteria=['t == -0.28'])
-#HA33 = utils.select(data[34], criteria=['t == -0.33'])
+HERMESpoints = data[31][12:] +  data[29]
+BSApoints = data[8] + data[29]
+HA17 = utils.select(data[34], criteria=['t == -0.17'])
+HA28 = utils.select(data[34], criteria=['t == -0.28'])
+HA33 = utils.select(data[34], criteria=['t == -0.33'])
 DVCSpoints = data[36] + data[37] + data[38] + data[39] + \
   data[40] + data[41] + data[42] + data[43] + data[44] + \
   data[45]
@@ -34,7 +36,7 @@ DVCSpoints = data[36] + data[37] + data[38] + data[39] + \
 ## [3] Create a theory
 
 # Gepard only
-mGepard = Model.ComptonGepard()
+mGepard = Model.ComptonGepard(cutq2=2.0)
 tGepard = Approach.hotfixedBMK(mGepard)
 
 # DR only
@@ -55,7 +57,6 @@ g = t.m.g
 
 tDR.m.parameters.update(DMepsGLO)
 tDR1.m.parameters.update(DMepsGLO1)
-t.m.parameters.update(DMepsGLO)
 
 
 def setpar(i, val):
@@ -68,6 +69,7 @@ def setpar(i, val):
 #f.fit()
 setpar(11,  0.15203911208796006)
 setpar(12,  1.1575060246398083)
+#setpar(31,  8.0)
 setpar(13,  0.15)
 setpar(14,  0.478391)
 setpar(15,  0.)
@@ -76,6 +78,7 @@ setpar(17, -0.15152)
 setpar(18,  0.)
 setpar(19,  0.)
 setpar(22,  1.247316701070471)
+#setpar(41,  6.0)
 setpar(23,  0.15)
 setpar(24,  0.7)
 setpar(25,  0.)
@@ -83,6 +86,8 @@ setpar(26,  2.)
 setpar(27, -0.81217)
 setpar(28,  0.)
 setpar(29,  0.)
+setpar(32,  0.)
+setpar(42,  0.)
 t.m.g.parint.p = 0
 
 
@@ -95,7 +100,15 @@ fDR = Fitter.FitterMinuit(GLOpoints, tDR)
 tDR1.m.release_parameters('bS', 'rv', 'bv', 'C', 'MC', 'trv', 'tbv')
 fDR1 = Fitter.FitterMinuit(GLO1points, tDR1)
 
-#t.m.parameters['bv'] = 0.5
-#t.m.release_parameters('rv', 'Mv', 'C', 'MC', 'tNv')
+#t.m.release_parameters('rv', 'bv', 'Nres', 'bres', 'C', 'MC')
 #f = Fitter.FitterMinuit(GLOpoints, t)
+#f = Fitter.FitterMinuit(BSApoints, t)
+
+#t.m.release_parameters('rv', 'bv', 'C', 'MC', 'trv', 'tbv')
+#f = Fitter.FitterMinuit(GLOpoints, t)
+
+t.m.parameters.update(hy1)
+t.m.release_parameters('M02S','SECS','SECG', 'rv', 'bv', 'C', 'MC', 'trv', 'tbv')
+#f = Fitter.FitterMinuit(DVCSpoints+data[48]+GLO1points, t)
+f = Fitter.FitterMinuit(DVCSpoints+GLO1points, t)
 

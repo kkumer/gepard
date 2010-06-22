@@ -43,16 +43,18 @@ def subplot(ax, sets, lines=[], band=[], xaxis=None, kinlabels=[], plotlines=Tru
     if not isinstance(lines, list): lines = [lines]
     if not xaxis: xaxis = sets[-1].xaxes[-1]
     # [1] Data sets (or fits with errorbars)
-    setshapes = ['o', 's']  # first circles, then squares ...
-    setcolors = ['blue', 'black']  # circles are blue, squares are black, ...
+    setshapes = ['o', 's', '^', 'd']  # first circles, then squares ...
+    setcolors = ['blue', 'black', 'purple', 'green']  # circles are blue, squares are black, ...
     setn = 0
+    xsets = []
     for set in sets:
         xval = []; yval = []; yerr = []
         for pt in set:
             xval.append(getattr(pt, xaxis)) 
             yval.append(pt.val)
             yerr.append(pt.err)
-        ax.errorbar(xval, yval, yerr, linestyle='None', elinewidth=setn+1, 
+        xsets.append(xval)
+        ax.errorbar(xval, yval, yerr, linestyle='None', elinewidth=1, 
                 marker=setshapes[setn], color=setcolors[setn])
         setn += 1
     # [2] Theory lines
@@ -61,16 +63,19 @@ def subplot(ax, sets, lines=[], band=[], xaxis=None, kinlabels=[], plotlines=Tru
     linestyles = ['-', '--', '-.', ':']  # solid, dashed, dot-dashed, dotted
     linen = 0
     for theory in lines:
-        # take abscissae from the first set
-        line = [theory.predict(pt) for pt in sets[-1]]
-        if plotlines:
-            # join the dots (xval belongs to last set)
-            ax.plot(xval, line, color=linecolors[linen], 
-                    linestyle=linestyles[linen], linewidth=2)
-        else:
-            # put symbols on dots
-            ax.plot(xval, line, lineshapes[linen], markersize=5,
-                    markerfacecolor=linecolors[linen], markeredgecolor='black')
+        # Each theory has to predict each set:
+        setn = 0
+        for set in sets:
+            line = [theory.predict(pt) for pt in set]
+            if plotlines:
+                # join the dots (xval belongs to last set)
+                ax.plot(xsets[setn], line, color=linecolors[linen], 
+                        linestyle=linestyles[linen], linewidth=2)
+            else:
+                # put symbols on dots
+                ax.plot(xsets[setn], line, lineshapes[linen], markersize=5,
+                        markerfacecolor=linecolors[linen], markeredgecolor='black')
+            setn += 1
         linen += 1
     # [3] Theory band
     up = []
@@ -103,7 +108,7 @@ def subplot(ax, sets, lines=[], band=[], xaxis=None, kinlabels=[], plotlines=Tru
     ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
     # [5] Annotations
     # constant kinematic variables positioning
-    labx = min(0, min(xval)) + (max(xval) - min(0, min(xval))) * 0.5
+    labx = min(0, min(xval)) + (max(xval) - min(0, min(xval))) * 0.35
     laby = min(0, min(yval)) + (max(yval) - min(0, min(yval))) * 0.05
     labtxt = ""
     for lab in kinlabels:
@@ -160,13 +165,13 @@ def HERMESBSA(lines=[], band=[], path=None, fmt='png'):
 def HERMES09(lines=[], band=[], path=None, fmt='png'):
     """Plot HERMES 0909.3587 BCA and BSA data with fit lines."""
 
-    ids = [2, 4, 5]
+    #ids = [2, 4, 5]
     title = '' #'HERMES-08'
     fig = plt.figure()
     fig.canvas.set_window_title(title)
     fig.suptitle(title)
     xaxes = ['tm', 'xB', 'Q2']
-    ylims = [(-0.05, 0.24), (-0.15, 0.05), (-0.30, 0.05)]
+    ylims = [(-0.05, 0.24), (-0.15, 0.05), (-0.45, 0.05)]
     # we have 3x18=54 points to be separated in nine panels six points each:
     for y, id, shift in zip(range(3), [32, 32, 5], [18, 0, 0]):
         for x in range(3):
@@ -211,7 +216,8 @@ def CLAS(lines=[], band=[], path=None, fmt='png'):
         panelset = Data.DataSet(panelpoints)
         panelset.__dict__ = dataset.__dict__.copy()
         # ... and plot
-        subplot(ax, [panelset], lines, band, 'tm', ['Q2', 'xB'])
+        subplot(ax, [panelset], lines, band, 'tm', ['Q2', 'xB'],
+                plotlines=not(panel==1 or panel==3))
         plt.xlim(0.0, 0.6)
         plt.ylim(0.0, 0.4)
         ax.yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))
@@ -242,6 +248,37 @@ def HALLA(lines=[], band=[], path=None, fmt='png'):
         elif panel == 3:
             ax.set_ylabel(toTeX['ReCpDCI'], fontsize=18)
         ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))
+    if path:
+        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+    else:
+        fig.canvas.draw()
+        fig.show()
+    return fig
+
+def H1ZEUS(lines=[], band=[], path=None, fmt='png'):
+    """Makes plot of H1 DVCS data with fit lines"""
+
+    subsets = {}
+    subsets[1] = [utils.select(data[36], criteria=['Q2 == 8.']),
+            utils.select(data[36], criteria=['Q2 == 15.5']), 
+            utils.select(data[36], criteria=['Q2 == 25.'])]
+    subsets[2] = [data[46]] # ZEUS t-dep
+    subsets[3] = [data[48],
+            utils.select(data[41], criteria=['Q2 == 8.']),
+            utils.select(data[41], criteria=['Q2 == 15.5']), 
+            utils.select(data[41], criteria=['Q2 == 25.'])]
+    subsets[4] = [data[45], data[47]] # ZEUS Q2-dep
+    xs = ['t', 't', 'W', 'Q2']
+    title = 'H1/ZEUS'
+    fig = plt.figure()
+    fig.canvas.set_window_title(title)
+    fig.suptitle(title)
+    for panel in range(1,5):
+        ax = fig.add_subplot(2,2,panel)
+        ax.set_yscale('log')  # y-axis to be logarithmic
+        subplot(ax, subsets[panel], lines, band, xs[panel-1])
+        if panel < 3:
+            ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.2))
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
@@ -683,23 +720,6 @@ def CFF(t, cffs=None, path=None, fmt='png'):
             _axband(ax, tm, xvals, getattr(t.model, cff), color=colors[tms.index(tm)])
         ax.set_xlabel('$\\xi$', fontsize=15)
     t.model.parameters['nnet'] = old
-    if path:
-        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
-    else:
-        fig.canvas.draw()
-        fig.show()
-    return fig
-
-def H1(lines=[], band=[], path=None, fmt='png'):
-    """Plot H1 cross section"""
-    id = 36
-    title = 'H1 DVCS cross section'
-    fig = plt.figure()
-    fig.canvas.set_window_title(title)
-    fig.suptitle(title)
-    ax = fig.add_subplot(1, 1, 1)
-    #ax.yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))  # tickmarks
-    subplot(ax, [data[36]], lines, band, 't', [])
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:

@@ -1,0 +1,58 @@
+id = 46
+editor = KK
+
+
+### Experiment
+
+collaboration = ZEUS
+process = gammastarp2gammap
+exptype = collider
+year = 2008
+reference = arXiv:0812.2517
+reference2 = Table 3
+
+
+### Scattering Process
+
+in1particle = gammastar
+in2particle = p
+
+out1particle = gamma
+out2particle = p
+
+# 31.3 1/pb data taken in 2000
+# colliding 27.5 GeV positrons with 920 GeV protons
+
+### Observable 
+
+y0name = XDVCSt
+y0namelong = DVCS cross section differential in t
+y0unit = nb/GeV^2
+y0value = column1
+y0errorstatistic = column2
+y0errorsystematic = column3
+
+
+### x-axes
+
+x0name = Q2
+x0unit = GeV^2
+x0value = 3.2
+
+x1name = W
+x1unit = GeV
+x1value = 104
+
+x2name = tm
+x2unit = GeV^2
+x2value = column0
+
+
+# -t   dsig/dt  stat   syst
+######################################
+
+0.14   34.6     9.6    2.4
+0.25   32.7     9.4    2.3
+0.36   19.6     7.5    1.4
+0.47    5.7     4.1    0.4
+
