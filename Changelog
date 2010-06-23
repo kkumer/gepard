@@ -6,6 +6,7 @@ Version 0.9.4  (unreleased yet)
 	       SPEED, saving significant time in fitting
 	- ADD: Compiles also with Intel ifort, NAG f95 and GNU gfortran compilers,
 	       including OpenMP parallelization.
+	- ADD: python extension pygepard.so created
 	       
 
 	{Merged from sid  67:85}

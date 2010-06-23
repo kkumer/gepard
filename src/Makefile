@@ -71,6 +71,17 @@ $(MMAODIR)/%.o: %.c  header.h
 $(EXFODIR)/%.o: $(EXDIR)/%.F header.F
 	$(FC) -c -o $@ $< $(FFLAGS)
 
+# Fortran prep files (needed for f2py which ignores preprocessing)
+FPREPDIR = Fprep
+FPREPS = init.f beta.f special.f dcomplex.f astrong.f lambda.f\
+projectors.f rnnlo.f erfunc.f evol.f cdvcs.f msbar.f \
+dvcs.f f2.f error.f gauss.f nd.f bigcns.f integra.f\
+initc.f evolc.f getmbgpd.f hj.f splice.f cff.f 
+_FPREPS = $(patsubst %,$(FPREPDIR)/%,$(FPREPS))
+
+$(FPREPDIR)/%.f: %.F  header.F
+	$(FC) -E $<  > $@
+
 # test and fit targets
 
 $(TESTTARGETS): %: $(ALLOBJS) $(FODIR)/F%.o
@@ -91,6 +102,12 @@ gepard.exe: CPPFLAGS += -DMMA  $(USEPGPLOT)
 gepard.exe: $(ALLOBJS) $(FODIR)/Ffcn.o $(_MMAOBJS)  $(FODIR)/Fmninterface.o
 	$(FC) -o ../fits/$@/$(SYS)/$@ $^ $(FFLAGS) $(CERNLIBS) -L$(MLLIBDIR) -l$(MLLIB) $(ALLPGPLOTLIBS) $(MLEXTRA)
 
+# pygepard target
+
+pygepard.so: $(_FPREPS)
+	f2py -c -m pygepard $^ adacf/*f
+	mv pygepard.so ../fits/
+
 # targets for examples
 #
 $(EXTARGETS): %: $(ALLOBJS) $(EXFODIR)/%.o
@@ -100,11 +117,12 @@ $(EXTARGETS): %: $(ALLOBJS) $(EXFODIR)/%.o
 .PHONY: clean
 clean:
 	-rm -f $(ADACFODIR)/*.o $(FODIR)/F*.o $(ODIR)/*.o $(EXFODIR)/*.o $(MMAODIR)/*
+	-rm -f $(FPREPDIR)/*.f
 	-rm -f $(patsubst %,../Tests/%,$(TESTTARGETS))
 	-rm -f $(patsubst %,../Tests/%.exe,$(TESTTARGETS))
 	-rm -f $(patsubst %,../fits/%,$(FITTARGETS))
 	-rm -f $(patsubst %,../fits/%.exe,$(FITTARGETS))
-	-rm -f ../fits/fit ../fits/fit.exe 
+	-rm -f ../fits/fit ../fits/fit.exe  ../fits/pygepard.so
 	-rm -f $(patsubst %,../ex/%,$(EXTARGETS))
 	-rm -f $(patsubst %,../ex/%.exe,$(EXTARGETS))
 	-rm -f ../fits/gepard.exe/$(SYS)/gepard.exe

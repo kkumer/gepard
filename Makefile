@@ -45,7 +45,7 @@
 FC = gfortran
 CMP_FFLAGS = -Wall
 OPT_FFLAGS = -O3 -ffast-math -funroll-all-loops  -ftree-vectorize
-OPT_CFLAGS = -O3 
+OPT_CFLAGS = -O3
 
 ## [--2b--] GNU gfortran + OpenMP parallelization
 #FC = gfortran
@@ -186,15 +186,16 @@ export EXTARGETS = auxsi auxns anatomyNS anatomy radNLONS radNLO evolutNS evolut
                    radNNLONS radNNLO scalesNS scales scalesNNLO
 export FITTARGETS = fitres fitres2 fitpdfs slope contours
 export MMATARGETS = gepard.exe
+export PYTARGETS = pygepard.so
 
-.PHONY: $(TESTTARGETS) $(EXTARGETS) $(FITTARGETS) $(MMATARGETS)
+.PHONY: $(TESTTARGETS) $(EXTARGETS) $(FITTARGETS) $(MMATARGETS) $(PYTARGETS)
 DOCTARGETS = pdf html htmlnocss
 
-all: $(TESTTARGETS) $(EXTARGETS) fit $(FITTARGETS) $(MMATARGETS) $(DOCTARGETS)
+all: $(TESTTARGETS) $(EXTARGETS) fit $(FITTARGETS) $(MMATARGETS) $(PYTARGETS) $(DOCTARGETS)
 
 tests: $(TESTTARGETS)
 
-$(TESTTARGETS) $(EXTARGETS) fit $(FITTARGETS) $(MMATARGETS):
+$(TESTTARGETS) $(EXTARGETS) fit $(FITTARGETS) $(MMATARGETS) $(PYTARGETS):
 	$(MAKE) -C src $@
 
 doc: html pdf

@@ -290,3 +290,7 @@ ex/   - files for plotting example plots shown in big paper hep-ph/0703179
 fits/gepard.m  - userspace functions
 fits/gepard.exe/ - MathLink executables
 Mathematica interface is described in manual doc/tex/gepard.pdf
+
+3.4 Python part
+---------------
+fits/pygepard.so  -  python extension, loadable e.g. by pype software
