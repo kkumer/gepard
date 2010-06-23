@@ -107,8 +107,8 @@ fDR1 = Fitter.FitterMinuit(GLO1points, tDR1)
 #t.m.release_parameters('rv', 'bv', 'C', 'MC', 'trv', 'tbv')
 #f = Fitter.FitterMinuit(GLOpoints, t)
 
-t.m.parameters.update(hy1)
+t.m.parameters['tNv'] = 0.6
 t.m.release_parameters('M02S','SECS','SECG', 'rv', 'bv', 'C', 'MC', 'trv', 'tbv')
 #f = Fitter.FitterMinuit(DVCSpoints+data[48]+GLO1points, t)
-f = Fitter.FitterMinuit(DVCSpoints+GLO1points, t)
+f = Fitter.FitterMinuit(DVCSpoints+data[48]+GLO1points, t)
 

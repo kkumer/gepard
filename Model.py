@@ -16,7 +16,7 @@ from termcolor import colored
 from quadrature import PVquadrature
 from utils import flatten, hubDict
 
-import gepard as g
+import pygepard as g
 
 
 class Model(object):
