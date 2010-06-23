@@ -4,6 +4,7 @@
 EXDIR = ex
 
 # Directories for storing object files
+ADACFODIR = adacf/obj
 FODIR = Fobj
 ODIR = obj
 MMAODIR = Mobj
@@ -12,6 +13,21 @@ EXFODIR = ex/obj
 ifndef NOPGPLOT
   USEPGPLOT := -DPGPLOT
 endif
+
+# "adacf" package Fortran object files
+ADACFOBJS = Harmonic.o Mellin.o WgammaVNSP0F.o WgammaVNSP1F.o\
+WgammaVNSP2F.o WgammaVQQ0F.o WgammaVQQ1F.o WgammaVQQ2F.o WgammaVQG0F.o\
+WgammaVQG1F.o WgammaVQG2F.o WgammaVGQ0F.o WgammaVGQ1F.o WgammaVGQ2F.o\
+WgammaVGG0F.o WgammaVGG1F.o WgammaVGG2F.o WcVF2NSP0F.o WcVF2NSP1F.o\
+WcVF2NSP2F.o WcVFLNSP0F.o WcVFLNSP1F.o WcVFLNSP2F.o WcVF2Q0F.o WcVF2Q1F.o\
+WcVF2Q2F.o WcVFLQ0F.o WcVFLQ1F.o WcVFLQ2F.o WcVF2G0F.o WcVF2G1F.o\
+WcVF2G2F.o WcVFLG0F.o WcVFLG1F.o WcVFLG2F.o
+_ADACFOBJS = $(patsubst %,$(ADACFODIR)/%,$(ADACFOBJS))
+
+# rule for compiling "adacf" Fortran files
+$(ADACFODIR)/%.o: adacf/%.f 
+	$(FC) -c -o $@ $< $(FFLAGS)
+
 
 # Fortran object files
 FOBJS = Finit.o Fbeta.o Fspecial.o Fdcomplex.o Fastrong.o Flambda.o\
@@ -36,7 +52,7 @@ $(ODIR)/%.o: %.c
 	$(CC) -c -o $@ $< $(CFLAGS) $(INCS)
 
 # All object files together
-export ALLOBJS = $(_OBJS) $(_FOBJS)
+export ALLOBJS = $(_OBJS) $(_ADACFOBJS) $(_FOBJS)
 
 # Mathlink C object files
 MMAOBJS = fit.tm.o fit.o 
@@ -58,32 +74,32 @@ $(EXFODIR)/%.o: $(EXDIR)/%.F header.F
 # test and fit targets
 
 $(TESTTARGETS): %: $(ALLOBJS) $(FODIR)/F%.o
-	$(FC) -o ../Tests/$@ $^ $(FFLAGS) $(ADACFLIB)
+	$(FC) -o ../Tests/$@ $^ $(FFLAGS)
 
 # main fit target  (a variant withouth PGPLOT)
 fit: CPPFLAGS += $(USEPGPLOT)
 fit: $(ALLOBJS) $(FODIR)/Ffcn.o $(FODIR)/Ffit.o
-	$(FC) -o ../fits/$@ $^ $(FFLAGS) $(CERNLIBS) $(ADACFLIB) $(ALLPGPLOTLIBS)
+	$(FC) -o ../fits/$@ $^ $(FFLAGS) $(CERNLIBS) $(ALLPGPLOTLIBS)
 
 # targets for processing/presenting GPDs resulting from fit
 $(FITTARGETS): %: $(ALLOBJS) $(EXFODIR)/%.o
-	$(FC) -o ../fits/$@ $^ $(FFLAGS) $(ADACFLIB) $(ALLPGPLOTLIBS)
+	$(FC) -o ../fits/$@ $^ $(FFLAGS) $(ALLPGPLOTLIBS)
 
 # mma targets
 
 gepard.exe: CPPFLAGS += -DMMA  $(USEPGPLOT)
 gepard.exe: $(ALLOBJS) $(FODIR)/Ffcn.o $(_MMAOBJS)  $(FODIR)/Fmninterface.o
-	$(FC) -o ../fits/$@/$(SYS)/$@ $^ $(FFLAGS) $(CERNLIBS) $(ADACFLIB) -L$(MLLIBDIR) -l$(MLLIB) $(ALLPGPLOTLIBS) $(MLEXTRA)
+	$(FC) -o ../fits/$@/$(SYS)/$@ $^ $(FFLAGS) $(CERNLIBS) -L$(MLLIBDIR) -l$(MLLIB) $(ALLPGPLOTLIBS) $(MLEXTRA)
 
 # targets for examples
 #
 $(EXTARGETS): %: $(ALLOBJS) $(EXFODIR)/%.o
-	$(FC) -o ../ex/$@ $^ $(FFLAGS) $(ADACFLIB)
+	$(FC) -o ../ex/$@ $^ $(FFLAGS)
 
 
 .PHONY: clean
 clean:
-	-rm -f $(FODIR)/F*.o $(ODIR)/*.o $(EXFODIR)/*.o $(MMAODIR)/*
+	-rm -f $(ADACFODIR)/*.o $(FODIR)/F*.o $(ODIR)/*.o $(EXFODIR)/*.o $(MMAODIR)/*
 	-rm -f $(patsubst %,../Tests/%,$(TESTTARGETS))
 	-rm -f $(patsubst %,../Tests/%.exe,$(TESTTARGETS))
 	-rm -f $(patsubst %,../fits/%,$(FITTARGETS))
