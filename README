@@ -7,7 +7,6 @@ gepard - Package for evolving conformal moments of GEneral PARton
 - This particular version is obtained by merging changes from nlso3ng
   branch so some things are broken. At least:
     - houches
-    - fitting by 'fit'
     - using 'MMA' ansatz  ('FIT' ansatz in mma seems to be working)
 
 ------------------------------------------------------------------------  

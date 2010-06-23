@@ -314,7 +314,7 @@ C  MEMBER OF
 C     QS(block)
 C  SYNOPSIS
       INTEGER QINDMAX
-      PARAMETER (QINDMAX = 50)
+      PARAMETER (QINDMAX = 150)
       DOUBLE PRECISION QS(QINDMAX)
 C     ***
 
@@ -483,7 +483,7 @@ C      N(K)  --  Complex coordinates of points on MB contour
 C  MEMBER OF
 C     NPOINTS
 C  SYNOPSIS
-      DOUBLE COMPLEX N(2,NPTSMAX)
+      DOUBLE COMPLEX N(3,NPTSMAX)
 C     ***
 
 *     ----- Values on a particular contour point
@@ -531,11 +531,11 @@ C     ***
 
 C     ****v* header.F/BIGC
 C  DESCRIPTION
-C     BIGC(K,P,flavour) -- "Big C" DVCS singlet Wilson coefficient  
+C     BIGC(SEC,K,P,flavour) -- "Big C" DVCS singlet Wilson coefficient  
 C  MEMBER OF
 C     BIGC(block)
 C  SYNOPSIS
-      DOUBLE COMPLEX BIGC(2,NPTSMAX,0:2,2)
+      DOUBLE COMPLEX BIGC(3,NPTSMAX,0:2,2)
 C     ***
 
 C     ****v* header.F/BIGCF2
@@ -559,11 +559,11 @@ C     ***
 
 C     ****v* header.F/GAM
 C  DESCRIPTION
-C      GAM(K,P,flavour_i,flavour_j) -- non-singlet DIS anomalous dimensions 
+C      GAM(SEC,K,P,flavour_i,flavour_j) -- non-singlet DIS anomalous dimensions 
 C  MEMBER OF
 C     GAMNS(block)
 C  SYNOPSIS
-      DOUBLE COMPLEX GAM(2,NPTSMAX,0:2,2,2)
+      DOUBLE COMPLEX GAM(3,NPTSMAX,0:2,2,2)
 C     ***
 
 C     ****v* header.F/CGRIDNS
@@ -580,13 +580,13 @@ C     ***
 
 C     ****v* header.F/CGRID
 C  DESCRIPTION
-C      CGRID(QIND,K,flavour) -- "Evolved" "big C" singlet Wilson
+C      CGRID(SEC,QIND,K,flavour) -- "Evolved" "big C" singlet Wilson
 C      coefficients of DVCS i.e. multiplied by evolution operator for
 C      evolution from Q02 to QS(QIND)
 C  MEMBER OF
 C    CGRID(block)
 C  SYNOPSIS
-      DOUBLE COMPLEX CGRID(2,QINDMAX, NPTSMAX, 2)
+      DOUBLE COMPLEX CGRID(3,QINDMAX, NPTSMAX, 2)
 C     ***
 
 C     ****v* header.F/CGRIDDIS

@@ -7,6 +7,7 @@ Version 0.9.4  (unreleased yet)
 	- ADD: Compiles also with Intel ifort, NAG f95 and GNU gfortran compilers,
 	       including OpenMP parallelization.
 	- ADD: python extension pygepard.so created
+	- ADD: third SO(3) partial wave to 'FIT' model
 	       
 
 	{Merged from sid  67:85}

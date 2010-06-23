@@ -164,6 +164,7 @@ C     Initialize grids with values of evolved C's
         Q2 = QS(QIND)
         CALL EVOLC(1, QIND)
         CALL EVOLC(2, QIND)
+        CALL EVOLC(3, QIND)
  310  CONTINUE
       PROCESS = 'DIS'
       DO 320 QIND = 1, NQSDIS

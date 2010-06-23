@@ -94,7 +94,8 @@ C
       EPH = EXP ( DBLCMPLX(0.D0, PHI) )
       DO 10 K = 1, NPTS
         N(1,K) = C + 1.0d0 + Y(K) * EPH 
- 10     N(2,K) = C + 3.0d0 + Y(K) * EPH 
+        N(2,K) = C + 3.0d0 + Y(K) * EPH 
+ 10     N(3,K) = C + 5.0d0 + Y(K) * EPH 
 
 *   ----  Initialization of common blocks ----
 
@@ -134,10 +135,11 @@ C
 
       CALL BETAF
 
-*   Making everything for two MB contours, first shifted (j+2),
+*   Making everything for three MB contours, first shifted (j+4),
+*   then shifted (j+2),
 *   and then the original one, so that SEC-independent stuff
 *   ends up with original values
-      DO 100 SEC = 2, 1, -1
+      DO 100 SEC = 3, 1, -1
 *   Now looping over MB contour points and initializing
       DO 100 K = 1, NPTS
 

@@ -51,6 +51,7 @@ C
         QS(1) = Q2
         CALL EVOLC(1,1)
         CALL EVOLC(2,1)
+        CALL EVOLC(3,1)
       END IF
 
       W2 = WAVG**2

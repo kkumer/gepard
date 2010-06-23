@@ -44,8 +44,8 @@
 ## [--2--] GNU gfortran
 FC = gfortran
 CMP_FFLAGS = -Wall
-OPT_FFLAGS = -O3 -ffast-math -funroll-all-loops  -ftree-vectorize
-OPT_CFLAGS = -O3
+OPT_FFLAGS = -O3 -ffast-math -funroll-all-loops  -ftree-vectorize -fPIC
+OPT_CFLAGS = -O3 -fPIC
 
 ## [--2b--] GNU gfortran + OpenMP parallelization
 #FC = gfortran
@@ -98,26 +98,25 @@ endif
 
 # -- 2. MathLink related things
 #
-# Put your version of Mathematica here
-export MMAVERSION=7.0
+# Put your version of Mathematica here and it's root dir (final slash needed!)
+export MMAVERSION=7.0.1
+# export MMAROOT = /usr/local/Wolfram/Mathematica/
+# export MMAROOT = /cygdrive/c/Program\ Files/Wolfram\ Research/Mathematica/
+export MMAROOT = /psi/math-
 ifdef WINDIR
   export SYS = Windows
-  ifeq '$(MMAVERSION)' '6.0'
-    export MLDIR=/cygdrive/c/Program\ Files/Wolfram\ Research/Mathematica/$(MMAVERSION)/SystemFiles/Links/MathLink/DeveloperKit/$(SYS)/CompilerAdditions/cygwin
+  ifeq '$(MMAVERSION)' '5.0'
+	export MLDIR=$(MMAROOT)$(MMAVERSION)/AddOns/MathLink/DeveloperKit/$(SYS)/CompilerAdditions/mldev32
   else
-	  ifeq '$(MMAVERSION)' '7.0'
-        export MLDIR=/cygdrive/c/Program\ Files/Wolfram\ Research/Mathematica/$(MMAVERSION)/SystemFiles/Links/MathLink/DeveloperKit/$(SYS)/CompilerAdditions/cygwin
-      else
-        export MLDIR=/cygdrive/c/Program\ Files/Wolfram\ Research/Mathematica/$(MMAVERSION)/AddOns/MathLink/DeveloperKit/$(SYS)/CompilerAdditions/mldev32
-	  endif
+	export MLDIR=$(MMAROOT)$(MMAVERSION)/SystemFiles/Links/MathLink/DeveloperKit/$(SYS)/CompilerAdditions/cygwin
   endif
   export MPREP = $(MLDIR)/bin/mprep
   export MLINCDIR = $(MLDIR)/include
   export MLLIBDIR = $(MLDIR)/lib 
-  ifeq '$(MMAVERSION)' '6.0'
-    export MLLIB = ML32i3
-  else
+  ifeq '$(MMAVERSION)' '5.0'
     export MLLIB = ml32i2w
+  else
+    export MLLIB = ML32i3
   endif
   export MLEXTRA = -mwindows -DWIN32_MATHLINK
 else
@@ -126,29 +125,24 @@ else
   else 
     export SYS = Linux-x86-64
   endif
-  ifeq '$(MMAVERSION)' '6.0'
-    export MLDIR = /usr/local/Wolfram/Mathematica/$(MMAVERSION)/SystemFiles/Links/MathLink/DeveloperKit/$(SYS)/CompilerAdditions
+  ifeq '$(MMAVERSION)' '5.0'
+    export MLDIR=$(MMAROOT)$(MMAVERSION)/AddOns/MathLink/DeveloperKit/$(SYS)/CompilerAdditions
   else
-    ifeq '$(MMAVERSION)' '7.0'
-      export MLDIR = /usr/local/Wolfram/Mathematica/$(MMAVERSION)/SystemFiles/Links/MathLink/DeveloperKit/$(SYS)/CompilerAdditions
-	else
-      export MLDIR=/usr/local/Wolfram/Mathematica/$(MMAVERSION)/AddOns/MathLink/DeveloperKit/$(SYS)/CompilerAdditions
-	endif
+    export MLDIR=$(MMAROOT)$(MMAVERSION)/SystemFiles/Links/MathLink/DeveloperKit/$(SYS)/CompilerAdditions
   endif
   export MPREP = $(MLDIR)/mprep
   export MLINCDIR = $(MLDIR)
   export MLLIBDIR = $(MLDIR)
-  ifeq '$(MMAVERSION)' '6.0'
-    export MLLIB = ML64i3
-    export MLEXTRA = -lpthread -lrt
+  ifeq '$(MMAVERSION)' '5.0'
+	export MLLIB = ML
+	export MLEXTRA = -lpthread
   else
-	ifeq '$(MMAVERSION)' '7.0'
-	  export MLLIB = ML64i3
-	  export MLEXTRA = -lpthread -lrt
+	ifdef NOT64
+	  export MLLIB = ML32i3
 	else
-	  export MLLIB = ML
-	  export MLEXTRA = -lpthread
+	  export MLLIB = ML64i3
 	endif
+	export MLEXTRA = -lpthread -lrt
   endif
 endif
 
@@ -168,12 +162,6 @@ ifndef NOPGPLOT
   export ALLPGPLOTLIBS = $(PGPLOTLIBS) $(X11LIBS)
 endif
 
-# -- 4. ADACF related things
-#  
-# Location and link to adacf library of DIS anomalous
-# dimensions and coefficient functions
-# FIXME: library and it's name is compiler dependent!
-export ADACFLIB = -L$(HOME)/local/lib -lgadacf_$(FC)
 
 # ------------------------------------------------------------------------  
 # ---- END of system dependent stuff                                  ----
