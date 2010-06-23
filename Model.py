@@ -593,6 +593,7 @@ class ComptonGepard(ComptonFormFactors):
         g.kinematics.q2 = self.cutq2
         g.evolc(1, 1)
         g.evolc(2, 1)
+        g.evolc(3, 1)
         self.qdict = {self.cutq2 : 1}
 
         g.newcall = 1
@@ -619,6 +620,7 @@ class ComptonGepard(ComptonFormFactors):
         else:
             self.g.evolc(1, nqs)
             self.g.evolc(2, nqs)
+            self.g.evolc(3, nqs)
 
     def _GepardCFFs(self, pt, xi=0):
         """Call gepard routine that calculates CFFs."""

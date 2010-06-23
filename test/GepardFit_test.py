@@ -53,6 +53,8 @@ def test_gepardfitsimple():
     setpar(27, 0.0)   
     setpar(18, 0.0)   
     setpar(28, 0.0)   
+    setpar(32, 0.0)
+    setpar(42, 0.0)
     mGepard.g.parint.p = 0
     mGepard.g.init()
     tGepard.model.release_parameters('M02S', 'SKEWS')
@@ -60,9 +62,10 @@ def test_gepardfitsimple():
     f.fit()
     chisq = tGepard.chisq(fitpoints)[0]
     assert_almost_equal(chisq, 5.1423271052023196, 3)
+    tGepard.model.fix_parameters('ALL')
 
-def test_gepardfitDVCS():
-    """Test fitting to HERA DVCS via gepard
+def test_gepardfitDVCSsumso3():
+    """Test fitting to HERA DVCS via gepard in sum-so3 model
     
     This should give same results as in smallx-final.nb,
     section 1-[sum]."""
@@ -83,6 +86,8 @@ def test_gepardfitDVCS():
     setpar(27,  0.)
     setpar(28,  0.)
     setpar(29,  0.)
+    setpar(32,  0.)
+    setpar(42,  0.)
     mGepard.g.parint.p = 0
     mGepard.g.init()
     tGepard.model.release_parameters('M02S','SKEWS','SKEWG')
@@ -90,12 +95,82 @@ def test_gepardfitDVCS():
     f.fit()
     chisq = tGepard.chisq(DVCSpoints)[0]
     assert_almost_equal(chisq, 101.094, 1)
+    tGepard.model.fix_parameters('ALL')
 
-test_gepardfitDVCS.long = 1
+test_gepardfitDVCSsumso3.long = 1
 # It's not a 'new feature' - test passes but the test
 # from GepardFitNLO_test.py is more comprehensive
-test_gepardfitDVCS.newfeature = 1
+test_gepardfitDVCSsumso3.newfeature = 1
 
+def test_gepardfitDVCSnlso3():
+    """Test fitting to HERA DVCS via gepard in nlso3 model
+    
+    This should give same results as in gepard's
+	'fit dvcs dvcs dvcs' or
+	smallx-final.nb, section 1-[nlo]-LO."""
+    setpar(11,  0.15203911208796006)
+    setpar(12,  1.1575060246398083)
+    setpar(13,  0.15)
+    setpar(14,  1.)
+    setpar(15,  0.)
+    setpar(16,  2.)
+    setpar(17,  0.)
+    setpar(18,  0.)
+    setpar(19,  0.)
+    setpar(22,  1.247316701070471)
+    setpar(23,  0.15)
+    setpar(24,  0.7)
+    setpar(25,  0.)
+    setpar(26,  2.)
+    setpar(27,  0.)
+    setpar(28,  0.)
+    setpar(29,  0.)
+    setpar(32,  0.)
+    setpar(42,  0.)
+    mGepard.g.parint.p = 0
+    mGepard.g.init()
+    tGepard.model.release_parameters('M02S','SECS','SECG')
+    f = Fitter.FitterMinuit(DVCSpoints, tGepard)
+    f.fit()
+    chisq = tGepard.chisq(DVCSpoints)[0]
+    assert_almost_equal(chisq/1000, 95.9/1000, 3)
+    tGepard.model.fix_parameters('ALL')
+
+test_gepardfitDVCSnlso3.long = 1
+
+def test_gepardfitDVCSthi():
+    """Test fitting to HERA DVCS via gepard in 3-PW nlso3 model."""
+    setpar(11,  0.15203911208796006)
+    setpar(12,  1.1575060246398083)
+    setpar(13,  0.15)
+    setpar(14,  0.5)
+    setpar(15,  0.)
+    setpar(16,  2.)
+    setpar(17, -0.15)
+    setpar(18,  0.)
+    setpar(19,  0.)
+    setpar(22,  1.247316701070471)
+    setpar(23,  0.15)
+    setpar(24,  0.7)
+    setpar(25,  0.)
+    setpar(26,  2.)
+    setpar(27, -0.81)
+    setpar(28,  0.)
+    setpar(29,  0.)
+    setpar(32,  0.)
+    #setpar(42,  0.1)
+    setpar(42,  0.0)
+    mGepard.g.parint.p = 0
+    mGepard.g.init()
+    tGepard.model.release_parameters('M02S','SECG','THIG')
+    f = Fitter.FitterMinuit(DVCSpoints, tGepard)
+    f.fit()
+    chisq = tGepard.chisq(DVCSpoints)[0]
+    assert_almost_equal(chisq/1000, 68.888/1000, 3)
+    #assert_almost_equal(chisq/1000, 234.597/1000, 3)
+    tGepard.model.fix_parameters('ALL')
+
+test_gepardfitDVCSthi.long = 1
     
 def test_hybridfitGepard():
     """Test simple hybrid fitting via gepard + DR (DR=0)"""
@@ -117,6 +192,8 @@ def test_hybridfitGepard():
     setpar(27, 0.0)   
     setpar(18, 0.0)   
     setpar(28, 0.0)   
+    setpar(32, 0.0)
+    setpar(42, 0.0)
     t.m.parameters['Nv'] = 0
     t.m.parameters['C'] = 0
     t.m.g.parint.p = 0
@@ -127,16 +204,8 @@ def test_hybridfitGepard():
     f.fit()
     chisq = t.chisq(fitpoints)[0]
     assert_almost_equal(chisq, 5.1423271052023196, 2)
+    tGepard.model.fix_parameters('ALL')
 
-def test_hybridfitDR():
-    """Test simple hybrid fitting via gepard + DR (gepard=0)"""
-    fitpoints = data[31][12:14] + data[8][1:3] + data[30][2:4]
-    f = Fitter.FitterMinuit(fitpoints, t)
-    f.fit()
-    chisq = t.chisq(fitpoints)[0]
-    assert_almost_equal(chisq, 6.7638690027046771, 5)
-
-test_hybridfitDR.newfeature = 1
     
 def test_hybridfitDVCS():
     """Test fitting to HERA DVCS with DR part off.
@@ -160,6 +229,8 @@ def test_hybridfitDVCS():
     setpar(27,  0.)
     setpar(28,  0.)
     setpar(29,  0.)
+    setpar(32, 0.0)
+    setpar(42, 0.0)
     t.m.parameters['Nv'] = 0
     t.m.parameters['C'] = 0
     t.m.g.parint.p = 0
@@ -170,6 +241,7 @@ def test_hybridfitDVCS():
     f.fit()
     chisq = t.chisq(DVCSpoints)[0]
     assert_almost_equal(chisq, 101.094, 1)
+    tGepard.model.fix_parameters('ALL')
 
 test_hybridfitDVCS.long = 1
 

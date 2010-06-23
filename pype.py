@@ -91,6 +91,7 @@ setpar(42,  0.)
 t.m.g.parint.p = 0
 
 
+t.m.parameters.update(hy1THI)
 
 t.m.g.init()
 
@@ -108,7 +109,7 @@ fDR1 = Fitter.FitterMinuit(GLO1points, tDR1)
 #f = Fitter.FitterMinuit(GLOpoints, t)
 
 t.m.parameters['tNv'] = 0.6
-t.m.release_parameters('M02S','SECS','SECG', 'rv', 'bv', 'C', 'MC', 'trv', 'tbv')
+t.m.release_parameters('M02S','SECS','SECG', 'THIS', 'THIG', 'rv', 'bv', 'C', 'MC', 'trv', 'tbv')
 #f = Fitter.FitterMinuit(DVCSpoints+data[48]+GLO1points, t)
-f = Fitter.FitterMinuit(DVCSpoints+data[48]+GLO1points, t)
+f = Fitter.FitterMinuit(DVCSpoints+data[48]+GLO1points+HA17[::2], t)
 
