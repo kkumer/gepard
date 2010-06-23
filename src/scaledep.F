@@ -20,11 +20,11 @@ C       FIG2[AB].dat  --  2 files with 8 sets of point coordinates
 C                          (\xi, \dot{K}_\lambda) or (\xi, \dot{K}_arg),
 C                          corresponding to 8 lines on a graph
 C  IDENTIFIERS
-C          NPOINTS -- number of points on each line
+C          NNPOINTS -- number of points on each line
 C       LOGXISTART -- log(\xi) where line begins
 C         LOGXIEND -- log(\xi) where line ends
-C              XIS -- array(NPOINTS), values of XI
-C           POINTS -- array(2, 8, NPOINTS), holds results for
+C              XIS -- array(NNPOINTS), values of XI
+C           POINTS -- array(2, 8, NNPOINTS), holds results for
 C                 two panels (Fig 2, in order  a, b) and
 C                 eight \dot{K}_{abs,arg} lines depicted on these panels
 C                 Order is:  1. NNLO, DEL2=0,    HARD 
@@ -51,18 +51,18 @@ C
       PROGRAM SCALEDEP
 
       IMPLICIT NONE
-      INTEGER PT, NPOINTS, LN, NDEL
+      INTEGER PT, NNPOINTS, LN, NDEL
       DOUBLE PRECISION QVAR2
       DOUBLE PRECISION LOGXI, LOGXISTART, LOGXIEND, LOGXISTEP
       INTEGER NEVALS
       DOUBLE PRECISION  LOGABSH, ARGH, H, DRVU, DRVD, ERR
       EXTERNAL LOGABSH, ARGH
-      PARAMETER ( NPOINTS = 2 )
-      DOUBLE PRECISION POINTS(2, 8, NPOINTS)
-      DOUBLE PRECISION XIS(NPOINTS)
+      PARAMETER ( NNPOINTS = 2 )
+      DOUBLE PRECISION POINTS(2, 8, NNPOINTS)
+      DOUBLE PRECISION XIS(NNPOINTS)
       PARAMETER ( NEVALS = 5, H = 0.41d0 )
       PARAMETER ( LOGXISTART = -5.0d0, LOGXIEND = -1.30103d0,
-     &       LOGXISTEP = (LOGXIEND - LOGXISTART) / (NPOINTS - 1)  )
+     &       LOGXISTEP = (LOGXIEND - LOGXISTART) / (NNPOINTS - 1)  )
 #include "header.F"
 
       PROCESS = 'DVCS'
@@ -91,10 +91,10 @@ C
       CALL INIT
 
 
-*     Looping over NPOINTS points for each line
+*     Looping over NNPOINTS points for each line
 
       LOGXI = LOGXISTART
-      DO 20 PT = 1, NPOINTS
+      DO 20 PT = 1, NNPOINTS
       XI = 10**LOGXI
       XIS(PT) = XI
 
@@ -147,7 +147,7 @@ C
 *     Printing all the results from arrays to files
 
       DO 40 LN = 1, 8
-      DO 30 PT = 1, NPOINTS
+      DO 30 PT = 1, NNPOINTS
          WRITE (UNIT=11,FMT=998) XIS(PT), POINTS(1, LN, PT)
          WRITE (UNIT=12,FMT=998) XIS(PT), POINTS(2, LN, PT)
  30   CONTINUE
@@ -182,7 +182,7 @@ C
 
       Q2 = QQ2
       QS(1) = Q2
-      CALL EVOLC(1)
+      CALL EVOLC(1,1)
 
       CALL CFFF 
 
@@ -213,7 +213,7 @@ C
 
       Q2 = QQ2
       QS(1) = Q2
-      CALL EVOLC(1)
+      CALL EVOLC(1,1)
 
       CALL CFFF 
 

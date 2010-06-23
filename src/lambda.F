@@ -15,10 +15,10 @@ C    matrix using Dieter's trick for treating the square-root cut
 C    in complex plane
 C  SYNOPSIS
 
-      SUBROUTINE LAMBDAF (K, LAM)
+      SUBROUTINE LAMBDAF (SEC, K, LAM)
 
       IMPLICIT NONE
-      INTEGER K
+      INTEGER SEC, K
       DOUBLE COMPLEX LAM(2)
 
 C  INPUTS
@@ -38,10 +38,10 @@ C
 *  Eigenvalues. Expression is adjusted to avoid the crossing
 *    of the SQRT cut on the negative real axis
 
-      AUX = (GAM(K,0,1,1) - GAM(K,0,2,2)) * SQRT (1.0d0 + 
-     &     4.0d0 * GAM(K,0,1,2)*GAM(K,0,2,1)/(GAM(K,0,1,1) 
-     &          - GAM(K,0,2,2))**2)
-      LAM(1) = 0.5d0 * (GAM(K,0,1,1) + GAM(K,0,2,2) - AUX)
+      AUX = (GAM(SEC,K,0,1,1) - GAM(SEC,K,0,2,2)) * SQRT (1.0d0 + 
+     &     4.0d0 * GAM(SEC,K,0,1,2)*GAM(SEC,K,0,2,1)/(GAM(SEC,K,0,1,1) 
+     &          - GAM(SEC,K,0,2,2))**2)
+      LAM(1) = 0.5d0 * (GAM(SEC,K,0,1,1) + GAM(SEC,K,0,2,2) - AUX)
       LAM(2) = LAM(1) + AUX
 
       RETURN

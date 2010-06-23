@@ -15,10 +15,10 @@ C    projectors to eigenstates of the LO singlet
 C    anomalous dimensions matrix.
 C  SYNOPSIS
 
-      SUBROUTINE PROJECTORSF (K, LAM, PR)
+      SUBROUTINE PROJECTORSF (SEC, K, LAM, PR)
 
       IMPLICIT NONE
-      INTEGER K
+      INTEGER K, SEC 
       DOUBLE COMPLEX LAM(2), PR(2,2,2)
 
 C  INPUTS
@@ -40,10 +40,10 @@ C
 
 *     P(+)
 
-      PR(1,1,1) = DEN * (GAM(K,0,1,1) - LAM(2)) 
-      PR(1,1,2) = DEN *  GAM(K,0,1,2)
-      PR(1,2,1) = DEN *  GAM(K,0,2,1)
-      PR(1,2,2) = DEN * (GAM(K,0,2,2) - LAM(2)) 
+      PR(1,1,1) = DEN * (GAM(SEC,K,0,1,1) - LAM(2)) 
+      PR(1,1,2) = DEN *  GAM(SEC,K,0,1,2)
+      PR(1,2,1) = DEN *  GAM(SEC,K,0,2,1)
+      PR(1,2,2) = DEN * (GAM(SEC,K,0,2,2) - LAM(2)) 
 
 *     Using P(-) = 1 - P(+) 
 

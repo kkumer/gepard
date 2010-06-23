@@ -27,7 +27,7 @@ C
 
 c$OMP parallel do PRIVATE(J, FCM)
       DO 30  K = 1, NPTS
-        J = N(K) - 1
+        J = N(1, K) - 1
         CALL HJ(J, FCM)
         MBGPD(K, 1) = FCM(1)
         MBGPD(K, 2) = FCM(2)

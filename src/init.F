@@ -26,7 +26,7 @@ C
 
       IMPLICIT NONE
       INTEGER NINTGMAX, K
-      INTEGER L, ORD
+      INTEGER L, ORD, SEC
       INTEGER EFFACC, NBNDMAX
       DOUBLE PRECISION NFD
       DOUBLE COMPLEX J, Z, EPH
@@ -93,7 +93,8 @@ C
 
       EPH = EXP ( DBLCMPLX(0.D0, PHI) )
       DO 10 K = 1, NPTS
- 10     N(K) = C + 1.0d0 + Y(K) * EPH 
+        N(1,K) = C + 1.0d0 + Y(K) * EPH 
+ 10     N(2,K) = C + 3.0d0 + Y(K) * EPH 
 
 *   ----  Initialization of common blocks ----
 
@@ -133,11 +134,15 @@ C
 
       CALL BETAF
 
+*   Making everything for two MB contours, first shifted (j+2),
+*   and then the original one, so that SEC-independent stuff
+*   ends up with original values
+      DO 100 SEC = 2, 1, -1
 *   Now looping over MB contour points and initializing
       DO 100 K = 1, NPTS
 
-      Z = N(K)
-      J = N(K) - 1
+      Z = N(SEC, K)
+      J = N(SEC, K) - 1
 
 *   2. ADACF initialization
 
@@ -162,22 +167,22 @@ C
               
 *   2.b Anomalous dimensions matrices: LO, NLO, and NNLO
 
-      CALL WgammaVQQ0F(NFD, Z, GAM(K, 0, 1, 1))
-      CALL WgammaVQG0F(NFD, Z, GAM(K, 0, 1, 2))
-      CALL WgammaVGQ0F(NFD, Z, GAM(K, 0, 2, 1))
-      CALL WgammaVGG0F(NFD, Z, GAM(K, 0, 2, 2))
+      CALL WgammaVQQ0F(NFD, Z, GAM(SEC, K, 0, 1, 1))
+      CALL WgammaVQG0F(NFD, Z, GAM(SEC, K, 0, 1, 2))
+      CALL WgammaVGQ0F(NFD, Z, GAM(SEC, K, 0, 2, 1))
+      CALL WgammaVGG0F(NFD, Z, GAM(SEC, K, 0, 2, 2))
 
       IF (P .GE. 1) THEN
-        CALL WgammaVQQ1F(NFD, Z, GAM(K, 1, 1, 1))
-        CALL WgammaVQG1F(NFD, Z, GAM(K, 1, 1, 2))
-        CALL WgammaVGQ1F(NFD, Z, GAM(K, 1, 2, 1))
-        CALL WgammaVGG1F(NFD, Z, GAM(K, 1, 2, 2))
+        CALL WgammaVQQ1F(NFD, Z, GAM(SEC, K, 1, 1, 1))
+        CALL WgammaVQG1F(NFD, Z, GAM(SEC, K, 1, 1, 2))
+        CALL WgammaVGQ1F(NFD, Z, GAM(SEC, K, 1, 2, 1))
+        CALL WgammaVGG1F(NFD, Z, GAM(SEC, K, 1, 2, 2))
 
         IF (P .GE. 2) THEN
-          CALL WgammaVQQ2F(NFD, Z, GAM(K, 2, 1, 1))
-          CALL WgammaVQG2F(NFD, Z, GAM(K, 2, 1, 2))
-          CALL WgammaVGQ2F(NFD, Z, GAM(K, 2, 2, 1))
-          CALL WgammaVGG2F(NFD, Z, GAM(K, 2, 2, 2))
+          CALL WgammaVQQ2F(NFD, Z, GAM(SEC, K, 2, 1, 1))
+          CALL WgammaVQG2F(NFD, Z, GAM(SEC, K, 2, 1, 2))
+          CALL WgammaVGQ2F(NFD, Z, GAM(SEC, K, 2, 2, 1))
+          CALL WgammaVGG2F(NFD, Z, GAM(SEC, K, 2, 2, 2))
         END IF
       END IF
 
@@ -234,10 +239,10 @@ C
  20     BIGCTMP(ORD, L) = (0.0d0, 0.0d0)
       ELSE IF (SCHEME .EQ. 'CSBAR') THEN
 *       (Option 3) CFF or F2 in CSBAR scheme
-          CALL CDVCSF(K, BIGCTMP)
+          CALL CDVCSF(SEC, K, BIGCTMP)
       ELSE IF (SCHEME(:3) .EQ. 'MSB') THEN
 *       (Option 4) CFF or F2 in MSBAR/MSBDI/MSBLO schemes
-          CALL MSBARF(K, BIGCTMP)
+          CALL MSBARF(SEC, K, BIGCTMP)
       ELSE
 *       (Option 5) This should never happen
           STOP
@@ -255,10 +260,10 @@ C
           BIGCF2(K, ORD, L) = BIGCTMP(ORD, L)
         ELSE IF ( PROCESS(5:5) .EQ. 'Z' ) THEN
 *          -- GPDs at eta=0 trajectory --
-          BIGC(K, ORD, L) = BIGCTMP(ORD, L)
+          BIGC(SEC, K, ORD, L) = BIGCTMP(ORD, L)
         ELSE
 *          -- CFFs or GPDs at eta=x trajectory --
-          BIGC(K, ORD, L) = BIGCTMP(ORD, L) * 2.0d0**(J+1.d0)
+          BIGC(SEC, K, ORD, L) = BIGCTMP(ORD, L) * 2.0d0**(J+1.d0)
      &           * EXP(CLNGAMMA(2.5d0 + J) - CLNGAMMA(3.0d0 + J))
      &           / 0.886226925452758014d0
         END IF

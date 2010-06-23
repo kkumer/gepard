@@ -154,7 +154,10 @@ C
 *   Following artifical renorm. scheme has C = (0, 1) at
 *   all orders, thus effectively putting F_2 -> Q_s^2 x g(x)
 
-      SCHEME = 'EVOLG'
+      WRITE (*,*) 'This test is presently broken!'
+*   FIXME: understand how to change (old) PROCESS = 'EVOLG' into this:
+      PROCESS = 'DVCSZG'
+      
 
 *   Parameters of Les Houches benchmark
 
@@ -189,7 +192,7 @@ C
         RES = 0.0D0
         P = 1
         CALL INIT
-        CALL EVOLC(1)
+        CALL EVOLC(1,1)
         DEL2 = 0.0d0
         CALL GETMBGPD
         EPH = EXP ( DBLCMPLX(0.0d0, PHI) )
@@ -197,7 +200,7 @@ C
         MTIND = 0
         QIND = 1
         DO 30 K = 1, NPTS
-        J = N(K) - 1
+        J = N(1,K) - 1
         FCM(1) = MBGPD(K, 1)
         FCM(2) = MBGPD(K, 2)
         FPW = CGRIDDIS(QIND,K,1) * FCM(1) + CGRIDDIS(QIND,K,2) * FCM(2)
@@ -216,7 +219,7 @@ C
         RES = 0.0D0
         P = 2
         CALL INIT
-        CALL EVOLC(1)
+        CALL EVOLC(1,1)
         CALL GETMBGPD
         EPH = EXP ( DBLCMPLX(0.0d0, PHI) )
 
@@ -224,7 +227,7 @@ C
         MTIND = 0
         QIND = 1
         DO 40 K = 1, NPTS
-        J = N(K) - 1
+        J = N(1,K) - 1
         FCM(1) = MBGPD(K, 1)
         FCM(2) = MBGPD(K, 2)
         FPW = CGRIDDIS(QIND,K,1) * FCM(1) + CGRIDDIS(QIND,K,2) * FCM(2)

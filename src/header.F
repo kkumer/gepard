@@ -483,7 +483,7 @@ C      N(K)  --  Complex coordinates of points on MB contour
 C  MEMBER OF
 C     NPOINTS
 C  SYNOPSIS
-      DOUBLE COMPLEX N(NPTSMAX)
+      DOUBLE COMPLEX N(2,NPTSMAX)
 C     ***
 
 *     ----- Values on a particular contour point
@@ -535,7 +535,7 @@ C     BIGC(K,P,flavour) -- "Big C" DVCS singlet Wilson coefficient
 C  MEMBER OF
 C     BIGC(block)
 C  SYNOPSIS
-      DOUBLE COMPLEX BIGC(NPTSMAX,0:2,2)
+      DOUBLE COMPLEX BIGC(2,NPTSMAX,0:2,2)
 C     ***
 
 C     ****v* header.F/BIGCF2
@@ -563,7 +563,7 @@ C      GAM(K,P,flavour_i,flavour_j) -- non-singlet DIS anomalous dimensions
 C  MEMBER OF
 C     GAMNS(block)
 C  SYNOPSIS
-      DOUBLE COMPLEX GAM(NPTSMAX,0:2,2,2)
+      DOUBLE COMPLEX GAM(2,NPTSMAX,0:2,2,2)
 C     ***
 
 C     ****v* header.F/CGRIDNS
@@ -586,7 +586,7 @@ C      evolution from Q02 to QS(QIND)
 C  MEMBER OF
 C    CGRID(block)
 C  SYNOPSIS
-      DOUBLE COMPLEX CGRID(QINDMAX, NPTSMAX, 2)
+      DOUBLE COMPLEX CGRID(2,QINDMAX, NPTSMAX, 2)
 C     ***
 
 C     ****v* header.F/CGRIDDIS

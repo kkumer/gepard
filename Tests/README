@@ -1,4 +1,4 @@
-2008-09-03 
+2010-06-23 
 
 Accuracy and dependence on SPEED (from GEPARD.INI) can be studied by
 the following test programs.
@@ -19,7 +19,7 @@ First test
 For testing the DVCS and DIS observables for some test values of
 parameters, use executable './test'.
 
-Second test (broken in the present version)
+Second test 
 -----------
 Testing the intermediate values of CFFs can be done using
 executable './auxtest'. (Note that this is useful mostly for
@@ -40,7 +40,7 @@ diff lett/FIG2A-LETT.dat FIG2A.dat
 Or, better, diff -> vimdiff
 
 
-Fourth test
+Fourth test (broken presently)
 -----------
 run executable ./houches and resulting files show relative difference with
 respect to evolution of Les Houches benchmark gluon PDF, as evaluated
@@ -58,7 +58,3 @@ xmgrace acc.dat -batch acc.bat
 
 
 ------------------------------------------------------------------------  
-
-The role of (obsolete) Mathematica part (in directory mma/) is explained in main README.
-
-

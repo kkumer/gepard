@@ -20,11 +20,11 @@ C       FIG1[A-D].dat  --  4 files with six sets of point coordinates
 C                          (\xi, K_\lambda) or (\xi, K_arg),
 C                          corresponding to six lines on a graph
 C  IDENTIFIERS
-C          NPOINTS -- number of points on each line
+C          NNPOINTS -- number of points on each line
 C       LOGXISTART -- log(\xi) where line begins
 C         LOGXIEND -- log(\xi) where line ends
-C              XIS -- array(NPOINTS), values of XI
-C           POINTS -- array(4, 6, NPOINTS), holds results for
+C              XIS -- array(NNPOINTS), values of XI
+C           POINTS -- array(4, 6, NNPOINTS), holds results for
 C                 four panels (Fig 1, in order  a, b, c and d) and
 C                 six K_{\lambda,arg} lines depicted on these panels
 C                 Order is:  1. NNLO, CSBAR, HARD 
@@ -44,14 +44,14 @@ C
       PROGRAM RADCORR
 
       IMPLICIT NONE
-      INTEGER PT, NPOINTS, LN, NDEL
+      INTEGER PT, NNPOINTS, LN, NDEL
       DOUBLE PRECISION LOGXI, LOGXISTART, LOGXIEND, LOGXISTEP
       DOUBLE PRECISION DCARG
-      PARAMETER ( NPOINTS = 2 )
-      DOUBLE PRECISION POINTS(4, 6, NPOINTS)
-      DOUBLE PRECISION XIS(NPOINTS)
+      PARAMETER ( NNPOINTS = 2 )
+      DOUBLE PRECISION POINTS(4, 6, NNPOINTS)
+      DOUBLE PRECISION XIS(NNPOINTS)
       PARAMETER ( LOGXISTART = -5.0d0, LOGXIEND = -1.30103d0,
-     &       LOGXISTEP = (LOGXIEND - LOGXISTART) / (NPOINTS - 1)  )
+     &       LOGXISTEP = (LOGXIEND - LOGXISTART) / (NNPOINTS - 1)  )
 #include "header.F"
 
       PROCESS = 'DVCS'
@@ -83,7 +83,7 @@ C
       DO 40 NDEL = 0, 1
 
       LOGXI = LOGXISTART
-      DO 20 PT = 1, NPOINTS
+      DO 20 PT = 1, NNPOINTS
       XI = 10**LOGXI
       XIS(PT) = XI
 
@@ -118,10 +118,10 @@ C
 
 *     Calculating two CFFs needed for present line and point ...
 
-      CALL EVOLC(1)
+      CALL EVOLC(1,1)
       CALL CFFF 
       P = P - 1
-      CALL EVOLC(1)
+      CALL EVOLC(1,1)
       CALL CFFF 
 
 *     ... and saving them to array
@@ -136,7 +136,7 @@ C
 *     Printing all the results from arrays to files
 
       DO 40 LN = 1, 6
-      DO 30 PT = 1, NPOINTS
+      DO 30 PT = 1, NNPOINTS
          WRITE (UNIT=11+NDEL,FMT=998) XIS(PT), POINTS(1+NDEL, LN, PT)
          WRITE (UNIT=13+NDEL,FMT=998) XIS(PT), POINTS(3+NDEL, LN, PT)
  30   CONTINUE

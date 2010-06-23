@@ -11,7 +11,7 @@
 # 	auxns    -  comparing MSBAR and CSBAR schemes
 # 	auxtest  -  tests DVCS \mathcal{H} calculation
 #
-# 	houches  -  comparison to Les Houches DIS benchmark
+# 	houches  -  comparison to Les Houches DIS benchmark (broken)
 # 	accuracy -  Analysis of accuracy and SPEED of DVCS calculation
 #
 # For compiling 'fit' and 'gepard.exe' without PGPLOT (no plotting) do
@@ -36,16 +36,16 @@
 # Fortran compiler dependent options (uncomment only one)
 #
 ## [--1--] GNU g77  (also cygwin)
-FC = g77
-CMP_FFLAGS = -Wall
-OPT_FFLAGS = -O3
-OPT_CFLAGS = -O3 
+#FC = g77
+#CMP_FFLAGS = -Wall
+#OPT_FFLAGS = -O3
+#OPT_CFLAGS = -O3 
 #
 ## [--2--] GNU gfortran
-#FC = gfortran
-#CMP_FFLAGS = -Wall
-#OPT_FFLAGS = -O3 -ffast-math -funroll-all-loops  -ftree-vectorize
-#OPT_CFLAGS = -O3 
+FC = gfortran
+CMP_FFLAGS = -Wall
+OPT_FFLAGS = -O3 -ffast-math -funroll-all-loops  -ftree-vectorize
+OPT_CFLAGS = -O3 
 
 ## [--2b--] GNU gfortran + OpenMP parallelization
 #FC = gfortran
@@ -99,14 +99,26 @@ endif
 # -- 2. MathLink related things
 #
 # Put your version of Mathematica here
-export MMAVERSION=5.2
+export MMAVERSION=7.0
 ifdef WINDIR
   export SYS = Windows
-  export MLDIR=/cygdrive/c/Program\ Files/Wolfram\ Research/Mathematica/$(MMAVERSION)/AddOns/MathLink/DeveloperKit/$(SYS)/CompilerAdditions/mldev32
+  ifeq '$(MMAVERSION)' '6.0'
+    export MLDIR=/cygdrive/c/Program\ Files/Wolfram\ Research/Mathematica/$(MMAVERSION)/SystemFiles/Links/MathLink/DeveloperKit/$(SYS)/CompilerAdditions/cygwin
+  else
+	  ifeq '$(MMAVERSION)' '7.0'
+        export MLDIR=/cygdrive/c/Program\ Files/Wolfram\ Research/Mathematica/$(MMAVERSION)/SystemFiles/Links/MathLink/DeveloperKit/$(SYS)/CompilerAdditions/cygwin
+      else
+        export MLDIR=/cygdrive/c/Program\ Files/Wolfram\ Research/Mathematica/$(MMAVERSION)/AddOns/MathLink/DeveloperKit/$(SYS)/CompilerAdditions/mldev32
+	  endif
+  endif
   export MPREP = $(MLDIR)/bin/mprep
   export MLINCDIR = $(MLDIR)/include
   export MLLIBDIR = $(MLDIR)/lib 
-  export MLLIB = ml32i2w
+  ifeq '$(MMAVERSION)' '6.0'
+    export MLLIB = ML32i3
+  else
+    export MLLIB = ml32i2w
+  endif
   export MLEXTRA = -mwindows -DWIN32_MATHLINK
 else
   ifdef NOT64
@@ -117,7 +129,11 @@ else
   ifeq '$(MMAVERSION)' '6.0'
     export MLDIR = /usr/local/Wolfram/Mathematica/$(MMAVERSION)/SystemFiles/Links/MathLink/DeveloperKit/$(SYS)/CompilerAdditions
   else
-    export MLDIR=/usr/local/Wolfram/Mathematica/$(MMAVERSION)/AddOns/MathLink/DeveloperKit/$(SYS)/CompilerAdditions
+    ifeq '$(MMAVERSION)' '7.0'
+      export MLDIR = /usr/local/Wolfram/Mathematica/$(MMAVERSION)/SystemFiles/Links/MathLink/DeveloperKit/$(SYS)/CompilerAdditions
+	else
+      export MLDIR=/usr/local/Wolfram/Mathematica/$(MMAVERSION)/AddOns/MathLink/DeveloperKit/$(SYS)/CompilerAdditions
+	endif
   endif
   export MPREP = $(MLDIR)/mprep
   export MLINCDIR = $(MLDIR)
@@ -126,8 +142,13 @@ else
     export MLLIB = ML64i3
     export MLEXTRA = -lpthread -lrt
   else
-    export MLLIB = ML
-    export MLEXTRA = -lpthread
+	ifeq '$(MMAVERSION)' '7.0'
+	  export MLLIB = ML64i3
+	  export MLEXTRA = -lpthread -lrt
+	else
+	  export MLLIB = ML
+	  export MLEXTRA = -lpthread
+	endif
   endif
 endif
 

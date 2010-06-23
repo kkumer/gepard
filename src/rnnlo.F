@@ -63,10 +63,10 @@ C     - combination of gamma^(n) and beta_m needed in evolution operator
 C     - projected on +/- directions
 C  SYNOPSIS
 
-      SUBROUTINE RNNLOF (K, LAM, PR, R1PROJ, R2PROJ)
+      SUBROUTINE RNNLOF (SEC, K, LAM, PR, R1PROJ, R2PROJ)
 
       IMPLICIT NONE
-      INTEGER  K
+      INTEGER  SEC, K
       DOUBLE COMPLEX LAM(2)
       DOUBLE COMPLEX PR(2,2,2), R1PROJ(2,2,2,2), R2PROJ(2,2,2,2)
 
@@ -92,20 +92,20 @@ C
       DOUBLE COMPLEX R1(2,2), R2(2,2)
 #include "header.F"
 
-      CALL PROJECTORSF(K, LAM, PR)
+      CALL PROJECTORSF(SEC, K, LAM, PR)
 
 *     Inverse beta_0 is often needed below
       INV = 1.0d0 / BETA0(NF)
 
       DO 10 K1 = 1,2
       DO 10 L = 1,2
-      R1(K1,L) = INV * (GAM(K,1,K1,L) 
-     &            - 0.5d0 * INV * BETA1(NF) * GAM(K,0,K1,L))
+      R1(K1,L) = INV * (GAM(SEC,K,1,K1,L) 
+     &            - 0.5d0 * INV * BETA1(NF) * GAM(SEC,K,0,K1,L))
       IF (P. GE. 2) THEN
-        R2(K1,L) = INV * (GAM(K,2,K1,L) 
-     &            - 0.5d0 * INV * BETA1(NF) * GAM(K,1,K1,L) 
+        R2(K1,L) = INV * (GAM(SEC,K,2,K1,L) 
+     &            - 0.5d0 * INV * BETA1(NF) * GAM(SEC,K,1,K1,L) 
      &            - 0.25d0 * INV * (BETA2(NF) 
-     &            - INV * BETA1(NF)**2) * GAM(K,0,K1,L))
+     &            - INV * BETA1(NF)**2) * GAM(SEC,K,0,K1,L))
       END IF
  10   CONTINUE
 

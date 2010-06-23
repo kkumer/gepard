@@ -43,7 +43,7 @@ void MinuitInit(int a)
 
           MLPutFunction(stdlink, "List", contour_.npts); /* passing MB points */
             for (i = 0; i < contour_.npts; i++){
-                    nc = npoints_.n[i];
+                    nc = npoints_.n[i][0];
                     MLPutFunction(stdlink, "Complex", 2);
                       MLPutReal(stdlink, nc.dr - 1);
                       MLPutReal(stdlink, nc.di);
@@ -323,9 +323,9 @@ void cffHInternal(double xi, double t, double q2, double q02, int speed, int p,
         int i;
         double xreal;
         struct dblcomplex nc;
-        long int nargs;
+        int nargs;
         const char *fname;
-        long int evoli=1, evolj=1;
+        long int evoli=1, evolj=1, evols=2;
         char datfile[] = "DFLT";
         char outfile[] = "DFLT";
 
@@ -346,7 +346,7 @@ void cffHInternal(double xi, double t, double q2, double q02, int speed, int p,
             MLPutSymbol(stdlink, "jValues");
             MLPutFunction(stdlink, "List", contour_.npts); /* passing MB points */
               for (i = 0; i < contour_.npts; i++){
-                      nc = npoints_.n[i];
+                      nc = npoints_.n[i][0];
                       MLPutFunction(stdlink, "Complex", 2);
                         MLPutReal(stdlink, nc.dr - 1);
                         MLPutReal(stdlink, nc.di);
@@ -368,6 +368,7 @@ void cffHInternal(double xi, double t, double q2, double q02, int speed, int p,
         MLEndPacket(stdlink);
 
 evolc_(&evoli, &evolj);
+evolc_(&evols, &evolj);
 
 cfff_();
 
@@ -401,9 +402,9 @@ void cffEInternal(double xi, double t, double q2, double q02, int speed, int p,
         int i;
         double xreal;
         struct dblcomplex nc;
-        long int nargs;
+        int nargs;
         const char *fname;
-        long int evoli=1, evolj=1;
+        long int evoli=1, evolj=1, evols=2;
         char datfile[] = "DFLT";
         char outfile[] = "DFLT";
 
@@ -424,7 +425,7 @@ void cffEInternal(double xi, double t, double q2, double q02, int speed, int p,
             MLPutSymbol(stdlink, "jValues");
             MLPutFunction(stdlink, "List", contour_.npts); /* passing MB points */
               for (i = 0; i < contour_.npts; i++){
-                      nc = npoints_.n[i];
+                      nc = npoints_.n[i][0];
                       MLPutFunction(stdlink, "Complex", 2);
                         MLPutReal(stdlink, nc.dr - 1);
                         MLPutReal(stdlink, nc.di);
@@ -446,6 +447,7 @@ void cffEInternal(double xi, double t, double q2, double q02, int speed, int p,
         MLEndPacket(stdlink);
 
 evolc_(&evoli, &evolj);
+evolc_(&evols, &evolj);
 
 cfff_();
 
@@ -479,7 +481,7 @@ void F2Internal(double xbj, double q2, double q02, int speed, int p,
         int i;
         double xreal;
         struct dblcomplex nc;
-        long int nargs;
+        int nargs;
         const char *fname;
         long int evoli=1, evolj=1;
         char datfile[] = "DFLT";
@@ -502,7 +504,7 @@ void F2Internal(double xbj, double q2, double q02, int speed, int p,
             MLPutSymbol(stdlink, "jValues");
             MLPutFunction(stdlink, "List", contour_.npts); /* passing MB points */
               for (i = 0; i < contour_.npts; i++){
-                      nc = npoints_.n[i];
+                      nc = npoints_.n[i][0];
                       MLPutFunction(stdlink, "Complex", 2);
                         MLPutReal(stdlink, nc.dr - 1);
                         MLPutReal(stdlink, nc.di);
@@ -571,7 +573,7 @@ void getmbgpdmma_(void)
         int i;
         double xr, xi;
         struct dblcomplex xc;
-        long int nargs;
+        int nargs;
         const char *fname;
 
 /* calling Mathematica function GPD[{params}, DEL2, XI]  */
@@ -669,7 +671,8 @@ void BCAInternal(double wavg, double q2avg, double phiin,
         int i;
         double xreal, herabca;
         struct dblcomplex nc;
-        long int nargs, fitflag=0;
+        int nargs; 
+        long int fitflag=0;
         const char *fname;
         char datfile[] = "DFLT";
         char outfile[] = "DFLT";
@@ -684,7 +687,7 @@ void BCAInternal(double wavg, double q2avg, double phiin,
             MLPutSymbol(stdlink, "jValues");
             MLPutFunction(stdlink, "List", contour_.npts); /* passing MB points */
               for (i = 0; i < contour_.npts; i++){
-                      nc = npoints_.n[i];
+                      nc = npoints_.n[i][0];
                       MLPutFunction(stdlink, "Complex", 2);
                         MLPutReal(stdlink, nc.dr - 1);
                         MLPutReal(stdlink, nc.di);
