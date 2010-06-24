@@ -8,10 +8,11 @@
 
 /* Array dimensions */
 #define NPARMAX   70
-#define QINDMAX   50
+#define QINDMAX  150
 #define NBNDMAX    1
 #define NPTSMAX  768
 #define MTINDMAX 100
+#define NPWMAX     3
 
 struct dblcomplex {
         double dr;
@@ -64,7 +65,7 @@ struct{
 /*   3. Kinematics */
 
       /* INTEGER QINDMAX, MTINDMAX
-       *PARAMETER (QINDMAX = 50, MTINDMAX = 100)
+       *PARAMETER (QINDMAX = 150, MTINDMAX = 100)
        *INTEGER NQS, NQSDIS, MTIND, NMTS, NMTSEXP
        *DOUBLE PRECISION XI, DEL2, Q2
        *DOUBLE PRECISION QS(QINDMAX), QSDIS(QINDMAX)
@@ -114,7 +115,7 @@ struct{
 } contour_;
 
 struct{
-        struct dblcomplex n[NPTSMAX][2];
+        struct dblcomplex n[NPTSMAX][NPWMAX];
 } npoints_;
 
 /*
@@ -124,11 +125,11 @@ struct{
  */
 
 struct{
-        struct dblcomplex hgrid[2][NPTSMAX][MTINDMAX+1];
+        struct dblcomplex hgrid[NPWMAX][NPTSMAX][MTINDMAX+1];
 } hgrid_;
 
 struct{
-        struct dblcomplex mbgpd[2][NPTSMAX];
+        struct dblcomplex mbgpd[NPWMAX][NPTSMAX];
 } mbgpd_;
 
 

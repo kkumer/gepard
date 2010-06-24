@@ -483,7 +483,9 @@ C      N(K)  --  Complex coordinates of points on MB contour
 C  MEMBER OF
 C     NPOINTS
 C  SYNOPSIS
-      DOUBLE COMPLEX N(3,NPTSMAX)
+      INTEGER NPWMAX
+      PARAMETER (NPWMAX = 3)
+      DOUBLE COMPLEX N(NPWMAX,NPTSMAX)
 C     ***
 
 *     ----- Values on a particular contour point
@@ -535,7 +537,7 @@ C     BIGC(SEC,K,P,flavour) -- "Big C" DVCS singlet Wilson coefficient
 C  MEMBER OF
 C     BIGC(block)
 C  SYNOPSIS
-      DOUBLE COMPLEX BIGC(3,NPTSMAX,0:2,2)
+      DOUBLE COMPLEX BIGC(NPWMAX,NPTSMAX,0:2,2)
 C     ***
 
 C     ****v* header.F/BIGCF2
@@ -586,7 +588,7 @@ C      evolution from Q02 to QS(QIND)
 C  MEMBER OF
 C    CGRID(block)
 C  SYNOPSIS
-      DOUBLE COMPLEX CGRID(3,QINDMAX, NPTSMAX, 2)
+      DOUBLE COMPLEX CGRID(NPWMAX, QINDMAX, NPTSMAX, 2)
 C     ***
 
 C     ****v* header.F/CGRIDDIS
