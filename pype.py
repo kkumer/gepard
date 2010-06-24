@@ -25,12 +25,14 @@ GLOpoints = data[31][12:] + data[8] + data[29]  # DM's GLO set
 GLO1points = data[31][12:] + data[8] + data[29] + data[30]  # DM's GLO1 set
 HERMESpoints = data[31][12:] +  data[29]
 BSApoints = data[8] + data[29]
+HAD17 = utils.select(data[33], criteria=['Q2 == 1.5', 't == -0.17'])
 HA17 = utils.select(data[34], criteria=['t == -0.17'])
 HA28 = utils.select(data[34], criteria=['t == -0.28'])
 HA33 = utils.select(data[34], criteria=['t == -0.33'])
 DVCSpoints = data[36] + data[37] + data[38] + data[39] + \
   data[40] + data[41] + data[42] + data[43] + data[44] + \
   data[45]
+ALTGLO1points = data[5] + data[25] + data[32] + HAD17 + HA17
 
 
 ## [3] Create a theory
@@ -109,7 +111,8 @@ fDR1 = Fitter.FitterMinuit(GLO1points, tDR1)
 #f = Fitter.FitterMinuit(GLOpoints, t)
 
 t.m.parameters['tNv'] = 0.6
-t.m.release_parameters('M02S','SECS','SECG', 'THIS', 'THIG', 'rv', 'bv', 'C', 'MC', 'trv', 'tbv')
-#f = Fitter.FitterMinuit(DVCSpoints+data[48]+GLO1points, t)
-f = Fitter.FitterMinuit(DVCSpoints+data[48]+GLO1points+HA17[::2], t)
+t.m.release_parameters('M02S','SECS','SECG', 'THIS', 'THIG', 'rv', 'bv', 'Mv', 'C', 'MC', 'trv', 'tbv')
+f = Fitter.FitterMinuit(DVCSpoints+GLO1points, t)
+#f = Fitter.FitterMinuit(DVCSpoints+data[48]+ALTGLO1points, t)
+#f = Fitter.FitterMinuit(DVCSpoints+data[48]+GLO1points+HA17[::2], t)
 
