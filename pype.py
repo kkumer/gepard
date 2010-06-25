@@ -33,6 +33,7 @@ DVCSpoints = data[36] + data[37] + data[38] + data[39] + \
   data[40] + data[41] + data[42] + data[43] + data[44] + \
   data[45]
 ALTGLO1points = data[5] + data[25] + data[32] + HAD17 + HA17
+ALTGLO2points = data[5] + data[25] + data[32] + data[30]
 
 
 ## [3] Create a theory
@@ -93,7 +94,7 @@ setpar(42,  0.)
 t.m.g.parint.p = 0
 
 
-t.m.parameters.update(hy1THI)
+#t.m.parameters.update(hy1THI)
 
 t.m.g.init()
 
@@ -111,8 +112,10 @@ fDR1 = Fitter.FitterMinuit(GLO1points, tDR1)
 #f = Fitter.FitterMinuit(GLOpoints, t)
 
 t.m.parameters['tNv'] = 0.6
-t.m.release_parameters('M02S','SECS','SECG', 'THIS', 'THIG', 'rv', 'bv', 'Mv', 'C', 'MC', 'trv', 'tbv')
-f = Fitter.FitterMinuit(DVCSpoints+GLO1points, t)
-#f = Fitter.FitterMinuit(DVCSpoints+data[48]+ALTGLO1points, t)
+t.m.parameters['tMv'] = 1.0
+t.m.parameters['Mv'] = 0.8
+t.m.release_parameters('M02S','SECS','SECG', 'THIS', 'THIG', 'rv', 'bv', 'C', 'MC', 'trv', 'tbv')
+#f = Fitter.FitterMinuit(DVCSpoints+GLO1points, t)
+f = Fitter.FitterMinuit(DVCSpoints+data[48]+ALTGLO1points, t)
 #f = Fitter.FitterMinuit(DVCSpoints+data[48]+GLO1points+HA17[::2], t)
 
