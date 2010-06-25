@@ -1,9 +1,10 @@
-# Master Makefile for gepard project 2008-09-03 
+# Master Makefile for gepard project 2010-06-25 
 
 # Interesting targets:
 # 	test     -  tests both DVCS and DIS routines
 # 	fit      -  fitting GPD ansatz to DVCS and DIS data
 # 	gepard.exe - Mathematica interface
+#   pygepard.so - python interface
 # 	html     -  HTML documentation
 # 	pdf      -  LaTeX -> PDF documentation
 # 	radcorr  -  program for producing Fig. 1 in hep-ph/0605237
@@ -21,8 +22,8 @@
 #     make DEBUG=1 <target> 
 #     make PROFILE=1 <target> 
 #
-# For compiling without cygwin.dll dependency
-# 	  make FFLAGS='-O -mno-cygwin' CFLAGS='-O2 -mno-cygwin' test
+# For compiling on Windows to create binary without cygwin.dll dependency
+# 	  make NOPGPLOT=1 FFLAGS='-O -mno-cygwin' CFLAGS='-O2 -mno-cygwin' gepard.exe
 #
 
 # ------------------------------------------------------------------------  

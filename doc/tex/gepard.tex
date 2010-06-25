@@ -51,14 +51,15 @@ $\sharp$\thecomment:} #1]}}
 \title{\texttt{gepard} --- Compton form factors and observables
                             by evolving moments of GEneral PARton 
                             Distributions}
-\author{Version: 0.9.4(unreleased)\footnote{For 
+\author{Version: 0.9.5\footnote{For 
 informations contact Kre\v{s}imir Kumeri\v{c}ki, \url{kkumer@phy.hr}}}
-\date{July 11th 2008}
+\date{June 25th 2010}
 \maketitle
 
 \begin{abstract}
-Fortran package \texttt{gepard} calculates singlet Compton form factor
-$\mathcal{H}$ and corresponding Compton cross-sections, beam charge
+Fortran package \texttt{gepard} calculates singlet Deeply Virtual Compton
+scattering (DVCS) form factor
+$\mathcal{H}$, and corresponding DVCS cross-sections, beam charge
 asymmetry, \ldots,  as well as
 DIS form factor $F_2$ by evolving GPDs in conformal moment space 
 from an ansatz shape specified at some input scale.  Together
@@ -112,7 +113,7 @@ $-\infty$). Because of this, by default $\phi = \pi/2$, for which this bug
 never occurs.}
 However if one uses different GPD ansatz, one should
 be aware of the position of the leading poles and choose $c$ accordingly. Also, if
-one uses $\overline{MS}$ scheme and \emph{non-diagonal evolution} (\texttt{SCHEME = 'MSBND'}),
+one uses $\overline{MS}$ scheme and \emph{non-diagonal evolution} (\texttt{SCHEME = 'MSBAR'}),
 one should not make $\phi$ too big or one runs in the danger of hitting poles of
 the evolution operator. In this case $\phi$ only slightly larger than (or
 equal to) $\pi/2$ is the safest choice.
@@ -174,11 +175,12 @@ move away from real axis, both
 amplitude and oscillation frequency decrease exponentially.
 This leads us to divide integration region in exponentially expanding segments
 defined by points:
-\begin{align*}
-0 \,\ldots\, 0.01 & \,\ldots\, 0.025 \,\ldots\, 0.067\,\ldots\, 0.18\,\ldots\, 0.5\,\ldots\, 1.3\,\ldots\, 3.7\,\ldots\, 10. \, \ldots \\
- & \ldots  \, 25. \, \ldots\, 67. \, \ldots\, 182. \, \ldots \, 500. \;,
+\begin{align}
+0 \,\ldots\, 0.01 & \,\ldots\, 0.08 \,\ldots\, 0.15 \,\ldots\, 0.3\,\ldots\, 0.5\,\ldots\, 
+1.0\,\ldots\, 1.5\,\ldots\, 2.0 \, \ldots  \nonumber \\
+ & \ldots  \, 4.0 \, \ldots\, 6.0 \, \ldots\, 8.0 \, \ldots \, 10.0 \;,
 \label{intervals}
-\end{align*}
+\end{align}
 for \texttt{SPEED=1}, while for higher values of \texttt{SPEED} segments
 are defined only using points number $(1, 1+SPEED, 1+ 2 SPEED, \ldots)$ from
 the above list (\ref{intervals}).
@@ -220,7 +222,7 @@ on an input scale by defining subroutine \texttt{HJ} which has the synopsis
 \end{verbatim}
 Input to the subroutine is the complex conformal moment \texttt{J} (i.e. coordinates of a point
 on the Melin-Barnes contour), and kinematical parameters \texttt{XI}$=\xi$ and
-\texttt{DEL2}$=t=\Delta^2$,
+\texttt{DEL2}$=t=\Delta^2$, which are provided via Fortran common block,
 while output should consist of corresponding values
 \begin{align}
 \texttt{FCM(1)}& =\, ^{\Sigma}\!H_{j} (\xi,\Delta^2,\mathcal{Q}_{0}^2)  \\
@@ -229,12 +231,11 @@ while output should consist of corresponding values
 \end{align}
 In the subroutine \texttt{HJ} provided with the software, there are several ansaetze 
 already implemented, such as \texttt{ANSATZ='SOFT'} and \texttt{ANSATZ='HARD'}
-used in \cite{Kumericki:2006xx}, as well as \texttt{ANSATZ='FITBP'}, used in
-\cite{Kumericki:2007sa}.
-Twenty four free parameters of this latter ansatz ($N_a$, $\alpha_{a}(0)$, $\alpha_{a}'$,
-$M_{0_a}$, $\Delta M_a$ and $p_a$ for  $a = \Sigma, G, u_{\rm val}, d_{\rm val}$),
-can either be fixed (e.g. in file \texttt{ansatz.f} used by example programs in
-subdirectory \texttt{ex}), or provided by the minimization routine for fitting, see
+used in \cite{Kumericki:2006xx}, \texttt{ANSATZ='FITBP'}, used in
+\cite{Kumericki:2007sa}, as well as \texttt{ANSATZ='FIT'}, used in
+\cite{Kumericki:2009uq}.
+Parameters of the ansaetze, contained in Fotran common block \texttt{PAR}, can
+be provided by the minimization routine for fitting, see
 Fig.~\ref{fig:fit.cmd}.
 
 
@@ -258,13 +259,15 @@ DIS form-factor ${}^{\rm S}F_2$
 \end{itemize}
 
 For calculating and testing DVCS form factors and observables the programs \texttt{test},
-\texttt{auxtest}, \texttt{radcorr}, and \texttt{scaledep} are provided at the
-moment. For doing example plots many programs are provided in subdirectory \texttt{ex}.
+\texttt{auxtest}, \texttt{radcorr}, \texttt{scaledep} and \texttt{houches}\footnote{Broken
+in present version but should be easy to fix.} are provided at the
+moment.
+For doing example plots many programs are provided in subdirectory \texttt{ex}.
 
 For fitting the GPD parameters using Minuit \cite{James:1975dr}, 
 as well as for calculating observables (by
 fixing all parameters to desired value), the program \texttt{fit} is provided, and
-also Mathematica interface for fitting and evaluating CFF.
+also Mathematica and python interfaces for fitting and evaluating CFF.
 
 \section{Initialization files}
 \label{sec:init}
@@ -279,8 +282,9 @@ the following files
 \end{itemize}
 The format and contents of these files should be mostly clear by looking at provided
 examples, and detailed explanations follow in the next subsections. Names of the
-files used instead of \texttt{fit.dat} and \texttt{fit.cmd} can be specified
-as command-line options of fitting program, see Section \ref{sect:examplerun}.
+files used (default names are \texttt{fit.dat} and \texttt{fit.cmd}) can be specified
+as command-line options of fitting program (or options to Mathematica functions), 
+see Section \ref{sect:examplerun}.
 
 \textbf{NB:} Various constants in these files should be specified
 according to Fortran 77 standard! Thus, integers should be without dot (e.g.
@@ -319,8 +323,8 @@ order of entries should correspond to code in that subroutine.
 1.956      PHI          angle MB contour makes with positive real axis
 -0.25      CND          same as C, but for ND evolution MB contour
 1.57       PHIND        same as PHI, for ND evolution MB contour
-'CSBAR'    SCHEME       'CSBAR', 'MSBAR', 'MSBLO', 'MSBND', 'ZEROG', ...
-'FIT'      ANSATZ       GPD ansatz label. Usually FIT, SPLICE or MMA
+'CSBAR'    SCHEME       'CSBAR', 'MSBAR', 'MSBLO'
+'FIT'      ANSATZ       GPD ansatz label. Usually FIT, TEST or MMA
 
 \end{verbatim}
 \hrule
@@ -394,24 +398,17 @@ Can presently be
 \item \texttt{'MSBAR'}: $\overline{MS}$, including non-diagonal evolution
 \item \texttt{'MSBDI'}: $\overline{MS}$, only diagonal evolution
 \item \texttt{'MSBLO'}: $\overline{MS}$, evolution is LO only
-\item \texttt{'ZEROQ'}, \texttt{'TRAJQ'}: $\mbox{\boldmath $C$} = (1,0)$ to all orders
-\item \texttt{'ZEROG', \texttt{'TRAJG'}}: $\mbox{\boldmath $C$} = (0,1)$ to all orders
 \end{itemize}
-Last two are not really renormalization schemes, but just a way to calculate
-just a GPD or PDF evolution, without multiplying with Wilson coefficients.
-For example, scheme \texttt{'ZEROG'} is used in Sect. \ref{sec:tests} to calculate
-evolution of Les Houches benchmark PDFs.
 
 \item
 \texttt{ANSATZ} --- \emph{Character*6}. Label of ansatz for conformal moments of GPDs on input scale. 
 It should correspond to one of  \texttt{IF\ldots ELSE IF} stanzas in subroutine
 \texttt{HJ} in file \texttt{hj.f}. Defaultly implemented ansaetze are
-\texttt{TOY} (used in some old development Mathematica notebooks), \texttt{SOFT} and \texttt{HARD},
+\texttt{TOY} and \texttt{TEST} (used in development and testing), \texttt{SOFT} and \texttt{HARD},
 corresponding to ansaetze from \cite{Kumericki:2006xx}, \texttt{FITBP}, corresponding
-to ansatz used in \cite{Kumericki:2007sa}, and \texttt{FIT}, corresponding to a new
-ansatz including skewness dependence.\footnote{Presently, \texttt{FIT} has
-$\beta_S + 1 = 9$ and $\beta_{G}+1=7$, while most of the other ansaetze and \texttt{FIT86} have
-$\beta_S + 1 = 8$ and $\beta_{G}+1=6$.}
+to ansatz used in \cite{Kumericki:2007sa}, and \texttt{FIT}, corresponding to
+ansatz described in  \cite{Kumericki:2009uq} which includes first three terms in SO(3)
+partial wave expansion.
 
 
 There are also two special values for \texttt{ANSATZ}. First is \texttt{ANSATZ = 'MMA'}, which
@@ -714,7 +711,7 @@ By default \texttt{OUTFILE=fit}, but this can be changed by second command-line
 argument of fitting program \texttt{fit}. Thus \texttt{fit  dvcs dvcsnlo test}
 will use \texttt{dvcs.dat} instead of \texttt{fit.dat} for reading required
 datasets, Minuit commands will be read from \texttt{test.cmd} instead of
-\texttt{fit.cmd} and results will go to \texttt{dvcsnlo.out} and \texttt{dvcsnlo.ps} (as well as \texttt{OUTFILE.mnt}).
+\texttt{fit.cmd} and results will go to \texttt{dvcsnlo.out} and \texttt{dvcsnlo.ps} (as well as \texttt{dvcsnlo.mnt}).
 
 
 
@@ -767,11 +764,11 @@ For such comparison we used package {\sc QCD-Pegasus} \cite{Vogt:2004ns} for fas
 In particular, we compared evolution of gluonic PDF, which is easiest to compare.
 
 To make \texttt{gepard} calculate only evolution of gluonic PDFs, we use
-\texttt{SCHEME} = \texttt{ZEROG} which
+\texttt{PROCESS} = \texttt{DVCSZG} in the code, which 
 makes Wilson coefficient vector equal to $(C_{\Sigma}, C_G) = (0, 1)$
-to all orders. Then the same routine that normally calculates DIS form factor
-$F_2(x)$ gives $x g(x)$, up
-to the charge factor $Q_s$. We also implemented \texttt{ANSATZ} = \texttt{HOUCHE}, corresponding to the
+to all orders and sets charge factor $Q_s=1$ . Then imaginary part of CFF for forward 
+kinematics gives $ \pi x g(x)$.
+ We also implemented \texttt{ANSATZ} = \texttt{HOUCHE}, corresponding to the
 input form of PDFs as used by \cite{Vogt:2004ns}. This is so called Les Houches benchmark PDF
 input \cite{Giele:2002hx}.  Finally, to have the same treatment of perturbative expansion of
 the solution to RGE, one sets {\sc QCD-Pegasus} parameter \texttt{IMODEV = 3}, as explained in
@@ -831,7 +828,7 @@ Main ``high level'' functions for accessing Gepard from mathematica are followin
 \begin{tabular}{rp{8cm}}%
 \defboxitem{GepardFit}{ \{par1, par2, \ldots\}, options}{Simple fitting of data to 
 variable parameters \{par1, par2, \ldots\}} \\[0.8ex]
-\defboxitem{JustCali3}{ \{par1, par2, \ldots\}, options}{Just prints out initial chi-square without
+\defboxitem{JustCali3}{ \{par1, par2, \ldots\}, options}{Just prints out chi-square without
 any fitting. Useful for checking ansaetze and debugging}\\[0.8ex]
 \defboxitem{cffH}{xi, t, q2, q02, options}{Returns singlet Compton form factor
 $\mathcal{H}(xi=\xi, t=\Delta^2, q2=\mathcal{Q}^2, q02=\mathcal{Q}_{0}^2)$.}\\[0.8ex]
@@ -859,7 +856,7 @@ be overriden by \emph{options}:
 \emph{option name} & \emph{default value} & \\ \hline
 \optboxitem{SPEED}{in \emph{GEPARD.INI}}{speed of execution} \\
 \optboxitem{P}{in \emph{GEPARD.INI}}{order of perturbation series N$^{P}$LO}\\
-\optboxitem{SCHEME}{in \emph{GEPARD.INI}}{factorization scheme (CSBAR, MSBND, \ldots)}\\
+\optboxitem{SCHEME}{in \emph{GEPARD.INI}}{factorization scheme (CSBAR, MSBAR, \ldots)}\\
 \optboxitem{ANSATZ}{in \emph{GEPARD.INI}}{ansatz used (MMA, SPLICE, FIT, \ldots)}\\
 \optboxitem{DATFILE}{\emph{fit}}{file DATFILE.dat specifies fitting datasets.}\\
 \optboxitem{OUTFILE}{\emph{fit}}{output to go to OUTFILE.out and OUTFILE.ps}
@@ -882,6 +879,7 @@ depending, apart from explicit arguments $j$, $t$, and $xi$, only on
 parameters \mmacomm{PAR[n]}, where $n$ corresponds to the elements of first column of the \mmacomm{Parameters}
 array described below. (Same for PDFs with \mmacomm{GPD}$\to$\mmacomm{PDF} above.) 
 After defining this function, it has to be compiled by issuing command \mmacomm{CompileMoments[]}.
+See section \emph{``Ansatz definition''} in example Mathematica notebook.
 
 \item[\texttt{SPLICE}] 
 One defines moments in exactly the same way as in point 1 above, but then, instead of compiling
@@ -1034,6 +1032,14 @@ for a system with \emph{dof} degrees of freedom will be larger than or equal to 
 \end{minipage}}\\[0.5ex]
 {\small Functions for displaying results II.}
 \end{flushleft}
+
+
+\section{Python interface}
+
+Since version 0.9.5 there is also a Python interface to GeParD, completely
+contained in python extension module \texttt{pygepard.so} which can be
+normally imported in python. Usage is presently undocumented. See 
+examples in separate python GPD software package \texttt{pype} (working name).
 
 \section{Algorithmic structure of \texttt{gepard} and its subroutines}
 

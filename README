@@ -1,13 +1,9 @@
-2010-06-23 
+2010-06-25 
 
 gepard - Package for evolving conformal moments of GEneral PARton 
          Distributions and calculation of DVCS form factors and observables
 
-- Version 0.9.4beta (unreleased yet)
-- This particular version is obtained by merging changes from nlso3ng
-  branch so some things are broken. At least:
-    - houches
-    - using 'MMA' ansatz  ('FIT' ansatz in mma seems to be working)
+- Version 0.9.5
 
 ------------------------------------------------------------------------  
 Note that there is additional documentation in gepard manual
@@ -43,6 +39,7 @@ Contents of this README
         3.2 Fortran part
         3.3 Mathematica part (obsolete)
                 3.3.1 Calculating CFFs in Mathematica
+        3.4 Python part
 
 
 ========================================

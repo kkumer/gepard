@@ -1,5 +1,5 @@
 set print pretty on
-set args 'dvcs' 'thi' 'thi'
+#set args 'dvcs' 'thi' 'thi'
 
 # macro for jumping
 define bj
@@ -25,5 +25,5 @@ break cfff_
 #break fcn_
 #break evolc_
 #break BCAInternal
-#run -linkmode listen -linkname 5000
-run
+run -linkmode connect -linkname 5000
+#run

@@ -1,6 +1,6 @@
-2008-09-11 
+2010-06-25 
 
-Version 0.9.4  (unreleased yet)
+Version 0.9.5 2010-06-25 
 
 	- ADD: Evaluation of gamma function is also controlled by
 	       SPEED, saving significant time in fitting
