@@ -109,7 +109,7 @@ def subplot(ax, sets, lines=[], band=[], xaxis=None, kinlabels=[], plotlines=Tru
     # [5] Annotations
     # constant kinematic variables positioning
     labx = min(0, min(xval)) + (max(xval) - min(0, min(xval))) * 0.35
-    laby = min(0, min(yval)) + (max(yval) - min(0, min(yval))) * 0.05
+    laby = min(0, min(yval)) + (max(yval) - min(0, min(yval))) * 0.02
     labtxt = ""
     for lab in kinlabels:
         try:
@@ -297,7 +297,7 @@ def HALLAphi(lines=[], band=[], path=None, fmt='png'):
     subsets[21] = utils.select(data[34], criteria=['t == -0.17'])
     subsets[23] = utils.select(data[34], criteria=['t == -0.28'])
     subsets[24] = utils.select(data[34], criteria=['t == -0.33'])
-    title = '' # 'HALLA-06'
+    title = 'HALLA-06'
     fig = plt.figure()
     fig.canvas.set_window_title(title)
     fig.suptitle(title)
@@ -306,6 +306,16 @@ def HALLAphi(lines=[], band=[], path=None, fmt='png'):
         ax = fig.add_subplot(2,3,panel)
         subplot(ax, [subsets[id]], lines, band, 'phi', ['Q2', 't'])
         ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(2.))
+        ax.set_xlabel('$\\phi\\; {\\rm [rad]}$', fontsize=15)
+        if not(panel==1 or panel==4):
+            # Leave labels only on leftmost panels
+            ax.set_ylabel('')
+        elif panel==1:
+            ax.set_ylabel('$d^4\\Sigma/(dQ^2\\! dx_{\\rm B}dt d\\phi)\\quad \
+                    [{\\rm nb/GeV}^4]$', fontsize=18)
+        else: # panel 4
+            ax.set_ylabel('$d^4\\sigma/(dQ^2\\! dx_{\\rm B}dt d\\phi)\\quad  \
+                    [{\\rm nb/GeV}^4]$', fontsize=18)
         panel += 1
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
@@ -553,7 +563,7 @@ def H(theories=[], path=None, fmt='png'):
     TODO: This should be a method of Model.
     
     """
-    title = '' # 'Fig 15'
+    title = 'GPD H at LO' # 'Fig 15'
     fig = plt.figure()
     fig.canvas.set_window_title(title)
     fig.suptitle(title)
@@ -684,10 +694,9 @@ def _axband(ax, tm, xvals, fun, color='g'):
     ax.fill(x, y, facecolor=color, alpha=0.5)
 
 def CFF(t, cffs=None, path=None, fmt='png'):
-    """Makes plot of cffs given by theories in lines and band.
+    """Makes plot of cffs given by neural network
     
-    t     -- Neural network 'theory', or a list of 'theories' defining 
-             band by their mean and standard deviation
+    t     -- Neural network 'theory'
     cffs  -- List of CFFs to be plotted. Each produces two panels.
 
     """
@@ -703,7 +712,7 @@ def CFF(t, cffs=None, path=None, fmt='png'):
     tms = [0.0, 0.3]
     # Define abscissas
     logxvals = np.power(10., np.arange(-3.5, 0, 0.1))  # left panel
-    xvals = np.linspace(0.05, 0.2, 20) # right panel
+    xvals = np.linspace(0.025, 0.1, 20) # right panel
     # Plot panels
     for n in range(len(cffs)):
         cff = cffs[n]

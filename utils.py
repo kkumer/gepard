@@ -212,8 +212,8 @@ def npars(m):
     """Return number of free (not fixed) parameters of MINUIT object m."""
 
     n = 0
-    for key in m.fixed:
-        if not m.fixed[key]:
+    for key in m.parameter_names:
+        if m.parameters.has_key('fix_'+key) and not m.parameters['fix_'+key]:
             n += 1
     return n
 

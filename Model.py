@@ -24,9 +24,9 @@ class Model(object):
 
     def __init__(self):
         # Intially all parameters are fixed and should be released by user
-        exec('self.fixed = {' + ", ".join(map(lambda x: "'fix_%s': %s" % x, 
+        exec('fixed = {' + ", ".join(map(lambda x: "'fix_%s': %s" % x, 
                     zip(self.parameter_names, len(self.parameter_names)*['True']))) + '}')
-        self.parameters.update(self.fixed)
+        self.parameters.update(fixed)
 
     def release_parameters(self, *args):
         """Release parameters for fitting.
@@ -39,22 +39,20 @@ class Model(object):
             if par not in self.parameter_names:
                 raise ValueError('Parameter "%s" is not defined in model %s' 
                         % (par, self))
-            self.fixed['fix_'+par] = False
-        self.parameters.update(self.fixed)
+            self.parameters['fix_'+par] = False
 
     def fix_parameters(self, *args):
         """Fix parameters so they are not fitting variables."""
         if args[0] == 'ALL':
             # fix 'em all
             for par in self.parameter_names:
-                self.fixed['fix_'+par] = True
+                self.parameters['fix_'+par] = True
         else:
             for par in args:
                 if par not in self.parameter_names:
                     raise ValueError('Parameter "%s" is not defined in model %s' 
                             % (par, self))
-                self.fixed['fix_'+par] = True
-        self.parameters.update(self.fixed)
+                self.parameters['fix_'+par] = True
 
     def print_parameters(self, compare_with=[]):
         """Pretty-print parameters and their values.
@@ -70,7 +68,6 @@ class Model(object):
         for name in self.parameter_names:
             value = self.parameters[name]
             row = '%4s -> %-5.3g' % (name, value)
-            #if self.fixed['fix_'+name] == False:
             if self.parameters.has_key('limit_'+name):
                 lo, hi = self.parameters['limit_'+name]
                 if (abs((lo-value)*(hi-value)) < 0.001):
@@ -406,7 +403,7 @@ class ComptonModelDRsea(ComptonDispersionRelations):
             - pt.t/2.)**2))/((0.0196 - pt.t)*pt.xi)
 
 
-class ComptonNeuralNets(ComptonFormFactors):
+class ComptonNeuralNets(Model):
     """Neural network CFFs"""
 
     def __init__(self, hidden_layers=[7], output_layer=['ImH', 'ReH']):
@@ -429,7 +426,7 @@ class ComptonNeuralNets(ComptonFormFactors):
         self.parameters = {'nnet':0, 'outputvalue':None}
         self.parameter_names = ['nnet', 'outputvalue']
         # now do whatever else is necessary
-        ComptonFormFactors.__init__(self)
+        #ComptonFormFactors.__init__(self)
 
     def __getattr__(self, name):
         """Return appropriate CFF function object."""

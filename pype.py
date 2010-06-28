@@ -21,7 +21,7 @@ db = shelve.open('theories.db')
 ## [2] Choose subset of datapoints for fitting
 
 testpoints = data[31][12:14] + data[8][1:3] + data[30][2:4]  # test set
-GLOpoints = data[31][12:] + data[8] + data[29]  # DM's GLO set
+GLOpoints = data[33][12:] + data[8] + data[29]  # DM's GLO set
 GLO1points = data[31][12:] + data[8] + data[29] + data[30]  # DM's GLO1 set
 HERMESpoints = data[31][12:] +  data[29]
 BSApoints = data[8] + data[29]
@@ -32,14 +32,16 @@ HA33 = utils.select(data[34], criteria=['t == -0.33'])
 DVCSpoints = data[36] + data[37] + data[38] + data[39] + \
   data[40] + data[41] + data[42] + data[43] + data[44] + \
   data[45]
+ALTGLOpoints = data[5] + data[25] + data[32][18:]
 ALTGLO1points = data[5] + data[25] + data[32] + HAD17 + HA17
-ALTGLO2points = data[5] + data[25] + data[32] + data[30]
+ALTGLO2points = data[5] + data[25] + data[32][18:] + HAD17[::2] + HA17[::2]
+ALTGLO3points = data[5] + data[25] + data[32][18:] + data[30]
 
 
 ## [3] Create a theory
 
 # Gepard only
-mGepard = Model.ComptonGepard(cutq2=2.0)
+mGepard = Model.ComptonGepard(cutq2=0.5)
 tGepard = Approach.hotfixedBMK(mGepard)
 
 # DR only
@@ -90,11 +92,11 @@ setpar(27, -0.81217)
 setpar(28,  0.)
 setpar(29,  0.)
 setpar(32,  0.)
-setpar(42,  0.)
+setpar(42,  -0.9)
 t.m.g.parint.p = 0
 
 
-#t.m.parameters.update(hy1THI)
+t.m.parameters.update(ALTGLO)
 
 t.m.g.init()
 
@@ -111,11 +113,12 @@ fDR1 = Fitter.FitterMinuit(GLO1points, tDR1)
 #t.m.release_parameters('rv', 'bv', 'C', 'MC', 'trv', 'tbv')
 #f = Fitter.FitterMinuit(GLOpoints, t)
 
-t.m.parameters['tNv'] = 0.6
-t.m.parameters['tMv'] = 1.0
-t.m.parameters['Mv'] = 0.8
-t.m.release_parameters('M02S','SECS','SECG', 'THIS', 'THIG', 'rv', 'bv', 'C', 'MC', 'trv', 'tbv')
-#f = Fitter.FitterMinuit(DVCSpoints+GLO1points, t)
-f = Fitter.FitterMinuit(DVCSpoints+data[48]+ALTGLO1points, t)
+#t.m.parameters['tNv'] = 0.6
+#t.m.parameters['tMv'] = 0.8
+#t.m.parameters['Mv'] = 0.8
+t.m.release_parameters('M02S','SECS','SECG', 'THIS', 'THIG', 'rv', 'bv', 'Mv', 'C', 'MC', 'trv', 'tbv', 'tMv')
+#t.m.release_parameters('M02S','SECS','SECG', 'THIS', 'THIG', 'rv', 'bv', 'C', 'MC', 'trv', 'tbv')
+#f = Fitter.FitterMinuit(DVCSpoints+data[48]+ALTGLO1points, t)
+f = Fitter.FitterMinuit(DVCSpoints+data[48]+ALTGLO2points, t)
 #f = Fitter.FitterMinuit(DVCSpoints+data[48]+GLO1points+HA17[::2], t)
 
