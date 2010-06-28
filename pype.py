@@ -96,7 +96,7 @@ setpar(42,  -0.9)
 t.m.g.parint.p = 0
 
 
-t.m.parameters.update(ALTGLO)
+t.m.parameters.update(ALTGLO2)
 
 t.m.g.init()
 

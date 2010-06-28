@@ -166,12 +166,12 @@ def HERMES09(lines=[], band=[], path=None, fmt='png'):
     """Plot HERMES 0909.3587 BCA and BSA data with fit lines."""
 
     #ids = [2, 4, 5]
-    title = '' #'HERMES-08'
+    title = 'HERMES 09'
     fig = plt.figure()
     fig.canvas.set_window_title(title)
     fig.suptitle(title)
     xaxes = ['tm', 'xB', 'Q2']
-    ylims = [(-0.05, 0.24), (-0.15, 0.05), (-0.45, 0.05)]
+    ylims = [(-0.05, 0.3), (-0.15, 0.15), (-0.45, 0.05)]
     # we have 3x18=54 points to be separated in nine panels six points each:
     for y, id, shift in zip(range(3), [32, 32, 5], [18, 0, 0]):
         for x in range(3):
@@ -180,6 +180,19 @@ def HERMES09(lines=[], band=[], path=None, fmt='png'):
             ax.yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))  # tickmarks
             subplot(ax, [data[id][x*6+shift:x*6+6+shift]], lines, band, xaxes[x], [])
             apply(ax.set_ylim, ylims[y])
+            if (panel % 3) != 1:
+                # Leave labels only on leftmost panels
+                ax.set_ylabel('')
+            else:
+                ylabels = ['$BCA\\; \\cos \\phi$', '$BCA\\; \\cos 0\\phi$', '$BSA\\; \\sin\\phi$']
+                ax.set_ylabel(ylabels[(panel-1)/3], fontsize=18)
+
+            if panel < 7:
+                # Leave labels only on lowest panels
+                ax.set_xlabel('')
+            else:
+                xlabels = ['$-t\\; [{\\rm GeV}^2]$', '$x_B$', '$Q^2\\; [{\\rm GeV}^2]$']
+                ax.set_xlabel(xlabels[panel-7], fontsize=18)
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
@@ -192,7 +205,7 @@ def CLAS(lines=[], band=[], path=None, fmt='png'):
 
     #datafile = "data/ep2epgamma-ALU-CLAS_KK-07.dat" # id = 25
     dataset = data[25]
-    title = ''
+    title = 'CLAS 07'
     fig = plt.figure()
     fig.canvas.set_window_title(title)
     fig.suptitle(title)
@@ -221,6 +234,13 @@ def CLAS(lines=[], band=[], path=None, fmt='png'):
         plt.xlim(0.0, 0.6)
         plt.ylim(0.0, 0.4)
         ax.yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))
+        if (panel % 3) != 1:
+            # Leave labels only on leftmost panels
+            ax.set_ylabel('')
+        if panel < 7:
+            ax.set_xlabel('')
+        else:
+            ax.set_xlabel('$-t\\; [{\\rm GeV}^2]$', fontsize=18)
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
@@ -269,7 +289,7 @@ def H1ZEUS(lines=[], band=[], path=None, fmt='png'):
             utils.select(data[41], criteria=['Q2 == 25.'])]
     subsets[4] = [data[45], data[47]] # ZEUS Q2-dep
     xs = ['t', 't', 'W', 'Q2']
-    title = 'H1/ZEUS'
+    title = 'H1 07 / ZEUS 08'
     fig = plt.figure()
     fig.canvas.set_window_title(title)
     fig.suptitle(title)
@@ -297,7 +317,7 @@ def HALLAphi(lines=[], band=[], path=None, fmt='png'):
     subsets[21] = utils.select(data[34], criteria=['t == -0.17'])
     subsets[23] = utils.select(data[34], criteria=['t == -0.28'])
     subsets[24] = utils.select(data[34], criteria=['t == -0.33'])
-    title = 'HALLA-06'
+    title = 'HALL A 06'
     fig = plt.figure()
     fig.canvas.set_window_title(title)
     fig.suptitle(title)
@@ -306,7 +326,7 @@ def HALLAphi(lines=[], band=[], path=None, fmt='png'):
         ax = fig.add_subplot(2,3,panel)
         subplot(ax, [subsets[id]], lines, band, 'phi', ['Q2', 't'])
         ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(2.))
-        ax.set_xlabel('$\\phi\\; {\\rm [rad]}$', fontsize=15)
+        ax.set_xlabel('$\\phi\\; {\\rm [rad]}$', fontsize=18)
         if not(panel==1 or panel==4):
             # Leave labels only on leftmost panels
             ax.set_ylabel('')
