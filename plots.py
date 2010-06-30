@@ -59,7 +59,7 @@ def subplot(ax, sets, lines=[], band=[], xaxis=None, kinlabels=[], plotlines=Tru
         setn += 1
     # [2] Theory lines
     lineshapes = ['s', '^', 'd', 'h']  # first squares, then triangles, diamonds, hexagons
-    linecolors = ['red', 'green', 'brown', 'purple']  # squares are red, etc.
+    linecolors = ['red', 'green', 'blue', 'purple']  # squares are red, etc.
     linestyles = ['-', '--', '-.', ':']  # solid, dashed, dot-dashed, dotted
     linen = 0
     for theory in lines:
@@ -287,7 +287,7 @@ def H1ZEUS(lines=[], band=[], path=None, fmt='png'):
             utils.select(data[41], criteria=['Q2 == 8.']),
             utils.select(data[41], criteria=['Q2 == 15.5']), 
             utils.select(data[41], criteria=['Q2 == 25.'])]
-    subsets[4] = [data[45], data[47]] # ZEUS Q2-dep
+    subsets[4] = [data[47]] # ZEUS Q2-dep
     xs = ['t', 't', 'W', 'Q2']
     title = 'H1 07 / ZEUS 08'
     fig = plt.figure()
@@ -299,6 +299,34 @@ def H1ZEUS(lines=[], band=[], path=None, fmt='png'):
         subplot(ax, subsets[panel], lines, band, xs[panel-1])
         if panel < 3:
             ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.2))
+        # y labels
+        if panel==1:
+            ax.set_ylabel('$d\\sigma/dt\\quad [{\\rm nb/GeV}^2]$', fontsize=18)
+        elif panel==3:
+            ax.set_ylabel('$\\sigma\\quad [{\\rm nb}]$', fontsize=18)
+        else: # panel 4
+            ax.set_ylabel('')
+        # x labels
+        if panel==1 or panel==2:
+            ax.set_xlabel('$t\\quad [{\\rm GeV}^2]$', fontsize=18)
+        elif panel==3:
+            ax.set_xlabel('$W\\quad [{\\rm GeV}]$', fontsize=18)
+        else: # panel 4
+            ax.set_xlabel('$Q^2\\quad [{\\rm GeV}^2]$', fontsize=18)
+        if panel==1:
+            ax.text(-0.8, 22, '${\\rm H1}$', fontsize=16)
+            ax.text(-0.8, 12, '${\\rm W = 82}\\, {\\rm GeV}$', fontsize=14)
+            ax.text(-0.8, 6, '$Q^2\\!= 8,\\, 15.5,\\, 25\\,{\\rm GeV}^2$', fontsize=14)
+        if panel==2:
+            ax.text(-0.3, 6, '${\\rm ZEUS}$', fontsize=16)
+            ax.text(-0.3, 4.5, '${\\rm W = 104}\\, {\\rm GeV}$', fontsize=14)
+            ax.text(-0.3, 3.3, '$Q^2\\!= 3.2\\,{\\rm GeV}^2$', fontsize=14)
+        if panel==3:
+            ax.text(50, 28, '${\\rm ZEUS}\\, (idem):$', fontsize=16)
+            ax.text(50, 5, '${\\rm H1}\\, (idem):$', fontsize=16)
+        else: # panel==4
+            ax.text(30, 3, '${\\rm ZEUS}\\, (idem)$', fontsize=16)
+            #ax.set_xlim(0, 80)
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
@@ -372,7 +400,7 @@ def COMPASS(lines=[], band=[], path=None, fmt='png'):
     phi = np.arange(0., np.pi, 0.2)
     utils.fill_kinematics(pt)
     linestyles = ['g--', 'b-', 'r-.']
-    labels = ['HERMES+CLAS', 'HERMES+CLAS+HALLA', '+HALLA(phi)']
+    labels = ['', '', '']
     #labels = ['GLO1 (DM)', 'GLO1 (KK)', '']
     pn = 0
     for approach in lines:
@@ -403,7 +431,7 @@ def COMPASS(lines=[], band=[], path=None, fmt='png'):
     phi = np.arange(0., np.pi, 0.2)
     utils.fill_kinematics(pt)
     linestyles = ['g--', 'b-', 'r-.']
-    labels = ['HERMES+CLAS', 'HERMES+CLAS+HALLA', '+HALLA(phi)']
+    labels = ['', '', '']
     #labels = ['GLO1 (DM)', 'GLO1 (KK)', '']
     pn = 0
     for approach in lines:
@@ -435,7 +463,8 @@ def COMPASS(lines=[], band=[], path=None, fmt='png'):
     ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
     phi = np.arange(0., np.pi, 0.2)
     linestyles = ['g--', 'b-', 'r-.']
-    labels = ['HERMES+CLAS', 'HERMES+CLAS+HALLA', '+HALLA(phi)']
+    #labels = ['HERMES+CLAS', 'HERMES+CLAS+HALLA', '+HALLA(phi)']
+    labels = ['', '', '']
     #labels = ['GLO1 (DM)', 'GLO1 (KK)', '']
     pn = 0
     for approach in lines:
@@ -547,8 +576,8 @@ def EIC(fits=[], path=None, fmt='png'):
     ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
     phi = np.arange(0., 2*np.pi, 0.2)
     utils.fill_kinematics(pt)
-    linestyles = ['g--', 'b-']
-    labels = ['polarized ' + t.name for t in fits]
+    linestyles = ['b-.', 'p:', 'r-', 'g--'] 
+    labels = [r'$\sigma^{\uparrow}$ ' + t.name for t in fits]
     pn = 0
     for approach in fits:
         approach.__class__.to_conventions(pt)
@@ -556,8 +585,8 @@ def EIC(fits=[], path=None, fmt='png'):
         line = approach.Xunp(pt, vars={'phi':phi})
         ax.plot(phi, line, linestyles[pn], linewidth=1, label=labels[pn]) 
         pn += 1
-    linestyles = ['r-.', 'p:']
-    labels = ['unpolarized ' + t.name for t in fits]
+    linestyles = ['r-', 'g--', 'b-.', 'p:'] 
+    labels = ['$(\\sigma^{\\uparrow} + \\sigma^{\\downarrow})/2$ ' + t.name for t in fits]
     pn = 0
     for approach in fits:
         approach.__class__.to_conventions(pt)
@@ -567,9 +596,16 @@ def EIC(fits=[], path=None, fmt='png'):
         pn += 1
     #ax.set_ylim(0.0, 0.5)
     # axes labels
-    ax.set_xlabel('$\\phi$')
-    ax.set_ylabel('Cross section')
+    ax.set_xlabel('$\\phi\\quad {\\rm [rad]}$', fontsize=20)
+    ax.set_ylabel('$\\sigma\\quad {\\rm [nb]}$', fontsize=20)
+    #ax.legend(loc=(0.3,0))
     ax.legend()
+    ax.text(0.7, 87., "EIC", fontsize=18)
+    ax.text(0.7, 82., "$E_e = %d \\,{\\rm GeV}$" % pt.in1energy, fontsize=18)
+    ax.text(0.7, 79., "$E_p = %d \\,{\\rm GeV}$" % pt.in2energy, fontsize=18)
+    ax.text(0.7, 76., "$x_B = %s$" % pt.xB, fontsize=18)
+    ax.text(0.7, 73., "$Q^2 = %s \\,{\\rm GeV}^2$" % pt.Q2, fontsize=18)
+    ax.text(0.7, 71., "$t = %s \\,{\\rm GeV}^2$" % pt.t, fontsize=18)
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
@@ -622,8 +658,8 @@ def H(theories=[], path=None, fmt='png'):
     ax.set_ylabel('$x H(x, x, t)$', fontsize=18)
     ax.legend()
     #ax.text(0.001, 0.405, "t = 0")
-    ax.text(0.001, 0.30, "t = -0.1 GeV^2")
-    ax.text(0.001, 0.12, "t = -0.3 GeV^2")
+    ax.text(0.001, 0.27, "$t = -0.1\\, {\\rm GeV}^2$", fontsize=15)
+    ax.text(0.001, 0.12, "$t = -0.3\\, {\\rm GeV}^2$", fontsize=15)
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:

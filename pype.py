@@ -21,7 +21,7 @@ db = shelve.open('theories.db')
 ## [2] Choose subset of datapoints for fitting
 
 testpoints = data[31][12:14] + data[8][1:3] + data[30][2:4]  # test set
-GLOpoints = data[33][12:] + data[8] + data[29]  # DM's GLO set
+GLOpoints = data[31][12:] + data[8] + data[29]  # DM's GLO set
 GLO1points = data[31][12:] + data[8] + data[29] + data[30]  # DM's GLO1 set
 HERMESpoints = data[31][12:] +  data[29]
 BSApoints = data[8] + data[29]
@@ -35,7 +35,7 @@ DVCSpoints = data[36] + data[37] + data[38] + data[39] + \
 ALTGLOpoints = data[5] + data[25] + data[32][18:]
 ALTGLO1points = data[5] + data[25] + data[32] + HAD17 + HA17
 ALTGLO2points = data[5] + data[25] + data[32][18:] + HAD17[::2] + HA17[::2]
-ALTGLO3points = data[5] + data[25] + data[32][18:] + data[30]
+ALTGLO3points = data[5] + data[25] + data[32][18:] + data[30] + HA17
 
 
 ## [3] Create a theory
@@ -119,6 +119,7 @@ fDR1 = Fitter.FitterMinuit(GLO1points, tDR1)
 t.m.release_parameters('M02S','SECS','SECG', 'THIS', 'THIG', 'rv', 'bv', 'Mv', 'C', 'MC', 'trv', 'tbv', 'tMv')
 #t.m.release_parameters('M02S','SECS','SECG', 'THIS', 'THIG', 'rv', 'bv', 'C', 'MC', 'trv', 'tbv')
 #f = Fitter.FitterMinuit(DVCSpoints+data[48]+ALTGLO1points, t)
-f = Fitter.FitterMinuit(DVCSpoints+data[48]+ALTGLO2points, t)
+#f = Fitter.FitterMinuit(DVCSpoints+data[48]+ALTGLO2points, t)
+f = Fitter.FitterMinuit(DVCSpoints+data[48]+ALTGLO3points, t)
 #f = Fitter.FitterMinuit(DVCSpoints+data[48]+GLO1points+HA17[::2], t)
 
