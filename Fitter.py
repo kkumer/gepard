@@ -175,22 +175,24 @@ class FitterBrain(Fitter):
                     n, memerr, chi, fitprob)
         return self.theory
 
-    def prune(minprob=0.01):
+    def prune(self, minprob=0.01):
         """Remove nets with low chi-square probability."""
         bad = []
         for n in range(self.nnets):
+            self.theory.model.parameters['nnet'] = n
             chi, dof, fitprob = self.theory.chisq(self.fitpoints)
             print "Net %2i ---> P(chisq = %1.2f) = %5.4f " % (
                     n, chi, fitprob)
             if fitprob < minprob:
-                print "chi-square probability less than %5.4f. Removing net %2i" % (
+                print "       P <  %5.4f. Removing net %2i" % (
                         minprob, n)
                 bad.append(n)
         goodnets = []
-        for n in range(self.nets):
+        for n in range(len(self.theory.model.nets)):
             if not bad.count(n):
-                goodnets.append(t.m.nets[n])
+                goodnets.append(self.theory.model.nets[n])
         # replace all nets with good ones
         self.theory.model.nets = goodnets
+        self.nnets = len(goodnets)
         return self.theory
 
