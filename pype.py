@@ -18,6 +18,7 @@ data.update(utils.loaddata('data/gammastarp2gammap'))
 db = shelve.open('theories.db')
 
 
+
 ## [2] Choose subset of datapoints for fitting
 
 testpoints = data[31][12:14] + data[8][1:3] + data[30][2:4]  # test set
@@ -67,44 +68,53 @@ tDR1.m.parameters.update(DMepsGLO1)
 def setpar(i, val):
     mGepard.parameters[mGepard.parameters_index[i]] = val
 
+# NN
+mNN = Model.ModelNN(hidden_layers=[9])
+tNN = Approach.hotfixedBMK(mNN)
+tNN.name = 'NNtest'
+tNN.description = 'testpoints'
+
 ## [4] Do the fit
 
 
-#f = Fitter.FitterBrain(fitpoints, t, nnets=12, nbatch=150, verbose=1)
-#f.fit()
-setpar(11,  0.15203911208796006)
-setpar(12,  1.1575060246398083)
+f = Fitter.FitterBrain(testpoints, tNN, nnets=4, nbatch=500, verbose=1)
+f.fit()
+#tNN.save(db)
+#db.close()
+
+#setpar(11,  0.15203911208796006)
+#setpar(12,  1.1575060246398083)
 #setpar(31,  8.0)
-setpar(13,  0.15)
-setpar(14,  0.478391)
-setpar(15,  0.)
-setpar(16,  2.)
-setpar(17, -0.15152)
-setpar(18,  0.)
-setpar(19,  0.)
-setpar(22,  1.247316701070471)
-#setpar(41,  6.0)
-setpar(23,  0.15)
-setpar(24,  0.7)
-setpar(25,  0.)
-setpar(26,  2.)
-setpar(27, -0.81217)
-setpar(28,  0.)
-setpar(29,  0.)
-setpar(32,  0.)
-setpar(42,  -0.9)
-t.m.g.parint.p = 0
-
-
-t.m.parameters.update(ALTGLO2)
-
-t.m.g.init()
-
-tDR.m.release_parameters('bS', 'rv', 'bv', 'C', 'MC')
-fDR = Fitter.FitterMinuit(GLOpoints, tDR)
-
-tDR1.m.release_parameters('bS', 'rv', 'bv', 'C', 'MC', 'trv', 'tbv')
-fDR1 = Fitter.FitterMinuit(GLO1points, tDR1)
+#setpar(13,  0.15)
+#setpar(14,  0.478391)
+#setpar(15,  0.)
+#setpar(16,  2.)
+#setpar(17, -0.15152)
+#setpar(18,  0.)
+#setpar(19,  0.)
+#setpar(22,  1.247316701070471)
+##setpar(41,  6.0)
+#setpar(23,  0.15)
+#setpar(24,  0.7)
+#setpar(25,  0.)
+#setpar(26,  2.)
+#setpar(27, -0.81217)
+#setpar(28,  0.)
+#setpar(29,  0.)
+#setpar(32,  0.)
+#setpar(42,  -0.9)
+#t.m.g.parint.p = 0
+#
+#
+#t.m.parameters.update(ALTGLO2)
+#
+#t.m.g.init()
+#
+#tDR.m.release_parameters('bS', 'rv', 'bv', 'C', 'MC')
+#fDR = Fitter.FitterMinuit(GLOpoints, tDR)
+#
+#tDR1.m.release_parameters('bS', 'rv', 'bv', 'C', 'MC', 'trv', 'tbv')
+#fDR1 = Fitter.FitterMinuit(GLO1points, tDR1)
 
 #t.m.release_parameters('rv', 'bv', 'Nres', 'bres', 'C', 'MC')
 #f = Fitter.FitterMinuit(GLOpoints, t)
@@ -116,10 +126,10 @@ fDR1 = Fitter.FitterMinuit(GLO1points, tDR1)
 #t.m.parameters['tNv'] = 0.6
 #t.m.parameters['tMv'] = 0.8
 #t.m.parameters['Mv'] = 0.8
-t.m.release_parameters('M02S','SECS','SECG', 'THIS', 'THIG', 'rv', 'bv', 'Mv', 'C', 'MC', 'trv', 'tbv', 'tMv')
+#t.m.release_parameters('M02S','SECS','SECG', 'THIS', 'THIG', 'rv', 'bv', 'Mv', 'C', 'MC', 'trv', 'tbv', 'tMv')
 #t.m.release_parameters('M02S','SECS','SECG', 'THIS', 'THIG', 'rv', 'bv', 'C', 'MC', 'trv', 'tbv')
 #f = Fitter.FitterMinuit(DVCSpoints+data[48]+ALTGLO1points, t)
 #f = Fitter.FitterMinuit(DVCSpoints+data[48]+ALTGLO2points, t)
-f = Fitter.FitterMinuit(DVCSpoints+data[48]+ALTGLO3points, t)
+#f = Fitter.FitterMinuit(DVCSpoints+data[48]+ALTGLO3points, t)
 #f = Fitter.FitterMinuit(DVCSpoints+data[48]+GLO1points+HA17[::2], t)
 
