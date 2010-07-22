@@ -52,6 +52,12 @@ def quadSciPy5(func,a,b,args=()):
     y = (b-a)*(roots5+1)/2.0 + a
     return (b-a)/2.0*sum(weights5*func(y,*args),0)
 
+def quadSciPy5transposed(func,a,b,args=()):
+    """Compute a definite integral using fifth-order Gaussian quadrature.
+    Adapted from scipy."""
+    y = (b-a)*(roots5+1)/2.0 + a
+    return (b-a)/2.0*sum((weights5*func(y,*args)).transpose(),0)
+
 def quadSciPy4(func,a,b,args=()):
     """Compute a definite integral using fifth-order Gaussian quadrature.
     Adapted from scipy."""
@@ -62,7 +68,7 @@ def quadSciPy4(func,a,b,args=()):
 PVquadrature = quadSciPy18
 
 # Choice of routine used for harmonic projection
-Hquadrature = quadSciPy5
+Hquadrature = quadSciPy5transposed
 
 # Choice of routine used for t-integration
 tquadrature = quadSciPy5
