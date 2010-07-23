@@ -764,11 +764,16 @@ def CFF(t, cffs=None, path=None, fmt='png'):
     fig = plt.figure()
     fig.canvas.set_window_title(title)
     fig.suptitle(title)
-    colors = ['red', 'green', 'brown', 'purple']
-    tms = [0.0, 0.3]
+    colors = ['red', 'blue', 'brown', 'purple']
+    linestyles = ['solid', 'dashed']
+    tms = [0.1, 0.3]
     # Define abscissas
-    logxvals = np.power(10., np.arange(-3.5, 0, 0.1))  # left panel
-    xvals = np.linspace(0.025, 0.1, 20) # right panel
+    logxvals = np.power(10., np.arange(-3.0, 0, 0.1))  # left panel
+    xvals = np.linspace(0.025, 0.2, 20) # right panel
+    # ordinatas for  left ...
+    allylims = [(-0.3, 1.0), (-0.3, 1.0), (-0.45, 0.05)]
+    # ... and right panles
+    ylims = [(-0.3, 1.0), (-0.3, 1.0), (-0.45, 0.05)]
     # Plot panels
     for n in range(len(cffs)):
         cff = cffs[n]
@@ -779,11 +784,21 @@ def CFF(t, cffs=None, path=None, fmt='png'):
             _axband(ax, tm, logxvals, getattr(t.model, cff), color=colors[tms.index(tm)])
         ax.set_xlabel('$\\xi$', fontsize=15)
         ax.set_ylabel('x %s' % cff, fontsize=18)
+        ax.set_xlim(0.001, 1.0)
+        apply(ax.set_ylim, allylims[n])
+        ax.axhspan(-0.0005, 0.0005, facecolor='g', alpha=0.6)  # horizontal bar
+        ax.axvspan(0.025, 0.2, facecolor='g', alpha=0.1)  # vertical band
+        ax.text(0.03, -0.27, "data region", fontsize=14)
         # measured x linear
         ax = fig.add_subplot(len(cffs), 2, 2*n+2)
         for tm in tms:
             _axband(ax, tm, xvals, getattr(t.model, cff), color=colors[tms.index(tm)])
+        ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
         ax.set_xlabel('$\\xi$', fontsize=15)
+        apply(ax.set_ylim, ylims[n])
+        ax.set_xlim(0.025, 0.2)
+        ax.text(0.03, -0.27, "data region only", fontsize=14)
+        #ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.02))  # tickmarks
     t.model.parameters['nnet'] = old
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
