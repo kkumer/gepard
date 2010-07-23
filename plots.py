@@ -760,7 +760,7 @@ def CFF(t, cffs=None, path=None, fmt='png'):
         cffs = t.model.output_layer
     old = t.model.parameters['nnet']
     t.model.parameters['nnet'] = 'ALL'
-    title = 'Compton Form Factors'
+    title = t.description
     fig = plt.figure()
     fig.canvas.set_window_title(title)
     fig.suptitle(title)
