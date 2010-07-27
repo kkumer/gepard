@@ -738,6 +738,7 @@ def _axband(ax, tm, xvals, fun, color='g'):
     pt = Data.DummyPoint()
     pt.t = -tm
     pt.xi = xvals
+    pt.xB = 2*pt.xi/(1.+pt.xi)
     up = []
     down = []
     res = xvals * fun(pt)
@@ -768,7 +769,7 @@ def CFF(t, cffs=None, path=None, fmt='png'):
     linestyles = ['solid', 'dashed']
     tms = [0.1, 0.3]
     # Define abscissas
-    logxvals = np.power(10., np.arange(-3.0, 0, 0.1))  # left panel
+    logxvals = np.power(10., np.arange(-3.0, 0.01, 0.1))  # left panel
     xvals = np.linspace(0.025, 0.2, 20) # right panel
     # ordinatas for  left ...
     allylims = [(-0.3, 1.0), (-0.3, 1.0), (-0.45, 0.05)]

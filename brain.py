@@ -25,7 +25,7 @@ class RPropMinusTrainerTransformed(RPropMinusTrainer):
             #outerr = target - self.module.outputbuffer[offset]
             outerr = target[0] - trans.trans(self.module.outputbuffer[offset], 
                     trans.map2pt[float(target[0])])
-            # weigh the error DON'T - it's taken care by data replicas
+            # weigh the error to increase importance of better measurements
             outerr = outerr / trans.map2pt[float(target[0])][1].err
             # multiply outerr with d trans/d output !!
             outerr = outerr * trans.map2pt[float(target[0])][1].deriv

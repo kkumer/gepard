@@ -2,7 +2,9 @@
 
 def trans(x, theory_and_pt):
     theory, pt = theory_and_pt
-    # could be multiplying with (1-xB) to implement constraint CFF(xB=1) = 0
+    if theory.model.endpointpower:
+        # multiplying with (1-xB)^2 to implement constraint CFF(xB=1) = 0
+        x = x * (1-pt.xB)**theory.model.endpointpower
     res = theory.predict(pt, parameters={'outputvalue':x})
     return res
 

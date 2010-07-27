@@ -406,7 +406,7 @@ class ComptonModelDRsea(ComptonDispersionRelations):
 class ComptonNeuralNets(Model):
     """Neural network CFFs"""
 
-    def __init__(self, hidden_layers=[7], output_layer=['ImH', 'ReH']):
+    def __init__(self, hidden_layers=[7], output_layer=['ImH', 'ReH'], endpointpower=None):
         """Model CFFs by neural networks.
         
         Neural network, created actually by Fitter instance, will have
@@ -418,6 +418,8 @@ class ComptonNeuralNets(Model):
         output_layer:  keyword argument output_layer is a list specifying
                        names of CFFs will be given by neural nets. Rest are
                        zero.
+        endpointpower: CFFs are defined as NN*(1-xB)**endpointpower to enforce
+                       vanishing at xB=0 and to improve convergence
         
         """
         self.architecture = [2] + hidden_layers + [len(output_layer)]
@@ -425,6 +427,7 @@ class ComptonNeuralNets(Model):
         self.nets = []
         self.parameters = {'nnet':0, 'outputvalue':None}
         self.parameter_names = ['nnet', 'outputvalue']
+        self.endpointpower = endpointpower
         # now do whatever else is necessary
         #ComptonFormFactors.__init__(self)
 
@@ -469,7 +472,10 @@ class ComptonNeuralNets(Model):
         for xB in xBs:
             ar = []
             for net in self.nets:
-                ar.append(net.activate([xB, pt.t])[ind])
+                if self.endpointpower:
+                    ar.append(net.activate([xB, pt.t])[ind]*(1-xB)**self.endpointpower)
+                else:
+                    ar.append(net.activate([xB, pt.t])[ind])
             all = array(ar).flatten()
             if self.parameters.has_key('nnet'):
                 if self.parameters['nnet'] == 'ALL':
