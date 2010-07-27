@@ -5,7 +5,7 @@ import copy, sys
 from numpy import sin, cos, pi, sqrt, array, linspace
 from scipy.special import gammainc
 
-import utils, quadrature
+import utils, quadrature, Data
 from constants import *
 
 class Approach(object):
@@ -284,16 +284,22 @@ class BMK(Approach):
     def CCALDVCSunp(self, pt):
         """ BKM Eq. (66) """
 
-        xB, t = pt.xB, pt.t
-        parenHH = ( self.m.ReH(pt)**2 + self.m.ImH(pt)**2 
-                +  self.m.ReHt(pt)**2 + self.m.ImHt(pt)**2 )
-        parenEH = 2.*( self.m.ReE(pt)*self.m.ReH(pt) + self.m.ImE(pt)*self.m.ImH(pt) 
-                +  self.m.ReEt(pt)*self.m.ReHt(pt) + self.m.ImEt(pt)*self.m.ImHt(pt) ) 
-        parenEE =  self.m.ReE(pt)**2 + self.m.ImE(pt)**2 
-        parenEtEt = self.m.ReEt(pt)**2 + self.m.ImEt(pt)**2
-        brace = 4. * (1.-xB) * parenHH - xB**2 * parenEH - (xB**2 
-                + (2.-xB)**2 * t/(4.*Mp2)) * parenEE - xB**2 * t/(4.*Mp2) * parenEtEt
-        return brace / (2.-xB)**2
+        xB2 = pt.xB**2
+        ReH = self.m.ReH(pt)
+        ImH = self.m.ImH(pt)
+        ReE = self.m.ReE(pt)
+        ImE = self.m.ImE(pt)
+        ReHt = self.m.ReHt(pt)
+        ImHt = self.m.ImHt(pt)
+        ReEt = self.m.ReEt(pt)
+        ImEt = self.m.ImEt(pt)
+        parenHH = ReH**2 + ImH**2 + ReHt**2 + ImHt**2
+        parenEH = 2.*( ReE*ReH + ImE*ImH + ReEt*ReHt + ImEt*ImHt ) 
+        parenEE =  ReE**2 + ImE**2 
+        parenEtEt = ReEt**2 + ImEt**2
+        brace = 4. * (1.-pt.xB) * parenHH - xB2 * parenEH - (xB2 
+                + (2.-pt.xB)**2 * pt.t/(4.*Mp2)) * parenEE - xB2 * pt.t/(4.*Mp2) * parenEtEt
+        return brace / (2.-pt.xB)**2
            
     # DVCS amplitude squared Fourier coefficients
 
@@ -398,11 +404,13 @@ class BMK(Approach):
         
         """
         if kwargs.has_key('vars'):
-            kin = utils.fill_kinematics(kwargs['vars'], old=pt)
+            ptvars = Data.DummyPoint(init=kwargs['vars'])
+            kin = utils.fill_kinematics(ptvars, old=pt)
             BMK.prepare(kin)
         else:
             # just copy everything from pt
-            kin = utils.fill_kinematics({}, old=pt)
+            ptempty = Data.DummyPoint()
+            kin = utils.fill_kinematics(ptempty, old=pt)
             BMK.prepare(kin)
             ## Nothing seems to be gained by following approach:
             #kin = dict((i, getattr(pt, i)) for i in 

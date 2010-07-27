@@ -1,7 +1,6 @@
 """ 
 Some utility stuff needed all over the application 
 
-AttrDict -- dictionary with attribute-style access
 loaddata -- loads datafiles from directory
 fill_kinematics --- calculates missing kinematical variables
 parse -- parses datafiles
@@ -27,50 +26,6 @@ from constants import Mp, Mp2
 class KinematicsError(Exception):
     pass
 
-class AttrDict(dict):
-    """A dictionary with attribute-style access. 
-    
-    It maps attribute access to the real dictionary.  
-    By Keith Darth, http://code.activestate.com/recipes/473786/
-    FIXME: Using this is bad for performance. __getitem__ is called 
-    way to many times. (I'm not using it any longer!)
-    """
-    def __init__(self, init={}):
-        dict.__init__(self, init)
-
-    def __getstate__(self):
-        return self.__dict__.items()
-
-    def __setstate__(self, items):
-        for key, val in items:
-            self.__dict__[key] = val
-
-    def __repr__(self):
-        return "%s(%s)" % (self.__class__.__name__, dict.__repr__(self))
-
-    def __str__(self):
-        s = ""
-        for key in self.keys():
-            s += '%4s -> % .3g\n' % (key, self[key])
-        s = s[:-1]
-        return s
-
-    def __setitem__(self, key, value):
-        return super(AttrDict, self).__setitem__(key, value)
-
-    def __getitem__(self, name):
-        return super(AttrDict, self).__getitem__(name)
-
-    def __delitem__(self, name):
-        return super(AttrDict, self).__delitem__(name)
-
-
-    __getattr__ = __getitem__
-    __setattr__ = __setitem__
-
-    def copy(self):
-        ch = AttrDict(self)
-        return ch
 
 def loaddata(datadir='data', approach=Approach.hotfixedBMK):
     """Return dictionary {id : `DataSet`, ...}  out of datadir/*dat files.
@@ -122,9 +77,6 @@ def fill_kinematics(kin, old={}):
     if provided.
 
     """
-    if not (isinstance(kin, Data.DataPoint) or 
-            isinstance(kin, Data.DummyPoint) or isinstance(kin, AttrDict)):
-        kin = AttrDict(kin)  # fixing kin
     kkeys = set(kin.keys())
     trio = set(['xB', 'W', 'Q2'])
     if len(trio.intersection(kkeys)) == 3:
