@@ -733,7 +733,7 @@ def HBCSA(ff, fits=[], path=None, fmt='png'):
         fig.show()
     return fig
 
-def _axband(ax, tm, xvals, fun, color='g'):
+def _axband(ax, tm, xvals, fun, color='g', avg=True):
     """Make a band of x*fun defined by ndarray-valued fun."""
     pt = Data.DummyPoint()
     pt.t = -tm
@@ -744,17 +744,22 @@ def _axband(ax, tm, xvals, fun, color='g'):
     res = xvals * fun(pt)
     mean = res.mean(axis=0)
     std = res.std(axis=0)
-    up = mean + std/2.
-    down = mean - std/2.
+    if avg:
+        up = mean + std/2.
+        down = mean - std/2.
+    else:
+        up = res.max(axis=0)
+        down = res.min(axis=0)
     x = plt.concatenate( (xvals, xvals[::-1]) )
     y = plt.concatenate( (up, down[::-1]) )
     ax.fill(x, y, facecolor=color, alpha=0.5)
 
-def CFF(t, cffs=None, path=None, fmt='png'):
+def CFF(t, cffs=None, path=None, fmt='png', average=True):
     """Makes plot of cffs given by neural network
     
     t     -- Neural network 'theory'
     cffs  -- List of CFFs to be plotted. Each produces two panels.
+    average -- plot 1-sigma band (othewise plot minimum-maximum band)
 
     """
     if not cffs:
@@ -782,7 +787,8 @@ def CFF(t, cffs=None, path=None, fmt='png'):
         ax = fig.add_subplot(len(cffs), 2, 2*n+1)
         ax.set_xscale('log')  # x-axis to be logarithmic
         for tm in tms :
-            _axband(ax, tm, logxvals, getattr(t.model, cff), color=colors[tms.index(tm)])
+            _axband(ax, tm, logxvals, getattr(t.model, cff), 
+                    color=colors[tms.index(tm)], avg=average)
         ax.set_xlabel('$\\xi$', fontsize=15)
         ax.set_ylabel('x %s' % cff, fontsize=18)
         ax.set_xlim(0.001, 1.0)
@@ -793,7 +799,8 @@ def CFF(t, cffs=None, path=None, fmt='png'):
         # measured x linear
         ax = fig.add_subplot(len(cffs), 2, 2*n+2)
         for tm in tms:
-            _axband(ax, tm, xvals, getattr(t.model, cff), color=colors[tms.index(tm)])
+            _axband(ax, tm, xvals, getattr(t.model, cff), 
+                    color=colors[tms.index(tm)], avg=average)
         ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
         ax.set_xlabel('$\\xi$', fontsize=15)
         apply(ax.set_ylim, ylims[n])

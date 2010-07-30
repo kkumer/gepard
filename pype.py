@@ -43,7 +43,7 @@ ALTGLO4points = data[25] + data[32][18:]
 
 # NN
 #mNN = Model.ModelNN(hidden_layers=[26], output_layer=['ImH', 'ReH', 'ImE', 'ReE', 'ImHt', 'ReHt', 'ImEt', 'ReEt'])
-mNN = Model.ModelNN(hidden_layers=[9], endpointpower=2.0)
+mNN = Model.ModelNN(hidden_layers=[9], endpointpower=3.0)
 tNN = Approach.hotfixedBMK(mNN)
 tNN.name = 'NNtest'
 tNN.description = '(xB,t)-9-2 nets. Fit to ALTGLO4points'
@@ -51,7 +51,7 @@ tNN.description = '(xB,t)-9-2 nets. Fit to ALTGLO4points'
 ## [4] Do the fit
 
 
-f = Fitter.FitterBrain(testpoints, tNN, nnets=10, nbatch=100, verbose=1)
+f = Fitter.FitterBrain(ALTGLO4points, tNN, nnets=30, nbatch=20, verbose=1)
 #f.fit()
 #f.prune(minprob=0.5)
 #tNN.save(db)
