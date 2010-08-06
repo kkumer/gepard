@@ -525,10 +525,6 @@ class BMK(Approach):
     def BCSA(self, pt, **kwargs):
         """Beam charge-spin asymmetry as measured by COMPASS. """
         return  self.BCSD(pt, **kwargs) / self.BCSS(pt, **kwargs)
-        ## optimized formula
-        # return  self.TINTunp(pt, phi, 0, 1) / ( 
-        #       self.TBH2unp(pt, phi) + self.TDVCS2unp(pt, phi) 
-        #    + (self.TINTunp(pt, phi, lam, 1) + self.TINTunp(pt, phi, -lam, -1))/2.)
 
     def _XDVCSt4int(self, t, pt):
         """Same as XDVCSt but with additional variable t 

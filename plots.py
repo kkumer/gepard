@@ -372,7 +372,7 @@ def HALLAphi(lines=[], band=[], path=None, fmt='png'):
         fig.show()
     return fig
 
-def COMPASS(lines=[], xB=0.05, Q2=2, path=None, fmt='png'):
+def COMPASS(lines=[], xB=0.05, Q2=2, path=None, fmt='png', numbers=False):
     """Plot COMPASS BCS asymmetry and difference and summ of xs for FormFactors model ff.
     
     FIXME: kinematic completion, charge etc. must be explicit here
@@ -390,24 +390,25 @@ def COMPASS(lines=[], xB=0.05, Q2=2, path=None, fmt='png'):
     pt.in1particle = 'e'
     pt.in1charge = 1
     pt.in1energy = 160.
-    pt.in1polarizationvector = 'L'
-    pt.in1polarization = 0.8
+    pt.in1polarization = -0.8
     pt.s = 2 * Mp * pt.in1energy + Mp2
     pt.xB = xB
     pt.t = -0.2
     pt.Q2 = Q2
     ax = fig.add_subplot(2,2,1)
     ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
-    phi = np.arange(0., np.pi, 0.2)
+    phi = np.arange(0., np.pi, 0.1)
     utils.fill_kinematics(pt)
     linestyles = ['g--', 'b-', 'c-.']
-    labels = ['without HALL-A', 'with HALL-A']
+    labels = ['without_HALLA', 'with_HALLA']
     pn = 0
+    asym = []
     for approach in lines:
         approach.__class__.to_conventions(pt)
         approach.__class__.prepare(pt)
         line = approach.BCSA(pt, vars={'phi':np.pi - phi})
         ax.plot(phi, line, linestyles[pn], linewidth=2, label=labels[pn]) 
+        asym.append(line)
         pn += 1
     #ax.set_ylim(0.0, 0.5)
     # axes labels
@@ -415,28 +416,17 @@ def COMPASS(lines=[], xB=0.05, Q2=2, path=None, fmt='png'):
     ax.set_ylabel('BCS Asymmetry')
     ax.legend()
     # Difference  panel
-    pt = Data.DummyPoint()
-    pt.exptype = 'fixed target'
-    pt.in1particle = 'e'
-    pt.in1charge = 1
-    pt.in1energy = 160.
-    pt.in1polarizationvector = 'L'
-    pt.in1polarization = 0.8
-    pt.s = 2 * Mp * pt.in1energy + Mp2
-    pt.xB = xB
-    pt.t = -0.2
-    pt.Q2 = Q2
     ax = fig.add_subplot(2,2,2)
     ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
-    phi = np.arange(0., np.pi, 0.2)
-    utils.fill_kinematics(pt)
     pn = 0
+    diff = []
     for approach in lines:
         approach.__class__.to_conventions(pt)
         approach.__class__.prepare(pt)
         # nb converted to pb:
         line = 1000. * approach.BCSD(pt, vars={'phi':np.pi - phi})
         ax.plot(phi, line, linestyles[pn], linewidth=2, label=labels[pn]) 
+        diff.append(line)
         pn += 1
     #ax.set_ylim(0.0, 0.5)
     # axes labels
@@ -444,34 +434,30 @@ def COMPASS(lines=[], xB=0.05, Q2=2, path=None, fmt='png'):
     ax.set_ylabel('BCS Difference  [pb/GeV^4]')
     ax.legend()
     # Sum pannel
-    pt = Data.DummyPoint()
-    pt.exptype = 'fixed target'
-    pt.in1particle = 'e'
-    pt.in1charge = 1
-    pt.in1energy = 160.
-    pt.in1polarizationvector = 'L'
-    pt.in1polarization = 0.8
-    pt.s = 2 * Mp * pt.in1energy + Mp2
-    pt.xB = xB
-    pt.t = -0.2
-    pt.Q2 = Q2
-    utils.fill_kinematics(pt)
     ax = fig.add_subplot(2,2,3)
     ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
-    phi = np.arange(0., np.pi, 0.2)
     pn = 0
+    summ = []
     for approach in lines:
         approach.__class__.to_conventions(pt)
         approach.__class__.prepare(pt)
         # nb converted to pb:
         line = 1000. * approach.BCSS(pt, vars={'phi':np.pi - phi})
         ax.plot(phi, line, linestyles[pn], linewidth=2, label=labels[pn]) 
+        summ.append(line)
         pn += 1
     #ax.set_ylim(0.0, 0.5)
     # axes labels
     ax.set_xlabel('$\\phi$')
     ax.set_ylabel('BCS sum  [pb/GeV^4]')
     ax.legend()
+    if numbers:
+        pn = 0
+        for approach in lines:
+            mat = np.array([phi, asym[pn], diff[pn], summ[pn]]).transpose()
+            np.savetxt('%s-%s.dat' % (filename, labels[pn]), mat, fmt='% f', 
+                    delimiter='   ')
+            pn += 1
     if path:
         fig.subplots_adjust(hspace=0.15)
         fig.subplots_adjust(wspace=0.35)
@@ -507,8 +493,7 @@ def COMPASSt(fits=[], path=None, fmt='png'):
                 pt.in1particle = 'e'
                 pt.in1charge = 1
                 pt.in1energy = 160.
-                pt.in1polarizationvector = 'L'
-                pt.in1polarization = 0.8
+                pt.in1polarization = -0.8
                 pt.s = 2 * Mp * pt.in1energy + Mp2
                 pt.xB = xB
                 pt.Q2 = Q2
@@ -556,7 +541,6 @@ def EIC(fits=[], path=None, fmt='png'):
     pt.in1particle = 'e'
     pt.in1charge = 1
     pt.in1energy = 5.
-    pt.in1polarizationvector = 'L'
     pt.in1polarization = 1.0
     pt.in2particle = 'p'
     pt.in2energy = 250.
@@ -697,8 +681,7 @@ def HBCSA(ff, fits=[], path=None, fmt='png'):
     pt.in1particle = 'e'
     pt.in1charge = 1
     pt.in1energy = 160.
-    pt.in1polarizationvector = 'L'
-    pt.in1polarization = 0.8
+    pt.in1polarization = -0.8
     pt.s = 2 * Mp * pt.in1energy + Mp2
     pt.xB = 0.05
     pt.t = -0.2

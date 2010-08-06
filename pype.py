@@ -96,17 +96,17 @@ pt.exptype = 'fixed target'
 pt.in1particle = 'e'
 pt.in1charge = 1
 pt.in1energy = 160.
-pt.in1polarizationvector = 'L'
-pt.in1polarization = -0.4
+pt.in1polarization = -0.8
 pt.s = 2 * Mp * pt.in1energy + Mp2
-pt.xB = 0.05
+pt.xB = 0.077
 pt.t = -0.2
-pt.Q2 = 2
-pt.phi = 0
+pt.Q2 = 1.4
+pt.phi = 2.
 pt.frame = 'Trento'
 pt.units = {'phi' : 'radian'}
 utils.fill_kinematics(pt)
 tDR1.to_conventions(pt)
 tDR1.prepare(pt)
-#print tDR1.BCSA(pt, vars={'phi':np.pi})
 print tDR1.BCSA(pt)
+print tDR1.BCSD(pt)
+print tDR1.BCSS(pt)
