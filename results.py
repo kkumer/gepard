@@ -467,9 +467,10 @@ hy1_17_THI = {
  'tbv': 4.2753844806174115,
  'trv': 7.9999635209873254}
 
-# Hybrid fit + 3rd PW to DVCSpoints + data[48] + AGLO1points  chisq = 273/220
+# Hybrid fit + 3rd PW to DVCSpoints + data[48] + ALTGLO1points  chisq = 273/220
 # ALTGLO1points = data[5] + data[25] + data[32] + HAD17 + HA17
 # ('M02S','SECS','SECG', 'THIS', 'THIG', 'rv', 'bv', 'C', 'MC', 'trv', 'tbv')
+# evolution cut at Q2 = 2 Gev^2
 allTHI = {
  'AL0G': 1.2473167010704711,
  'AL0S': 1.1575060246398083,
@@ -614,3 +615,68 @@ ALTGLO2 = {
         'fix_tMv': True, 'trv': 7.871587331745177}
 
 
+# as ALTGLO2 but, starting from hy1THI  chisq/dof = 195/176
+ALTGLO2B = {
+'fix_THIG': False, 'KAPS': 0.0, 'fix_ALPG': True, 'fix_DELM2S': True,
+  'fix_SECG': False, 'KAPG': 0.0, 'fix_SECS': False, 'fix_DELM2G': True,
+  'PS': 2.0, 'SECG': -2.6338224450174748, 'fix_AL0S': True, 'fix_THIS':
+  False, 'fix_KAPG': True, 'SECS': -0.056898607234204653, 'fix_M02G':
+  True, 'NG': 0.5, 'fix_ALPS': True, 'M02S': 0.50156492842554723, 'PG':
+  2.0, 'ALPG': 0.14999999999999999, 'fix_M02S': False, 'NS':
+  0.15203911208796006, 'fix_AL0G': True, 'fix_PG': True, 'AL0S':
+  1.1575060246398083, 'limit_M02S': (0.29999999999999999, 1.5), 'fix_PS':
+  True, 'SKEWG': 0.0, 'AL0G': 1.2473167010704711, 'SKEWS': 0.0, 'ALPS':
+  0.14999999999999999, 'M02G': 0.69999999999999996, 'fix_NG': True,
+  'THIS': -0.028774918377538185, 'fix_SKEWS': True, 'DELM2S': 0.0,
+  'fix_SKEWG': True, 'fix_NS': True, 'limit_M02G': (0.29999999999999999,
+      1.5), 'fix_KAPS': True, 'THIG': 0.88660385756192783, 'DELM2G': 0.0,
+'tMv': 0.72300855154777954, 'rS': 1.0, 'limit_tbv':
+  (0.40000000000000002, 5.0), 'fix_Mv': False, 'alv':
+  0.42999999999999999, 'fix_bv': False, 'Nv': 1.3500000000000001,
+  'fix_trv': False, 'limit_C': (-10.0, 10.0), 'rv': 0.48857257980811708,
+  'fix_tNv': True, 'fix_MC': False, 'Nsea': 0.0, 'fix_MS': True,
+  'limit_trv': (0.0, 8.0), 'limit_rv': (0.0, 8.0), 'alS':
+  1.1299999999999999, 'fix_bS': True, 'alpS': 0.14999999999999999, 'C':
+  9.9999973166591687, 'tNv': 0.59999999999999998, 'limit_Mv':
+  (0.40000000000000002, 1.5), 'limit_tMv': (0.40000000000000002, 2.0),
+  'limit_bS': (0.40000000000000002, 5.0), 'fix_alpv': True, 'tbv':
+  2.5968261726412112, 'fix_alv': True, 'bv': 0.43965295355048556, 'Mv':
+  1.4999996661106532, 'fix_rS': True, 'fix_Nv': True, 'fix_tbv': False,
+  'alpv': 0.84999999999999998, 'MC': 0.73870986675252859, 'fix_Nsea':
+  True, 'fix_alpS': True, 'fix_rv': False, 'limit_bv':
+  (0.40000000000000002, 5.0), 'limit_MC': (0.40000000000000002, 2.0),
+  'fix_alS': True, 'MS': 0.70699999999999996, 'bS': 2.0, 'fix_C': False,
+  'fix_tMv': False, 'trv': 7.9999982364753528
+}
+
+# as ALTGLO2 but starting from hy1THI AND keeping SECS fixed  chisq/dof = 196/177
+ALTGLO2C = {
+'fix_THIG': False, 'KAPS': 0.0, 'fix_ALPG': True, 'fix_DELM2S': True,
+'fix_SECG': False, 'KAPG': 0.0, 'fix_SECS': True, 'fix_DELM2G': True, 'PS':
+2.0, 'SECG': -2.5440702464099867, 'fix_AL0S': True, 'fix_THIS': False,
+'fix_KAPG': True, 'SECS': -0.44159594968364457, 'fix_M02G': True, 'NG': 0.5,
+'fix_ALPS': True, 'M02S': 0.49720249608913697, 'PG': 2.0, 'ALPG':
+0.14999999999999999, 'fix_M02S': False, 'NS': 0.15203911208796006, 'fix_AL0G':
+True, 'fix_PG': True, 'AL0S': 1.1575060246398083, 'limit_M02S':
+(0.29999999999999999, 1.5), 'fix_PS': True, 'SKEWG': 0.0, 'AL0G':
+1.2473167010704711, 'SKEWS': 0.0, 'ALPS': 0.14999999999999999, 'M02G':
+0.69999999999999996, 'fix_NG': True, 'THIS': 0.087583283215139196, 'fix_SKEWS':
+True, 'DELM2S': 0.0, 'fix_SKEWG': True, 'fix_NS': True, 'limit_M02G':
+(0.29999999999999999, 1.5), 'fix_KAPS': True, 'THIG': 0.90870318050138843,
+'DELM2G': 0.0,
+'tMv': 0.715584941355635, 'rS': 1.0, 'limit_tbv': (0.40000000000000002, 5.0),
+'fix_Mv': False, 'alv': 0.42999999999999999, 'fix_bv': False, 'Nv':
+1.3500000000000001, 'fix_trv': False, 'limit_C': (-10.0, 10.0), 'rv':
+0.45374522143316343, 'fix_tNv': True, 'fix_MC': False, 'Nsea': 0.0, 'fix_MS':
+True, 'limit_trv': (0.0, 8.0), 'limit_rv': (0.0, 8.0), 'alS':
+1.1299999999999999, 'fix_bS': True, 'alpS': 0.14999999999999999, 'C':
+9.9999999527870074, 'tNv': 0.59999999999999998, 'limit_Mv':
+(0.40000000000000002, 1.5), 'limit_tMv': (0.40000000000000002, 2.0),
+'limit_bS': (0.40000000000000002, 5.0), 'fix_alpv': True, 'tbv':
+2.5636206794234195, 'fix_alv': True, 'bv': 0.40002654542014571, 'Mv':
+1.499999483194582, 'fix_rS': True, 'fix_Nv': True, 'fix_tbv': False, 'alpv':
+0.84999999999999998, 'MC': 0.73974790427385917, 'fix_Nsea': True, 'fix_alpS':
+True, 'fix_rv': False, 'limit_bv': (0.40000000000000002, 5.0), 'limit_MC':
+(0.40000000000000002, 2.0), 'fix_alS': True, 'MS': 0.70699999999999996, 'bS':
+2.0, 'fix_C': False, 'fix_tMv': False, 'trv': 7.9999998367016341}
+  

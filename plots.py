@@ -372,13 +372,14 @@ def HALLAphi(lines=[], band=[], path=None, fmt='png'):
         fig.show()
     return fig
 
-def COMPASS(lines=[], band=[], path=None, fmt='png'):
+def COMPASS(lines=[], xB=0.05, Q2=2, path=None, fmt='png'):
     """Plot COMPASS BCS asymmetry and difference and summ of xs for FormFactors model ff.
     
     FIXME: kinematic completion, charge etc. must be explicit here
     """
 
-    title = 'COMPASS BCSA (asymmetry), BCSD (difference) and BCSS (sum) of XS'
+    title = 'COMPASS $Q^2$ = %s GeV$^2$, $x_B$ = %s' % (Q2, xB)
+    filename = 'COMPASS-Q2-%s-xB-%s' % (Q2, xB)
     fig = plt.figure()
     fig.canvas.set_window_title(title)
     fig.suptitle(title)
@@ -392,16 +393,15 @@ def COMPASS(lines=[], band=[], path=None, fmt='png'):
     pt.in1polarizationvector = 'L'
     pt.in1polarization = 0.8
     pt.s = 2 * Mp * pt.in1energy + Mp2
-    pt.xB = 0.05
+    pt.xB = xB
     pt.t = -0.2
-    pt.Q2 = 2.
+    pt.Q2 = Q2
     ax = fig.add_subplot(2,2,1)
     ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
     phi = np.arange(0., np.pi, 0.2)
     utils.fill_kinematics(pt)
-    linestyles = ['g--', 'b-', 'r-.']
-    labels = ['', '', '']
-    #labels = ['GLO1 (DM)', 'GLO1 (KK)', '']
+    linestyles = ['g--', 'b-', 'c-.']
+    labels = ['without HALL-A', 'with HALL-A']
     pn = 0
     for approach in lines:
         approach.__class__.to_conventions(pt)
@@ -423,16 +423,13 @@ def COMPASS(lines=[], band=[], path=None, fmt='png'):
     pt.in1polarizationvector = 'L'
     pt.in1polarization = 0.8
     pt.s = 2 * Mp * pt.in1energy + Mp2
-    pt.xB = 0.05
+    pt.xB = xB
     pt.t = -0.2
-    pt.Q2 = 2.
+    pt.Q2 = Q2
     ax = fig.add_subplot(2,2,2)
     ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
     phi = np.arange(0., np.pi, 0.2)
     utils.fill_kinematics(pt)
-    linestyles = ['g--', 'b-', 'r-.']
-    labels = ['', '', '']
-    #labels = ['GLO1 (DM)', 'GLO1 (KK)', '']
     pn = 0
     for approach in lines:
         approach.__class__.to_conventions(pt)
@@ -444,7 +441,7 @@ def COMPASS(lines=[], band=[], path=None, fmt='png'):
     #ax.set_ylim(0.0, 0.5)
     # axes labels
     ax.set_xlabel('$\\phi$')
-    ax.set_ylabel('BCS Difference  [pb]')
+    ax.set_ylabel('BCS Difference  [pb/GeV^4]')
     ax.legend()
     # Sum pannel
     pt = Data.DummyPoint()
@@ -455,17 +452,13 @@ def COMPASS(lines=[], band=[], path=None, fmt='png'):
     pt.in1polarizationvector = 'L'
     pt.in1polarization = 0.8
     pt.s = 2 * Mp * pt.in1energy + Mp2
-    pt.xB = 0.05
+    pt.xB = xB
     pt.t = -0.2
-    pt.Q2 = 2.
+    pt.Q2 = Q2
     utils.fill_kinematics(pt)
     ax = fig.add_subplot(2,2,3)
     ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
     phi = np.arange(0., np.pi, 0.2)
-    linestyles = ['g--', 'b-', 'r-.']
-    #labels = ['HERMES+CLAS', 'HERMES+CLAS+HALLA', '+HALLA(phi)']
-    labels = ['', '', '']
-    #labels = ['GLO1 (DM)', 'GLO1 (KK)', '']
     pn = 0
     for approach in lines:
         approach.__class__.to_conventions(pt)
@@ -477,10 +470,12 @@ def COMPASS(lines=[], band=[], path=None, fmt='png'):
     #ax.set_ylim(0.0, 0.5)
     # axes labels
     ax.set_xlabel('$\\phi$')
-    ax.set_ylabel('BCS sum  [pb]')
+    ax.set_ylabel('BCS sum  [pb/GeV^4]')
     ax.legend()
     if path:
-        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+        fig.subplots_adjust(hspace=0.15)
+        fig.subplots_adjust(wspace=0.35)
+        fig.savefig(os.path.join(path, filename+'.'+fmt), format=fmt)
     else:
         fig.canvas.draw()
         fig.show()
@@ -499,7 +494,7 @@ def COMPASSt(fits=[], path=None, fmt='png'):
     for xB, Q2 in kinpoints:
         ax = fig.add_subplot(2,3,panel)
         ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
-        linestyles = ['g--', 'b-', 'r-.']
+        linestyles = ['r-', 'g--', 'b-.', 'p:']
         labels = ['HERMES+CLAS', 'HERMES+CLAS+HALLA', '+HALLA(phi)']
         pn = 0
         for approach in fits:
@@ -576,7 +571,7 @@ def EIC(fits=[], path=None, fmt='png'):
     ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
     phi = np.arange(0., 2*np.pi, 0.2)
     utils.fill_kinematics(pt)
-    linestyles = ['b-.', 'p:', 'r-', 'g--'] 
+    linestyles = ['r-', 'g--', 'b-.', 'p:']
     labels = [r'$\sigma^{\uparrow}$ ' + t.name for t in fits]
     pn = 0
     for approach in fits:
@@ -585,7 +580,6 @@ def EIC(fits=[], path=None, fmt='png'):
         line = approach.Xunp(pt, vars={'phi':phi})
         ax.plot(phi, line, linestyles[pn], linewidth=1, label=labels[pn]) 
         pn += 1
-    linestyles = ['r-', 'g--', 'b-.', 'p:'] 
     labels = ['$(\\sigma^{\\uparrow} + \\sigma^{\\downarrow})/2$ ' + t.name for t in fits]
     pn = 0
     for approach in fits:
@@ -680,7 +674,7 @@ def HBCSA(ff, fits=[], path=None, fmt='png'):
     ax = fig.add_subplot(1,2,1)
     ax.set_xscale('log')  # x-axis to be logarithmic
     xval = np.power(10., np.arange(-3.5, 0, 0.01)) 
-    linestyles = ['g--', 'b-', 'r-.']
+    linestyles = ['r-', 'g--', 'b-.', 'p:'] 
     pn = 0
     for approach in fits:
         pt.t = 0.0
@@ -713,7 +707,6 @@ def HBCSA(ff, fits=[], path=None, fmt='png'):
     ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
     phi = np.arange(0., np.pi, 0.2)
     utils.fill_kinematics(pt)
-    linestyles = ['g--', 'b-', 'r-.']
     pn = 0
     for approach in fits:
         approach.__class__.to_conventions(pt)
