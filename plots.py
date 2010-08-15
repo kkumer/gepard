@@ -15,13 +15,12 @@ else: #linux
 import pylab as plt
 
 
-import Data
-import utils
+import Data, Approach, utils
 from constants import toTeX, Mp2, Mp
 
 # load experimental data
-data = utils.loaddata('data/ep2epgamma')  # dictionary {1 : DataSet instance, ...}
-data.update(utils.loaddata('data/gammastarp2gammap')) 
+data = utils.loaddata('data/ep2epgamma', approach=Approach.hotfixedBMK) 
+data.update(utils.loaddata('data/gammastarp2gammap', approach=Approach.hotfixedBMK)) 
 
 
 def subplot(ax, sets, lines=[], band=[], xaxis=None, kinlabels=[], plotlines=True):
@@ -193,6 +192,10 @@ def HERMES09(lines=[], band=[], path=None, fmt='png'):
             else:
                 xlabels = ['$-t\\; [{\\rm GeV}^2]$', '$x_B$', '$Q^2\\; [{\\rm GeV}^2]$']
                 ax.set_xlabel(xlabels[panel-7], fontsize=18)
+
+            if (panel % 3) == 2:
+                # Adjust x-axis on middle column
+                ax.set_xlim(0.04, 0.25)
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:

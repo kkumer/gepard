@@ -15,8 +15,8 @@ from results import *
 
 # [1] Load experimental data and theoretical models
 
-data = utils.loaddata('data/ep2epgamma')  # dictionary {1 : DataSet instance, ...}
-data.update(utils.loaddata('data/gammastarp2gammap'))
+data = utils.loaddata('data/ep2epgamma', approach=Approach.hotfixedBMK)  
+data.update(utils.loaddata('data/gammastarp2gammap', approach=Approach.hotfixedBMK))
 db = shelve.open('theories.db')
 
 
@@ -91,22 +91,3 @@ tDR1.m.parameters.update(DMepsGLO1)
 #t.m.release_parameters('M02S','SECG', 'THIS', 'THIG', 'rv', 'bv', 'Mv', 'C', 'MC', 'trv', 'tbv', 'tMv')
 #f = Fitter.FitterMinuit(DVCSpoints+data[48]+ALTGLO2points, t)
 
-pt = Data.DummyPoint()
-pt.exptype = 'fixed target'
-pt.in1particle = 'e'
-pt.in1charge = 1
-pt.in1energy = 160.
-pt.in1polarization = -0.8
-pt.s = 2 * Mp * pt.in1energy + Mp2
-pt.xB = 0.077
-pt.t = -0.2
-pt.Q2 = 1.4
-pt.phi = 2.
-pt.frame = 'Trento'
-pt.units = {'phi' : 'radian'}
-utils.fill_kinematics(pt)
-tDR1.to_conventions(pt)
-tDR1.prepare(pt)
-print tDR1.BCSA(pt)
-print tDR1.BCSD(pt)
-print tDR1.BCSS(pt)

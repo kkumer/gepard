@@ -6,8 +6,8 @@ import numpy as np
 
 import utils, Model, Approach, Fitter
 
-data = utils.loaddata('data/ep2epgamma')  
-data.update(utils.loaddata('data/gammastarp2gammap'))
+data = utils.loaddata('data/ep2epgamma', approach=Approach.hotfixedBMK)  
+data.update(utils.loaddata('data/gammastarp2gammap', approach=Approach.hotfixedBMK))
 
 # Gepard only
 mGepard = Model.ComptonGepard()

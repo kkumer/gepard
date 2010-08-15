@@ -1,4 +1,4 @@
-from IPython.Debugger import Tracer; debug_here = Tracer()
+#from IPython.Debugger import Tracer; debug_here = Tracer()
 
 import copy, sys
 
@@ -49,10 +49,12 @@ class Approach(object):
         db[self.name] = self
 
     def chisq(self, points, sigmas=False):
-        """Return tuple (chi-square, d.o.f., probability).."""
+        """Return tuple (chi-square, d.o.f., probability). If the approach and model
+           provide uncertainties, they are ignored - only experimental uncertainties
+           are taken into account."""
         nfreepars=utils.npars(self.model)
         dof = len(points) - nfreepars
-        allsigmas = [(getattr(self, pt.yaxis)(pt) - pt.val) / pt.err for
+        allsigmas = [(self.predict(pt, observable=pt.yaxis) - pt.val) / pt.err for
                     pt in points]
         chi = sum(s*s for s in allsigmas)  # equal to m.fval if minuit fit is done
         fitprob = (1.-gammainc(dof/2., chi/2.)) # probability of this chi-sq
@@ -78,10 +80,11 @@ class Approach(object):
             print self.chisq(points, sigmas=True)
         print 'P(chi-square, d.o.f) = P(%1.2f, %2d) = %5.4f' % self.chisq(points)
 
-    def predict(self, pt, **kwargs):
+    def predict(self, pt, error=False, **kwargs):
         """Give prediction for DataPoint pt.
 
         Keyword arguments:
+        error - if available, produce tuple (mean, error)
         observable - string. Default is pt.yaxis
         parameters - dictionary which will update model's one
 
@@ -94,6 +97,16 @@ class Approach(object):
         if kwargs.has_key('parameters'):
             old = self.model.parameters.copy()
             self.model.parameters.update(kwargs['parameters'])
+        #elif isinstance(self.model, Model.ComptonNeuralNets):
+        #    # It is not training (which always uses 'parameters'), and
+        #    # we are not asked for particular net (call would again come
+        #    # with 'parameters'), so we want mean of all nets
+        #    self.model.parameters['nnet'] = 'ALL'
+        #    result = getattr(self, obs)(pt)
+        #    if error:
+        #        return (result.mean(), result.std())
+        #    else:
+        #        return result.mean()
 
         result = getattr(self, obs)(pt)
 

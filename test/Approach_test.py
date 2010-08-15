@@ -6,7 +6,7 @@ import numpy as np
 import utils, Model, Approach
 from results import DMGLO1  #use some testpars here?
 
-data = utils.loaddata('data/ep2epgamma')  
+data = utils.loaddata('data/ep2epgamma', approach=Approach.hotfixedBMK)  
 
 m = Model.ModelDR()
 m.parameters.update(DMGLO1)

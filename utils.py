@@ -27,7 +27,7 @@ class KinematicsError(Exception):
     pass
 
 
-def loaddata(datadir='data', approach=Approach.hotfixedBMK):
+def loaddata(datadir='data', approach=False):
     """Return dictionary {id : `DataSet`, ...}  out of datadir/*dat files.
     
     approach defines conventions for frame, kinematics etc. to which data
