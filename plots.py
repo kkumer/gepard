@@ -255,7 +255,7 @@ def HALLA(lines=[], band=[], path=None, fmt='png'):
     """Makes plot of HALL-A data with fit lines"""
 
     subsets = {}
-    subsets[1] = utils.select(data[26], criteria=['Q2 == 1.9'])
+    subsets[1] = utils.select(data[26], criteria=['Q2 == 2.3'])
     subsets[2] = utils.select(data[35], criteria=['FTn == 1'])
     subsets[3] = utils.select(data[35], criteria=['FTn == 0'])
     subsets[4] = data[30]
@@ -277,6 +277,37 @@ def HALLA(lines=[], band=[], path=None, fmt='png'):
         fig.canvas.draw()
         fig.show()
     return fig
+
+def HALLAalt(lines=[], band=[], path=None, fmt='png'):
+    """Makes plot of 'alternative' HALL-A data with fit lines"""
+
+    subsets = {}
+    subsets[1] = utils.select(data[50], criteria=['Q2 == 2.3'])
+    subsets[2] = utils.select(data[51], criteria=['FTn == 1'])
+    subsets[3] = utils.select(data[51], criteria=['FTn == 0'])
+    subsets[4] = utils.select(data[51], criteria=['FTn == 2'])
+    subsets[5] = data[30]
+    title = 'Hall-A-alt'
+    fig = plt.figure()
+    fig.canvas.set_window_title(title)
+    fig.suptitle(title)
+    for panel in range(1,6):
+        ax = fig.add_subplot(2,3,panel)
+        subplot(ax, [subsets[panel]], lines, band, 't')
+        if panel == 2:
+            ax.set_ylabel('1st harm', fontsize=18)
+        elif panel == 3:
+            ax.set_ylabel('0th harm', fontsize=18)
+        elif panel == 4:
+            ax.set_ylabel('2nd harm', fontsize=18)
+        ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))
+    if path:
+        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+    else:
+        fig.canvas.draw()
+        fig.show()
+    return fig
+
 
 def H1ZEUS(lines=[], band=[], path=None, fmt='png'):
     """Makes plot of H1 DVCS data with fit lines"""

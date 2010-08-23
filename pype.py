@@ -40,6 +40,10 @@ ALTGLO1points = data[5] + data[25] + data[32] + HAD17 + HA17
 ALTGLO2points = data[5] + data[25] + data[32][18:] + HAD17[::2] + HA17[::2]
 ALTGLO3points = data[5] + data[25] + data[32][18:] + data[30] + HA17
 ALTGLO4points = data[25] + data[32][18:]
+BSDw2Cpoints = utils.select(data[26], criteria=['Q2 == 2.3'])
+BSDw2CDpoints = utils.select(data[50], criteria=['Q2 == 2.3'])
+BSSwpoints = utils.select(data[51], criteria=['FTn != 2'])
+
 
 
 ## [3] Create a theory
@@ -58,6 +62,9 @@ mDRonly1 = Model.ModelDR()
 tDR1 = Approach.hotfixedBMK(mDRonly1)
 tDR1.name = 'DR model 1'
 
+mDRonly2 = Model.ModelDR()
+tDR2 = Approach.BMK(mDRonly2)
+tDR2.name = 'DR model 2'
 
 # Hybrid: Gepard+DR (can reuse above Gepard)
 #mDRsea = Model.ComptonModelDRsea()
@@ -69,20 +76,25 @@ tDR1.name = 'DR model 1'
 
 tDR.m.parameters.update(DMepsGLO)
 tDR1.m.parameters.update(DMepsGLO1)
+tDR2.m.parameters.update(DMepsGLO1)
 
 #t.m.parameters.update(allTHI)
 
 # NN
-#mNN = Model.ModelNN(hidden_layers=[26], output_layer=['ImH', 'ReH', 'ImE', 'ReE', 'ImHt', 'ReHt', 'ImEt', 'ReEt'])
+mNN = Model.ModelNN(hidden_layers=[15], output_layer=['ImH', 'ReH', 'ImE', 'ReE', 'ImHt', 'ReHt', 'ImEt', 'ReEt'])
 #mNN = Model.ModelNN(hidden_layers=[9], endpointpower=3.0)
-#tNN = Approach.hotfixedBMK(mNN)
-#tNN.name = 'NNtest'
-#tNN.description = '(xB,t)-9-2 nets. Fit to ALTGLO4points'
+tNN = Approach.hotfixedBMK(mNN)
+tNN.name = 'NNtest'
+tNN.description = 'x (xB,t)-13-8 nets trained on ALTGLO+BSDw2CD+BSSw for 500 batches'
 
 ## [4] Do the fit
 
 
-#f = Fitter.FitterBrain(ALTGLO4points, tNN, nnets=30, nbatch=20, verbose=1)
+#f = Fitter.FitterBrain(BSDw2CDpoints, tNN, nnets=20, nbatch=20, verbose=1)
+#f = Fitter.FitterBrain(BSDw2CDpoints+BSSwpoints, tNN, nnets=20, nbatch=30, verbose=1)
+f = Fitter.FitterBrain(ALTGLOpoints+BSDw2CDpoints+BSSwpoints, tNN, nnets=30, nbatch=500, verbose=1)
+#f = Fitter.FitterBrain(ALTGLOpoints+data[30], tNN, nnets=20, nbatch=50, verbose=1)
+#f = Fitter.FitterBrain(BSDw2CDpoints, tNN, nnets=20, nbatch=50, verbose=1)
 #f.fit()
 #f.prune(minprob=0.5)
 #tNN.save(db)
@@ -90,4 +102,7 @@ tDR1.m.parameters.update(DMepsGLO1)
 
 #t.m.release_parameters('M02S','SECG', 'THIS', 'THIG', 'rv', 'bv', 'Mv', 'C', 'MC', 'trv', 'tbv', 'tMv')
 #f = Fitter.FitterMinuit(DVCSpoints+data[48]+ALTGLO2points, t)
+
+#tDR2.m.release_parameters('rv', 'bv', 'Mv', 'C', 'MC', 'trv', 'tbv', 'tMv')
+#f = Fitter.FitterMinuit(BSDw2CDpoints+data[51], tDR2)
 

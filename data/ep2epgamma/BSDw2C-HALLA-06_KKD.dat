@@ -1,0 +1,94 @@
+id = 50
+editor = KK
+
+# the y0 data are derived from the phi measurement
+# of HALL A data from the experiment (BSD-HALLA-06)
+
+
+### Experiment
+
+collaboration = HALLA
+process = ep2epgamma
+exptype = fixed target
+year = 2006
+reference =  nucl-ex/0607029
+reference2 = DFT analysis with MC error propagation by KK
+# sin(2 phi) set to zero. F^eff set to zero.
+
+
+### Scattering Process
+
+frame = Trento
+
+in1particle = em
+in1energy = 5.75
+in1energyunit = GeV
+in1polarizationvector = L
+in1polarization = +1
+
+in2particle = p
+
+out1particle = e
+out2particle = p
+out3particle = gamma
+
+
+### Observable 
+
+y0name = BSDw2C
+y0namelong = Im Part of BMK01 Angular Harmonic Coefficient CI
+# related to the Fourier transform of weighted Beam Spin Difference
+y0unit = 1
+y0value = table0column2
+y0error = table0column3
+
+
+### x-axes
+
+x0name = xB
+x0unit = 1
+x0value = 0.36
+
+x1name = Q2
+x1unit = GeV^2
+x1value = table0column0
+
+x2name = t
+x2unit = GeV^2
+x2value = table0column1
+
+x3name = FTn
+x3unit = 1
+x3value = -1
+
+
+### Data
+
+# Q2    t      ImCI     err
+############################################
+# hotfixedBMK 
+1.5   -0.17   4.18    0.267
+1.5   -0.23   2.67    0.273
+1.5   -0.28   2.9     0.336
+1.5   -0.33   2.86    0.366
+1.9   -0.17   4.01    0.227
+1.9   -0.23   3.18    0.179
+1.9   -0.28   2.92    0.198
+1.9   -0.33   2.41    0.203
+2.3   -0.17   3.91    0.278
+2.3   -0.23   3.17    0.214
+2.3   -0.28   2.92    0.212
+2.3   -0.33   2.61    0.202
+# BMK
+# 1.5   -0.17   3.2    0.19
+# 1.5   -0.23   2.     0.204
+# 1.5   -0.28   2.09   0.219
+# 1.5   -0.33   2.07   0.246
+# 1.9   -0.17   3.22   0.183
+# 1.9   -0.23   2.51   0.144
+# 1.9   -0.28   2.27   0.151
+# 1.9   -0.33   1.85   0.163
+# 2.3   -0.17   3.28   0.229
+# 2.3   -0.23   2.6    0.173
+# 2.3   -0.28   2.36   0.161
+# 2.3   -0.33   2.08   0.172

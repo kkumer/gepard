@@ -186,7 +186,7 @@ class BMK(Approach):
 
     def w(self, pt):
         """ Weight factor removing BH propagators from INT and BH amplitudes. 
-        It is normalized to \int_0^2pi w = 2pi as in BMK. """
+        It is normalized to \int_0^2pi w  2pi as in BMK. """
         return 2.*pi*pt.P1P2 / pt.intP1P2
 
     def to_conventions(pt):
@@ -585,13 +585,27 @@ class BMK(Approach):
         """Re(C^I) or Re(C^I + Del C^I) as defined by HALL A.
 
         FIXME: Although it is attributed to FTn=0, Re(C^I + Del C^I)
-        is only a part of zeroth harmonic. 
+        is only a part of zeroth harmonic.
 
         """
         if pt.FTn == 0:
             return self.ReCCALINTunp(pt) + self.ReDELCCALINTunp(pt)
         elif pt.FTn == 1:
             return self.ReCCALINTunp(pt)
+
+    def BSSw(self, pt):
+        """Weighted BSS as defined by HALL A.
+
+        """
+        if pt.FTn == 0:
+            return quadrature.Hquadrature(lambda phi: self.BSS(pt, vars={'phi':phi}, 
+                weighted=True), 0, 2.0*pi) / (2.0*pi)
+        elif pt.FTn == 1:
+            return quadrature.Hquadrature(lambda phi: self.BSS(pt, vars={'phi':phi},
+                weighted=True) * cos(phi), 0, 2.0*pi) / pi
+        elif pt.FTn == 2:
+            return quadrature.Hquadrature(lambda phi: self.BSS(pt, vars={'phi':phi},
+                weighted=True) * cos(2.*phi), 0, 2.0*pi) / pi
 
     def XwA(self, pt):
         """Ratio of first two cos harmonics of w-weighted cross section. In BMK, not Trento??"""
