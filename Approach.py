@@ -186,8 +186,8 @@ class BMK(Approach):
 
     def w(self, pt):
         """ Weight factor removing BH propagators from INT and BH amplitudes. 
-        It is normalized to \int_0^2pi w = 1, and not 2pi as in BMK. """
-        return pt.P1P2 / pt.intP1P2
+        It is normalized to \int_0^2pi w = 2pi as in BMK. """
+        return 2.*pi*pt.P1P2 / pt.intP1P2
 
     def to_conventions(pt):
         """Transform stuff into Approach's conventions."""
