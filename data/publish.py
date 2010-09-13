@@ -12,6 +12,8 @@
 import re, os, sys, shutil
 
 
+sys.stderr.write('This script is broken!')
+
 from Cheetah.Template import Template
 import matplotlib
 matplotlib.use('AGG')

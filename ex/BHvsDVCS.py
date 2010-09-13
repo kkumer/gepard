@@ -1,5 +1,9 @@
-"""Compares Bethe-Heitler and DVCS contributions to cross-section
-for various experiments."""
+#!/usr/bin/env python
+
+"""
+Compares Bethe-Heitler and DVCS contributions to cross-section
+for various experiments.
+"""
 
 import shelve, os, math
 
@@ -21,7 +25,7 @@ import plots
 from constants import Mp2, Mp
 
 db = shelve.open('theories.db')
-th = db['DMGLO1']
+th = db['KKepsGLO1']
 
 def tfromgamma(Q2, xB, gamma):
     """Calculate momentum transfer, given angle between photons."""
@@ -160,3 +164,5 @@ for n in range(4):
     #ggrid(kin[n])
 fig.canvas.draw()
 fig.show()
+
+raw_input('press ENTER to end')

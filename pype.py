@@ -49,8 +49,8 @@ BSSwpoints = utils.select(data[51], criteria=['FTn != 2'])
 ## [3] Create a theory
 
 # Gepard only
-#mGepard = Model.ComptonGepard(cutq2=0.5)
-#tGepard = Approach.hotfixedBMK(mGepard)
+mGepard = Model.ComptonGepard(cutq2=0.5)
+tGepard = Approach.hotfixedBMK(mGepard)
 
 
 # DR only
@@ -67,18 +67,18 @@ tDR2 = Approach.BMK(mDRonly2)
 tDR2.name = 'DR model 2'
 
 # Hybrid: Gepard+DR (can reuse above Gepard)
-#mDRsea = Model.ComptonModelDRsea()
-#m = Model.Hybrid(mGepard, mDRsea)
-#t = Approach.hotfixedBMK(m)
-#t.name = 'DR + Gepard sea'
-#g = t.m.g
+mDRsea = Model.ComptonModelDRsea()
+m = Model.Hybrid(mGepard, mDRsea)
+t = Approach.hotfixedBMK(m)
+t.name = 'DR + Gepard sea'
+g = t.m.g
 
 
 tDR.m.parameters.update(DMepsGLO)
 tDR1.m.parameters.update(DMepsGLO1)
 tDR2.m.parameters.update(DMepsGLO1)
 
-#t.m.parameters.update(allTHI)
+t.m.parameters.update(hy1THI)
 
 # NN
 mNN = Model.ModelNN(hidden_layers=[15], output_layer=['ImH', 'ReH', 'ImE', 'ReE', 'ImHt', 'ReHt', 'ImEt', 'ReEt'])
@@ -92,7 +92,7 @@ tNN.description = 'x (xB,t)-13-8 nets trained on ALTGLO+BSDw2CD+BSSw for 500 bat
 
 #f = Fitter.FitterBrain(BSDw2CDpoints, tNN, nnets=20, nbatch=20, verbose=1)
 #f = Fitter.FitterBrain(BSDw2CDpoints+BSSwpoints, tNN, nnets=20, nbatch=30, verbose=1)
-f = Fitter.FitterBrain(ALTGLOpoints+BSDw2CDpoints+BSSwpoints, tNN, nnets=30, nbatch=500, verbose=1)
+#f = Fitter.FitterBrain(ALTGLOpoints+BSDw2CDpoints+BSSwpoints, tNN, nnets=30, nbatch=500, verbose=1)
 #f = Fitter.FitterBrain(ALTGLOpoints+data[30], tNN, nnets=20, nbatch=50, verbose=1)
 #f = Fitter.FitterBrain(BSDw2CDpoints, tNN, nnets=20, nbatch=50, verbose=1)
 #f.fit()
