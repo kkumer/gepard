@@ -193,7 +193,7 @@ class DataSet(list):
             # units used for internal theoretical formulas
             self.newunits = {}
             # charge of first particle FIXME: just electron treated
-            if self.in1particle == 'ep':                      # positron
+            if self.in1particle == 'e+' or self.in1particle == 'ep':    # positron
                 self.in1charge = +1
             elif self.in1particle == 'e' or self.in1particle == 'em':   # electron
                 self.in1charge = -1

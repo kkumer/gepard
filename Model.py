@@ -119,6 +119,8 @@ class ComptonFormFactors(Model):
     """
 
     allCFFs = ['ImH', 'ReH', 'ImE', 'ReE', 'ImHt', 'ReHt', 'ImEt', 'ReEt']
+    allCFFeffs = ['ImHeff', 'ReHeff', 'ImEeff', 'ReEeff', 
+                     'ImHteff', 'ReHteff', 'ImEteff', 'ReEteff']
 
     def CFFvalues(self, pt):
         """Print values of CFFs. Pastable into Mathematica."""
@@ -131,6 +133,8 @@ class ComptonFormFactors(Model):
     for name in allCFFs:
         exec('def %s(self, pt): return 0.' % name)
 
+    for name in allCFFeffs:
+        exec('def %s(self, pt): return 0.' % name)
 
 class ComptonDispersionRelations(ComptonFormFactors):
     """Use dispersion relations for ReH and ReE

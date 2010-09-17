@@ -203,6 +203,61 @@ def HERMES09(lines=[], band=[], path=None, fmt='png'):
         fig.show()
     return fig
 
+def HERMES10(obs='TSA', lines=[], band=[], path=None, fmt='png'):
+    """Plot HERMES 1004.0177 TSA data with fit lines."""
+
+    title = 'HERMES10-'+obs
+    fig = plt.figure()
+    fig.canvas.set_window_title(title)
+    fig.suptitle(title)
+    xaxes = ['tm', 'xB', 'Q2']
+    ylims = [(-0.05, 0.3), (-0.15, 0.15), (-0.45, 0.05)]
+    xticks = [0.2, 0.1, 2]
+    if obs=='TSA':
+        id = 50
+        harmonics = [-1, -2, -3]
+        fun = 'sin'
+    else:
+        id = 51
+        harmonics = [0, 1, 2]
+        fun = 'cos'
+    subsets = {}
+    for k in range(3):
+        subsets[k] = utils.select(data[id], criteria=['FTn == %i' % harmonics[k]])
+    # we have 3x12=36 points to be separated in nine panels four points each:
+    for y in range(3):
+        for x in range(3):
+            panel = 3*y + x + 1  # 1, 2, ..., 9
+            ax = fig.add_subplot(3,3,panel)
+            ax.yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))  # tickmarks
+            ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(xticks[x]))
+            subplot(ax, [subsets[y][x*4:x*4+4]], lines, band, xaxes[x], [])
+            #apply(ax.set_ylim, ylims[y])
+            if (panel % 3) != 1:
+                # Leave labels only on leftmost panels
+                ax.set_ylabel('')
+            else:
+                ylabels = ['$'+obs+'\\; \\'+fun+'(%i\\phi)$' % harmonics[k] for k in range(3)]
+                ax.set_ylabel(ylabels[(panel-1)/3], fontsize=18)
+
+            if panel < 7:
+                # Leave labels only on lowest panels
+                ax.set_xlabel('')
+            else:
+                xlabels = ['$-t\\; [{\\rm GeV}^2]$', '$x_B$', '$Q^2\\; [{\\rm GeV}^2]$']
+                ax.set_xlabel(xlabels[panel-7], fontsize=18)
+
+            if (panel % 3) == 2:
+                # Adjust x-axis on middle column
+                ax.set_xlim(0.04, 0.25)
+    if path:
+        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+    else:
+        fig.canvas.draw()
+        fig.show()
+    return fig
+
+
 def CLAS(lines=[], band=[], path=None, fmt='png'):
     """Makes plot of CLAS BSA data with fit lines"""
 
