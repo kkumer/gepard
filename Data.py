@@ -195,7 +195,7 @@ class DataSet(list):
             # charge of first particle FIXME: just electron treated
             if self.in1particle == 'e+' or self.in1particle == 'ep':    # positron
                 self.in1charge = +1
-            elif self.in1particle == 'e' or self.in1particle == 'em':   # electron
+            elif self.in1particle == 'e' or self.in1particle == 'e-' or self.in1particle == 'em':
                 self.in1charge = -1
             # Mandelstam s
             if self.process == 'ep2epgamma':

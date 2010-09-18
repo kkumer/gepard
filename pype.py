@@ -19,13 +19,12 @@ data = utils.loaddata('data/ep2epgamma', approach=Approach.hotfixedBMK)
 #data.update(utils.loaddata('data/gammastarp2gammap', approach=Approach.hotfixedBMK))
 #db = shelve.open('theories.db')
 
-pt0 = data[33][-1]
-pt0.in2polarization = 1
-pt0.phi = 2.*np.pi/5.
-Approach.BM10.prepare(pt0)
+# Test point ...
+#pt0 = data[33][-1]
+#pt0.in2polarization = 1
+#pt0.phi = 2.*np.pi/5.
+#Approach.BM10.prepare(pt0)
 
-pt5 = data[50][5]
-Approach.BM10.prepare(pt5)
 
 
 ## [2] Choose subset of datapoints for fitting
@@ -64,15 +63,14 @@ TSA1points = utils.select(data[52], criteria=['FTn == -1'])
 # DR only
 mDRonly = Model.ModelDR()
 tDR = Approach.hotfixedBMK(mDRonly)
-tDR.name = 'DR model'
+tDR.name = 'DR model GLO'
+tDR.m.parameters.update(DMepsGLO)
 
 mDRonly1 = Model.ModelDR()
 tDR1 = Approach.hotfixedBMK(mDRonly1)
-tDR1.name = 'DR model 1'
+tDR1.name = 'DR model GLO1'
+tDR1.m.parameters.update(DMepsGLO1)
 
-#mDRonly2 = Model.ModelDR()
-#tDR2 = Approach.BMK(mDRonly2)
-#tDR2.name = 'DR model 2'
 
 ## Hybrid: Gepard+DR (can reuse above Gepard)
 #mDRsea = Model.ComptonModelDRsea()
@@ -81,17 +79,10 @@ tDR1.name = 'DR model 1'
 #t.name = 'DR + Gepard sea'
 #g = t.m.g
 
-#t = Approach.BM10(mDRonly1)
-#t.name = 'BM10 noQ2'
-#t.m.parameters.update(DMepsGLO)
-
-#tex = Approach.BM10ex(mDRonly1)
-#tex.name = 'BM10 ex'
-#tex.m.parameters.update(DMepsGLO1)
-
-tDR.m.parameters.update(DMepsGLO)
-tDR1.m.parameters.update(DMepsGLO1)
-#tDR2.m.parameters.update(DMepsGLO1)
+mDRonly2 = Model.ModelDR()
+t = Approach.BM10(mDRonly2)
+t.name = 'BM10'
+t.m.parameters.update(DMepsGLO)
 
 #t.m.parameters.update(hy1THI)
 
@@ -104,20 +95,17 @@ tDR1.m.parameters.update(DMepsGLO1)
 
 ## [4] Do the fit
 
-
-#f = Fitter.FitterBrain(BSDw2CDpoints, tNN, nnets=20, nbatch=20, verbose=1)
-#f = Fitter.FitterBrain(BSDw2CDpoints+BSSwpoints, tNN, nnets=20, nbatch=30, verbose=1)
-#f = Fitter.FitterBrain(ALTGLOpoints+BSDw2CDpoints+BSSwpoints, tNN, nnets=30, nbatch=500, verbose=1)
-#f = Fitter.FitterBrain(ALTGLOpoints+data[30], tNN, nnets=20, nbatch=50, verbose=1)
 #f = Fitter.FitterBrain(BSDw2CDpoints, tNN, nnets=20, nbatch=50, verbose=1)
 #f.fit()
 #f.prune(minprob=0.5)
 #tNN.save(db)
 #db.close()
 
+## Fitting to both small- and large-x data
 #t.m.release_parameters('M02S','SECG', 'THIS', 'THIG', 'rv', 'bv', 'Mv', 'C', 'MC', 'trv', 'tbv', 'tMv')
 #f = Fitter.FitterMinuit(DVCSpoints+data[48]+ALTGLO2points, t)
 
+## DR fit
 #t.m.release_parameters('rv', 'bv', 'Mv', 'C', 'MC', 'trv', 'tbv', 'tMv')
 #f = Fitter.FitterMinuit(GLOpoints, t)
 
