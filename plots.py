@@ -214,11 +214,11 @@ def HERMES10(obs='TSA', lines=[], band=[], path=None, fmt='png'):
     ylims = [(-0.05, 0.3), (-0.15, 0.15), (-0.45, 0.05)]
     xticks = [0.2, 0.1, 2]
     if obs=='TSA':
-        id = 50
+        id = 52
         harmonics = [-1, -2, -3]
         fun = 'sin'
     else:
-        id = 51
+        id = 53
         harmonics = [0, 1, 2]
         fun = 'cos'
     subsets = {}

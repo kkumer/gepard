@@ -50,7 +50,7 @@ GLO1points = data[31][12:] + data[8] + data[29] + data[30]  # DM's GLO1 set
 #BSDw2Cpoints = utils.select(data[26], criteria=['Q2 == 2.3'])
 #BSDw2CDpoints = utils.select(data[50], criteria=['Q2 == 2.3'])
 #BSSwpoints = utils.select(data[51], criteria=['FTn != 2'])
-TSA1points = utils.select(data[50], criteria=['FTn == -1'])
+TSA1points = utils.select(data[52], criteria=['FTn == -1'])
 
 
 
@@ -62,9 +62,9 @@ TSA1points = utils.select(data[50], criteria=['FTn == -1'])
 
 
 # DR only
-#mDRonly = Model.ModelDR()
-#tDR = Approach.hotfixedBMK(mDRonly)
-#tDR.name = 'DR model'
+mDRonly = Model.ModelDR()
+tDR = Approach.hotfixedBMK(mDRonly)
+tDR.name = 'DR model'
 
 mDRonly1 = Model.ModelDR()
 tDR1 = Approach.hotfixedBMK(mDRonly1)
@@ -81,15 +81,15 @@ tDR1.name = 'DR model 1'
 #t.name = 'DR + Gepard sea'
 #g = t.m.g
 
-t = Approach.BM10(mDRonly1)
-t.name = 'BM10 noQ2'
-t.m.parameters.update(DMepsGLO1)
+#t = Approach.BM10(mDRonly1)
+#t.name = 'BM10 noQ2'
+#t.m.parameters.update(DMepsGLO)
 
 #tex = Approach.BM10ex(mDRonly1)
 #tex.name = 'BM10 ex'
 #tex.m.parameters.update(DMepsGLO1)
 
-#tDR.m.parameters.update(DMepsGLO)
+tDR.m.parameters.update(DMepsGLO)
 tDR1.m.parameters.update(DMepsGLO1)
 #tDR2.m.parameters.update(DMepsGLO1)
 
@@ -118,7 +118,7 @@ tDR1.m.parameters.update(DMepsGLO1)
 #t.m.release_parameters('M02S','SECG', 'THIS', 'THIG', 'rv', 'bv', 'Mv', 'C', 'MC', 'trv', 'tbv', 'tMv')
 #f = Fitter.FitterMinuit(DVCSpoints+data[48]+ALTGLO2points, t)
 
-t.m.release_parameters('rv', 'bv', 'Mv', 'C', 'MC', 'trv', 'tbv', 'tMv')
-f = Fitter.FitterMinuit(GLO1points+TSA1points, t)
+#t.m.release_parameters('rv', 'bv', 'Mv', 'C', 'MC', 'trv', 'tbv', 'tMv')
+#f = Fitter.FitterMinuit(GLOpoints, t)
 
 
