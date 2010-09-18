@@ -26,17 +26,14 @@ def test_fit():
     for pt in testpoints:
         chisq = chisq + (
                 (getattr(t, pt.yaxis)(pt) - pt.val)**2 / pt.err**2 )
-    assert_almost_equal(chisq, 8.5683742574814694)
-
+    assert_almost_equal(chisq, 8.8479922732922276)
 
 def test_fit2():
     """Testing actual fitting by FitterMinuit."""
     f = Fitter.FitterMinuit(fitpoints, t)
     f.fit()
     chisq = t.chisq(fitpoints)[0]
-    assert_almost_equal(chisq, 8.1467195035040003, 4)
-
-#test_fit2.long = 1
+    assert_almost_equal(chisq, 8.4891170857950087)
 
 def test_fit_neural():
     """Testing neural network fitting by FitterBrain."""
@@ -46,6 +43,4 @@ def test_fit_neural():
     fNN = Fitter.FitterBrain(2*fitpoints, tNN, nnets=1, nbatch=6)
     fNN.fit()
     chisq = tNN.chisq(2*fitpoints)[0]
-    assert_almost_equal(chisq, 22.548298365132368)
-
-#test_fit_neural.long = 1
+    assert_almost_equal(chisq, 22.754514666801569)

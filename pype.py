@@ -4,11 +4,10 @@ import shelve
 
 import numpy as np
 
-import Model, Approach, Fitter
+import Model, Approach, Fitter, Data
 import utils 
 import plots
 
-import Data
 from constants import Mp, Mp2
 
 from results import *
@@ -18,14 +17,6 @@ from results import *
 data = utils.loaddata('data/ep2epgamma', approach=Approach.hotfixedBMK)  
 #data.update(utils.loaddata('data/gammastarp2gammap', approach=Approach.hotfixedBMK))
 #db = shelve.open('theories.db')
-
-# Test point ...
-#pt0 = data[33][-1]
-#pt0.in2polarization = 1
-#pt0.phi = 2.*np.pi/5.
-#Approach.BM10.prepare(pt0)
-
-
 
 ## [2] Choose subset of datapoints for fitting
 
@@ -82,7 +73,7 @@ tDR1.m.parameters.update(DMepsGLO1)
 mDRonly2 = Model.ModelDR()
 t = Approach.BM10(mDRonly2)
 t.name = 'BM10'
-t.m.parameters.update(DMepsGLO)
+t.m.parameters.update(DMepsGLO1)
 
 #t.m.parameters.update(hy1THI)
 
