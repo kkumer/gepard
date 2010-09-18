@@ -306,6 +306,26 @@ def CLAS(lines=[], band=[], path=None, fmt='png'):
         fig.show()
     return fig
 
+def CLASTSA(lines=[], band=[], path=None, fmt='png'):
+    """Plot CLAS TSA."""
+    id = 54
+    title = 'CLAS-TSA'
+    fig = plt.figure()
+    fig.canvas.set_window_title(title)
+    fig.suptitle(title)
+    xaxes = ['tm', 'xB']
+    # we have 2x3 points
+    for x in range(2):
+        ax = fig.add_subplot(2, 1, x+1)
+        #ax.yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))  # tickmarks
+        subplot(ax, [data[id][x*3:x*3+3]], lines, band, xaxes[x], [])
+    if path:
+        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+    else:
+        fig.canvas.draw()
+        fig.show()
+    return fig
+
 def HALLA(lines=[], band=[], path=None, fmt='png'):
     """Makes plot of HALL-A data with fit lines"""
 

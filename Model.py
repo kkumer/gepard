@@ -446,6 +446,9 @@ class ComptonNeuralNets(Model):
         elif name in ComptonFormFactors.allCFFs:
             # if asked for CFF which is not in output_layer, return 0
             return self.zero
+        elif name in ComptonFormFactors.allCFFeffs:
+            # if asked for CFF which is not in output_layer, return 0
+            return self.zero
         elif name == 'endpointpower':
             if self.__dict__.has_key('endpointpower'):
                 return self.endpointpower
