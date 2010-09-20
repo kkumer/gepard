@@ -14,6 +14,14 @@ m.parameters['limit_Mv'] = (0.9, 1.1)  # for compatibility with old g.
 m.release_parameters('bS', 'Mv')
 t = Approach.hotfixedBMK(m, optimization = False)
 
+# Optimized model
+mopt = Model.ModelDR(optimization = True)
+mopt.parameters.update(DMGLO1)
+mopt.ndparameters = np.array([mopt.parameters[name] for name in mopt.parameter_names])
+mopt.parameters['limit_Mv'] = (0.9, 1.1)  # for compatibility with old g.
+mopt.release_parameters('bS', 'Mv')
+topt = Approach.hotfixedBMK(mopt, optimization = False)
+
 # testing data set
 testpoints = [data[31][12]] + [data[8][1]] + [data[29][2]] + [data[30][3]]
 # testing data set for fits
@@ -37,6 +45,17 @@ def test_fit2():
 
 test_fit2.long = 1
 test_fit2.batch = 1
+
+def test_fit2opt():
+    """Testing actual fitting by FitterMinuit."""
+    fopt = Fitter.FitterMinuit(fitpoints, topt)
+    fopt.fit()
+    chisq = topt.chisq(fitpoints)[0]
+    assert_almost_equal(chisq, 8.4891170857950087, 5)
+
+test_fit2opt.long = 1
+test_fit2opt.batch = 1
+test_fit2opt.optimization = 1
 
 def test_fit_neural():
     """Testing neural network fitting by FitterBrain."""

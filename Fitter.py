@@ -45,12 +45,13 @@ class FitterMinuit(Fitter):
 """
 def fcn(%s):
     theory.model.parameters.update({%s})
+    theory.model.ndparameters.put(range(theory.model.ndparameters.size), [%s])
     chisq = 0.
     for pt in fitpoints:
         chisq = chisq + (
                 (getattr(theory, pt.yaxis)(pt) - pt.val)**2 / pt.err**2 )
     return chisq
-""" % (fcnargs, pardict), locals(),locals())
+""" % (fcnargs, pardict, fcnargs), locals(),locals())
         if isinstance(theory.model.parameters, utils.hubDict):
             # This is needed because in Python <=2.5 ** operator
             # requires dict as an argument, i.e. my hubDict wouldn't work:

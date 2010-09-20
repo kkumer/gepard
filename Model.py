@@ -17,16 +17,19 @@ from quadrature import PVquadrature
 from utils import flatten, hubDict
 
 import pygepard as g
-
+import optModel
 
 class Model(object):
     """Base class for all models."""
 
-    def __init__(self):
+    def __init__(self, optimization=False):
+        self.optimization = optimization
         # Intially all parameters are fixed and should be released by user
         exec('fixed = {' + ", ".join(map(lambda x: "'fix_%s': %s" % x, 
                     zip(self.parameter_names, len(self.parameter_names)*['True']))) + '}')
         self.parameters.update(fixed)
+        self.ndparameters = array([self.parameters[name] for name in self.parameter_names])
+        #self.res = array([0. for k in range(18)])
 
     def release_parameters(self, *args):
         """Release parameters for fitting.
@@ -145,7 +148,7 @@ class ComptonDispersionRelations(ComptonFormFactors):
     
     """
 
-    def dispargV(self, x, fun, pt):
+    def dispargV(self, x, ndfun, fun, pt):
         """ Integrand of the dispersion integral (vector case) 
         
         fun -- Im(CFF)
@@ -155,7 +158,8 @@ class ComptonDispersionRelations(ComptonFormFactors):
         """
         ga = 0.9  # Nice value obtained by experimentation in Mathematica
         u = x**(1./(1.-ga))
-        res = u**ga * ( fun(pt, u) - fun(pt) )
+        #res = u**ga * ( fun(pt, u) - fun(pt) )
+        res = u**ga * ( ndfun(pt, u) - fun(pt) )
         #print x, fun(pt, u), fun(pt)
         return (2.*u) / (pt.xi**2 - u**2) * res / (1.-ga)
 
@@ -181,8 +185,11 @@ class ComptonDispersionRelations(ComptonFormFactors):
         Given by dispersion integral over ImH - subtraction constant.
         
         """
-        res = PVquadrature(self.dispargV, 0, 1, (self.ImH, pt))
-        pv = res + log(pt.xi**2 / (1.-pt.xi**2)) * self.ImH(pt)
+        if self.optimization:
+            pv = optModel.pvquadratureh(self.ndparameters, pt.t, pt.xi)
+        else:
+            res = PVquadrature(self.dispargV, 0, 1, (self.ndImH, self.ImH, pt))
+            pv = res + log(pt.xi**2 / (1.-pt.xi**2)) * self.ImH(pt)
         # P.V./pi - subtraction constant C/(1-t/MC^2)^2
         return pv/pi - self.subtraction(pt)
 
@@ -203,7 +210,7 @@ class ComptonDispersionRelations(ComptonFormFactors):
         Given by dispersion integral over ImE + subtraction constant.
         
         """
-        res = PVquadrature(self.dispargV, 0, 1, (self.ImE, pt))
+        res = PVquadrature(self.dispargV, 0, 1, (self.ImE, self.ImE, pt))
         pv = res + log(pt.xi**2 / (1.-pt.xi**2)) * self.ImE(pt)
         # This is same subtraction constant
         # as for H, but with opposite sign
@@ -223,7 +230,7 @@ class ComptonDispersionRelations(ComptonFormFactors):
 class ComptonModelDR(ComptonDispersionRelations):
     """Model for CFFs as in arXiv:0904.0458."""
 
-    def __init__(self):
+    def __init__(self, **kwargs):
         # initial values of parameters and limits on their values
         self.parameters = {
               'NS' : 1.5,                                 
@@ -252,7 +259,7 @@ class ComptonModelDR(ComptonDispersionRelations):
                                 'tNv', 'tMv', 'trv', 'tbv']
 
         # now do whatever else is necessary
-        ComptonFormFactors.__init__(self)
+        ComptonFormFactors.__init__(self, **kwargs)
 
     def subtraction(self, pt):
         return self.parameters['C']/(1.-pt.t/self.parameters['MC']**2)**2
@@ -278,6 +285,12 @@ class ComptonModelDR(ComptonDispersionRelations):
         sea = ( (2./9.) * p['NS'] * p['rS'] * twox**(-p['alS']-p['alpS']*t) *
                  onex**p['bS'] / (1. - onex*t/(p['MS']**2))**2 )
         return pi * (val + sea) / (1.+x)
+
+    def ndImH(self, pt, x): 
+        if self.optimization:
+            return optModel.imhopt(self.ndparameters, pt.t, x)
+        else:
+            return self.ImH(pt, xi=x)
 
     def ImHt(self, pt, xi=0):
         """Imaginary part of CFF Ht i.e. \tilde{H}."""
@@ -316,7 +329,7 @@ class ComptonModelDR(ComptonDispersionRelations):
 class ComptonModelDRPP(ComptonModelDR):
     """Model for CFFs as in arXiv:0904.0458. + free pion pole normalization"""
 
-    def __init__(self):
+    def __init__(self, **kwargs):
         # initial values of parameters and limits on their values
         self.parameters = {
               'NS' : 1.5,                                 
@@ -346,7 +359,7 @@ class ComptonModelDRPP(ComptonModelDR):
                                 'tNv', 'tMv', 'trv', 'tbv', 'NPP']
 
         # now do whatever else is necessary
-        ComptonFormFactors.__init__(self)
+        ComptonFormFactors.__init__(self, **kwargs)
 
     def ReEt(self, pt):
         """Instead of disp. rel. use pole formula * NPP."""
@@ -356,7 +369,7 @@ class ComptonModelDRPP(ComptonModelDR):
 class ComptonModelDRsea(ComptonDispersionRelations):
     """DR Model intended for combining with Gepard sea. NS->Nsea"""
 
-    def __init__(self):
+    def __init__(self, **kwargs):
         # initial values of parameters and limits on their values
         self.parameters = {
               'Nsea' : 1.5,                                 
@@ -385,9 +398,7 @@ class ComptonModelDRsea(ComptonDispersionRelations):
                                 'tNv', 'tMv', 'trv', 'tbv']
 
         # now do whatever else is necessary
-        ComptonFormFactors.__init__(self)
-
-
+        ComptonFormFactors.__init__(self, **kwargs)
 
     def subtraction(self, pt):
         return self.parameters['C']/(1.-pt.t/self.parameters['MC']**2)**2
@@ -413,6 +424,8 @@ class ComptonModelDRsea(ComptonDispersionRelations):
         sea = ( (2./9.) * p['Nsea'] * p['rS'] * twox**(-p['alS']-p['alpS']*t) *
                  onex**p['bS'] / (1. - onex*t/(p['MS']**2))**2 )
         return pi * (val + sea) / (1.+x)
+
+    def ndImH(self, pt, xi=0): return self.ImH(pt, xi)
 
     def ImHt(self, pt, xi=0):
         """Imaginary part of CFF Ht i.e. \tilde{H}."""
@@ -558,7 +571,7 @@ class ComptonGepard(ComptonFormFactors):
     cutq2 - Q2 at which evolution is frozen (default = 0 GeV^2)
     
     """
-    def __init__(self, cutq2=0.0):
+    def __init__(self, cutq2=0.0, **kwargs):
         # initial values of parameters and limits on their values
         self.parameters = {
                'NS' : 0.15,
@@ -657,7 +670,7 @@ class ComptonGepard(ComptonFormFactors):
         g.npts = 2**g.parint.acc * 12 / g.parint.speed
         self.g = g
         # now do whatever else is necessary
-        ComptonFormFactors.__init__(self)
+        ComptonFormFactors.__init__(self, **kwargs)
 
     def _evolve(self, pt):
         """Calculate evolution operator."""
@@ -736,7 +749,7 @@ class ComptonGepard(ComptonFormFactors):
 class ComptonHybrid(ComptonFormFactors):
     """This combines gepard for small xB and DR model for valence xB."""
 
-    def __init__(self, instGepard, instDR):
+    def __init__(self, instGepard, instDR, **kwargs):
         self.Gepard = instGepard  # instance of ComptonGepard
         self.DR = instDR  # instance of ComptonModelDR
         self.DR.parameters['Nsea'] = 0.  # sea comes from Gepard part
@@ -745,7 +758,7 @@ class ComptonHybrid(ComptonFormFactors):
 
         self.g = g
         # now do whatever else is necessary
-        ComptonFormFactors.__init__(self)
+        ComptonFormFactors.__init__(self, **kwargs)
 
 
     def ImH(self, pt, xi=0):

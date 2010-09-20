@@ -16,6 +16,12 @@ mBM10 = Model.ModelDR()
 mBM10.parameters.update(DMepsGLO1)
 tBM10 = Approach.BM10(mBM10, optimization = False)
 
+# Optimized model
+mopt = Model.ModelDR(optimization = False)
+mopt.parameters.update(DMepsGLO1)
+mopt.ndparameters = np.array([mopt.parameters[name] for name in mopt.parameter_names])
+topt = Approach.BM10(mopt, optimization = True)
+
 # testing data point for hotfixedBMK
 pt0 = copy.deepcopy(data[31][12])  # was data[1][0]
 pt0.in1polarization = 1
@@ -33,6 +39,19 @@ def test_CFF():
     assert_almost_equal(m.ReH(pt0), -2.4699741916859592)
 
 test_CFF.one = 1
+
+def test_CFF2():
+    """Calculate CFF H."""
+    assert_almost_equal(mBM10.ImH(pt1), 1.3213158482535692)
+    assert_almost_equal(mBM10.ReH(pt1), -3.8889361918326872)
+
+
+def test_CFFopt():
+    """Calculate CFF H."""
+    assert_almost_equal(mopt.ImH(pt1), 1.3213158482535692)
+    assert_almost_equal(mopt.ReH(pt1), -3.8889361918326872)
+
+test_CFFopt.optimization = 1
 
 def test_Xunp():
     """Calculate basic cross section Xunp."""
@@ -75,3 +94,13 @@ def test_XLP():
     assert_almost_equal(tBM10.PreFacSigma(pt1)*tBM10.TDVCS2LP(pt1), -0.0032470111398419628)
     assert_almost_equal(tBM10.PreFacSigma(pt1)*tBM10.TINTLP(pt1), 0.0085102074298275109)
     assert_almost_equal(tBM10.XLP(pt1), 0.014759105067399584)
+
+def test_XunpBM10opt():
+    """Calculate optimally unpolarized cross section Xunp in BM10 Approach."""
+
+    assert_almost_equal(topt.PreFacSigma(pt1)*topt.TBH2unp(pt1), 0.01502937358336803)
+    assert_almost_equal(topt.PreFacSigma(pt1)*topt.TDVCS2unp(pt1), 0.012565093106990456)
+    assert_almost_equal(topt.PreFacSigma(pt1)*topt.TINTunp(pt1), 0.0011255158978939425)
+    assert_almost_equal(topt.Xunp(pt1), 0.028719982588252427)
+
+test_XunpBM10opt.optimization = 1
