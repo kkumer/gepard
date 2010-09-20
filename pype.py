@@ -70,9 +70,9 @@ tDR1.m.parameters.update(DMepsGLO1)
 #t.name = 'DR + Gepard sea'
 #g = t.m.g
 
-mDRonly2 = Model.ModelDR()
-t = Approach.BM10(mDRonly2)
-t.name = 'BM10'
+mDRPP = Model.ModelDRPP()
+t = Approach.BM10(mDRPP)
+t.name = 'BM10 + free PP'
 t.m.parameters.update(DMepsGLO1)
 
 #t.m.parameters.update(hy1THI)
@@ -97,7 +97,7 @@ t.m.parameters.update(DMepsGLO1)
 #f = Fitter.FitterMinuit(DVCSpoints+data[48]+ALTGLO2points, t)
 
 ## DR fit
-#t.m.release_parameters('rv', 'bv', 'Mv', 'C', 'MC', 'trv', 'tbv', 'tMv')
-#f = Fitter.FitterMinuit(GLOpoints, t)
+t.m.release_parameters('rv', 'bv', 'Mv', 'C', 'MC', 'trv', 'tbv', 'tMv', 'NPP')
+f = Fitter.FitterMinuit(GLO1points + TSA1points, t)
 
 

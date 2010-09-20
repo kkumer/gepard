@@ -312,6 +312,47 @@ class ComptonModelDR(ComptonDispersionRelations):
         return (2.2390424 * (1. - (1.7*(0.0196 - pt.t))/(1. 
             - pt.t/2.)**2))/((0.0196 - pt.t)*pt.xi)
 
+
+class ComptonModelDRPP(ComptonModelDR):
+    """Model for CFFs as in arXiv:0904.0458. + free pion pole normalization"""
+
+    def __init__(self):
+        # initial values of parameters and limits on their values
+        self.parameters = {
+              'NS' : 1.5,                                 
+             'alS' : 1.13,                              
+            'alpS' : 0.15,                              
+              'MS' : 0.707,                               
+              'rS' : 1.0,                               
+              'bS' : 2.0,     'limit_bS' : (0.4, 5.0),
+              'Nv' : 1.35,                              
+             'alv' : 0.43,                              
+            'alpv' : 0.85,                              
+              'Mv' : 1.0,     'limit_Mv' : (0.4, 1.5),
+              'rv' : 0.5,     'limit_rv' : (0., 8.),
+              'bv' : 2.2,     'limit_bv' : (0.4, 5.),
+               'C' : 7.0,      'limit_C' : (-10., 10.),
+              'MC' : 1.3,     'limit_MC' : (0.4, 2.),
+             'tNv' : 0.0,                             
+             'tMv' : 2.7,    'limit_tMv' : (0.4, 2.),
+             'trv' : 6.0,    'limit_trv' : (0., 8.),
+             'tbv' : 3.0,    'limit_tbv' : (0.4, 5.),
+             'NPP' : 1.0,    'limit_tbv' : (-8, 8.)   }
+
+        # order matters to fit.MinuitFitter, so it is defined by:
+        self.parameter_names = ['NS', 'alS', 'alpS', 'MS', 'rS', 'bS',
+                                'Nv', 'alv', 'alpv', 'Mv', 'rv', 'bv',
+                                'C', 'MC',
+                                'tNv', 'tMv', 'trv', 'tbv', 'NPP']
+
+        # now do whatever else is necessary
+        ComptonFormFactors.__init__(self)
+
+    def ReEt(self, pt):
+        """Instead of disp. rel. use pole formula * NPP."""
+        return self.parameters['NPP']*(2.2390424 * (1. - (1.7*(0.0196 - pt.t))/(1. 
+            - pt.t/2.)**2))/((0.0196 - pt.t)*pt.xi)
+
 class ComptonModelDRsea(ComptonDispersionRelations):
     """DR Model intended for combining with Gepard sea. NS->Nsea"""
 
@@ -745,4 +786,7 @@ class ModelNN(ComptonNeuralNets, ElasticDipole):
 
 class Hybrid(ComptonHybrid, ElasticDipole):
     """Complete hybrid model."""
+
+class ModelDRPP(ComptonModelDRPP, ElasticDipole):
+    """Complete model as in arXiv:0904.0458. + free pion pole normalization."""
 

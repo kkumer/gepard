@@ -35,6 +35,9 @@ def test_fit2():
     chisq = t.chisq(fitpoints)[0]
     assert_almost_equal(chisq, 8.4891170857950087)
 
+test_fit2.long = 1
+test_fit2.batch = 1
+
 def test_fit_neural():
     """Testing neural network fitting by FitterBrain."""
     np.random.seed(68)
@@ -44,3 +47,5 @@ def test_fit_neural():
     fNN.fit()
     chisq = tNN.chisq(2*fitpoints)[0]
     assert_almost_equal(chisq, 22.754514666801569)
+
+test_fit_neural.long = 1
