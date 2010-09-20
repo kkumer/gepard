@@ -337,7 +337,7 @@ class ComptonModelDRPP(ComptonModelDR):
              'tMv' : 2.7,    'limit_tMv' : (0.4, 2.),
              'trv' : 6.0,    'limit_trv' : (0., 8.),
              'tbv' : 3.0,    'limit_tbv' : (0.4, 5.),
-             'NPP' : 1.0,    'limit_tbv' : (-8, 8.)   }
+             'NPP' : 1.0,    'limit_tPP' : (-8, 8.)   }
 
         # order matters to fit.MinuitFitter, so it is defined by:
         self.parameter_names = ['NS', 'alS', 'alpS', 'MS', 'rS', 'bS',
