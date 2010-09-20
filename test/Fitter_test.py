@@ -41,7 +41,7 @@ def test_fit2():
     f = Fitter.FitterMinuit(fitpoints, t)
     f.fit()
     chisq = t.chisq(fitpoints)[0]
-    assert_almost_equal(chisq, 8.4891170857950087)
+    assert_almost_equal(chisq, 8.4891170857950087, 4)
 
 test_fit2.long = 1
 test_fit2.batch = 1
@@ -51,7 +51,7 @@ def test_fit2opt():
     fopt = Fitter.FitterMinuit(fitpoints, topt)
     fopt.fit()
     chisq = topt.chisq(fitpoints)[0]
-    assert_almost_equal(chisq, 8.4891170857950087, 5)
+    assert_almost_equal(chisq, 8.4891170857950087, 4)
 
 test_fit2opt.long = 1
 test_fit2opt.batch = 1

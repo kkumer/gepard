@@ -148,7 +148,7 @@ class ComptonDispersionRelations(ComptonFormFactors):
     
     """
 
-    def dispargV(self, x, ndfun, fun, pt):
+    def dispargV(self, x, fun, pt):
         """ Integrand of the dispersion integral (vector case) 
         
         fun -- Im(CFF)
@@ -158,9 +158,7 @@ class ComptonDispersionRelations(ComptonFormFactors):
         """
         ga = 0.9  # Nice value obtained by experimentation in Mathematica
         u = x**(1./(1.-ga))
-        #res = u**ga * ( fun(pt, u) - fun(pt) )
-        res = u**ga * ( ndfun(pt, u) - fun(pt) )
-        #print x, fun(pt, u), fun(pt)
+        res = u**ga * ( fun(pt, u) - fun(pt) )
         return (2.*u) / (pt.xi**2 - u**2) * res / (1.-ga)
 
     def dispargA(self, x, fun, pt):
@@ -186,12 +184,13 @@ class ComptonDispersionRelations(ComptonFormFactors):
         
         """
         if self.optimization:
-            pv = optModel.pvquadratureh(self.ndparameters, pt.t, pt.xi)
+            pvpi = optModel.pvquadrature('H', self.ndparameters, pt.t, pt.xi)
+            return pvpi - optModel.subtractionr(self.ndparameters, pt.t)
         else:
-            res = PVquadrature(self.dispargV, 0, 1, (self.ndImH, self.ImH, pt))
-            pv = res + log(pt.xi**2 / (1.-pt.xi**2)) * self.ImH(pt)
-        # P.V./pi - subtraction constant C/(1-t/MC^2)^2
-        return pv/pi - self.subtraction(pt)
+            res = PVquadrature(self.dispargV, 0, 1, (self.ImH, pt))
+            pvpi = (res + log(pt.xi**2 / (1.-pt.xi**2)) * self.ImH(pt)) / pi
+            # P.V./pi - subtraction constant C/(1-t/MC^2)^2
+            return pvpi - self.subtraction(pt)
 
     def ReHt(self, pt):
         """ Real part of CFF Ht. 
@@ -199,10 +198,12 @@ class ComptonDispersionRelations(ComptonFormFactors):
         Given by dispersion integral over ImHt
 
         """
-
-        res = PVquadrature(self.dispargA, 0, 1, (self.ImHt, pt))
-        pv = res + log((1.+pt.xi)/(1.-pt.xi)) * self.ImHt(pt)
-        return pv/pi   # this is P.V./pi 
+        if self.optimization:
+            pvpi = optModel.pvquadrature('Ht', self.ndparameters, pt.t, pt.xi)
+        else:
+            res = PVquadrature(self.dispargA, 0, 1, (self.ImHt, pt))
+            pvpi = (res + log((1.+pt.xi)/(1.-pt.xi)) * self.ImHt(pt))/pi
+        return pvpi   # this is P.V./pi 
 
     def ReE(self, pt):
         """Real part of CFF E.
@@ -210,11 +211,15 @@ class ComptonDispersionRelations(ComptonFormFactors):
         Given by dispersion integral over ImE + subtraction constant.
         
         """
-        res = PVquadrature(self.dispargV, 0, 1, (self.ImE, self.ImE, pt))
-        pv = res + log(pt.xi**2 / (1.-pt.xi**2)) * self.ImE(pt)
-        # This is same subtraction constant
-        # as for H, but with opposite sign
-        return pv/pi + self.subtraction(pt)
+        if self.optimization:
+            pvpi = optModel.pvquadrature('E', self.ndparameters, pt.t, pt.xi)
+            return pvpi + optModel.subtractionr(self.ndparameters, pt.t)
+        else:
+            res = PVquadrature(self.dispargV, 0, 1, (self.ImE, pt))
+            pvpi = (res + log(pt.xi**2 / (1.-pt.xi**2)) * self.ImE(pt)) / pi
+            # This is same subtraction constant
+            # as for H, but with opposite sign
+            return pvpi + self.subtraction(pt)
 
     def ReEt(self, pt):
         """ Real part of CFF Et. 
@@ -222,9 +227,12 @@ class ComptonDispersionRelations(ComptonFormFactors):
         Given by dispersion integral over ImEt
 
         """
-        res = PVquadrature(self.dispargA, 0, 1, (self.ImEt, pt))
-        pv = res + log((1.+pt.xi)/(1.-pt.xi)) * self.ImEt(pt)
-        return pv/pi   # this is P.V./pi 
+        if self.optimization:
+            pvpi = optModel.pvquadrature('Et', self.ndparameters, pt.t, pt.xi)
+        else:
+            res = PVquadrature(self.dispargA, 0, 1, (self.ImEt, pt))
+            pvpi = (res + log((1.+pt.xi)/(1.-pt.xi)) * self.ImEt(pt))
+        return pvpi   # this is P.V./pi 
 
 
 class ComptonModelDR(ComptonDispersionRelations):
@@ -286,11 +294,6 @@ class ComptonModelDR(ComptonDispersionRelations):
                  onex**p['bS'] / (1. - onex*t/(p['MS']**2))**2 )
         return pi * (val + sea) / (1.+x)
 
-    def ndImH(self, pt, x): 
-        if self.optimization:
-            return optModel.imhopt(self.ndparameters, pt.t, x)
-        else:
-            return self.ImH(pt, xi=x)
 
     def ImHt(self, pt, xi=0):
         """Imaginary part of CFF Ht i.e. \tilde{H}."""
@@ -424,8 +427,6 @@ class ComptonModelDRsea(ComptonDispersionRelations):
         sea = ( (2./9.) * p['Nsea'] * p['rS'] * twox**(-p['alS']-p['alpS']*t) *
                  onex**p['bS'] / (1. - onex*t/(p['MS']**2))**2 )
         return pi * (val + sea) / (1.+x)
-
-    def ndImH(self, pt, xi=0): return self.ImH(pt, xi)
 
     def ImHt(self, pt, xi=0):
         """Imaginary part of CFF Ht i.e. \tilde{H}."""

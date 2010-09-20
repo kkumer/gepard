@@ -17,10 +17,10 @@ mBM10.parameters.update(DMepsGLO1)
 tBM10 = Approach.BM10(mBM10, optimization = False)
 
 # Optimized model
-mopt = Model.ModelDR(optimization = False)
+mopt = Model.ModelDR(optimization = True)
 mopt.parameters.update(DMepsGLO1)
 mopt.ndparameters = np.array([mopt.parameters[name] for name in mopt.parameter_names])
-topt = Approach.BM10(mopt, optimization = True)
+topt = Approach.BM10(mopt, optimization = False)
 
 # testing data point for hotfixedBMK
 pt0 = copy.deepcopy(data[31][12])  # was data[1][0]
