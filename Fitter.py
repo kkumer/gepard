@@ -70,6 +70,14 @@ def fcn(%s):
         self.theory.print_chisq(self.fitpoints)
         self.theory.model.print_parameters()
 
+    def print_parameters(self):
+        for par in self.theory.model.parameter_names:
+            if not self.theory.model.parameters['fix_'+par]:
+                print '%5s = %4.2f +- %4.2f' % (par, 
+                        self.minuit.values[par], self.minuit.errors[par])
+         
+
+
 
 class FitterBrain(Fitter):
     """Fits using PyBrain neural net library.

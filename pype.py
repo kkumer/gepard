@@ -71,15 +71,10 @@ tDR1.m.parameters.update(DMepsGLO1)
 #t.name = 'DR + Gepard sea'
 #g = t.m.g
 
-mDRPP = Model.ModelDRPP()
+mDRPP = Model.ModelDRPP(optimization=True)
 t = Approach.BM10(mDRPP)
 t.name = 'BM10 + free PP'
 t.m.parameters.update(DMPP)
-
-mDRPPopt = Model.ModelDRPP(optimization=True)
-topt = Approach.BM10(mDRPPopt)
-topt.name = 'BM10 + free PP - opt'
-topt.m.parameters.update(DMPP)
 
 
 #t.m.parameters.update(hy1THI)
@@ -105,7 +100,6 @@ topt.m.parameters.update(DMPP)
 
 ## DR fit
 t.m.release_parameters('rv', 'bv', 'Mv', 'C', 'MC', 'trv', 'tbv', 'tMv', 'rpi', 'Mpi')
-topt.m.release_parameters('rv', 'bv', 'Mv', 'C', 'MC', 'trv', 'tbv', 'tMv', 'rpi', 'Mpi')
 f = Fitter.FitterMinuit(DMTSApoints, t)
 
 
