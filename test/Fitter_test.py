@@ -25,7 +25,7 @@ mopt.parameters['MC'] = 2.
 mopt.parameters['tMv'] = 2.
 mopt.parameters['trv'] = 8.
 mopt.parameters['tbv'] = 3.78
-mopt.ndparameters = np.array([mopt.parameters[name] for name in mopt.parameter_names])
+mopt.ndparameters = np.array([mopt.parameters[name] for name in mopt.parameter_names]+[0.,0.])
 mopt.release_parameters('bS', 'Mv')
 topt = Approach.BM10(mopt, optimization = False)
 

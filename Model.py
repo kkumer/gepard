@@ -29,7 +29,9 @@ class Model(object):
                     zip(self.parameter_names, len(self.parameter_names)*['True']))) + '}')
         # FIXME: duplication of stuff: parameters and ndparameters!
         self.parameters.update(fixed)
-        self.ndparameters = array([self.parameters[name] for name in self.parameter_names])
+        # right-pad with zeros to the array of 20 elements needed by Fortran
+        self.ndparameters = array([self.parameters[name] for name in self.parameter_names]+
+                [0. for k in range(20-len(self.parameter_names))])
         #self.res = array([0. for k in range(18)])
 
     def release_parameters(self, *args):
@@ -295,7 +297,6 @@ class ComptonModelDR(ComptonDispersionRelations):
                  onex**p['bS'] / (1. - onex*t/(p['MS']**2))**2 )
         return pi * (val + sea) / (1.+x)
 
-
     def ImHt(self, pt, xi=0):
         """Imaginary part of CFF Ht i.e. \tilde{H}."""
         p = self.parameters # just a shortcut
@@ -331,7 +332,7 @@ class ComptonModelDR(ComptonDispersionRelations):
 
 
 class ComptonModelDRPP(ComptonModelDR):
-    """Model for CFFs as in arXiv:0904.0458. + free pion pole normalization"""
+    """Model for CFFs as in arXiv:0904.0458. + free pion pole"""
 
     def __init__(self, **kwargs):
         # initial values of parameters and limits on their values
@@ -345,30 +346,31 @@ class ComptonModelDRPP(ComptonModelDR):
               'Nv' : 1.35,                              
              'alv' : 0.43,                              
             'alpv' : 0.85,                              
-              'Mv' : 1.0,     'limit_Mv' : (0.4, 1.5),
+              'Mv' : 1.0,     'limit_Mv' : (0.4, 4.),
               'rv' : 0.5,     'limit_rv' : (0., 8.),
               'bv' : 2.2,     'limit_bv' : (0.4, 5.),
                'C' : 7.0,      'limit_C' : (-10., 10.),
-              'MC' : 1.3,     'limit_MC' : (0.4, 2.),
+              'MC' : 1.3,     'limit_MC' : (0.4, 4.),
              'tNv' : 0.0,                             
-             'tMv' : 2.7,    'limit_tMv' : (0.4, 2.),
+             'tMv' : 2.7,    'limit_tMv' : (0.4, 4.),
              'trv' : 6.0,    'limit_trv' : (0., 8.),
              'tbv' : 3.0,    'limit_tbv' : (0.4, 5.),
-             'NPP' : 1.0,    'limit_tPP' : (-8, 8.)   }
+             'rpi' : 1.0,    'limit_rpi' : (-8, 8.),
+             'Mpi' : 1.0,    'limit_Mpi' : (0.4, 4.)   }
 
         # order matters to fit.MinuitFitter, so it is defined by:
         self.parameter_names = ['NS', 'alS', 'alpS', 'MS', 'rS', 'bS',
                                 'Nv', 'alv', 'alpv', 'Mv', 'rv', 'bv',
                                 'C', 'MC',
-                                'tNv', 'tMv', 'trv', 'tbv', 'NPP']
+                                'tNv', 'tMv', 'trv', 'tbv', 'rpi', 'Mpi']
 
         # now do whatever else is necessary
         ComptonFormFactors.__init__(self, **kwargs)
 
     def ReEt(self, pt):
-        """Instead of disp. rel. use pole formula * NPP."""
-        return self.parameters['NPP']*(2.2390424 * (1. - (1.7*(0.0196 - pt.t))/(1. 
-            - pt.t/2.)**2))/((0.0196 - pt.t)*pt.xi)
+        """Instead of disp. rel. use pole formula"""
+        return self.parameters['rpi'] * 2.16444 / (0.0196 - pt.t) / (1. 
+            - pt.t/self.parameters['Mpi']**2)**2 / pt.xi
 
 class ComptonModelDRsea(ComptonDispersionRelations):
     """DR Model intended for combining with Gepard sea. NS->Nsea"""

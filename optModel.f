@@ -2,7 +2,7 @@
       DOUBLE PRECISION FUNCTION ImHoptR(p, t, x)
 
       IMPLICIT NONE
-      DOUBLE PRECISION p(0:17), t, x
+      DOUBLE PRECISION p(0:19), t, x
       DOUBLE PRECISION twox, onex, val, sea, PI
 Cf2py intent(in) p
 Cf2py intent(in) t, x
@@ -21,7 +21,7 @@ Cf2py intent(in) t, x
       DOUBLE PRECISION FUNCTION ImHtoptR(p, t, x)
 
       IMPLICIT NONE
-      DOUBLE PRECISION p(0:17), t, x
+      DOUBLE PRECISION p(0:19), t, x
       DOUBLE PRECISION twox, onex, val, PI
 Cf2py intent(in) p
 Cf2py intent(in) t, x
@@ -38,7 +38,7 @@ Cf2py intent(in) t, x
       DOUBLE PRECISION FUNCTION subtractionR(p, t)
 
       IMPLICIT NONE
-      DOUBLE PRECISION p(0:17), t
+      DOUBLE PRECISION p(0:19), t
 Cf2py intent(in) p
 Cf2py intent(in) t
       DOUBLE PRECISION PI
@@ -51,7 +51,7 @@ Cf2py intent(in) t
 
       IMPLICIT NONE
       CHARACTER*2 fname
-      DOUBLE PRECISION p(0:17)
+      DOUBLE PRECISION p(0:19)
       DOUBLE PRECISION t, xi, res
 Cf2py intent(in) fname
 Cf2py intent(in) p
