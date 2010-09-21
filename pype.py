@@ -41,6 +41,7 @@ GLO1points = data[31][12:] + data[8] + data[29] + data[30]  # DM's GLO1 set
 #BSDw2CDpoints = utils.select(data[50], criteria=['Q2 == 2.3'])
 #BSSwpoints = utils.select(data[51], criteria=['FTn != 2'])
 TSA1points = utils.select(data[52], criteria=['FTn == -1'])
+DMTSApoints = data[5] + data[32][18:] + TSA1points + data[8] + data[30]
 
 
 
@@ -73,7 +74,7 @@ tDR1.m.parameters.update(DMepsGLO1)
 mDRPP = Model.ModelDRPP()
 t = Approach.BM10(mDRPP)
 t.name = 'BM10 + free PP'
-t.m.parameters.update(DMepsGLO1)
+t.m.parameters.update(DMPP)
 
 #t.m.parameters.update(hy1THI)
 
@@ -98,6 +99,6 @@ t.m.parameters.update(DMepsGLO1)
 
 ## DR fit
 t.m.release_parameters('rv', 'bv', 'Mv', 'C', 'MC', 'trv', 'tbv', 'tMv', 'NPP')
-f = Fitter.FitterMinuit(GLO1points + TSA1points, t)
+f = Fitter.FitterMinuit(DMTSApoints, t)
 
 

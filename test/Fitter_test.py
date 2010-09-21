@@ -4,7 +4,7 @@ from nose.tools import *
 import numpy as np
 
 import utils, Model, Approach, Fitter
-from results import DMGLO1  #use some testpars here?
+from results import DMGLO1, DMepsGLO1  #use some testpars here?
 
 data = utils.loaddata('data/ep2epgamma', approach=Approach.hotfixedBMK)  
 
@@ -15,8 +15,16 @@ m.release_parameters('bS', 'Mv')
 t = Approach.hotfixedBMK(m, optimization = False)
 
 # Optimized model
-mopt = Model.ModelDR(optimization = True)
-mopt.parameters.update(DMGLO1)
+mopt = Model.ModelDR(optimization = False)
+mopt.parameters.update(DMepsGLO1)
+mopt.parameters['Mv'] = 1.5
+mopt.parameters['bv'] = 0.4
+mopt.parameters['rv'] = 0.798
+mopt.parameters['C'] = 5.36
+mopt.parameters['MC'] = 2.
+mopt.parameters['tMv'] = 2.
+mopt.parameters['trv'] = 8.
+mopt.parameters['tbv'] = 3.78
 mopt.ndparameters = np.array([mopt.parameters[name] for name in mopt.parameter_names])
 mopt.release_parameters('bS', 'Mv')
 topt = Approach.BM10(mopt, optimization = False)
@@ -51,7 +59,7 @@ def test_fit2opt():
     fopt = Fitter.FitterMinuit(fitpoints, topt)
     fopt.fit()
     chisq = topt.chisq(fitpoints)[0]
-    assert_almost_equal(chisq, 14.310845563308604, 4)
+    assert_almost_equal(chisq, 7.3648989640243645, 4)
 
 test_fit2opt.long = 1
 test_fit2opt.batch = 1

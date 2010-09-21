@@ -27,6 +27,7 @@ class Model(object):
         # Intially all parameters are fixed and should be released by user
         exec('fixed = {' + ", ".join(map(lambda x: "'fix_%s': %s" % x, 
                     zip(self.parameter_names, len(self.parameter_names)*['True']))) + '}')
+        # FIXME: duplication of stuff: parameters and ndparameters!
         self.parameters.update(fixed)
         self.ndparameters = array([self.parameters[name] for name in self.parameter_names])
         #self.res = array([0. for k in range(18)])
