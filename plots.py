@@ -357,11 +357,13 @@ def HALLAalt(lines=[], band=[], path=None, fmt='png'):
     """Makes plot of 'alternative' HALL-A data with fit lines"""
 
     subsets = {}
-    subsets[1] = utils.select(data[50], criteria=['Q2 == 2.3'])
-    subsets[2] = utils.select(data[51], criteria=['FTn == 1'])
-    subsets[3] = utils.select(data[51], criteria=['FTn == 0'])
-    subsets[4] = utils.select(data[51], criteria=['FTn == 2'])
-    subsets[5] = data[30]
+    subsets[1] = utils.select(data[50], criteria=['Q2 == 1.5', 'FTn == -1'])
+    subsets[2] = utils.select(data[50], criteria=['Q2 == 1.9', 'FTn == -1'])
+    subsets[3] = utils.select(data[50], criteria=['Q2 == 2.3', 'FTn == -1'])
+    subsets[4] = utils.select(data[51], criteria=['FTn == 0'])
+    subsets[5] = utils.select(data[51], criteria=['FTn == 1'])
+    #subsets[6] = utils.select(data[51], criteria=['FTn == 2'])
+
     title = 'Hall-A-alt'
     fig = plt.figure()
     fig.canvas.set_window_title(title)
@@ -369,13 +371,17 @@ def HALLAalt(lines=[], band=[], path=None, fmt='png'):
     for panel in range(1,6):
         ax = fig.add_subplot(2,3,panel)
         subplot(ax, [subsets[panel]], lines, band, 't')
-        if panel == 2:
-            ax.set_ylabel('1st harm', fontsize=18)
-        elif panel == 3:
-            ax.set_ylabel('0th harm', fontsize=18)
-        elif panel == 4:
-            ax.set_ylabel('2nd harm', fontsize=18)
+        ax.set_ylabel('%s(FTn = %i)' % (subsets[panel][0].y0name, 
+            subsets[panel][0].FTn), fontsize=16)
         ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))
+    # left  = 0.125  # the left side of the subplots of the figure
+    # right = 0.9    # the right side of the subplots of the figure
+    # bottom = 0.0   # the bottom of the subplots of the figure
+    # top = 0.9      # the top of the subplots of the figure
+    # wspace = 0.2   # the amount of width reserved for blank space between subplots
+    # hspace = 0.2   # the amount of height reserved for white space between subplots
+    fig.subplots_adjust(wspace=0.4)
+
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:

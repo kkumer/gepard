@@ -594,8 +594,65 @@ class BMK(Approach):
         elif pt.FTn == 1:
             return self.ReCCALINTunp(pt)
 
-    def BSSw(self, pt):
-        """Weighted BSS as defined by HALL A.
+    def BSDw(self, pt):
+        """Weighted BSD harmonics.
+
+        """
+        if pt.FTn == -1:
+            return quadrature.Hquadrature(lambda phi: self.BSD(pt, vars={'phi':phi},
+                weighted=True) * sin(phi), 0, 2.0*pi) / pi
+        elif pt.FTn == -2:
+            return quadrature.Hquadrature(lambda phi: self.BSS(pt, vars={'phi':phi},
+                weighted=True) * sin(2.*phi), 0, 2.0*pi) / pi
+
+    def BSDw(self, pt, **kwargs):
+        """Calculate weighted beam spin difference (BSD) or its harmonics."""
+        if pt.has_key('phi'):
+            kwargs[weighted] = True
+            #return self.BSD(pt, **kwargs)
+            raise ValueError('Untested!')
+        elif pt.has_key('FTn'):
+            if pt.FTn < 0:
+                res = quadrature.Hquadrature(lambda phi: self.BSD(pt, vars={'phi':phi},
+                weighted=True) * sin(-pt.FTn*phi), 0, 2.0*pi)
+            elif pt.FTn > 0:
+                res = quadrature.Hquadrature(lambda phi: self.BSD(pt, vars={'phi':phi},
+                weighted=True) * cos(pt.FTn*phi), 0, 2.0*pi)
+            elif pt.FTn == 0:
+                res = quadrature.Hquadrature(lambda phi: self.BSD(pt, vars={'phi':phi},
+                weighted=True), 0, 2.0*pi) / 2.0
+            else:
+                raise ValueError('This should never happen!')
+            return  res / pi
+        else:
+            raise ValueError('[%s] has neither azimuthal angle phi\
+ nor harmonic FTn defined!' % pt)
+
+    def BSSw(self, pt, **kwargs):
+        """Calculate weighted beam spin sum (BSS) or its harmonics."""
+        if pt.has_key('phi'):
+            kwargs[weighted] = True
+            #return self.BSS(pt, **kwargs)
+            raise ValueError('Untested!')
+        elif pt.has_key('FTn'):
+            if pt.FTn < 0:
+                res = quadrature.Hquadrature(lambda phi: self.BSS(pt, vars={'phi':phi},
+                weighted=True) * sin(-pt.FTn*phi), 0, 2.0*pi)
+            elif pt.FTn > 0:
+                res = quadrature.Hquadrature(lambda phi: self.BSS(pt, vars={'phi':phi},
+                weighted=True) * cos(pt.FTn*phi), 0, 2.0*pi)
+            elif pt.FTn == 0:
+                res = quadrature.Hquadrature(lambda phi: self.BSS(pt, vars={'phi':phi},
+                weighted=True), 0, 2.0*pi) / 2.0
+            else:
+                raise ValueError('This should never happen!')
+            return  res / pi
+        else:
+            raise ValueError('[%s] has neither azimuthal angle phi\
+ nor harmonic FTn defined!' % pt)
+
+    def BSSwOLD(self, pt):
+        """Weighted BSS harmonics.
 
         """
         if pt.FTn == 0:
@@ -2893,6 +2950,7 @@ class BM10ex(hotfixedBMK):
         else:
             raise ValueError('[%s] has neither azimuthal angle phi\
  nor harmonic FTn defined!' % pt)
+
                     
     def _BTSA(self, pt, **kwargs):
         """Calculate beam-target spin asymmetry (BTSA)."""

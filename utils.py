@@ -145,7 +145,7 @@ def parse(datafile):
             # converting preamble line into dictionary item
             desctpl = tuple(map(string.strip,string.split(dataFileLine,"=")))
             desc[desctpl[0]] = desctpl[1] 
-        if re.match(r'([ ]*[-\.\d]+[ \r]+)+', dataFileLine):
+        if re.match(r'([ \t]*[-\.\d]+[ \t\r]+)+', dataFileLine):
             # FIXME: TAB-delimited columns are not handled! Only spaces are OK.
             snumbers = re.findall(r'[-\.\d]+', dataFileLine)
             numbers = []
