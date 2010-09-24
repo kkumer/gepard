@@ -32,7 +32,7 @@ GLO1points = data[31][12:] + data[8] + data[29] + data[30]  # DM's GLO1 set
 #DVCSpoints = data[36] + data[37] + data[38] + data[39] + \
 #  data[40] + data[41] + data[42] + data[43] + data[44] + \
 #  data[45]
-#ALTGLOpoints = data[5] + data[25] + data[32][18:]
+ALTGLOpoints = data[5] + data[25] + data[32][18:]
 #ALTGLO1points = data[5] + data[25] + data[32] + HAD17 + HA17
 #ALTGLO2points = data[5] + data[25] + data[32][18:] + HAD17[::2] + HA17[::2]
 #ALTGLO3points = data[5] + data[25] + data[32][18:] + data[30] + HA17
@@ -40,7 +40,9 @@ GLO1points = data[31][12:] + data[8] + data[29] + data[30]  # DM's GLO1 set
 #BSDw2Cpoints = utils.select(data[26], criteria=['Q2 == 2.3'])
 #BSDw2CDpoints = utils.select(data[50], criteria=['Q2 == 2.3'])
 BSDwpoints = utils.select(data[50], criteria=['FTn == -1'])
-BSSwpoints = utils.select(data[51], criteria=['FTn != 2'])
+BSSwpoints = utils.select(data[51], criteria=['FTn>=0', 'FTn <= 1'])
+BSDwDMpoints = utils.select(data[55], criteria=['FTn == -1'])
+BSSwDMpoints = utils.select(data[56], criteria=['FTn>=0', 'FTn <= 1'])
 TSA1points = utils.select(data[52], criteria=['FTn == -1'])
 DMpoints = data[5] + data[32][18:] + data[8] + data[30]
 DMTSApoints = data[5] + data[32][18:] + TSA1points + data[8] + data[30]
@@ -103,6 +105,6 @@ t.m.ndparameters = np.array([t.m.parameters[name] for name in t.m.parameter_name
 
 ## DR fit
 t.m.release_parameters('rv', 'bv', 'Mv', 'C', 'MC', 'trv', 'tbv', 'tMv', 'rpi', 'Mpi')
-f = Fitter.FitterMinuit(DMpoints+BSDwpoints+BSSwpoints, t)
+f = Fitter.FitterMinuit(ALTGLOpoints+BSDwpoints+BSSwpoints, t)
 
 

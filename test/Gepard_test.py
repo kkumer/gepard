@@ -81,3 +81,21 @@ def test_hybrid():
     aux = tBoth.XDVCSt(pt)/1.e4
     assert_almost_equal(aux, 0.56075998541187819, 3)
 
+def test_hybridopt():
+    """GepardDR optimized with switched-off DR should be same as Gepard."""
+    mDRsea = Model.ComptonModelDRsea(optimization=True)
+    mBoth = Model.Hybrid(m, mDRsea)
+    tBoth = Approach.hotfixedBMK(mBoth)
+    tBoth.m.parameters['Nv'] = 0
+    tBoth.m.DR.ndparameters[0] = 0
+    tBoth.m.parameters['Nsea'] = 0
+    tBoth.m.DR.ndparameters[6] = 0
+    pt.W = 82.
+    pt.Q2 = 1.
+    pt.t = 0.0
+    pt.xi = pt.Q2 / ( 2.0 * pt.W * pt.W + pt.Q2)
+    tBoth.m.g.parint.p = 0
+    tBoth.m.g.init()
+    aux = tBoth.XDVCSt(pt)/1.e4
+    assert_almost_equal(aux, 0.56075998541187819, 3)
+

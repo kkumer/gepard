@@ -18,8 +18,11 @@ del mGepard.parameters['limit_M02G']
 
 # Hybrid: Gepard+DR (can reuse above Gepard)
 mDRsea = Model.ComptonModelDRsea()
+mDRseaopt = Model.ComptonModelDRsea(optimization=True)
 m = Model.Hybrid(mGepard, mDRsea)
+mopt = Model.Hybrid(mGepard, mDRseaopt)
 t = Approach.hotfixedBMK(m)
+topt = Approach.hotfixedBMK(mopt)
 
 # Shortcut for seting gepard model parameters
 def setpar(i, val):
@@ -31,6 +34,8 @@ DVCSpoints = data[36] + data[37] + data[38] + data[39] + \
   data[40] + data[41] + data[42] + data[43] + data[44] + \
   data[45]
 
+# testing data set for fits
+fitpoints = data[31][12:14] + data[8][1:3] + data[30][2:4]
 
 def test_gepardfitsimple():
     """Test simple fitting to H1 DVCS (one dataset) via gepard"""
@@ -256,3 +261,87 @@ def test_gepardfitDIS():
 
 test_gepardfitDIS.newfeature = 1
 
+def test_hybridfit():
+    """Test fitting to large- and small-x data
+
+    with both parts of hybrid model.
+    
+    """
+    setpar(11,  0.15203911208796006)
+    setpar(12,  1.1575060246398083)
+    setpar(13,  0.15)
+    setpar(14,  1.)
+    setpar(15,  0.)
+    setpar(16,  2.)
+    setpar(17,  0.)
+    setpar(18,  0.)
+    setpar(19,  0.)
+    setpar(22,  1.247316701070471)
+    setpar(23,  0.15)
+    setpar(24,  0.7)
+    setpar(25,  0.)
+    setpar(26,  2.)
+    setpar(27,  0.)
+    setpar(28,  0.)
+    setpar(29,  0.)
+    setpar(32, 0.0)
+    setpar(42, 0.0)
+    t.m.parameters['Nv'] = 0
+    t.m.parameters['C'] = 0
+    t.m.g.parint.p = 0
+    t.m.g.parchr.scheme = np.array([c for c in 'CSBAR'])
+    t.m.g.init()
+    t.m.release_parameters('M02S','SKEWG', 'Nv', 'C')
+    f = Fitter.FitterMinuit(fitpoints+DVCSpoints[:6], t)
+    f.fit()
+    chisq = t.chisq(DVCSpoints)[0]
+    assert_almost_equal(chisq, 358.52558417612039, 2)
+    tGepard.model.fix_parameters('ALL')
+
+test_hybridfit.long = 1
+
+def test_hybridfitopt():
+    """Test optimized fitting to large- and small-x data
+
+    with both parts of hybrid model.
+    
+    """
+    setpar(11,  0.15203911208796006)
+    setpar(12,  1.1575060246398083)
+    setpar(13,  0.15)
+    setpar(14,  1.)
+    setpar(15,  0.)
+    setpar(16,  2.)
+    setpar(17,  0.)
+    setpar(18,  0.)
+    setpar(19,  0.)
+    setpar(22,  1.247316701070471)
+    setpar(23,  0.15)
+    setpar(24,  0.7)
+    setpar(25,  0.)
+    setpar(26,  2.)
+    setpar(27,  0.)
+    setpar(28,  0.)
+    setpar(29,  0.)
+    setpar(32, 0.0)
+    setpar(42, 0.0)
+    topt.m.parameters['Nv'] = 0
+    topt.m.DR.ndparameters[0] = 0
+    topt.m.parameters['C'] = 0
+    topt.m.DR.ndparameters[12] = 0
+    topt.m.g.parint.p = 0
+    topt.m.g.parchr.scheme = np.array([c for c in 'CSBAR'])
+    topt.m.g.init()
+    topt.m.release_parameters('M02S','SKEWG', 'Nv', 'C')
+    f = Fitter.FitterMinuit(fitpoints+DVCSpoints[:6], topt)
+    f.fit()
+    chisq = topt.chisq(DVCSpoints)[0]
+    assert_almost_equal(chisq, 358.52558417612039, 2)
+    tGepard.model.fix_parameters('ALL')
+
+test_hybridfitopt.long = 1
+test_hybridfitopt.newfeature = 1
+
+pt0 = fitpoints[0]
+print 'nonoptimized = %f' % m.DR.ReH(pt0)
+print 'optimized = %f' % mopt.DR.ReH(pt0)
