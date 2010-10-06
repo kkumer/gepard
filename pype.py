@@ -15,8 +15,8 @@ from results import *
 # [1] Load experimental data and theoretical models
 
 data = utils.loaddata('data/ep2epgamma', approach=Approach.hotfixedBMK)  
-#data.update(utils.loaddata('data/gammastarp2gammap', approach=Approach.hotfixedBMK))
-#db = shelve.open('theories.db')
+data.update(utils.loaddata('data/gammastarp2gammap', approach=Approach.hotfixedBMK))
+db = shelve.open('theories.db')
 
 ## [2] Choose subset of datapoints for fitting
 
@@ -29,9 +29,9 @@ GLO1points = data[31][12:] + data[8] + data[29] + data[30]  # DM's GLO1 set
 #HA17 = utils.select(data[34], criteria=['t == -0.17'])
 #HA28 = utils.select(data[34], criteria=['t == -0.28'])
 #HA33 = utils.select(data[34], criteria=['t == -0.33'])
-#DVCSpoints = data[36] + data[37] + data[38] + data[39] + \
-#  data[40] + data[41] + data[42] + data[43] + data[44] + \
-#  data[45]
+DVCSpoints = data[36] + data[37] + data[38] + data[39] + \
+  data[40] + data[41] + data[42] + data[43] + data[44] + \
+  data[45]
 ALTGLOpoints = data[5] + data[25] + data[32][18:]
 #ALTGLO1points = data[5] + data[25] + data[32] + HAD17 + HA17
 #ALTGLO2points = data[5] + data[25] + data[32][18:] + HAD17[::2] + HA17[::2]
@@ -52,20 +52,20 @@ DMTSApoints = data[5] + data[32][18:] + TSA1points + data[8] + data[30]
 ## [3] Create a theory
 
 # Gepard only
-#mGepard = Model.ComptonGepard(cutq2=0.5)
-#tGepard = Approach.hotfixedBMK(mGepard)
+mGepard = Model.ComptonGepard(cutq2=0.5)
+tGepard = Approach.hotfixedBMK(mGepard)
 
 
 # DR only
-mDRonly = Model.ModelDR()
-tDR = Approach.hotfixedBMK(mDRonly)
-tDR.name = 'DR model GLO'
-tDR.m.parameters.update(DMepsGLO)
+#mDRonly = Model.ModelDR()
+#tDR = Approach.hotfixedBMK(mDRonly)
+#tDR.name = 'DR model GLO'
+#tDR.m.parameters.update(DMepsGLO)
 
-mDRonly1 = Model.ModelDR()
-tDR1 = Approach.hotfixedBMK(mDRonly1)
-tDR1.name = 'DR model GLO1'
-tDR1.m.parameters.update(DMepsGLO1)
+#mDRonly1 = Model.ModelDR()
+#tDR1 = Approach.hotfixedBMK(mDRonly1)
+#tDR1.name = 'DR model GLO1'
+#tDR1.m.parameters.update(DMepsGLO1)
 
 
 ## Hybrid: Gepard+DR (can reuse above Gepard)
@@ -75,14 +75,19 @@ tDR1.m.parameters.update(DMepsGLO1)
 #t.name = 'DR + Gepard sea'
 #g = t.m.g
 
-mDRPP = Model.ModelDRPP(optimization=True)
-t = Approach.BM10(mDRPP)
-t.name = 'BM10 + free PP'
-t.m.parameters.update(DMPP)
-t.m.ndparameters = np.array([t.m.parameters[name] for name in t.m.parameter_names])
+#mDRPP = Model.ModelDRPP(optimization=True)
+#t = Approach.BM10(mDRPP)
+#t.name = 'BM10 + free PP'
+#t.m.parameters.update(DMPP)
+#t.m.ndparameters = np.array([t.m.parameters[name] for name in t.m.parameter_names])
 
+mDRPPsea = Model.ComptonModelDRPPsea()
+m = Model.Hybrid(mGepard, mDRPPsea)
+t = Approach.BM10(m)
+t.name = 'DRPP + Gepard sea'
+g = t.m.g
 
-#t.m.parameters.update(hy1THI)
+t.m.parameters.update(hy1THI)
 
 # NN
 #mNN = Model.ModelNN(hidden_layers=[15], output_layer=['ImH', 'ReH', 'ImE', 'ReE', 'ImHt', 'ReHt', 'ImEt', 'ReEt'])
@@ -101,10 +106,11 @@ t.m.ndparameters = np.array([t.m.parameters[name] for name in t.m.parameter_name
 
 ## Fitting to both small- and large-x data
 #t.m.release_parameters('M02S','SECG', 'THIS', 'THIG', 'rv', 'bv', 'Mv', 'C', 'MC', 'trv', 'tbv', 'tMv')
-#f = Fitter.FitterMinuit(DVCSpoints+data[48]+ALTGLO2points, t)
+t.m.release_parameters('M02S', 'THIG', 'rv', 'trv', 'rpi')
+f = Fitter.FitterMinuit(DVCSpoints+data[48]+ALTGLOpoints+BSDwpoints+BSSwpoints, t)
 
 ## DR fit
-t.m.release_parameters('rv', 'bv', 'Mv', 'C', 'MC', 'trv', 'tbv', 'tMv', 'rpi', 'Mpi')
-f = Fitter.FitterMinuit(ALTGLOpoints+BSDwpoints+BSSwpoints, t)
+#t.m.release_parameters('rv', 'bv', 'Mv', 'C', 'MC', 'trv', 'tbv', 'tMv', 'rpi', 'Mpi')
+#f = Fitter.FitterMinuit(ALTGLOpoints+BSDwpoints+BSSwpoints, t)
 
 

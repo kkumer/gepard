@@ -69,9 +69,11 @@ class Approach(object):
         chis = []
         for val in linspace(0.5*mem, 1.5 * mem, npoints):
             self.m.parameters[parname] = val
+            self.m.ndparameters[self.m.parameter_names.index(parname)] = val
             chi, dof, fitprob = self.chisq(points)
             print '%s  ->  %s' % (val, chi)
         self.m.parameters[parname] = mem  # restore original value
+        self.m.ndparameters[self.m.parameter_names.index(parname)] = mem
 
 
     def print_chisq(self, points, sigmas=False):

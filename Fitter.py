@@ -45,7 +45,11 @@ class FitterMinuit(Fitter):
 """
 def fcn(%s):
     theory.model.parameters.update({%s})
-    theory.model.ndparameters.put(range(theory.model.ndparameters.size), [%s])
+    new = [%s]
+    if theory.model.__dict__.has_key('Gepard'):
+        theory.model.ndparameters.put(range(theory.model.DR.ndparameters.size), new[:20])
+    else:
+        theory.model.ndparameters.put(range(theory.model.ndparameters.size), new)
     chisq = 0.
     for pt in fitpoints:
         chisq = chisq + (

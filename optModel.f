@@ -14,6 +14,8 @@ Cf2py intent(in) t, x
       sea = ( 2./9. * p(0) * p(4) * twox**(-p(1)-p(2)*t) * 
      &         onex**p(5) / (1. - onex*t/(p(3)**2))**2 )
       ImHoptR = PI * (val + sea) / (1.+x)
+*     write (22,*)  x, val, sea, ImHoptR
+*     write (22,*)  p(0), p(1), p(4)
       return 
       end
 
@@ -98,6 +100,7 @@ Cf2py intent(out) res
           fu =  0
         ENDIF
         intg = u**ga * ( fu - fxi )
+*       write (21,*)  u, fu
         IF ((fname .EQ. 'Ht') .OR. (fname .EQ. 'Et')) THEN
           intg = (2.*xi) / (xi**2 - u**2) * intg / (1.-ga)
         ELSE   ! H or E
