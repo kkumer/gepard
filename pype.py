@@ -46,7 +46,10 @@ BSSwDMpoints = utils.select(data[56], criteria=['FTn>=0', 'FTn <= 1'])
 TSA1points = utils.select(data[52], criteria=['FTn == -1'])
 DMpoints = data[5] + data[32][18:] + data[8] + data[30]
 DMTSApoints = data[5] + data[32][18:] + TSA1points + data[8] + data[30]
-
+TSApoints = TSA1points + data[54]
+BTSApoints = utils.select(data[53], criteria=['FTn==0'])
+UNPpoints = ALTGLOpoints + BSSwpoints + BSDwpoints
+H1ZEUSpoints = DVCSpoints + data[48]
 
 
 ## [3] Create a theory
@@ -75,19 +78,15 @@ tGepard = Approach.hotfixedBMK(mGepard)
 #t.name = 'DR + Gepard sea'
 #g = t.m.g
 
-#mDRPP = Model.ModelDRPP(optimization=True)
-#t = Approach.BM10(mDRPP)
-#t.name = 'BM10 + free PP'
-#t.m.parameters.update(DMPP)
-#t.m.ndparameters = np.array([t.m.parameters[name] for name in t.m.parameter_names])
-
 mDRPPsea = Model.ComptonModelDRPPsea()
 m = Model.Hybrid(mGepard, mDRPPsea)
 t = Approach.BM10(m)
 t.name = 'DRPP + Gepard sea'
 g = t.m.g
 
-t.m.parameters.update(hy1THI)
+#t.m.parameters.update(hy1THI)
+t.m.parameters.update(KKunpfull)
+
 
 # NN
 #mNN = Model.ModelNN(hidden_layers=[15], output_layer=['ImH', 'ReH', 'ImE', 'ReE', 'ImHt', 'ReHt', 'ImEt', 'ReEt'])
@@ -97,17 +96,25 @@ t.m.parameters.update(hy1THI)
 #tNN.description = 'x (xB,t)-13-8 nets trained on ALTGLO+BSDw2CD+BSSw for 500 batches'
 
 ## [4] Do the fit
+t.m.fix_parameters('ALL')
 
-#f = Fitter.FitterBrain(BSDw2CDpoints, tNN, nnets=20, nbatch=50, verbose=1)
+#f = Fitter.FitterBrain(UNPpoints+TSApoints+BTSApoints, tNN, nnets=10, nbatch=50, verbose=1)
 #f.fit()
 #f.prune(minprob=0.5)
 #tNN.save(db)
 #db.close()
 
 ## Fitting to both small- and large-x data
-#t.m.release_parameters('M02S','SECG', 'THIS', 'THIG', 'rv', 'bv', 'Mv', 'C', 'MC', 'trv', 'tbv', 'tMv')
-t.m.release_parameters('M02S', 'THIG', 'rv', 'trv', 'rpi')
-f = Fitter.FitterMinuit(DVCSpoints+data[48]+ALTGLOpoints+BSDwpoints+BSSwpoints, t)
+t.m.release_parameters('M02S', 'SECS', 'SECG', 'THIS', 'THIG', 'rv', 'bv', 'Mv', 'C', 'MC', 'trv', 'tbv', 'tMv', 'rpi', 'Mpi')
+f = Fitter.FitterMinuit(H1ZEUSpoints+UNPpoints+TSApoints+BTSApoints, t)
+f.minuit.tol = 80
+f.minuit.maxcalls = 100
+f.minuit.printMode = 1
+#for par in t.m.parameter_names:
+#    if not t.m.parameters['fix_'+par]:
+#        print '---- '+par+' ---'
+#        t.scan(par, f.fitpoints)
+
 
 ## DR fit
 #t.m.release_parameters('rv', 'bv', 'Mv', 'C', 'MC', 'trv', 'tbv', 'tMv', 'rpi', 'Mpi')
