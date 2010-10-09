@@ -37,6 +37,7 @@ ALTGLOpoints = data[5] + data[25] + data[32][18:]
 #ALTGLO2points = data[5] + data[25] + data[32][18:] + HAD17[::2] + HA17[::2]
 #ALTGLO3points = data[5] + data[25] + data[32][18:] + data[30] + HA17
 #ALTGLO4points = data[25] + data[32][18:]
+ALTGLO5points = data[5] + data[8] + data[32][18:]   # DM's CLAS BSA
 #BSDw2Cpoints = utils.select(data[26], criteria=['Q2 == 2.3'])
 #BSDw2CDpoints = utils.select(data[50], criteria=['Q2 == 2.3'])
 BSDwpoints = utils.select(data[50], criteria=['FTn == -1'])
@@ -49,6 +50,7 @@ DMTSApoints = data[5] + data[32][18:] + TSA1points + data[8] + data[30]
 TSApoints = TSA1points + data[54]
 BTSApoints = utils.select(data[53], criteria=['FTn==0'])
 UNPpoints = ALTGLOpoints + BSSwpoints + BSDwpoints
+UNP5points = ALTGLO5points + BSSwpoints + BSDwpoints
 H1ZEUSpoints = DVCSpoints + data[48]
 
 
@@ -60,15 +62,15 @@ tGepard = Approach.hotfixedBMK(mGepard)
 
 
 # DR only
-#mDRonly = Model.ModelDR()
-#tDR = Approach.hotfixedBMK(mDRonly)
-#tDR.name = 'DR model GLO'
-#tDR.m.parameters.update(DMepsGLO)
+mDRonly = Model.ModelDR()
+tDR = Approach.hotfixedBMK(mDRonly)
+tDR.name = '(H1/ZEUS)+HERMES+CLAS'
+tDR.m.parameters.update(DMepsGLO)
 
-#mDRonly1 = Model.ModelDR()
-#tDR1 = Approach.hotfixedBMK(mDRonly1)
-#tDR1.name = 'DR model GLO1'
-#tDR1.m.parameters.update(DMepsGLO1)
+mDRonly1 = Model.ModelDR()
+tDR1 = Approach.hotfixedBMK(mDRonly1)
+tDR1.name = '(H1/ZEUS)+HERMES+CLAS+HallA'
+tDR1.m.parameters.update(DMepsGLO1)
 
 
 ## Hybrid: Gepard+DR (can reuse above Gepard)
@@ -81,11 +83,13 @@ tGepard = Approach.hotfixedBMK(mGepard)
 mDRPPsea = Model.ComptonModelDRPPsea()
 m = Model.Hybrid(mGepard, mDRPPsea)
 t = Approach.BM10(m)
-t.name = 'DRPP + Gepard sea'
+t.name = 'H1/ZEUS+HERMES+CLAS+HallA'
 g = t.m.g
 
 #t.m.parameters.update(hy1THI)
-t.m.parameters.update(KKunpfull)
+#t.m.parameters.update(KKunp5)
+t.m.parameters.update(KKunpTSA1)
+#t.m.parameters.update(KKunpTSA1cut16)
 
 
 # NN
@@ -96,7 +100,7 @@ t.m.parameters.update(KKunpfull)
 #tNN.description = 'x (xB,t)-13-8 nets trained on ALTGLO+BSDw2CD+BSSw for 500 batches'
 
 ## [4] Do the fit
-t.m.fix_parameters('ALL')
+#t.m.fix_parameters('ALL')
 
 #f = Fitter.FitterBrain(UNPpoints+TSApoints+BTSApoints, tNN, nnets=10, nbatch=50, verbose=1)
 #f.fit()
@@ -105,11 +109,11 @@ t.m.fix_parameters('ALL')
 #db.close()
 
 ## Fitting to both small- and large-x data
-t.m.release_parameters('M02S', 'SECS', 'SECG', 'THIS', 'THIG', 'rv', 'bv', 'Mv', 'C', 'MC', 'trv', 'tbv', 'tMv', 'rpi', 'Mpi')
-f = Fitter.FitterMinuit(H1ZEUSpoints+UNPpoints+TSApoints+BTSApoints, t)
-f.minuit.tol = 80
-f.minuit.maxcalls = 100
-f.minuit.printMode = 1
+#t.m.release_parameters('M02S', 'SECS', 'SECG', 'THIS', 'THIG', 'rv', 'bv', 'Mv', 'C', 'MC', 'trv', 'tbv', 'tMv', 'rpi', 'Mpi')
+#f = Fitter.FitterMinuit(H1ZEUSpoints+UNP5points+TSApoints+BTSApoints, t)
+#f.minuit.tol = 80
+#f.minuit.maxcalls = 100
+#f.minuit.printMode = 1
 #for par in t.m.parameter_names:
 #    if not t.m.parameters['fix_'+par]:
 #        print '---- '+par+' ---'
@@ -120,4 +124,12 @@ f.minuit.printMode = 1
 #t.m.release_parameters('rv', 'bv', 'Mv', 'C', 'MC', 'trv', 'tbv', 'tMv', 'rpi', 'Mpi')
 #f = Fitter.FitterMinuit(ALTGLOpoints+BSDwpoints+BSSwpoints, t)
 
+
+def pc(th):
+    exps = ['UNP5points', 'H1ZEUS', 'ALTGLO5', 'CLAS', 'CLASDM', 'BSDw', 'BSSw', 'TSA1']
+    ptssets = [UNP5points, H1ZEUSpoints, ALTGLO5points, data[25], data[8], BSDwpoints, BSSwpoints, TSA1points]
+    for name, pts in zip(exps,ptssets):
+        print '%6s: chi/npts = %5.2f/%d' % (name, th.chisq(pts)[0], len(pts))
+        cutpts = utils.select(pts, criteria=['Q2>=1.6'])
+        print '%6s: chi/npts = %5.2f/%d (cut)' % (name, th.chisq(cutpts)[0], len(cutpts))
 

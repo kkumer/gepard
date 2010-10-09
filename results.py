@@ -706,7 +706,7 @@ DMPP = {
  'Mpi': 1.4634}
 
 # chisq/dof = 200/172 = 0.07
-# total uncut unp
+# total uncut unp (my CLAS)
 # 15 params DRPP + gepard sea
 KKunpfull = {'tMv': 3.9999968268035802, 'rS': 1.0, 'limit_tbv':
     (0.40000000000000002, 5.0), 'rpi': 4.1889940690558589, 'fix_Mv': True,
@@ -779,4 +779,162 @@ True, 'SKEWG': 0.0, 'AL0G': 1.2473167010704711, 'SKEWS': 0.0, 'ALPS':
 'THIS': -0.41512377901430425, 'fix_SKEWS': True, 'DELM2S': 0.0,
 'fix_SKEWG': True, 'fix_NS': True, 'limit_M02G': (0.29999999999999999,
     1.5), 'fix_KAPS': True, 'THIG': 1.1755426941813287, 'DELM2G': 0.0}
+
+# P(131.94, 160) = 0.9488
+# H1ZEUSpoints+UNP5points
+# 15 params DRPP + gepard sea
+#
+#   Mv = 4.00 +- 3.33 (edge)
+#   rv = 0.62 +- 0.06
+#   bv = 0.40 +- 0.67
+#    C = 8.78 +- 0.98
+#   MC = 0.97 +- 0.11
+#  tMv = 0.88 +- 0.24
+#  trv = 7.76 +- 1.39
+#  tbv = 2.05 +- 0.40
+#  rpi = 3.54 +- 1.77
+#  Mpi = 0.73 +- 0.37
+# M02S = 0.51 +- 0.02
+# SECS = 0.28 +- 0.02
+# THIS = -0.13 +- 0.01
+# SECG = -2.79 +- 0.12
+# THIG = 0.90 +- 0.05
+KKunp5 = {
+'tMv': 0.88386035557556641, 'rS': 1.0, 'limit_tbv': (0.40000000000000002, 5.0),
+'rpi': 3.5355742996824659, 'fix_Mv': False, 'fix_Mpi': False, 'alv':
+0.42999999999999999, 'fix_bv': False, 'Mpi': 0.72673907227274226, 'Nv':
+1.3500000000000001, 'fix_trv': False, 'limit_C': (-10.0, 10.0), 'rv':
+0.61981779615528687, 'fix_tNv': True, 'fix_MC': False, 'Nsea': 0.0, 'fix_MS':
+True, 'limit_trv': (0.0, 8.0), 'limit_rv': (0.0, 8.0), 'alS':
+1.1299999999999999, 'fix_bS': True, 'alpS': 0.14999999999999999, 'limit_Mpi':
+(0.40000000000000002, 4.0), 'C': 8.7771705279055432, 'tNv':
+0.59999999999999998, 'limit_Mv': (0.40000000000000002, 4.0), 'limit_tMv':
+(0.40000000000000002, 4.0), 'limit_bS': (0.40000000000000002, 5.0), 'fix_alpv':
+True, 'tbv': 2.0496515976221952, 'fix_alv': True, 'limit_rpi': (-8, 8.0), 'bv':
+0.40375381018570683, 'Mv': 3.999996566773552, 'fix_rS': True, 'fix_Nv': True,
+'fix_tbv': False, 'fix_rpi': False, 'alpv': 0.84999999999999998, 'MC':
+0.9746453693853796, 'fix_Nsea': True, 'fix_alpS': True, 'fix_rv': False,
+'limit_bv': (0.40000000000000002, 5.0), 'limit_MC': (0.40000000000000002, 4.0),
+'fix_alS': True, 'MS': 0.70699999999999996, 'bS': 2.0, 'fix_C': False,
+'fix_tMv': False, 'trv': 7.7592155354071064,
+'fix_THIG': False, 'KAPS': 0.0, 'fix_ALPG': True, 'fix_DELM2S': True,
+'fix_SECG': False, 'KAPG': 0.0, 'fix_SECS': False, 'fix_DELM2G': True,
+'PS': 2.0, 'SECG': -2.787206139384161, 'fix_AL0S': True, 'fix_THIS':
+False, 'fix_KAPG': True, 'SECS': 0.27800486286895021, 'fix_M02G': True,
+'NG': 0.5, 'fix_ALPS': True, 'M02S': 0.51318802297356658, 'PG': 2.0,
+'ALPG': 0.14999999999999999, 'fix_M02S': False, 'NS':
+0.15203911208796006, 'fix_AL0G': True, 'fix_PG': True, 'AL0S':
+1.1575060246398083, 'limit_M02S': (0.29999999999999999, 1.5), 'fix_PS':
+True, 'SKEWG': 0.0, 'AL0G': 1.2473167010704711, 'SKEWS': 0.0, 'ALPS':
+0.14999999999999999, 'M02G': 0.69999999999999996, 'fix_NG': True,
+'THIS': -0.12999801345190121, 'fix_SKEWS': True, 'DELM2S': 0.0,
+'fix_SKEWG': True, 'fix_NS': True, 'limit_M02G': (0.29999999999999999,
+1.5), 'fix_KAPS': True, 'THIG': 0.89633675296304127, 'DELM2G': 0.0}
+
+# P(196.41, 172) = 0.0978
+# H1ZEUSpoints+UNP5points+TSA1points
+# 
+#   Mv = 4.00 +- 3.54 (edge)
+#   rv = 1.07 +- 0.04
+#   bv = 0.40 +- 0.02 (edge)
+#    C = 1.05 +- 0.30
+#   MC = 4.00 +- 3.38 (edge)
+#  tMv = 1.32 +- 2.26
+#  trv = 0.82 +- 0.19
+#  tbv = 0.40 +- 0.16 (edge)
+#  rpi = 3.38 +- 0.16
+#  Mpi = 4.00 +- 2.33 (edge)
+# M02S = 0.54 +- 0.02
+# SECS = 1.49 +- 0.02
+# THIS = -0.50 +- 0.01
+# SECG = -3.34 +- 0.12
+# THIG = 0.94 +- 0.05
+KKunpTSA1 = {
+'tMv': 1.3156138534382904, 'rS': 1.0, 'limit_tbv':
+    (0.40000000000000002, 5.0), 'rpi': 3.3825826231632483, 'fix_Mv': False,
+    'fix_Mpi': False, 'alv': 0.42999999999999999, 'fix_bv': False, 'Mpi':
+    3.999996566773552, 'Nv': 1.3500000000000001, 'fix_trv': False, 'limit_C':
+    (-10.0, 10.0), 'rv': 1.073018581431247, 'fix_tNv': True, 'fix_MC': False,
+    'Nsea': 0.0, 'fix_MS': True, 'limit_trv': (0.0, 8.0), 'limit_rv': (0.0,
+        8.0), 'alS': 1.1299999999999999, 'fix_bS': True, 'alpS':
+    0.14999999999999999, 'limit_Mpi': (0.40000000000000002, 4.0), 'C':
+    1.0467670088984438, 'tNv': 0.59999999999999998, 'limit_Mv':
+    (0.40000000000000002, 4.0), 'limit_tMv': (0.40000000000000002, 4.0),
+    'limit_bS': (0.40000000000000002, 5.0), 'fix_alpv': True, 'tbv':
+    0.40000438690046103, 'fix_alv': True, 'limit_rpi': (-8, 8.0), 'bv':
+    0.40000438690046103, 'Mv': 3.9999999070113295, 'fix_rS': True, 'fix_Nv':
+    True, 'fix_tbv': False, 'fix_rpi': False, 'alpv': 0.84999999999999998,
+    'MC': 3.9999983844050448, 'fix_Nsea': True, 'fix_alpS': True, 'fix_rv':
+    False, 'limit_bv': (0.40000000000000002, 5.0), 'limit_MC':
+    (0.40000000000000002, 4.0), 'fix_alS': True, 'MS': 0.70699999999999996,
+    'bS': 2.0, 'fix_C': False, 'fix_tMv': False, 'trv': 0.82031179907880603,
+'fix_THIG': False, 'KAPS': 0.0, 'fix_ALPG': True, 'fix_DELM2S': True,
+    'fix_SECG': False, 'KAPG': 0.0, 'fix_SECS': False, 'fix_DELM2G': True,
+    'PS': 2.0, 'SECG': -3.3409075255124683, 'fix_AL0S': True, 'fix_THIS':
+    False, 'fix_KAPG': True, 'SECS': 1.4901840478689927, 'fix_M02G': True,
+    'NG': 0.5, 'fix_ALPS': True, 'M02S': 0.53728944647200971, 'PG': 2.0,
+    'ALPG': 0.14999999999999999, 'fix_M02S': False, 'NS': 0.15203911208796006,
+    'fix_AL0G': True, 'fix_PG': True, 'AL0S': 1.1575060246398083, 'limit_M02S':
+    (0.29999999999999999, 1.5), 'fix_PS': True, 'SKEWG': 0.0, 'AL0G':
+    1.2473167010704711, 'SKEWS': 0.0, 'ALPS': 0.14999999999999999, 'M02G':
+    0.69999999999999996, 'fix_NG': True, 'THIS': -0.49729314108803641,
+    'fix_SKEWS': True, 'DELM2S': 0.0, 'fix_SKEWG': True, 'fix_NS': True,
+    'limit_M02G': (0.29999999999999999, 1.5), 'fix_KAPS': True, 'THIG':
+    0.94501600044624157, 'DELM2G': 0.0}
+
+
+# P(168.82, 156) = 0.2283
+# utils.select(H1ZEUSpoints+UNP5points+TSA1points, criteria=['Q2>=1.6'])
+#
+#   Mv = 4.00 +- 3.58 (edge)
+#   rv = 1.03 +- 0.04
+#   bv = 0.40 +- 0.03 (edge)
+#    C = 1.23 +- 0.33
+#   MC = 4.00 +- 3.36 (edge)
+#  tMv = 1.03 +- 0.82
+#  trv = 0.92 +- 0.23
+#  tbv = 0.40 +- 0.33 (edge)
+#  rpi = 3.38 +- 0.17
+#  Mpi = 4.00 +- 2.35 (edge)
+# M02S = 0.52 +- 0.02
+# SECS = 0.57 +- 0.03
+# THIS = -0.22 +- 0.01
+# SECG = -3.30 +- 0.18
+# THIG = 1.09 +- 0.09
+KKunpTSA1cut16 = {
+'tMv': 1.0256490851163997, 'rS': 1.0, 'limit_tbv':
+        (0.40000000000000002, 5.0), 'rpi': 3.3811271921721318, 'fix_Mv': False,
+        'fix_Mpi': False, 'alv': 0.42999999999999999, 'fix_bv': False, 'Mpi':
+        3.999996566773552, 'Nv': 1.3500000000000001, 'fix_trv': False,
+        'limit_C': (-10.0, 10.0), 'rv': 1.0274081985087875, 'fix_tNv': True,
+        'fix_MC': False, 'Nsea': 0.0, 'fix_MS': True, 'limit_trv': (0.0, 8.0),
+        'limit_rv': (0.0, 8.0), 'alS': 1.1299999999999999, 'fix_bS': True,
+        'alpS': 0.14999999999999999, 'limit_Mpi': (0.40000000000000002, 4.0),
+        'C': 1.2299651857374361, 'tNv': 0.59999999999999998, 'limit_Mv':
+        (0.40000000000000002, 4.0), 'limit_tMv': (0.40000000000000002, 4.0),
+        'limit_bS': (0.40000000000000002, 5.0), 'fix_alpv': True, 'tbv':
+        0.40000438690046103, 'fix_alv': True, 'limit_rpi': (-8, 8.0), 'bv':
+        0.40000438690046103, 'Mv': 3.9999941114628839, 'fix_rS': True,
+        'fix_Nv': True, 'fix_tbv': False, 'fix_rpi': False, 'alpv':
+        0.84999999999999998, 'MC': 3.9999999029164206, 'fix_Nsea': True,
+        'fix_alpS': True, 'fix_rv': False, 'limit_bv': (0.40000000000000002,
+            5.0), 'limit_MC': (0.40000000000000002, 4.0), 'fix_alS': True,
+        'MS': 0.70699999999999996, 'bS': 2.0, 'fix_C': False, 'fix_tMv': False,
+        'trv': 0.92231447360569696,
+'fix_THIG': False, 'KAPS': 0.0,
+        'fix_ALPG': True, 'fix_DELM2S': True, 'fix_SECG': False,
+        'KAPG': 0.0, 'fix_SECS': False, 'fix_DELM2G': True, 'PS': 2.0,
+        'SECG': -3.2970087421085648, 'fix_AL0S': True, 'fix_THIS':
+        False, 'fix_KAPG': True, 'SECS': 0.56506108003883404,
+        'fix_M02G': True, 'NG': 0.5, 'fix_ALPS': True, 'M02S':
+        0.52222295960573129, 'PG': 2.0, 'ALPG': 0.14999999999999999,
+        'fix_M02S': False, 'NS': 0.15203911208796006, 'fix_AL0G': True,
+        'fix_PG': True, 'AL0S': 1.1575060246398083, 'limit_M02S':
+        (0.29999999999999999, 1.5), 'fix_PS': True, 'SKEWG': 0.0,
+        'AL0G': 1.2473167010704711, 'SKEWS': 0.0, 'ALPS':
+        0.14999999999999999, 'M02G': 0.69999999999999996, 'fix_NG':
+        True, 'THIS': -0.21683562189055644, 'fix_SKEWS': True,
+        'DELM2S': 0.0, 'fix_SKEWG': True, 'fix_NS': True, 'limit_M02G':
+        (0.29999999999999999, 1.5), 'fix_KAPS': True, 'THIG':
+        1.0922767800778619, 'DELM2G': 0.0}
 

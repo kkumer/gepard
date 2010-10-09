@@ -165,7 +165,7 @@ def HERMES09(lines=[], band=[], path=None, fmt='png'):
     """Plot HERMES 0909.3587 BCA and BSA data with fit lines."""
 
     #ids = [2, 4, 5]
-    title = 'HERMES 09'
+    title = '' #'HERMES 09'
     fig = plt.figure()
     fig.canvas.set_window_title(title)
     fig.suptitle(title)
@@ -206,7 +206,7 @@ def HERMES09(lines=[], band=[], path=None, fmt='png'):
 def HERMES10(obs='TSA', lines=[], band=[], path=None, fmt='png'):
     """Plot HERMES 1004.0177 TSA data with fit lines."""
 
-    title = 'HERMES10-'+obs
+    title = '' # 'HERMES10-'+obs
     fig = plt.figure()
     fig.canvas.set_window_title(title)
     fig.suptitle(title)
@@ -263,7 +263,7 @@ def CLAS(lines=[], band=[], path=None, fmt='png'):
 
     #datafile = "data/ep2epgamma-ALU-CLAS_KK-07.dat" # id = 25
     dataset = data[25]
-    title = 'CLAS 07'
+    title = '' #'CLAS 07'
     fig = plt.figure()
     fig.canvas.set_window_title(title)
     fig.suptitle(title)
@@ -364,15 +364,20 @@ def HALLAalt(lines=[], band=[], path=None, fmt='png'):
     subsets[5] = utils.select(data[51], criteria=['FTn == 1'])
     #subsets[6] = utils.select(data[51], criteria=['FTn == 2'])
 
-    title = 'Hall-A-alt'
+    title = '' #'Hall-A-alt'
     fig = plt.figure()
     fig.canvas.set_window_title(title)
     fig.suptitle(title)
+    Qs = ['1.5', '1.9', '2.3', '2.3', '2.3']
     for panel in range(1,6):
         ax = fig.add_subplot(2,3,panel)
         subplot(ax, [subsets[panel]], lines, band, 't')
         ax.set_ylabel('%s(FTn = %i)' % (subsets[panel][0].y0name, 
             subsets[panel][0].FTn), fontsize=16)
+        if panel<5:
+            ax.text(-0.31, 0.002, '$Q^2\\!= %s\\,{\\rm GeV}^2$' % Qs[panel-1], fontsize=12)
+        else:
+            ax.text(-0.31, -0.008, '$Q^2\\!= %s\\,{\\rm GeV}^2$' % Qs[panel-1], fontsize=12)
         ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))
     # left  = 0.125  # the left side of the subplots of the figure
     # right = 0.9    # the right side of the subplots of the figure
@@ -380,7 +385,7 @@ def HALLAalt(lines=[], band=[], path=None, fmt='png'):
     # top = 0.9      # the top of the subplots of the figure
     # wspace = 0.2   # the amount of width reserved for blank space between subplots
     # hspace = 0.2   # the amount of height reserved for white space between subplots
-    fig.subplots_adjust(wspace=0.4)
+    fig.subplots_adjust(wspace=0.7)
 
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
@@ -404,10 +409,12 @@ def H1ZEUS(lines=[], band=[], path=None, fmt='png'):
             utils.select(data[41], criteria=['Q2 == 25.'])]
     subsets[4] = [data[47]] # ZEUS Q2-dep
     xs = ['t', 't', 'W', 'Q2']
-    title = 'H1 07 / ZEUS 08'
+    #title = 'H1 07 / ZEUS 08'
+    title = ''
     fig = plt.figure()
     fig.canvas.set_window_title(title)
     fig.suptitle(title)
+    fig.subplots_adjust(bottom=0.1, hspace=0.3)
     for panel in range(1,5):
         ax = fig.add_subplot(2,2,panel)
         ax.set_yscale('log')  # y-axis to be logarithmic
@@ -430,12 +437,12 @@ def H1ZEUS(lines=[], band=[], path=None, fmt='png'):
             ax.set_xlabel('$Q^2\\quad [{\\rm GeV}^2]$', fontsize=18)
         if panel==1:
             ax.text(-0.8, 22, '${\\rm H1}$', fontsize=16)
-            ax.text(-0.8, 12, '${\\rm W = 82}\\, {\\rm GeV}$', fontsize=14)
-            ax.text(-0.8, 6, '$Q^2\\!= 8,\\, 15.5,\\, 25\\,{\\rm GeV}^2$', fontsize=14)
+            ax.text(-0.8, 10, '${\\rm W = 82}\\, {\\rm GeV}$', fontsize=12)
+            ax.text(-0.8, 3, '$Q^2\\!= 8,\\, 15.5,\\, 25\\,{\\rm GeV}^2$', fontsize=12)
         if panel==2:
             ax.text(-0.3, 6, '${\\rm ZEUS}$', fontsize=16)
-            ax.text(-0.3, 4.5, '${\\rm W = 104}\\, {\\rm GeV}$', fontsize=14)
-            ax.text(-0.3, 3.3, '$Q^2\\!= 3.2\\,{\\rm GeV}^2$', fontsize=14)
+            ax.text(-0.3, 3.5, '${\\rm W = 104}\\, {\\rm GeV}$', fontsize=12)
+            ax.text(-0.3, 2.1, '$Q^2\\!= 3.2\\,{\\rm GeV}^2$', fontsize=12)
         if panel==3:
             ax.text(50, 28, '${\\rm ZEUS}\\, (idem):$', fontsize=16)
             ax.text(50, 5, '${\\rm H1}\\, (idem):$', fontsize=16)
@@ -460,25 +467,28 @@ def HALLAphi(lines=[], band=[], path=None, fmt='png'):
     subsets[21] = utils.select(data[34], criteria=['t == -0.17'])
     subsets[23] = utils.select(data[34], criteria=['t == -0.28'])
     subsets[24] = utils.select(data[34], criteria=['t == -0.33'])
-    title = 'HALL A 06'
+    title = '' # 'HALL A 06'
     fig = plt.figure()
     fig.canvas.set_window_title(title)
     fig.suptitle(title)
+    fig.subplots_adjust(wspace=0.2, right=0.95)
     panel = 1
     for id in ids:
         ax = fig.add_subplot(2,3,panel)
         subplot(ax, [subsets[id]], lines, band, 'phi', ['Q2', 't'])
         ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(2.))
-        ax.set_xlabel('$\\phi\\; {\\rm [rad]}$', fontsize=18)
+        ax.set_xlabel('$\\phi\\; {\\rm [rad]}$', fontsize=16)
         if not(panel==1 or panel==4):
             # Leave labels only on leftmost panels
             ax.set_ylabel('')
         elif panel==1:
-            ax.set_ylabel('$d^4\\Sigma/(dQ^2\\! dx_{\\rm B}dt d\\phi)\\quad \
-                    [{\\rm nb/GeV}^4]$', fontsize=18)
+            ax.set_ylabel('$d^4\\Sigma$', fontsize=18)
+            #ax.set_ylabel('$d^4\\Sigma/(dQ^2\\! dx_{\\rm B}dt d\\phi)\\quad \
+            #        [{\\rm nb/GeV}^4]$', fontsize=18)
         else: # panel 4
-            ax.set_ylabel('$d^4\\sigma/(dQ^2\\! dx_{\\rm B}dt d\\phi)\\quad  \
-                    [{\\rm nb/GeV}^4]$', fontsize=18)
+            ax.set_ylabel('$d^4\\sigma$', fontsize=18)
+            #ax.set_ylabel('$d^4\\sigma/(dQ^2\\! dx_{\\rm B}dt d\\phi)\\quad  \
+            #        [{\\rm nb/GeV}^4]$', fontsize=18)
         panel += 1
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
@@ -493,7 +503,7 @@ def COMPASS(lines=[], xB=0.05, Q2=2, path=None, fmt='png', numbers=False):
     FIXME: kinematic completion, charge etc. must be explicit here
     """
 
-    title = 'COMPASS $Q^2$ = %s GeV$^2$, $x_B$ = %s' % (Q2, xB)
+    title = '' # 'COMPASS $Q^2$ = %s GeV$^2$, $x_B$ = %s' % (Q2, xB)
     filename = 'COMPASS-Q2-%s-xB-%s' % (Q2, xB)
     fig = plt.figure()
     fig.canvas.set_window_title(title)
@@ -510,11 +520,12 @@ def COMPASS(lines=[], xB=0.05, Q2=2, path=None, fmt='png', numbers=False):
     pt.xB = xB
     pt.t = -0.2
     pt.Q2 = Q2
-    ax = fig.add_subplot(2,2,1)
+    #ax = fig.add_subplot(2,2,1)
+    ax = fig.add_subplot(1,1,1)
     ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
     phi = np.arange(0., np.pi, 0.1)
     utils.fill_kinematics(pt)
-    linestyles = ['g--', 'b-', 'c-.']
+    linestyles = ['r-', 'g--', 'b-.']
     labels = ['without_HALLA', 'with_HALLA']
     pn = 0
     asym = []
@@ -522,60 +533,61 @@ def COMPASS(lines=[], xB=0.05, Q2=2, path=None, fmt='png', numbers=False):
         approach.__class__.to_conventions(pt)
         approach.__class__.prepare(pt)
         line = approach.BCSA(pt, vars={'phi':np.pi - phi})
-        ax.plot(phi, line, linestyles[pn], linewidth=2, label=labels[pn]) 
+        ax.plot(phi, line, linestyles[pn], linewidth=2, label=approach.name) 
         asym.append(line)
         pn += 1
     #ax.set_ylim(0.0, 0.5)
     # axes labels
     ax.set_xlabel('$\\phi$')
     ax.set_ylabel('BCS Asymmetry')
-    ax.legend()
-    # Difference  panel
-    ax = fig.add_subplot(2,2,2)
-    ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
-    pn = 0
-    diff = []
-    for approach in lines:
-        approach.__class__.to_conventions(pt)
-        approach.__class__.prepare(pt)
-        # nb converted to pb:
-        line = 1000. * approach.BCSD(pt, vars={'phi':np.pi - phi})
-        ax.plot(phi, line, linestyles[pn], linewidth=2, label=labels[pn]) 
-        diff.append(line)
-        pn += 1
-    #ax.set_ylim(0.0, 0.5)
-    # axes labels
-    ax.set_xlabel('$\\phi$')
-    ax.set_ylabel('BCS Difference  [pb/GeV^4]')
-    ax.legend()
-    # Sum pannel
-    ax = fig.add_subplot(2,2,3)
-    ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
-    pn = 0
-    summ = []
-    for approach in lines:
-        approach.__class__.to_conventions(pt)
-        approach.__class__.prepare(pt)
-        # nb converted to pb:
-        line = 1000. * approach.BCSS(pt, vars={'phi':np.pi - phi})
-        ax.plot(phi, line, linestyles[pn], linewidth=2, label=labels[pn]) 
-        summ.append(line)
-        pn += 1
-    #ax.set_ylim(0.0, 0.5)
-    # axes labels
-    ax.set_xlabel('$\\phi$')
-    ax.set_ylabel('BCS sum  [pb/GeV^4]')
-    ax.legend()
-    if numbers:
-        pn = 0
-        for approach in lines:
-            mat = np.array([phi, asym[pn], diff[pn], summ[pn]]).transpose()
-            np.savetxt('%s-%s.dat' % (filename, labels[pn]), mat, fmt='% f', 
-                    delimiter='   ')
-            pn += 1
+    ax.legend().draw_frame(0)
+    ## Difference  panel
+    #ax = fig.add_subplot(2,2,2)
+    #ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
+    #pn = 0
+    #diff = []
+    #for approach in lines:
+    #    approach.__class__.to_conventions(pt)
+    #    approach.__class__.prepare(pt)
+    #    # nb converted to pb:
+    #    line = 1000. * approach.BCSD(pt, vars={'phi':np.pi - phi})
+    #    ax.plot(phi, line, linestyles[pn], linewidth=2, label=approach.name) 
+    #    diff.append(line)
+    #    pn += 1
+    ##ax.set_ylim(0.0, 0.5)
+    ## axes labels
+    #ax.set_xlabel('$\\phi$')
+    #ax.set_ylabel('BCS Difference  [pb/GeV^4]')
+    #ax.legend().draw_frame(0)
+    ## Sum pannel
+    #ax = fig.add_subplot(2,2,3)
+    #ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
+    #pn = 0
+    #summ = []
+    #for approach in lines:
+    #    approach.__class__.to_conventions(pt)
+    #    approach.__class__.prepare(pt)
+    #    # nb converted to pb:
+    #    line = 1000. * approach.BCSS(pt, vars={'phi':np.pi - phi})
+    #    ax.plot(phi, line, linestyles[pn], linewidth=2, label=approach.name) 
+    #    summ.append(line)
+    #    pn += 1
+    ##ax.set_ylim(0.0, 0.5)
+    ## axes labels
+    #ax.set_xlabel('$\\phi$')
+    #ax.set_ylabel('BCS sum  [pb/GeV^4]')
+    #ax.legend().draw_frame(0)
+    #if numbers:
+    #    pn = 0
+    #    for approach in lines:
+    #        mat = np.array([phi, asym[pn], diff[pn], summ[pn]]).transpose()
+    #        np.savetxt('%s-%s.dat' % (filename, labels[pn]), mat, fmt='% f', 
+    #                delimiter='   ')
+    #        pn += 1
     if path:
         fig.subplots_adjust(hspace=0.15)
         fig.subplots_adjust(wspace=0.35)
+        fig.subplots_adjust(bottom=0.30)
         fig.savefig(os.path.join(path, filename+'.'+fmt), format=fmt)
     else:
         fig.canvas.draw()
@@ -649,7 +661,7 @@ def EIC(fits=[], path=None, fmt='png'):
     fig = plt.figure()
     fig.canvas.set_window_title(title)
     fig.suptitle(title)
-    #fig.subplots_adjust(bottom=0.35)
+    fig.subplots_adjust(bottom=0.35)
     # Asymmetry panel
     pt = Data.DummyPoint()
     pt.exptype = 'collider'
@@ -685,20 +697,20 @@ def EIC(fits=[], path=None, fmt='png'):
         approach.__class__.to_conventions(pt)
         approach.__class__.prepare(pt)
         lineBSS = approach.BSS(pt, vars={'phi':phi})
-        ax.plot(phi, lineBSS, linestyles[pn], linewidth=2, label=labels[pn]) 
+        ax.plot(phi, lineBSS, linestyles[pn], linewidth=3, label=labels[pn]) 
         pn += 1
     #ax.set_ylim(0.0, 0.5)
     # axes labels
     ax.set_xlabel('$\\phi\\quad {\\rm [rad]}$', fontsize=20)
     ax.set_ylabel('$\\sigma\\quad {\\rm [nb]}$', fontsize=20)
     #ax.legend(loc=(0.3,0))
-    ax.legend()
-    ax.text(0.7, 87., "EIC", fontsize=18)
-    ax.text(0.7, 82., "$E_e = %d \\,{\\rm GeV}$" % pt.in1energy, fontsize=18)
-    ax.text(0.7, 79., "$E_p = %d \\,{\\rm GeV}$" % pt.in2energy, fontsize=18)
-    ax.text(0.7, 76., "$x_B = %s$" % pt.xB, fontsize=18)
-    ax.text(0.7, 73., "$Q^2 = %s \\,{\\rm GeV}^2$" % pt.Q2, fontsize=18)
-    ax.text(0.7, 71., "$t = %s \\,{\\rm GeV}^2$" % pt.t, fontsize=18)
+    ax.legend(loc=(0.2, 0)).draw_frame(0)
+    ax.text(0.7, 90., "EIC", fontsize=18)
+    ax.text(0.7, 84., "$E_e = %d \\,{\\rm GeV}$" % pt.in1energy, fontsize=18)
+    ax.text(0.7, 80., "$E_p = %d \\,{\\rm GeV}$" % pt.in2energy, fontsize=18)
+    ax.text(0.7, 75., "$x_B = %s$" % pt.xB, fontsize=18)
+    ax.text(0.7, 71., "$Q^2 = %s \\,{\\rm GeV}^2$" % pt.Q2, fontsize=18)
+    ax.text(0.7, 67., "$t = %s \\,{\\rm GeV}^2$" % pt.t, fontsize=18)
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
@@ -712,47 +724,93 @@ def H(theories=[], path=None, fmt='png'):
     TODO: This should be a method of Model.
     
     """
-    title = 'GPD H at LO' # 'Fig 15'
+    title = '' # 'Fig 15'
     fig = plt.figure()
     fig.canvas.set_window_title(title)
     fig.suptitle(title)
-    fig.subplots_adjust(bottom=0.45)
+    fig.subplots_adjust(bottom=0.15)
     # Left panel
     pt = Data.DummyPoint()
     pt.Q2 = 2.
     ax = fig.add_subplot(1,1,1)
     ax.set_xscale('log')  # x-axis to be logarithmic
     xval = np.power(10., np.arange(-3.5, 0, 0.01)) 
-    colors = ['red', 'green', 'brown', 'purple']
+    colors = ['red', 'green', 'blue', 'purple']
     styles = ['-', '--', '-.', ':']
     pn = 0
     for t in theories:
-        pt.t = -0.1
+        #pt.t = -0.1
         # kludge alert!
-        ImHvals = []
-        for xi in xval:
-            if t.model.__dict__.has_key('Gepard'): t.m.g.newcall = 1
-            ImHvals.append(t.model.ImH(pt, xi))
-        line1 = xval * np.array(ImHvals) / np.pi
-        pt.t = -0.3
+        #ImHvals = []
+        #for xi in xval:
+        #    if t.model.__dict__.has_key('Gepard'): t.m.g.newcall = 1
+        #    ImHvals.append(t.model.ImH(pt, xi))
+        #line1 = xval * np.array(ImHvals) / np.pi
+        pt.t = -0.28
         ImHvals = []
         for xi in xval:
             if t.model.__dict__.has_key('Gepard'): t.m.g.newcall = 1
             ImHvals.append(t.model.ImH(pt, xi))
         line2 = xval * ImHvals / np.pi
-        ax.plot(xval, line1, color=colors[pn], linestyle=styles[pn], linewidth=2)
-        ax.plot(xval, line2, color=colors[pn], linestyle=styles[pn], linewidth=4, label=t.name) 
+        #ax.plot(xval, line1, color=colors[pn], linestyle=styles[pn], linewidth=2)
+        ax.plot(xval, line2, color=colors[pn], linestyle=styles[pn], linewidth=3, label=t.name) 
         pn += 1
-    ax.set_ylim(0.0, 0.5)
+    ax.set_ylim(0.0, 0.4)
     ax.set_xlim(0.0005, 1.0)
     #plt.ylim(0.0, 0.5)
     # axes labels
-    ax.set_xlabel('$x$', fontsize=15)
-    ax.set_ylabel('$x H(x, x, t)$', fontsize=18)
-    ax.legend()
+    ax.set_xlabel('$\\xi = x_{\\rm B}/(2-x_{\\rm B})$', fontsize=18)
+    ax.set_ylabel('$\\xi\\, H(\\xi, \\xi, t)$', fontsize=22)
+    ax.legend().draw_frame(0)
     #ax.text(0.001, 0.405, "t = 0")
-    ax.text(0.001, 0.27, "$t = -0.1\\, {\\rm GeV}^2$", fontsize=15)
-    ax.text(0.001, 0.12, "$t = -0.3\\, {\\rm GeV}^2$", fontsize=15)
+    #ax.text(0.001, 0.27, "$t = -0.1\\, {\\rm GeV}^2$", fontsize=15)
+    ax.text(0.01, 0.25, "$t = -0.28\\, {\\rm GeV}^2$", fontsize=15)
+    ax.text(0.01, 0.22, "$Q^2 = 2\\, {\\rm GeV}^2$", fontsize=15)
+    if path:
+        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+    else:
+        fig.canvas.draw()
+        fig.show()
+    return fig
+
+def Hval(theories=[], path=None, fmt='png'):
+    """Makes plot of Im(cffH) in valence region.
+    
+    
+    """
+    title = '' # 'Fig 15'
+    fig = plt.figure()
+    fig.canvas.set_window_title(title)
+    fig.suptitle(title)
+    fig.subplots_adjust(bottom=0.15)
+    pt = Data.DummyPoint()
+    pt.Q2 = 2.
+    pt.t = -0.28
+    ax = fig.add_subplot(1,1,1)
+    #ax.set_xscale('log')  # x-axis to be logarithmic
+    xval = np.linspace(0.07, 0.38, 20) 
+    colors = ['red', 'green', 'blue', 'purple']
+    styles = ['-', '--', '-.', ':']
+    pn = 0
+    for t in theories:
+        # kludge alert!
+        ImHvals = []
+        for xB in xval:
+            xi = xB/(2.-xB)
+            if t.model.__dict__.has_key('Gepard'): t.m.g.newcall = 1
+            ImHvals.append(t.model.ImH(pt, xi)/np.pi)
+        ax.plot(xval, ImHvals, color=colors[pn], linestyle=styles[pn], linewidth=3, label=t.name) 
+        pn += 1
+    ax.set_ylim(0.0, 4.5)
+    ax.set_xlim(0.075, 0.38)
+    #plt.ylim(0.0, 0.5)
+    # axes labels
+    ax.set_xlabel('$x_B$', fontsize=18)
+    ax.set_ylabel('$\\Im\\! m \\mathcal{H}(x_{\\rm B}, t, Q^2)/\\pi$', fontsize=22)
+    ax.legend().draw_frame(0)
+    #ax.text(0.001, 0.405, "t = 0")
+    ax.text(0.2, 3.2, "$t = -0.28\\, {\\rm GeV}^2$", fontsize=15)
+    ax.text(0.2, 2.8, "$Q^2 = 2\\, {\\rm GeV}^2$", fontsize=15)
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
