@@ -964,3 +964,104 @@ def CFF(t, cffs=None, path=None, fmt='png', average=True):
         fig.show()
     return fig
 
+
+def HvalNN(theories=[], band=None, path=None, fmt='png'):
+    """Makes plot of Im(cffH) in valence region.
+    
+    
+    """
+    title = '' # 'Fig 15'
+    fig = plt.figure()
+    fig.canvas.set_window_title(title)
+    fig.suptitle(title)
+    fig.subplots_adjust(bottom=0.15)
+    pt = Data.DummyPoint()
+    pt.Q2 = 2.
+    pt.t = -0.28
+    ax = fig.add_subplot(1,1,1)
+    #ax.set_xscale('log')  # x-axis to be logarithmic
+    xval = np.linspace(0.07, 0.38, 20) 
+    colors = ['red', 'green', 'blue', 'purple']
+    styles = ['-', '--', '-.', ':']
+    pn = 0
+    for t in theories:
+        # kludge alert!
+        ImHvals = []
+        for xB in xval:
+            xi = xB/(2.-xB)
+            if t.model.__dict__.has_key('Gepard'): t.m.g.newcall = 1
+            ImHvals.append(t.model.ImH(pt, xi)/np.pi)
+        ax.plot(xval, ImHvals, color=colors[pn], linestyle=styles[pn], linewidth=3, label=t.name) 
+        pn += 1
+    ax.set_ylim(0.0, 4.5)
+    ax.set_xlim(0.075, 0.38)
+    #plt.ylim(0.0, 0.5)
+    # axes labels
+    ax.set_xlabel('$x_B$', fontsize=18)
+    ax.set_ylabel('$\\Im\\! m \\mathcal{H}(x_{\\rm B}, t, Q^2)/\\pi$', fontsize=22)
+    ax.legend().draw_frame(0)
+    #ax.text(0.001, 0.405, "t = 0")
+    ax.text(0.2, 3.2, "$t = -0.28\\, {\\rm GeV}^2$", fontsize=15)
+    ax.text(0.2, 2.8, "$Q^2 = 2\\, {\\rm GeV}^2$", fontsize=15)
+    if band:
+        old = band.model.parameters['nnet']
+        band.model.parameters['nnet'] = 'ALL'
+        _axband(ax, -pt.t, xval, band.m.ImH, color='green', avg=False)
+        band.model.parameters['nnet'] = old
+    if path:
+        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+    else:
+        fig.canvas.draw()
+        fig.show()
+    return fig
+
+
+def Ht(theories=[], xB=0.36, path=None, fmt='png'):
+    """Makes plot of cffH for M. Guidal's proceedings.
+    
+    """
+    title = ''
+    fig = plt.figure()
+    fig.canvas.set_window_title(title)
+    fig.suptitle(title)
+    fig.subplots_adjust(bottom=0.15)
+    pt = Data.DummyPoint()
+    pt.Q2 = 2.
+    pt.xB = xB
+    pt.xi = xB/(2.-xB)
+    ax = fig.add_subplot(1,1,1)
+    #ax.set_xscale('log')  # x-axis to be logarithmic
+    mts = np.linspace(0.0, 0.6, 20) 
+    colors = ['red', 'green', 'blue', 'purple']
+    styles = ['-', '--', '-.', ':']
+    pn = 0
+    for th in theories:
+        # kludge alert!
+        ImHvals = []
+        ReHvals = []
+        for mt in mts:
+            pt.mt = mt
+            pt.t = -mt
+            if th.model.__dict__.has_key('Gepard'): th.m.g.newcall = 1
+            ImHvals.append(th.model.ImH(pt)/np.pi)  # M. Guidal conventions!
+            ReHvals.append(-th.model.ReH(pt))       # M. Guidal conventions!
+        ax.plot(mts, ImHvals, color=colors[pn], linestyle=styles[pn], linewidth=3, label=th.name) 
+        ax.plot(mts, ReHvals, color=colors[pn], linestyle=styles[pn], linewidth=1, label=th.name) 
+        pn += 1
+    ax.set_ylim(-2.0, 11.0)
+    #ax.set_xlim(0.075, 0.38)
+    #plt.ylim(0.0, 0.5)
+    # axes labels
+    ax.set_xlabel('$-t \\, [{\\rm GeV}^2]$', fontsize=18)
+    ax.set_ylabel('$\\Im\\! m \\mathcal{H}(x_{\\rm B}, t, Q^2=2\\, {\\rm GeV}^2)$', fontsize=22)
+    ax.legend().draw_frame(0)
+    #ax.text(0.001, 0.405, "t = 0")
+    ax.text(0.2, 3.2, "$xB = %s$" % xB, fontsize=15)
+    #ax.text(0.2, 2.8, "$Q^2 = 2\\, {\\rm GeV}^2$", fontsize=15)
+    if path:
+        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+    else:
+        fig.canvas.draw()
+        fig.show()
+    return fig
+

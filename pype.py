@@ -7,6 +7,7 @@ import numpy as np
 import Model, Approach, Fitter, Data
 import utils 
 import plots
+import grids
 
 from constants import Mp, Mp2
 
@@ -83,12 +84,12 @@ tDR1.m.parameters.update(DMepsGLO1)
 mDRPPsea = Model.ComptonModelDRPPsea()
 m = Model.Hybrid(mGepard, mDRPPsea)
 t = Approach.BM10(m)
-t.name = 'H1/ZEUS+HERMES+CLAS+HallA'
+t.name = 'prelim. H1/ZEUS+HERMES+CLAS+HallA'
 g = t.m.g
 
 #t.m.parameters.update(hy1THI)
-#t.m.parameters.update(KKunp5)
-t.m.parameters.update(KKunpTSA1)
+t.m.parameters.update(KKunp5)
+#t.m.parameters.update(KKunpTSA1)
 #t.m.parameters.update(KKunpTSA1cut16)
 
 
@@ -132,4 +133,35 @@ def pc(th):
         print '%6s: chi/npts = %5.2f/%d' % (name, th.chisq(pts)[0], len(pts))
         cutpts = utils.select(pts, criteria=['Q2>=1.6'])
         print '%6s: chi/npts = %5.2f/%d (cut)' % (name, th.chisq(cutpts)[0], len(cutpts))
+
+    
+pt0 = Data.DummyPoint()
+pt0.in1energy = 27.6
+pt0.s = 2 * Mp * pt0.in1energy + Mp2
+pt0.in1charge = -1
+pt0.in1polarization = 1
+pt0.xB = 0.111
+pt0.Q2 = 3.467
+#pt0.t = -0.467
+pt0.t = -0.6
+pt0.xi = pt0.xB/(2.-pt0.xB)
+pt0.phi = 2.094
+pt0.frame = 'BMK'
+utils.fill_kinematics(pt0)
+tDR.prepare(pt0)
+
+for t in np.linspace(-0.6, -0.2, 40):
+    pt0.t = t
+    try:
+        del pt0.W
+    except:
+        pass
+    try:
+        del pt0.tm
+    except:
+        pass
+    utils.fill_kinematics(pt0)
+    tDR.prepare(pt0)
+    print "{%.3f,  %.6g}," % (t, tDR.BSA(pt0))
+
 
