@@ -208,6 +208,7 @@ class BMK(Approach):
 
     def from_conventions(pt):
         """Transform stuff from Approach's conventions into original data's."""
+        # This method is never used presently!!
         # C1. azimutal angle phi should be in radians ...
         if pt.has_key('phi'):
             if pt.units['phi'][:3]== 'deg': # deg, degree, degrees -> radians

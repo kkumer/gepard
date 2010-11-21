@@ -7,7 +7,6 @@ import numpy as np
 import Model, Approach, Fitter, Data
 import utils 
 import plots
-import grids
 
 from constants import Mp, Mp2
 
@@ -83,12 +82,12 @@ tDR1.m.parameters.update(DMepsGLO1)
 
 mDRPPsea = Model.ComptonModelDRPPsea()
 m = Model.Hybrid(mGepard, mDRPPsea)
-t = Approach.BM10(m)
-t.name = 'prelim. H1/ZEUS+HERMES+CLAS+HallA'
-g = t.m.g
+th = Approach.BM10(m)
+th.name = 'prelim. H1/ZEUS+HERMES+CLAS+HallA'
+g = th.m.g
 
 #t.m.parameters.update(hy1THI)
-t.m.parameters.update(KKunp5)
+th.m.parameters.update(KKunp5)
 #t.m.parameters.update(KKunpTSA1)
 #t.m.parameters.update(KKunpTSA1cut16)
 
@@ -146,8 +145,10 @@ pt0.Q2 = 3.467
 pt0.t = -0.6
 pt0.xi = pt0.xB/(2.-pt0.xB)
 pt0.phi = 2.094
-pt0.frame = 'BMK'
+pt0.frame = 'Trento'
+pt0.units = {'phi': 'radian'}
 utils.fill_kinematics(pt0)
+tDR.to_conventions(pt0)
 tDR.prepare(pt0)
 
 for t in np.linspace(-0.6, -0.2, 40):
