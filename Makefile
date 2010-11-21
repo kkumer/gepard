@@ -8,6 +8,7 @@
 
 # -- 0. Compilation options
 
+FC = gfortran
 OPT_CFLAGS = -O3 -fPIC
 
 # optimized, debug and profiling modes
@@ -88,16 +89,21 @@ export MMATARGETS = xs_mma.exe
 
 .PHONY: $(TESTTARGETS)  $(MMATARGETS) 
 
-all: $(TESTTARGETS) $(MMATARGETS) 
+all: $(TESTTARGETS) $(MMATARGETS)
 
 tests: $(TESTTARGETS)
 
 mma: $(MMATARGETS)
 
+
 $(TESTTARGETS) $(MMATARGETS):
 	$(MAKE) -C ifaces $@
 
 
-.PHONY: clean
+optModel.so: optModel.f
+	f2py --fcompiler=$(FC) -c -m optModel $^ 
+
+.PHONY: clean 
 clean:
 	$(MAKE) -C ifaces clean
+	-rm -f optModel.so
