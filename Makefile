@@ -9,6 +9,7 @@
 # -- 0. Compilation options
 
 FC = gfortran
+CC = gcc
 OPT_CFLAGS = -O3 -fPIC
 
 # optimized, debug and profiling modes
@@ -23,15 +24,26 @@ ifdef PROFILE
 endif
 CFLAGS = $(OPT_CFLAGS)
 
-export CC CFLAGS
 
+ifdef WINDIR
+	#PYINCLUDES = -I c:\Python25\include
+	PYINCLUDES = -I /cygdrive/c/Python25/include
+
+	#PYLIBS = -L c:\Python25\libs -lpython25 -lm 
+	PYLIBS = -L /cygdrive/c/Python25/libs -lpython25 -lm
+else
+	PYINCLUDES = -I/usr/include/python2.5 -I/usr/include/python2.5
+	PYLIBS = -lpthread -ldl -lutil -lm -lpython2.5
+endif
+
+export CC CFLAGS PYINCLUDES PYLIBS
 
 # -- 2. MathLink related things
 #
 # Put your version of Mathematica here and it's root dir (final slash needed!)
 export MMAVERSION=7.0
 export MMAROOT = /usr/local/Wolfram/Mathematica/
-# export MMAROOT = /cygdrive/c/Program\ Files/Wolfram\ Research/Mathematica/
+#export MMAROOT = /cygdrive/c/Program\ Files/Wolfram\ Research/Mathematica/
 # export MMAROOT = /psi/math-
 ifdef WINDIR
   export SYS = Windows

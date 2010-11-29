@@ -11,7 +11,11 @@ import pickle, sys
 
 from numpy import log, pi, imag, real
 from numpy import ndarray, array
-from termcolor import colored
+try:
+	from termcolor import colored
+except ImportError:
+	def colored(a, c):
+		return a
 
 from quadrature import PVquadrature
 from utils import flatten, hubDict

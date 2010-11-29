@@ -72,7 +72,7 @@ double xs(int id, int Q, int lam, double Ee, double Ep, double xB, double Q2, do
     }
     else {
         PyErr_Print();
-        fprintf(stderr, "Failed to load \"%s\"\n", "grid");
+        fprintf(stderr, "Failed to load module \"%s\"\n", "xs");
         return 1;
     }
     /* Py_Finalize(); */

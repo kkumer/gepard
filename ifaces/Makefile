@@ -32,18 +32,18 @@ _PYOBJS = $(patsubst %,$(PYODIR)/%,$(PYOBJS))
 
 # rule for compiling Python embedders
 $(PYODIR)/%.o: %.c ifaces.h
-	$(CC) -c -o $@ $< `python-config --includes` $(CFLAGS)
+	$(CC) -c -o $@ $< $(PYINCLUDES) $(CFLAGS)
 
 
 # targets
 
 $(TESTTARGETS): %: $(_OBJS) $(_PYOBJS)
-	$(CC) -o ../$@ $^ $(CFLAGS)  `python-config --libs`
+	$(CC) -o ../$@ $^ $(CFLAGS)  $(PYLIBS)
 
 # mma target
 
 xs_mma.exe: $(_PYOBJS)  $(_MMAOBJS) 
-	$(CC) -o ../$@/$(SYS)/$@ $^  -L$(MLLIBDIR) -l$(MLLIB) $(MLEXTRA) `python-config --libs`
+	$(CC) -o ../$@/$(SYS)/$@ $^  -L$(MLLIBDIR) -l$(MLLIB) $(MLEXTRA) $(PYLIBS)
 
 
 .PHONY: clean
