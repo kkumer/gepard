@@ -117,15 +117,15 @@ if __name__ == '__main__':
   xs.exe  ModelID  Charge  Polarization  Ee  Ep  xB  Q2  t  phi
 
 returns cross section (in nb) for scattering of lepton of energy Ee 
-on unpolarized proton target of energy Ep. Charge=-1 is for electron. 
+on unpolarized proton of energy Ep. Charge=-1 is for electron. 
 
 ModelID is one of  
    0 debug, always returns 42, 
-   1 arXiv:0904.0458 fit without Hall A,
-   2 arXiv:0904.0458 fit with Hall A, 
-   3 preliminary hybrid fit with LO sea evolution, from Trento presentation.
+   1 KM09a - arXiv:0904.0458 fit without Hall A,
+   2 KM09b - arXiv:0904.0458 fit with Hall A, 
+   3 KM10 - preliminary hybrid fit with LO sea evolution, from Trento presentation.
 
-xB Q2 t phi  -- usual kinematics (phi in Trento convention)
+xB Q2 t phi  -- usual kinematics (phi is in Trento convention)
 
 For convenience, if last argument (phi=n) is larger than 2pi, you get grid 
 of n equidistant points with phi=0..2pi.
