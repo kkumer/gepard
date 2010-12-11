@@ -11,11 +11,20 @@ import pickle, sys
 
 from numpy import log, pi, imag, real
 from numpy import ndarray, array
+
+def _fakecolor(a, b):
+    return a
+
 try:
 	from termcolor import colored
 except ImportError:
-	def colored(a, c):
-		return a
+	colored = _fakecolor
+
+def stringcolor(a, c, colors=False):
+    if colors:
+        return colored(a, c)
+    else:
+        return _fakecolor(a, c)
 
 from quadrature import PVquadrature
 from utils import flatten, hubDict
@@ -64,7 +73,8 @@ class Model(object):
                             % (par, self))
                 self.parameters['fix_'+par] = True
 
-    def print_parameters(self, compare_with=[]):
+
+    def print_parameters(self, compare_with=[], exact=False, colors=True):
         """Pretty-print parameters and their values.
 
         Variable parameters are printed green, while parameters with values
@@ -77,28 +87,31 @@ class Model(object):
         s = ""
         for name in self.parameter_names:
             value = self.parameters[name]
-            row = '%4s -> %-5.3g' % (name, value)
+            if exact:
+                row = '%5s -> %-g,' % (name, value)
+            else:
+                row = '%5s -> %-5.3g' % (name, value)
             if self.parameters.has_key('limit_'+name):
                 lo, hi = self.parameters['limit_'+name]
                 if (abs((lo-value)*(hi-value)) < 0.001):
-                    row = colored(row, 'red')
+                    row = stringcolor(row, 'red', colors)
             if self.parameters['fix_'+name] == False:
-                row = colored(row, 'green')
+                row = stringcolor(row, 'green', colors)
             for model in compare_with:
                 try:
                     value2 =  model.parameters[name]
                 except KeyError:
                     # compared model doesnt' have this parameter
                     value2 = 0
-                app = '   %-5.3g' % value2
+                app = ('   '+parform) % value2
                 # calculate relative diff, or absolute if value is zero
                 diff = value - value2
                 if value != 0:
                     diff = diff/abs(value)
                 if diff > 0.05:
-                    app = colored(app, 'red')
+                    app = stringcolor(app, 'red', colors)
                 elif diff < -0.05:
-                    app = colored(app, 'blue')
+                    app = stringcolor(app, 'blue', colors)
                 row += app
             row += '\n'
             s += row

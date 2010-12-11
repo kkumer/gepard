@@ -11,6 +11,7 @@ import plots
 from constants import Mp, Mp2
 
 from results import *
+from math import sqrt
 
 # [1] Load experimental data and theoretical models
 
@@ -151,18 +152,22 @@ utils.fill_kinematics(pt0)
 tDR.to_conventions(pt0)
 tDR.prepare(pt0)
 
-for t in np.linspace(-0.6, -0.2, 40):
-    pt0.t = t
-    try:
-        del pt0.W
-    except:
-        pass
-    try:
-        del pt0.tm
-    except:
-        pass
-    utils.fill_kinematics(pt0)
-    tDR.prepare(pt0)
-    print "{%.3f,  %.6g}," % (t, tDR.BSA(pt0))
+ptE = Data.DummyPoint()
+ptE.in1energy = 5.
+ptE.in2energy = 160.
+ptE.s = 2 * ptE.in1energy * (ptE.in2energy + sqrt(
+            ptE.in2energy**2 - Mp2)) + Mp2
+ptE.in1charge = 1
+ptE.in1polarization = 1
+ptE.xB = 0.1
+ptE.Q2 = 2.2
+ptE.t = -0.1
+ptE.xi = ptE.xB/(2.-ptE.xB)
+ptE.phi = 0.
+ptE.frame = 'Trento'
+ptE.units = {'phi': 'radian'}
+utils.fill_kinematics(ptE)
+tDR.to_conventions(ptE)
+tDR.prepare(ptE)
 
 

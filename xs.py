@@ -57,8 +57,8 @@ def tmin(xB, Q2):
     """BMK Eq. (31)"""
 
     eps2 = (4. * xB**2 * Mp2) / Q2
-    return min(-Q2 * ( 2. * (1.-xB)*(1. - sqrt(1.+eps2)) + eps2 ) / (
-            4. * xB * (1.-xB) + eps2 ), -0.15)
+    return (-Q2 * ( 2. * (1.-xB)*(1. - sqrt(1.+eps2)) + eps2 ) / (
+            4. * xB * (1.-xB) + eps2 ))
 
 def XSunp(id, Q, lam, Ee, Ep, xB, Q2, t, phi):
     """ Return cross section of scattering on unpolarized proton
@@ -119,7 +119,7 @@ For convenience, if last argument (phi=n) is larger than 2pi, you get grid
 of n equidistant points with phi=0..2pi.
 
 Example:
-    ./xs.exe 1 -1 1 27.6 0 0.111 3. -0.3 20
+    ./xs.exe 1 -1 1 27.6 0.938  0.111 3. -0.3 20
 
 """
 
@@ -134,7 +134,7 @@ Example:
         sys.exit(1)
     if args[-1] <= 2*3.141592:
         res = apply(XSunp, args)
-        sys.stdout.write("%.4f\n" % res)
+        sys.stdout.write("%.14f\n" % res)
     else:
         # we want phi-grid
         res = []
@@ -142,5 +142,5 @@ Example:
         for k in range(npts):
             phi = 2*3.141*k / npts
             args[-1] = phi
-            sys.stdout.write("%.3f  %.4f\n" % (phi, apply(XSunp, args)))
+            sys.stdout.write("%.3f  %.14f\n" % (phi, apply(XSunp, args)))
     sys.stdout.flush()
