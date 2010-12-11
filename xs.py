@@ -17,11 +17,20 @@ def theory(id):
 
     if id == 0:
         # for debugging, always returns 42
+        class dummymodel(object):
+            def is_within_model_kinematics(self, pt):
+                return True
         class dummy(object):
+            def __init__(self):
+                self.model = dummymodel()
+                self.m = self.model
             def to_conventions(self, pt):
                 pass
             def prepare(self, pt):
                 pass
+            @staticmethod
+            def is_within_phase_space(pt):
+                return True
             def Xunp(self, pt):
                 return 42
         dummyo = dummy()
