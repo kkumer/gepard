@@ -131,6 +131,12 @@ class BMK(Approach):
                 4. * xB * (1.-xB) + eps2 )
     tmin = staticmethod(tmin)
 
+    def xBmin(s, Q2):
+        """Constrained by xB=Q2/(s-Mp^2)/yMax, with 1-yMax+yMax^2*eps2/4=0."""
+        yMax = 1 + Mp2*Q2/(s-Mp2)**2
+        return Q2 / (s-Mp2) / yMax
+    xBmin = staticmethod(xBmin)
+
     def K2(Q2, xB, t, y, eps2):
         """BMK Eq. (30)"""
         tm = BMK.tmin(Q2, xB, eps2)
@@ -144,6 +150,11 @@ class BMK(Approach):
         """BMK below Eq. (32)"""
         return (1.-y-y*eps2/2.) * (1. + t/Q2) - (1.-xB)*(2.-y)*t/Q2
     J = staticmethod(J)
+
+    @staticmethod
+    def is_within_phase_space(pt):
+        """Is pt kinematics within allowed phase space?"""
+        return (pt.xB > BMK.xBmin(pt.s, pt.Q2) and pt.t < BMK.tmin(pt.Q2, pt.xB, pt.eps2))
 
     def r(Q2, xB, t, y, eps2):
         """DM's fitting notes, below Eq. (13)"""

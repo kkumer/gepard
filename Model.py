@@ -159,6 +159,12 @@ class ComptonFormFactors(Model):
     for name in allCFFeffs:
         exec('def %s(self, pt): return 0.' % name)
 
+    def is_within_model_kinematics(self, pt):
+        return ( (1.5 <= pt.Q2 <= 5.) and 
+                 (pt.tm < min(1., pt.Q2/4)) and
+                 (1e-3 < pt.xB < 0.5)
+               )
+
 class ComptonDispersionRelations(ComptonFormFactors):
     """Use dispersion relations for ReH and ReE
 
@@ -825,6 +831,12 @@ class ComptonHybrid(ComptonFormFactors):
         # now do whatever else is necessary
         ComptonFormFactors.__init__(self, **kwargs)
 
+    def is_within_model_kinematics(self, pt):
+        # relaxing xBmin and removing Q2max
+        return ( (1.5 <= pt.Q2) and 
+                 (pt.tm < min(1., pt.Q2/4)) and
+                 (1e-5 < pt.xB < 0.5)
+               )
 
     def ImH(self, pt, xi=0):
         return  self.Gepard.ImH(pt, xi) + self.DR.ImH(pt, xi)

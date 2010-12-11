@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 
+#from IPython.Debugger import Tracer; debug_here = Tracer()
 
 import sys
-from math import sqrt
+from math import sqrt, pi
 
 import Data, Model, Approach, utils
 
@@ -44,11 +45,11 @@ def theory(id):
         mGepard = Model.ComptonGepard(cutq2=0.5)
         mDRPPsea = Model.ComptonModelDRPPsea()
         m = Model.Hybrid(mGepard, mDRPPsea)
-        t = Approach.BM10(m)
-        t.name = 'prelim. H1/ZEUS+HERMES+CLAS+HallA'
-        g = t.m.g
-        t.m.parameters.update(KKunp5)
-        return t
+        th = Approach.BM10(m)
+        th.name = 'prelim. H1/ZEUS+HERMES+CLAS+HallA'
+        g = th.m.g
+        th.m.parameters.update(KKunp5)
+        return th
     else:
         sys.stdout.write('Unknown model: %d' % id)
         sys.exit(1)
@@ -72,32 +73,34 @@ def XSunp(id, Q, lam, Ee, Ep, xB, Q2, t, phi):
     pt0 = Data.DummyPoint()
     pt0.in1energy = Ee
     if Ep > Mp:
+        # collider
         pt0.in2energy = Ep
         pt0.s = 2 * pt0.in1energy * (pt0.in2energy + sqrt(
                     pt0.in2energy**2 - Mp2)) + Mp2
     else:
+        # fixed target
         pt0.s = 2 * Mp * pt0.in1energy + Mp2
-    if xB<0.000001 or xB>0.4:
-        sys.stdout.write('xB = %.4g is not in reliable range 1e-6 < xB < 0.4\n' % xB)
+    pt0.in1charge = Q
+    pt0.in1polarization = lam
+    pt0.xB = xB
+    pt0.Q2 = Q2
+    pt0.t = t
+    pt0.xi = pt0.xB/(2.-pt0.xB)
+    pt0.phi = phi
+    pt0.units = {'phi': 'radian'}
+    pt0.frame = 'Trento'
+    utils.fill_kinematics(pt0)
+    th = theory(id)
+    th.to_conventions(pt0)
+    th.prepare(pt0)
+    if not th.is_within_phase_space(pt0):
+        return 0
+    elif not th.m.is_within_model_kinematics(pt0):
+        sys.stdout.write('Error: (xB, Q2, t) = (%.4g, %.4g, %.4g) is outside of kinematic bounds of model %i\n' % (xB, Q2, t, id))
         sys.stdout.flush()
         sys.exit(1)
-    elif (Q2 >= (pt0.s-Mp2)*xB) or (t >= tmin(xB,Q2)):
-        return 0
     else:
-        pt0.in1charge = Q
-        pt0.in1polarization = lam
-        pt0.xB = xB
-        pt0.Q2 = Q2
-        pt0.t = t
-        pt0.xi = pt0.xB/(2.-pt0.xB)
-        pt0.phi = phi
-        pt0.units = {'phi': 'radian'}
-        pt0.frame = 'Trento'
-        utils.fill_kinematics(pt0)
-        t = theory(id)
-        t.to_conventions(pt0)
-        t.prepare(pt0)
-        return t.Xunp(pt0)
+        return th.Xunp(pt0)
 
 if __name__ == '__main__':
     usage = """
@@ -140,7 +143,7 @@ Example:
         res = []
         npts = int(args[-1]) # number of points
         for k in range(npts):
-            phi = 2*3.141*k / npts
+            phi = 2*pi*k / (npts-1)
             args[-1] = phi
             sys.stdout.write("%.3f  %.14f\n" % (phi, apply(XSunp, args)))
     sys.stdout.flush()
