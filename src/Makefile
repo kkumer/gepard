@@ -105,7 +105,7 @@ gepard.exe: $(ALLOBJS) $(FODIR)/Ffcn.o $(_MMAOBJS)  $(FODIR)/Fmninterface.o
 # pygepard target
 
 pygepard.so: $(_FPREPS)
-	f2py -c -m pygepard $^ adacf/*f
+	f2py --fcompiler=$(FC) -c -m pygepard $^ adacf/*f
 	mv pygepard.so ../fits/
 
 # targets for examples
