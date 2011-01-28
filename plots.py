@@ -172,7 +172,7 @@ def HERMES10(lines=[], band=[], path=None, fmt='png'):
     xaxes = ['tm', 'xB', 'Q2']
     ylims = [(-0.05, 0.3), (-0.15, 0.15), (-0.45, 0.05)]
     # we have 3x18=54 points to be separated in nine panels six points each:
-    for y, id, shift in zip(range(3), [57, 57, 5], [18, 0, 0]):
+    for y, id, shift in zip(range(3), [57, 57, 58], [18, 0, 0]):
         for x in range(3):
             panel = 3*y + x + 1  # 1, 2, ..., 9
             ax = fig.add_subplot(3,3,panel)
@@ -183,7 +183,91 @@ def HERMES10(lines=[], band=[], path=None, fmt='png'):
                 # Leave labels only on leftmost panels
                 ax.set_ylabel('')
             else:
-                ylabels = ['$BCA\\; \\cos \\phi$', '$BCA\\; \\cos 0\\phi$', '$BSA\\; \\sin\\phi$']
+                ylabels = ['$BCA\\; \\cos \\phi$', '$BCA\\; \\cos 0\\phi$', '$ALUI\\; \\sin\\phi$']
+                ax.set_ylabel(ylabels[(panel-1)/3], fontsize=18)
+
+            if panel < 7:
+                # Leave labels only on lowest panels
+                ax.set_xlabel('')
+            else:
+                xlabels = ['$-t\\; [{\\rm GeV}^2]$', '$x_B$', '$Q^2\\; [{\\rm GeV}^2]$']
+                ax.set_xlabel(xlabels[panel-7], fontsize=18)
+
+            if (panel % 3) == 2:
+                # Adjust x-axis on middle column
+                ax.set_xlim(0.04, 0.25)
+    if path:
+        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+    else:
+        fig.canvas.draw()
+        fig.show()
+    return fig
+
+def HERMES10BCA(lines=[], band=[], path=None, fmt='png'):
+    """Plot HERMES PRELIMINARY 06/07 BCA data with fit lines."""
+
+    #ids = [2, 4, 5]
+    title = 'HERMES 10 BCA PRELIMINARY'
+    fig = plt.figure()
+    fig.canvas.set_window_title(title)
+    fig.suptitle(title)
+    xaxes = ['tm', 'xB', 'Q2']
+    ylims = [(-0.15, 0.15), (-0.05, 0.3), (-0.15, 0.15)]
+    # we have 3x18=54 points to be separated in nine panels six points each:
+    for y, id, shift in zip(range(3), [57, 57, 57], [0, 18, 36]):
+        for x in range(3):
+            panel = 3*y + x + 1  # 1, 2, ..., 9
+            ax = fig.add_subplot(3,3,panel)
+            ax.yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))  # tickmarks
+            subplot(ax, [data[id][x*6+shift:x*6+6+shift]], lines, band, xaxes[x], [])
+            apply(ax.set_ylim, ylims[y])
+            if (panel % 3) != 1:
+                # Leave labels only on leftmost panels
+                ax.set_ylabel('')
+            else:
+                ylabels = ['$BCA\\; \\cos 0\\phi$', '$BCA\\; \\cos \\phi$', '$BCA\\; \\cos 2\\phi$']
+                ax.set_ylabel(ylabels[(panel-1)/3], fontsize=18)
+
+            if panel < 7:
+                # Leave labels only on lowest panels
+                ax.set_xlabel('')
+            else:
+                xlabels = ['$-t\\; [{\\rm GeV}^2]$', '$x_B$', '$Q^2\\; [{\\rm GeV}^2]$']
+                ax.set_xlabel(xlabels[panel-7], fontsize=18)
+
+            if (panel % 3) == 2:
+                # Adjust x-axis on middle column
+                ax.set_xlim(0.04, 0.25)
+    if path:
+        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+    else:
+        fig.canvas.draw()
+        fig.show()
+    return fig
+
+def HERMES10BSA(lines=[], band=[], path=None, fmt='png'):
+    """Plot HERMES PRELIMINARY 06/07 BSA data with fit lines."""
+
+    #ids = [2, 4, 5]
+    title = 'HERMES 10 BSA PRELIMINARY'
+    fig = plt.figure()
+    fig.canvas.set_window_title(title)
+    fig.suptitle(title)
+    xaxes = ['tm', 'xB', 'Q2']
+    ylims = [(-0.45, 0.1), (-0.25, 0.25), (-0.15, 0.15)]
+    # we have 3x18=54 points to be separated in nine panels six points each:
+    for y, id, shift in zip(range(3), [58, 59, 58], [0, 0, 18]):
+        for x in range(3):
+            panel = 3*y + x + 1  # 1, 2, ..., 9
+            ax = fig.add_subplot(3,3,panel)
+            ax.yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))  # tickmarks
+            subplot(ax, [data[id][x*6+shift:x*6+6+shift]], lines, band, xaxes[x], [])
+            apply(ax.set_ylim, ylims[y])
+            if (panel % 3) != 1:
+                # Leave labels only on leftmost panels
+                ax.set_ylabel('')
+            else:
+                ylabels = ['$ALUI\\; \\sin \\phi$', '$ALUDVCS\\; \\sin \\phi$', '$ALUI\\; \\sin 2\\phi$']
                 ax.set_ylabel(ylabels[(panel-1)/3], fontsize=18)
 
             if panel < 7:

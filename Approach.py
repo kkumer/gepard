@@ -488,6 +488,66 @@ class BMK(Approach):
         return ( self.Xunp(pt, **kwargs) 
                 + self.Xunp(pt, **R) ) / 2.
 
+    def _ALUI(self, pt, **kwargs):
+        """Calculate BSA as defined by HERMES 0909.3587 Eq. (2.2) """
+
+        pol = kwargs.copy()
+        pol.update({'flip':'in1polarization'})
+        chg = kwargs.copy()
+        chg.update({'flip':'in1charge'})
+        both = kwargs.copy()
+        both.update({'flip':['in1polarization', 'in1charge']})
+        o =  self.Xunp(pt, **kwargs)
+        p =  self.Xunp(pt, **pol)
+        c =  self.Xunp(pt, **chg)
+        b =  self.Xunp(pt, **both)
+        return ((o-p) - (c-b)) / ((o+p) + (c+b))
+
+    def ALUI(self, pt):
+        """Calculate BSA as defined by HERMES 0909.3587 Eq. (2.2) or
+        its harmonics."""
+
+        if pt.has_key('phi'):
+            return self._ALUI(pt)
+        elif pt.has_key('FTn') and pt.FTn == -1:
+            res = quadrature.Hquadrature(lambda phi: 
+                    self._ALUI(pt, vars={'phi':phi}) * sin(phi), 0, 2*pi)
+            return  res / pi
+        elif pt.has_key('FTn') and pt.FTn == -2:
+            res = quadrature.Hquadrature(lambda phi: 
+                    self._ALUI(pt, vars={'phi':phi}) * sin(2.*phi), 0, 2*pi)
+            return  res / pi
+
+    def _ALUDVCS(self, pt, **kwargs):
+        """Calculate BSA as defined by HERMES 0909.3587 Eq. (2.3) """
+
+        pol = kwargs.copy()
+        pol.update({'flip':'in1polarization'})
+        chg = kwargs.copy()
+        chg.update({'flip':'in1charge'})
+        both = kwargs.copy()
+        both.update({'flip':['in1polarization', 'in1charge']})
+        o =  self.Xunp(pt, **kwargs)
+        p =  self.Xunp(pt, **pol)
+        c =  self.Xunp(pt, **chg)
+        b =  self.Xunp(pt, **both)
+        return ((o-p) + (c-b)) / ((o+p) + (c+b))
+
+    def ALUDVCS(self, pt):
+        """Calculate BSA as defined by HERMES 0909.3587 Eq. (2.3) or
+        its harmonics."""
+
+        if pt.has_key('phi'):
+            return self._ALUDVCS(pt)
+        elif pt.has_key('FTn') and pt.FTn == -1:
+            res = quadrature.Hquadrature(lambda phi: 
+                    self._ALUDVCS(pt, vars={'phi':phi}) * sin(phi), 0, 2*pi)
+            return  res / pi
+        elif pt.has_key('FTn') and pt.FTn == -2:
+            res = quadrature.Hquadrature(lambda phi: 
+                    self._ALUDVCS(pt, vars={'phi':phi}) * sin(2.*phi), 0, 2*pi)
+            return  res / pi
+
     def _BSA(self, pt, **kwargs):
         """Calculate beam spin asymmetry (BSA)."""
         return self.BSD(pt, **kwargs) / self.BSS(pt, **kwargs)
@@ -534,6 +594,14 @@ class BMK(Approach):
         elif pt.has_key('FTn') and pt.FTn == 1:
             res = quadrature.Hquadrature(lambda phi: 
                     self._BCA(pt, vars={'phi':phi}) * cos(phi), 0, 2*pi)
+            return  - res / pi
+        elif pt.has_key('FTn') and pt.FTn == 2:
+            res = quadrature.Hquadrature(lambda phi: 
+                    self._BCA(pt, vars={'phi':phi}) * cos(2.*phi), 0, 2*pi)
+            return  res / pi
+        elif pt.has_key('FTn') and pt.FTn == 3:
+            res = quadrature.Hquadrature(lambda phi: 
+                    self._BCA(pt, vars={'phi':phi}) * cos(3.*phi), 0, 2*pi)
             return  - res / pi
 
     def BCSD(self, pt, **kwargs):

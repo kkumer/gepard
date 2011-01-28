@@ -158,10 +158,12 @@ ptE.in2energy = 160.
 ptE.s = 2 * ptE.in1energy * (ptE.in2energy + sqrt(
             ptE.in2energy**2 - Mp2)) + Mp2
 ptE.in1charge = 1
-ptE.in1polarization = 1
-ptE.xB = 0.1
-ptE.Q2 = 2.2
-ptE.t = -0.1
+ptE.in1polarization = -1
+ptE.xB = 0.3
+#ptE.Q2 = 2.2
+ptE.Q2 = 4.
+#ptE.t = -0.1
+ptE.t = -0.0
 ptE.xi = ptE.xB/(2.-ptE.xB)
 ptE.phi = 0.
 ptE.frame = 'Trento'
