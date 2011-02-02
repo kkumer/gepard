@@ -517,6 +517,9 @@ class BMK(Approach):
             res = quadrature.Hquadrature(lambda phi: 
                     self._ALUI(pt, vars={'phi':phi}) * sin(2.*phi), 0, 2*pi)
             return  res / pi
+        else:
+            raise ValueError('[%s] has neither azimuthal angle phi\
+ nor harmonic FTn defined!' % pt)
 
     def _ALUDVCS(self, pt, **kwargs):
         """Calculate BSA as defined by HERMES 0909.3587 Eq. (2.3) """
@@ -547,6 +550,9 @@ class BMK(Approach):
             res = quadrature.Hquadrature(lambda phi: 
                     self._ALUDVCS(pt, vars={'phi':phi}) * sin(2.*phi), 0, 2*pi)
             return  res / pi
+        else:
+            raise ValueError('[%s] has neither azimuthal angle phi\
+ nor harmonic FTn defined!' % pt)
 
     def _BSA(self, pt, **kwargs):
         """Calculate beam spin asymmetry (BSA)."""
@@ -563,6 +569,9 @@ class BMK(Approach):
             else:
                 kwargs['vars'] = {'phi':pi/2.}
             return  self._BSA(pt, **kwargs) 
+        else:
+            raise ValueError('[%s] has neither azimuthal angle phi\
+ nor harmonic FTn defined!' % pt)
         ### Exact but slower:
             #res = quadrature.Hquadrature(lambda phi: 
             #        self._BSA(pt, vars={'phi':phi}) * sin(phi), 0, 2*pi)
@@ -603,6 +612,9 @@ class BMK(Approach):
             res = quadrature.Hquadrature(lambda phi: 
                     self._BCA(pt, vars={'phi':phi}) * cos(3.*phi), 0, 2*pi)
             return  - res / pi
+        else:
+            raise ValueError('[%s] has neither azimuthal angle phi\
+ nor harmonic FTn defined!' % pt)
 
     def BCSD(self, pt, **kwargs):
         """4-fold beam charge-spin cross section difference measured by COMPASS """

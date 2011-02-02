@@ -39,14 +39,14 @@ def theory(id):
         # NPB fit withouth Hall A
         mDRonly = Model.ModelDR()
         tDR = Approach.hotfixedBMK(mDRonly)
-        tDR.name = '(H1/ZEUS)+HERMES+CLAS'
+        tDR.name = 'KM09a'
         tDR.m.parameters.update(DMepsGLO)
         return tDR
     elif id == 2:
         # NPB fit with Hall A
         mDRonly1 = Model.ModelDR()
         tDR1 = Approach.hotfixedBMK(mDRonly1)
-        tDR1.name = '(H1/ZEUS)+HERMES+CLAS+HallA'
+        tDR1.name = 'KM09b'
         tDR1.m.parameters.update(DMepsGLO1)
         return tDR1
     elif id == 3:
@@ -55,12 +55,33 @@ def theory(id):
         mDRPPsea = Model.ComptonModelDRPPsea()
         m = Model.Hybrid(mGepard, mDRPPsea)
         th = Approach.BM10(m)
-        th.name = 'prelim. H1/ZEUS+HERMES+CLAS+HallA'
+        th.name = 'KM10'
         g = th.m.g
-        th.m.parameters.update(KKunp5)
+        th.m.parameters.update(KM10)  # KKunp5
+        return th
+    elif id == 4:
+        # Hybrid fit + 3rd PW to DVCSpoints + data[48] + ALTGLOpoints
+        # P(133.06, 155) = 0.8983
+        mGepard = Model.ComptonGepard(cutq2=0.5)
+        mDRsea = Model.ComptonModelDRsea()
+        m = Model.Hybrid(mGepard, mDRsea)
+        th = Approach.hotfixedBMK(m)
+        th.name = 'KM10a'
+        g = th.m.g
+        th.m.parameters.update(KM10a)  # ALTGLO
+        return th
+    elif id == 5:
+        # Hybrid fit + 3rd PW to DVCSpoints and GLO1points  chisq = 108/141
+        mGepard = Model.ComptonGepard(cutq2=0.5)
+        mDRsea = Model.ComptonModelDRsea()
+        m = Model.Hybrid(mGepard, mDRsea)
+        th = Approach.hotfixedBMK(m)
+        th.name = 'KM10b'
+        g = th.m.g
+        th.m.parameters.update(KM10b)  # hyTHI
         return th
     else:
-        sys.stdout.write('Unknown model: %d' % id)
+        sys.stdout.write('Unknown model: %d\n' % id)
         sys.exit(1)
     
 def tmin(xB, Q2):
@@ -123,7 +144,9 @@ ModelID is one of
    0 debug, always returns 42, 
    1 KM09a - arXiv:0904.0458 fit without Hall A,
    2 KM09b - arXiv:0904.0458 fit with Hall A, 
-   3 KM10 - preliminary hybrid fit with LO sea evolution, from Trento presentation.
+   3 KM10  - preliminary hybrid fit with LO sea evolution, from Trento presentation,
+   4 KM10a - preliminary hybrid fit with LO sea evolution, without Hall A data
+   5 KM10b - preliminary hybrid fit with LO sea evolution, with Hall A data
 
 xB Q2 t phi  -- usual kinematics (phi is in Trento convention)
 

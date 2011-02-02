@@ -385,6 +385,7 @@ hy1 = {
  'trv': 6.5439416177483896}
 
 # Hybrid fit + 3rd PW to DVCSpoints and GLO1points  chisq = 96/129
+# Or is it 108/141?
 # ('M02S','SECS','SECG', 'THIS', 'THIG', 'rv', 'bv', 'C', 'MC', 'trv', 'tbv')
 hy1THI = {
  'AL0G': 1.2473167010704711,
@@ -425,6 +426,7 @@ hy1THI = {
  'tNv': 0.59999999999999998,
  'tbv': 4.9999998875540301,
  'trv': 6.9128424208463581}
+KM10b = hy1THI
 
 # HERMES BCA uglyish. Otherwise OK.
 hy1_17_THI = {
@@ -543,6 +545,7 @@ True, 'limit_trv': (0.0, 8.0), 'limit_rv': (0.0, 8.0), 'alS':
 (0.40000000000000002, 5.0), 'limit_MC': (0.40000000000000002, 2.0), 'fix_alS':
 True, 'MS': 0.70699999999999996, 'bS': 2.0, 'fix_C': False, 'fix_tMv': True,
 'trv': 6.0}
+KM10a = ALTGLO
 # cutq2 = 2.0 !!!  P(143.10, 155) = 0.7441
 ALTGLOcut = {
 'fix_THIG': False, 'KAPS': 0.0, 'fix_ALPG': True, 'fix_DELM2S': True,
@@ -830,6 +833,7 @@ True, 'SKEWG': 0.0, 'AL0G': 1.2473167010704711, 'SKEWS': 0.0, 'ALPS':
 'THIS': -0.12999801345190121, 'fix_SKEWS': True, 'DELM2S': 0.0,
 'fix_SKEWG': True, 'fix_NS': True, 'limit_M02G': (0.29999999999999999,
 1.5), 'fix_KAPS': True, 'THIG': 0.89633675296304127, 'DELM2G': 0.0}
+KM10 = KKunp5
 
 # P(196.41, 172) = 0.0978
 # H1ZEUSpoints+UNP5points+TSA1points
@@ -937,4 +941,40 @@ KKunpTSA1cut16 = {
         'DELM2S': 0.0, 'fix_SKEWG': True, 'fix_NS': True, 'limit_M02G':
         (0.29999999999999999, 1.5), 'fix_KAPS': True, 'THIG':
         1.0922767800778619, 'DELM2G': 0.0}
+
+# 86/127
+# DVCSpoints+GLOpoints
+# t.m.release_parameters('M02S', 'SECS', 'SECG', 'THIS', 'THIG', 'rv', 'bv', 'Mv', 'C', 'MC', 'trv', 'tbv', 'tMv')
+# mDRsea = Model.ComptonModelDRsea()
+#m = Model.Hybrid(mGepard, mDRsea)
+#t = Approach.hotfixedBMK(m)
+KM10aCand1 = {
+'tMv': 0.72866940517442902, 'rS': 1.0, 'limit_tbv': (0.40000000000000002, 5.0),
+'fix_Mv': False, 'alv': 0.42999999999999999, 'fix_bv': False, 'Nv':
+1.3500000000000001, 'fix_trv': True, 'limit_C': (-10.0, 10.0), 'rv':
+0.49042198904829348, 'fix_tNv': True, 'fix_MC': False, 'Nsea': 0.0, 'fix_MS':
+True, 'limit_trv': (0.0, 8.0), 'limit_rv': (0.0, 8.0), 'alS':
+1.1299999999999999, 'fix_bS': True, 'alpS': 0.14999999999999999, 'C':
+9.1754359638461835, 'tNv': 0.59999999999999998, 'limit_Mv':
+(0.40000000000000002, 1.5), 'limit_tMv': (0.40000000000000002, 2.0),
+'limit_bS': (0.40000000000000002, 5.0), 'fix_alpv': True, 'tbv':
+3.1820059611233771, 'fix_alv': True, 'bv': 0.40000252441118156, 'Mv':
+1.4999996092274657, 'fix_rS': True, 'fix_Nv': True, 'fix_tbv': True, 'alpv':
+0.84999999999999998, 'MC': 0.74710776531169398, 'fix_Nsea': True, 'fix_alpS':
+True, 'fix_rv': False, 'limit_bv': (0.40000000000000002, 5.0), 'limit_MC':
+(0.40000000000000002, 2.0), 'fix_alS': True, 'MS': 0.70699999999999996, 'bS':
+2.0, 'fix_C': False, 'fix_tMv': True, 'trv': 7.9999646375514626,
+'fix_THIG': False, 'KAPS': 0.0, 'fix_ALPG': True, 'fix_DELM2S': True,
+'fix_SECG': False, 'KAPG': 0.0, 'fix_SECS': False, 'fix_DELM2G': True, 'PS':
+2.0, 'SECG': -2.0577533684495162, 'fix_AL0S': True, 'fix_THIS': False,
+'fix_KAPG': True, 'SECS': -1.0722853854418892, 'fix_M02G': True, 'NG': 0.5,
+'fix_ALPS': True, 'M02S': 0.48024712029919264, 'PG': 2.0, 'ALPG':
+0.14999999999999999, 'fix_M02S': False, 'NS': 0.15203911208796006, 'fix_AL0G':
+True, 'fix_PG': True, 'AL0S': 1.1575060246398083, 'limit_M02S':
+(0.29999999999999999, 1.5), 'fix_PS': True, 'SKEWG': 0.0, 'AL0G':
+1.2473167010704711, 'SKEWS': 0.0, 'ALPS': 0.14999999999999999, 'M02G':
+0.69999999999999996, 'fix_NG': True, 'THIS': 0.27563608304019077, 'fix_SKEWS':
+True, 'DELM2S': 0.0, 'fix_SKEWG': True, 'fix_NS': True, 'limit_M02G':
+(0.29999999999999999, 1.5), 'fix_KAPS': True, 'THIG': 0.8023193873056319,
+'DELM2G': 0.0}
 

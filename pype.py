@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 
+#import pylab
+import matplotlib.pyplot as plt
+
 import shelve
 
 import numpy as np
@@ -65,32 +68,42 @@ tGepard = Approach.hotfixedBMK(mGepard)
 # DR only
 mDRonly = Model.ModelDR()
 tDR = Approach.hotfixedBMK(mDRonly)
-tDR.name = '(H1/ZEUS)+HERMES+CLAS'
+tDR.name = 'KM09a'
 tDR.m.parameters.update(DMepsGLO)
+
+tDRBM = Approach.BM10(mDRonly)
+tDRBM.name = 'KM09a+BM10'
+tDRBM.m.parameters.update(DMepsGLO)
 
 mDRonly1 = Model.ModelDR()
 tDR1 = Approach.hotfixedBMK(mDRonly1)
-tDR1.name = '(H1/ZEUS)+HERMES+CLAS+HallA'
+tDR1.name = 'KM09b'
 tDR1.m.parameters.update(DMepsGLO1)
+
+tDR1BM = Approach.BM10(mDRonly1)
+tDR1BM.name = 'KM09b+BM10'
+tDR1BM.m.parameters.update(DMepsGLO1)
 
 
 ## Hybrid: Gepard+DR (can reuse above Gepard)
-#mDRsea = Model.ComptonModelDRsea()
-#m = Model.Hybrid(mGepard, mDRsea)
-#t = Approach.hotfixedBMK(m)
-#t.name = 'DR + Gepard sea'
-#g = t.m.g
-
-mDRPPsea = Model.ComptonModelDRPPsea()
-m = Model.Hybrid(mGepard, mDRPPsea)
-th = Approach.BM10(m)
-th.name = 'prelim. H1/ZEUS+HERMES+CLAS+HallA'
+mDRsea = Model.ComptonModelDRsea()
+m = Model.Hybrid(mGepard, mDRsea)
+th = Approach.hotfixedBMK(m)
+th.name = 'KM10b'
+th.m.parameters.update(KM10b)  
 g = th.m.g
 
-#t.m.parameters.update(hy1THI)
-th.m.parameters.update(KKunp5)
-#t.m.parameters.update(KKunpTSA1)
-#t.m.parameters.update(KKunpTSA1cut16)
+thBM = Approach.BM10(m)
+thBM.m.name = "KM10b+BM10"
+
+
+#mDRPPsea = Model.ComptonModelDRPPsea()
+#m = Model.Hybrid(mGepard, mDRPPsea)
+#th = Approach.BM10(m)
+#th.name = 'KM10'
+#g = th.m.g
+#th.m.parameters.update(KM10)
+
 
 
 # NN
@@ -101,7 +114,7 @@ th.m.parameters.update(KKunp5)
 #tNN.description = 'x (xB,t)-13-8 nets trained on ALTGLO+BSDw2CD+BSSw for 500 batches'
 
 ## [4] Do the fit
-#t.m.fix_parameters('ALL')
+#th.m.fix_parameters('ALL')
 
 #f = Fitter.FitterBrain(UNPpoints+TSApoints+BTSApoints, tNN, nnets=10, nbatch=50, verbose=1)
 #f.fit()
@@ -110,19 +123,20 @@ th.m.parameters.update(KKunp5)
 #db.close()
 
 ## Fitting to both small- and large-x data
-#t.m.release_parameters('M02S', 'SECS', 'SECG', 'THIS', 'THIG', 'rv', 'bv', 'Mv', 'C', 'MC', 'trv', 'tbv', 'tMv', 'rpi', 'Mpi')
-#f = Fitter.FitterMinuit(H1ZEUSpoints+UNP5points+TSApoints+BTSApoints, t)
+#th.m.release_parameters('M02S', 'SECS', 'SECG', 'THIS', 'THIG', 'rv', 'bv', 'Mv', 'C', 'MC', 'trv', 'tbv', 'tMv')#, 'rpi', 'Mpi')
+#f = Fitter.FitterMinuit(H1ZEUSpoints+UNP5points+TSApoints+BTSApoints, th)
+#f = Fitter.FitterMinuit(DVCSpoints+GLOpoints, th)
 #f.minuit.tol = 80
 #f.minuit.maxcalls = 100
 #f.minuit.printMode = 1
-#for par in t.m.parameter_names:
-#    if not t.m.parameters['fix_'+par]:
+#for par in th.m.parameter_names:
+#    if not th.m.parameters['fix_'+par]:
 #        print '---- '+par+' ---'
-#        t.scan(par, f.fitpoints)
+#        th.scan(par, f.fitpoints)
 
 
 ## DR fit
-#t.m.release_parameters('rv', 'bv', 'Mv', 'C', 'MC', 'trv', 'tbv', 'tMv', 'rpi', 'Mpi')
+#th.m.release_parameters('rv', 'bv', 'Mv', 'C', 'MC', 'trv', 'tbv', 'tMv', 'rpi', 'Mpi')
 #f = Fitter.FitterMinuit(ALTGLOpoints+BSDwpoints+BSSwpoints, t)
 
 
@@ -135,41 +149,82 @@ def pc(th):
         print '%6s: chi/npts = %5.2f/%d (cut)' % (name, th.chisq(cutpts)[0], len(cutpts))
 
     
-pt0 = Data.DummyPoint()
-pt0.in1energy = 27.6
-pt0.s = 2 * Mp * pt0.in1energy + Mp2
-pt0.in1charge = -1
-pt0.in1polarization = 1
-pt0.xB = 0.111
-pt0.Q2 = 3.467
-#pt0.t = -0.467
-pt0.t = -0.6
-pt0.xi = pt0.xB/(2.-pt0.xB)
-pt0.phi = 2.094
-pt0.frame = 'Trento'
-pt0.units = {'phi': 'radian'}
-utils.fill_kinematics(pt0)
-tDR.to_conventions(pt0)
-tDR.prepare(pt0)
-
-ptE = Data.DummyPoint()
-ptE.in1energy = 5.
-ptE.in2energy = 160.
-ptE.s = 2 * ptE.in1energy * (ptE.in2energy + sqrt(
-            ptE.in2energy**2 - Mp2)) + Mp2
-ptE.in1charge = 1
-ptE.in1polarization = -1
-ptE.xB = 0.3
-#ptE.Q2 = 2.2
-ptE.Q2 = 4.
-#ptE.t = -0.1
-ptE.t = -0.0
-ptE.xi = ptE.xB/(2.-ptE.xB)
-ptE.phi = 0.
-ptE.frame = 'Trento'
-ptE.units = {'phi': 'radian'}
-utils.fill_kinematics(ptE)
-tDR.to_conventions(ptE)
-tDR.prepare(ptE)
+# fixed target datapoint FIXME: WRONG!
+def ptfix(Ee, xB):
+def ptfix(th, Q=-1, pol=1, Ee=30., xB=0.1, Q2=4., t=-0.2, phi=1., FTn=None):
+    ptf = Data.DummyPoint()
+    ptf.in1energy = Ee
+    ptf.s = 2 * Mp * ptf.in1energy + Mp2
+    ptf.in1charge = Q
+    ptf.in1polarization = pol
+    ptf.xB = xB
+    ptf.Q2 = Q2
+    ptf.t = t
+    ptf.xi = ptf.xB/(2.-ptf.xB)
+    ptf.phi = phi
+    ptf.frame = 'Trento'
+    ptf.units = {'phi': 'radian'}
+    utils.fill_kinematics(ptf)
+    th.to_conventions(ptf)
+    th.prepare(ptf)
+    return ptf
 
 
+# collider datapoint
+def ptcol(th, Q=-1, pol=1, Ee=5, Ep=250, xB=0.001, Q2=4., t=-0.2, phi=1., FTn=None):
+    ptc = Data.DummyPoint()
+    ptc.in1energy = Ee
+    ptc.in2energy = Ep
+    ptc.s = 2 * ptc.in1energy * (ptc.in2energy + sqrt(
+                ptc.in2energy**2 - Mp2)) + Mp2
+    ptc.in1charge =  Q
+    ptc.in1polarization = pol
+    ptc.in2polarization = 1 # relevant only for XLP and TSA
+    ptc.xB = xB
+    ptc.Q2 = Q2
+    ptc.t = t
+    ptc.xi = ptc.xB/(2.-ptc.xB)
+    if phi:
+        ptc.phi = phi
+        ptc.units = {'phi': 'radian'}
+    elif FTn:
+        ptc.FTn = FTn
+    ptc.frame = 'Trento'
+    utils.fill_kinematics(ptc)
+    th.to_conventions(ptc)
+    th.prepare(ptc)
+    return ptc
+
+ptc = ptcol(th, Q=1, pol=0, Ee=5, Ep=250, phi=3.14, xB=5e-3)
+
+fig = plt.figure()
+fig.suptitle('Fig. 10 (hotfixedBMK)')
+# Left panel
+ax = fig.add_subplot(1,2,1)
+phis = np.linspace(0.001, 6.282)
+bcas =  [th.BCA(ptcol(th, Q=1, pol=0, Ee=5, Ep=250, phi=f, xB=5e-3)) for f in phis]
+ax.plot(phis, bcas, color='blue', label='KM10b')
+ax.set_xlabel('$\\phi$')
+ax.set_ylabel('$A_{BC}$')
+ax.set_ylim(-0.42, 0.42)
+ax.axhline(y=0, linewidth=1, color='g')
+ax.text(1, -0.25, 'Ee=5, Ep=250, Q2=4')
+ax.text(1, -0.35, 't=-0.2, xB=5e-3')
+ax.legend(handlelen=0.15, handletextsep = 0.04).draw_frame(0)
+# Right panel
+#ax = fig.add_subplot(1,2,2)
+#xs = np.logspace(-4., -1.8)
+#xsL = np.logspace(-2., -0.28, 120)
+#ys =  [th.BCA(ptcol(th, Q=1, pol=0, Ee=30, Ep=360, phi=None, FTn=1, xB=x)) for x in xs]
+#ysL = [th.BCA(ptcol(th, Q=1, pol=0, Ee=5, Ep=150, Q2=50, phi=None, FTn=1, xB=x)) for x in xsL]
+#ax.plot(xs, ys, color='blue', label='KM10b')
+#ax.plot(xsL, ysL, color='red', label='KM10b')
+#ax.set_xscale('log')
+#ax.set_xlabel('$x_B$')
+#ax.set_ylabel('$A^{(1)}_{BC}$')
+#ax.set_ylim(-0.42, 0.42)
+#ax.axhline(y=0, linewidth=1, color='g')
+#ax.text(0.0001, -0.25, 'Ee=30, Ep=360, Q2=4')
+#ax.text(0.01, -0.35, 'Ee=5, Ep=150, Q2=50')
+#ax.legend(handlelen=0.15, handletextsep = 0.04).draw_frame(0)
+fig.savefig('Fig10.png')
