@@ -19,8 +19,8 @@ del mGepard.parameters['limit_M02G']
 # Hybrid: Gepard+DR (can reuse above Gepard)
 mDRsea = Model.ComptonModelDRsea()
 mDRseaopt = Model.ComptonModelDRsea(optimization=True)
-m = Model.Hybrid(mGepard, mDRsea)
-mopt = Model.Hybrid(mGepard, mDRseaopt)
+m = Model.HybridDipole(mGepard, mDRsea)
+mopt = Model.HybridDipole(mGepard, mDRseaopt)
 t = Approach.hotfixedBMK(m)
 topt = Approach.hotfixedBMK(mopt)
 

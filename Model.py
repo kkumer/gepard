@@ -126,13 +126,48 @@ class ElasticDipole(ElasticFormFactors):
     """Dipole approximation from DM's notebook."""
 
     def F1(self, t):
-        """Dirac elastic form factor."""
+        """Dirac elastic proton form factor - dipole parametrization."""
         return (1.41 * (1.26 - t))/((0.71 - t)**2 * (3.53 - t))
 
     def F2(self, t):
-        """Pauli elastic form factor."""
+        """Pauli elastic proton form factor - dipole parametrization."""
         return 3.2 / ((0.71 - t)**2 * (3.53 - t))
 
+
+class ElasticKelly(ElasticFormFactors):
+    """Kelly's approximation from DM's notebook."""
+
+    def F1(self, t):
+        """Dirac elastic proton form factor - Kelly's parametrization."""
+        return ((1 + 0.06815437285120148*t)/(1 - 3.118062557942468*t + 
+             1.0338391956016382*t**2 - 0.5031268669574522*t**3) - 
+             (0.7931031653189349*(1 - 0.03407718642560074*t)*t)/
+              (1 - 3.115222792407001*t + 1.520921000705686*t**2 - 
+             0.14999913420898098*t**3))/(1 - 0.28397655354667284*t)
+
+    def F2(self, t):
+        """Pauli elastic proton form factor - Kelly's parametrization."""
+        return (-((1 + 0.06815437285120148*t)/(1 - 3.118062557942468*t + 
+             1.0338391956016382*t**2 - 0.5031268669574522*t**3)) + 
+          (2.792847351*(1 - 0.03407718642560074*t))/(1 - 
+              3.115222792407001*t + 1.520921000705686*t**2 - 
+          0.14999913420898098*t**3))/ (1 - 0.28397655354667284*t)
+
+    def F1n(self, t):
+        """Dirac elastic neutron form factor - Kelly's parametrization."""
+        return ((-0.4842637275288574*t)/((1 - 1.4084507042253522*t)**2*
+          (1 - 0.9345440355820054*t)) + 
+          (0.5417644379086957*(1 - 0.6598447281533554*t)*t)/
+          (1 - 4.168632789020339*t + 1.9408278987597791*t**2 - 
+           1.9100884849907935*t**3))/(1 - 0.2831951622975774*t)
+
+    def F2n(self, t):
+        """Pauli elastic neutron form factor - Kelly's parametrization."""
+        return ((0.4842637275288574*t)/((1 - 1.4084507042253522*t)**2*
+          (1 - 0.9345440355820054*t)) - (1.9130427*(1 - 0.6598447281533554*t))/
+          (1 - 4.168632789020339*t + 1.9408278987597791*t**2 - 
+          1.9100884849907935*t**3))/(1 - 0.2831951622975774*t)
+ 
 
 class ComptonFormFactors(Model):
     """Twist-two, no-transversity set of 4 CFFs.
@@ -870,13 +905,21 @@ class ModelDR(ComptonModelDR, ElasticDipole):
     """Complete model as in arXiv:0904.0458.."""
 
 
+class ModelDRKelly(ComptonModelDR, ElasticKelly):
+    """Same, but with Kelly elastic form factors."""
+
+
 class ModelNN(ComptonNeuralNets, ElasticDipole):
     """Complete model."""
 
 
-class Hybrid(ComptonHybrid, ElasticDipole):
+class HybridDipole(ComptonHybrid, ElasticDipole):
     """Complete hybrid model."""
+
 
 class ModelDRPP(ComptonModelDRPP, ElasticDipole):
     """Complete model as in arXiv:0904.0458. + free pion pole normalization."""
 
+
+class HybridKelly(ComptonHybrid, ElasticKelly):
+    """As Hybrid, but with Kelly elasticd FFs."""

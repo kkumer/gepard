@@ -44,7 +44,7 @@ tDR1.name = '(H1/ZEUS)+HERMES+CLAS+HallA'
 tDR1.m.parameters.update(DMepsGLO1)
 
 mDRPPsea = Model.ComptonModelDRPPsea()
-m = Model.Hybrid(mGepard, mDRPPsea)
+m = Model.HybridDipole(mGepard, mDRPPsea)
 t = Approach.BM10(m)
 t.name = 'prelim. H1/ZEUS+HERMES+CLAS+HallA'
 g = t.m.g

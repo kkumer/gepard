@@ -53,7 +53,7 @@ def theory(id):
         # Hybrid preliminary fit shown in Trento
         mGepard = Model.ComptonGepard(cutq2=0.5)
         mDRPPsea = Model.ComptonModelDRPPsea()
-        m = Model.Hybrid(mGepard, mDRPPsea)
+        m = Model.HybridDipole(mGepard, mDRPPsea)
         th = Approach.BM10(m)
         th.name = 'KM10'
         g = th.m.g
@@ -64,21 +64,21 @@ def theory(id):
         # P(133.06, 155) = 0.8983
         mGepard = Model.ComptonGepard(cutq2=0.5)
         mDRsea = Model.ComptonModelDRsea()
-        m = Model.Hybrid(mGepard, mDRsea)
+        m = Model.HybridDipole(mGepard, mDRsea)
         th = Approach.hotfixedBMK(m)
         th.name = 'KM10a'
         g = th.m.g
         th.m.parameters.update(KM10a)  # ALTGLO
         return th
     elif id == 5:
-        # Hybrid fit + 3rd PW to DVCSpoints and GLO1points  chisq = 108/141
+        # Hybrid fit + 3rd PW to DVCSpoints and GLO1points  chisq = fine
         mGepard = Model.ComptonGepard(cutq2=0.5)
-        mDRsea = Model.ComptonModelDRsea()
-        m = Model.Hybrid(mGepard, mDRsea)
-        th = Approach.hotfixedBMK(m)
+        mDRPPsea = Model.ComptonModelDRPPsea()
+        m = Model.HybridKelly(mGepard, mDRPPsea)
+        th = Approach.BM10(m)
         th.name = 'KM10b'
         g = th.m.g
-        th.m.parameters.update(KM10b)  # hyTHI
+        th.m.parameters.update(KM10b)  # DM email only!
         return th
     else:
         sys.stdout.write('Unknown model: %d\n' % id)

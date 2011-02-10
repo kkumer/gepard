@@ -71,7 +71,7 @@ def quadSciPy4(func,a,b,args=()):
     return (b-a)/2.0*sum(weights4*func(y,*args),0)
 
 # Choice of routine used for P.V. integration
-PVquadrature = quadSciPy35
+PVquadrature = quadSciPy18
 
 # Choice of routine used for harmonic projection
 Hquadrature = quadSciPy10transposed

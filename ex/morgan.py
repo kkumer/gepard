@@ -35,13 +35,13 @@ tDR1.m.parameters.update(DMepsGLO1)
 
 ## Hybrid: Gepard+DR (can reuse above Gepard)
 #mDRsea = Model.ComptonModelDRsea()
-#m = Model.Hybrid(mGepard, mDRsea)
+#m = Model.HybridDipole(mGepard, mDRsea)
 #t = Approach.hotfixedBMK(m)
 #t.name = 'DR + Gepard sea'
 #g = t.m.g
 
 mDRPPsea = Model.ComptonModelDRPPsea()
-m = Model.Hybrid(mGepard, mDRPPsea)
+m = Model.HybridDipole(mGepard, mDRPPsea)
 th = Approach.BM10(m)
 th.name = 'prelim. H1/ZEUS+HERMES+CLAS+HallA'
 g = th.m.g

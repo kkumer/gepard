@@ -426,7 +426,6 @@ hy1THI = {
  'tNv': 0.59999999999999998,
  'tbv': 4.9999998875540301,
  'trv': 6.9128424208463581}
-KM10b = hy1THI
 
 # HERMES BCA uglyish. Otherwise OK.
 hy1_17_THI = {
@@ -946,7 +945,7 @@ KKunpTSA1cut16 = {
 # DVCSpoints+GLOpoints
 # t.m.release_parameters('M02S', 'SECS', 'SECG', 'THIS', 'THIG', 'rv', 'bv', 'Mv', 'C', 'MC', 'trv', 'tbv', 'tMv')
 # mDRsea = Model.ComptonModelDRsea()
-#m = Model.Hybrid(mGepard, mDRsea)
+#m = Model.HybridDipole(mGepard, mDRsea)
 #t = Approach.hotfixedBMK(m)
 KM10aCand1 = {
 'tMv': 0.72866940517442902, 'rS': 1.0, 'limit_tbv': (0.40000000000000002, 5.0),
@@ -977,4 +976,47 @@ True, 'fix_PG': True, 'AL0S': 1.1575060246398083, 'limit_M02S':
 True, 'DELM2S': 0.0, 'fix_SKEWG': True, 'fix_NS': True, 'limit_M02G':
 (0.29999999999999999, 1.5), 'fix_KAPS': True, 'THIG': 0.8023193873056319,
 'DELM2G': 0.0}
+
+# Hybrid fit + 3rd PW 
+KM10b = {
+ 'AL0G': 1.2473167010704711,
+ 'AL0S': 1.1575060246398083,
+ 'ALPG': 0.14999999999999999,
+ 'ALPS': 0.14999999999999999,
+ 'DELM2G': 0.0,
+ 'DELM2S': 0.0,
+ 'KAPG': 0.0,
+ 'KAPS': 0.0,
+ 'M02G': 0.69999999999999996,
+ 'M02S': 0.49754317018981614,
+ 'NG': 0.5,
+ 'NS': 0.15203911208796006,
+ 'PG': 2.0,
+ 'PS': 2.0,
+ 'SECG': -2.5151319493485427,
+ 'SECS': -0.46005118719187721,
+ 'SKEWG': 0.0,
+ 'SKEWS': 0.0,
+ 'THIG': 0.89157575591751848,
+ 'THIS': 0.093517989519796618,
+ 'C': 5.4259,
+ 'MC': 1.3305,
+ 'MS': 0.70699999999999996,
+ 'Mv': 0.8,
+ 'Nsea': 0.0,
+ 'Nv': 1.3500000000000001,
+ 'alS': 1.1299999999999999,
+ 'alpS': 0.14999999999999999,
+ 'alpv': 0.84999999999999998,
+ 'alv': 0.42999999999999999,
+ 'bS': 2.0,
+ 'bv': 0.7706,
+ 'rS': 1.0,
+ 'rv': 0.8081,
+ 'tMv': 0.8,
+ 'tNv': 0.59999999999999998,
+ 'tbv': 1.0,
+ 'trv': 3.2931,
+'rpi': 4.0201, 
+'Mpi': 1.5369}
 
