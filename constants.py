@@ -42,5 +42,6 @@ toTeX = {'tm' : '$-t$',  'xB' : '$x_{\\rm B}$', 'Q2' : '$Q^{2}$',
      "BCAcos0" : '$A_{C}^{\\cos 0\\phi}$',
      "BCAcos1" : '$A_{C}^{\\cos 1\\phi}$',
      "XDVCSt" : '$d\\sigma_{DVCS} / dt$',
-     "XDVCS" : '$\\sigma_{DVCS}$'
+     "XDVCS" : '$\\sigma_{DVCS}$',
+     "point" : 'point no.'
      }

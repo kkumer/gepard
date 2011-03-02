@@ -31,7 +31,8 @@ def subplot(ax, sets, lines=[], band=[], xaxis=None, kinlabels=[], plotlines=Tru
     lines -- list of 'theories' describing curves for plotting.
     band  -- neural network 'theory' or a list of 'theories' defining 
              band by their mean and standard deviation
-    xaxis -- abscissa variable; if None, last of sets.xaxes is taken
+    xaxis -- abscissa variable; if None, last of sets.xaxes is taken;
+             if 'points' all points are just put equidistantly along x-axis
     kinlabels -- list of constant kinematic variables whose values will
                  be put on plot as annotation
     TODO: legend
@@ -45,11 +46,16 @@ def subplot(ax, sets, lines=[], band=[], xaxis=None, kinlabels=[], plotlines=Tru
     setshapes = ['o', 's', '^', 'd']  # first circles, then squares ...
     setcolors = ['blue', 'black', 'purple', 'green']  # circles are blue, squares are black, ...
     setn = 0
+    xn = 1
     xsets = []
     for set in sets:
         xval = []; yval = []; yerr = []
         for pt in set:
-            xval.append(getattr(pt, xaxis)) 
+            if xaxis == 'point':
+                xval.append(xn)
+                xn += 1
+            else:
+                xval.append(getattr(pt, xaxis)) 
             yval.append(pt.val)
             yerr.append(pt.err)
         xsets.append(xval)
@@ -154,6 +160,26 @@ def HERMESBSA(lines=[], band=[], path=None, fmt='png'):
         ax = fig.add_subplot(3, 1, x+1)
         ax.yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))  # tickmarks
         subplot(ax, [data[5][x*6:x*6+6]], lines, band, xaxes[x], [])
+    if path:
+        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+    else:
+        fig.canvas.draw()
+        fig.show()
+    return fig
+
+def anydata(sets, lines=[], band=[], path=None, fmt='png'):
+    """Plot Mock HERMES-like BSA.
+    sets - list of 'Dataset' instances to be ploted
+    
+    """
+    id = 1001
+    title = 'Any data'
+    fig = plt.figure()
+    fig.canvas.set_window_title(title)
+    fig.suptitle(title)
+    ax = fig.add_subplot(1, 1, 1)
+    xaxes = ['tm', 'xB', 'Q2']
+    subplot(ax, sets, lines, band, 'point', [])
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
@@ -1009,14 +1035,15 @@ def HBCSA(ff, fits=[], path=None, fmt='png'):
     return fig
 
 def _axband(ax, tm, xvals, fun, color='g', avg=True):
-    """Make a band of x*fun defined by ndarray-valued fun."""
+    """Make a band of fun defined by ndarray-valued fun."""
     pt = Data.DummyPoint()
     pt.t = -tm
     pt.xi = xvals
     pt.xB = 2*pt.xi/(1.+pt.xi)
     up = []
     down = []
-    res = xvals * fun(pt)
+    #res = xvals * fun(pt)
+    res = fun(pt)
     mean = res.mean(axis=0)
     std = res.std(axis=0)
     if avg:
@@ -1029,10 +1056,23 @@ def _axband(ax, tm, xvals, fun, color='g', avg=True):
     y = plt.concatenate( (up, down[::-1]) )
     ax.fill(x, y, facecolor=color, alpha=0.5)
 
-def CFF(t, cffs=None, path=None, fmt='png', average=True):
+def _axline(ax, tm, xvals, fun, **kwargs):
+    """Make a line of x*fun defined by ndarray-valued fun."""
+    res = []
+    for xi in xvals:
+        pt = Data.DummyPoint()
+        pt.t = -tm
+        pt.xi = xi
+        pt.xB = 2*pt.xi/(1.+pt.xi)
+        #res.append(xi*fun(pt))
+        res.append(fun(pt))
+    ax.plot(xvals, res, **kwargs)
+
+def CFF(t, th=None, cffs=None, path=None, fmt='png', average=True):
     """Makes plot of cffs given by neural network
     
     t     -- Neural network 'theory'
+    th    -- non-net theory
     cffs  -- List of CFFs to be plotted. Each produces two panels.
     average -- plot 1-sigma band (othewise plot minimum-maximum band)
 
@@ -1049,12 +1089,14 @@ def CFF(t, cffs=None, path=None, fmt='png', average=True):
     linestyles = ['solid', 'dashed']
     tms = [0.1, 0.3]
     # Define abscissas
-    logxvals = np.power(10., np.arange(-3.0, 0.01, 0.1))  # left panel
+    logxvals = np.power(10., np.arange(-3.0, -0.01, 0.1))  # left panel
     xvals = np.linspace(0.025, 0.2, 20) # right panel
     # ordinatas for  left ...
-    allylims = [(-0.3, 1.0), (-0.3, 1.0), (-0.45, 0.05)]
+    #allylims = [(-0.3, 1.0), (-0.3, 1.0), (-0.45, 0.05)]
+    allylims = [(-3.3, 35.0), (-3.3, 10.0), (-4.45, 0.05)]
     # ... and right panles
-    ylims = [(-0.3, 1.0), (-0.3, 1.0), (-0.45, 0.05)]
+    #ylims = [(-0.3, 1.0), (-0.3, 1.0), (-0.45, 0.05)]
+    ylims = [(-3.3, 35.0), (-3.3, 10.0), (-4.45, 0.05)]
     # Plot panels
     for n in range(len(cffs)):
         cff = cffs[n]
@@ -1064,22 +1106,28 @@ def CFF(t, cffs=None, path=None, fmt='png', average=True):
         for tm in tms :
             _axband(ax, tm, logxvals, getattr(t.model, cff), 
                     color=colors[tms.index(tm)], avg=average)
+            _axline(ax, tm, logxvals, getattr(th.model, cff), 
+                    color=colors[tms.index(tm)], 
+                    linestyle='dashed', label='t = %s' % str(tm))
         ax.set_xlabel('$\\xi$', fontsize=15)
-        ax.set_ylabel('x %s' % cff, fontsize=18)
-        ax.set_xlim(0.001, 1.0)
-        apply(ax.set_ylim, allylims[n])
+        ax.set_ylabel('%s' % cff, fontsize=18)
         ax.axhspan(-0.0005, 0.0005, facecolor='g', alpha=0.6)  # horizontal bar
-        ax.axvspan(0.025, 0.2, facecolor='g', alpha=0.1)  # vertical band
+        ax.axvspan(0.03, 0.093, facecolor='g', alpha=0.1)  # vertical band
         ax.text(0.03, -0.27, "data region", fontsize=14)
+        apply(ax.set_ylim, allylims[n])
+        ax.set_xlim(0.005, 1.0)
         # measured x linear
         ax = fig.add_subplot(len(cffs), 2, 2*n+2)
         for tm in tms:
             _axband(ax, tm, xvals, getattr(t.model, cff), 
                     color=colors[tms.index(tm)], avg=average)
+            _axline(ax, tm, xvals, getattr(th.model, cff), 
+                    color=colors[tms.index(tm)], 
+                    linestyle='dashed', label='t = %s' % str(tm))
         ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
         ax.set_xlabel('$\\xi$', fontsize=15)
         apply(ax.set_ylim, ylims[n])
-        ax.set_xlim(0.025, 0.2)
+        ax.set_xlim(0.03, 0.093)
         ax.text(0.03, -0.27, "data region only", fontsize=14)
         #ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.02))  # tickmarks
     t.model.parameters['nnet'] = old

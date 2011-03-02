@@ -32,8 +32,8 @@ ifdef WINDIR
 	#PYLIBS = -L c:\Python25\libs -lpython25 -lm 
 	PYLIBS = -L /cygdrive/c/Python25/libs -lpython25 -lm
 else
-	PYINCLUDES = -I/usr/include/python2.5 -I/usr/include/python2.5
-	PYLIBS = -lpthread -ldl -lutil -lm -lpython2.5
+	PYINCLUDES = -I/usr/include/python2.6 -I/usr/include/python2.6
+	PYLIBS = -lpthread -ldl -lutil -lm -lpython2.6
 endif
 
 export CC CFLAGS PYINCLUDES PYLIBS

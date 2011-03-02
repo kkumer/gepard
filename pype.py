@@ -20,7 +20,7 @@ from math import sqrt
 
 data = utils.loaddata('data/ep2epgamma', approach=Approach.hotfixedBMK)  
 data.update(utils.loaddata('data/gammastarp2gammap', approach=Approach.hotfixedBMK))
-db = shelve.open('theories.db')
+db = shelve.open('aux.db')
 
 ## [2] Choose subset of datapoints for fitting
 
@@ -40,7 +40,7 @@ ALTGLOpoints = data[5] + data[25] + data[32][18:]
 #ALTGLO1points = data[5] + data[25] + data[32] + HAD17 + HA17
 #ALTGLO2points = data[5] + data[25] + data[32][18:] + HAD17[::2] + HA17[::2]
 #ALTGLO3points = data[5] + data[25] + data[32][18:] + data[30] + HA17
-#ALTGLO4points = data[25] + data[32][18:]
+ALTGLO4points = data[25] + data[32][18:]
 ALTGLO5points = data[5] + data[8] + data[32][18:]   # DM's CLAS BSA
 #BSDw2Cpoints = utils.select(data[26], criteria=['Q2 == 2.3'])
 #BSDw2CDpoints = utils.select(data[50], criteria=['Q2 == 2.3'])
@@ -110,16 +110,18 @@ th.m.parameters.update(KM10b)
 # NN
 #mNN = Model.ModelNN(hidden_layers=[15], output_layer=['ImH', 'ReH', 'ImE', 'ReE', 'ImHt', 'ReHt', 'ImEt', 'ReEt'])
 #mNN = Model.ModelNN(hidden_layers=[9], endpointpower=3.0)
-#tNN = Approach.hotfixedBMK(mNN)
-#tNN.name = 'NNtest'
-#tNN.description = 'x (xB,t)-13-8 nets trained on ALTGLO+BSDw2CD+BSSw for 500 batches'
+mNN = Model.ModelNN(hidden_layers=[23])
+tNN = Approach.hotfixedBMK(mNN)
+tNN.name = 'NNtest'
+tNN.description = 'x (xB,t)-11-2 nets trained on mock1 for 50 batches'
 
 ## [4] Do the fit
 #th.m.fix_parameters('ALL')
 
-#f = Fitter.FitterBrain(UNPpoints+TSApoints+BTSApoints, tNN, nnets=10, nbatch=50, verbose=1)
-#f.fit()
-#f.prune(minprob=0.5)
+traindata = data[1001][2::13]
+f = Fitter.FitterBrain(traindata, tNN, nnets=40, nbatch=400, verbose=1)
+f.fit()
+f.prune(minprob=0.5)
 #tNN.save(db)
 #db.close()
 
