@@ -172,7 +172,6 @@ def anydata(sets, lines=[], band=[], path=None, fmt='png'):
     sets - list of 'Dataset' instances to be ploted
     
     """
-    id = 1001
     title = 'Any data'
     fig = plt.figure()
     fig.canvas.set_window_title(title)
@@ -1242,3 +1241,32 @@ def Ht(theories=[], xB=0.36, path=None, fmt='png'):
         fig.show()
     return fig
 
+def xBt(sets, path=None, fmt='png'):
+    """Plot xB-t distribution of data sets. """
+    
+    title = 'xB-t distribution of data'
+    fig = plt.figure()
+    fig.canvas.set_window_title(title)
+    fig.suptitle(title)
+    ax = fig.add_subplot(1, 1, 1)
+    setshapes = ['o', 's', '^', 'd']  # first circles, then squares ...
+    setcolors = ['blue', 'black', 'purple', 'green']  # circles are blue, squares are black, ...
+    setn = 0
+    for set in sets:
+        xval = []; yval = []; err = []
+        for pt in set:
+            xval.append(pt.xB)
+            yval.append(pt.t)
+            err.append(abs(pt.err/pt.val))
+        nperr = np.array(err)
+        ax.plot(xval, yval, linestyle='None', markersize=math.log(5e3*nperr.mean()),
+                marker=setshapes[setn], color=setcolors[setn])
+        setn += 1
+    ax.set_xlabel(toTeX['xB'], fontsize=15)
+    ax.set_ylabel(toTeX['t'], fontsize=15)
+    if path:
+        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+    else:
+        fig.canvas.draw()
+        fig.show()
+    return fig

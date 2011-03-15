@@ -3,15 +3,12 @@
 #import pylab
 #import matplotlib.pyplot as plt
 
-import shelve
+import shelve, copy
 
 import numpy as np
 import scipy.stats
 
-import Model, Approach, Fitter, Data
-import utils 
-import plots
-
+import Model, Approach, Fitter, Data, utils, plots
 from constants import Mp, Mp2
 
 from results import *
@@ -60,6 +57,15 @@ BTSApoints = utils.select(data[53], criteria=['FTn==0'])
 UNPpoints = ALTGLOpoints + BSSwpoints + BSDwpoints
 UNP5points = ALTGLO5points + BSSwpoints + BSDwpoints
 H1ZEUSpoints = DVCSpoints + data[48]
+
+mockH = data[1001][::27] + data[1002][::27]
+oldmockH = []
+np.random.seed(42)  # For reproducibility
+for pt in mockH:
+    oldmockH.append(copy.deepcopy(pt))
+    pt.err = 0.05
+    pt.val = pt.val + scipy.stats.norm.rvs(loc=0, scale=0.05)
+#mockHHa = mockH + data[1003]  # Adding Hall A
 
 ## [3] Create a theory
 
@@ -120,14 +126,8 @@ tNN.description = 'x (xB,t)-11-6 nets trained on HERMES+CLAS+HallA mock data for
 ## [4] Do the fit
 #th.m.fix_parameters('ALL')
 
-traindata = data[1001][::31] + data[1002][::31]
-for pt in traindata:
-    pt.err = 0.05
-    pt.val = pt.val + scipy.stats.norm.rvs(loc=0, scale=0.05)
-traindata = traindata + data[1003]  # Adding Hall A
-
 #f = Fitter.FitterBrain(traindata, tNN, nnets=20, nbatch=200, verbose=1)
-f = Fitter.FitterBrain(traindata, tNN, nnets=8, nbatch=400, verbose=2)
+#f = Fitter.FitterBrain(traindata, tNN, nnets=8, nbatch=400, verbose=2)
 #f.fit()
 #f.prune(minprob=0.5)
 #tNN.m.parameters['nnet'] = 'ALL'
@@ -148,8 +148,8 @@ f = Fitter.FitterBrain(traindata, tNN, nnets=8, nbatch=400, verbose=2)
 
 
 ## DR fit
-#th.m.release_parameters('rv', 'bv', 'Mv', 'C', 'MC', 'trv', 'tbv', 'tMv', 'rpi', 'Mpi')
-#f = Fitter.FitterMinuit(ALTGLOpoints+BSDwpoints+BSSwpoints, t)
+th.m.release_parameters('rv', 'bv', 'Mv', 'C', 'MC')
+f = Fitter.FitterMinuit(mockH, th)
 
 ## [5] Some shortcuts ...
 
