@@ -169,12 +169,20 @@ class FitterBrain(Fitter):
             self.trainer.trainOnDataset(self.dstrain, self.batchlen)
             trainerr, testerr = (self.trainer.testOnData(self.dstrain), 
                     self.trainer.testOnData(self.dstest))
+            if self.verbose > 1:
+                print "Epoch: %6i   ---->    Error: %8.3g  TestError: %8.3g / %6.3g" % (
+                        self.trainer.epoch, trainerr, testerr, memerr)
             if testerr < memerr:
                 memerr = testerr
                 memnet = net.copy()
                 if self.verbose:
+                    if self.verbose > 1:
+                        print "---- New best result:  ----"
                     print "Epoch: %6i   ---->    Error: %8.3g  TestError: %8.3g" % (
                             self.trainer.epoch, trainerr, testerr)
+            elif testerr > 100 or trainerr > 100:
+                print "---- This one is hopeless. Giving up. ----"
+                break
         return memnet, memerr
     
     def fit(self):
@@ -184,8 +192,12 @@ class FitterBrain(Fitter):
             self.theory.model.nets.append(net)
             self.theory.model.parameters['nnet'] = n
             chi, dof, fitprob = self.theory.chisq(self.fitpoints)
-            print "Net %2i ---> TestError: %8.3g  ---> P(chisq = %1.2f) = %5.4f " % (
-                    n, memerr, chi, fitprob)
+            if fitprob < 0.05:
+                sfitprob = utils.stringcolor("%5.4f" % fitprob, 'red', True)
+            else:
+                sfitprob = utils.stringcolor("%5.4f" % fitprob, 'green', True)
+            print "Net %2i ---> TestError: %8.3g  ---> P(chisq = %1.2f) = %s " % (
+                    n, memerr, chi, sfitprob)
         return self.theory
 
     def prune(self, minprob=0.01):

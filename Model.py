@@ -12,19 +12,6 @@ import pickle, sys
 from numpy import log, pi, imag, real
 from numpy import ndarray, array
 
-def _fakecolor(a, b):
-    return a
-
-try:
-	from termcolor import colored
-except ImportError:
-	colored = _fakecolor
-
-def stringcolor(a, c, colors=False):
-    if colors:
-        return colored(a, c)
-    else:
-        return _fakecolor(a, c)
 
 from quadrature import PVquadrature
 from utils import flatten, hubDict
@@ -94,9 +81,9 @@ class Model(object):
             if self.parameters.has_key('limit_'+name):
                 lo, hi = self.parameters['limit_'+name]
                 if (abs((lo-value)*(hi-value)) < 0.001):
-                    row = stringcolor(row, 'red', colors)
+                    row = utils.stringcolor(row, 'red', colors)
             if self.parameters['fix_'+name] == False:
-                row = stringcolor(row, 'green', colors)
+                row = utils.stringcolor(row, 'green', colors)
             for model in compare_with:
                 try:
                     value2 =  model.parameters[name]
@@ -109,9 +96,9 @@ class Model(object):
                 if value != 0:
                     diff = diff/abs(value)
                 if diff > 0.05:
-                    app = stringcolor(app, 'red', colors)
+                    app = utils.stringcolor(app, 'red', colors)
                 elif diff < -0.05:
-                    app = stringcolor(app, 'blue', colors)
+                    app = utils.stringcolor(app, 'blue', colors)
                 row += app
             row += '\n'
             s += row

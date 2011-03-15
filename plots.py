@@ -1085,18 +1085,19 @@ def CFF(t, th=None, cffs=None, path=None, fmt='png', average=True):
     fig = plt.figure()
     fig.canvas.set_window_title(title)
     fig.suptitle(title)
-    colors = ['red', 'blue', 'brown', 'purple']
+    colors = ['blue', 'red', 'brown', 'purple']
     linestyles = ['solid', 'dashed']
-    tms = [0.1, 0.3]
+    #tms = [0.1, 0.3]
+    tms = [0.2]
     # Define abscissas
     logxvals = np.power(10., np.arange(-3.0, -0.01, 0.1))  # left panel
     xvals = np.linspace(0.025, 0.2, 20) # right panel
     # ordinatas for  left ...
     #allylims = [(-0.3, 1.0), (-0.3, 1.0), (-0.45, 0.05)]
-    allylims = [(-3.3, 35.0), (-3.3, 10.0), (-4.45, 0.05)]
+    #allylims = [(-3.3, 35.0), (-3.3, 10.0), (-4.45, 0.05)]
     # ... and right panles
     #ylims = [(-0.3, 1.0), (-0.3, 1.0), (-0.45, 0.05)]
-    ylims = [(-3.3, 35.0), (-3.3, 10.0), (-4.45, 0.05)]
+    #ylims = [(-3.3, 35.0), (-3.3, 10.0), (-4.45, 0.05)]
     # Plot panels
     for n in range(len(cffs)):
         cff = cffs[n]
@@ -1106,27 +1107,29 @@ def CFF(t, th=None, cffs=None, path=None, fmt='png', average=True):
         for tm in tms :
             _axband(ax, tm, logxvals, getattr(t.model, cff), 
                     color=colors[tms.index(tm)], avg=average)
-            _axline(ax, tm, logxvals, getattr(th.model, cff), 
-                    color=colors[tms.index(tm)], 
-                    linestyle='dashed', label='t = %s' % str(tm))
+            if th:
+                _axline(ax, tm, logxvals, getattr(th.model, cff), 
+                        color=colors[tms.index(tm)], 
+                        linestyle='dashed', label='t = %s' % str(tm))
         ax.set_xlabel('$\\xi$', fontsize=15)
         ax.set_ylabel('%s' % cff, fontsize=18)
         ax.axhspan(-0.0005, 0.0005, facecolor='g', alpha=0.6)  # horizontal bar
         ax.axvspan(0.03, 0.093, facecolor='g', alpha=0.1)  # vertical band
         ax.text(0.03, -0.27, "data region", fontsize=14)
-        apply(ax.set_ylim, allylims[n])
+        #apply(ax.set_ylim, allylims[n])
         ax.set_xlim(0.005, 1.0)
         # measured x linear
         ax = fig.add_subplot(len(cffs), 2, 2*n+2)
         for tm in tms:
             _axband(ax, tm, xvals, getattr(t.model, cff), 
                     color=colors[tms.index(tm)], avg=average)
-            _axline(ax, tm, xvals, getattr(th.model, cff), 
-                    color=colors[tms.index(tm)], 
-                    linestyle='dashed', label='t = %s' % str(tm))
+            if th:
+                _axline(ax, tm, xvals, getattr(th.model, cff), 
+                        color=colors[tms.index(tm)], 
+                        linestyle='dashed', label='t = %s' % str(tm))
         ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
         ax.set_xlabel('$\\xi$', fontsize=15)
-        apply(ax.set_ylim, ylims[n])
+        #apply(ax.set_ylim, ylims[n])
         ax.set_xlim(0.03, 0.093)
         ax.text(0.03, -0.27, "data region only", fontsize=14)
         #ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.02))  # tickmarks

@@ -6,6 +6,7 @@
 import shelve
 
 import numpy as np
+import scipy.stats
 
 import Model, Approach, Fitter, Data
 import utils 
@@ -16,11 +17,14 @@ from constants import Mp, Mp2
 from results import *
 from math import sqrt
 
-# [1] Load experimental data and theoretical models
+## [1] Load experimental data and theoretical models
 
 data = utils.loaddata('data/ep2epgamma', approach=Approach.hotfixedBMK)  
 data.update(utils.loaddata('data/gammastarp2gammap', approach=Approach.hotfixedBMK))
 db = shelve.open('aux.db')
+#ths = shelve.open('theories.db')
+dell = shelve.open('dell.db')
+dellB = shelve.open('dellB.db')
 
 ## [2] Choose subset of datapoints for fitting
 
@@ -57,13 +61,11 @@ UNPpoints = ALTGLOpoints + BSSwpoints + BSDwpoints
 UNP5points = ALTGLO5points + BSSwpoints + BSDwpoints
 H1ZEUSpoints = DVCSpoints + data[48]
 
-
 ## [3] Create a theory
 
 # Gepard only
 mGepard = Model.ComptonGepard(cutq2=0.5)
 tGepard = Approach.hotfixedBMK(mGepard)
-
 
 # DR only
 mDRonly = Model.ModelDR()
@@ -83,7 +85,6 @@ tDR1.m.parameters.update(DMepsGLO1)
 tDR1BM = Approach.BM10(mDRonly1)
 tDR1BM.name = 'KM09b+BM10'
 tDR1BM.m.parameters.update(DMepsGLO1)
-
 
 ## Hybrid: Gepard+DR (can reuse above Gepard)
 #mDRsea = Model.ComptonModelDRsea()
@@ -110,18 +111,26 @@ th.m.parameters.update(KM10b)
 # NN
 #mNN = Model.ModelNN(hidden_layers=[15], output_layer=['ImH', 'ReH', 'ImE', 'ReE', 'ImHt', 'ReHt', 'ImEt', 'ReEt'])
 #mNN = Model.ModelNN(hidden_layers=[9], endpointpower=3.0)
-mNN = Model.ModelNN(hidden_layers=[23])
+mNN = Model.ModelNN(hidden_layers=[11])
+#mNN = Model.ModelNN(hidden_layers=[11], output_layer=['ImH', 'ReH', 'ReE','ImHt', 'ReHt', 'ReEt'])
 tNN = Approach.hotfixedBMK(mNN)
 tNN.name = 'NNtest'
-tNN.description = 'x (xB,t)-11-2 nets trained on mock1 for 50 batches'
+tNN.description = 'x (xB,t)-11-6 nets trained on HERMES+CLAS+HallA mock data for 100 batches'
 
 ## [4] Do the fit
 #th.m.fix_parameters('ALL')
 
-traindata = data[1001][2::13]
-f = Fitter.FitterBrain(traindata, tNN, nnets=40, nbatch=400, verbose=1)
-f.fit()
-f.prune(minprob=0.5)
+traindata = data[1001][::31] + data[1002][::31]
+for pt in traindata:
+    pt.err = 0.05
+    pt.val = pt.val + scipy.stats.norm.rvs(loc=0, scale=0.05)
+traindata = traindata + data[1003]  # Adding Hall A
+
+#f = Fitter.FitterBrain(traindata, tNN, nnets=20, nbatch=200, verbose=1)
+f = Fitter.FitterBrain(traindata, tNN, nnets=8, nbatch=400, verbose=2)
+#f.fit()
+#f.prune(minprob=0.5)
+#tNN.m.parameters['nnet'] = 'ALL'
 #tNN.save(db)
 #db.close()
 
@@ -142,6 +151,10 @@ f.prune(minprob=0.5)
 #th.m.release_parameters('rv', 'bv', 'Mv', 'C', 'MC', 'trv', 'tbv', 'tMv', 'rpi', 'Mpi')
 #f = Fitter.FitterMinuit(ALTGLOpoints+BSDwpoints+BSSwpoints, t)
 
+## [5] Some shortcuts ...
+
+def ld(db):
+    utils.listdb(db)
 
 def pc(th):
     exps = ['UNP5points', 'H1ZEUS', 'ALTGLO5', 'CLAS', 'CLASDM', 'BSDw', 'BSSw', 'TSA1']

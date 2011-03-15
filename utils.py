@@ -12,6 +12,7 @@ listFiles -- listfiles in subdirs matching pattern
 select -- selecting DataPoints according to criteria
 listdb --  listing the content of database of models
 hubDict -- merges two dicts, but not actually but by forwarding
+stringcolor -- coloring string for output, if possible
 """
 
 import os, re, string, fnmatch, itertools
@@ -329,3 +330,17 @@ class hubDict(dict):
         return 'First: %s\nSecond: %s' % (
                 self.d1.__repr__(), self.d2.__repr__())
 
+
+def _fakecolor(a, b):
+    return a
+
+try:
+	from termcolor import colored
+except ImportError:
+	colored = _fakecolor
+
+def stringcolor(a, c, colors=False):
+    if colors:
+        return colored(a, c)
+    else:
+        return _fakecolor(a, c)
