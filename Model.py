@@ -14,7 +14,7 @@ from numpy import ndarray, array
 
 
 from quadrature import PVquadrature
-from utils import flatten, hubDict
+from utils import flatten, hubDict, stringcolor
 
 import pygepard as g
 import optModel
@@ -81,9 +81,9 @@ class Model(object):
             if self.parameters.has_key('limit_'+name):
                 lo, hi = self.parameters['limit_'+name]
                 if (abs((lo-value)*(hi-value)) < 0.001):
-                    row = utils.stringcolor(row, 'red', colors)
+                    row = stringcolor(row, 'red', colors)
             if self.parameters['fix_'+name] == False:
-                row = utils.stringcolor(row, 'green', colors)
+                row = stringcolor(row, 'green', colors)
             for model in compare_with:
                 try:
                     value2 =  model.parameters[name]
@@ -96,9 +96,9 @@ class Model(object):
                 if value != 0:
                     diff = diff/abs(value)
                 if diff > 0.05:
-                    app = utils.stringcolor(app, 'red', colors)
+                    app = stringcolor(app, 'red', colors)
                 elif diff < -0.05:
-                    app = utils.stringcolor(app, 'blue', colors)
+                    app = stringcolor(app, 'blue', colors)
                 row += app
             row += '\n'
             s += row
