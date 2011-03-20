@@ -3,7 +3,7 @@
 #import pylab
 #import matplotlib.pyplot as plt
 
-import shelve, copy
+import shelve, copy, sys
 
 import numpy as np
 import scipy.stats
@@ -121,13 +121,12 @@ mNN = Model.ModelNN(hidden_layers=[11])
 #mNN = Model.ModelNN(hidden_layers=[11], output_layer=['ImH', 'ReH', 'ReE','ImHt', 'ReHt', 'ReEt'])
 tNN = Approach.hotfixedBMK(mNN)
 tNN.name = 'NNtest'
-tNN.description = 'x (xB,t)-11-6 nets trained on HERMES+CLAS+HallA mock data for 100 batches'
+tNN.description = 'x (xB,t)-11-2 nets trained on HERMES-like mock data for 200 batches'
 
 ## [4] Do the fit
 #th.m.fix_parameters('ALL')
 
-#f = Fitter.FitterBrain(traindata, tNN, nnets=20, nbatch=200, verbose=1)
-#f = Fitter.FitterBrain(traindata, tNN, nnets=8, nbatch=400, verbose=2)
+#f = Fitter.FitterBrain(mockH, tNN, nnets=10, nbatch=200, verbose=1)
 #f.fit()
 #f.prune(minprob=0.5)
 #tNN.m.parameters['nnet'] = 'ALL'
@@ -148,8 +147,9 @@ tNN.description = 'x (xB,t)-11-6 nets trained on HERMES+CLAS+HallA mock data for
 
 
 ## DR fit
-th.m.release_parameters('rv', 'bv', 'Mv', 'C', 'MC')
-f = Fitter.FitterMinuit(mockH, th)
+tDR.m.release_parameters('rv', 'Mv')
+#tDR.m.release_parameters('rv', 'Mv')
+f = Fitter.FitterMinuit(mockH, tDR)
 
 ## [5] Some shortcuts ...
 
@@ -212,3 +212,48 @@ def ptcol(th, Q=-1, pol=1, Ee=5, Ep=250, xB=0.001, Q2=4., t=-0.2, phi=1., FTn=No
 
 ptc = ptcol(th, Q=1, pol=0, Ee=5, Ep=350, phi=3.14/2., xB=1e-2)
 
+def cov(f):
+    m = f.theory.model
+    # fitting parameters (not fixed)
+    pars = [p for p in m.parameter_names if m.parameters['fix_'+p] == False]
+    header = '     |' + len(pars)*'%5s   ' + '\n-----+' + len(pars)*'--------'+'\n'
+    sys.stdout.write(header % tuple(pars))
+    for prow in pars:
+        sys.stdout.write('%4s |' % prow)
+        for pcol in pars:
+            sys.stdout.write(' % 5.3f ' % f.minuit.covariance[prow, pcol])
+        sys.stdout.write('\n') 
+
+    
+def diff(cff, p, pt, h=0.05):
+    """Compute derivative of f w.r.t. model parameter p at point pt."""
+
+    m = cff.__self__  # m = instance of Model
+    mem = m.parameters[p]
+    m.parameters[p] = mem+h/2.
+    up = cff(pt)
+    m.parameters[p] = mem-h/2.
+    down = cff(pt)
+    m.parameters[p] = mem
+    return (up-down)/h
+
+def uncert(cff, covdict, pt):
+    """Uncertainty of cff propagated from covdict covariance dictionary."""
+
+    m = cff.__self__  # m = instance of Model
+    pars = [p for p in m.parameter_names if m.parameters['fix_'+p] == False]
+    var = 0
+    dfdp = {}
+    for p in pars:
+        dfdp[p] = diff(cff, p, pt, h=sqrt(covdict[p,p]))
+    for p1 in pars:
+        for p2 in pars:
+            var += dfdp[p1]*covdict[p1,p2]*dfdp[p2]
+    val = cff(pt)
+    std = sqrt(var)
+    return np.array([val-std, val+std])
+    
+    
+    
+
+    

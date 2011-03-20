@@ -99,8 +99,8 @@ def subplot(ax, sets, lines=[], band=[], xaxis=None, kinlabels=[], plotlines=Tru
                     nnet in range(len(band.model.nets))])
         mean = res.mean()
         std = res.std()
-        up.append(mean + std/2.)
-        down.append(mean - std/2.)
+        up.append(mean + std)
+        down.append(mean - std)
     up = np.array(up)
     down = np.array(down)
     # xval belongs to last set after loop above
@@ -1046,8 +1046,8 @@ def _axband(ax, tm, xvals, fun, color='g', avg=True):
     mean = res.mean(axis=0)
     std = res.std(axis=0)
     if avg:
-        up = mean + std/2.
-        down = mean - std/2.
+        up = mean + std
+        down = mean - std
     else:
         up = res.max(axis=0)
         down = res.min(axis=0)
@@ -1270,3 +1270,91 @@ def xBt(sets, path=None, fmt='png'):
         fig.canvas.draw()
         fig.show()
     return fig
+
+def uncertCFF(tnn=None, th=None, thband=None, cffs=['ImH'], path=None, fmt='png'):
+    """Makes plot of cffs given by theory th, with uncertainty band.
+    
+    tnn     -- neural net (NN) theory
+    th      -- non-NN theory to be plotted as line
+    thband  -- non-NN theory to be plotted as 1-sigma error band
+    cffs    -- List of CFFs to be plotted. Each produces two panels.
+
+    """
+    if tnn:
+        title = tnn.description
+        old = tnn.model.parameters['nnet']
+        tnn.model.parameters['nnet'] = 'ALL'
+    elif thband:
+        title = thband.description
+    elif th:
+        title = th.description
+    else:
+        title = 'uncertCFF'
+    fig = plt.figure()
+    fig.canvas.set_window_title(title)
+    fig.suptitle(title)
+    colors = ['red', 'brown']     # worm human colors :-)
+    nncolors = ['blue', 'green']  # cold computer colors
+    linestyles = ['solid', 'dashed']
+    tms = [0.2]
+    # Define abscissas
+    logxvals = np.power(10., np.arange(-3.0, -0.01, 0.1))  # left panel
+    xvals = np.linspace(0.025, 0.2, 20) # right panel
+    # ordinatas for  left ...
+    #allylims = [(-0.3, 1.0), (-0.3, 1.0), (-0.45, 0.05)]
+    #allylims = [(-3.3, 35.0), (-3.3, 10.0), (-4.45, 0.05)]
+    # ... and right panles
+    #ylims = [(-0.3, 1.0), (-0.3, 1.0), (-0.45, 0.05)]
+    #ylims = [(-3.3, 35.0), (-3.3, 10.0), (-4.45, 0.05)]
+    # Plot panels
+    for n in range(len(cffs)):
+        cff = cffs[n]
+        # all-x logarithmic
+        ax = fig.add_subplot(len(cffs), 2, 2*n+1)
+        ax.set_xscale('log')  # x-axis to be logarithmic
+        for tm in tms :
+            if tnn:
+                _axband(ax, tm, logxvals, getattr(tnn.model, cff), 
+                        color=nncolors[tms.index(tm)])
+            if th:
+                _axline(ax, tm, logxvals, getattr(th.model, cff), 
+                        color=colors[tms.index(tm)], 
+                        linestyle='dashed', label='t = %s' % str(tm))
+            if thband:
+                _axband(ax, tm, logxvals, lambda pt: thband.model.uncert(cff, pt), 
+                        color=colors[tms.index(tm)])
+        ax.set_xlabel('$\\xi$', fontsize=15)
+        ax.set_ylabel('%s' % cff, fontsize=18)
+        ax.axhspan(-0.0005, 0.0005, facecolor='g', alpha=0.6)  # horizontal bar
+        ax.axvspan(0.03, 0.093, facecolor='g', alpha=0.1)  # vertical band
+        ax.text(0.03, -0.27, "data region", fontsize=14)
+        #apply(ax.set_ylim, allylims[n])
+        ax.set_xlim(0.005, 1.0)
+        # measured x linear
+        ax = fig.add_subplot(len(cffs), 2, 2*n+2)
+        for tm in tms:
+            if tnn:
+                _axband(ax, tm, xvals, getattr(tnn.model, cff), 
+                        color=nncolors[tms.index(tm)])
+            if th:
+                _axline(ax, tm, xvals, getattr(th.model, cff), 
+                        color=colors[tms.index(tm)], 
+                        linestyle='dashed', label='t = %s' % str(tm))
+            if thband:
+                _axband(ax, tm, xvals, lambda pt: thband.model.uncert(cff, pt), 
+                        color=colors[tms.index(tm)])
+        ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
+        ax.set_xlabel('$\\xi$', fontsize=15)
+        #apply(ax.set_ylim, ylims[n])
+        ax.set_xlim(0.03, 0.093)
+        ax.text(0.03, -0.27, "data region only", fontsize=14)
+        #ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.02))  # tickmarks
+    if tnn:
+        tnn.model.parameters['nnet'] = old
+    if path:
+        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+    else:
+        fig.canvas.draw()
+        fig.show()
+    return fig
+

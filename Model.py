@@ -9,7 +9,7 @@ and parameter values can calculate observables.
 #from IPython.Debugger import Tracer; debug_here = Tracer()
 import pickle, sys
 
-from numpy import log, pi, imag, real
+from numpy import log, pi, imag, real, sqrt
 from numpy import ndarray, array
 
 
@@ -104,6 +104,44 @@ class Model(object):
             s += row
         print s
 
+    def _diff(self, f, p, pt, h=0.05):
+        """Compute derivative of f w.r.t. model parameter p at point pt.
+        
+        Simple difference is used (f(p+h/2)-f(p-h/2))/h.
+        f is string representing appropriate method of self.
+
+        """
+        fun = self.__getattribute__(f) 
+        mem = self.parameters[p]
+        self.parameters[p] = mem+h/2.
+        up = fun(pt)
+        self.parameters[p] = mem-h/2.
+        down = fun(pt)
+        self.parameters[p] = mem
+        return (up-down)/h
+
+    def uncert(self, f, pt):
+        """Compute uncertainty of f from self's covariance dictionary.
+        
+        covariance dict should be provided by Fitter
+        f is string representing appropriate method of self.
+        Returns ndarray (mean-std, mean+std) for easy plotting.
+        
+        """
+        fun = self.__getattribute__(f) 
+        pars = [p for p in self.parameter_names if self.parameters['fix_'+p] == False]
+        var = 0
+        dfdp = {}
+        for p in pars:
+            dfdp[p] = self._diff(f, p, pt, h=sqrt(self.covariance[p,p]))
+        for p1 in pars:
+            for p2 in pars:
+                var += dfdp[p1]*self.covariance[p1,p2]*dfdp[p2]
+        mean = self.__getattribute__(f)(pt)
+        std = sqrt(var)
+        return array([mean-std, mean+std])
+        
+    
 
 class ElasticFormFactors(Model):
     """Dirac and Pauli elastic form factors F_1 and F_2."""
@@ -186,7 +224,8 @@ class ComptonFormFactors(Model):
                  (pt.tm < min(1., pt.Q2/4)) and
                  (1e-3 < pt.xB < 0.5)
                )
-
+    
+    
 class ComptonDispersionRelations(ComptonFormFactors):
     """Use dispersion relations for ReH and ReE
 
