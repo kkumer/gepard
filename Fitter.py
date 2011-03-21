@@ -73,6 +73,8 @@ def fcn(%s):
         print "ncalls = ", self.minuit.ncalls
         self.theory.print_chisq(self.fitpoints)
         self.theory.model.print_parameters()
+        # Set/update covariance matrix of model:
+        self.theory.model.covariance = self.minuit.covariance
 
     def print_parameters(self):
         for par in self.theory.model.parameter_names:

@@ -60,7 +60,6 @@ class Model(object):
                             % (par, self))
                 self.parameters['fix_'+par] = True
 
-
     def print_parameters(self, compare_with=[], exact=False, colors=True):
         """Pretty-print parameters and their values.
 
@@ -104,6 +103,22 @@ class Model(object):
             s += row
         print s
 
+    def print_covariance(self, colors=True):
+        """Pretty-print covariance matrix
+
+        TODO: Elements larger than 0.9 should be printed red.
+
+        """
+        # fitting parameters (not fixed)
+        pars = [p for p in self.parameter_names if self.parameters['fix_'+p] == False]
+        header = '     |' + len(pars)*'%5s   ' + '\n-----+' + len(pars)*'--------'+'\n'
+        sys.stdout.write(header % tuple(pars))
+        for prow in pars:
+            sys.stdout.write('%4s |' % prow)
+            for pcol in pars:
+                sys.stdout.write(' % 5.3f ' % self.covariance[prow, pcol])
+            sys.stdout.write('\n') 
+
     def _diff(self, f, p, pt, h=0.05):
         """Compute derivative of f w.r.t. model parameter p at point pt.
         
@@ -123,7 +138,7 @@ class Model(object):
     def uncert(self, f, pt):
         """Compute uncertainty of f from self's covariance dictionary.
         
-        covariance dict should be provided by Fitter
+        covariance dict could be provided by Fitter
         f is string representing appropriate method of self.
         Returns ndarray (mean-std, mean+std) for easy plotting.
         
