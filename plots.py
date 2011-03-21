@@ -91,7 +91,8 @@ def subplot(ax, sets, lines=[], band=[], xaxis=None, kinlabels=[], plotlines=Tru
         if isinstance(band, list):
             # we have list of theories
             res = np.array([theory.predict(pt) for theory in band])
-        else:
+        elif [n for n in [c.__name__ for c in  band.model.__class__.mro()
+                           ] if n.find('Neural')!=-1]:
             # we have neural network.
             try:
                 res = band.predict(pt, parameters={'nnet':'ALL'})
@@ -99,6 +100,9 @@ def subplot(ax, sets, lines=[], band=[], xaxis=None, kinlabels=[], plotlines=Tru
                 #FIXME: if len(band.model.nets)==5 exception will NOT occur!
                 res = np.array([band.predict(pt, parameters={'nnet':nnet}) for 
                     nnet in range(len(band.model.nets))])
+        else:
+            # we have something weird
+            raise ValueError, 'Band is neither list of theories nor nnet theory'
         mean = res.mean()
         std = res.std()
         up.append(mean + std)

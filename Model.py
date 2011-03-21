@@ -39,6 +39,10 @@ class Model(object):
 
         If allowed ranges have to be changed from default, user needs
         to modify parameters_dict dictionary directly.
+        FIXME:
+        Note that relasing and fixing parameters for model instance is sensible
+        only before creating Fitter instance! Afterwards, one has to fix and release
+        params both for Fitter and for model.
 
         """
         for par in args:
@@ -48,7 +52,14 @@ class Model(object):
             self.parameters['fix_'+par] = False
 
     def fix_parameters(self, *args):
-        """Fix parameters so they are not fitting variables."""
+        """Fix parameters so they are not fitting variables.
+
+        FIXME:
+        Note that relasing and fixing parameters for model instance is sensible
+        only before creating Fitter instance! Afterwards, one has to fix and release
+        params both for Fitter and for model.
+
+        """
         if args[0] == 'ALL':
             # fix 'em all
             for par in self.parameter_names:
@@ -89,7 +100,8 @@ class Model(object):
                 except KeyError:
                     # compared model doesnt' have this parameter
                     value2 = 0
-                app = ('   '+parform) % value2
+                app = '   %-5.3g' % value2
+                #app = ('   '+parform) % value2
                 # calculate relative diff, or absolute if value is zero
                 diff = value - value2
                 if value != 0:
