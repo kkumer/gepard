@@ -43,6 +43,7 @@ ALTGLOpoints = data[5] + data[25] + data[32][18:]
 #ALTGLO3points = data[5] + data[25] + data[32][18:] + data[30] + HA17
 ALTGLO4points = data[25] + data[32][18:]
 ALTGLO5points = data[5] + data[8] + data[32][18:]   # DM's CLAS BSA
+Hpoints = data[5] + data[32][18:]
 #BSDw2Cpoints = utils.select(data[26], criteria=['Q2 == 2.3'])
 #BSDw2CDpoints = utils.select(data[50], criteria=['Q2 == 2.3'])
 BSDwpoints = utils.select(data[50], criteria=['FTn == -1'])

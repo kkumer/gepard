@@ -115,10 +115,8 @@ class Model(object):
             s += row
         print s
 
-    def print_covariance(self, colors=True):
+    def print_covariance(self, colors=True, correlations=False):
         """Pretty-print covariance matrix
-
-        TODO: Elements larger than 0.9 should be printed red.
 
         """
         # fitting parameters (not fixed)
@@ -128,8 +126,28 @@ class Model(object):
         for prow in pars:
             sys.stdout.write('%4s |' % prow)
             for pcol in pars:
-                sys.stdout.write(' % 5.3f ' % self.covariance[prow, pcol])
+                cov = self.covariance[prow, pcol]
+                cor = cov/sqrt(self.covariance[prow, prow])/sqrt(
+                        self.covariance[pcol, pcol])
+                if correlations:
+                    it = ' % 5.3f ' % cor
+                else:
+                    it = ' % 5.3f ' % cov
+                if prow==pcol:
+                    it = stringcolor(it, 'green', colors)
+                if abs(cor) > 0.99 and prow!=pcol:
+                    it = stringcolor(it, 'red', colors)
+                elif abs(cor) < 0.01:
+                    it = stringcolor(it, 'blue', colors)
+                sys.stdout.write(it)
             sys.stdout.write('\n') 
+
+    def print_correlation(self, colors=True):
+        """Pretty-print correlation matrix
+
+        """
+        self.print_covariance(colors=colors, correlations=True)
+
 
     def _diff(self, f, p, pt, h=0.05):
         """Compute derivative of f w.r.t. model parameter p at point pt.

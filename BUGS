@@ -1,3 +1,6 @@
  - some XDVCS points have pt.t attribute
 
  - Kelly's neutron FFs differ from mma cca 1%
+
+ + fixing and releasing parameters should be methods of Fitter,
+   and not Model?

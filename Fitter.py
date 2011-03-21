@@ -76,6 +76,27 @@ def fcn(%s):
         # Set/update covariance matrix of model:
         self.theory.model.covariance = self.minuit.covariance
 
+    def fix_parameters(self, *args):
+        """fix_parameters('p1', 'p2', ...)."""
+
+        if args[0] == 'ALL':
+            # fix 'em all
+            self.theory.model.fix_parameters('ALL')
+            for par in self.theory.model.parameter_names:
+                self.minuit.fixed[par] = True
+                    
+        else:
+            self.theory.model.fix_parameters(*args)
+            for par in args:
+                self.minuit.fixed[par] = True
+
+    def release_parameters(self, *args):
+        """release_parameters('p1', 'p2', ...)."""
+
+        self.theory.model.release_parameters(*args)
+        for par in args:
+            self.minuit.fixed[par] = False
+
     def print_parameters(self):
         for par in self.theory.model.parameter_names:
             if not self.theory.model.parameters['fix_'+par]:
