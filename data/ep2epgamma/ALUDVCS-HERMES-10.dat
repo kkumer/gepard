@@ -1,0 +1,85 @@
+id = 59
+editor = KK
+
+### Experiment
+
+collaboration = HERMES
+process = ep2epgamma
+exptype = fixed target
+year = 2010
+reference =  PRELIMINARY
+reference2 = 
+reference3 = 2006-2007 run
+
+
+### Scattering Process
+
+frame = Trento
+
+in1particle = ep
+in1energy = 27.6
+in1energyunit = GeV
+in1polarizationvector = L
+in1polarization = +1
+
+in2particle = p
+
+out1particle = ep
+out2particle = p
+out3particle = gamma
+
+
+### Observable 
+# Asymmetry:  A^{sin (-FTn)*phi}_{LU,I} #
+
+y0namelong = Charge Averaged Beam Spin Azimuthal Asymmetry
+y0name = ALUDVCS
+y0unit = 1
+y0value = table0column4
+y0errorstatistic = table0column5 
+y0errorsystematic = table0column6
+
+
+### x-axes
+
+x0name = tm
+x0unit = GeV^2
+x0value = table0column0
+
+x1name = xB
+x1unit = 1
+x1value = table0column1
+
+x2name = Q2
+x2unit = GeV^2
+x2value = table0column2
+
+x3name = FTn
+x3unit = 1
+x3value = table0column3
+
+
+
+### Data
+#  -t     x_B     Q2   FTn   asym      stat.     syst. 
+#####################################################
+#0.117  0.097   2.521   -1   -0.015     0.026     0.011 #overall
+0.018   0.068   1.720   -1   0.032     0.055      0.007  
+0.043   0.088   2.259   -1   0.091     0.062      0.021  
+0.078   0.099   2.512   -1   -0.051    0.069      0.012  
+0.142   0.110   2.785   -1   0.020     0.058      0.023  
+0.260   0.121   3.272   -1   0.126     0.079      0.024  
+0.460   0.125   3.819   -1   -0.101    0.114      0.016  
+0.095   0.049   1.338   -1   -0.051    0.056      0.021  
+0.091   0.069   1.799   -1   0.023     0.055      0.004  
+0.104   0.089   2.300   -1   0.069     0.062      0.004  
+0.121   0.113   2.928   -1   -0.012     0.065     0.002  
+0.159   0.157   4.058   -1   -0.071    0.071      0.036  
+0.231   0.244   6.139   -1   -0.074    0.120      0.032  
+0.076   0.054   1.199   -1   -0.037     0.055     0.008  
+0.089   0.069   1.590   -1   0.020     0.061      0.025  
+0.104   0.085   2.079   -1   0.082     0.058      0.023  
+0.126   0.105   2.768   -1   -0.015     0.063     0.016  
+0.151   0.134   3.764   -1   -0.119    0.047      0.029  
+0.218   0.200   5.819   -1   -0.052    0.080      0.016  
+
