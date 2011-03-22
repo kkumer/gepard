@@ -638,6 +638,9 @@ class ComptonModelDRPPsea(ComptonModelDRsea):
 class ComptonNeuralNets(Model):
     """Neural network CFFs"""
 
+    # FIXME: this variable should be purged out of the code most likely
+    allCFFs = ['ImH', 'ReH', 'ImE', 'ReE', 'ImHt', 'ReHt', 'ImEt', 'ReEt']
+
     def __init__(self, hidden_layers=[7], output_layer=['ImH', 'ReH'], endpointpower=None):
         """Model CFFs by neural networks.
         
@@ -656,6 +659,7 @@ class ComptonNeuralNets(Model):
         """
         self.architecture = [2] + hidden_layers + [len(output_layer)]
         self.output_layer = output_layer
+        self.allCFFs = output_layer
         self.nets = []
         self.parameters = {'nnet':0, 'outputvalue':None}
         self.parameter_names = ['nnet', 'outputvalue']

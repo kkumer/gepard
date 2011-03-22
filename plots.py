@@ -4,7 +4,7 @@ of some specific datasets and CFFs.
 
 """
 
-#from IPython.Debugger import Tracer; debug_here = Tracer()
+from IPython.Debugger import Tracer; debug_here = Tracer()
 
 import sys, os, math
 import numpy as np
@@ -24,6 +24,151 @@ from constants import toTeX, Mp2, Mp
 data = utils.loaddata('data/ep2epgamma', approach=Approach.hotfixedBMK) 
 data.update(utils.loaddata('data/gammastarp2gammap', approach=Approach.hotfixedBMK)) 
 
+def _axpoints(ax, pts, xaxis, **kwargs):
+    """Make an errorbar plot defined by single set of data points.
+
+    pts   -- single set of data points
+    xaxis -- 'Q2', 't', 'xB', ...
+
+    """
+    xvals = [getattr(pt, xaxis) for pt in pts]
+    yvals = [pt.val for pt in pts]
+    yerrs = [pt.err for pt in pts]
+    ax.errorbar(xvals, yvals, yerrs, **kwargs)
+
+def _axline(ax, fun, points, xaxis, **kwargs):
+    """Make a line(s) corresponding to points 
+
+    fun -- real-valued function of DataPoint instance
+    points -- list of sets of DataPoint instances
+    xaxis -- 'Q2', 't', 'xB', ...
+
+    """
+    for pts in points:
+        xvals = [getattr(pt, xaxis) for pt in pts]
+        yvals = [fun(pt) for pt in pts]
+        ax.plot(xvals, yvals, **kwargs)
+
+def _axband(ax, fun, pts, xaxis, **kwargs):
+    """Make a band corresponding to points 
+
+    fun -- array-valued function of DataPoint instance
+           mean and std.dev. of this array define position
+           and with of errorband
+    pts -- set of DataPoint instances (just one set!)
+    xaxis -- 'Q2', 't', 'xB', ...
+
+    """
+    if not (isinstance(pts[0], Data.DataPoint) or isinstance(pts[0], Data.DummyPoint)):
+        raise ValueError, "%s is not single dataset" % str(pts)
+
+    xvals = [getattr(pt, xaxis) for pt in pts]
+    res = [fun(pt) for pt in pts]
+    #mean = res.mean(axis=1)
+    #std = res.std(axis=1)
+    #up = mean + std
+    #down = mean - std
+    ## ... if we like extreems
+    #up = res.max(axis=0)
+    #down = res.min(axis=0)
+    up, down = np.array([(m+s, m-s) for m,s in res]).transpose()
+    x = plt.concatenate( (xvals, xvals[::-1]) )
+    y = plt.concatenate( (up, down[::-1]) )
+    ax.fill(x, y, alpha=0.5, **kwargs)
+
+
+def panel(ax, points=None, lines=None, bands=None, xaxis=None, xs=None, 
+        kins={}, kinlabels=None, **kwargs):
+    """Plot datapoints together with fit/theory line(s) and band(s).
+
+    ax -- subplot of matplotlib's figure i.e. ax = figure.add_subplot(..)
+
+    Keyword arguments:
+
+    points --  (list of) `DataSet` instance(s) to be plotted.
+    lines -- (list of) 'theorie(s)' describing curves for plotting.
+    bands  -- (list of) neural network 'theorie(s)' or 'theorie(s)' with
+              defined uncertianties, defining band by their mean and std.dev.
+    xaxis -- abscissa variable; if None, last of sets.xaxes is taken;
+             if 'points' all points are just put equidistantly along x-axis
+    xs    -- list of xvalues, needed if not specified by points
+
+    Additional keywoard arguments:
+
+    kinlabels -- list of constant kinematic variables whose values will
+                 be extracted from points and put on plot as annotation
+
+    **kwargs -- passed to matplotlib
+    TODO: legend
+
+    """
+    if points:
+        # If not provided, take xaxis from last axis from last set
+        if not xaxis: xaxis = points[-1].xaxes[-1]
+        if isinstance(points[0], Data.DataPoint): points = [points]
+
+        pointshapes = ['o', 's', '^', 'd']  # first circles, then squares ...
+        pointcolors = ['blue', 'black', 'purple', 'green']  # circles are blue, squares are black, ...
+        setn = 0
+        for pts in points:
+            _axpoints(ax, pts, xaxis, linestyle='None', elinewidth=1, 
+                    marker=pointshapes[setn], color=pointcolors[setn], **kwargs)
+            setn += 1
+    else:
+        # We have to create set of DataPoints.
+        # (It is up to caller to provide everything needed
+        # via xaxis and kins)
+        pts = []
+        for x in xs:
+            pt = Data.DummyPoint(init=kins)
+            setattr(pt, xaxis, x)
+            # workaround for imperfect fill_kinematics
+            if hasattr(pt, 'xi'):
+                pt.xB = 2*pt.xi/(1.+pt.xi)
+            # end of workaorund
+            utils.fill_kinematics(pt)
+            pts.append(pt)
+        points = [pts]
+
+    if lines:
+        if not isinstance(lines, list): lines = [lines]
+        lineshapes = ['s', '^', 'd', 'h']  # first squares, then triangles, diamonds, hexagons
+        linecolors = ['red', 'green', 'blue', 'purple']  # squares are red, etc.
+        linestyles = ['-', '--', '-.', ':']  # solid, dashed, dot-dashed, dotted
+        linen = 0
+        for line in lines:
+            _axline(ax, lambda pt: line.predict(pt), points, xaxis=xaxis,
+                    color=linecolors[linen], linestyle=linestyles[linen], 
+                    linewidth=2, **kwargs)
+            linen += 1
+
+    if bands:
+        if not isinstance(bands, list): bands = [bands]
+        bandcolors = ['red', 'blue', 'brown', 'green']
+        bandn = 0
+        for band in bands:
+            for pts in points:
+                _axband(ax, lambda pt: band.predict(pt, error=True), pts, xaxis=xaxis,
+                        facecolor=bandcolors[bandn], **kwargs)
+            bandn += 1
+
+    if kinlabels:
+        # constant kinematic variables positioning
+        xvals = []; yvals = []
+        for pts in points:
+            for pt in pts:
+                xvals.append(getattr(pt, xaxis))
+                yvals.append(pt.val)
+        labx = min(0, min(xvals)) + (max(xvals) - min(0, min(xvals))) * 0.35
+        laby = min(0, min(yvals)) + (max(yvals) - min(0, min(yvals))) * 0.02
+        labtxt = ""
+        for lab in kinlabels:
+            try:
+                labtxt += toTeX[lab] + ' = ' + str(getattr(points[0],lab)) + ', '
+            except AttributeError:
+                # If dataset doesn't have it, all points should have it 
+                labtxt += toTeX[lab] + ' = ' + str(getattr(points[0][0],lab)) + ', '
+        ax.text(labx, laby, labtxt[:-2])
 
 def subplot(ax, sets, lines=[], band=[], xaxis=None, kinlabels=[], plotlines=True):
     """Plot datapoints together with fit/theory line(s).
@@ -132,6 +277,27 @@ def subplot(ax, sets, lines=[], band=[], xaxis=None, kinlabels=[], plotlines=Tru
     # ax.frame.set_linewidth(5) # ???
     return
 
+def newHERMESBCA(path=None, fmt='png', **kwargs):
+    """Plot HERMES BCA."""
+    id = 32
+    title = 'HERMES BCA'
+    fig = plt.figure()
+    fig.canvas.set_window_title(title)
+    fig.suptitle(title)
+    xaxes = ['tm', 'xB', 'Q2']
+    # we have 3x6 points
+    for x in range(3):
+        ax = fig.add_subplot(3, 1, x+1)
+        ax.yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))  # tickmarks
+        panel(ax, points=data[id][x*6+18:x*6+6+18], xaxis=xaxes[x], **kwargs)
+        #apply(ax.set_ylim, ylims[(-0.30, 0.05)])
+    if path:
+        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+    else:
+        fig.canvas.draw()
+        fig.show()
+    return fig
+
 def HERMESBCA(lines=[], band=[], path=None, fmt='png'):
     """Plot HERMES BCA."""
     id = 32
@@ -191,6 +357,48 @@ def anydata(sets, lines=[], band=[], path=None, fmt='png'):
         fig.canvas.draw()
         fig.show()
     return fig
+
+def newHERMES10(path=None, fmt='png', **kwargs):
+    """Plot HERMES PRELIMINARY 06/07 BCA and BSA data with fit lines."""
+
+    title = 'HERMES 10 PRELIMINARY'
+    fig = plt.figure()
+    fig.canvas.set_window_title(title)
+    fig.suptitle(title)
+    xaxes = ['tm', 'xB', 'Q2']
+    ylims = [(-0.05, 0.3), (-0.15, 0.15), (-0.45, 0.05)]
+    # we have 3x18=54 points to be separated in nine panels six points each:
+    for y, id, shift in zip(range(3), [57, 57, 58], [18, 0, 0]):
+        for x in range(3):
+            npanel = 3*y + x + 1  # 1, 2, ..., 9
+            ax = fig.add_subplot(3,3,npanel)
+            ax.yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))  # tickmarks
+            panel(ax, points=data[id][x*6+shift:x*6+6+shift], xaxis=xaxes[x], **kwargs)
+            apply(ax.set_ylim, ylims[y])
+            if (npanel % 3) != 1:
+                # Leave labels only on leftmost panels
+                ax.set_ylabel('')
+            else:
+                ylabels = ['$BCA\\; \\cos \\phi$', '$BCA\\; \\cos 0\\phi$', '$ALUI\\; \\sin\\phi$']
+                ax.set_ylabel(ylabels[(npanel-1)/3], fontsize=18)
+
+            if npanel < 7:
+                # Leave labels only on lowest panels
+                ax.set_xlabel('')
+            else:
+                xlabels = ['$-t\\; [{\\rm GeV}^2]$', '$x_B$', '$Q^2\\; [{\\rm GeV}^2]$']
+                ax.set_xlabel(xlabels[npanel-7], fontsize=18)
+
+            if (npanel % 3) == 2:
+                # Adjust x-axis on middle column
+                ax.set_xlim(0.04, 0.25)
+    if path:
+        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+    else:
+        fig.canvas.draw()
+        fig.show()
+    return fig
+
 
 def HERMES10(lines=[], band=[], path=None, fmt='png'):
     """Plot HERMES PRELIMINARY 06/07 BCA and BSA data with fit lines."""
@@ -414,6 +622,51 @@ def HERMES10TP(obs='TSA', lines=[], band=[], path=None, fmt='png'):
         fig.show()
     return fig
 
+def newCLAS(path=None, fmt='png', **kwargs):
+    """Makes plot of CLAS BSA data with fit lines and bands"""
+
+    dataset = data[25]
+    title = 'CLAS 07'
+    fig = plt.figure()
+    fig.canvas.set_window_title(title)
+    fig.suptitle(title)
+    nmax = len(dataset) - 1
+    # Each different Q2 has its own panel
+    npt = 0
+    panelpoints = []
+    for npanel in [7, 8, 9, 4, 5, 6, 1, 2, 3]:
+        ax = fig.add_subplot(3,3,npanel)
+        panelpoints = []
+        pt = dataset[npt]
+        Q2 = pt.Q2
+        while Q2 == pt.Q2:
+            panelpoints.append(pt)
+            npt += 1
+            if npt == nmax:
+                break
+            pt = dataset[npt]
+        # now transform list into DataSet instance ...
+        panelset = Data.DataSet(panelpoints)
+        panelset.__dict__ = dataset.__dict__.copy()
+        # ... and plot
+        panel(ax, points=panelset, xaxis='tm', kinlabels=['Q2', 'xB'], **kwargs)
+
+        plt.xlim(0.0, 0.6)
+        plt.ylim(0.0, 0.4)
+        ax.yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))
+        if (npanel % 3) != 1:
+            # Leave labels only on leftmost panels
+            ax.set_ylabel('')
+        if npanel < 7:
+            ax.set_xlabel('')
+        else:
+            ax.set_xlabel('$-t\\; [{\\rm GeV}^2]$', fontsize=18)
+    if path:
+        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+    else:
+        fig.canvas.draw()
+        fig.show()
+    return fig
 
 def CLAS(lines=[], band=[], path=None, fmt='png'):
     """Makes plot of CLAS BSA data with fit lines"""
@@ -510,6 +763,48 @@ def HALLA(lines=[], band=[], path=None, fmt='png'):
         fig.show()
     return fig
 
+def newHALLA(path=None, fmt='png', **kwargs):
+    """Makes plot of 'alternative' HALL-A data with fit lines"""
+
+    subsets = {}
+    subsets[1] = utils.select(data[50], criteria=['Q2 == 1.5', 'FTn == -1'])
+    subsets[2] = utils.select(data[50], criteria=['Q2 == 1.9', 'FTn == -1'])
+    subsets[3] = utils.select(data[50], criteria=['Q2 == 2.3', 'FTn == -1'])
+    subsets[4] = utils.select(data[51], criteria=['FTn == 0'])
+    subsets[5] = utils.select(data[51], criteria=['FTn == 1'])
+    #subsets[6] = utils.select(data[51], criteria=['FTn == 2'])
+
+    title = 'Hall-A'
+    fig = plt.figure()
+    fig.canvas.set_window_title(title)
+    fig.suptitle(title)
+    Qs = ['1.5', '1.9', '2.3', '2.3', '2.3']
+    for npanel in range(1,6):
+        ax = fig.add_subplot(2,3,npanel)
+        panel(ax, points=subsets[npanel], xaxis='t', **kwargs)
+        ax.set_ylabel('%s(FTn = %i)' % (subsets[npanel][0].y0name, 
+            subsets[npanel][0].FTn), fontsize=16)
+        if npanel<5:
+            ax.text(-0.31, 0.002, '$Q^2\\!= %s\\,{\\rm GeV}^2$' % Qs[npanel-1], fontsize=12)
+        else:
+            ax.text(-0.31, -0.008, '$Q^2\\!= %s\\,{\\rm GeV}^2$' % Qs[npanel-1], fontsize=12)
+        ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))
+    # left  = 0.125  # the left side of the subplots of the figure
+    # right = 0.9    # the right side of the subplots of the figure
+    # bottom = 0.0   # the bottom of the subplots of the figure
+    # top = 0.9      # the top of the subplots of the figure
+    # wspace = 0.2   # the amount of width reserved for blank space between subplots
+    # hspace = 0.2   # the amount of height reserved for white space between subplots
+    fig.subplots_adjust(wspace=0.7)
+
+    if path:
+        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+    else:
+        fig.canvas.draw()
+        fig.show()
+    return fig
+
+
 def HALLAalt(lines=[], band=[], path=None, fmt='png'):
     """Makes plot of 'alternative' HALL-A data with fit lines"""
 
@@ -551,6 +846,67 @@ def HALLAalt(lines=[], band=[], path=None, fmt='png'):
         fig.show()
     return fig
 
+
+def newH1ZEUS(path=None, fmt='png', **kwargs):
+    """Makes plot of H1 DVCS data with fit lines"""
+
+    subsets = {}
+    subsets[1] = [utils.select(data[36], criteria=['Q2 == 8.']),
+            utils.select(data[36], criteria=['Q2 == 15.5']), 
+            utils.select(data[36], criteria=['Q2 == 25.'])]
+    subsets[2] = [data[46]] # ZEUS t-dep
+    subsets[3] = [data[48],
+            utils.select(data[41], criteria=['Q2 == 8.']),
+            utils.select(data[41], criteria=['Q2 == 15.5']), 
+            utils.select(data[41], criteria=['Q2 == 25.'])]
+    subsets[4] = [data[47]] # ZEUS Q2-dep
+    xs = ['t', 't', 'W', 'Q2']
+    #title = 'H1 07 / ZEUS 08'
+    title = ''
+    fig = plt.figure()
+    fig.canvas.set_window_title(title)
+    fig.suptitle(title)
+    fig.subplots_adjust(bottom=0.1, hspace=0.3)
+    for npanel in range(1,5):
+        ax = fig.add_subplot(2,2,npanel)
+        ax.set_yscale('log')  # y-axis to be logarithmic
+        panel(ax, points=subsets[npanel], xaxis=xs[npanel-1], **kwargs)
+        if npanel < 3:
+            ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.2))
+        # y labels
+        if npanel==1:
+            ax.set_ylabel('$d\\sigma/dt\\quad [{\\rm nb/GeV}^2]$', fontsize=18)
+        elif npanel==3:
+            ax.set_ylabel('$\\sigma\\quad [{\\rm nb}]$', fontsize=18)
+        else: # npanel 4
+            ax.set_ylabel('')
+        # x labels
+        if npanel==1 or npanel==2:
+            ax.set_xlabel('$t\\quad [{\\rm GeV}^2]$', fontsize=18)
+        elif npanel==3:
+            ax.set_xlabel('$W\\quad [{\\rm GeV}]$', fontsize=18)
+        else: # npanel 4
+            ax.set_xlabel('$Q^2\\quad [{\\rm GeV}^2]$', fontsize=18)
+        if npanel==1:
+            ax.text(-0.8, 22, '${\\rm H1}$', fontsize=16)
+            ax.text(-0.8, 10, '${\\rm W = 82}\\, {\\rm GeV}$', fontsize=12)
+            ax.text(-0.8, 3, '$Q^2\\!= 8,\\, 15.5,\\, 25\\,{\\rm GeV}^2$', fontsize=12)
+        if npanel==2:
+            ax.text(-0.3, 6, '${\\rm ZEUS}$', fontsize=16)
+            ax.text(-0.3, 3.5, '${\\rm W = 104}\\, {\\rm GeV}$', fontsize=12)
+            ax.text(-0.3, 2.1, '$Q^2\\!= 3.2\\,{\\rm GeV}^2$', fontsize=12)
+        if npanel==3:
+            ax.text(50, 28, '${\\rm ZEUS}\\, (idem):$', fontsize=16)
+            ax.text(50, 5, '${\\rm H1}\\, (idem):$', fontsize=16)
+        else: # npanel==4
+            ax.text(30, 3, '${\\rm ZEUS}\\, (idem)$', fontsize=16)
+            #ax.set_xlim(0, 80)
+    if path:
+        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+    else:
+        fig.canvas.draw()
+        fig.show()
+    return fig
 
 def H1ZEUS(lines=[], band=[], path=None, fmt='png'):
     """Makes plot of H1 DVCS data with fit lines"""
@@ -1039,49 +1395,37 @@ def HBCSA(ff, fits=[], path=None, fmt='png'):
         fig.show()
     return fig
 
-def _axband(ax, tm, xvals, fun, color='g', avg=True):
-    """Make a band of fun defined by ndarray-valued fun."""
-    pt = Data.DummyPoint()
-    pt.t = -tm
-    try:
-        # We try to do all xi's at once
-        pt.xi = xvals
-        pt.xB = 2*pt.xi/(1.+pt.xi)
-        res = fun(pt)
-        mean = res.mean(axis=0)
-        std = res.std(axis=0)
-    except ValueError:
-        # We have to go one by one (probably because
-        # dispersion integral introduces another array-axis.
-        res = []
-        for onexi in xvals:
-            pt.xi = onexi
-            pt.xB = 2*pt.xi/(1.+pt.xi)
-            res.append(fun(pt))
-        res = np.array(res)
-        mean = res.mean(axis=1)
-        std = res.std(axis=1)
-    if avg:
-        up = mean + std
-        down = mean - std
-    else:
-        up = res.max(axis=0)
-        down = res.min(axis=0)
-    x = plt.concatenate( (xvals, xvals[::-1]) )
-    y = plt.concatenate( (up, down[::-1]) )
-    ax.fill(x, y, facecolor=color, alpha=0.5)
-
-def _axline(ax, tm, xvals, fun, **kwargs):
-    """Make a line of x*fun defined by ndarray-valued fun."""
-    res = []
-    for xi in xvals:
-        pt = Data.DummyPoint()
-        pt.t = -tm
-        pt.xi = xi
-        pt.xB = 2*pt.xi/(1.+pt.xi)
-        #res.append(xi*fun(pt))
-        res.append(fun(pt))
-    ax.plot(xvals, res, **kwargs)
+#def _axband(ax, tm, xvals, fun, color='g', avg=True):
+#    """Make a band of fun defined by ndarray-valued fun."""
+#    pt = Data.DummyPoint()
+#    pt.t = -tm
+#    try:
+#        # We try to do all xi's at once
+#        pt.xi = xvals
+#        pt.xB = 2*pt.xi/(1.+pt.xi)
+#        res = fun(pt)
+#        mean = res.mean(axis=0)
+#        std = res.std(axis=0)
+#    except ValueError:
+#        # We have to go one by one (probably because
+#        # dispersion integral introduces another array-axis.
+#        res = []
+#        for onexi in xvals:
+#            pt.xi = onexi
+#            pt.xB = 2*pt.xi/(1.+pt.xi)
+#            res.append(fun(pt))
+#        res = np.array(res)
+#        mean = res.mean(axis=1)
+#        std = res.std(axis=1)
+#    if avg:
+#        up = mean + std
+#        down = mean - std
+#    else:
+#        up = res.max(axis=0)
+#        down = res.min(axis=0)
+#    x = plt.concatenate( (xvals, xvals[::-1]) )
+#    y = plt.concatenate( (up, down[::-1]) )
+#    ax.fill(x, y, facecolor=color, alpha=0.5)
 
 
 def HvalNN(theories=[], band=None, path=None, fmt='png'):
@@ -1291,6 +1635,54 @@ def CFF(thnn=None, th=None, thband=None, cffs=['ImH'], path=None, fmt='png'):
         #ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.02))  # tickmarks
     if thnn:
         thnn.model.parameters['nnet'] = old
+    if path:
+        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+    else:
+        fig.canvas.draw()
+        fig.show()
+    return fig
+
+def newCFF(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
+    """Makes plots of cffs given by various theories/models
+    
+    cffs    -- List of CFFs to be plotted. Each produces two panels.
+
+    """
+    title = 'newCFFs'
+    fig = plt.figure()
+    fig.canvas.set_window_title(title)
+    fig.suptitle(title)
+    colors = ['red', 'brown']     # worm human colors :-)
+    nncolors = ['blue', 'green']  # cold computer colors
+    linestyles = ['solid', 'dashed']
+    # Define abscissas
+    logxvals = np.power(10., np.arange(-3.0, -0.01, 0.1))  # left panel
+    xvals = np.linspace(0.025, 0.2, 20) # right panel
+    # ordinates 
+    ylims = {'ImH': (-3.3, 35), 'ReH': (-4.5, 8)}
+    # Plot panels
+    for n in range(len(cffs)):
+        cff = cffs[n]
+        # all-x logarithmic
+        ax = fig.add_subplot(len(cffs), 2, 2*n+1)
+        ax.set_xscale('log')  # x-axis to be logarithmic
+        panel(ax, xaxis='xi', xs=xvals, kins={'yaxis':cff, 't':-0.2}, **kwargs)
+        ax.set_xlabel('$\\xi$', fontsize=15)
+        ax.set_ylabel('%s' % cff, fontsize=18)
+        ax.axhspan(-0.0005, 0.0005, facecolor='g', alpha=0.6)  # horizontal bar
+        ax.axvspan(0.03, 0.093, facecolor='g', alpha=0.1)  # vertical band
+        ax.text(0.03, -0.27, "data region", fontsize=14)
+        apply(ax.set_ylim, ylims[cff])
+        ax.set_xlim(0.005, 1.0)
+        # measured x linear
+        ax = fig.add_subplot(len(cffs), 2, 2*n+2)
+        panel(ax, xaxis='xi', xs=logxvals, kins={'yaxis':cff, 't':-0.2}, **kwargs)
+        ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
+        ax.set_xlabel('$\\xi$', fontsize=15)
+        apply(ax.set_ylim, ylims[cff])
+        ax.set_xlim(0.03, 0.093)
+        ax.text(0.03, -0.27, "data region only", fontsize=14)
+        #ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.02))  # tickmarks
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:

@@ -17,55 +17,55 @@ from math import sqrt
 ## [1] Load experimental data and theoretical models
 
 data = utils.loaddata('data/ep2epgamma', approach=Approach.hotfixedBMK)  
-data.update(utils.loaddata('data/gammastarp2gammap', approach=Approach.hotfixedBMK))
-db = shelve.open('aux.db')
-#ths = shelve.open('theories.db')
+#data.update(utils.loaddata('data/gammastarp2gammap', approach=Approach.hotfixedBMK))
+#db = shelve.open('aux.db')
+##ths = shelve.open('theories.db')
 dell = shelve.open('dell.db')
-dellB = shelve.open('dellB.db')
+dellnew = shelve.open('dellnew.db')
 
 ## [2] Choose subset of datapoints for fitting
 
-testpoints = data[31][12:14] + data[8][1:3] + data[30][2:4]  # test set
-GLOpoints = data[31][12:] + data[8] + data[29]  # DM's GLO set
-GLO1points = data[31][12:] + data[8] + data[29] + data[30]  # DM's GLO1 set
-#HERMESpoints = data[31][12:] +  data[29]
-#BSApoints = data[8] + data[29]
-#HAD17 = utils.select(data[33], criteria=['Q2 == 1.5', 't == -0.17'])
-#HA17 = utils.select(data[34], criteria=['t == -0.17'])
-#HA28 = utils.select(data[34], criteria=['t == -0.28'])
-#HA33 = utils.select(data[34], criteria=['t == -0.33'])
-DVCSpoints = data[36] + data[37] + data[38] + data[39] + \
-  data[40] + data[41] + data[42] + data[43] + data[44] + \
-  data[45]
-ALTGLOpoints = data[5] + data[25] + data[32][18:]
-#ALTGLO1points = data[5] + data[25] + data[32] + HAD17 + HA17
-#ALTGLO2points = data[5] + data[25] + data[32][18:] + HAD17[::2] + HA17[::2]
-#ALTGLO3points = data[5] + data[25] + data[32][18:] + data[30] + HA17
-ALTGLO4points = data[25] + data[32][18:]
-ALTGLO5points = data[5] + data[8] + data[32][18:]   # DM's CLAS BSA
+#testpoints = data[31][12:14] + data[8][1:3] + data[30][2:4]  # test set
+#GLOpoints = data[31][12:] + data[8] + data[29]  # DM's GLO set
+#GLO1points = data[31][12:] + data[8] + data[29] + data[30]  # DM's GLO1 set
+##HERMESpoints = data[31][12:] +  data[29]
+##BSApoints = data[8] + data[29]
+##HAD17 = utils.select(data[33], criteria=['Q2 == 1.5', 't == -0.17'])
+##HA17 = utils.select(data[34], criteria=['t == -0.17'])
+##HA28 = utils.select(data[34], criteria=['t == -0.28'])
+##HA33 = utils.select(data[34], criteria=['t == -0.33'])
+#DVCSpoints = data[36] + data[37] + data[38] + data[39] + \
+#  data[40] + data[41] + data[42] + data[43] + data[44] + \
+#  data[45]
+#ALTGLOpoints = data[5] + data[25] + data[32][18:]
+##ALTGLO1points = data[5] + data[25] + data[32] + HAD17 + HA17
+##ALTGLO2points = data[5] + data[25] + data[32][18:] + HAD17[::2] + HA17[::2]
+##ALTGLO3points = data[5] + data[25] + data[32][18:] + data[30] + HA17
+#ALTGLO4points = data[25] + data[32][18:]
+#ALTGLO5points = data[5] + data[8] + data[32][18:]   # DM's CLAS BSA
 Hpoints = data[5] + data[32][18:]
-#BSDw2Cpoints = utils.select(data[26], criteria=['Q2 == 2.3'])
-#BSDw2CDpoints = utils.select(data[50], criteria=['Q2 == 2.3'])
-BSDwpoints = utils.select(data[50], criteria=['FTn == -1'])
-BSSwpoints = utils.select(data[51], criteria=['FTn>=0', 'FTn <= 1'])
-BSDwDMpoints = utils.select(data[55], criteria=['FTn == -1'])
-BSSwDMpoints = utils.select(data[56], criteria=['FTn>=0', 'FTn <= 1'])
-TSA1points = utils.select(data[52], criteria=['FTn == -1'])
-DMpoints = data[5] + data[32][18:] + data[8] + data[30]
-DMTSApoints = data[5] + data[32][18:] + TSA1points + data[8] + data[30]
-TSApoints = TSA1points + data[54]
-BTSApoints = utils.select(data[53], criteria=['FTn==0'])
-UNPpoints = ALTGLOpoints + BSSwpoints + BSDwpoints
-UNP5points = ALTGLO5points + BSSwpoints + BSDwpoints
-H1ZEUSpoints = DVCSpoints + data[48]
+##BSDw2Cpoints = utils.select(data[26], criteria=['Q2 == 2.3'])
+##BSDw2CDpoints = utils.select(data[50], criteria=['Q2 == 2.3'])
+#BSDwpoints = utils.select(data[50], criteria=['FTn == -1'])
+#BSSwpoints = utils.select(data[51], criteria=['FTn>=0', 'FTn <= 1'])
+#BSDwDMpoints = utils.select(data[55], criteria=['FTn == -1'])
+#BSSwDMpoints = utils.select(data[56], criteria=['FTn>=0', 'FTn <= 1'])
+#TSA1points = utils.select(data[52], criteria=['FTn == -1'])
+#DMpoints = data[5] + data[32][18:] + data[8] + data[30]
+#DMTSApoints = data[5] + data[32][18:] + TSA1points + data[8] + data[30]
+#TSApoints = TSA1points + data[54]
+#BTSApoints = utils.select(data[53], criteria=['FTn==0'])
+#UNPpoints = ALTGLOpoints + BSSwpoints + BSDwpoints
+#UNP5points = ALTGLO5points + BSSwpoints + BSDwpoints
+#H1ZEUSpoints = DVCSpoints + data[48]
 
-mockH = data[1001][::27] + data[1002][::27]
-oldmockH = []
-np.random.seed(42)  # For reproducibility
-for pt in mockH:
-    oldmockH.append(copy.deepcopy(pt))
-    pt.err = 0.05
-    pt.val = pt.val + scipy.stats.norm.rvs(loc=0, scale=0.05)
+#mockH = data[1001][::27] + data[1002][::27]
+#oldmockH = []
+#np.random.seed(42)  # For reproducibility
+#for pt in mockH:
+#    oldmockH.append(copy.deepcopy(pt))
+#    pt.err = 0.05
+#    pt.val = pt.val + scipy.stats.norm.rvs(loc=0, scale=0.05)
 #mockHHa = mockH + data[1003]  # Adding Hall A
 
 ## [3] Create a theory
@@ -80,26 +80,26 @@ tDR = Approach.hotfixedBMK(mDRonly)
 tDR.name = 'KM09a'
 tDR.m.parameters.update(DMepsGLO)
 
-tDRBM = Approach.BM10(mDRonly)
-tDRBM.name = 'KM09a+BM10'
-tDRBM.m.parameters.update(DMepsGLO)
+#tDRBM = Approach.BM10(mDRonly)
+#tDRBM.name = 'KM09a+BM10'
+#tDRBM.m.parameters.update(DMepsGLO)
 
 mDRonly1 = Model.ModelDR()
 tDR1 = Approach.hotfixedBMK(mDRonly1)
 tDR1.name = 'KM09b'
 tDR1.m.parameters.update(DMepsGLO1)
 
-tDR1BM = Approach.BM10(mDRonly1)
-tDR1BM.name = 'KM09b+BM10'
-tDR1BM.m.parameters.update(DMepsGLO1)
+#tDR1BM = Approach.BM10(mDRonly1)
+#tDR1BM.name = 'KM09b+BM10'
+#tDR1BM.m.parameters.update(DMepsGLO1)
 
 ## Hybrid: Gepard+DR (can reuse above Gepard)
-#mDRsea = Model.ComptonModelDRsea()
-#m = Model.HybridDipole(mGepard, mDRsea)
-#th = Approach.hotfixedBMK(m)
-#th.name = 'KM10b'
-#th.m.parameters.update(KM10b)  
-#g = th.m.g
+mDRsea = Model.ComptonModelDRsea()
+m = Model.HybridDipole(mGepard, mDRsea)
+th = Approach.hotfixedBMK(m)
+th.name = 'KM10b'
+th.m.parameters.update(KM10b)  
+g = th.m.g
 
 #thBM = Approach.BM10(m)
 #thBM.m.name = "KM10b+BM10"
@@ -118,11 +118,11 @@ tDR1BM.m.parameters.update(DMepsGLO1)
 # NN
 #mNN = Model.ModelNN(hidden_layers=[15], output_layer=['ImH', 'ReH', 'ImE', 'ReE', 'ImHt', 'ReHt', 'ImEt', 'ReEt'])
 #mNN = Model.ModelNN(hidden_layers=[9], endpointpower=3.0)
-mNN = Model.ModelNN(hidden_layers=[11])
+#mNN = Model.ModelNN(hidden_layers=[11])
 #mNN = Model.ModelNN(hidden_layers=[11], output_layer=['ImH', 'ReH', 'ReE','ImHt', 'ReHt', 'ReEt'])
-tNN = Approach.hotfixedBMK(mNN)
-tNN.name = 'NNtest'
-tNN.description = 'x (xB,t)-11-2 nets trained on HERMES-like mock data for 200 batches'
+#tNN = Approach.hotfixedBMK(mNN)
+#tNN.name = 'NNtest'
+#tNN.description = 'x (xB,t)-11-2 nets trained on HERMES-like mock data for 200 batches'
 
 ## [4] Do the fit
 #th.m.fix_parameters('ALL')
@@ -148,9 +148,9 @@ tNN.description = 'x (xB,t)-11-2 nets trained on HERMES-like mock data for 200 b
 
 
 ## DR fit
-tDR.m.release_parameters('rv', 'Mv')
 #tDR.m.release_parameters('rv', 'Mv')
-f = Fitter.FitterMinuit(mockH, tDR)
+#tDR.m.release_parameters('rv', 'Mv')
+#f = Fitter.FitterMinuit(mockH, tDR)
 
 ## [5] Some shortcuts ...
 

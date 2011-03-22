@@ -2,7 +2,7 @@
 
 import copy, sys
 
-from numpy import sin, cos, pi, sqrt, array, linspace
+from numpy import sin, cos, pi, sqrt, array, linspace, ndarray
 from scipy.special import gammainc
 
 import utils, quadrature, Data
@@ -82,35 +82,72 @@ class Approach(object):
             print self.chisq(points, sigmas=True)
         print 'P(chi-square, d.o.f) = P(%1.2f, %2d) = %5.4f' % self.chisq(points)
 
+        
     def predict(self, pt, error=False, **kwargs):
         """Give prediction for DataPoint pt.
 
         Keyword arguments:
         error - if available, produce tuple (mean, error)
-        observable - string. Default is pt.yaxis
-        parameters - dictionary which will update model's one
+        observable - string. Default is pt.yaxis. It is acceptable also
+                     to pass CFF as observable, e.g., observable = 'ImH'
+        parameters - dictionary which will temporarily update model's one
 
         """
+        m = self.model
         if kwargs.has_key('observable'):
             obs = kwargs['observable']
         else:
             obs = pt.yaxis
 
         if kwargs.has_key('parameters'):
-            old = self.model.parameters.copy()
-            self.model.parameters.update(kwargs['parameters'])
-        #elif isinstance(self.model, Model.ComptonNeuralNets):
+            old = m.parameters.copy()
+            m.parameters.update(kwargs['parameters'])
+        #elif isinstance(m, Model.ComptonNeuralNets):
         #    # It is not training (which always uses 'parameters'), and
         #    # we are not asked for particular net (call would again come
         #    # with 'parameters'), so we want mean of all nets
-        #    self.model.parameters['nnet'] = 'ALL'
+        #    m.parameters['nnet'] = 'ALL'
         #    result = getattr(self, obs)(pt)
         #    if error:
         #        return (result.mean(), result.std())
         #    else:
         #        return result.mean()
 
-        result = getattr(self, obs)(pt)
+        if obs in m.allCFFs:
+            # we need a CFF
+            fun = getattr(m, obs)
+        else:
+            # we need a "real" observable
+            fun = getattr(self, obs)
+
+        if error:
+            try:
+                pars = [p for p in m.parameter_names if m.parameters['fix_'+p] == False]
+                var = 0
+                dfdp = {}
+                for p in pars:
+                    # calculating dfdp = derivative of observable w.r.t. parameter:
+                    h=sqrt(m.covariance[p,p])
+                    mem = m.parameters[p]
+                    m.parameters[p] = mem+h/2.
+                    up = fun(pt)
+                    m.parameters[p] = mem-h/2.
+                    down = fun(pt)
+                    m.parameters[p] = mem
+                    dfdp[p] = (up-down)/h
+                for p1 in pars:
+                    for p2 in pars:
+                        var += dfdp[p1]*m.covariance[p1,p2]*dfdp[p2]
+                result = (fun(pt), sqrt(var))
+            except KeyError:
+                # we have neural net
+                allnets = fun(pt)
+                result = (allnets.mean(), allnets.std())
+        else:
+            result = fun(pt)
+            if isinstance(result, ndarray):
+                # we have neural net
+                result = result.mean()
 
         if kwargs.has_key('parameters'):
             # restore old values
