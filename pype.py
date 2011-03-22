@@ -80,18 +80,18 @@ tDR = Approach.hotfixedBMK(mDRonly)
 tDR.name = 'KM09a'
 tDR.m.parameters.update(DMepsGLO)
 
-#tDRBM = Approach.BM10(mDRonly)
-#tDRBM.name = 'KM09a+BM10'
-#tDRBM.m.parameters.update(DMepsGLO)
+tDRBM = Approach.BM10(mDRonly)
+tDRBM.name = 'KM09a+BM10'
+tDRBM.m.parameters.update(DMepsGLO)
 
 mDRonly1 = Model.ModelDR()
 tDR1 = Approach.hotfixedBMK(mDRonly1)
 tDR1.name = 'KM09b'
 tDR1.m.parameters.update(DMepsGLO1)
 
-#tDR1BM = Approach.BM10(mDRonly1)
-#tDR1BM.name = 'KM09b+BM10'
-#tDR1BM.m.parameters.update(DMepsGLO1)
+tDR1BM = Approach.BM10(mDRonly1)
+tDR1BM.name = 'KM09b+BM10'
+tDR1BM.m.parameters.update(DMepsGLO1)
 
 ## Hybrid: Gepard+DR (can reuse above Gepard)
 mDRsea = Model.ComptonModelDRsea()
