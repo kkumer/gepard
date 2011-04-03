@@ -15,6 +15,7 @@ from numpy import ndarray, array
 
 from quadrature import PVquadrature
 from utils import flatten, hubDict, stringcolor
+from constants import tolerance2
 
 import pygepard as g
 import optModel
@@ -115,12 +116,29 @@ class Model(object):
             s += row
         print s
 
+    def free_parameters(self):
+        """Return just free (non-fixed) parameters."""
+
+        # fitting parameters (not fixed)
+        return [p for p in self.parameter_names if self.parameters['fix_'+p] == False]
+
+    def print_parameters_errors(self):
+        """Print fitting parameters and their errors.
+
+        Model must have covariance defined.
+
+
+        """
+        for p in self.free_parameters():
+            print '%5s = %8.3f +- %5.3f' % (p, self.parameters[p],
+                    sqrt(tolerance2)*sqrt(self.covariance[p,p]))
+
     def print_covariance(self, colors=True, correlations=False):
         """Pretty-print covariance matrix
 
         """
         # fitting parameters (not fixed)
-        pars = [p for p in self.parameter_names if self.parameters['fix_'+p] == False]
+        pars = self.free_parameters()
         header = '     |' + len(pars)*'%5s   ' + '\n-----+' + len(pars)*'--------'+'\n'
         sys.stdout.write(header % tuple(pars))
         for prow in pars:
@@ -186,6 +204,19 @@ class Model(object):
         std = sqrt(var)
         return array([mean-std, mean+std])
         
+    def covariance_matrix(self, colors=True, correlations=False):
+        """Return covariance matrix
+
+        """
+        # fitting parameters (not fixed)
+        pars = [p for p in self.parameter_names if self.parameters['fix_'+p] == False]
+        m = []
+        for prow in pars:
+            row = []
+            for pcol in pars:
+                row.append(self.covariance[prow, pcol])
+            m.append(row)
+        return array(m)
     
 
 class ElasticFormFactors(Model):

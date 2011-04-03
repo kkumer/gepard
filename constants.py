@@ -11,12 +11,14 @@ alpha = 1./137.036  # inverse of fine structure constant
 # WolframAlpha: (hbar^2 c^2 / GeV^2)  in nanobarns
 GeV2nb = 389379.
 
+tolerance2 = 6.75  # sqrt(2*Npoints)/1.65^2 according to GJV/MRST
 
 
 # Dictionary that maps variables to their LaTeX representation
 toTeX = {'tm' : '$-t$',  'xB' : '$x_{\\rm B}$', 'Q2' : '$Q^{2}$', 
      'phi' : '$\\phi$', 't' : '$t$',
      'xi': '$\\xi$',  'W': '$W$',
+     'xixB': '$\\xi=x_{B}/(2-x_{B})$',
      "TotalCrossSection" : '$\\sigma$',
      "PartialCrossSection" : '$d\\sigma / dt$',
      "ALUIsin1" : '$A_{LU,I}^{\\sin 1\\phi}$',
@@ -43,5 +45,7 @@ toTeX = {'tm' : '$-t$',  'xB' : '$x_{\\rm B}$', 'Q2' : '$Q^{2}$',
      "BCAcos1" : '$A_{C}^{\\cos 1\\phi}$',
      "XDVCSt" : '$d\\sigma_{DVCS} / dt$',
      "XDVCS" : '$\\sigma_{DVCS}$',
-     "point" : 'point no.'
+     "npt" : 'point no.',
+     "ImH" : '$Im\\mathcal{H}(\\xi, t) = \\pi H(\\xi, \\xi, t)$',
+     "ReH" : '$Re\\mathcal{H}(\\xi, t)$',
      }

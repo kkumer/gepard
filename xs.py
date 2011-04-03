@@ -51,6 +51,7 @@ def theory(id):
         return tDR1
     elif id == 3:
         # Hybrid preliminary fit shown in Trento
+        # P(132.80, 160) = 0.943  (for UNP5 and H1ZEUS)
         mGepard = Model.ComptonGepard(cutq2=0.5)
         mDRPPsea = Model.ComptonModelDRPPsea()
         m = Model.HybridDipole(mGepard, mDRPPsea)
@@ -71,7 +72,8 @@ def theory(id):
         th.m.parameters.update(KM10a)  # ALTGLO
         return th
     elif id == 5:
-        # Hybrid fit + 3rd PW to DVCSpoints and GLO1points  chisq = fine
+        # Hybrid fit + 3rd PW to DVCSpoints and GLO1points
+        # P(42.51/40) = 0.3633
         mGepard = Model.ComptonGepard(cutq2=0.5)
         mDRPPsea = Model.ComptonModelDRPPsea()
         m = Model.HybridKelly(mGepard, mDRPPsea)

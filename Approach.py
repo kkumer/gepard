@@ -48,13 +48,13 @@ class Approach(object):
         """Save theory to database."""
         db[self.name] = self
 
-    def chisq(self, points, sigmas=False):
+    def chisq(self, points, sigmas=False, **kwargs):
         """Return tuple (chi-square, d.o.f., probability). If the approach and model
            provide uncertainties, they are ignored - only experimental uncertainties
            are taken into account."""
         nfreepars=utils.npars(self.model)
         dof = len(points) - nfreepars
-        allsigmas = [(self.predict(pt, observable=pt.yaxis) - pt.val) / pt.err for
+        allsigmas = [(self.predict(pt, observable=pt.yaxis, **kwargs) - pt.val) / pt.err for
                     pt in points]
         chi = sum(s*s for s in allsigmas)  # equal to m.fval if minuit fit is done
         fitprob = (1.-gammainc(dof/2., chi/2.)) # probability of this chi-sq
@@ -76,11 +76,11 @@ class Approach(object):
         self.m.ndparameters[self.m.parameter_names.index(parname)] = mem
 
 
-    def print_chisq(self, points, sigmas=False):
+    def print_chisq(self, points, sigmas=False, **kwargs):
         """Pretty-print the chi-square."""
         if sigmas:
-            print self.chisq(points, sigmas=True)
-        print 'P(chi-square, d.o.f) = P(%1.2f, %2d) = %5.4f' % self.chisq(points)
+            print self.chisq(points, sigmas=True, **kwargs)
+        print 'P(chi-square, d.o.f) = P(%1.2f, %2d) = %5.4f' % self.chisq(points, **kwargs)
 
         
     def predict(self, pt, error=False, **kwargs):
@@ -138,6 +138,7 @@ class Approach(object):
                 for p1 in pars:
                     for p2 in pars:
                         var += dfdp[p1]*m.covariance[p1,p2]*dfdp[p2]
+                var = tolerance2 * var
                 result = (fun(pt), sqrt(var))
             except KeyError:
                 # we have neural net
@@ -882,6 +883,7 @@ class hotfixedBMK(BMK):
         """ hotfixed BKM Eq. (54) """
 
         return pt.in1polarization * self.SINTunpPP1(pt) * self.ImCCALINTunp(pt)
+
 
 class BM10ex(hotfixedBMK):
     """According to BM arXiv:1005.5209 [hep-ph] - exact formulas
@@ -3082,7 +3084,6 @@ class BM10ex(hotfixedBMK):
             raise ValueError('[%s] has neither azimuthal angle phi\
  nor harmonic FTn defined!' % pt)
 
-                    
     def _BTSA(self, pt, **kwargs):
         """Calculate beam-target spin asymmetry (BTSA)."""
 
@@ -3232,7 +3233,6 @@ class BM10(BM10ex):
             return res.imag
         else:
             return res.real
-    
 
     def CCALINTunpA(self, pt, im=0, eff=0):
         """ BM10 ... with 1/Q2 suppressed terms removed """
@@ -3255,7 +3255,6 @@ class BM10(BM10ex):
             return res.imag
         else:
             return res.real
-    
 
     def CCALINTLP(self, pt, im=0, eff=0):
         """ BM10 ... with 1/Q2 suppressed terms removed """
@@ -3282,7 +3281,6 @@ class BM10(BM10ex):
         else:
             return res.real
     
-
     def CCALINTLPV(self, pt, im=0, eff=0):
         """ BM10 ... with 1/Q2 suppressed terms removed """
     
@@ -3305,7 +3303,6 @@ class BM10(BM10ex):
         else:
             return res.real
     
-
     def CCALINTLPA(self, pt, im=0, eff=0):
         """ BM10 ... with 1/Q2 suppressed terms removed """
     

@@ -82,7 +82,7 @@ def _axband(ax, fun, pts, xaxis, **kwargs):
     up, down = np.array([(m+s, m-s) for m,s in res]).transpose()
     x = plt.concatenate( (xvals, xvals[::-1]) )
     y = plt.concatenate( (up, down[::-1]) )
-    ax.fill(x, y, alpha=0.5, **kwargs)
+    ax.fill(x, y, alpha=0.5,  **kwargs)
 
 def panel(ax, points=None, lines=None, bands=None, xaxis=None, xs=None, 
         kins={}, kinlabels=None, **kwargs):
@@ -146,7 +146,7 @@ def panel(ax, points=None, lines=None, bands=None, xaxis=None, xs=None,
         for line in lines:
             _axline(ax, lambda pt: line.predict(pt), points, xaxis=xaxis,
                     color=linecolors[linen], linestyle=linestyles[linen], 
-                    linewidth=2, **kwargs)
+                    linewidth=2, label=line.name, **kwargs)
             linen += 1
 
     if bands:
@@ -156,7 +156,7 @@ def panel(ax, points=None, lines=None, bands=None, xaxis=None, xs=None,
         for band in bands:
             for pts in points:
                 _axband(ax, lambda pt: band.predict(pt, error=True), pts, xaxis=xaxis,
-                        facecolor=bandcolors[bandn], **kwargs)
+                        facecolor=bandcolors[bandn], label=band.name, **kwargs)
             bandn += 1
 
     if kinlabels:
@@ -946,7 +946,7 @@ def CFF(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
     cffs    -- List of CFFs to be plotted. Each produces two panels.
 
     """
-    title = 'newCFFs'
+    title = ''
     fig = plt.figure()
     fig.canvas.set_window_title(title)
     fig.suptitle(title)
@@ -954,32 +954,41 @@ def CFF(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
     nncolors = ['blue', 'green']  # cold computer colors
     linestyles = ['solid', 'dashed']
     # Define abscissas
-    logxvals = np.power(10., np.arange(-3.0, -0.01, 0.1))  # left panel
-    xvals = np.linspace(0.025, 0.2, 20) # right panel
+    #logxvals = np.power(10., np.arange(-3.0, -0.001, 0.1))  # left panel
+    logxvals = np.logspace(-3.0, -0.01, 20)  # left panel
+    xvals = np.linspace(0.02, 0.15, 20) # right panel
     # ordinates 
-    ylims = {'ImH': (-3.3, 35), 'ReH': (-4.5, 8)}
+    ylims = {'ImH': (-4.3, 35), 'ReH': (-6.5, 8)}
     # Plot panels
     for n in range(len(cffs)):
         cff = cffs[n]
         # all-x logarithmic
         ax = fig.add_subplot(len(cffs), 2, 2*n+1)
         ax.set_xscale('log')  # x-axis to be logarithmic
-        panel(ax, xaxis='xi', xs=logxvals, kins={'yaxis':cff, 't':-0.2}, **kwargs)
-        ax.set_xlabel('$\\xi$', fontsize=15)
-        ax.set_ylabel('%s' % cff, fontsize=18)
+        panel(ax, xaxis='xi', xs=logxvals, kins={'yaxis':cff, 't':-0.2, 'Q2':4.}, **kwargs)
+        ax.set_xlabel(toTeX['xixB'], fontsize=15)
+        ax.set_ylabel(toTeX['%s' % cff], fontsize=18)
         ax.axhspan(-0.0005, 0.0005, facecolor='g', alpha=0.6)  # horizontal bar
-        ax.axvspan(0.03, 0.093, facecolor='g', alpha=0.1)  # vertical band
-        ax.text(0.03, -0.27, "data region", fontsize=14)
+        ax.axvspan(0.025, 0.136, facecolor='g', alpha=0.1)  # vertical band
+        ax.text(0.35, 0.95, "data region", transform=ax.transAxes, 
+                fontsize=14, fontweight='bold', va='top')
         apply(ax.set_ylim, ylims[cff])
         ax.set_xlim(0.005, 1.0)
+        if n == 0:
+            ax.legend(loc='upper right')
+            ax.legend().draw_frame(0)
+            ax.text(0.006, 0.5, "$t = -0.2\\, {\\rm GeV}^2$",# transform=ax.transAxes, 
+                    fontsize=15)
         # measured x linear
         ax = fig.add_subplot(len(cffs), 2, 2*n+2)
-        panel(ax, xaxis='xi', xs=xvals, kins={'yaxis':cff, 't':-0.2}, **kwargs)
+        panel(ax, xaxis='xi', xs=xvals, kins={'yaxis':cff, 't':-0.2,  'Q2':4.}, **kwargs)
         ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
-        ax.set_xlabel('$\\xi$', fontsize=15)
+        ax.set_xlabel(toTeX['xixB'], fontsize=15)
         apply(ax.set_ylim, ylims[cff])
-        ax.set_xlim(0.03, 0.093)
-        ax.text(0.03, -0.27, "data region only", fontsize=14)
+        ax.axvspan(0.025, 0.136, facecolor='g', alpha=0.1)  # vertical band
+        ax.set_xlim(0.02, 0.142)
+        ax.text(0.20, 0.95, "d   a   t   a       r   e   g   i   o   n", 
+                transform=ax.transAxes, fontsize=14, fontweight='bold', va='top')
         #ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.02))  # tickmarks
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
