@@ -11,7 +11,7 @@ alpha = 1./137.036  # inverse of fine structure constant
 # WolframAlpha: (hbar^2 c^2 / GeV^2)  in nanobarns
 GeV2nb = 389379.
 
-tolerance2 = 6.75  # sqrt(2*Npoints)/1.65^2 according to GJV/MRST
+tolerance2 = 1.0   # sqrt(2*Npoints)/1.65^2 according to GJV/MRST
 
 
 # Dictionary that maps variables to their LaTeX representation

@@ -8,7 +8,7 @@ import shelve, copy, sys
 import numpy as np
 import scipy.stats
 
-import Model, Approach, Fitter, Data, utils#, plots
+import Model, Approach, Fitter, Data, utils, plots
 from constants import Mp, Mp2
 
 from results import *
@@ -129,9 +129,9 @@ thHF.m.parameters.update(KM10)
 #tNN.name = 'NNtest'
 #tNN.description = 'x (xB,t)-11-2 nets trained on HERMES-like mock data for 200 batches'
 
-#tDR2 = db['DR2-H']
-#tDR3 = db['DR3-H']
-#tNN = db['NN-H']
+tDR2 = db['DR2-H']
+tDR3 = db['DR3-H']
+tNN = db['NN-H']
 
 ## [4] Do the fit
 #th.m.fix_parameters('ALL')
