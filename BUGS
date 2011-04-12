@@ -2,5 +2,8 @@
 
  - Kelly's neutron FFs differ from mma cca 1%
 
+ - It is not clear whose duty is to call fill_kinematics(), 
+    to_conventions() and prepare() !!
+
  + fixing and releasing parameters should be methods of Fitter,
    and not Model?

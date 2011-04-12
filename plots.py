@@ -627,6 +627,50 @@ def H1ZEUS(path=None, fmt='png', **kwargs):
         fig.show()
     return fig
 
+def COMPASSt(path=None, fmt='png', **kwargs):
+    """Makes plot of COMPASS BCS asymmetry in terms of t for various values of xB"""
+
+    title = ''#Prediction for COMPASS BCSA'
+    fig = plt.figure()
+    fig.canvas.set_window_title(title)
+    fig.suptitle(title)
+    kinpoints = [(0.007, 1.5), (0.014, 2.5), (0.024, 3.7), 
+                           (0.045, 3.0), (0.1, 3.0), (0.2, 4.4)]
+    pn = 1
+    ks = {'exptype' : 'fixed target'}
+    ks['in1particle'] = 'e'
+    ks['in1charge'] = 1
+    ks['in1energy'] = 160.
+    ks['in1polarization'] = -0.8
+    ks['s'] = 2 * Mp * ks['in1energy'] + Mp2
+    ks['phi'] = 3.141
+    ks['units'] = {'phi' : 'radian'}
+    ks['frame'] = 'BKM'
+    ks['yaxis'] = 'BCSA'
+    for xB, Q2 in kinpoints:
+        ax = fig.add_subplot(2,3,pn)
+        ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
+        #linestyles = ['r-', 'g--', 'b-.', 'p:']
+        #labels = ['HERMES+CLAS', 'HERMES+CLAS+HALLA', '+HALLA(phi)']
+        tms = np.arange(0.05, 0.6, 0.02)
+        ks.update({'xB':xB, 'Q2':Q2})
+        panel(ax, xaxis='tm', xs=tms, kins=ks, **kwargs)
+        ax.set_xlim(0.0, 0.8)
+        ax.set_ylim(-0.1, 0.4)
+        # axes labels
+        ax.set_xlabel('$-t$')
+        ax.text(0.03, 0.35, "%s = %s" % (toTeX['xB'], xB))
+        ax.text(0.03, 0.3, "%s = %s" % (toTeX['Q2'], Q2))
+        pn += 1
+    #ax.set_ylabel('BCS Asymmetry')
+    #ax.legend()
+    if path:
+        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+    else:
+        fig.canvas.draw()
+        fig.show()
+    return fig
+
 ### FIXME: Following plots are done without using panel(), so they cannot plot bands
 
 def COMPASS(lines=[], xB=0.05, Q2=2, path=None, fmt='png', numbers=False):
@@ -725,8 +769,63 @@ def COMPASS(lines=[], xB=0.05, Q2=2, path=None, fmt='png', numbers=False):
         fig.canvas.draw()
         fig.show()
     return fig
-
 def COMPASSt(lines=[], path=None, fmt='png'):
+    """Makes plot of COMPASS BCS asymmetry in terms of t for various values of xB"""
+
+    title = 'Prediction for COMPASS BCSA'
+    fig = plt.figure()
+    fig.canvas.set_window_title(title)
+    fig.suptitle(title)
+    kinpoints = [(0.007, 1.5), (0.014, 2.5), (0.024, 3.7), 
+                           (0.045, 3.0), (0.1, 3.0), (0.2, 4.4)]
+    panel = 1
+    for xB, Q2 in kinpoints:
+        ax = fig.add_subplot(2,3,panel)
+        ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
+        linestyles = ['r-', 'g--', 'b-.', 'p:']
+        labels = ['HERMES+CLAS', 'HERMES+CLAS+HALLA', '+HALLA(phi)']
+        pn = 0
+        for approach in lines:
+            line = []
+            tmvals = []
+            for tm in np.arange(0.05, 0.6, 0.02):
+                tmvals.append(tm)
+                pt = Data.DummyPoint()
+                pt.exptype = 'fixed target'
+                pt.in1particle = 'e'
+                pt.in1charge = 1
+                pt.in1energy = 160.
+                pt.in1polarization = -0.8
+                pt.s = 2 * Mp * pt.in1energy + Mp2
+                pt.xB = xB
+                pt.Q2 = Q2
+                pt.phi = 0.
+                pt.units = {'phi' : 'radian'}
+                pt.frame = 'Trento'
+                pt.tm = tm
+                utils.fill_kinematics(pt)
+                approach.__class__.to_conventions(pt)
+                approach.__class__.prepare(pt)
+                line.append(approach.BCSA(pt))
+            ax.plot(tmvals, line, linestyles[pn], linewidth=2, 
+                    label=labels[pn]) 
+            pn += 1
+        ax.set_xlim(0.0, 0.8)
+        ax.set_ylim(-0.1, 0.4)
+        # axes labels
+        ax.set_xlabel('$-t$')
+        ax.text(0.03, 0.35, "%s = %s" % (toTeX['xB'], xB))
+        ax.text(0.03, 0.3, "%s = %s" % (toTeX['Q2'], Q2))
+        panel += 1
+    #ax.set_ylabel('BCS Asymmetry')
+    #ax.legend()
+    if path:
+        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+    else:
+        fig.canvas.draw()
+        fig.show()
+    return fig
+def COMPASStOLD(lines=[], path=None, fmt='png'):
     """Makes plot of COMPASS BCS asymmetry in terms of t for various values of xB"""
 
     title = 'Prediction for COMPASS BCSA'
