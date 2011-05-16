@@ -7,29 +7,30 @@ C    $Id$
 C     *******
 
 
-C     ****s* dvem.F/MC
+C     ****s* dvem.F/MCQ
 C  NAME
-C     MC       --  "big C" Wilson coefficient for DVEM
+C     MCQ       --  "big C" Wilson coefficient for DVEM - quark contribution
 C  DESCRIPTION
 C    calculates Wilson coefficients for  ...
 C  SYNOPSIS
 
-      DOUBLE COMPLEX FUNCTION MC (J, K)
+      DOUBLE COMPLEX FUNCTION MCQ (J, K)
 
       IMPLICIT NONE
-      DOUBLE COMPLEX J, K
-      INTEGER PJ, PK, TWO
+      DOUBLE COMPLEX J, K, JAUX
+      INTEGER PJ, PK, PJAUX, TWO
 
 C  SOURCE
 C
 
       DOUBLE COMPLEX MCMUFQ1F, MCMURQ1F, MCBETQ1F, MCFQ1F, MCGAQ1F
-      DOUBLE COMPLEX MCGBIAQ1F, MCGBIBQ1F, MCGBIIQ1F
+      DOUBLE COMPLEX MCGBIAQ1F, MCGBIBQ1F, MCGBIIQ1F, MCSINGQ1F
+      DOUBLE COMPLEX MCG1F
       DOUBLE COMPLEX NCONF, NLNCONF, FINT
       DOUBLE PRECISION LRGPDF2, LRDAF2, LRR2
       DOUBLE COMPLEX HS1, HS2, HS3, HSM1, HSM2, HSM3, HS1M2
       EXTERNAL HS1, HS2, HS3, HSM1, HSM2, HSM3, HS1M2
-      INTEGER PTY
+      INTEGER PTY, LI
       EXTERNAL PTY, NCONF, NLNCONF, FINT
       PARAMETER (TWO=2)
 #include "header.F"
@@ -60,27 +61,55 @@ C     J = N(1, K) - 1
 
 <* MCGAQ1Fexpr *>
 
+*     PRINT *, 'MCMUFQ1F = ', MCMUFQ1F
+*     PRINT *, 'MCMURQ1F = ', MCMURQ1F
+*     PRINT *, 'MCBETQ1F = ', MCBETQ1F
+*     PRINT *, 'MCFQ1F = ', MCFQ1F
+*     PRINT *, 'MCGAQ1F = ', MCGAQ1F
+
+      MCQ = MCMUFQ1F + MCMURQ1F + MCBETQ1F + MCFQ1F + MCGAQ1F
+
+      DO 10 LI=1,2
+      IF (LI .EQ. 2) THEN
+          PJAUX = PJ
+          JAUX =J
+          PJ = PK
+          J = K
+          PK = PJAUX
+          K = JAUX
+      END IF
+
 <* MCGBIAQ1Fexpr *>
+
+      MCQ = MCQ + MCGBIAQ1F 
 
 <* MCGBIBQ1Fexpr *>
 
+      MCQ = MCQ + MCGBIBQ1F 
+
 <* MCGBIIQ1Fexpr *>
 
-      PRINT *, 'MCMUFQ1F = ', MCMUFQ1F
-      PRINT *, 'MCMURQ1F = ', MCMURQ1F
-      PRINT *, 'MCBETQ1F = ', MCBETQ1F
-      PRINT *, 'MCFQ1F = ', MCFQ1F
-      PRINT *, 'MCGAQ1F = ', MCGAQ1F
-      PRINT *, 'MCGBIAQ1F = ', MCGBIAQ1F
-      PRINT *, 'MCGB1BQ1F = ', MCGBIBQ1F
-      PRINT *, 'MCGBIIQ1F = ', MCGBIIQ1F
+      MCQ = MCQ + MCGBIIQ1F
 
-      MC = MCMUFQ1F + MCMURQ1F + MCBETQ1F + MCFQ1F + MCGAQ1F
-     &  + MCGBIAQ1F + MCGBIBQ1F + MCGBIIQ1F
+*     PRINT *, 'LI, MCGBIAQ1F = ', LI,  MCGBIAQ1F
+*     PRINT *, 'LI, MCGB1BQ1F = ', LI,  MCGBIBQ1F
+*     PRINT *, 'LI, MCGBIIQ1F = ', LI,  MCGBIIQ1F
+
+ 10   CONTINUE
+
+<* MCSINGQ1Fexpr *>
+
+      PRINT *, ' MCSINGQ1F = ',  MCSINGQ1F
+
+<* MCG1Fexpr *>
+
+      PRINT *, ' MCG1F = ',  MCG1F
 
       RETURN
       END
 C     *******
+
+
 
       INTEGER FUNCTION PTY(K)
        
@@ -98,7 +127,7 @@ C     *******
       DOUBLE COMPLEX J, CLNGAMMA
       EXTERNAL CLNGAMMA
 
-      WRITE (*,*) 'MU,NINT(MU) = ', MU, NINT(MU)
+*     WRITE (*,*) 'MU,NINT(2*MU) = ', MU, NINT(2*MU)
       IF (NINT(2*MU) .EQ. 1) THEN
         NLNCONF = 1.0d0/(2.0d0 + J)
       ELSE IF (NINT(2*MU) .EQ. 3) THEN
@@ -109,7 +138,7 @@ C     *******
         NLNCONF = 1.0d0
       END IF
       
-      WRITE (*,*) 'NLNCONF = ', NLNCONF
+*     WRITE (*,*) 'MU, J, NLNCONF = ', MU, J, NLNCONF
       RETURN
       END
 
@@ -120,8 +149,7 @@ C     *******
 
       NCONF =  CLNGAMMA(K+2.0d0) - CLNGAMMA(2.0d0*K + 4.0d0) +
      &         CLNGAMMA(K + 1.5d0 + NU) 
-      WRITE (*,*) 'NCONF = ', NCONF
       NCONF = EXP(NCONF)
-      WRITE (*,*) 'NCONF = ', NCONF
+*     WRITE (*,*) 'NU, K, NCONF = ', NU, K, NCONF
       RETURN
       END
