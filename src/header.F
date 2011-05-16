@@ -114,11 +114,35 @@ C     ****v* header.F/RF2
 C  DESCRIPTION
 C        RF2 --  $ {\cal Q}^2/{\mu_{f}^2}$ i.e. ratio
 C               of photon virtuality and factorization scales squared
+C               (for DVCS)
 C  MEMBER OF
 C     PARFLT
 C  SYNOPSIS
       DOUBLE PRECISION RF2
 C     ***
+
+C     ****v* header.F/RGPDF2
+C  DESCRIPTION
+C        RGPDF2 --  $ {\cal Q}^2/{\mu_{f,GPD}^2}$ i.e. ratio
+C               of photon virtuality and GPD factorization scales squared
+C               (for DVEM)
+C  MEMBER OF
+C     PARFLT
+C  SYNOPSIS
+      DOUBLE PRECISION RGPDF2
+C     ***
+
+C     ****v* header.F/RDAF2
+C  DESCRIPTION
+C        RDAF2 --  $ {\cal Q}^2/{\mu_{f,DA}^2}$ i.e. ratio
+C               of photon virtuality and DA factorization scales squared
+C               (for DVEM)
+C  MEMBER OF
+C     PARFLT
+C  SYNOPSIS
+      DOUBLE PRECISION RDAF2
+C     ***
+
 
 C     ****v* header.F/RR2
 C  DESCRIPTION
@@ -423,10 +447,14 @@ C     ***
 
 *   4. Other
 
-      DOUBLE PRECISION PI, PIHALF, CF, CA, TF, MP2
+      DOUBLE PRECISION PI, PIHALF, CF, CA, CG, TF, MP2
+      DOUBLE PRECISION EMC, ZETA2, ZETA3, ZETA4
+      PARAMETER ( EMC  = 0.57721 56649D0, ZETA2 = 1.64493 40668D0,
+     ,            ZETA3 = 1.20205 69032D0, ZETA4 = 1.08232 32337D0 )
       PARAMETER ( PI = 3.1415 92653 58979 D0 )
       PARAMETER ( PIHALF = 1.5707 963267 948966 D0 )
       PARAMETER ( CF = 4.0d0 / 3.0d0, CA = 3.0d0, TF = 0.5d0 )
+      PARAMETER ( CG = -1.0d0 / 6.0d0 )
       PARAMETER ( MP2 = 0.880354d0 )
       DOUBLE COMPLEX TWOPII
       PARAMETER ( TWOPII = (0.0d0, 6.2831 853071 795865 D0) )
@@ -703,7 +731,7 @@ C     ****c* header.F/PARFLT
 C  DESCRIPTION
 C     Floating point parameters
 C  SYNOPSIS
-      COMMON / PARFLT /  Q02, RF2, RR2, CHARGEFAC
+      COMMON / PARFLT /  Q02, RF2, RGPDF2, RDAF2, RR2, CHARGEFAC
 C     ***
 
 C     ****c* header.F/MBCONT

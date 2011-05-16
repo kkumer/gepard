@@ -1,0 +1,6 @@
+{
+ 'integer':{'KIND(1)':'int'},
+ 'real':{'KIND(1.0D0)':'double'},
+ 'complex':{'KIND(1.0D0)':'complex_double'},
+}
+

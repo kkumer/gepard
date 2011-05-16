@@ -54,6 +54,7 @@
 
 * =================================================================av==
 
+
        DOUBLE COMPLEX FUNCTION HS4 (Z)
 *
        DOUBLE COMPLEX Z, DPSI
@@ -68,6 +69,125 @@
        RETURN
        END
 
+* =================================================================kk==
+
+       DOUBLE COMPLEX FUNCTION HSM1 (Z, K)
+*
+      IMPLICIT NONE
+       INTEGER K
+       DOUBLE COMPLEX Z, PSI
+       DOUBLE PRECISION EMC, LOG2
+       PARAMETER ( EMC  = 0.57721 56649D0, LOG2 = 0.69314 718056D0)
+*
+       
+        HSM1 = - LOG2 + 0.5d0 * (1-2*MOD(K,2)) * ( PSI((Z+2.0d0)/2.0d0)
+     &    -PSI((Z+1.d0)/2.0d0) )
+
+       RETURN
+       END
+
+* =================================================================kk==
+
+       DOUBLE COMPLEX FUNCTION HSM2 (Z, K)
+*
+      IMPLICIT NONE
+       INTEGER K
+       DOUBLE COMPLEX Z, DPSI
+       DOUBLE PRECISION EMC, ZETA2, ZETA3, ZETA4
+       PARAMETER ( EMC  = 0.57721 56649D0, ZETA2 = 1.64493 40668D0,
+     ,            ZETA3 = 1.20205 69032D0, ZETA4 = 1.08232 32337D0 )
+*
+       
+        HSM2 = - ZETA2/2.0d0 + 0.25d0 * (1-2*MOD(K+1,2)) * ( 
+     &        DPSI((Z+2.0d0)/2.0d0, 1) - DPSI((Z+1.d0)/2.0d0, 1) )
+              
+
+       RETURN
+       END
+
+* =================================================================kk==
+
+       DOUBLE COMPLEX FUNCTION HSM3 (Z, K)
+*
+      IMPLICIT NONE
+       INTEGER K
+       DOUBLE COMPLEX Z, DPSI
+       DOUBLE PRECISION EMC, ZETA2, ZETA3, ZETA4
+       PARAMETER ( EMC  = 0.57721 56649D0, ZETA2 = 1.64493 40668D0,
+     ,            ZETA3 = 1.20205 69032D0, ZETA4 = 1.08232 32337D0 )
+*
+       
+        HSM3 = - 0.75d0*ZETA3 + (1-2*MOD(K,2)) * ( 
+     &    DPSI((Z+2.0d0)/2.0d0, 2) - DPSI((Z+1.d0)/2.0d0, 2) )/16.0d0
+              
+
+       RETURN
+       END
+
+* =================================================================kk==
+
+      DOUBLE COMPLEX FUNCTION MDILOG (J)
+
+*      Approximate Mellin moment x^J of dilog(x)/(1+x) 
+*      (about 1e-3 accuracy)
+
+      IMPLICIT NONE
+      DOUBLE COMPLEX J
+      INTEGER I, IMAX
+      PARAMETER (IMAX=5)
+      DOUBLE PRECISION COEF(IMAX)
+       
+*     coefs of odd powers of x
+*     dilog(x)/(1+x) = c1*x + c2*x^3 + ... + ck*x^(2*k-1)
+      DATA (COEF(I), I = 1, IMAX)
+     & /  0.9191873351383635 D0, -1.1104046996355397 D0,
+     &    2.895284481438232 D0, - 3.5219362238384186 D0,
+     &    1.640336140321476 D0 /
+*
+       MDILOG = 0.0d0
+       DO 10 I = 1, IMAX
+ 10      MDILOG = MDILOG + COEF(I)/(J + 2*I)
+
+       RETURN
+       END
+
+* =================================================================kk==
+
+       DOUBLE COMPLEX FUNCTION HSM21 (Z, K)
+*
+       IMPLICIT NONE
+       INTEGER K
+       DOUBLE COMPLEX Z, MDILOG, HSM1
+       DOUBLE PRECISION EMC, ZETA2, ZETA3, LOG2
+       EXTERNAL HSM1, MDILOG
+       PARAMETER ( EMC  = 0.57721 56649D0, ZETA2 = 1.64493 40668D0,
+     ,            ZETA3 = 1.20205 69032D0, LOG2 = 0.69314 718056D0 )
+*
+
+        HSM21 = ZETA2*HSM1(Z,K) - 5.0d0*ZETA3/8.0d0 + ZETA2*LOG2
+     &     + (1-2*MOD(K+1,2)) * MDILOG(Z)
+              
+
+       RETURN
+       END
+
+* =================================================================kk==
+
+       DOUBLE COMPLEX FUNCTION HS1M2 (Z, K)
+*
+       INTEGER K
+       DOUBLE COMPLEX Z, HSM21, HSM2, HSM3, HS1
+       EXTERNAL HSM21, HSM2, HSM3, HS1
+*
+
+       HS1M2 = - HSM21(Z, K) + HSM2(Z, K) * HS1(Z) + HSM3(Z, K)
+
+       RETURN
+       END
+
+
+
+* =================================================================av==
 *
 * =====================================================================
 * ..The complex psi function,  PZI(Z),  and its m'th derivatives, 
