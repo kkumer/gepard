@@ -4,7 +4,7 @@
 (*     ==============================    *)
 
 
-Print["GeParD - Mathematica interface (2010-06-23)"];
+Print["GeParD - Mathematica interface (2011-01-21)"];
 
 If[$VersionNumber<5.999,  (* Mathematica 5.*)
 BeginPackage["gepard`", "Format`", "NumericalMath`NLimit`", "Graphics`Graphics`",
@@ -98,6 +98,20 @@ GPD H(x, eta=x, t, Q2).  Options are same as for GepardInit."
 gpdHzeroG::usage = "gpdHzeroG[x, t, Q2, Q02, opts] returns singlet gluon
 GPD H(x, eta=0, t, Q2).  Options are same as for GepardInit. Don't use
 it for nl-PW model because it's wrong there. Use GPDzero function."
+
+cffHtrajQ::usage = "cffHtrajQ[x, t, Q2, Q02, opts] returns singlet \"quarkonic 
+CFF\" calHq(x, eta=x, t, Q2).  Options are same as for GepardInit."
+
+cffHzeroQ::usage = "cffHzeroQ[x, t, Q2, Q02, opts] returns singlet \"quarkonic
+CFF\" calHq(x, eta=0, t, Q2).  Options are same as for GepardInit. Don't use
+it for nl-PW model because it's wrong there."
+
+cffHtrajG::usage = "cffHtrajG[x, t, Q2, Q02, opts] returns \"gluonic CFF\" 
+calHg(x, eta=x, t, Q2).  Options are same as for GepardInit."
+
+cffHzeroG::usage = "cffHzeroG[x, t, Q2, Q02, opts] returns \"gluonic CFF\" 
+calHg(x, eta=0, t, Q2).  Options are same as for GepardInit. Don't use
+it for nl-PW model because it's wrong there."
 
 PDF::usage = "PDF[{val1, val2, ...}, t, xi] is a function that is contacted by MathLink Minuit
 interface and should give PDF's for .... "
@@ -262,6 +276,24 @@ gpdHtrajQ[(x_)?NumericQ, (t_)?NumericQ, (q2_)?NumericQ, (q02_)?NumericQ, (opts__
 gpdHtrajG[(x_)?NumericQ, (t_)?NumericQ, (q2_)?NumericQ, (q02_)?NumericQ, (opts___)?OptionQ] := Im[
  x cffHInternal @@ ( {x, t, q2, q02, SPEED, P, PROCESS, SCHEME, ANSATZ} 
     /. PROCESS->"DVCSTG" /. {opts} /. Options[cffH] ) ] / Pi
+
+(* Same as above, but gives CFFs *)
+
+cffHzeroQ[(x_)?NumericQ, (t_)?NumericQ, (q2_)?NumericQ, (q02_)?NumericQ, (opts___)?OptionQ] := 
+  cffHInternal @@ ( {x, t, q2, q02, SPEED, P, PROCESS, SCHEME, ANSATZ} 
+    /. PROCESS->"DVCSZQ" /. {opts} /. Options[cffH] ) 
+
+cffHzeroG[(x_)?NumericQ, (t_)?NumericQ, (q2_)?NumericQ, (q02_)?NumericQ, (opts___)?OptionQ] := 
+ x cffHInternal @@ ( {x, t, q2, q02, SPEED, P, PROCESS, SCHEME, ANSATZ} 
+    /. PROCESS->"DVCSZG" /. {opts} /. Options[cffH] )
+
+cffHtrajQ[(x_)?NumericQ, (t_)?NumericQ, (q2_)?NumericQ, (q02_)?NumericQ, (opts___)?OptionQ] :=
+  cffHInternal @@ ( {x, t, q2, q02, SPEED, P, PROCESS, SCHEME, ANSATZ} 
+    /. PROCESS->"DVCSTQ" /. {opts} /. Options[cffH] )
+
+cffHtrajG[(x_)?NumericQ, (t_)?NumericQ, (q2_)?NumericQ, (q02_)?NumericQ, (opts___)?OptionQ] := 
+ x cffHInternal @@ ( {x, t, q2, q02, SPEED, P, PROCESS, SCHEME, ANSATZ} 
+    /. PROCESS->"DVCSTG" /. {opts} /. Options[cffH] )
 
 SaveParameters[] := Block[{},
 Parameters = Map[{#[[1]], #[[2]], 
