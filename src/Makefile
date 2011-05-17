@@ -40,6 +40,9 @@ _FOBJS = $(patsubst %,$(FODIR)/%,$(FOBJS))
 # rule for compiling Fortran .F  files
 # (prefix "F" in "F%.o" is used to avoid possible future clashes with
 #  C-wrappers with the same name)
+$(FODIR)/Fhyp2F1.o: hyp2F1.f90
+	$(FC) -c -o $@ $< $(FFLAGS) $(CPPFLAGS)
+
 $(FODIR)/F%.o: %.F  header.F
 	$(FC) -c -o $@ $< $(FFLAGS) $(CPPFLAGS)
 
@@ -57,6 +60,9 @@ export ALLOBJS = $(_OBJS) $(_ADACFOBJS) $(_FOBJS)
 # Mathlink C object files
 MMAOBJS = fit.tm.o fit.o 
 _MMAOBJS = $(patsubst %,$(MMAODIR)/%,$(MMAOBJS))
+
+MMAINTOBJS = int2F1.tm.o int2F1.o 
+_MMAINTOBJS = $(patsubst %,$(MMAODIR)/%,$(MMAINTOBJS))
 
 # rules for compiling MathLink C files
 $(MMAODIR)/%.tm.c: %.tm
@@ -102,6 +108,9 @@ gepard.exe: CPPFLAGS += -DMMA  $(USEPGPLOT)
 gepard.exe: $(ALLOBJS) $(FODIR)/Ffcn.o $(_MMAOBJS)  $(FODIR)/Fmninterface.o
 	$(FC) -o ../fits/$@/$(SYS)/$@ $^ $(FFLAGS) $(CERNLIBS) -L$(MLLIBDIR) -l$(MLLIB) $(ALLPGPLOTLIBS) $(MLEXTRA)
 
+int2f1.exe: $(FODIR)/Fhyp2F1.o $(FODIR)/Fgauss.o $(FODIR)/Fintegra.o  $(FODIR)/Fint2F1F.o $(_MMAINTOBJS)
+	$(FC) -o ../fits/$@/$(SYS)/$@ $^ $(FFLAGS)  -L$(MLLIBDIR) -l$(MLLIB)  $(MLEXTRA)
+
 # pygepard target
 
 pygepard.so: $(_FPREPS)
@@ -126,3 +135,4 @@ clean:
 	-rm -f $(patsubst %,../ex/%,$(EXTARGETS))
 	-rm -f $(patsubst %,../ex/%.exe,$(EXTARGETS))
 	-rm -f ../fits/gepard.exe/$(SYS)/gepard.exe
+	-rm -f ../fits/int2f1.exe/$(SYS)/int2f1.exe
