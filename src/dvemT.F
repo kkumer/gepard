@@ -14,17 +14,23 @@ C  DESCRIPTION
 C    calculates Wilson coefficients for  ...
 C  SYNOPSIS
 
-      DOUBLE COMPLEX FUNCTION MCQ (J, K)
+      SUBROUTINE CDVEM (J, K, MC, MCU)
+
+!f2py complex(8) intent(in) :: J, K
+!f2py complex(8) intent(out) :: MC, MCU
 
       IMPLICIT NONE
-      DOUBLE COMPLEX J, K, JAUX
+      DOUBLE COMPLEX MC(3), MCU(3), MCQ, J, K, JAUX, CLNGAMMA
+      DOUBLE COMPLEX NQNORM, NQBNORM, NGNORM
       INTEGER PJ, PK, PJAUX, TWO
+      EXTERNAL CLNGAMMA
 
 C  SOURCE
 C
 
       DOUBLE COMPLEX MCMUFQ1F, MCMURQ1F, MCBETQ1F, MCFQ1F, MCGAQ1F
-      DOUBLE COMPLEX MCGBIAQ1F, MCGBIBQ1F, MCGBIIQ1F, MCSINGQ1F
+      DOUBLE COMPLEX MCBMUFQ1F, MCBAQ1F, MCBBQ1F
+      DOUBLE COMPLEX MCGBIAQ1F, MCGBIBQ1F, MCGBIIQ1F
       DOUBLE COMPLEX MCG1F
       DOUBLE COMPLEX NCONF, NLNCONF, FINT
       DOUBLE PRECISION LRGPDF2, LRDAF2, LRR2
@@ -49,7 +55,20 @@ C     J = N(1, K) - 1
       LRDAF2 = LOG(RDAF2)
       LRR2 = LOG(RR2)
 
+      NQNORM=(0.5641895835477563*2.**(3.+J)*CF*(3.+2.*K)*
+     &  (-1.+PTY(PJ+PK))*PTY(PJ+PK))/((1.+K)*(2.+K)) *
+     &  EXP(CLNGAMMA(J+2.5d0) - CLNGAMMA(J+3.0d0))
+
+      NQBNORM=(0.5641895835477563*2.**(5.+J)*(3.+2.*K))/((1.+K)*(2.+K))*
+     &  EXP(CLNGAMMA(J+2.5d0) - CLNGAMMA(J+3.0d0))
+
+      NGNORM=(0.5641895835477563*2.**(5.+J)*(3.+2.*K))/((
+     &  3.+J)*(1.+K)*(2.+K))*
+     &  EXP(CLNGAMMA(J+2.5d0) - CLNGAMMA(J+3.0d0))
+
 *  Spliced from Mathematica:
+
+*  ... quark part
 
 <* MCMUFQ1Fexpr *>
 
@@ -71,6 +90,7 @@ C     J = N(1, K) - 1
 
       DO 10 LI=1,2
       IF (LI .EQ. 2) THEN
+*      J <--> K
           PJAUX = PJ
           JAUX =J
           PJ = PK
@@ -96,14 +116,47 @@ C     J = N(1, K) - 1
 *     PRINT *, 'LI, MCGBIIQ1F = ', LI,  MCGBIIQ1F
 
  10   CONTINUE
+ 
+*     PRINT *, ' NQNORM = ',  NQNORM
+*     PRINT *, ' unnorm Q = ',  MCQ
+*     change J and K back to their values
+        PJAUX = PJ
+        JAUX =J
+        PJ = PK
+        J = K
+        PK = PJAUX
+        K = JAUX
 
-<* MCSINGQ1Fexpr *>
+C  ... quark part starting at NLO
 
-      PRINT *, ' MCSINGQ1F = ',  MCSINGQ1F
+<* MCBMUFQ1Fexpr *>
+
+<* MCBAQ1Fexpr *>
+
+<* MCBBQ1Fexpr *>
+
+*     PRINT *, ' MCBMUFQ1F = ',  MCBMUFQ1F
+*     PRINT *, ' MCBAQ1F = ',  MCBAQ1F
+*     PRINT *, ' MCBBQ1F = ',  MCBBQ1F
+
+*     PRINT *, ' NQBNORM = ',  NQBNORM
+*     PRINT *, ' unnorm NLO QUARK = ',  (MCBMUFQ1F+MCBAQ1F+MCBBQ1F)
+*     PRINT *, ' NLO QUARK = ',  NQBNORM * (MCBMUFQ1F+MCBAQ1F+MCBBQ1F)
+
+C   ... gluon part
 
 <* MCG1Fexpr *>
 
-      PRINT *, ' MCG1F = ',  MCG1F
+*     PRINT *, ' NGNORM = ',  NGNORM
+*     PRINT *, ' unnorm G = ',  MCG1F
+
+      MCU(1) = MCQ
+      MCU(2) = (MCBMUFQ1F+MCBAQ1F+MCBBQ1F)
+      MCU(3) = MCG1F
+
+      MC(1) = NQNORM * MCU(1)
+      MC(2) = NQBNORM * MCU(2)
+      MC(3) = NGNORM * MCU(3)
 
       RETURN
       END
