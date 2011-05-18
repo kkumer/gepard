@@ -1,27 +1,29 @@
 C     ****h* gepard/dvem.F
 C  FILE DESCRIPTION
-C    calculation of  Wilson coefficients for DVEM in MSbar scheme
+C    calculation of NLO Wilson coefficients for DVEM 
 C    according to DVEM-notes.pdf
 C
 C    $Id$
 C     *******
 
 
-C     ****s* dvem.F/MCQ
+C     ****s* dvem.F/CDVEMF
 C  NAME
-C     MCQ       --  "big C" Wilson coefficient for DVEM - quark contribution
+C     CDVEMF  --  "big C" NLO Wilson coefficient for DVEM
 C  DESCRIPTION
-C    calculates Wilson coefficients for  ...
+C    calculates (unnormalized) Wilson coefficients for DVEM
+C    i.e. they are normalized w.r.t. LO C=1.
+C    OUTPUT MCU(K) K=1,2,3 for quark, pure singlet quark and gluon contrib
 C  SYNOPSIS
 
-      SUBROUTINE CDVEM (J, K, MC, MCU)
+      SUBROUTINE CDVEMF (J, K, MCU)
 
 !f2py complex(8) intent(in) :: J, K
-!f2py complex(8) intent(out) :: MC, MCU
+!f2py complex(8) intent(out) :: MCU
 
       IMPLICIT NONE
-      DOUBLE COMPLEX MC(3), MCU(3), MCQ, J, K, JAUX, CLNGAMMA
-      DOUBLE COMPLEX NQNORM, NQBNORM, NGNORM
+      DOUBLE COMPLEX MCU(3), MCQ, J, K, JAUX, CLNGAMMA
+*     DOUBLE COMPLEX NQNORM, NQBNORM, NGNORM
       INTEGER PJ, PK, PJAUX, TWO
       EXTERNAL CLNGAMMA
 
@@ -55,16 +57,16 @@ C     J = N(1, K) - 1
       LRDAF2 = LOG(RDAF2)
       LRR2 = LOG(RR2)
 
-      NQNORM=(0.5641895835477563*2.**(3.+J)*CF*(3.+2.*K)*
-     &  (-1.+PTY(PJ+PK))*PTY(PJ+PK))/((1.+K)*(2.+K)) *
-     &  EXP(CLNGAMMA(J+2.5d0) - CLNGAMMA(J+3.0d0))
-
-      NQBNORM=(0.5641895835477563*2.**(5.+J)*(3.+2.*K))/((1.+K)*(2.+K))*
-     &  EXP(CLNGAMMA(J+2.5d0) - CLNGAMMA(J+3.0d0))
-
-      NGNORM=(0.5641895835477563*2.**(5.+J)*(3.+2.*K))/((
-     &  3.+J)*(1.+K)*(2.+K))*
-     &  EXP(CLNGAMMA(J+2.5d0) - CLNGAMMA(J+3.0d0))
+*      NQNORM=(0.5641895835477563*2.**(3.+J)*CF*(3.+2.*K)*
+*     &  (-1.+PTY(PJ+PK))*PTY(PJ+PK))/((1.+K)*(2.+K)) *
+*     &  EXP(CLNGAMMA(J+2.5d0) - CLNGAMMA(J+3.0d0))
+*
+*      NQBNORM=(0.5641895835477563*2.**(5.+J)*(3.+2.*K))/((1.+K)*(2.+K))*
+*     &  EXP(CLNGAMMA(J+2.5d0) - CLNGAMMA(J+3.0d0))
+*
+*      NGNORM=(0.5641895835477563*2.**(5.+J)*(3.+2.*K))/((
+*     &  3.+J)*(1.+K)*(2.+K))*
+*     &  EXP(CLNGAMMA(J+2.5d0) - CLNGAMMA(J+3.0d0))
 
 *  Spliced from Mathematica:
 
@@ -154,9 +156,9 @@ C   ... gluon part
       MCU(2) = (MCBMUFQ1F+MCBAQ1F+MCBBQ1F)
       MCU(3) = MCG1F
 
-      MC(1) = NQNORM * MCU(1)
-      MC(2) = NQBNORM * MCU(2)
-      MC(3) = NGNORM * MCU(3)
+*     MC(1) = NQNORM * MCU(1)
+*     MC(2) = NQBNORM * MCU(2)
+*     MC(3) = NGNORM * MCU(3)
 
       RETURN
       END

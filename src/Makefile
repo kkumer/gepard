@@ -61,8 +61,8 @@ export ALLOBJS = $(_OBJS) $(_ADACFOBJS) $(_FOBJS)
 MMAOBJS = fit.tm.o fit.o 
 _MMAOBJS = $(patsubst %,$(MMAODIR)/%,$(MMAOBJS))
 
-MMAINTOBJS = int2F1.tm.o int2F1.o 
-_MMAINTOBJS = $(patsubst %,$(MMAODIR)/%,$(MMAINTOBJS))
+MMADVEMOBJS = cdvem.tm.o cdvem.o int2F1.tm.o int2F1.o 
+_MMADVEMOBJS = $(patsubst %,$(MMAODIR)/%,$(MMADVEMOBJS))
 
 # rules for compiling MathLink C files
 $(MMAODIR)/%.tm.c: %.tm
@@ -108,9 +108,14 @@ gepard.exe: CPPFLAGS += -DMMA  $(USEPGPLOT)
 gepard.exe: $(ALLOBJS) $(FODIR)/Ffcn.o $(_MMAOBJS)  $(FODIR)/Fmninterface.o
 	$(FC) -o ../fits/$@/$(SYS)/$@ $^ $(FFLAGS) $(CERNLIBS) -L$(MLLIBDIR) -l$(MLLIB) $(ALLPGPLOTLIBS) $(MLEXTRA)
 
-int2f1.exe: $(FODIR)/Fhyp2F1.o $(FODIR)/Fgauss.o $(FODIR)/Fintegra.o  $(FODIR)/Fint2F1F.o $(_MMAINTOBJS)
+int2f1.exe: $(FODIR)/Fhyp2F1.o $(FODIR)/Fgauss.o $(FODIR)/Fintegra.o  \
+             $(FODIR)/Fint2F1F.o $(_MMADVEMOBJS)
 	$(FC) -o ../fits/$@/$(SYS)/$@ $^ $(FFLAGS)  -L$(MLLIBDIR) -l$(MLLIB)  $(MLEXTRA)
 
+# cdvem.F beta.F int2F1.F  special.F adacf/Harmonic.f
+dvem.exe: $(FODIR)/Fhyp2F1.o $(FODIR)/Fgauss.o $(FODIR)/Fintegra.o  \
+        $(FODIR)/Fint2F1F.o $(_MMADVEMOBJS)
+	$(FC) -o ../fits/$@/$(SYS)/$@ $^ $(FFLAGS)  -L$(MLLIBDIR) -l$(MLLIB)  $(MLEXTRA)
 # pygepard target
 
 pygepard.so: $(_FPREPS)

@@ -1,9 +1,26 @@
 
+*  Just a wrapper for subroutine below. Subroutine is
+*   used for direct ML call, and function from cdvem.F
+
       DOUBLE COMPLEX FUNCTION FINT(MU, J, NU, K, IND)
 
       IMPLICIT NONE
-      REAL MU, NU, IND
+      REAL MU, NU, IND, ACC
       DOUBLE COMPLEX J, K
+
+      ACC = 4.
+      CALL INT2F1F(MU, J, NU, K, IND, ACC, FINT)
+
+      RETURN
+      END
+
+
+      SUBROUTINE INT2F1F(MU, J, NU, K, IND, ACC, FINT)
+
+      IMPLICIT NONE
+      REAL MU, NU, IND, ACC
+      DOUBLE COMPLEX J, K
+      DOUBLE COMPLEX FINT
 
       INTEGER EFFACC, NBNDMAX
       PARAMETER (NBNDMAX = 1)
@@ -21,12 +38,13 @@
 *     Integration is done on the interval:
       DATA BND /0.0D0, 1.0D0/ 
 *     Effective numerical accuracy used for this integration is:
-      EFFACC = 3
+      EFFACC = NINT(ACC)
 *     which means that resulting number of integration points is:
       NMTS = 2**EFFACC
 *     Calculating abscissas and weights
       CALL INTEGRAF(EFFACC, 1, BND, NBNDMAX, MTS, MTWG)
 
+*     PRINT *, "ARGS = ", MU, J, NU, K, IND, EFFACC
       aln = 1.0d0
       bln = 1.0d0
       cln = J + 3.5d0 - MU
