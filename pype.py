@@ -20,8 +20,8 @@ data = utils.loaddata('/home/kkumer/pype/data/ep2epgamma', approach=Approach.hot
 data.update(utils.loaddata('/home/kkumer/pype/data/gammastarp2gammap', approach=Approach.hotfixedBMK))
 db = shelve.open('/home/kkumer/pype/lbl.db')
 ##ths = shelve.open('theories.db')
-#dell = shelve.open('dell.db')
-#dellnew = shelve.open('dellnew.db')
+dell = shelve.open('/home/kkumer/pype/dell.db')
+#nn50 = shelve.open('nn50.db')
 
 ## [2] Choose subset of datapoints for fitting
 
@@ -132,11 +132,15 @@ thHF.m.parameters.update(KM10)
 tDR2 = db['DR2-H']
 tDR3 = db['DR3-H']
 tNN = db['NN-H']
+tNNf = dell['NN-H-final']
+
+tNNf.name = 'Neural nets'
+tDR3.name = 'Model fit'
 
 ## [4] Do the fit
 #th.m.fix_parameters('ALL')
 
-#f = Fitter.FitterBrain(mockH, tNN, nnets=10, nbatch=200, verbose=1)
+f = Fitter.FitterBrain(Hpoints, tNNf, nnets=50, nbatch=400, verbose=1)
 #f.fit()
 #f.prune(minprob=0.5)
 #tNN.m.parameters['nnet'] = 'ALL'

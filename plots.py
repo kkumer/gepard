@@ -12,8 +12,8 @@ import numpy as np
 import matplotlib
 if os.sys.platform == 'win32':
     matplotlib.use('WxAgg')
-else: #linux
-    matplotlib.use('TkAgg')
+#else: #linux
+#    matplotlib.use('TkAgg')
 import pylab as plt
 
 
@@ -21,8 +21,8 @@ import Data, Approach, utils
 from constants import toTeX, Mp2, Mp
 
 # load experimental data
-data = utils.loaddata('data/ep2epgamma', approach=Approach.hotfixedBMK) 
-data.update(utils.loaddata('data/gammastarp2gammap', approach=Approach.hotfixedBMK)) 
+data = utils.loaddata('/home/kkumer/pype/data/ep2epgamma', approach=Approach.hotfixedBMK) 
+data.update(utils.loaddata('/home/kkumer/pype/data/gammastarp2gammap', approach=Approach.hotfixedBMK)) 
 
 ###  subplots_adjust options and their meanings:
  # left  = 0.125  # the left side of the subplots of the figure
@@ -67,9 +67,8 @@ def _axline(ax, fun, points, xaxis, **kwargs):
 def _axband(ax, fun, pts, xaxis, **kwargs):
     """Make a band corresponding to points 
 
-    fun -- array-valued function of DataPoint instance
-           mean and std.dev. of this array define position
-           and with of errorband
+    fun -- function of DataPoint instance returning tuple
+           (mean, err) or (mean, err+, err-) defining errorband
     pts -- set of DataPoint instances (just one set!)
     xaxis -- 'Q2', 't', 'xB', ...
 
@@ -79,13 +78,17 @@ def _axband(ax, fun, pts, xaxis, **kwargs):
 
     xvals = [getattr(pt, xaxis) for pt in pts]
     res = [fun(pt) for pt in pts]
-    up, down = np.array([(m+s, m-s) for m,s in res]).transpose()
+    if len(res[0]) == 2:
+        # we have symmetric error
+        res = [(m, err, err) for m, err in res]
+    up, down = np.array([(m+errp, m-errm) for m,errp,errm in res]).transpose()
     x = plt.concatenate( (xvals, xvals[::-1]) )
     y = plt.concatenate( (up, down[::-1]) )
-    ax.fill(x, y, alpha=0.5,  **kwargs)
+    ax.fill(x, y, alpha=0.5, **kwargs)
+
 
 def panel(ax, points=None, lines=None, bands=None, xaxis=None, xs=None, 
-        kins={}, kinlabels=None, **kwargs):
+        kins={}, kinlabels=None, CL=False, **kwargs):
     """Plot datapoints together with fit/theory line(s) and band(s).
 
     ax -- subplot of matplotlib's figure i.e. ax = figure.add_subplot(..)
@@ -104,6 +107,7 @@ def panel(ax, points=None, lines=None, bands=None, xaxis=None, xs=None,
 
     kinlabels -- list of constant kinematic variables whose values will
                  be extracted from points and put on plot as annotation
+    CL -- if 68% C.L. is required for bands instead of one sigma
 
     **kwargs -- passed to matplotlib
     TODO: legend
@@ -140,7 +144,7 @@ def panel(ax, points=None, lines=None, bands=None, xaxis=None, xs=None,
     if lines:
         if not isinstance(lines, list): lines = [lines]
         lineshapes = ['s', '^', 'd', 'h']  # first squares, then triangles, diamonds, hexagons
-        linecolors = ['red', 'green', 'blue', 'purple']  # squares are red, etc.
+        linecolors = ['black', 'blue', 'green', 'purple']  
         linestyles = ['-', '--', '-.', ':']  # solid, dashed, dot-dashed, dotted
         linen = 0
         for line in lines:
@@ -152,11 +156,18 @@ def panel(ax, points=None, lines=None, bands=None, xaxis=None, xs=None,
     if bands:
         if not isinstance(bands, list): bands = [bands]
         bandcolors = ['red', 'green', 'blue', 'purple']
+        hatches = ['/', '\\', '|', '.']
         bandn = 0
         for band in bands:
             for pts in points:
-                _axband(ax, lambda pt: band.predict(pt, error=True), pts, xaxis=xaxis,
-                        facecolor=bandcolors[bandn], label=band.name, **kwargs)
+                _axband(ax, lambda pt: band.predict(pt, error=True, CL=CL), pts, xaxis=xaxis,
+                        hatch=hatches[bandn], 
+                        #color=bandcolors[bandn],
+                        #facecolor=bandcolors[bandn], # band  color
+                        facecolor='none',
+                        edgecolor=bandcolors[bandn], # band edge color
+                        linewidth=1,
+                        label=band.name, **kwargs)
             bandn += 1
 
     if kinlabels:
@@ -328,7 +339,55 @@ def HERMES09(path=None, fmt='png', **kwargs):
     """Plot HERMES 0909.3587 BCA and BSA data with fit lines."""
 
     #ids = [2, 4, 5]
-    title = 'HERMES-09'
+    title = ''#HERMES-09'
+    fig = plt.figure()
+    fig.canvas.set_window_title(title)
+    fig.suptitle(title)
+    xaxes = ['tm', 'xB', 'Q2']
+    ylims = [(-0.05, 0.3), (-0.45, 0.05)]
+    xlims = [(0.0, 0.48), (0.04, 0.27), (0.85, 6)]
+    # we have 3x18=54 points to be separated in nine panels six points each:
+    for y, id, shift in zip(range(2), [32, 5], [18, 0]):
+        for x in range(3):
+            npanel = 3*y + x + 1  # 1, 2, ..., 6
+            ax = fig.add_subplot(2,3,npanel)
+            ax.yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))  # tickmarks
+            panel(ax, points=data[id][x*6+shift:x*6+6+shift], xaxis=xaxes[x], **kwargs)
+            apply(ax.set_ylim, ylims[y])
+            apply(ax.set_xlim, xlims[x])
+            if (npanel % 3) != 1:
+                # Leave labels only on leftmost panels
+                ax.set_ylabel('')
+                ax.set_yticklabels([])
+            else:
+                ylabels = ['$A_{C}^{\\cos\\phi}$', '$A_{LU}^{\\sin\\phi}$']
+                ax.set_ylabel(ylabels[(npanel-1)/3], fontsize=20)
+            if npanel < 4:
+                # Leave labels only on lowest panels
+                ax.set_xlabel('')
+                ax.set_xticklabels([])
+            else:
+                xlabels = ['$-t\\; [{\\rm GeV}^2]$', '$x_B$', '$Q^2\\; [{\\rm GeV}^2]$']
+                ax.set_xlabel(xlabels[npanel-7], fontsize=18)
+            if npanel == 1:
+                ax.legend(bbox_to_anchor=(0., 1.), loc='upper left',
+                        borderaxespad=0.).draw_frame(0)
+        #ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.2))  # tickmarks
+            for label in ax.get_xticklabels() + ax.get_yticklabels():
+                label.set_fontsize(14)
+    fig.subplots_adjust(bottom=0.45, wspace=0.0, hspace=0.0)
+    if path:
+        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+    else:
+        fig.canvas.draw()
+        fig.show()
+    return fig
+
+def HERMES09OLD(path=None, fmt='png', **kwargs):
+    """Plot HERMES 0909.3587 BCA and BSA data with fit lines."""
+
+    #ids = [2, 4, 5]
+    title = ''#HERMES-09'
     fig = plt.figure()
     fig.canvas.set_window_title(title)
     fig.suptitle(title)
@@ -634,8 +693,10 @@ def COMPASSt(path=None, fmt='png', **kwargs):
     fig = plt.figure()
     fig.canvas.set_window_title(title)
     fig.suptitle(title)
-    kinpoints = [(0.007, 1.5), (0.014, 2.5), (0.024, 3.7), 
-                           (0.045, 3.0), (0.1, 3.0), (0.2, 4.4)]
+    #kinpoints = [(0.007, 1.5), (0.014, 2.5), (0.024, 3.7), 
+    #                       (0.045, 3.0), (0.1, 3.0), (0.2, 4.4)]
+    kinpoints = [(0.01, 1.4), (0.015, 2.4), (0.03, 5.0), 
+                 (0.04, 1.4), (0.07, 2.4), (0.13, 5.0)]
     pn = 1
     ks = {'exptype' : 'fixed target'}
     ks['in1particle'] = 'e'
@@ -655,13 +716,32 @@ def COMPASSt(path=None, fmt='png', **kwargs):
         tms = np.arange(0.05, 0.6, 0.02)
         ks.update({'xB':xB, 'Q2':Q2})
         panel(ax, xaxis='tm', xs=tms, kins=ks, **kwargs)
-        ax.set_xlim(0.0, 0.8)
-        ax.set_ylim(-0.1, 0.4)
+        ax.set_xlim(0.0, 0.7)
+        ax.set_ylim(-0.1, 0.45)
         # axes labels
         ax.set_xlabel('$-t$')
-        ax.text(0.03, 0.35, "%s = %s" % (toTeX['xB'], xB))
-        ax.text(0.03, 0.3, "%s = %s" % (toTeX['Q2'], Q2))
+        ax.text(0.03, 0.35, "%s = %s" % (toTeX['xB'], xB), fontsize=14)
+        ax.text(0.03, 0.3, "%s = %s" % (toTeX['Q2'], Q2), fontsize=14)
+        if pn == 1:
+            ax.legend(bbox_to_anchor=(0.9, 0.7), loc='upper right',
+                    borderaxespad=0.).draw_frame(0)
+        if (pn != 1) and (pn != 4):
+            # no y tick labels on right panels
+            ax.set_yticklabels([])
+        else:
+            # y label on left panels
+            ax.set_ylabel(toTeX['BCSA'], fontsize=20)
+        if pn <= 3:
+            # no x tick labels on upper panels
+            ax.set_xticklabels([])
+        if pn >= 4:
+            # x-label only on lower panels
+            ax.set_xlabel(toTeX['tm'], fontsize=17)
         pn += 1
+        ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.2))  # tickmarks
+        for label in ax.get_xticklabels() + ax.get_yticklabels():
+            label.set_fontsize(14)
+    fig.subplots_adjust(bottom=0.45, wspace=0.0, hspace=0.0)
     #ax.set_ylabel('BCS Asymmetry')
     #ax.legend()
     if path:
@@ -765,118 +845,6 @@ def COMPASS(lines=[], xB=0.05, Q2=2, path=None, fmt='png', numbers=False):
         fig.subplots_adjust(wspace=0.35)
         fig.subplots_adjust(bottom=0.30)
         fig.savefig(os.path.join(path, filename+'.'+fmt), format=fmt)
-    else:
-        fig.canvas.draw()
-        fig.show()
-    return fig
-def COMPASSt(lines=[], path=None, fmt='png'):
-    """Makes plot of COMPASS BCS asymmetry in terms of t for various values of xB"""
-
-    title = 'Prediction for COMPASS BCSA'
-    fig = plt.figure()
-    fig.canvas.set_window_title(title)
-    fig.suptitle(title)
-    kinpoints = [(0.007, 1.5), (0.014, 2.5), (0.024, 3.7), 
-                           (0.045, 3.0), (0.1, 3.0), (0.2, 4.4)]
-    panel = 1
-    for xB, Q2 in kinpoints:
-        ax = fig.add_subplot(2,3,panel)
-        ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
-        linestyles = ['r-', 'g--', 'b-.', 'p:']
-        labels = ['HERMES+CLAS', 'HERMES+CLAS+HALLA', '+HALLA(phi)']
-        pn = 0
-        for approach in lines:
-            line = []
-            tmvals = []
-            for tm in np.arange(0.05, 0.6, 0.02):
-                tmvals.append(tm)
-                pt = Data.DummyPoint()
-                pt.exptype = 'fixed target'
-                pt.in1particle = 'e'
-                pt.in1charge = 1
-                pt.in1energy = 160.
-                pt.in1polarization = -0.8
-                pt.s = 2 * Mp * pt.in1energy + Mp2
-                pt.xB = xB
-                pt.Q2 = Q2
-                pt.phi = 0.
-                pt.units = {'phi' : 'radian'}
-                pt.frame = 'Trento'
-                pt.tm = tm
-                utils.fill_kinematics(pt)
-                approach.__class__.to_conventions(pt)
-                approach.__class__.prepare(pt)
-                line.append(approach.BCSA(pt))
-            ax.plot(tmvals, line, linestyles[pn], linewidth=2, 
-                    label=labels[pn]) 
-            pn += 1
-        ax.set_xlim(0.0, 0.8)
-        ax.set_ylim(-0.1, 0.4)
-        # axes labels
-        ax.set_xlabel('$-t$')
-        ax.text(0.03, 0.35, "%s = %s" % (toTeX['xB'], xB))
-        ax.text(0.03, 0.3, "%s = %s" % (toTeX['Q2'], Q2))
-        panel += 1
-    #ax.set_ylabel('BCS Asymmetry')
-    #ax.legend()
-    if path:
-        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
-    else:
-        fig.canvas.draw()
-        fig.show()
-    return fig
-def COMPASStOLD(lines=[], path=None, fmt='png'):
-    """Makes plot of COMPASS BCS asymmetry in terms of t for various values of xB"""
-
-    title = 'Prediction for COMPASS BCSA'
-    fig = plt.figure()
-    fig.canvas.set_window_title(title)
-    fig.suptitle(title)
-    kinpoints = [(0.007, 1.5), (0.014, 2.5), (0.024, 3.7), 
-                           (0.045, 3.0), (0.1, 3.0), (0.2, 4.4)]
-    panel = 1
-    for xB, Q2 in kinpoints:
-        ax = fig.add_subplot(2,3,panel)
-        ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
-        linestyles = ['r-', 'g--', 'b-.', 'p:']
-        labels = ['HERMES+CLAS', 'HERMES+CLAS+HALLA', '+HALLA(phi)']
-        pn = 0
-        for approach in lines:
-            line = []
-            tmvals = []
-            for tm in np.arange(0.05, 0.6, 0.02):
-                tmvals.append(tm)
-                pt = Data.DummyPoint()
-                pt.exptype = 'fixed target'
-                pt.in1particle = 'e'
-                pt.in1charge = 1
-                pt.in1energy = 160.
-                pt.in1polarization = -0.8
-                pt.s = 2 * Mp * pt.in1energy + Mp2
-                pt.xB = xB
-                pt.Q2 = Q2
-                pt.phi = 0.
-                pt.units = {'phi' : 'radian'}
-                pt.frame = 'Trento'
-                pt.tm = tm
-                utils.fill_kinematics(pt)
-                approach.__class__.to_conventions(pt)
-                approach.__class__.prepare(pt)
-                line.append(approach.BCSA(pt))
-            ax.plot(tmvals, line, linestyles[pn], linewidth=2, 
-                    label=labels[pn]) 
-            pn += 1
-        ax.set_xlim(0.0, 0.8)
-        ax.set_ylim(-0.1, 0.4)
-        # axes labels
-        ax.set_xlabel('$-t$')
-        ax.text(0.03, 0.35, "%s = %s" % (toTeX['xB'], xB))
-        ax.text(0.03, 0.3, "%s = %s" % (toTeX['Q2'], Q2))
-        panel += 1
-    #ax.set_ylabel('BCS Asymmetry')
-    #ax.legend()
-    if path:
-        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
         fig.canvas.draw()
         fig.show()
@@ -1057,7 +1025,9 @@ def CFF(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
     logxvals = np.logspace(-3.0, -0.01, 20)  # left panel
     xvals = np.linspace(0.02, 0.15, 20) # right panel
     # ordinates 
-    ylims = {'ImH': (-4.3, 35), 'ReH': (-6.5, 8)}
+    #ylims = {'ImH': (-4.3, 35), 'ReH': (-6.5, 8),
+    ylims = {'ImH': (-4.3, 35), 'ReH': (-15, 8),
+             'ImHt': (-40, 50), 'ReHt': (-15, 30)}
     # Plot panels
     for n in range(len(cffs)):
         cff = cffs[n]
@@ -1089,6 +1059,72 @@ def CFF(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
         ax.text(0.20, 0.95, "d   a   t   a       r   e   g   i   o   n", 
                 transform=ax.transAxes, fontsize=14, fontweight='bold', va='top')
         #ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.02))  # tickmarks
+    if path:
+        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+    else:
+        fig.canvas.draw()
+        fig.show()
+    return fig
+
+def CFF2(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
+    """Makes plots of cffs at two t given by various theories/models
+    
+    cffs    -- List of CFFs to be plotted. Each produces two panels.
+
+    """
+    title = 'NNDRCFF'
+    fig = plt.figure()
+    #fig.canvas.set_window_title(title)
+    #fig.suptitle(title)
+    colors = ['red', 'brown']     # worm human colors :-)
+    nncolors = ['blue', 'green']  # cold computer colors
+    linestyles = ['solid', 'dashed']
+    # Define abscissas
+    logxvals = np.logspace(-3.0, -0.01, 40)
+    # ordinates 
+    ylims = {'ImH': (-4.3, 35), 'ReH': (-6.5, 8)}
+    # Plot panels
+    ts = [-0.2, -0.02]
+    for n in range(len(cffs)):
+        for nt in range(len(ts)):
+            cff = cffs[n]
+            # all-x logarithmic
+            ax = fig.add_subplot(len(cffs), 2, 2*n+nt+1)
+            ax.set_xscale('log')  # x-axis to be logarithmic
+            panel(ax, xaxis='xi', xs=logxvals, kins={
+                    'yaxis':cff, 't':ts[nt], 'Q2':4.}, **kwargs)
+            ax.axhspan(-0.0005, 0.0005, facecolor='g', alpha=0.6)  # horizontal bar
+            ax.text(0.3, 0.02, "$t = %s\\, {\\rm GeV}^2$" % str(ts[nt]), 
+                    transform=ax.transAxes, fontsize=18)
+            ax.xaxis.set_major_formatter(matplotlib.ticker.FormatStrFormatter('%s'))
+            if nt == 0:
+                # plot data-region vertical band for left panels
+                #ax.axvspan(0.025, 0.136, facecolor='g', alpha=0.1)
+                ax.set_ylabel(toTeX['%s' % cff], fontsize=20)
+            if nt == 1:
+                # no y tick labels on right panels
+                ax.set_yticklabels([])
+            if n == 0:
+                # no x tick labels on upper panels
+                ax.set_xticklabels([])
+            if n == 1:
+                # x-label only on lower panels
+                ax.set_xlabel(toTeX['xixB'], fontsize=18)
+            if n == 0 and nt == 0:
+                # put legend in first panel
+                #ax.legend(loc='upper right')
+                ax.legend(bbox_to_anchor=(0.85, 0.85), loc='upper right',
+                        borderaxespad=0.).draw_frame(0)
+                #ax.legend().draw_frame(0)
+                # 
+                #ax.text(0.33, 0.95, "data region", transform=ax.transAxes, 
+                #        fontsize=14, fontweight='bold', va='top')
+            apply(ax.set_ylim, ylims[cff])
+            ax.set_xlim(0.005, 1.0)
+            #ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.02))  # tickmarks
+            for label in ax.get_xticklabels() + ax.get_yticklabels():
+                label.set_fontsize(14)
+    fig.subplots_adjust(bottom=0.4, wspace=0.0, hspace=0.0)
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:

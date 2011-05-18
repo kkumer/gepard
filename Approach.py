@@ -4,6 +4,7 @@ import copy, sys
 
 from numpy import sin, cos, pi, sqrt, array, linspace, ndarray
 from scipy.special import gammainc
+from scipy.stats import scoreatpercentile
 
 import utils, quadrature, Data
 from constants import *
@@ -83,11 +84,12 @@ class Approach(object):
         print 'P(chi-square, d.o.f) = P(%1.2f, %2d) = %5.4f' % self.chisq(points, **kwargs)
 
         
-    def predict(self, pt, error=False, **kwargs):
+    def predict(self, pt, error=False, CL=False, **kwargs):
         """Give prediction for DataPoint pt.
 
         Keyword arguments:
         error - if available, produce tuple (mean, error)
+        CL - error is not std.dev., but 68% C.L. (mean, errplus, errminus)
         observable - string. Default is pt.yaxis. It is acceptable also
                      to pass CFF as observable, e.g., observable = 'ImH'
         parameters - dictionary which will temporarily update model's one
@@ -143,7 +145,20 @@ class Approach(object):
             except KeyError:
                 # we have neural net
                 allnets = fun(pt)
-                result = (allnets.mean(), allnets.std())
+                if CL:
+                    # 68% confidence level
+                    m = allnets.mean()
+                    try:
+                        result = (m, 
+                              scoreatpercentile(allnets, 84)[0] - m,
+                              m - scoreatpercentile(allnets, 16)[0])
+                    except IndexError:
+                        result = (m, 
+                              scoreatpercentile(allnets, 84) - m,
+                              m - scoreatpercentile(allnets, 16))
+                else:
+                    # one sigma
+                    result = (allnets.mean(), allnets.std())
         else:
             result = fun(pt)
             if isinstance(result, ndarray):

@@ -182,6 +182,9 @@ def str2num(s):
 def prettyprint(all_numbers):
     """Formatted printout of fit values. Using algorithm by Alex Martelli."""
 
+    # Alternative:
+    # http://stackoverflow.com/questions/1025379/decimal-alignment-formatting-in-python
+
     formatted_numbers = []
     space_on_the_left = []
     for number in all_numbers:
