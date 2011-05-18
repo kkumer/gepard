@@ -36,6 +36,9 @@ Fdvcs.o Ff2.o Freadpar.o Ferror.o Fgauss.o Fnd.o Fbigcns.o Fintegra.o Fxspace.o\
 Finitc.o Fevolc.o Fgetmbgpd.o Fhj.o Fsplice.o Fcff.o Fderiv.o Fbca.o
 _FOBJS = $(patsubst %,$(FODIR)/%,$(FOBJS))
 
+# Fortran object files needed for DVEM
+FDVEMOBJS = Fhyp2F1.o Fgauss.o Fintegra.o Fint2F1.o Fbeta.o Fspecial.o Fcdvem.o 
+_FDVEMOBJS = $(patsubst %,$(FODIR)/%,$(FDVEMOBJS))
 
 # rule for compiling Fortran .F  files
 # (prefix "F" in "F%.o" is used to avoid possible future clashes with
@@ -61,7 +64,7 @@ export ALLOBJS = $(_OBJS) $(_ADACFOBJS) $(_FOBJS)
 MMAOBJS = fit.tm.o fit.o 
 _MMAOBJS = $(patsubst %,$(MMAODIR)/%,$(MMAOBJS))
 
-MMADVEMOBJS = cdvem.tm.o cdvem.o int2F1.tm.o int2F1.o 
+MMADVEMOBJS = dvem.tm.o dvem.o 
 _MMADVEMOBJS = $(patsubst %,$(MMAODIR)/%,$(MMADVEMOBJS))
 
 # rules for compiling MathLink C files
@@ -112,9 +115,7 @@ int2f1.exe: $(FODIR)/Fhyp2F1.o $(FODIR)/Fgauss.o $(FODIR)/Fintegra.o  \
              $(FODIR)/Fint2F1F.o $(_MMADVEMOBJS)
 	$(FC) -o ../fits/$@/$(SYS)/$@ $^ $(FFLAGS)  -L$(MLLIBDIR) -l$(MLLIB)  $(MLEXTRA)
 
-# cdvem.F beta.F int2F1.F  special.F adacf/Harmonic.f
-dvem.exe: $(FODIR)/Fhyp2F1.o $(FODIR)/Fgauss.o $(FODIR)/Fintegra.o  \
-        $(FODIR)/Fint2F1F.o $(_MMADVEMOBJS)
+dvem.exe: $(ADACFODIR)/Harmonic.o $(_FDVEMOBJS) $(_MMADVEMOBJS)
 	$(FC) -o ../fits/$@/$(SYS)/$@ $^ $(FFLAGS)  -L$(MLLIBDIR) -l$(MLLIB)  $(MLEXTRA)
 # pygepard target
 

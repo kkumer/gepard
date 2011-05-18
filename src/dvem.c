@@ -146,6 +146,87 @@ void int2f1(void) {
         return;
 };
 
+void cdvemf_(struct dblcomplex *j, struct dblcomplex *k, struct dblcomplex (*mcu)[]);
+
+void cdvem(void) {
+
+        int xint, dttype;
+        double xreal, xi, xr;
+        struct dblcomplex j, k, z;
+        struct dblcomplex mcu[3];
+        int i, nargs;
+        const char *fname;
+
+
+/* getting input j via MathLink.  */
+
+        dttype=MLGetType(stdlink); 
+        switch (MLGetType(stdlink)) {
+                case MLTKINT:   /* Mma sent integer number*/
+                        MLGetInteger(stdlink, &xint);
+                        j.dr=xint;
+                        j.di=0.0;
+                        break;
+                case MLTKREAL:  /* Mma sent real number */
+                        MLGetReal(stdlink, &xreal);
+                        j.dr=xreal;
+                        j.di=0.0;
+                        break;
+                case MLTKFUNC:  /* Mma sent Complex[] */
+                        /* FIXME: Check if it realy is Complex[] */
+                        MLGetFunction(stdlink, &fname, &nargs);
+                        MLGetReal(stdlink, &xr);
+                        MLGetReal(stdlink, &xi);
+                        j.dr=xr;
+                        j.di=xi;
+                        break;
+                default:  /* Return an error */
+                        MLPutSymbol(stdlink, "errnan");
+                        return;
+        }
+                       
+/* getting input k via MathLink.  */
+
+        dttype=MLGetType(stdlink); 
+        switch (MLGetType(stdlink)) {
+                case MLTKINT:   /* Mma sent integer number*/
+                        MLGetInteger(stdlink, &xint);
+                        k.dr=xint;
+                        k.di=0.0;
+                        break;
+                case MLTKREAL:  /* Mma sent real number */
+                        MLGetReal(stdlink, &xreal);
+                        k.dr=xreal;
+                        k.di=0.0;
+                        break;
+                case MLTKFUNC:  /* Mma sent Complex[] */
+                        /* FIXME: Check if it realy is Complex[] */
+                        MLGetFunction(stdlink, &fname, &nargs);
+                        MLGetReal(stdlink, &xr);
+                        MLGetReal(stdlink, &xi);
+                        k.dr=xr;
+                        k.di=xi;
+                        break;
+                default:  /* Return an error */
+                        MLPutSymbol(stdlink, "errnan");
+                        return;
+        }
+
+
+/* calling FORTRAN subroutine  */
+        cdvemf_(&j, &k, &mcu);
+
+/* returning result via MathLink  */
+            MLPutFunction(stdlink, "List", 3); /* passing MB points */
+              for (i = 0; i < 3; i++){
+                z = mcu[i];
+				MLPutFunction(stdlink, "Complex", 2);
+				MLPutReal(stdlink, z.dr);
+				MLPutReal(stdlink, z.di);
+              }
+
+        return;
+};
 
 int main(int argc, char *argv[]) {
            return MLMain(argc, argv);

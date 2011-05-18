@@ -8,3 +8,14 @@
 :ArgumentTypes: {Manual}
 :ReturnType:    Manual
 :End:
+
+:Evaluate: cdvem::usage = "cdvem[j, k] returns three (unnormalized) DVEM Wilson coefficients: quark, pure singlet quark and gluon "
+:Evaluate: cdvem::nan = "Error - Argument not in correct numerical form."
+:Evaluate: errnan := Message[cdvem::nan]
+:Begin:
+:Function:      cdvem
+:Pattern:       cdvem[j_?NumericQ, k_?NumericQ]
+:Arguments:     {j, k}
+:ArgumentTypes: {Manual}
+:ReturnType:    Manual
+:End:
