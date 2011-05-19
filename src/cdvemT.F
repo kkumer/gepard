@@ -47,9 +47,6 @@ C     J = N(1, K) - 1
 
       PJ = 1
       PK = 2
-      RGPDF2 = 2.0d0
-      RDAF2 = 2.1d0
-      RR2 = 2.2d0
       NF = 3
       CALL BETAF
 

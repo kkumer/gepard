@@ -7,14 +7,10 @@
 */
 
 #include "mathlink.h"
-/* #include "header.h"
-* #include <string.h>
+#include "header.h"
+/* #include <string.h>
 */
 
-struct dblcomplex {
-        double dr; 
-        double di;
-};
 
 
 void int2f1(void) {
@@ -152,6 +148,7 @@ void cdvem(void) {
 
         int xint, dttype;
         double xreal, xi, xr;
+        double rgpdf2, rdaf2, rr2;
         struct dblcomplex j, k, z;
         struct dblcomplex mcu[3];
         int i, nargs;
@@ -212,6 +209,62 @@ void cdvem(void) {
                         return;
         }
 
+/* getting input rgpdf2 via MathLink.  */
+
+        dttype=MLGetType(stdlink); 
+        switch (MLGetType(stdlink)) {
+                case MLTKINT:   /* Mma sent integer number*/
+                        MLGetInteger(stdlink, &xint);
+                        rgpdf2=xint;
+                        break;
+                case MLTKREAL:  /* Mma sent real number */
+                        MLGetReal(stdlink, &xreal);
+                        rgpdf2=xreal;
+                        break;
+                default:  /* Return an error */
+                        MLPutSymbol(stdlink, "errnan");
+                        return;
+        }
+
+/* getting input rdaf2 via MathLink.  */
+
+        dttype=MLGetType(stdlink); 
+        switch (MLGetType(stdlink)) {
+                case MLTKINT:   /* Mma sent integer number*/
+                        MLGetInteger(stdlink, &xint);
+                        rdaf2=xint;
+                        break;
+                case MLTKREAL:  /* Mma sent real number */
+                        MLGetReal(stdlink, &xreal);
+                        rdaf2=xreal;
+                        break;
+                default:  /* Return an error */
+                        MLPutSymbol(stdlink, "errnan");
+                        return;
+        }
+
+/* getting input rr2 via MathLink.  */
+
+        dttype=MLGetType(stdlink); 
+        switch (MLGetType(stdlink)) {
+                case MLTKINT:   /* Mma sent integer number*/
+                        MLGetInteger(stdlink, &xint);
+                        rr2=xint;
+                        break;
+                case MLTKREAL:  /* Mma sent real number */
+                        MLGetReal(stdlink, &xreal);
+                        rr2=xreal;
+                        break;
+                default:  /* Return an error */
+                        MLPutSymbol(stdlink, "errnan");
+                        return;
+        }
+
+   /* putting scales in common block */
+
+        parflt_.rgpdf2 = rgpdf2;
+        parflt_.rdaf2 = rdaf2;
+        parflt_.rr2 = rr2;
 
 /* calling FORTRAN subroutine  */
         cdvemf_(&j, &k, &mcu);
