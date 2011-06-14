@@ -141,4 +141,5 @@ clean:
 	-rm -f $(patsubst %,../ex/%,$(EXTARGETS))
 	-rm -f $(patsubst %,../ex/%.exe,$(EXTARGETS))
 	-rm -f ../fits/gepard.exe/$(SYS)/gepard.exe
-	-rm -f ../fits/int2f1.exe/$(SYS)/int2f1.exe
+	-rm -f ../fits/dvem.exe/$(SYS)/dvem.exe
+	-rm -f hyp_2f1_module.mod
