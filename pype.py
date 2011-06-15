@@ -18,15 +18,12 @@ from math import sqrt
 
 data = utils.loaddata('/home/kkumer/pype/data/ep2epgamma', approach=Approach.hotfixedBMK)  
 data.update(utils.loaddata('/home/kkumer/pype/data/gammastarp2gammap', approach=Approach.hotfixedBMK))
-db = shelve.open('/home/kkumer/pype/lbl.db')
-##ths = shelve.open('theories.db')
-dell = shelve.open('/home/kkumer/pype/dell.db')
-#nn50 = shelve.open('nn50.db')
+db = shelve.open('/home/kkumer/pype/theories.db')
 
 ## [2] Choose subset of datapoints for fitting
 
 #testpoints = data[31][12:14] + data[8][1:3] + data[30][2:4]  # test set
-#GLOpoints = data[31][12:] + data[8] + data[29]  # DM's GLO set
+GLOpoints = data[31][12:] + data[8] + data[29]  # DM's GLO set
 GLO1points = data[31][12:] + data[8] + data[29] + data[30]  # DM's GLO1 set
 ##HERMESpoints = data[31][12:] +  data[29]
 ##BSApoints = data[8] + data[29]
@@ -59,14 +56,6 @@ UNPpoints = ALTGLOpoints + BSSwpoints + BSDwpoints
 UNP5points = ALTGLO5points + BSSwpoints + BSDwpoints
 H1ZEUSpoints = DVCSpoints + data[48]
 
-#mockH = data[1001][::27] + data[1002][::27]
-#oldmockH = []
-#np.random.seed(42)  # For reproducibility
-#for pt in mockH:
-#    oldmockH.append(copy.deepcopy(pt))
-#    pt.err = 0.05
-#    pt.val = pt.val + scipy.stats.norm.rvs(loc=0, scale=0.05)
-#mockHHa = mockH + data[1003]  # Adding Hall A
 
 ## [3] Create a theory
 
@@ -75,19 +64,19 @@ mGepard = Model.ComptonGepard(cutq2=0.5)
 #tGepard = Approach.hotfixedBMK(mGepard)
 
 # DR only
-mDRonly = Model.ModelDR()
-tDR = Approach.hotfixedBMK(mDRonly)
-tDR.name = 'KM09a'
-tDR.m.parameters.update(DMepsGLO)
+#mDRonly = Model.ModelDR()
+#tDR = Approach.hotfixedBMK(mDRonly)
+#tDR.name = 'KM09a'
+#tDR.m.parameters.update(DMepsGLO)
 
-tDRBM = Approach.BM10(mDRonly)
-tDRBM.name = 'KM09a+BM10'
-tDRBM.m.parameters.update(DMepsGLO)
+#tDRBM = Approach.BM10(mDRonly)
+#tDRBM.name = 'KM09a+BM10'
+#tDRBM.m.parameters.update(DMepsGLO)
 
-mDRonly1 = Model.ModelDR()
-tDR1 = Approach.hotfixedBMK(mDRonly1)
-tDR1.name = 'KM09b'
-tDR1.m.parameters.update(DMepsGLO1)
+#mDRonly1 = Model.ModelDR()
+#tDR1 = Approach.hotfixedBMK(mDRonly1)
+#tDR1.name = 'KM09b'
+#tDR1.m.parameters.update(DMepsGLO1)
 
 #tDR1BM = Approach.BM10(mDRonly1)
 #tDR1BM.name = 'KM09b+BM10'
@@ -115,9 +104,9 @@ th.m.parameters.update(KM10)
 #th.m.parameters['Mv'] = 1.0
 th.m.covariance = KM10cov
 
-thHF = Approach.hotfixedBMK(m)
-thHF.name = 'KM10 - hotfixed'
-thHF.m.parameters.update(KM10)
+#thHF = Approach.hotfixedBMK(m)
+#thHF.name = 'KM10 - hotfixed'
+#thHF.m.parameters.update(KM10)
 
 
 # NN
@@ -129,18 +118,18 @@ thHF.m.parameters.update(KM10)
 #tNN.name = 'NNtest'
 #tNN.description = 'x (xB,t)-11-2 nets trained on HERMES-like mock data for 200 batches'
 
-tDR2 = db['DR2-H']
-tDR3 = db['DR3-H']
-tNN = db['NN-H']
-tNNf = dell['NN-H-final']
+#tDR2 = db['DR2-H']
+#tDR3 = db['DR3-H']
+#tNN = db['NN-H']
+#tNNf = dell['NN-H-final']
 
-tNNf.name = 'Neural nets'
-tDR3.name = 'Model fit'
+#tNNf.name = 'Neural nets'
+#tDR3.name = 'Model fit'
 
 ## [4] Do the fit
 #th.m.fix_parameters('ALL')
 
-f = Fitter.FitterBrain(Hpoints, tNNf, nnets=50, nbatch=400, verbose=1)
+#f = Fitter.FitterBrain(Hpoints, tNNf, nnets=50, nbatch=400, verbose=1)
 #f.fit()
 #f.prune(minprob=0.5)
 #tNN.m.parameters['nnet'] = 'ALL'

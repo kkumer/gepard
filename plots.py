@@ -375,7 +375,7 @@ def HERMES09(path=None, fmt='png', **kwargs):
         #ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.2))  # tickmarks
             for label in ax.get_xticklabels() + ax.get_yticklabels():
                 label.set_fontsize(14)
-    fig.subplots_adjust(bottom=0.45, wspace=0.0, hspace=0.0)
+    fig.subplots_adjust(bottom=0.25, wspace=0.0, hspace=0.0)
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
@@ -741,7 +741,7 @@ def COMPASSt(path=None, fmt='png', **kwargs):
         ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.2))  # tickmarks
         for label in ax.get_xticklabels() + ax.get_yticklabels():
             label.set_fontsize(14)
-    fig.subplots_adjust(bottom=0.45, wspace=0.0, hspace=0.0)
+    fig.subplots_adjust(bottom=0.12, wspace=0.0, hspace=0.0)
     #ax.set_ylabel('BCS Asymmetry')
     #ax.legend()
     if path:
@@ -1124,7 +1124,7 @@ def CFF2(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
             #ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.02))  # tickmarks
             for label in ax.get_xticklabels() + ax.get_yticklabels():
                 label.set_fontsize(14)
-    fig.subplots_adjust(bottom=0.4, wspace=0.0, hspace=0.0)
+    fig.subplots_adjust(bottom=0.2, wspace=0.0, hspace=0.0)
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:

@@ -26,3 +26,7 @@ README
 test - test units. Use nosetest for elegant testing.
 theories.db - database of 'theories' (theory = model + approach)
 utils.py  - datafile parsing, dataset plotting and other auxilliary routines
+
+Additional example scripts
+--------------------------
+ex/KMS11.py  - produces figs for neural network paper KMS11
