@@ -1027,6 +1027,8 @@ def CFF(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
     # ordinates 
     #ylims = {'ImH': (-4.3, 35), 'ReH': (-6.5, 8),
     ylims = {'ImH': (-4.3, 35), 'ReH': (-15, 8),
+             'ImE': (-40, 35), 'ReE': (-15, 30),
+             'ImEt': (-40, 300), 'ReEt': (-15, 150),
              'ImHt': (-40, 50), 'ReHt': (-15, 30)}
     # Plot panels
     for n in range(len(cffs)):

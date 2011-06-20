@@ -51,7 +51,7 @@ TSA1points = utils.select(data[52], criteria=['FTn == -1'])
 #DMpoints = data[5] + data[32][18:] + data[8] + data[30]
 #DMTSApoints = data[5] + data[32][18:] + TSA1points + data[8] + data[30]
 #TSApoints = TSA1points + data[54]
-#BTSApoints = utils.select(data[53], criteria=['FTn==0'])
+BTSApoints = utils.select(data[53], criteria=['FTn==0'])
 UNPpoints = ALTGLOpoints + BSSwpoints + BSDwpoints
 UNP5points = ALTGLO5points + BSSwpoints + BSDwpoints
 H1ZEUSpoints = DVCSpoints + data[48]
@@ -98,11 +98,10 @@ mDRPPsea = Model.ComptonModelDRPPsea()
 #m = Model.HybridDipole(mGepard, mDRPPsea)
 m = Model.HybridKelly(mGepard, mDRPPsea)
 th = Approach.BM10(m)
-th.name = 'KM10'
+th.name = 'new'
 g = th.m.g
-th.m.parameters.update(KM10)
-#th.m.parameters['Mv'] = 1.0
-th.m.covariance = KM10cov
+th.m.parameters.update(zeroHt)
+#th.m.covariance = KM10cov
 
 #thHF = Approach.hotfixedBMK(m)
 #thHF.name = 'KM10 - hotfixed'
@@ -127,7 +126,7 @@ th.m.covariance = KM10cov
 #tDR3.name = 'Model fit'
 
 ## [4] Do the fit
-#th.m.fix_parameters('ALL')
+th.m.fix_parameters('ALL')
 
 #f = Fitter.FitterBrain(Hpoints, tNNf, nnets=50, nbatch=400, verbose=1)
 #f.fit()
@@ -138,6 +137,7 @@ th.m.covariance = KM10cov
 
 ## Fitting to both small- and large-x data
 #th.m.release_parameters('M02S', 'SECS', 'SECG', 'THIS', 'THIG', 'rv', 'bv', 'Mv', 'C', 'MC', 'trv', 'tbv', 'tMv')#, 'rpi', 'Mpi')
+th.m.release_parameters('rv', 'bv', 'Mv', 'C', 'MC', 'trv', 'tbv', 'tMv', 'rpi', 'Mpi')
 #f = Fitter.FitterMinuit(H1ZEUSpoints+UNP5points+TSApoints+BTSApoints, th)
 #f = Fitter.FitterMinuit(DVCSpoints+GLOpoints, th)
 #f.minuit.tol = 80
@@ -160,12 +160,12 @@ def ld(db):
     utils.listdb(db)
 
 def pc(th):
-    exps = ['UNP5points', 'H1ZEUS', 'ALTGLO5', 'CLAS', 'CLASDM', 'BSDw', 'BSSw', 'TSA1']
-    ptssets = [UNP5points, H1ZEUSpoints, ALTGLO5points, data[25], data[8], BSDwpoints, BSSwpoints, TSA1points]
+    exps = ['UNP5points', 'H1ZEUS', 'ALTGLO5', 'CLAS', 'CLASDM', 'BSDw', 'BSSw', 'TSA1', 'BTSA']
+    ptssets = [UNP5points, H1ZEUSpoints, ALTGLO5points, data[25], data[8], BSDwpoints, BSSwpoints, TSA1points, BTSApoints]
     for name, pts in zip(exps,ptssets):
         print '%10s: chi/npts = %6.2f/%d' % (name, th.chisq(pts)[0], len(pts))
-        cutpts = utils.select(pts, criteria=['Q2>=1.6'])
-        print '%10s: chi/npts = %6.2f/%d (cut)' % (name, th.chisq(cutpts)[0], len(cutpts))
+        #cutpts = utils.select(pts, criteria=['Q2>=1.6'])
+        #print '%10s: chi/npts = %6.2f/%d (cut)' % (name, th.chisq(cutpts)[0], len(cutpts))
 
     
 # fixed target datapoint FIXME: WRONG!
@@ -221,4 +221,32 @@ def ccals(th, pt):
         print '%8s =  %10.5f + %10.5f * I ' % (c, getattr(th, 'CCAL'+c)(pt), 
                 getattr(th, 'CCAL'+c)(pt, im=1))
 
+
+def _derpt(th, p, pt, f=False, h=0.05):
+    """Compute derivative of f w.r.t. model parameter p at point pt.
+    
+    Simple difference is used (f(p+h/2)-f(p-h/2))/h.
+    f is string representing appropriate method of th, or
+    observable will be taken as yaxis of pt
+
+    """
+    if f:
+        fun = th.__getattribute__(f) 
+    else:
+        fun = th.__getattribute__(pt.yaxis)
+    mem = th.m.parameters[p]
+    th.m.parameters[p] = mem+h/2.
+    up = fun(pt)
+    th.m.parameters[p] = mem-h/2.
+    down = fun(pt)
+    th.m.parameters[p] = mem
+    return (up-down)/h
+
+
+def der(th, pars, pts, f=False,  h=0.05):
+    """Compute average derivative at points for each par in pars."""
+
+    for par in pars:
+        ders = np.array([_derpt(th, par, pt, f, h) for pt in pts])
+        print '%4s  |  %5.2f' % (par, ders.mean())
 

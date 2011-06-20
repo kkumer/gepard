@@ -20,8 +20,6 @@ frame = Trento
 in1particle = e-
 in1energy = 5.7
 in1energyunit = GeV
-in1polarizationvector = L
-in1polarization = +1
 
 in2particle = p
 in2polarizationvector = L
