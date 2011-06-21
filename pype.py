@@ -19,7 +19,7 @@ from math import sqrt
 data = utils.loaddata('/home/kkumer/pype/data/ep2epgamma', approach=Approach.hotfixedBMK)  
 data.update(utils.loaddata('/home/kkumer/pype/data/gammastarp2gammap', approach=Approach.hotfixedBMK))
 db = shelve.open('/home/kkumer/pype/theories.db')
-dell = shelve.open('/home/kkumer/pype/dellB.db')
+#dell = shelve.open('/home/kkumer/pype/dellB.db')
 
 ## [2] Choose subset of datapoints for fitting
 
@@ -95,13 +95,13 @@ mGepard = Model.ComptonGepard(cutq2=0.5)
 #thBM.m.name = "KM10b+BM10"
 
 
-mDRPPsea = Model.ComptonModelDRPPsea()
+#mDRPPsea = Model.ComptonModelDRPPsea()
 #m = Model.HybridDipole(mGepard, mDRPPsea)
-m = Model.HybridKelly(mGepard, mDRPPsea)
-th = Approach.BM10(m)
-th.name = 'KM10'
-g = th.m.g
-th.m.parameters.update(KM10)
+#m = Model.HybridKelly(mGepard, mDRPPsea)
+#th = Approach.BM10(m)
+#th.name = 'KM10'
+#g = th.m.g
+#th.m.parameters.update(KM10)
 #th.m.covariance = KM10cov
 
 #thHF = Approach.hotfixedBMK(m)
@@ -127,7 +127,7 @@ th.m.parameters.update(KM10)
 #tDR3.name = 'Model fit'
 
 ## [4] Do the fit
-th.m.fix_parameters('ALL')
+#th.m.fix_parameters('ALL')
 
 #f = Fitter.FitterBrain(Hpoints, tNNf, nnets=50, nbatch=400, verbose=1)
 #f.fit()
@@ -138,7 +138,7 @@ th.m.fix_parameters('ALL')
 
 ## Fitting to both small- and large-x data
 #th.m.release_parameters('M02S', 'SECS', 'SECG', 'THIS', 'THIG', 'rv', 'bv', 'Mv', 'C', 'MC', 'trv', 'tbv', 'tMv')#, 'rpi', 'Mpi')
-th.m.release_parameters('rv', 'bv', 'Mv', 'C', 'MC', 'trv', 'tbv', 'tMv', 'rpi', 'Mpi')
+#th.m.release_parameters('rv', 'bv', 'Mv', 'C', 'MC', 'trv', 'tbv', 'tMv', 'rpi', 'Mpi')
 #f = Fitter.FitterMinuit(H1ZEUSpoints+UNP5points+TSApoints+BTSApoints, th)
 #f = Fitter.FitterMinuit(DVCSpoints+GLOpoints, th)
 #f.minuit.tol = 80
@@ -156,6 +156,10 @@ th.m.release_parameters('rv', 'bv', 'Mv', 'C', 'MC', 'trv', 'tbv', 'tMv', 'rpi',
 #f = Fitter.FitterMinuit(mockH, tDR)
 
 ## [5] Some shortcuts ...
+
+pt0 = Hpoints[0]
+
+NN5 = db['NNfive']
 
 def ld(db):
     utils.listdb(db)

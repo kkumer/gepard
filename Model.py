@@ -16,6 +16,7 @@ from numpy import ndarray, array
 from quadrature import PVquadrature
 from utils import flatten, hubDict, stringcolor
 from constants import tolerance2
+import dispersion as DR
 
 import pygepard as g
 import optModel
@@ -395,7 +396,7 @@ class ComptonDispersionRelations(ComptonFormFactors):
             pvpi = optModel.pvquadrature('Et', self.ndparameters, pt.t, pt.xi)
         else:
             res = PVquadrature(self.dispargA, 0, 1, (self.ImEt, pt))
-            pvpi = (res + log((1.+pt.xi)/(1.-pt.xi)) * self.ImEt(pt))
+            pvpi = (res + log((1.+pt.xi)/(1.-pt.xi)) * self.ImEt(pt))/pi
         return pvpi   # this is P.V./pi 
 
 
@@ -690,7 +691,6 @@ class ComptonNeuralNets(Model):
         """
         self.architecture = [2] + hidden_layers + [len(output_layer)]
         self.output_layer = output_layer
-        #self.allCFFs = output_layer
         self.nets = []
         self.parameters = {'nnet':0, 'outputvalue':None}
         self.parameter_names = ['nnet', 'outputvalue']
@@ -700,11 +700,14 @@ class ComptonNeuralNets(Model):
 
     def __getattr__(self, name):
         """Return appropriate CFF function object."""
+        #sys.stderr.write('NN model called with attr = %s\n' % name)
+        #debug_here()
         # FIXME: I don't understand why I have to use this:
         if name in object.__getattribute__(self, 'output_layer'):
         # and this creates infinite recursion:
         #if name in self.output_layer:
             self.curname = name
+            #sys.stderr.write('Entering actual CFF: %s\n' % name)
             return self.CFF
         elif name in ComptonFormFactors.allCFFs:
             # if asked for CFF which is not in output_layer, return 0
@@ -712,24 +715,38 @@ class ComptonNeuralNets(Model):
         elif name in ComptonFormFactors.allCFFeffs:
             # if asked for CFF which is not in output_layer, return 0
             return self.zero
-        elif name == 'endpointpower':
-            if self.__dict__.has_key('endpointpower'):
-                return self.endpointpower
+        elif name in ['endpointpower', 'optimization']:
+            if self.__dict__.has_key(name):
+                return self.__dict__[name]
             else:
                 return None
         else:
-            raise AttributeError
+            #syst.stderr.write('Possibly caught exception: AttErr: $s\n' % name)
+            raise AttributeError, name
 
     def zero(self, *args, **kwargs):
         return 0
 
-    def CFF(self, pt, outputvalue=None, xi=0):
+    def CFF(self, pt, xi=0, outputvalue=None, useDR=False):
+        """
+        useDR -- use dispersion relation to calculate this CFF
+        """
+
         # FIXME: This function is HEAVILY sub-optimal and non-pythonic!
         ind = self.output_layer.index(self.curname)
         if self.parameters['outputvalue'] != None:
             # this occurs during training: value is set by training
             # routine by calling with outputvalue set by training routine
             return self.parameters['outputvalue'][ind]
+        if useDR and self.curname in ['ReH', 'ReE', 'ReHt', 'ReEt']:
+            #sys.stderr.write('Doing DR for CFF: %s\n' % self.curname)
+            # FIXME: still now subtraction
+            if self.curname in ['ReH', 'ReE']:
+                return DR.intV(self.__getattr__('Im'+self.curname[2:]), pt)
+            elif self.curname in ['ReHt', 'ReEt']:
+                return DR.intA(self.__getattr__('Im'+self.curname[2:]), pt)
+            else:
+                raise ValueError, 'Only Re(CFF) can be calculated via disp. rel.'
         if isinstance(xi, ndarray):
             # function was called with third argument that is xi nd array
             x = xi
