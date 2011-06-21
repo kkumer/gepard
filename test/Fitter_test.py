@@ -65,14 +65,3 @@ test_fit2opt.long = 1
 test_fit2opt.batch = 1
 test_fit2opt.optimization = 1
 
-def test_fit_neural():
-    """Testing neural network fitting by FitterBrain."""
-    np.random.seed(68)
-    mNN = Model.ModelNN()
-    tNN = Approach.hotfixedBMK(mNN)
-    fNN = Fitter.FitterBrain(2*fitpoints, tNN, nnets=1, nbatch=6)
-    fNN.fit()
-    chisq = tNN.chisq(2*fitpoints)[0]
-    assert_almost_equal(chisq, 22.754514666801569)
-
-test_fit_neural.long = 1

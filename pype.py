@@ -19,6 +19,7 @@ from math import sqrt
 data = utils.loaddata('/home/kkumer/pype/data/ep2epgamma', approach=Approach.hotfixedBMK)  
 data.update(utils.loaddata('/home/kkumer/pype/data/gammastarp2gammap', approach=Approach.hotfixedBMK))
 db = shelve.open('/home/kkumer/pype/theories.db')
+dell = shelve.open('/home/kkumer/pype/dellB.db')
 
 ## [2] Choose subset of datapoints for fitting
 
@@ -160,8 +161,8 @@ def ld(db):
     utils.listdb(db)
 
 def pc(th):
-    exps = ['UNP5points', 'H1ZEUS', 'ALTGLO5', 'CLAS', 'CLASDM', 'BSDw', 'BSSw', 'TSA1', 'BTSA']
-    ptssets = [UNP5points, H1ZEUSpoints, ALTGLO5points, data[25], data[8], BSDwpoints, BSSwpoints, TSA1points, BTSApoints]
+    exps = ['UNP5points', 'ALTGLO5', 'CLAS', 'CLASDM', 'BSDw', 'BSSw', 'TSA1', 'BTSA']
+    ptssets = [UNP5points, ALTGLO5points, data[25], data[8], BSDwpoints, BSSwpoints, TSA1points, BTSApoints]
     for name, pts in zip(exps,ptssets):
         print '%10s: chi/npts = %6.2f/%d' % (name, th.chisq(pts)[0], len(pts))
         #cutpts = utils.select(pts, criteria=['Q2>=1.6'])

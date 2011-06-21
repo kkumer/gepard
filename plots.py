@@ -1028,7 +1028,7 @@ def CFF(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
     #ylims = {'ImH': (-4.3, 35), 'ReH': (-6.5, 8),
     ylims = {'ImH': (-4.3, 35), 'ReH': (-15, 8),
              'ImE': (-40, 35), 'ReE': (-15, 30),
-             'ImEt': (-40, 300), 'ReEt': (-15, 150),
+             'ImEt': (-200, 300), 'ReEt': (-150, 150),
              'ImHt': (-40, 50), 'ReHt': (-15, 30)}
     # Plot panels
     for n in range(len(cffs)):
@@ -1041,7 +1041,7 @@ def CFF(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
         ax.set_ylabel(toTeX['%s' % cff], fontsize=18)
         ax.axhspan(-0.0005, 0.0005, facecolor='g', alpha=0.6)  # horizontal bar
         ax.axvspan(0.025, 0.136, facecolor='g', alpha=0.1)  # vertical band
-        ax.text(0.35, 0.95, "data region", transform=ax.transAxes, 
+        ax.text(0.35, 0.95, "HERMES region", transform=ax.transAxes, 
                 fontsize=14, fontweight='bold', va='top')
         apply(ax.set_ylim, ylims[cff])
         ax.set_xlim(0.005, 1.0)
@@ -1058,7 +1058,7 @@ def CFF(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
         apply(ax.set_ylim, ylims[cff])
         ax.axvspan(0.025, 0.136, facecolor='g', alpha=0.1)  # vertical band
         ax.set_xlim(0.02, 0.142)
-        ax.text(0.20, 0.95, "d   a   t   a       r   e   g   i   o   n", 
+        ax.text(0.20, 0.95, "H  E  R  M  E  S       r   e   g   i   o   n", 
                 transform=ax.transAxes, fontsize=14, fontweight='bold', va='top')
         #ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.02))  # tickmarks
     if path:
@@ -1084,9 +1084,13 @@ def CFF2(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
     # Define abscissas
     logxvals = np.logspace(-3.0, -0.01, 40)
     # ordinates 
-    ylims = {'ImH': (-4.3, 35), 'ReH': (-6.5, 8)}
+    #ylims = {'ImH': (-4.3, 35), 'ReH': (-6.5, 8)}
+    ylims = {'ImH': (-4.3, 35), 'ReH': (-15, 8),
+             'ImE': (-40, 35), 'ReE': (-15, 30),
+             'ImEt': (-500, 500), 'ReEt': (-500, 500),
+             'ImHt': (-40, 50), 'ReHt': (-15, 30)}
     # Plot panels
-    ts = [-0.2, -0.02]
+    ts = [-0.17, -0.33]
     for n in range(len(cffs)):
         for nt in range(len(ts)):
             cff = cffs[n]

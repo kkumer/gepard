@@ -690,7 +690,7 @@ class ComptonNeuralNets(Model):
         """
         self.architecture = [2] + hidden_layers + [len(output_layer)]
         self.output_layer = output_layer
-        self.allCFFs = output_layer
+        #self.allCFFs = output_layer
         self.nets = []
         self.parameters = {'nnet':0, 'outputvalue':None}
         self.parameter_names = ['nnet', 'outputvalue']
