@@ -1087,8 +1087,8 @@ def CFF2(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
     #ylims = {'ImH': (-4.3, 35), 'ReH': (-6.5, 8)}
     ylims = {'ImH': (-4.3, 35), 'ReH': (-15, 8),
              'ImE': (-40, 35), 'ReE': (-15, 30),
-             'ImEt': (-500, 500), 'ReEt': (-500, 500),
-             'ImHt': (-40, 50), 'ReHt': (-15, 30)}
+             'ImEt': (-50, 100), 'ReEt': (-50, 100),
+             'ImHt': (-10, 20), 'ReHt': (-10, 20)}
     # Plot panels
     ts = [-0.17, -0.33]
     for n in range(len(cffs)):

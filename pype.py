@@ -99,9 +99,9 @@ mDRPPsea = Model.ComptonModelDRPPsea()
 #m = Model.HybridDipole(mGepard, mDRPPsea)
 m = Model.HybridKelly(mGepard, mDRPPsea)
 th = Approach.BM10(m)
-th.name = 'new'
+th.name = 'KM10'
 g = th.m.g
-th.m.parameters.update(zeroHt)
+th.m.parameters.update(KM10)
 #th.m.covariance = KM10cov
 
 #thHF = Approach.hotfixedBMK(m)
