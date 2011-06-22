@@ -112,11 +112,12 @@ mGepard = Model.ComptonGepard(cutq2=0.5)
 # NN
 #mNN = Model.ModelNN(hidden_layers=[15], output_layer=['ImH', 'ReH', 'ImE', 'ReE', 'ImHt', 'ReHt', 'ImEt', 'ReEt'])
 #mNN = Model.ModelNN(hidden_layers=[9], endpointpower=3.0)
-#mNN = Model.ModelNN(hidden_layers=[11])
+#mNN = Model.ModelNN(hidden_layers=[11], output_layer=['ImH'], useDR=['ReH'])
+mNN = Model.ModelNN(output_layer=['ImH'], useDR=['ReH'])
 #mNN = Model.ModelNN(hidden_layers=[11], output_layer=['ImH', 'ReH', 'ReE','ImHt', 'ReHt', 'ReEt'])
-#tNN = Approach.hotfixedBMK(mNN)
-#tNN.name = 'NNtest'
-#tNN.description = 'x (xB,t)-11-2 nets trained on HERMES-like mock data for 200 batches'
+tNN = Approach.hotfixedBMK(mNN)
+tNN.name = 'NNDR'
+tNN.description = 'x 2-11-1 DR / H'
 
 #tDR2 = db['DR2-H']
 #tDR3 = db['DR3-H']
@@ -129,7 +130,7 @@ mGepard = Model.ComptonGepard(cutq2=0.5)
 ## [4] Do the fit
 #th.m.fix_parameters('ALL')
 
-#f = Fitter.FitterBrain(Hpoints, tNNf, nnets=50, nbatch=400, verbose=1)
+f = Fitter.FitterBrain(Hpoints[:6]+Hpoints[18:24], tNN, nnets=1, nbatch=20, verbose=2)
 #f.fit()
 #f.prune(minprob=0.5)
 #tNN.m.parameters['nnet'] = 'ALL'

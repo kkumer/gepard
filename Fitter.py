@@ -126,7 +126,7 @@ class FitterBrain(Fitter):
         self.verbose = 0
         self.inputs = theory.model.architecture[0]
         self.outputs = theory.model.architecture[-1]
-        # Numerical derivative of transformation function w.r.t. net output:
+        # Numerical derivatives of transformation function w.r.t. each of net outputs:
         left = self.outputs * [1.0]
         right = self.outputs * [1.0]
         for pt in self.fitpoints:
@@ -138,9 +138,12 @@ class FitterBrain(Fitter):
                 # return left to default value of [1, 1, ...]
                 left[k] = 1.0
             pt.deriv = np.array(deriv)
+            # adding derivative w.r.t. subtraction constant
+            pt.derivC = (theory.predict(pt, parameters={'outputvalue':tuple(right), 'outputvalueC':1.2}) -
+                     theory.predict(pt, parameters={'outputvalue':tuple(right), 'outputvalueC':1.0})) / 0.2
         Fitter.__init__(self, **kwargs)
 
-    def artificialData(self, datapoints, trainpercentage=70):
+    def artificialData(self, datapoints, trainpercentage=70, useDR=None):
         """Create artificial data replica.
         
         Replica is created by randomly picking value around mean value taken from
@@ -153,14 +156,22 @@ class FitterBrain(Fitter):
 
         Keyword arguments:
         trainpercentage -- size of subset used for training (rest is for testing)
+                  useDR -- if true returns also trainingC  SupervisedDataSet
+                           instance used for subtraction constant netC training
+                           and similarly testingC (which is maybe not needed?)
 
            
         """
         training = brain.SupervisedDataSetTransformed(self.inputs, self.outputs) 
         testing = brain.SupervisedDataSetTransformed(self.inputs, self.outputs)
+        if useDR:
+            # for subtraction constant
+            trainingC = brain.SupervisedDataSetTransformed(1, 1)
+            testingC = brain.SupervisedDataSetTransformed(1, 1)
         trainsize = int(len(datapoints) * trainpercentage / 100.)
         i = 0
         trans.map2pt.clear()
+        trans.outmem.clear()
         for pt in np.random.permutation(datapoints):
             xs = [pt.xB, pt.t]
             ys = self.outputs * [0]
@@ -169,11 +180,18 @@ class FitterBrain(Fitter):
             ys[0] = pt.val + round(np.random.normal(0, pt.err, 1)[0], 5)
             # ys[1:] are zero and are never used.
             trans.map2pt[ys[0]] = (self.theory, pt)
+            trans.outmem[ys[0]] = (0, 0)
             if i < trainsize:
                 training.addSample(xs, ys)
+                if useDR:
+                    trainingC.addSample(xs[1:], ys[:1])
             else:
                 testing.addSample(xs, ys)
+                if useDR:
+                    testingC.addSample(xs[1:], ys[:1])
             i += 1
+        if useDR:
+            return training, trainingC, testing, testingC
         return training, testing
 
     def makenet(self, datapoints):
@@ -207,11 +225,74 @@ class FitterBrain(Fitter):
                 print "---- This one is hopeless. Giving up. ----"
                 break
         return memnet, memerr
+
+    def makenetDR(self, datapoints):
+        """Create trained nets and return tuple (net, netC, error).
+        net is network giving CFF outputs, while netC is network with
+        single input and output giving subtraction constant C(t)
+        
+        """
+        self.dstrain, self.dstrainC, self.dstest, self.dstestC = self.artificialData(
+                datapoints, useDR=True)
+
+        net = buildNetwork(*self.theory.model.architecture)
+        netC = buildNetwork(1, 3, 1)  # hardwired hidden layer good enough?
+
+        self.trainer = brain.RPropMinusTrainerTransformed(net, learningrate = 0.9, 
+                lrdecay = 0.98, momentum = 0.0, batchlearning = True, verbose = False)
+        self.trainerC = brain.RPropMinusTrainerTransformed(netC, learningrate = 0.9, 
+                lrdecay = 0.98, momentum = 0.0, batchlearning = True, verbose = False)
+
+        memerr = 1.  # large initial error, certain to be bettered
+        memerrC = 1.
+        memnet = net.copy()
+        memnetC = netC.copy()
+        for k in range(self.nbatch):
+            self.trainer.trainOnDataset(self.dstrain, self.batchlen)
+            self.trainerC.trainOnDataset(self.dstrainC, self.batchlen)
+            trainerr, testerr = (self.trainer.testOnData(self.dstrain), 
+                    self.trainer.testOnData(self.dstest))
+            trainerrC, testerrC = (self.trainerC.testOnData(self.dstrainC), 
+                    self.trainerC.testOnData(self.dstestC))
+            if self.verbose > 1:
+                print "Epoch: %6i   ---->    Error: %8.3g  TestError: %8.3g / %6.3g" % (
+                        self.trainer.epoch, trainerr, testerr, memerr)
+                print "       EpochC: %6i   ---->    Error: %8.3g  TestError: %8.3g / %6.3g" % (
+                        self.trainerC.epoch, trainerrC, testerrC, memerrC)
+            if testerr < memerr:
+                memerr = testerr
+                memnet = net.copy()
+                if self.verbose:
+                    if self.verbose > 1:
+                        print "---- New best result:  ----"
+                    print "Epoch: %6i   ---->    Error: %8.3g  TestError: %8.3g" % (
+                            self.trainer.epoch, trainerr, testerr)
+                    print "          EpochC: %6i   ---->    Error: %8.3g  TestError: %8.3g" % (
+                            self.trainer.epoch, trainerr, testerr)
+            if testerrC < memerrC:
+                memerrC = testerrC
+                memnetC = netC.copy()
+                if self.verbose:
+                    if self.verbose > 1:
+                        print "---- New best resultC:  ----"
+                    print "EpochC: %6i   ---->    Error: %8.3g  TestError: %8.3g" % (
+                            self.trainerC.epoch, trainerrC, testerrC)
+            elif testerr > 100 or trainerr > 100 or testerrC > 100 or trainerrC > 100:
+                print "---- Further training is hopeless. Giving up. ----"
+                break
+        sys.stderr.write(str(trans.outmem))
+        return memnet, memnetC, memerr, memerrC
     
     def fit(self):
         """Create and train neural networks."""
         for n in range(self.nnets):
-            net, memerr = self.makenet(self.fitpoints)
+            if self.theory.m.useDR:
+                # some Re parts are obtained via DR
+                net, netC, memerr, memerrC = self.makenetDR(self.fitpoints)
+                self.theory.model.netsC.append(netC)
+            else:
+                # decoupled Im and Re Parts are all net outputs
+                net, memerr = self.makenet(self.fitpoints)
             self.theory.model.nets.append(net)
             self.theory.model.parameters['nnet'] = n
             chi, dof, fitprob = self.theory.chisq(self.fitpoints)

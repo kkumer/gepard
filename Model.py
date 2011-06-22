@@ -25,6 +25,10 @@ class Model(object):
     """Base class for all models."""
 
     def __init__(self, optimization=False):
+        """ 
+        optimization -- use C/Fortran extensions or some such
+        
+        """
         self.optimization = optimization
         # Intially all parameters are fixed and should be released by user
         exec('fixed = {' + ", ".join(map(lambda x: "'fix_%s': %s" % x, 
@@ -673,7 +677,7 @@ class ComptonNeuralNets(Model):
     # FIXME: this variable should be purged out of the code most likely
     allCFFs = ['ImH', 'ReH', 'ImE', 'ReE', 'ImHt', 'ReHt', 'ImEt', 'ReEt']
 
-    def __init__(self, hidden_layers=[7], output_layer=['ImH', 'ReH'], endpointpower=None):
+    def __init__(self, hidden_layers=[7], output_layer=['ImH', 'ReH'], endpointpower=None, useDR=None):
         """Model CFFs by neural networks.
         
         Neural network, created actually by Fitter instance, will have
@@ -687,14 +691,18 @@ class ComptonNeuralNets(Model):
                        zero.
         endpointpower: CFFs are defined as NN*(1-xB)**endpointpower to enforce
                        vanishing at xB=0 and to improve convergence
+                useDR:  use dispersion relations for some Re(CFF)s.
+                         E.g.  useDR = ['ReH', 'ReE', 'ReEt', 'ReHt']
         
         """
         self.architecture = [2] + hidden_layers + [len(output_layer)]
         self.output_layer = output_layer
         self.nets = []
-        self.parameters = {'nnet':0, 'outputvalue':None}
-        self.parameter_names = ['nnet', 'outputvalue']
+        self.netsC = []  # for subtraction constants if useDR
+        self.parameters = {'nnet':0, 'outputvalue':None, 'outputvalueC':None}
+        self.parameter_names = ['nnet', 'outputvalue', 'outputvalueC']
         self.endpointpower = endpointpower
+        self.useDR = useDR
         # now do whatever else is necessary
         #ComptonFormFactors.__init__(self)
 
@@ -715,7 +723,7 @@ class ComptonNeuralNets(Model):
         elif name in ComptonFormFactors.allCFFeffs:
             # if asked for CFF which is not in output_layer, return 0
             return self.zero
-        elif name in ['endpointpower', 'optimization']:
+        elif name in ['endpointpower', 'optimization', 'useDR']:
             if self.__dict__.has_key(name):
                 return self.__dict__[name]
             else:
@@ -727,7 +735,32 @@ class ComptonNeuralNets(Model):
     def zero(self, *args, **kwargs):
         return 0
 
-    def CFF(self, pt, xi=0, outputvalue=None, useDR=False):
+    def subtraction(self, pt):
+        # FIXME: to be exteded by netsC evaluation
+        if self.parameters['outputvalueC'] != None:
+            # this occurs during training: value is set by training
+            # routine by calling with outputvalueC set by training routine
+            return self.parameters['outputvalueC']
+        ar = []
+        for netC in self.netsC:
+            ar.append(netC.activate([pt.t])[0])
+        all = array(ar).flatten()
+        if self.parameters.has_key('nnet'):
+            if self.parameters['nnet'] == 'ALL':
+                return all
+            elif self.parameters['nnet'] == 'AVG':
+                return all.mean()
+            else: # we want particular netC
+                try:
+                    return all[self.parameters['nnet']]
+                except IndexError:
+                    raise IndexError, str(self)+' has only '+str(len(self.netsC))+' nets!'
+        # by default, we get mean value (FIXME:this should never occurr?)
+        else:
+            return all.mean()
+
+
+    def CFF(self, pt, xi=0, outputvalue=None):
         """
         useDR -- use dispersion relation to calculate this CFF
         """
@@ -738,11 +771,12 @@ class ComptonNeuralNets(Model):
             # this occurs during training: value is set by training
             # routine by calling with outputvalue set by training routine
             return self.parameters['outputvalue'][ind]
-        if useDR and self.curname in ['ReH', 'ReE', 'ReHt', 'ReEt']:
+        if self.useDR and self.curname in self.useDR:
             #sys.stderr.write('Doing DR for CFF: %s\n' % self.curname)
-            # FIXME: still now subtraction
-            if self.curname in ['ReH', 'ReE']:
-                return DR.intV(self.__getattr__('Im'+self.curname[2:]), pt)
+            if self.curname == 'ReH':
+                return DR.intV(self.ImH, pt) - self.subtraction(pt)
+            elif self.curname == 'ReE':
+                return DR.intV(self.ImE, pt) + self.subtraction(pt)
             elif self.curname in ['ReHt', 'ReEt']:
                 return DR.intA(self.__getattr__('Im'+self.curname[2:]), pt)
             else:
