@@ -7,7 +7,7 @@ and parameter values can calculate observables.
 
 """
 #from IPython.Debugger import Tracer; debug_here = Tracer()
-import pickle, sys
+import pickle, sys, logging
 
 from numpy import log, pi, imag, real, sqrt
 from numpy import ndarray, array
@@ -20,6 +20,9 @@ import dispersion as DR
 
 import pygepard as g
 import optModel
+
+_lg = logging.getLogger('p.%s' % __name__)
+#_lg.setLevel(logging.DEBUG)  #DEBUG, INFO, WARNING, ERROR, CRITICAL
 
 class Model(object):
     """Base class for all models."""
@@ -708,14 +711,16 @@ class ComptonNeuralNets(Model):
 
     def __getattr__(self, name):
         """Return appropriate CFF function object."""
-        #sys.stderr.write('NN model called with attr = %s\n' % name)
+        #_lg.debug('NN model called with attr = %s\n' % name)
         #debug_here()
         # FIXME: I don't understand why I have to use this:
         if name in object.__getattribute__(self, 'output_layer'):
         # and this creates infinite recursion:
         #if name in self.output_layer:
             self.curname = name
-            #sys.stderr.write('Entering actual CFF: %s\n' % name)
+            return self.CFF
+        if self.useDR and name in self.useDR:
+            self.curname = name
             return self.CFF
         elif name in ComptonFormFactors.allCFFs:
             # if asked for CFF which is not in output_layer, return 0
@@ -736,7 +741,7 @@ class ComptonNeuralNets(Model):
         return 0
 
     def subtraction(self, pt):
-        # FIXME: to be exteded by netsC evaluation
+        return 2.25  # temporary
         if self.parameters['outputvalueC'] != None:
             # this occurs during training: value is set by training
             # routine by calling with outputvalueC set by training routine
@@ -761,18 +766,9 @@ class ComptonNeuralNets(Model):
 
 
     def CFF(self, pt, xi=0, outputvalue=None):
-        """
-        useDR -- use dispersion relation to calculate this CFF
-        """
-
         # FIXME: This function is HEAVILY sub-optimal and non-pythonic!
-        ind = self.output_layer.index(self.curname)
-        if self.parameters['outputvalue'] != None:
-            # this occurs during training: value is set by training
-            # routine by calling with outputvalue set by training routine
-            return self.parameters['outputvalue'][ind]
         if self.useDR and self.curname in self.useDR:
-            #sys.stderr.write('Doing DR for CFF: %s\n' % self.curname)
+            #_lg.debug('Doing DR for CFF: %s\n' % self.curname)
             if self.curname == 'ReH':
                 return DR.intV(self.ImH, pt) - self.subtraction(pt)
             elif self.curname == 'ReE':
@@ -781,6 +777,11 @@ class ComptonNeuralNets(Model):
                 return DR.intA(self.__getattr__('Im'+self.curname[2:]), pt)
             else:
                 raise ValueError, 'Only Re(CFF) can be calculated via disp. rel.'
+        ind = self.output_layer.index(self.curname)
+        if self.parameters['outputvalue'] != None:
+            # this occurs during training: value is set by training
+            # routine by calling with outputvalue set by training routine
+            return self.parameters['outputvalue'][ind]
         if isinstance(xi, ndarray):
             # function was called with third argument that is xi nd array
             x = xi

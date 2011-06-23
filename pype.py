@@ -3,16 +3,45 @@
 #import pylab
 #import matplotlib.pyplot as plt
 
-import shelve, copy, sys
+import shelve, copy, sys, logging
 
 import numpy as np
 import scipy.stats
+
+logging.basicConfig(level=logging.DEBUG)
 
 import Model, Approach, Fitter, Data, utils, plots
 from constants import Mp, Mp2
 
 from results import *
 from math import sqrt
+
+from dispersion import *
+
+class HFilter(logging.Filter):
+
+    def __init__(self, treestring):
+        self.tree = treestring.split('.')
+        logging.Filter.__init__(self)
+
+    def filter(self, rec):
+        head = rec.name.split('.')[:len(self.tree)]
+        if head != self.tree: 
+            return 0
+        #sys.stderr.write(' --- HFilter hit by %s (%s)\n' % (rec.name, rec.levelname))
+        return 1
+
+_lg = logging.getLogger('p')
+
+hfil = HFilter('p')
+logging._handlerList[0].addFilter(hfil)
+
+#lg = logging.Logger('A')
+#lg.addHandler(logging.StreamHandler())
+#fil = HFilter('A')
+#lg.handlers[0].addFilter(hfil)
+#lg.addFilter(hfil)
+#lg.setLevel(logging.DEBUG)  #DEBUG, INFO, WARNING, ERROR, CRITICAL
 
 ## [1] Load experimental data and theoretical models
 
@@ -114,10 +143,11 @@ mGepard = Model.ComptonGepard(cutq2=0.5)
 #mNN = Model.ModelNN(hidden_layers=[9], endpointpower=3.0)
 #mNN = Model.ModelNN(hidden_layers=[11], output_layer=['ImH'], useDR=['ReH'])
 mNN = Model.ModelNN(output_layer=['ImH'], useDR=['ReH'])
+#mNN = Model.ModelNN(output_layer=['ReH'])
 #mNN = Model.ModelNN(hidden_layers=[11], output_layer=['ImH', 'ReH', 'ReE','ImHt', 'ReHt', 'ReEt'])
 tNN = Approach.hotfixedBMK(mNN)
 tNN.name = 'NNDR'
-tNN.description = 'x 2-11-1 DR / H'
+tNN.description = 'x 2-11-1 DR / H6'
 
 #tDR2 = db['DR2-H']
 #tDR3 = db['DR3-H']
@@ -130,7 +160,9 @@ tNN.description = 'x 2-11-1 DR / H'
 ## [4] Do the fit
 #th.m.fix_parameters('ALL')
 
-f = Fitter.FitterBrain(Hpoints[:6]+Hpoints[18:24], tNN, nnets=1, nbatch=20, verbose=2)
+f = Fitter.FitterBrain(Hpoints[:6]+Hpoints[18:24], tNN, crossvalidation=False, nnets=3, nbatch=200, verbose=2)
+#f = Fitter.FitterBrain(Hpoints[:6], tNN, nnets=1, nbatch=20, verbose=2)   # BSA
+#f = Fitter.FitterBrain(Hpoints[18:24], tNN, usenet=0, nnets=1, nbatch=20, verbose=2)  # BCA
 #f.fit()
 #f.prune(minprob=0.5)
 #tNN.m.parameters['nnet'] = 'ALL'
@@ -173,6 +205,13 @@ def pc(th):
         #cutpts = utils.select(pts, criteria=['Q2>=1.6'])
         #print '%10s: chi/npts = %6.2f/%d (cut)' % (name, th.chisq(cutpts)[0], len(cutpts))
 
+def pcs(th):
+    exps = ['BSAs', 'BCAs']
+    ptssets = [Hpoints[:6], Hpoints[18:24]]
+    for name, pts in zip(exps,ptssets):
+        print '%10s: chi/npts = %6.2f/%d' % (name, th.chisq(pts)[0], len(pts))
+        #cutpts = utils.select(pts, criteria=['Q2>=1.6'])
+        #print '%10s: chi/npts = %6.2f/%d (cut)' % (name, th.chisq(cutpts)[0], len(cutpts))
     
 # fixed target datapoint FIXME: WRONG!
 def ptfix(th, Q=1, pol=-1, Ee=160., xB=0.1, Q2=2.2, t=-0.1, phi=3.5, FTn=None):

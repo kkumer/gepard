@@ -1,7 +1,7 @@
 """Classes for fitting."""
 #from IPython.Debugger import Tracer; debug_here = Tracer()
 
-import sys
+import sys, logging
 
 import numpy as np
 
@@ -12,6 +12,12 @@ try: # if you have ROOT you might want minuit2
     from minuit2 import Minuit2 as Minuit
 except:
     from minuit import Minuit
+
+
+_lg = logging.getLogger('p.%s' % __name__)
+#_lg.setLevel('logging.INFO')
+#_lg = logging.Logger('A.F')
+#_lg.addHandler(logging.StreamHandler())
 
 from pybrain.tools.shortcuts import buildNetwork
 import brain
@@ -25,6 +31,7 @@ class Fitter(object):
     def __init__(self, **kwargs):
         for key in kwargs:
             setattr(self, key, kwargs[key])
+        _lg.info('Fitter instance created')
 
 
 class FitterMinuit(Fitter):
@@ -120,6 +127,8 @@ class FitterBrain(Fitter):
     def __init__(self, fitpoints, theory, **kwargs):
         self.fitpoints = fitpoints
         self.theory = theory
+        self.usenet = None
+        self.crossvalidation = True
         self.nnets = 4
         self.nbatch = 20
         self.batchlen = 5
@@ -197,34 +206,46 @@ class FitterBrain(Fitter):
     def makenet(self, datapoints):
         """Create trained net and return tuple (net, error)."""
 
-        self.dstrain, self.dstest = self.artificialData(datapoints)
 
-        net = buildNetwork(*self.theory.model.architecture)
+        if isinstance(self.usenet, int):
+            # we want to use already existing net
+            net = self.theory.m.nets[self.usenet]
+        else:
+            # we need new net
+            net = buildNetwork(*self.theory.model.architecture)
 
         self.trainer = brain.RPropMinusTrainerTransformed(net, learningrate = 0.9, 
-                lrdecay = 0.98, momentum = 0.0, batchlearning = True, verbose = False)
+                lrdecay = 0.98, momentum = 0.3, batchlearning = False, verbose = False)
 
-        memerr = 1.  # large initial error, certain to be bettered
-        memnet = net.copy()
-        for k in range(self.nbatch):
-            self.trainer.trainOnDataset(self.dstrain, self.batchlen)
-            trainerr, testerr = (self.trainer.testOnData(self.dstrain), 
-                    self.trainer.testOnData(self.dstest))
-            if self.verbose > 1:
-                print "Epoch: %6i   ---->    Error: %8.3g  TestError: %8.3g / %6.3g" % (
-                        self.trainer.epoch, trainerr, testerr, memerr)
-            if testerr < memerr:
-                memerr = testerr
-                memnet = net.copy()
-                if self.verbose:
-                    if self.verbose > 1:
-                        print "---- New best result:  ----"
-                    print "Epoch: %6i   ---->    Error: %8.3g  TestError: %8.3g" % (
-                            self.trainer.epoch, trainerr, testerr)
-            elif testerr > 100 or trainerr > 100:
-                print "---- This one is hopeless. Giving up. ----"
-                break
-        return memnet, memerr
+        if self.crossvalidation:
+            # train using cross-validation procedure to avoid overfitting
+            self.dstrain, self.dstest = self.artificialData(datapoints)
+            memerr = 1.  # large initial error, certain to be bettered
+            memnet = net.copy()
+            for k in range(self.nbatch):
+                self.trainer.trainOnDataset(self.dstrain, self.batchlen)
+                trainerr, testerr = (self.trainer.testOnData(self.dstrain), 
+                        self.trainer.testOnData(self.dstest))
+                if self.verbose > 1:
+                    print "Epoch: %6i   ---->    TrainErr: %8.3g  TestErr: %8.3g / %6.3g" % (
+                            self.trainer.epoch, trainerr, testerr, memerr)
+                if testerr < memerr:
+                    memerr = testerr
+                    memnet = net.copy()
+                    if self.verbose:
+                        if self.verbose > 1:
+                            print "---- New best result:  ----"
+                        print "Epoch: %6i   ---->    TrainErr: %8.3g  TestErr: %8.3g" % (
+                                self.trainer.epoch, trainerr, testerr)
+                elif testerr > 100 or trainerr > 100:
+                    print "---- This one is hopeless. Giving up. ----"
+                    break
+            return memnet, memerr
+        else:
+            # simple training
+            self.dstrain, self.dstest = self.artificialData(datapoints, trainpercentage=100)
+            self.trainer.trainOnDataset(self.dstrain, self.nbatch*self.batchlen)
+            return net, 0
 
     def makenetDR(self, datapoints):
         """Create trained nets and return tuple (net, netC, error).
@@ -255,9 +276,9 @@ class FitterBrain(Fitter):
             trainerrC, testerrC = (self.trainerC.testOnData(self.dstrainC), 
                     self.trainerC.testOnData(self.dstestC))
             if self.verbose > 1:
-                print "Epoch: %6i   ---->    Error: %8.3g  TestError: %8.3g / %6.3g" % (
+                print "Epoch: %6i   ---->    TrainErr: %8.3g  TestErr: %8.3g / %6.3g" % (
                         self.trainer.epoch, trainerr, testerr, memerr)
-                print "       EpochC: %6i   ---->    Error: %8.3g  TestError: %8.3g / %6.3g" % (
+                print "       EpochC: %6i   ---->    TrainErrC: %8.3g  TestErrC: %8.3g / %6.3g" % (
                         self.trainerC.epoch, trainerrC, testerrC, memerrC)
             if testerr < memerr:
                 memerr = testerr
@@ -265,9 +286,9 @@ class FitterBrain(Fitter):
                 if self.verbose:
                     if self.verbose > 1:
                         print "---- New best result:  ----"
-                    print "Epoch: %6i   ---->    Error: %8.3g  TestError: %8.3g" % (
+                    print "Epoch: %6i   ---->    TrainErr: %8.3g  TestErr: %8.3g" % (
                             self.trainer.epoch, trainerr, testerr)
-                    print "          EpochC: %6i   ---->    Error: %8.3g  TestError: %8.3g" % (
+                    print "          EpochC: %6i   ---->    TrainErr: %8.3g  TestErr: %8.3g" % (
                             self.trainer.epoch, trainerr, testerr)
             if testerrC < memerrC:
                 memerrC = testerrC
@@ -275,7 +296,7 @@ class FitterBrain(Fitter):
                 if self.verbose:
                     if self.verbose > 1:
                         print "---- New best resultC:  ----"
-                    print "EpochC: %6i   ---->    Error: %8.3g  TestError: %8.3g" % (
+                    print "EpochC: %6i   ---->    TrainErrC: %8.3g  TestErrC: %8.3g" % (
                             self.trainerC.epoch, trainerrC, testerrC)
             elif testerr > 100 or trainerr > 100 or testerrC > 100 or trainerrC > 100:
                 print "---- Further training is hopeless. Giving up. ----"
@@ -286,15 +307,22 @@ class FitterBrain(Fitter):
     def fit(self):
         """Create and train neural networks."""
         for n in range(self.nnets):
-            if self.theory.m.useDR:
+            _lg.info('Making NN no %i' % n)
+            #if self.theory.m.useDR:
+            if False:  # switch subtraction constant off temporarily
                 # some Re parts are obtained via DR
                 net, netC, memerr, memerrC = self.makenetDR(self.fitpoints)
                 self.theory.model.netsC.append(netC)
             else:
                 # decoupled Im and Re Parts are all net outputs
                 net, memerr = self.makenet(self.fitpoints)
-            self.theory.model.nets.append(net)
-            self.theory.model.parameters['nnet'] = n
+            if isinstance(self.usenet, int):
+                # just set actual number to the one of requested net
+                self.theory.model.parameters['nnet'] = self.usenet
+            else:
+                # append newly created net to nets
+                self.theory.model.nets.append(net)
+                self.theory.model.parameters['nnet'] = n
             chi, dof, fitprob = self.theory.chisq(self.fitpoints)
             if fitprob < 0.05:
                 sfitprob = utils.stringcolor("%5.4f" % fitprob, 'red', True)
