@@ -15,6 +15,7 @@ fitpoints = data[31][12:14] + data[8][1:3] + data[30][2:4]
 
 # test-network 
 testNN = db['KMS11-NN']
+testNN.m.useDR = None
 
 
 def test_basicNN():

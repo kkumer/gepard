@@ -160,9 +160,9 @@ tNN.description = 'x 2-11-1 DR / H6'
 ## [4] Do the fit
 #th.m.fix_parameters('ALL')
 
-f = Fitter.FitterBrain(Hpoints[:6]+Hpoints[18:24], tNN, crossvalidation=False, nnets=3, nbatch=200, verbose=2)
+#f = Fitter.FitterBrain(Hpoints[:6]+Hpoints[18:24], tNN, crossvalidation=False, nnets=1, nbatch=50, verbose=2)
 #f = Fitter.FitterBrain(Hpoints[:6], tNN, nnets=1, nbatch=20, verbose=2)   # BSA
-#f = Fitter.FitterBrain(Hpoints[18:24], tNN, usenet=0, nnets=1, nbatch=20, verbose=2)  # BCA
+f = Fitter.FitterBrain(Hpoints[18:24], tNN, nnets=1, nbatch=20, verbose=2)  # BCA
 #f.fit()
 #f.prune(minprob=0.5)
 #tNN.m.parameters['nnet'] = 'ALL'

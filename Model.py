@@ -712,16 +712,17 @@ class ComptonNeuralNets(Model):
     def __getattr__(self, name):
         """Return appropriate CFF function object."""
         #_lg.debug('NN model called with attr = %s\n' % name)
-        #debug_here()
         # FIXME: I don't understand why I have to use this:
         if name in object.__getattribute__(self, 'output_layer'):
         # and this creates infinite recursion:
         #if name in self.output_layer:
             self.curname = name
             return self.CFF
-        if self.useDR and name in self.useDR:
-            self.curname = name
-            return self.CFF
+        #if hasattr(self, 'useDR'):
+        #    if object.__getattribute__(self, 'useDR') \
+        #        and name in object.__getattribute__(self, 'useDR'):
+        #        self.curname = name
+        #        return self.CFF
         elif name in ComptonFormFactors.allCFFs:
             # if asked for CFF which is not in output_layer, return 0
             return self.zero
@@ -767,7 +768,7 @@ class ComptonNeuralNets(Model):
 
     def CFF(self, pt, xi=0, outputvalue=None):
         # FIXME: This function is HEAVILY sub-optimal and non-pythonic!
-        if self.useDR and self.curname in self.useDR:
+        if hasattr(self, 'useDR') and self.useDR and self.curname in self.useDR:
             #_lg.debug('Doing DR for CFF: %s\n' % self.curname)
             if self.curname == 'ReH':
                 return DR.intV(self.ImH, pt) - self.subtraction(pt)
