@@ -718,11 +718,11 @@ class ComptonNeuralNets(Model):
         #if name in self.output_layer:
             self.curname = name
             return self.CFF
-        #if hasattr(self, 'useDR'):
-        #    if object.__getattribute__(self, 'useDR') \
-        #        and name in object.__getattribute__(self, 'useDR'):
-        #        self.curname = name
-        #        return self.CFF
+        elif hasattr(self, 'useDR') \
+                and object.__getattribute__(self, 'useDR') \
+                and name in object.__getattribute__(self, 'useDR'):
+            self.curname = name
+            return self.CFF
         elif name in ComptonFormFactors.allCFFs:
             # if asked for CFF which is not in output_layer, return 0
             return self.zero
@@ -768,6 +768,7 @@ class ComptonNeuralNets(Model):
 
     def CFF(self, pt, xi=0, outputvalue=None):
         # FIXME: This function is HEAVILY sub-optimal and non-pythonic!
+        #_lg.debug('NN model CFF called as = %s\n' % self.curname)
         if hasattr(self, 'useDR') and self.useDR and self.curname in self.useDR:
             #_lg.debug('Doing DR for CFF: %s\n' % self.curname)
             if self.curname == 'ReH':
