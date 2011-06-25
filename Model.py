@@ -6,7 +6,7 @@ fitting procedure).  Theoretical "approach", when given an instance of a model
 and parameter values can calculate observables.
 
 """
-#from IPython.Debugger import Tracer; debug_here = Tracer()
+from IPython.Debugger import Tracer; debug_here = Tracer()
 import pickle, sys, logging
 
 from numpy import log, pi, imag, real, sqrt
@@ -765,13 +765,13 @@ class ComptonNeuralNets(Model):
         else:
             return all.mean()
 
-
-    def CFF(self, pt, xi=0, outputvalue=None):
+    def CFF(self, pt, xi=0):
         # FIXME: This function is HEAVILY sub-optimal and non-pythonic!
         #_lg.debug('NN model CFF called as = %s\n' % self.curname)
         if hasattr(self, 'useDR') and self.useDR and self.curname in self.useDR:
             #_lg.debug('Doing DR for CFF: %s\n' % self.curname)
             if self.curname == 'ReH':
+                #debug_here()
                 return DR.intV(self.ImH, pt) - self.subtraction(pt)
             elif self.curname == 'ReE':
                 return DR.intV(self.ImE, pt) + self.subtraction(pt)
@@ -780,13 +780,14 @@ class ComptonNeuralNets(Model):
             else:
                 raise ValueError, 'Only Re(CFF) can be calculated via disp. rel.'
         ind = self.output_layer.index(self.curname)
-        if self.parameters['outputvalue'] != None:
+        if isinstance(xi, ndarray) and len(self.nets)>0:
+            # function was called with third argument that is xi nd array
+            # and we already have some nets so disp.int. can be calculated
+            x = xi
+        elif self.parameters['outputvalue'] != None:
             # this occurs during training: value is set by training
             # routine by calling with outputvalue set by training routine
             return self.parameters['outputvalue'][ind]
-        if isinstance(xi, ndarray):
-            # function was called with third argument that is xi nd array
-            x = xi
         elif xi != 0:
             # function was called with third argument that is xi number
             x = array((xi,))

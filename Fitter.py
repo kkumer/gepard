@@ -316,7 +316,6 @@ class FitterBrain(Fitter):
     def fit(self):
         """Create and train neural networks."""
         for n in range(self.nnets):
-            _lg.info('Making NN no %i' % n)
             #if self.theory.m.useDR:
             if False:  # switch subtraction constant off temporarily
                 # some Re parts are obtained via DR

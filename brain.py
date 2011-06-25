@@ -1,10 +1,13 @@
 """Interface to pybrain package, overriding stuff there"""
+#from IPython.Debugger import Tracer; debug_here = Tracer()
 
-import sys
+import sys, logging
 
 # Loading pybrain classes whose methods need overriding
 from pybrain.datasets import SupervisedDataSet
 from pybrain.supervised import BackpropTrainer, RPropMinusTrainer
+
+_lg = logging.getLogger('p.%s' % __name__)
 
 import trans  # output layer transformation for FitterBrain
 
@@ -14,6 +17,7 @@ class RPropMinusTrainerTransformed(RPropMinusTrainer):
     def _calcDerivs(self, seq):
         """Calculate error function [with transformed outer layer]
         and backpropagate output errors to yield the gradient."""
+        #_lg.debug('doing _calcDerivs()')
         self.module.reset()        
         for sample in seq:
             self.module.activate(sample[0])
