@@ -718,7 +718,9 @@ class ComptonNeuralNets(Model):
         #if name in self.output_layer:
             self.curname = name
             return self.CFF
-        elif hasattr(self, 'useDR') \
+                #and self.useDR \
+        #elif hasattr(self, 'useDR') \
+        elif self.__dict__.has_key('useDR') \
                 and object.__getattribute__(self, 'useDR') \
                 and name in object.__getattribute__(self, 'useDR'):
             self.curname = name

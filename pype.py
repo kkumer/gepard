@@ -48,7 +48,7 @@ logging._handlerList[0].addFilter(hfil)
 data = utils.loaddata('/home/kkumer/pype/data/ep2epgamma', approach=Approach.hotfixedBMK)  
 data.update(utils.loaddata('/home/kkumer/pype/data/gammastarp2gammap', approach=Approach.hotfixedBMK))
 db = shelve.open('/home/kkumer/pype/theories.db')
-#dell = shelve.open('/home/kkumer/pype/dellB.db')
+dell = shelve.open('/home/kkumer/pype/dellB.db')
 
 ## [2] Choose subset of datapoints for fitting
 
