@@ -132,8 +132,12 @@ class Approach(object):
                     h=sqrt(m.covariance[p,p])
                     mem = m.parameters[p]
                     m.parameters[p] = mem+h/2.
+                    if self.model.__dict__.has_key('Gepard') or \
+                            self.model.__dict__.has_key('g'): self.m.g.newcall = 1
                     up = fun(pt)
                     m.parameters[p] = mem-h/2.
+                    if self.model.__dict__.has_key('Gepard') or \
+                            self.model.__dict__.has_key('g'): self.m.g.newcall = 1
                     down = fun(pt)
                     m.parameters[p] = mem
                     dfdp[p] = (up-down)/h
@@ -160,6 +164,8 @@ class Approach(object):
                     # one sigma
                     result = (allnets.mean(), allnets.std())
         else:
+            if self.model.__dict__.has_key('Gepard') or \
+                    self.model.__dict__.has_key('g'): self.m.g.newcall = 1
             result = fun(pt)
             if isinstance(result, ndarray):
                 # we have neural net

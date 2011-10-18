@@ -837,13 +837,13 @@ class ComptonGepard(ComptonFormFactors):
     cutq2 - Q2 at which evolution is frozen (default = 0 GeV^2)
     
     """
-    def __init__(self, cutq2=0.0, **kwargs):
+    def __init__(self, cutq2=0.0, tdep='dipole', **kwargs):
         # initial values of parameters and limits on their values
         self.parameters = {
                'NS' : 0.15,
              'AL0S' : 1.0,
              'ALPS' : 0.15,
-             'M02S' : 1.0,    'limit_M02S' : (0.3, 1.5),
+             'M02S' : 1.0,    'limit_M02S' : (0.1, 1.5),
            'DELM2S' : 0.0,
                'PS' : 2.0,
              'SECS' : 0.0,
@@ -853,7 +853,7 @@ class ComptonGepard(ComptonFormFactors):
                'NG' : 0.5,
              'AL0G' : 1.1,
              'ALPG' : 0.15,
-             'M02G' : 0.7,    'limit_M02G' : (0.3, 1.5),
+             'M02G' : 0.7,    'limit_M02G' : (0.1, 1.5),
            'DELM2G' : 0.0,
                'PG' : 2.0,
              'SECG' : 0.0,
@@ -913,7 +913,15 @@ class ComptonGepard(ComptonFormFactors):
         g.mbcont.phind = 1.57
 
         g.parchr.scheme = array([c for c in 'CSBAR'])  # array(5)
-        g.parchr.ansatz = array([c for c in 'FIT   ']) # array(6)
+        if tdep == 'dipole':
+            g.parchr.ansatz = array([c for c in 'FIT   ']) # array(6)
+        elif tdep == 'exponential':
+            g.parchr.ansatz = array([c for c in 'FITEXP']) # array(6)
+            self.parameters['ALPS'] = 0.0   # like in smallx.nb
+            self.parameters['ALPG'] = 0.0
+            self.parameters['M02G'] = 1./4.63 # from J/Psi production
+        else:
+            raise ValueError, "Invalid tdep: %s\n" % tdep
 
         # following two items usually came from driver file
         g.parchr.process = array([c for c in 'DVCS  '])  # array(6)

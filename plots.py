@@ -161,10 +161,10 @@ def panel(ax, points=None, lines=None, bands=None, xaxis=None, xs=None,
         for band in bands:
             for pts in points:
                 _axband(ax, lambda pt: band.predict(pt, error=True, CL=CL), pts, xaxis=xaxis,
-                        hatch=hatches[bandn], 
-                        #color=bandcolors[bandn],
-                        #facecolor=bandcolors[bandn], # band  color
-                        facecolor='none',
+                        #hatch=hatches[bandn], 
+                        color=bandcolors[bandn],
+                        facecolor=bandcolors[bandn], # band  color
+                        #facecolor='none',
                         edgecolor=bandcolors[bandn], # band edge color
                         linewidth=1,
                         label=band.name, **kwargs)
@@ -370,8 +370,9 @@ def HERMES09(path=None, fmt='png', **kwargs):
                 xlabels = ['$-t\\; [{\\rm GeV}^2]$', '$x_B$', '$Q^2\\; [{\\rm GeV}^2]$']
                 ax.set_xlabel(xlabels[npanel-7], fontsize=18)
             if npanel == 1:
-                ax.legend(bbox_to_anchor=(0., 1.), loc='upper left',
-                        borderaxespad=0.).draw_frame(0)
+                #ax.legend(bbox_to_anchor=(0., 1.), loc='upper left',
+                #        borderaxespad=0.).draw_frame(0)
+                pass
         #ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.2))  # tickmarks
             for label in ax.get_xticklabels() + ax.get_yticklabels():
                 label.set_fontsize(14)
@@ -723,8 +724,9 @@ def COMPASSt(path=None, fmt='png', **kwargs):
         ax.text(0.03, 0.35, "%s = %s" % (toTeX['xB'], xB), fontsize=14)
         ax.text(0.03, 0.3, "%s = %s" % (toTeX['Q2'], Q2), fontsize=14)
         if pn == 1:
-            ax.legend(bbox_to_anchor=(0.9, 0.7), loc='upper right',
-                    borderaxespad=0.).draw_frame(0)
+            #ax.legend(bbox_to_anchor=(0.9, 0.7), loc='upper right',
+            #        borderaxespad=0.).draw_frame(0)
+            pass
         if (pn != 1) and (pn != 4):
             # no y tick labels on right panels
             ax.set_yticklabels([])
@@ -1022,7 +1024,7 @@ def CFF(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
     linestyles = ['solid', 'dashed']
     # Define abscissas
     #logxvals = np.power(10., np.arange(-3.0, -0.001, 0.1))  # left panel
-    logxvals = np.logspace(-3.0, -0.01, 20)  # left panel
+    logxvals = np.logspace(-5.0, -0.01, 20)  # left panel
     xvals = np.linspace(0.02, 0.15, 20) # right panel
     # ordinates 
     #ylims = {'ImH': (-4.3, 35), 'ReH': (-6.5, 8),
@@ -1040,11 +1042,11 @@ def CFF(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
         ax.set_xlabel(toTeX['xixB'], fontsize=15)
         ax.set_ylabel(toTeX['%s' % cff], fontsize=18)
         ax.axhspan(-0.0005, 0.0005, facecolor='g', alpha=0.6)  # horizontal bar
-        ax.axvspan(0.025, 0.136, facecolor='g', alpha=0.1)  # vertical band
-        ax.text(0.35, 0.95, "HERMES region", transform=ax.transAxes, 
-                fontsize=14, fontweight='bold', va='top')
-        apply(ax.set_ylim, ylims[cff])
-        ax.set_xlim(0.005, 1.0)
+        #ax.axvspan(0.025, 0.136, facecolor='g', alpha=0.1)  # vertical band
+        #ax.text(0.35, 0.95, "data region", transform=ax.transAxes, 
+        #        fontsize=14, fontweight='bold', va='top')
+        #apply(ax.set_ylim, ylims[cff])
+        #ax.set_xlim(0.005, 1.0)
         if n == 0:
             ax.legend(loc='upper right')
             ax.legend().draw_frame(0)
@@ -1055,11 +1057,11 @@ def CFF(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
         panel(ax, xaxis='xi', xs=xvals, kins={'yaxis':cff, 't':-0.2,  'Q2':4.}, **kwargs)
         ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
         ax.set_xlabel(toTeX['xixB'], fontsize=15)
-        apply(ax.set_ylim, ylims[cff])
-        ax.axvspan(0.025, 0.136, facecolor='g', alpha=0.1)  # vertical band
-        ax.set_xlim(0.02, 0.142)
-        ax.text(0.20, 0.95, "H  E  R  M  E  S       r   e   g   i   o   n", 
-                transform=ax.transAxes, fontsize=14, fontweight='bold', va='top')
+        #apply(ax.set_ylim, ylims[cff])
+        #ax.axvspan(0.025, 0.136, facecolor='g', alpha=0.1)  # vertical band
+        #ax.set_xlim(0.02, 0.142)
+        #ax.text(0.20, 0.95, "d   a   t   a       r   e   g   i   o   n", 
+        #        transform=ax.transAxes, fontsize=14, fontweight='bold', va='top')
         #ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.02))  # tickmarks
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
@@ -1100,12 +1102,12 @@ def CFF2(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
             panel(ax, xaxis='xi', xs=logxvals, kins={
                     'yaxis':cff, 't':ts[nt], 'Q2':4.}, **kwargs)
             ax.axhspan(-0.0005, 0.0005, facecolor='g', alpha=0.6)  # horizontal bar
-            ax.text(0.3, 0.02, "$t = %s\\, {\\rm GeV}^2$" % str(ts[nt]), 
+            ax.text(0.31, 0.02, "$t = %s\\, {\\rm GeV}^2$" % str(ts[nt]), 
                     transform=ax.transAxes, fontsize=18)
             ax.xaxis.set_major_formatter(matplotlib.ticker.FormatStrFormatter('%s'))
             if nt == 0:
                 # plot data-region vertical band for left panels
-                #ax.axvspan(0.025, 0.136, facecolor='g', alpha=0.1)
+                ax.axvspan(0.025, 0.136, facecolor='g', edgecolor='black', alpha=0.2)
                 ax.set_ylabel(toTeX['%s' % cff], fontsize=20)
             if nt == 1:
                 # no y tick labels on right panels
@@ -1119,18 +1121,73 @@ def CFF2(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
             if n == 0 and nt == 0:
                 # put legend in first panel
                 #ax.legend(loc='upper right')
-                ax.legend(bbox_to_anchor=(0.85, 0.85), loc='upper right',
-                        borderaxespad=0.).draw_frame(0)
+                #ax.legend(bbox_to_anchor=(0.85, 0.85), loc='upper right',
+                #        borderaxespad=0.).draw_frame(0)
+                pass
                 #ax.legend().draw_frame(0)
                 # 
-                #ax.text(0.33, 0.95, "data region", transform=ax.transAxes, 
-                #        fontsize=14, fontweight='bold', va='top')
+                ax.text(0.33, 0.95, "data region", transform=ax.transAxes, 
+                        fontsize=14, fontweight='bold', va='top')
             apply(ax.set_ylim, ylims[cff])
             ax.set_xlim(0.005, 1.0)
             #ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.02))  # tickmarks
             for label in ax.get_xticklabels() + ax.get_yticklabels():
                 label.set_fontsize(14)
     fig.subplots_adjust(bottom=0.2, wspace=0.0, hspace=0.0)
+    if path:
+        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+    else:
+        fig.canvas.draw()
+        fig.show()
+    return fig
+
+def CFFt(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
+    """Makes plots of cffs as function of t given by various theories/models
+    
+    cffs    -- List of CFFs to be plotted. Each produces two panels: ImF, ReF.
+
+    """
+    title = ''
+    fig = plt.figure()
+    fig.canvas.set_window_title(title)
+    fig.suptitle(title)
+    colors = ['red', 'brown']     # worm human colors :-)
+    nncolors = ['blue', 'green']  # cold computer colors
+    linestyles = ['solid', 'dashed']
+    # Define abscissas
+    tmvals = np.linspace(0.02, 0.6, 10) # right panel
+    # ordinates 
+    #ylims = {'ImH': (-4.3, 35), 'ReH': (-6.5, 8),
+    # Plot panels
+    for n in range(len(cffs)):
+        cff = cffs[n]
+        # small x
+        ax = fig.add_subplot(len(cffs), 2, 2*n+1)
+        panel(ax, xaxis='tm', xs=tmvals, kins={'yaxis':cff, 'xB':0.001, 'Q2':4.}, **kwargs)
+        ax.set_xlabel(toTeX['tm'], fontsize=15)
+        ax.set_ylabel(toTeX['%s' % cff], fontsize=18)
+        ax.axhspan(-0.0005, 0.0005, facecolor='g', alpha=0.6)  # horizontal bar
+        if n == 0:
+            ax.legend(loc='upper right')
+            ax.legend().draw_frame(0)
+            ax.text(0.03, 600, "$x_B = 0.001$",# transform=ax.transAxes, 
+                    fontsize=15)
+            ax.text(0.03, 40, "$Q^2 = 4\\, {\\rm GeV}^2$",# transform=ax.transAxes, 
+                    fontsize=15)
+        # moderate x
+        ax = fig.add_subplot(len(cffs), 2, 2*n+2)
+        panel(ax, xaxis='tm', xs=tmvals, kins={'yaxis':cff, 'xB':0.05, 'Q2':4.}, **kwargs)
+        ax.set_xlabel(toTeX['tm'], fontsize=15)
+        ax.set_ylabel(toTeX['%s' % cff], fontsize=18)
+        ax.axhspan(-0.0005, 0.0005, facecolor='g', alpha=0.6)  # horizontal bar
+        if n == 0:
+            ax.legend(loc='upper right')
+            ax.legend().draw_frame(0)
+            ax.text(0.03, 4, "$x_B = 0.05$",# transform=ax.transAxes, 
+                    fontsize=15)
+            ax.text(0.03, 0.4, "$Q^2 = 4\\, {\\rm GeV}^2$",# transform=ax.transAxes, 
+                    fontsize=15)
+    fig.subplots_adjust(bottom=0.4)
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
