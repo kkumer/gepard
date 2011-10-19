@@ -919,6 +919,27 @@ def EIC(lines=[], path=None, fmt='png'):
         fig.show()
     return fig
 
+def EICt(path=None, fmt='png', **kwargs):
+    """Plot simulated EIC DVCS data."""
+    id = 1001
+    title = 'EIC - simulated'
+    fig = plt.figure()
+    fig.canvas.set_window_title(title)
+    fig.suptitle(title)
+    # we have 2x3 points
+    ax = fig.add_subplot(1, 1, 1)
+    #ax.yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))  # tickmarks
+    ax.set_yscale('log')  # y-axis to be logarithmic
+    panel(ax, points=data[id], xaxis='tm', **kwargs)
+    ax.set_ylabel('$d\\sigma/dt\\quad [{\\rm nb/GeV}^2]$', fontsize=18)
+    ax.set_xlabel('$-t\\quad [{\\rm GeV}^2]$', fontsize=18)
+    if path:
+        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+    else:
+        fig.canvas.draw()
+        fig.show()
+    return fig
+
 def H(theories=[], path=None, fmt='png'):
     """Makes plot of x*Im(cffH)/pi = x * H
     

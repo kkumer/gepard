@@ -85,16 +85,15 @@ BTSApoints = utils.select(data[53], criteria=['FTn==0'])
 #UNPpoints = ALTGLOpoints + BSSwpoints + BSDwpoints
 #UNP5points = ALTGLO5points + BSSwpoints + BSDwpoints
 H1ZEUSpoints = DVCSpoints + data[48]
+H1ZEUSindependent = data[45] + data[39] + data[36] + data[46]
+EICtest2 = data[1001]
 
 
 ## [3] Create a theory
 
 # Gepard only
-mGepard = Model.ComptonGepard()
+mGepard = Model.ComptonGepard(tdep='exponential')
 tGepard = Approach.hotfixedBMK(mGepard)
-# removing some limits for compatibility with old Gepard
-del mGepard.parameters['limit_M02S']
-del mGepard.parameters['limit_M02G']
 
 # DR only
 #mDRonly = Model.ModelDR()
@@ -130,8 +129,10 @@ del mGepard.parameters['limit_M02G']
 
 ## [4] Do the fit
 tGepard.model.fix_parameters('ALL')
-tGepard.model.release_parameters('M02S')
-f = Fitter.FitterMinuit(data[40], tGepard)
+mGepard.parameters.update({'NS':0.1520391, 'AL0S':1.1575060, 'AL0G':1.2473167})
+mGepard.release_parameters('M02S', 'SECS', 'SECG')
+th = tGepard
+f = Fitter.FitterMinuit(EICtest2+H1ZEUSindependent, th)
 
 # Hybrid: Gepard+DR (can reuse above Gepard)
 #mDRsea = Model.ComptonModelDRsea()
