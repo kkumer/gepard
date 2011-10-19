@@ -34,33 +34,33 @@ out3particle = gamma
 # A_{LU}
 
 
-y0name = TSA
-y0namelong = Target Spin Asymmetry
-y0unit = 1
-y0value = column2
-y0error = column3
+y1name = TSA
+y1namelong = Target Spin Asymmetry
+y1unit = 1
+y1value = column3
+y1error = column4
 # only total error is knonw
 
 
 
 ### x-axes
 
-x0name = xB
+x1name = xB
 # xi values were given, it was understood that xB= 2xi/(1+xi)
-x0unit = 1
-x0value = column0
+x1unit = 1
+x1value = column1
 
-x1name = Q2
-x1unit = GeV^2
-x1value = 1.82
-
-x2name = tm
+x2name = Q2
 x2unit = GeV^2
-x2value = column1
+x2value = 1.82
 
-x3name = FTn
-x3unit = 1
-x3value = -1
+x3name = tm
+x3unit = GeV^2
+x3value = column2
+
+x4name = FTn
+x4unit = 1
+x4value = -1
 
 ### Data
 table =

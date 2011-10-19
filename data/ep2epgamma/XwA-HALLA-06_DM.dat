@@ -4,7 +4,7 @@ editor1 = DM
 # Feb. 2010
 # modified naming scheme
 
-# the y0 data of this angular assymmetry are derived from the phi measurement
+# the y1 data of this angular assymmetry are derived from the phi measurement
 # of HALL A data from the experiment (BSS-HALLA-06)
 
 ### Experiment
@@ -36,27 +36,27 @@ out3particle = gamma
 
 ### Observable 
 
-y0name = XwA
-y0namelong = Helicity Independent Cross Section - Ratio of First Two Cos Harmonics
+y1name = XwA
+y1namelong = Helicity Independent Cross Section - Ratio of First Two Cos Harmonics
 # or weigthed cross section azimuthal angular asymmetry
-y0unit = nb/GeV^4
-y0value = table0column1
-y0error = table0column2
+y1unit = nb/GeV^4
+y1value = column2
+y1error = column3
 
 
 ### x-axes
 
-x0name = t
-x0unit = GeV^2
-x0value = table0column0
-
-x1name = xB
+x1name = t
 x1unit = GeV^2
-x1value = 0.36
+x1value = column1
 
-x2name = Q2
+x2name = xB
 x2unit = GeV^2
-x2value = 2.3
+x2value = 0.36
+
+x3name = Q2
+x3unit = GeV^2
+x3value = 2.3
 
 
 ### Data

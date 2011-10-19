@@ -85,9 +85,9 @@ class DataPoint(DummyPoint):
         `gridline` is a list constructed from one row of data grid in data file.
         It is assumed that data gridline is of the form:
 
-              x0  x1 ....   y0  y0stat y0syst  
+              x1  x2 ....   y1  y1stat y1syst  
 
-        where y0syst need not be present, or can have one or two values, syst+ and syst-
+        where y1syst need not be present, or can have one or two values, syst+ and syst-
 
         (Further elements are ignored.)
         `dataset` is container `DataSet` that is to contain this `DataPoint`
@@ -106,29 +106,29 @@ class DataPoint(DummyPoint):
         for name in self.xnames:
             nameindex = int(name[1:].split('name')[0])  # = 1, 0, 2, ...
             xname = getattr(self, name)  # = 't', 'xB', ...
-            xval = getattr(self, 'x' + str(nameindex) + 'value') #  = '[table0]column1' or 0.1
+            xval = getattr(self, 'x' + str(nameindex) + 'value') #  =  0.1
             if isinstance(xval, float) or isinstance(xval, int): 
                 # we have global instead of grid value
                 setattr(self, xname, xval)    # pt.xB = 0.1, pt.FTn = 1, ...
             else: 
                 # take value from the grid 
-                columnindex = int(xval.split('column')[1])  # = 1, 0, 2, ...
+                columnindex = int(xval.split('column')[1])-1  # = 1, 0, 2, ...
                 setattr(self, xname, gridline[columnindex])  # pt.xB = gridline[1]
         # 2c. y-axis 
-        self.val = gridline[int(self.y0value.split('column')[1])]
+        self.val = gridline[int(self.y1value.split('column')[1])-1]
         # 2d. y-axis errors
-        if self.has_key('y0error'):  # we are given total error already
-            self.err = gridline[int(self.y0error.split('column')[1])]
+        if self.has_key('y1error'):  # we are given total error already
+            self.err = gridline[int(self.y1error.split('column')[1])-1]
         else:  # we have to add stat and syst in quadrature
-            self.stat = gridline[int(self.y0errorstatistic.split('column')[1])]
-            if self.has_key('y0errorsystematic'):
-                self.syst = gridline[int(self.y0errorsystematic.split('column')[1])]
+            self.stat = gridline[int(self.y1errorstatistic.split('column')[1])-1]
+            if self.has_key('y1errorsystematic'):
+                self.syst = gridline[int(self.y1errorsystematic.split('column')[1])-1]
                 self.err = math.sqrt( self.stat**2 + self.syst**2 )
-            elif self.has_key('y0errorsystematicplus'): 
+            elif self.has_key('y1errorsystematicplus'): 
                 # we have syst+ and syst-. Taking the larger one as a systematic error.
                 # TODO: This should be, of course, treated in a assymetric way
-                self.systplus = gridline[int(self.y0errorsystematicplus.split('column')[1])]
-                self.systminus = gridline[int(self.y0errorsystematicminus.split('column')[1])]
+                self.systplus = gridline[int(self.y1errorsystematicplus.split('column')[1])-1]
+                self.systminus = gridline[int(self.y1errorsystematicminus.split('column')[1])-1]
                 self.syst = max(self.systplus, -self.systminus)
                 self.err = math.sqrt( self.stat**2 + self.syst**2 )
             else:  # syst error not given, assumed zero
@@ -177,18 +177,18 @@ class DataSet(list):
                     setattr(self, key, preamble[key])
 
             #  Extracting names of x-axes variables 
-            #  xnames = ['x0name', 'x1name', ...], not necessarily sorted!
+            #  xnames = ['x1name', 'x2name', ...], not necessarily sorted!
             #  xaxes = ['t', 'xB', ...]
             self.xnames = [key for key in preamble if re.match('^x\dname$', key)]
             self.xaxes = [preamble[key] for key in self.xnames]
 
             # Good to have:
-            self.yaxis = preamble['y0name']
+            self.yaxis = preamble['y1name']
             self.filename = os.path.split(datafile)[-1]
             # Following dictionary will contain units for everything
             # i.e.  {'phi' : 'degrees', 't' : 'GeV^2', ...}
             self.units = dict((preamble[key], preamble[key[:2]+'unit']) for key in self.xnames)
-            self.units[self.yaxis] = preamble['y0unit']
+            self.units[self.yaxis] = preamble['y1unit']
             # Following dictionary will have units which are changed so that match
             # units used for internal theoretical formulas
             self.newunits = {}
@@ -220,26 +220,4 @@ class DataSet(list):
         tmp = DataSet(self[start:end:step])
         tmp.__dict__ = self.__dict__.copy() # transfer the attributes
         return tmp
-
-    #def plot(self, xaxis=None, kinlabels=[], fits=[], path=None, fmt='png'):
-    #    """Plot the dataset, with fit lines if needed.
-
-    #    Named arguments correspond to those of `utils.subplot`.
-    #    If path to directory is given, figure is saved there in format `fmt`.
-
-    #    """
-
-    #    title = self.filename
-    #    fig = plt.figure()
-    #    fig.canvas.set_window_title(title)
-    #    fig.suptitle(title)
-    #    ax = fig.add_subplot(111)
-    #    utils.subplot(ax, [self], xaxis, kinlabels, fits)
-    #    if path:
-    #        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
-    #    else:
-    #        fig.canvas.draw()
-    #        fig.show()
-    #    return 
-
 

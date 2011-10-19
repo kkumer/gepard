@@ -5,7 +5,7 @@ editor1 = DM
 # modified naming scheme
 # combining two files by introducing FTn
 
-# the y0 data are derived from the phi measurement
+# the y1 data are derived from the phi measurement
 # of HALL A data from the experiment (BSS-HALLA-06)
 
 ### Experiment
@@ -36,32 +36,32 @@ out3particle = gamma
 
 
 ### Observable 
-y0long = Re Part of BMK01 Angular Harmonic Coefficients CI and DEL CI
+y1long = Re Part of BMK01 Angular Harmonic Coefficients CI and DEL CI
 # related to the Fourier transform of weighted Beam Spin Sum
-y0name = BSSw2C
-y0unit = 1
-y0value = table0column2
-y0error = table0column3
+y1name = BSSw2C
+y1unit = 1
+y1value = column3
+y1error = column4
 
 
 ### x-axes
 
-x0name = xB
-x0unit = 1
-x0value = 0.36
+x1name = xB
+x1unit = 1
+x1value = 0.36
 
-x1name = Q2
-x1unit = GeV^2
-x1value = 2.3
-
-
-x2name = t
+x2name = Q2
 x2unit = GeV^2
-x2value = table0column0
+x2value = 2.3
 
-x3name = FTn
-x3unit = 1
-x3value = table0column1
+
+x3name = t
+x3unit = GeV^2
+x3value = column1
+
+x4name = FTn
+x4unit = 1
+x4value = column2
 
 
 ### Data

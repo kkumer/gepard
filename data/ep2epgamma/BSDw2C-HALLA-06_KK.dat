@@ -4,7 +4,7 @@ editor1 = DM
 # Feb. 2010
 # modified naming scheme
 
-# the y0 data are derived from the phi measurement
+# the y1 data are derived from the phi measurement
 # of HALL A data from the experiment (BSD-HALLA-06)
 
 
@@ -37,31 +37,31 @@ out3particle = gamma
 
 ### Observable 
 
-y0name = BSDw2C
-y0namelong = Im Part of BMK01 Angular Harmonic Coefficient CI
+y1name = BSDw2C
+y1namelong = Im Part of BMK01 Angular Harmonic Coefficient CI
 # related to the Fourier transform of weighted Beam Spin Difference
-y0unit = 1
-y0value = table0column2
-y0error = table0column3
+y1unit = 1
+y1value = column3
+y1error = column4
 
 
 ### x-axes
 
-x0name = xB
-x0unit = 1
-x0value = 0.36
+x1name = xB
+x1unit = 1
+x1value = 0.36
 
-x1name = Q2
-x1unit = GeV^2
-x1value = table0column0
-
-x2name = t
+x2name = Q2
 x2unit = GeV^2
-x2value = table0column1
+x2value = column1
 
-x3name = FTn
-x3unit = 1
-x3value = -1
+x3name = t
+x3unit = GeV^2
+x3value = column2
+
+x4name = FTn
+x4unit = 1
+x4value = -1
 
 
 ### Data

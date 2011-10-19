@@ -25,24 +25,24 @@ out2particle = p
 
 ### Observable 
 
-y0name = XDVCS
-y0namelong = DVCS cross section
-y0unit = nb
-y0value = column1
-y0errorstatistic = column2
-y0errorsystematicplus = column3
-y0errorsystematicminus = column4
+y1name = XDVCS
+y1namelong = DVCS cross section
+y1unit = nb
+y1value = column2
+y1errorstatistic = column3
+y1errorsystematicplus = column4
+y1errorsystematicminus = column5
 
 
 ### x-axes
 
-x0name = Q2
-x0unit = GeV^2
-x0value = 3.2
+x1name = Q2
+x1unit = GeV^2
+x1value = 3.2
 
-x1name = W
-x1unit = GeV
-x1value = column0
+x2name = W
+x2unit = GeV
+x2value = column1
 
 
 # W    sigma  stat   syst+ syst-

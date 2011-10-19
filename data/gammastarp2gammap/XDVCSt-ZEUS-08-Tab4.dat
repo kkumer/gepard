@@ -25,27 +25,27 @@ out2particle = p
 
 ### Observable 
 
-y0name = XDVCSt
-y0namelong = DVCS cross section differential in t
-y0unit = nb/GeV^2
-y0value = column1
-y0errorstatistic = column2
-y0errorsystematic = column3
+y1name = XDVCSt
+y1namelong = DVCS cross section differential in t
+y1unit = nb/GeV^2
+y1value = column2
+y1errorstatistic = column3
+y1errorsystematic = column4
 
 
 ### x-axes
 
-x0name = Q2
-x0unit = GeV^2
-x0value = 3.2
+x1name = Q2
+x1unit = GeV^2
+x1value = 3.2
 
-x1name = W
-x1unit = GeV
-x1value = 104
+x2name = W
+x2unit = GeV
+x2value = 104
 
-x2name = tm
-x2unit = GeV^2
-x2value = column0
+x3name = tm
+x3unit = GeV^2
+x3value = column1
 
 
 # -t   dsig/dt  stat   syst

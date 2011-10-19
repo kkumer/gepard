@@ -1,7 +1,7 @@
 id = 51
 editor = KK
 
-# the y0 data are derived from the phi measurement
+# the y1 data are derived from the phi measurement
 # of HALL A data from the experiment (BSS-HALLA-06)
 
 ### Experiment
@@ -32,32 +32,32 @@ out3particle = gamma
 
 
 ### Observable 
-y0long = Weighted beam spin sum
-y0name = BSSw
-y0unit = 1
-y0value = column2
-y0errorstatistic = column3
-y0errorsystematic = column4
+y1long = Weighted beam spin sum
+y1name = BSSw
+y1unit = 1
+y1value = column3
+y1errorstatistic = column4
+y1errorsystematic = column5
 
 
 ### x-axes
 
-x0name = xB
-x0unit = 1
-x0value = 0.36
+x1name = xB
+x1unit = 1
+x1value = 0.36
 
-x1name = Q2
-x1unit = GeV^2
-x1value = 2.3
-
-
-x2name = t
+x2name = Q2
 x2unit = GeV^2
-x2value = column0
+x2value = 2.3
 
-x3name = FTn
-x3unit = 1
+
+x3name = t
+x3unit = GeV^2
 x3value = column1
+
+x4name = FTn
+x4unit = 1
+x4value = column2
 
 
 ### Data

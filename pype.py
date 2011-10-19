@@ -47,14 +47,14 @@ logging._handlerList[0].addFilter(hfil)
 
 data = utils.loaddata('/home/kkumer/pype/data/ep2epgamma', approach=Approach.hotfixedBMK)  
 data.update(utils.loaddata('/home/kkumer/pype/data/gammastarp2gammap', approach=Approach.hotfixedBMK))
-db = shelve.open('/home/kkumer/pype/theories.db')
+#db = shelve.open('/home/kkumer/pype/theories.db')
 dell = shelve.open('/home/kkumer/pype/dellB.db')
 
 ## [2] Choose subset of datapoints for fitting
 
 #testpoints = data[31][12:14] + data[8][1:3] + data[30][2:4]  # test set
-GLOpoints = data[31][12:] + data[8] + data[29]  # DM's GLO set
-GLO1points = data[31][12:] + data[8] + data[29] + data[30]  # DM's GLO1 set
+#GLOpoints = data[31][12:] + data[8] + data[29]  # DM's GLO set
+#GLO1points = data[31][12:] + data[8] + data[29] + data[30]  # DM's GLO1 set
 ##HERMESpoints = data[31][12:] +  data[29]
 ##BSApoints = data[8] + data[29]
 ##HAD17 = utils.select(data[33], criteria=['Q2 == 1.5', 't == -0.17'])
@@ -64,26 +64,26 @@ GLO1points = data[31][12:] + data[8] + data[29] + data[30]  # DM's GLO1 set
 DVCSpoints = data[36] + data[37] + data[38] + data[39] + \
   data[40] + data[41] + data[42] + data[43] + data[44] + \
   data[45]
-ALTGLOpoints = data[5] + data[25] + data[32][18:]  # KK's CLAS BSA
+#ALTGLOpoints = data[5] + data[25] + data[32][18:]  # KK's CLAS BSA
 ##ALTGLO1points = data[5] + data[25] + data[32] + HAD17 + HA17
 ##ALTGLO2points = data[5] + data[25] + data[32][18:] + HAD17[::2] + HA17[::2]
 ##ALTGLO3points = data[5] + data[25] + data[32][18:] + data[30] + HA17
 #ALTGLO4points = data[25] + data[32][18:]
-ALTGLO5points = data[5] + data[8] + data[32][18:]   # DM's CLAS BSA
-Hpoints = data[5] + data[32][18:]
+#ALTGLO5points = data[5] + data[8] + data[32][18:]   # DM's CLAS BSA
+#Hpoints = data[5] + data[32][18:]
 ##BSDw2Cpoints = utils.select(data[26], criteria=['Q2 == 2.3'])
 ##BSDw2CDpoints = utils.select(data[50], criteria=['Q2 == 2.3'])
-BSDwpoints = utils.select(data[50], criteria=['FTn == -1'])
-BSSwpoints = utils.select(data[51], criteria=['FTn>=0', 'FTn <= 1'])
+#BSDwpoints = utils.select(data[50], criteria=['FTn == -1'])
+#BSSwpoints = utils.select(data[51], criteria=['FTn>=0', 'FTn <= 1'])
 #BSDwDMpoints = utils.select(data[55], criteria=['FTn == -1'])
 #BSSwDMpoints = utils.select(data[56], criteria=['FTn>=0', 'FTn <= 1'])
-TSA1points = utils.select(data[52], criteria=['FTn == -1'])
+#TSA1points = utils.select(data[52], criteria=['FTn == -1'])
 #DMpoints = data[5] + data[32][18:] + data[8] + data[30]
 #DMTSApoints = data[5] + data[32][18:] + TSA1points + data[8] + data[30]
 #TSApoints = TSA1points + data[54]
 BTSApoints = utils.select(data[53], criteria=['FTn==0'])
-UNPpoints = ALTGLOpoints + BSSwpoints + BSDwpoints
-UNP5points = ALTGLO5points + BSSwpoints + BSDwpoints
+#UNPpoints = ALTGLOpoints + BSSwpoints + BSDwpoints
+#UNP5points = ALTGLO5points + BSSwpoints + BSDwpoints
 H1ZEUSpoints = DVCSpoints + data[48]
 
 
@@ -91,7 +91,7 @@ H1ZEUSpoints = DVCSpoints + data[48]
 
 # Gepard only
 mGepard = Model.ComptonGepard(cutq2=0.5)
-#tGepard = Approach.hotfixedBMK(mGepard)
+tGepard = Approach.hotfixedBMK(mGepard)
 
 # DR only
 #mDRonly = Model.ModelDR()
@@ -158,7 +158,7 @@ tNN.description = 'x 2-11-1 DR / H6'
 #tDR3.name = 'Model fit'
 
 ## [4] Do the fit
-#th.m.fix_parameters('ALL')
+tGepard.m.fix_parameters('ALL')
 
 f = Fitter.FitterBrain(Hpoints[:6]+Hpoints[18:24], tNN, nnets=10, crossvalidation=True, nbatch=20, verbose=2)
 #f = Fitter.FitterBrain(Hpoints[:6], tNN, nnets=1, crossvalidation=True, nbatch=20, verbose=2)   # BSA
@@ -181,6 +181,28 @@ f = Fitter.FitterBrain(Hpoints[:6]+Hpoints[18:24], tNN, nnets=10, crossvalidatio
 #    if not th.m.parameters['fix_'+par]:
 #        print '---- '+par+' ---'
 #        th.scan(par, f.fitpoints)
+
+## Fitting to just small-x data (H1 + ZEUS)
+mGepard.parameters.update({'NS':0.1520391, 'AL0S':1.1575060, 'AL0G':1.2473167})
+tGepard.m.release_parameters('M02S', 'SECS', 'SECG')#, 'THIS', 'THIG')
+f = Fitter.FitterMinuit(H1ZEUSpoints, tGepard)
+#f.minuit.tol = 80
+#f.minuit.maxcalls = 100
+#f.minuit.printMode = 1
+#for par in th.m.parameter_names:
+#    if not th.m.parameters['fix_'+par]:
+#        print '---- '+par+' ---'
+#        th.scan(par, f.fitpoints)
+
+## Fitting to just large-x data
+#th.m.release_parameters('rv', 'bv', 'Mv', 'C', 'MC', 'trv', 'tbv', 'tMv', 'rpi', 'Mpi')
+#th.m.parameters['trv'] = 1.
+#th.m.parameters['limit_trv'] = (-2., 2.)
+#f = Fitter.FitterMinuit(UNP5points, th)
+#f = Fitter.FitterMinuit(DVCSpoints+GLOpoints, th)
+#f.minuit.tol = 80
+#f.minuit.maxcalls = 100
+#f.minuit.printMode = 1
 
 
 ## DR fit

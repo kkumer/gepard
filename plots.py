@@ -570,7 +570,7 @@ def HallAFT(path=None, fmt='png', **kwargs):
     for npanel in range(1,6):
         ax = fig.add_subplot(2,3,npanel)
         panel(ax, points=subsets[npanel], xaxis='t', **kwargs)
-        ax.set_ylabel('%s(FTn = %i)' % (subsets[npanel][0].y0name, 
+        ax.set_ylabel('%s(FTn = %i)' % (subsets[npanel][0].y1name, 
             subsets[npanel][0].FTn), fontsize=16)
         if npanel<5:
             ax.text(-0.31, 0.002, '$Q^2\\!= %s\\,{\\rm GeV}^2$' % Qs[npanel-1], fontsize=12)

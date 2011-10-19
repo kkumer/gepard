@@ -6,7 +6,7 @@ fitting procedure).  Theoretical "approach", when given an instance of a model
 and parameter values can calculate observables.
 
 """
-from IPython.Debugger import Tracer; debug_here = Tracer()
+#from IPython.Debugger import Tracer; debug_here = Tracer()
 import pickle, sys, logging
 
 from numpy import log, pi, imag, real, sqrt

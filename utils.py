@@ -15,13 +15,16 @@ hubDict -- merges two dicts, but not actually but by forwarding
 stringcolor -- coloring string for output, if possible
 """
 
-import os, re, string, fnmatch, itertools
+import os, re, string, fnmatch, itertools, logging
 import numpy as np
 
 import Data, Approach
 from constants import Mp, Mp2
 
 #from IPython.Debugger import Tracer; debug_here = Tracer()
+_lg = logging.getLogger('p.%s' % __name__)
+_lg.setLevel('logging.INFO')
+_lg.info('Loading module %s' % __name__)
 
 
 class KinematicsError(Exception):
@@ -37,6 +40,8 @@ def loaddata(datadir='data', approach=False):
     """
     data = {}
     for file in os.listdir(datadir):
+        _lg.info('Loading datafile %s' % file)
+        print 'Loading datafile %s' % file
         if os.path.splitext(file)[1] == ".dat":
             dataset = Data.DataSet(datafile=os.path.join(datadir, file))
             if approach and dataset.process == 'ep2epgamma':
@@ -126,7 +131,7 @@ def parse(datafile):
 
     `preamble` is dictionary obtained by converting datafile preamble
     items into dictionary items like this:
-        y0 = BCA from datafile goes into   {'y0' : 'BCA', ...}
+        y1 = BCA from datafile goes into   {'y1' : 'BCA', ...}
 
     `data` is actual numerical grid of experimental data converted 
     into list of lists
@@ -245,7 +250,7 @@ def select(dataset, criteria=[], logic='AND'):
 
     logic='OR': select points satisfying any
     of the list of criteria.
-    Example: criteria=['xB > 0.1', 'y0name == BSA']
+    Example: criteria=['xB > 0.1', 'y1name == BSA']
     
     """
     selected = []
