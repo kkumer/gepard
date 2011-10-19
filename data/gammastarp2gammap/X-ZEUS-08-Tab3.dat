@@ -44,6 +44,10 @@ x2name = W
 x2unit = GeV
 x2value = column1
 
+x3name = tmmax
+x3unit = GeV^2
+x3value = 0.5
+
 
 # W    Q2    sigma  stat  syst+  syst-
 ######################################
