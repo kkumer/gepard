@@ -90,27 +90,17 @@ H1ZEUSpoints = DVCSpoints + data[48]
 ## [3] Create a theory
 
 # Gepard only
-mGepard = Model.ComptonGepard(cutq2=0.5)
+mGepard = Model.ComptonGepard()
 tGepard = Approach.hotfixedBMK(mGepard)
+# removing some limits for compatibility with old Gepard
+del mGepard.parameters['limit_M02S']
+del mGepard.parameters['limit_M02G']
 
 # DR only
 #mDRonly = Model.ModelDR()
 #tDR = Approach.hotfixedBMK(mDRonly)
 #tDR.name = 'KM09a'
 #tDR.m.parameters.update(DMepsGLO)
-
-#tDRBM = Approach.BM10(mDRonly)
-#tDRBM.name = 'KM09a+BM10'
-#tDRBM.m.parameters.update(DMepsGLO)
-
-#mDRonly1 = Model.ModelDR()
-#tDR1 = Approach.hotfixedBMK(mDRonly1)
-#tDR1.name = 'KM09b'
-#tDR1.m.parameters.update(DMepsGLO1)
-
-#tDR1BM = Approach.BM10(mDRonly1)
-#tDR1BM.name = 'KM09b+BM10'
-#tDR1BM.m.parameters.update(DMepsGLO1)
 
 ## Hybrid: Gepard+DR (can reuse above Gepard)
 #mDRsea = Model.ComptonModelDRsea()
@@ -119,10 +109,6 @@ tGepard = Approach.hotfixedBMK(mGepard)
 #th.name = 'KM10a'
 #th.m.parameters.update(KM10a)  
 #g = th.m.g
-
-#thBM = Approach.BM10(m)
-#thBM.m.name = "KM10b+BM10"
-
 
 #mDRPPsea = Model.ComptonModelDRPPsea()
 #m = Model.HybridDipole(mGepard, mDRPPsea)
@@ -133,88 +119,44 @@ tGepard = Approach.hotfixedBMK(mGepard)
 #th.m.parameters.update(KM10)
 #th.m.covariance = KM10cov
 
-#thHF = Approach.hotfixedBMK(m)
-#thHF.name = 'KM10 - hotfixed'
-#thHF.m.parameters.update(KM10)
-
-
 # NN
-#mNN = Model.ModelNN(hidden_layers=[15], output_layer=['ImH', 'ReH', 'ImE', 'ReE', 'ImHt', 'ReHt', 'ImEt', 'ReEt'])
 #mNN = Model.ModelNN(hidden_layers=[9], endpointpower=3.0)
 #mNN = Model.ModelNN(hidden_layers=[11], output_layer=['ImH'], useDR=['ReH'])
-mNN = Model.ModelNN(output_layer=['ImH'], useDR=['ReH'])
-#mNN = Model.ModelNN(output_layer=['ReH'])
-#mNN = Model.ModelNN(hidden_layers=[11], output_layer=['ImH', 'ReH', 'ReE','ImHt', 'ReHt', 'ReEt'])
-tNN = Approach.hotfixedBMK(mNN)
-tNN.name = 'NNDR'
-tNN.description = 'x 2-11-1 DR / H6'
+#tNN = Approach.hotfixedBMK(mNN)
+#tNN.name = 'NNDR'
+#tNN.description = 'x 2-11-1 DR / H6'
 
-#tDR2 = db['DR2-H']
-#tDR3 = db['DR3-H']
-#tNN = db['NN-H']
-#tNNf = dell['NN-H-final']
 
-#tNNf.name = 'Neural nets'
-#tDR3.name = 'Model fit'
 
 ## [4] Do the fit
-tGepard.m.fix_parameters('ALL')
+tGepard.model.fix_parameters('ALL')
+tGepard.model.release_parameters('M02S')
+f = Fitter.FitterMinuit(data[40], tGepard)
 
-f = Fitter.FitterBrain(Hpoints[:6]+Hpoints[18:24], tNN, nnets=10, crossvalidation=True, nbatch=20, verbose=2)
-#f = Fitter.FitterBrain(Hpoints[:6], tNN, nnets=1, crossvalidation=True, nbatch=20, verbose=2)   # BSA
-#f = Fitter.FitterBrain(Hpoints[18:24], tNN, nnets=1, crossvalidation=True, nbatch=20, verbose=2)  # BCA
+# Hybrid: Gepard+DR (can reuse above Gepard)
+#mDRsea = Model.ComptonModelDRsea()
+#mDRseaopt = Model.ComptonModelDRsea(optimization=True)
+#m = Model.HybridDipole(mGepard, mDRsea)
+#mopt = Model.HybridDipole(mGepard, mDRseaopt)
+#t = Approach.hotfixedBMK(m)
+#topt = Approach.hotfixedBMK(mopt)
+
+#f.minuit.tol = 80
+#f.minuit.maxcalls = 100
+#f.minuit.printMode = 1
+
+
+#f = Fitter.FitterBrain(Hpoints[:6]+Hpoints[18:24], tNN, nnets=10, crossvalidation=True, nbatch=20, verbose=2)
 #f.fit()
 #f.prune(minprob=0.5)
 #tNN.m.parameters['nnet'] = 'ALL'
 #tNN.save(db)
 #db.close()
 
-## Fitting to both small- and large-x data
-#th.m.release_parameters('M02S', 'SECS', 'SECG', 'THIS', 'THIG', 'rv', 'bv', 'Mv', 'C', 'MC', 'trv', 'tbv', 'tMv')#, 'rpi', 'Mpi')
-#th.m.release_parameters('rv', 'bv', 'Mv', 'C', 'MC', 'trv', 'tbv', 'tMv', 'rpi', 'Mpi')
-#f = Fitter.FitterMinuit(H1ZEUSpoints+UNP5points+TSApoints+BTSApoints, th)
-#f = Fitter.FitterMinuit(DVCSpoints+GLOpoints, th)
-#f.minuit.tol = 80
-#f.minuit.maxcalls = 100
-#f.minuit.printMode = 1
-#for par in th.m.parameter_names:
-#    if not th.m.parameters['fix_'+par]:
-#        print '---- '+par+' ---'
-#        th.scan(par, f.fitpoints)
-
-## Fitting to just small-x data (H1 + ZEUS)
-mGepard.parameters.update({'NS':0.1520391, 'AL0S':1.1575060, 'AL0G':1.2473167})
-tGepard.m.release_parameters('M02S', 'SECS', 'SECG')#, 'THIS', 'THIG')
-f = Fitter.FitterMinuit(H1ZEUSpoints, tGepard)
-#f.minuit.tol = 80
-#f.minuit.maxcalls = 100
-#f.minuit.printMode = 1
-#for par in th.m.parameter_names:
-#    if not th.m.parameters['fix_'+par]:
-#        print '---- '+par+' ---'
-#        th.scan(par, f.fitpoints)
-
-## Fitting to just large-x data
-#th.m.release_parameters('rv', 'bv', 'Mv', 'C', 'MC', 'trv', 'tbv', 'tMv', 'rpi', 'Mpi')
-#th.m.parameters['trv'] = 1.
-#th.m.parameters['limit_trv'] = (-2., 2.)
-#f = Fitter.FitterMinuit(UNP5points, th)
-#f = Fitter.FitterMinuit(DVCSpoints+GLOpoints, th)
-#f.minuit.tol = 80
-#f.minuit.maxcalls = 100
-#f.minuit.printMode = 1
-
-
-## DR fit
-#tDR.m.release_parameters('rv', 'Mv')
-#tDR.m.release_parameters('rv', 'Mv')
-#f = Fitter.FitterMinuit(mockH, tDR)
 
 ## [5] Some shortcuts ...
 
-pt0 = Hpoints[0]
-
-NN5 = db['NNfive']
+pt0 = DVCSpoints[0]
 
 def ld(db):
     utils.listdb(db)

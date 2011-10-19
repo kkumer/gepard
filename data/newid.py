@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import os, re, string
+import os, re, string, sys
 import utils
 
 # files with ".dat" extension
@@ -19,7 +19,19 @@ for file in datafiles:
         if re.search(r'id( )*=', dataFileLine):
             # converting preamble line into dictionary item
             id = string.split(dataFileLine,"=")[-1].strip()
-            ids.append(int(id))
+            try:
+                if ids.count(int(id)):
+                    if int(id)>30:
+                        sys.stderr.write(
+                         'Duplicate id (%d) of file %s.\n' % (int(id), file))
+                elif int(id) > 1000:
+                    sys.stderr.write(
+                      'Mock/pseudo data (id=%d) in file %s.\n' % (int(id), file))
+                else:
+                    ids.append(int(id))
+                break
+            except ValueError:
+                sys.stderr.write('File %s has funny id.\n' % file)
             break
         dataFileLine = dataFile.readline()
 

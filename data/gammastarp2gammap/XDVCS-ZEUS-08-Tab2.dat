@@ -25,7 +25,7 @@ out2particle = p
 
 ### Observable 
 
-y1name = XDVCS
+y1name = X
 y1namelong = DVCS cross section
 y1unit = nb
 y1value = column2
@@ -47,6 +47,7 @@ x2value = column1
 
 # W    sigma  stat   syst+ syst-
 ######################################
+table =
  50    14.47  1.05   0.50  -0.88
  70    20.38  1.57   1.01  -1.99
  90    17.95  1.35   0.64  -0.93

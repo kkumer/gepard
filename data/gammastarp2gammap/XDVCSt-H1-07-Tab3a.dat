@@ -30,7 +30,7 @@ out2particle = p
 
 ### Observable 
 
-y1name = XDVCSt
+y1name = X
 y1namelong = DVCS cross section differential in t
 y1unit = nb/GeV^2
 y1value = column3
@@ -57,6 +57,7 @@ x3value = column2
 
 # Q2   -t   dsig/dt  stat   syst
 ######################################
+table =
  8.0  0.10   13.1    1.10   1.85 
  8.0  0.30    4.69   0.45   0.55 
  8.0  0.50    1.37   0.21   0.23 

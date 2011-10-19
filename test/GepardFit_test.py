@@ -38,7 +38,7 @@ DVCSpoints = data[36] + data[37] + data[38] + data[39] + \
 fitpoints = data[31][12:14] + data[8][1:3] + data[30][2:4]
 
 def test_gepardfitsimple():
-    """Test simple fitting to H1 DVCS (one dataset) via gepard"""
+    """Test simple fitting to fixed target data (few points) via gepard"""
     fitpoints = data[36][:4]
     setpar(21, 0.5)   
     setpar(11, 0.15)  
@@ -142,6 +142,7 @@ def test_gepardfitDVCSnlso3():
     tGepard.model.fix_parameters('ALL')
 
 test_gepardfitDVCSnlso3.long = 1
+test_gepardfitDVCSnlso3.extendedtesting = 1
 
 def test_gepardfitDVCSthi():
     """Test fitting to HERA DVCS via gepard in 3-PW nlso3 model."""
@@ -176,6 +177,7 @@ def test_gepardfitDVCSthi():
     tGepard.model.fix_parameters('ALL')
 
 test_gepardfitDVCSthi.long = 1
+test_gepardfitDVCSthi.extendedtesting = 1
     
 def test_hybridfitGepard():
     """Test simple hybrid fitting via gepard + DR (DR=0)"""
@@ -249,6 +251,7 @@ def test_hybridfitDVCS():
     tGepard.model.fix_parameters('ALL')
 
 test_hybridfitDVCS.long = 1
+test_hybridfitDVCS.extendedtesting = 1
 
 def test_gepardfitDIS():
     """Test fitting to H1 DIS via gepard"""

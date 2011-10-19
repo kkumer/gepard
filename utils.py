@@ -41,7 +41,6 @@ def loaddata(datadir='data', approach=False):
     data = {}
     for file in os.listdir(datadir):
         _lg.info('Loading datafile %s' % file)
-        print 'Loading datafile %s' % file
         if os.path.splitext(file)[1] == ".dat":
             dataset = Data.DataSet(datafile=os.path.join(datadir, file))
             if approach and dataset.process == 'ep2epgamma':

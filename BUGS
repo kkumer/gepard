@@ -1,4 +1,5 @@
- - some XDVCS points have pt.t attribute
+ - some XDVCS points have pt.t attribute (This is now dangerous
+   bug because X relies on pt.t. Is it still true?)
 
  - Kelly's neutron FFs differ from mma cca 1%
 

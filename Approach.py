@@ -694,21 +694,22 @@ class BMK(Approach):
         return  self.BCSD(pt, **kwargs) / self.BCSS(pt, **kwargs)
 
     def _XDVCSt4int(self, t, pt):
-        """Same as XDVCSt but with additional variable t 
+        """Same as _XDVCSt but with additional variable t 
         to facilitate integration over it.
         
         """
         aux = []
         for t_single in t:
             pt.t = t_single
-            res = self.XDVCSt(pt)
+            res = self._XDVCSt(pt)
+            del pt.t
             #if debug == 2: print "t = %s  =>  dsig/dt = %s" % (t_single, res)
             aux.append(res)
 
         return array(aux)
 
 
-    def XDVCSt(self, pt):
+    def _XDVCSt(self, pt):
         """Partial DVCS cross section w.r.t. Mandelstam t."""
 
         W2 = pt.W * pt.W
@@ -722,11 +723,25 @@ class BMK(Approach):
         return res
 
 
-    def XDVCS(self, pt):
-        """Total DVCS cross section."""
+    def X(self, pt):
+        """Total DVCS cross section.
 
-        res = quadrature.tquadrature(lambda t: self._XDVCSt4int(t, pt), -1, 0)
-        return res
+        FIXME: should be universal total xs and should look into 'process'
+
+        """
+        # if pt.process = 'gammastarp2gammap':
+        #debug_here()
+        if pt.has_key('t') or pt.has_key('tm'):
+            # partial XS w.r.t momentum transfer t
+            return self._XDVCSt(pt)
+        else:
+            # total XS
+            if pt.has_key('tmmax'):
+                tmmax = pt.tmmax
+            else:
+                tmmax = 1.  # default -t cuttoff in GeV^2
+            res = quadrature.tquadrature(lambda t: self._XDVCSt4int(t, pt), -tmmax, 0)
+            return res
 
     def BCA0minusr1(self, pt):
         return self.BCAcos0(pt) - pt.r * self.BCAcos1(pt)

@@ -45,7 +45,7 @@ def test_fit():
     assert_almost_equal(chisq, 8.8479922732922276)
 
 def test_fit2():
-    """Testing actual fitting by FitterMinuit."""
+    """Testing fitting by FitterMinuit."""
     f = Fitter.FitterMinuit(fitpoints, t)
     f.fit()
     chisq = t.chisq(fitpoints)[0]
@@ -55,7 +55,7 @@ test_fit2.long = 1
 test_fit2.batch = 1
 
 def test_fit2opt():
-    """Testing actual fitting by FitterMinuit."""
+    """Testing optimized (not really) fitting by FitterMinuit."""
     fopt = Fitter.FitterMinuit(fitpoints, topt)
     fopt.fit()
     chisq = topt.chisq(fitpoints)[0]

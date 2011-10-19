@@ -30,7 +30,7 @@ out2particle = p
 
 ### Observable 
 
-y1name = XDVCS
+y1name = X
 y1namelong = DVCS cross section
 y1unit = nb
 y1value = column2
@@ -50,6 +50,7 @@ x2value = 82.
 
 # Q2  sig   stat   syst
 ######################################
+table =
 3.0   15.7   2.5   3.4   
 5.25   5.7  1.1   1.4  
 8.75  3.20  0.49  0.69
