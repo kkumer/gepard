@@ -120,7 +120,7 @@ dvem.exe: $(ADACFODIR)/Harmonic.o $(_FDVEMOBJS) $(_MMADVEMOBJS)
 # pygepard target
 
 pygepard.so: $(_FPREPS)
-	f2py --fcompiler=$(FC) -c -m pygepard $^ adacf/*f
+	f2py --fcompiler=$(FC) --f77flags="-lgomp" -c -m pygepard $^ adacf/*f -lgomp
 	mv pygepard.so ../fits/
 
 # targets for examples

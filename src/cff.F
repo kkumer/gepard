@@ -98,6 +98,9 @@ C
      &            PAR(28) * PAR(42) * CGRID(3,QIND,K,2) * MBGPD(K,2)
       END IF
 
+*     PAR(38)=Delta-B for CFF-E as proposed by Markus
+*     FPWE = FPWE * EXP(PAR(38))
+
       FREALH = IMAGPART(CFAC * DCTAN(PIHALF*J) * FPWH)
       FREALE = IMAGPART(CFAC * DCTAN(PIHALF*J) * FPWE)
 

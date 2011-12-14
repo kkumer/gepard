@@ -43,16 +43,16 @@
 #OPT_CFLAGS = -O3 
 #
 ## [--2--] GNU gfortran
-FC = gfortran
-CMP_FFLAGS = -Wall
-OPT_FFLAGS = -O3 -ffast-math -funroll-all-loops  -ftree-vectorize -fPIC
-OPT_CFLAGS = -O3 -fPIC
-
-## [--2b--] GNU gfortran + OpenMP parallelization
 #FC = gfortran
 #CMP_FFLAGS = -Wall
-#OPT_FFLAGS = -O3 -fopenmp
-#OPT_CFLAGS = -O3 
+#OPT_FFLAGS = -O3 -ffast-math -funroll-all-loops  -ftree-vectorize -fPIC
+#OPT_CFLAGS = -O3 -fPIC
+
+## [--2b--] GNU gfortran + OpenMP parallelization
+FC = gfortran
+CMP_FFLAGS = -Wall
+OPT_FFLAGS = -O3 -fopenmp  -fPIC
+OPT_CFLAGS = -O3 
 
 ## [--3--] INTEL + OpenMP parallelization
 #FC = ifort
