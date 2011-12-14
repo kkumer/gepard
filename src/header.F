@@ -278,7 +278,7 @@ C  MEMBER OF
 C     PAR(block)
 C  SYNOPSIS
       INTEGER NPARMAX
-      PARAMETER (NPARMAX = 50)
+      PARAMETER (NPARMAX = 150)
       DOUBLE PRECISION PAR(NPARMAX)
 C     ***
 
@@ -642,11 +642,15 @@ C     ***
 
 C     ****v* header.F/MBGPD
 C  DESCRIPTION
-C      MBGPD(K, flavour)  --  values of GPD H 
+C      MBGPD(K, index)  --  values of GPDs H and E
+C          index: 1  H_S
+C          index: 2  H_G
+C          index: 3  E_S
+C          index: 4  E_G
 C  MEMBER OF
 C    MBGPD(block) 
 C  SYNOPSIS
-      DOUBLE COMPLEX MBGPD(NPTSMAX, 2)
+      DOUBLE COMPLEX MBGPD(NPTSMAX, 4)
 C     ***
 
 *     - Final observables

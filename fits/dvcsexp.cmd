@@ -22,10 +22,12 @@ PARAMETERS
 29 'SKEWG     '   0.0       .1  
 32 'THIS      '   0.0       .1  
 42 'THIG      '   0.0       .1  
+111 'NSE      '   0.0       .1
 
 
 fix  11 12 13    15 16 18 19 32
 fix  21 22 23 24 25 26 28 29 42
+fix 111
 
 migrad
 

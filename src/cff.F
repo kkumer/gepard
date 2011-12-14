@@ -78,7 +78,7 @@ C
 *        FIXME: Following line could be wrong parameter no. It's ther
 *               just to avoid compiler warning ... NONSING is maybe
 *               broken!
-        FPWE = CGRIDNS(QIND,K)*PAR(18)*MBGPD(K,1)        
+        FPWE = CGRIDNS(QIND,K)*PAR(18)*MBGPD(K,3)        
       ELSE
         FPWH = CGRID(1,QIND,K,1)*MBGPD(K,1) + 
      &         CGRID(1,QIND,K,2)*MBGPD(K,2)
@@ -88,14 +88,14 @@ C
         FPWH = FPWH +  
      &              PAR(32) * CGRID(3,QIND,K,1) * MBGPD(K,1) + 
      &              PAR(42) * CGRID(3,QIND,K,2) * MBGPD(K,2)
-        FPWE = CGRID(1,QIND,K,1)*PAR(18)*MBGPD(K,1) 
-     &       + CGRID(1,QIND,K,2)*PAR(28)*MBGPD(K,2)
+        FPWE = CGRID(1,QIND,K,1)*PAR(18)*MBGPD(K,3) 
+     &       + CGRID(1,QIND,K,2)*PAR(28)*MBGPD(K,4)
         FPWE = FPWE +  
-     &            PAR(18) * PAR(17) * CGRID(2,QIND,K,1) * MBGPD(K,1) + 
-     &            PAR(28) * PAR(27) * CGRID(2,QIND,K,2) * MBGPD(K,2)
+     &            PAR(18) * PAR(17) * CGRID(2,QIND,K,1) * MBGPD(K,3) + 
+     &            PAR(28) * PAR(27) * CGRID(2,QIND,K,2) * MBGPD(K,4)
         FPWE = FPWE +  
-     &            PAR(18) * PAR(32) * CGRID(3,QIND,K,1) * MBGPD(K,1) + 
-     &            PAR(28) * PAR(42) * CGRID(3,QIND,K,2) * MBGPD(K,2)
+     &            PAR(18) * PAR(32) * CGRID(3,QIND,K,1) * MBGPD(K,3) + 
+     &            PAR(28) * PAR(42) * CGRID(3,QIND,K,2) * MBGPD(K,4)
       END IF
 
 *     PAR(38)=Delta-B for CFF-E as proposed by Markus

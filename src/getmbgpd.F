@@ -31,6 +31,16 @@ c$OMP parallel do PRIVATE(J, FCM)
         CALL HJ(J, FCM)
         MBGPD(K, 1) = FCM(1)
         MBGPD(K, 2) = FCM(2)
+        IF (PAR(111) .GT. 0.0d0) THEN
+*           we model E independently
+            CALL EJ(J, FCM)
+            MBGPD(K, 3) = FCM(1)
+            MBGPD(K, 4) = FCM(2)
+        ELSE
+*           use E \propto H
+            MBGPD(K, 3) = FCM(1)
+            MBGPD(K, 4) = FCM(2)
+        END IF
  30   CONTINUE
 c$OMP end parallel do
 

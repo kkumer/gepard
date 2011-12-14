@@ -7,12 +7,13 @@
  */
 
 /* Array dimensions */
-#define NPARMAX   70
+#define NPARMAX  170
 #define QINDMAX  150
 #define NBNDMAX    1
 #define NPTSMAX  768
 #define MTINDMAX 100
 #define NPWMAX     3
+#define NGPDSMAX   4
 
 struct dblcomplex {
         double dr;
@@ -126,11 +127,11 @@ struct{
  */
 
 struct{
-        struct dblcomplex hgrid[NPWMAX][NPTSMAX][MTINDMAX+1];
+        struct dblcomplex hgrid[NGPDSMAX][NPTSMAX][MTINDMAX+1];
 } hgrid_;
 
 struct{
-        struct dblcomplex mbgpd[NPWMAX][NPTSMAX];
+        struct dblcomplex mbgpd[NGPDSMAX][NPTSMAX];
 } mbgpd_;
 
 
