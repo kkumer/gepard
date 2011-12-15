@@ -21,9 +21,10 @@ end
 #break GepardInitInternal 
 #break  F2Internal
 #break  cffHInternal
-break cfff_
+#break cfff_
+break MinuitSetParameter
 #break fcn_
 #break evolc_
 #break BCAInternal
-run -linkmode connect -linkname 5000
+run -linkmode listen -linkname 5000
 #run

@@ -108,9 +108,9 @@ C
 * Use first sum-rule constraint
           PAR(21) = 0.6d0 - PAR(11)
           FCM(1) = QJ(J, 9, PAR(11), PAR(12), PAR(13), PAR(19)) *
-     &                BETAEXP(J, PAR(14), PAR(15), PAR(16))
+     &                BETAEXP(PAR(14))
           FCM(2) = QJ(J, 7, PAR(21), PAR(22), PAR(23), PAR(29)) *
-     &                BETAEXP(J, PAR(24), PAR(25), PAR(26))
+     &                BETAEXP(PAR(24))
       ELSE IF (ANSATZ .EQ. 'FITNG') THEN
 * Don't use first sum-rule constraint (and not that pochs are different!)
           ALPT(1) = PAR(12) + PAR(13)*DEL2

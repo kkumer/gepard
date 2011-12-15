@@ -33,8 +33,7 @@ C
       DOUBLE COMPLEX HSEA, HU, HD
       DOUBLE PRECISION NORMS
       DOUBLE COMPLEX CLNGAMMA, CBETA, POCHSEA, POCHG, POCHHAMMER
-      DOUBLE COMPLEX RATGAMMA, JMA(2)
-      DOUBLE COMPLEX MULTIGAMMA, CORR(2)
+      DOUBLE COMPLEX JMA(2), CORR(2)
       DOUBLE COMPLEX QJ, BETADIP, BETAEXP
       INTEGER LHBETA(4), LHBETAF(4)
       DOUBLE PRECISION LHA(4), LHLAM(4), ALPT(2)
@@ -108,9 +107,9 @@ C
 * Use first sum-rule constraint
           PAR(21) = 0.6d0 - PAR(11)
           FCM(1) = QJ(J, 9, PAR(11), PAR(12), PAR(13), PAR(19)) *
-     &                BETAEXP(J, PAR(14), PAR(15), PAR(16))
+     &                BETAEXP(PAR(14))
           FCM(2) = QJ(J, 7, PAR(21), PAR(22), PAR(23), PAR(29)) *
-     &                BETAEXP(J, PAR(24), PAR(25), PAR(26))
+     &                BETAEXP(PAR(24))
       ELSE IF (ANSATZ .EQ. 'FITNG') THEN
 * Don't use first sum-rule constraint (and not that pochs are different!)
           ALPT(1) = PAR(12) + PAR(13)*DEL2
@@ -267,7 +266,7 @@ C
         QJ = NORM * POCHHAMMER(DBLCMPLX(2.0d0 - AL0,0.0d0) 
      &            , POCH) / POCHHAMMER(1.0d0 - AL0
      &        + J , POCH) * (1.0d0 - AL0 + J) / (1.0d0 + JMA)
-      ELSE IF ( PROCESS .EQ. 'DVCS' ) THEN 
+      ELSE
 *       correction factor from Eq. (57), same for quarks and G
         CORR = EXP(   CLNGAMMA(DBLCMPLX(7.0d0 + AL0, 0.0d0)) -
      &         CLNGAMMA(DBLCMPLX(7.0d0 + ALPT, 0.0d0))   )
@@ -281,10 +280,6 @@ C
      &         DBLCMPLX(ALPT, 0.0d0)) ) / SIN(PI*ALPT) *
      &        (1.0d0 - (SIN(PI*ALPT) -
      &         SIN(J*PI))/SIN(PI*JMA) ) * CORR  )
-      ELSE  
-        CALL ERROR ('GeParD', 'QJ',
-     &   'Process must be either DVCS or DIS                          ',
-     &   1, 1)
       END IF
       RETURN
       END
@@ -327,10 +322,9 @@ C     BETAEXP  -- residual t-dependence function \beta from Eq.(19)
 C                 (exponential version)
 C  SYNOPSIS
 
-      DOUBLE COMPLEX FUNCTION BETAEXP(J, M02)
+      DOUBLE COMPLEX FUNCTION BETAEXP(M02)
 
       IMPLICIT NONE
-      DOUBLE COMPLEX J
       DOUBLE PRECISION M02
 
 C  INPUTS

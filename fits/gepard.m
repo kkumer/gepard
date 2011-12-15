@@ -4,7 +4,7 @@
 (*     ==============================    *)
 
 
-Print["GeParD - Mathematica interface (2011-01-21)"];
+Print["GeParD - Mathematica interface (2011-12-15)"];
 
 If[$VersionNumber<5.999,  (* Mathematica 5.*)
 BeginPackage["gepard`", "Format`", "NumericalMath`NLimit`", "Graphics`Graphics`",
@@ -207,7 +207,9 @@ PlotMinuitContourFixed::usage = "PlotMinuitContourFixed[par1, par2, npts, option
 PlotMinuitContourFixedAll::usage = "PlotMinuitContourFixed[par1, par2, npts, options] plots two-parameter correlation contour produced by Minuit's MNCONT. par1 and par2 are symbols from Parameters list, npts is number of points on the contour and options are same as for ListPlot. Other parameters are temporarily fixed and then released for faster plotting. Additionally values of par1 and par2 are returned to old values before plotting. See also PlotMinuitContour and PlotMinuitContourFixed"
 Begin["`Private`"]
 
-AllParameterValues[] := Block[{iv = Table[0, {70}]}, 
+NPARMAX = 170;
+
+AllParameterValues[] := Block[{iv = Table[0, {NPARMAX}]}, 
 (iv[[#[[1]]]] = #[[3]]) & /@ Parameters; iv]
 
 SpliceToFortran[path_String, tfor_] := 
@@ -231,7 +233,7 @@ SpliceToFortran[path_String, tfor_] :=
     Splice[StringJoin[path, "/splice_template.f"], 
       StringJoin[path, "/splice.f"], FormatType -> OutputForm]]
 
-Install["gepard.exe"]   (* Installing C and Fortran routines. *)
+Install["gepard.exe"] (*   Installing C and Fortran routines. *)
 
 defaultopts = {SPEED -> -1, P -> -1, SCHEME -> "DFLT", 
               ANSATZ -> "DFLT", DATFILE -> "DFLT", OUTFILE -> "DFLT"};
@@ -304,9 +306,7 @@ GepardFit[pars_, (opts___)?OptionQ] := Block[{varpars = ParameterID /@ pars,
       fixedpars = Complement[allpars, varpars]; 
       GepardInit[opts];
       jValues = MinuitInit[1]; (MinuitSetParameter @@ #1 & ) /@ Parameters; 
-      MinuitCommand[StringJoin["fix ", StringJoin[
-         Flatten[Table[{" ", ToString[fixedpars[[n]]]}, 
-           {n, Length[fixedpars]}]]]]]; 
+      MinuitCommand["fix " <> ToString[#1]] & /@ fixedpars;
       Print[First[AbsoluteTiming[ierr = MinuitCommand["migrad"]]]]; 
       If[ierr == 4, 
        Print["Abnormal termination (e.g. MIGRAD not converged)"]; Abort[], 
@@ -328,13 +328,8 @@ GepardFitSilent[pars_, (opts___)?OptionQ] :=
    allpars = First[Transpose[Parameters]], ierr}, 
   fixedpars = Complement[allpars, varpars];
   GepardInit[opts];
-  jValues = MinuitInit[1]; (MinuitSetParameter @@ #1 &) /@ 
-   Parameters;
-  MinuitCommand[
-   StringJoin["fix ", 
-    StringJoin[
-     Flatten[Table[{" ", ToString[fixedpars[[n]]]}, {n, 
-        Length[fixedpars]}]]]]];
+  jValues = MinuitInit[1]; (MinuitSetParameter @@ #1 &) /@ Parameters;
+  MinuitCommand["fix " <> ToString[#1]] & /@ fixedpars;
   ierr = MinuitCommand["migrad"]; MinuitCommand["cali 3"]; 
   GPDcurrent[j_, t_, xi_] = 
    GPDMom[j, t, xi] /. PAR[n_] :> First[MinuitGetParameter[n]];
@@ -360,9 +355,8 @@ JustCali3[pars_, (opts___)?OptionQ] := Block[{varpars = ParameterID /@ pars,
      fixedpars = Complement[allpars, varpars]; 
       GepardInit[opts]; jValues = MinuitInit[1]; 
       (MinuitSetParameter @@ #1 & ) /@ Parameters; 
-      MinuitCommand[StringJoin["fix ", StringJoin[
-         Flatten[Table[{" ", ToString[fixedpars[[n]]]}, 
-           {n, Length[fixedpars]}]]]]]; ierr = MinuitCommand["cali 3"]; 
+      MinuitCommand["fix " <> ToString[#1]] & /@ fixedpars;
+      ierr = MinuitCommand["cali 3"]; 
       status = MinuitStatus[]; Print[StringJoin["\!\(\[Chi]\^2\) = ", 
         ToString[First[status]]]]; GPDcurrent[j_, t_, xi_] = 
        GPDMom[j, t, xi] /. PAR[n_] :> First[MinuitGetParameter[n]]; 
@@ -459,8 +453,8 @@ rdfile[fname_] := Block[{str,
         ln =!= EndOfFile, AppendTo[outp, ln = Read[str, String]]]; Close[str];
        outp]
 
-PrintMinuitCommand[comm_?StringQ, fsize_:5] := 
-  Module[{before, after, fname="fit.mnt"}, 
+PrintMinuitCommand[comm_?StringQ, fsize_:5, filename_:"fit"] := 
+  Module[{before, after, fname=filename<>".mnt"}, 
     before = rdfile[fname]; MinuitCommand[comm]; after = rdfile[fname]; 
     StylePrint[TableForm[Take[after, Length[before] - Length[after]]], 
       FontFamily->"Bitstream vera sans mono", 

@@ -80,6 +80,7 @@ C
 *               broken!
         FPWE = CGRIDNS(QIND,K)*PAR(18)*MBGPD(K,3)        
       ELSE
+*       --- singlet case ---
         FPWH = CGRID(1,QIND,K,1)*MBGPD(K,1) + 
      &         CGRID(1,QIND,K,2)*MBGPD(K,2)
         FPWH = FPWH +  
@@ -88,14 +89,21 @@ C
         FPWH = FPWH +  
      &              PAR(32) * CGRID(3,QIND,K,1) * MBGPD(K,1) + 
      &              PAR(42) * CGRID(3,QIND,K,2) * MBGPD(K,2)
+        IF (.NOT. ( ANSATZ(:1) .EQ. 'E' )) THEN
+*         we set strength of subleading PWs for E equal to those of H
+          PAR(117) = PAR(17)
+          PAR(127) = PAR(27)
+          PAR(132) = PAR(32)
+          PAR(142) = PAR(42)
+        END IF
         FPWE = CGRID(1,QIND,K,1)*PAR(18)*MBGPD(K,3) 
      &       + CGRID(1,QIND,K,2)*PAR(28)*MBGPD(K,4)
         FPWE = FPWE +  
-     &            PAR(18) * PAR(17) * CGRID(2,QIND,K,1) * MBGPD(K,3) + 
-     &            PAR(28) * PAR(27) * CGRID(2,QIND,K,2) * MBGPD(K,4)
+     &            PAR(18) * PAR(117) * CGRID(2,QIND,K,1) * MBGPD(K,3) + 
+     &            PAR(28) * PAR(127) * CGRID(2,QIND,K,2) * MBGPD(K,4)
         FPWE = FPWE +  
-     &            PAR(18) * PAR(32) * CGRID(3,QIND,K,1) * MBGPD(K,3) + 
-     &            PAR(28) * PAR(42) * CGRID(3,QIND,K,2) * MBGPD(K,4)
+     &            PAR(18) * PAR(132) * CGRID(3,QIND,K,1) * MBGPD(K,3) + 
+     &            PAR(28) * PAR(142) * CGRID(3,QIND,K,2) * MBGPD(K,4)
       END IF
 
 *     PAR(38)=Delta-B for CFF-E as proposed by Markus
