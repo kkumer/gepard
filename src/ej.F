@@ -97,19 +97,21 @@ C
 *           Killing E contribution
             PAR(18) = 0.0d0
             PAR(28) = 0.0d0
-      ELSE IF ((ANSATZ .EQ. 'FIT') .OR. (ANSATZ .EQ. 'EPH')) THEN
-* Use first sum-rule constraint
-          PAR(21) = 0.6d0 - PAR(11)
-          FCM(1) = QJ(J, 9, PAR(11), PAR(12), PAR(13), PAR(19)) *
-     &                BETADIP(J, PAR(14), PAR(15), PAR(16))
-          FCM(2) = QJ(J, 7, PAR(21), PAR(22), PAR(23), PAR(29)) *
-     &                BETADIP(J, PAR(24), PAR(25), PAR(26))
-      ELSE IF ((ANSATZ .EQ. 'FITEXP') .OR. (ANSATZ .EQ. 'EPHEXP')) THEN
-* Use first sum-rule constraint
-          PAR(21) = 0.6d0 - PAR(11)
-          FCM(1) = QJ(J, 9, PAR(11), PAR(12), PAR(13), PAR(19)) *
+      ELSE IF ((ANSATZ .EQ. 'EFL') .OR. (ANSATZ .EQ. 'EPH')) THEN
+* Use sum-rule constraints, PAR(111) = BS = KAPS*NS, PAR(121) = BG = -BS
+          PAR(111) = PAR(18) * PAR(11)
+          PAR(121) = - PAR(111)
+          FCM(1) = QJ(J, 9, PAR(111), PAR(112), PAR(113), PAR(119)) *
+     &                BETADIP(J, PAR(114), PAR(115), PAR(116))
+          FCM(2) = QJ(J, 7, PAR(121), PAR(122), PAR(123), PAR(129)) *
+     &                BETADIP(J, PAR(124), PAR(125), PAR(126))
+      ELSE IF ((ANSATZ .EQ. 'EFLEXP') .OR. (ANSATZ .EQ. 'EPHEXP')) THEN
+* Use sum-rule constraints, PAR(111) = BS = KAPS*NS, PAR(121) = BG = -BS
+          PAR(111) = PAR(18) * PAR(11)
+          PAR(121) = - PAR(111)
+          FCM(1) = QJ(J, 9, PAR(111), PAR(112), PAR(113), PAR(119)) *
      &                BETAEXP(PAR(14))
-          FCM(2) = QJ(J, 7, PAR(21), PAR(22), PAR(23), PAR(29)) *
+          FCM(2) = QJ(J, 7, PAR(121), PAR(122), PAR(123), PAR(129)) *
      &                BETAEXP(PAR(24))
       ELSE IF (ANSATZ .EQ. 'FITNG') THEN
 * Don't use first sum-rule constraint (and not that pochs are different!)

@@ -92,6 +92,7 @@ C
         IF (.NOT. ( (ANSATZ .EQ. 'EFL') .OR. (ANSATZ .EQ. 'EFLEXP')
      &           )) THEN
 *         we set strength of subleading PWs for E equal to those of H
+*         to get full proportionality  E \propto H
           PAR(117) = PAR(17)
           PAR(127) = PAR(27)
           PAR(132) = PAR(32)
@@ -107,7 +108,7 @@ C
      &            PAR(28) * PAR(142) * CGRID(3,QIND,K,2) * MBGPD(K,4)
       END IF
 
-      IF ( (ANSATZ .EQ. 'EPH') .OR. (ANSATZ .EQ. 'EPHEXP') ) THEN
+      IF (ANSATZ(:1) .EQ. 'E') THEN
 *     PAR(38)=Delta-B for CFF-E as proposed by Markus
         FPWE = FPWE * EXP(PAR(48)*DEL2)
       END IF
