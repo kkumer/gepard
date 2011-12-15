@@ -31,7 +31,7 @@ c$OMP parallel do PRIVATE(J, FCM)
         CALL HJ(J, FCM)
         MBGPD(K, 1) = FCM(1)
         MBGPD(K, 2) = FCM(2)
-        IF ( ANSATZ(:1) .EQ. 'E' ) THEN
+        IF ( (ANSATZ .EQ. 'EFL') .OR. (ANSATZ .EQ. 'EFLEXP') ) THEN
 *           we model E independently
             CALL EJ(J, FCM)
             MBGPD(K, 3) = FCM(1)

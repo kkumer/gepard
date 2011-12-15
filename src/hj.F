@@ -96,14 +96,14 @@ C
 *           Killing E contribution
             PAR(18) = 0.0d0
             PAR(28) = 0.0d0
-      ELSE IF (ANSATZ .EQ. 'FIT') THEN
+      ELSE IF ((ANSATZ .EQ. 'FIT') .OR. (ANSATZ .EQ. 'EPH')) THEN
 * Use first sum-rule constraint
           PAR(21) = 0.6d0 - PAR(11)
           FCM(1) = QJ(J, 9, PAR(11), PAR(12), PAR(13), PAR(19)) *
      &                BETADIP(J, PAR(14), PAR(15), PAR(16))
           FCM(2) = QJ(J, 7, PAR(21), PAR(22), PAR(23), PAR(29)) *
      &                BETADIP(J, PAR(24), PAR(25), PAR(26))
-      ELSE IF (ANSATZ .EQ. 'FITEXP') THEN
+      ELSE IF ((ANSATZ .EQ. 'FITEXP') .OR. (ANSATZ .EQ. 'EPHEXP')) THEN
 * Use first sum-rule constraint
           PAR(21) = 0.6d0 - PAR(11)
           FCM(1) = QJ(J, 9, PAR(11), PAR(12), PAR(13), PAR(19)) *

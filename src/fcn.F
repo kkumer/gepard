@@ -235,7 +235,8 @@ C
 
       IF (IFLAG .EQ. 3)  THEN
 *     Write parameter values, chi-squares and BCA to *.out
-        IF ((ANSATZ(:3) .EQ. 'FIT') .OR. (ANSATZ(:3) .EQ. 'MMA')) THEN
+        IF ((ANSATZ(:3) .EQ. 'FIT') .OR. (ANSATZ(:3) .EQ. 'MMA')
+     &   .OR. (ANSATZ(:1) .EQ. 'E')  ) THEN
           WRITE (21, 803) "Final fit parameters (*=fixed):"
           DO 25 K = 1, PRPARMAX
           CALL MNPOUT(10+PRPAR(K), NAML, VALL, ERL, BND1, BND2, IVAR)
@@ -277,7 +278,8 @@ C
         CALL PGTEXT (1., 12., TXT)
         WRITE(TXT, 806) SCHEME, Q02
         CALL PGTEXT (1., 11., TXT)
-        IF ((ANSATZ(:3) .EQ. 'FIT') .OR. (ANSATZ(:3) .EQ. 'MMA')) THEN
+        IF ((ANSATZ(:3) .EQ. 'FIT') .OR. (ANSATZ(:3) .EQ. 'MMA')
+     &      .OR. (ANSATZ(:1) .EQ. 'E')  ) THEN
           CALL PGTEXT (-1., 10., "Final fit parameters (*=fixed):")
           DO 30 K = 1, PRPARMAX
           CALL MNPOUT(10+PRPAR(K), NAML, VALL, ERL, BND1, BND2, IVAR)

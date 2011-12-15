@@ -89,7 +89,8 @@ C
         FPWH = FPWH +  
      &              PAR(32) * CGRID(3,QIND,K,1) * MBGPD(K,1) + 
      &              PAR(42) * CGRID(3,QIND,K,2) * MBGPD(K,2)
-        IF (.NOT. ( ANSATZ(:1) .EQ. 'E' )) THEN
+        IF (.NOT. ( (ANSATZ .EQ. 'EFL') .OR. (ANSATZ .EQ. 'EFLEXP')
+     &           )) THEN
 *         we set strength of subleading PWs for E equal to those of H
           PAR(117) = PAR(17)
           PAR(127) = PAR(27)
@@ -106,8 +107,10 @@ C
      &            PAR(28) * PAR(142) * CGRID(3,QIND,K,2) * MBGPD(K,4)
       END IF
 
+      IF ( (ANSATZ .EQ. 'EPH') .OR. (ANSATZ .EQ. 'EPHEXP') ) THEN
 *     PAR(38)=Delta-B for CFF-E as proposed by Markus
-*     FPWE = FPWE * EXP(PAR(38))
+        FPWE = FPWE * EXP(PAR(48)*DEL2)
+      END IF
 
       FREALH = IMAGPART(CFAC * DCTAN(PIHALF*J) * FPWH)
       FREALE = IMAGPART(CFAC * DCTAN(PIHALF*J) * FPWE)
