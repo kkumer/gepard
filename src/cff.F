@@ -81,6 +81,7 @@ C
         FPWE = CGRIDNS(QIND,K)*PAR(18)*MBGPD(K,3)        
       ELSE
 *       --- singlet case ---
+*            --- CFF H ---
         FPWH = CGRID(1,QIND,K,1)*MBGPD(K,1) + 
      &         CGRID(1,QIND,K,2)*MBGPD(K,2)
         FPWH = FPWH +  
@@ -89,6 +90,7 @@ C
         FPWH = FPWH +  
      &              PAR(32) * CGRID(3,QIND,K,1) * MBGPD(K,1) + 
      &              PAR(42) * CGRID(3,QIND,K,2) * MBGPD(K,2)
+*            --- CFF E ---
         IF (.NOT. ( (ANSATZ .EQ. 'EFL') .OR. (ANSATZ .EQ. 'EFLEXP')
      &           )) THEN
 *         we set strength of subleading PWs for E equal to those of H
@@ -98,6 +100,11 @@ C
           PAR(132) = PAR(32)
           PAR(142) = PAR(42)
         END IF
+        IF (ANSATZ(:1) .EQ. 'E') THEN
+*         we implement BS + BG = 0 sum rule
+          PAR(28) = - PAR(18)*PAR(11) / (0.6d0 - PAR(11))
+        END IF
+
         FPWE = CGRID(1,QIND,K,1)*PAR(18)*MBGPD(K,3) 
      &       + CGRID(1,QIND,K,2)*PAR(28)*MBGPD(K,4)
         FPWE = FPWE +  

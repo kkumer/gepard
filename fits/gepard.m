@@ -4,7 +4,7 @@
 (*     ==============================    *)
 
 
-Print["GeParD - Mathematica interface (2011-12-15)"];
+Print["GeParD - Mathematica interface (2011-12-16)"];
 
 If[$VersionNumber<5.999,  (* Mathematica 5.*)
 BeginPackage["gepard`", "Format`", "NumericalMath`NLimit`", "Graphics`Graphics`",
@@ -56,6 +56,8 @@ SaveParameters::usage = "SaveParameters[] writes present values of fitting
 parameters (which are only recorded in the internal Minuit-Gepard memory)
 into the list Parameters, preparing it thus for next fitting procedure."
 
+
+
 ParameterID::usage = "ParameterID[symbol] returns parameter number (id) of a parameter with
 name symbol, as specified by array Parameters."
 
@@ -63,6 +65,10 @@ ParameterValue::usage = "ParameterValue[name, pars:Parameters] returns value of 
 name, as specified by array pars."
 
 ParameterName::usage = "ParameterName[id] returns name string corresponding to parameter number id, as specified by array Parameters."
+
+SetParameterValue::usage = "SetParameterValue[symbol, value, pars:Parameters] sets value of parameter in array pars."
+
+GetParameterValue::usage = "GetParameterValue[symbol, pars:Parameters] gets value of parameter from array pars."
 
 GPD::usage = "GPD[{val1, val2, ...}, t, xi] is a function that is contacted by MathLink Minuit
 interface and should give GPD's"
@@ -99,19 +105,20 @@ gpdHzeroG::usage = "gpdHzeroG[x, t, Q2, Q02, opts] returns singlet gluon
 GPD H(x, eta=0, t, Q2).  Options are same as for GepardInit. Don't use
 it for nl-PW model because it's wrong there. Use GPDzero function."
 
-cffHtrajQ::usage = "cffHtrajQ[x, t, Q2, Q02, opts] returns singlet \"quarkonic 
-CFF\" calHq(x, eta=x, t, Q2).  Options are same as for GepardInit."
+gpdEtrajQ::usage = "gpdEtrajQ[x, t, Q2, Q02, opts] returns singlet quark 
+GPD E(x, eta=x, t, Q2).  Options are same as for GepardInit."
 
-cffHzeroQ::usage = "cffHzeroQ[x, t, Q2, Q02, opts] returns singlet \"quarkonic
-CFF\" calHq(x, eta=0, t, Q2).  Options are same as for GepardInit. Don't use
-it for nl-PW model because it's wrong there."
+gpdEzeroQ::usage = "gpdEzeroQ[x, t, Q2, Q02, opts] returns singlet quark
+GPD E(x, eta=0, t, Q2).  Options are same as for GepardInit. Don't use
+it for nl-PW model because it's wrong there. Use GPDzero function."
 
-cffHtrajG::usage = "cffHtrajG[x, t, Q2, Q02, opts] returns \"gluonic CFF\" 
-calHg(x, eta=x, t, Q2).  Options are same as for GepardInit."
+gpdEtrajG::usage = "gpdEtrajG[x, t, Q2, Q02, opts] returns singlet gluon 
+GPD E(x, eta=x, t, Q2).  Options are same as for GepardInit."
 
-cffHzeroG::usage = "cffHzeroG[x, t, Q2, Q02, opts] returns \"gluonic CFF\" 
-calHg(x, eta=0, t, Q2).  Options are same as for GepardInit. Don't use
-it for nl-PW model because it's wrong there."
+gpdEzeroG::usage = "gpdEzeroG[x, t, Q2, Q02, opts] returns singlet gluon
+GPD E(x, eta=0, t, Q2).  Options are same as for GepardInit. Don't use
+it for nl-PW model because it's wrong there. Use GPDzero function."
+
 
 PDF::usage = "PDF[{val1, val2, ...}, t, xi] is a function that is contacted by MathLink Minuit
 interface and should give PDF's for .... "
@@ -279,23 +286,23 @@ gpdHtrajG[(x_)?NumericQ, (t_)?NumericQ, (q2_)?NumericQ, (q02_)?NumericQ, (opts__
  x cffHInternal @@ ( {x, t, q2, q02, SPEED, P, PROCESS, SCHEME, ANSATZ} 
     /. PROCESS->"DVCSTG" /. {opts} /. Options[cffH] ) ] / Pi
 
-(* Same as above, but gives CFFs *)
+gpdEzeroQ[(x_)?NumericQ, (t_)?NumericQ, (q2_)?NumericQ, (q02_)?NumericQ, (opts___)?OptionQ] := Im[
+  cffEInternal @@ ( {x, t, q2, q02, SPEED, P, PROCESS, SCHEME, ANSATZ} 
+    /. PROCESS->"DVCSZQ" /. {opts} /. Options[cffE] ) ] / Pi
 
-cffHzeroQ[(x_)?NumericQ, (t_)?NumericQ, (q2_)?NumericQ, (q02_)?NumericQ, (opts___)?OptionQ] := 
-  cffHInternal @@ ( {x, t, q2, q02, SPEED, P, PROCESS, SCHEME, ANSATZ} 
-    /. PROCESS->"DVCSZQ" /. {opts} /. Options[cffH] ) 
+gpdEzeroG[(x_)?NumericQ, (t_)?NumericQ, (q2_)?NumericQ, (q02_)?NumericQ, (opts___)?OptionQ] := Im[
+ x cffEInternal @@ ( {x, t, q2, q02, SPEED, P, PROCESS, SCHEME, ANSATZ} 
+    /. PROCESS->"DVCSZG" /. {opts} /. Options[cffE] ) ] / Pi
 
-cffHzeroG[(x_)?NumericQ, (t_)?NumericQ, (q2_)?NumericQ, (q02_)?NumericQ, (opts___)?OptionQ] := 
- x cffHInternal @@ ( {x, t, q2, q02, SPEED, P, PROCESS, SCHEME, ANSATZ} 
-    /. PROCESS->"DVCSZG" /. {opts} /. Options[cffH] )
+gpdEtrajQ[(x_)?NumericQ, (t_)?NumericQ, (q2_)?NumericQ, (q02_)?NumericQ, (opts___)?OptionQ] := Im[
+  cffEInternal @@ ( {x, t, q2, q02, SPEED, P, PROCESS, SCHEME, ANSATZ} 
+    /. PROCESS->"DVCSTQ" /. {opts} /. Options[cffE] ) ] / Pi
 
-cffHtrajQ[(x_)?NumericQ, (t_)?NumericQ, (q2_)?NumericQ, (q02_)?NumericQ, (opts___)?OptionQ] :=
-  cffHInternal @@ ( {x, t, q2, q02, SPEED, P, PROCESS, SCHEME, ANSATZ} 
-    /. PROCESS->"DVCSTQ" /. {opts} /. Options[cffH] )
+gpdEtrajG[(x_)?NumericQ, (t_)?NumericQ, (q2_)?NumericQ, (q02_)?NumericQ, (opts___)?OptionQ] := Im[
+ x cffEInternal @@ ( {x, t, q2, q02, SPEED, P, PROCESS, SCHEME, ANSATZ} 
+    /. PROCESS->"DVCSTG" /. {opts} /. Options[cffE] ) ] / Pi
 
-cffHtrajG[(x_)?NumericQ, (t_)?NumericQ, (q2_)?NumericQ, (q02_)?NumericQ, (opts___)?OptionQ] := 
- x cffHInternal @@ ( {x, t, q2, q02, SPEED, P, PROCESS, SCHEME, ANSATZ} 
-    /. PROCESS->"DVCSTG" /. {opts} /. Options[cffH] )
+
 
 SaveParameters[] := Block[{},
 Parameters = Map[{#[[1]], #[[2]], 
@@ -443,6 +450,13 @@ ParameterValue[name_String, pars_: Parameters] :=
 
 ParameterName[id_Integer] := ToString[Select[Parameters, #1[[1]] == id & ][[
      1,2]]]
+
+SetParameterValue[par_Symbol, (val_)?NumericQ, pars_: Parameters] := 
+   (Parameters[[Position[Parameters, ToString[par]][[1, 1]], 3]] = val)
+
+GetParameterValue[par_Symbol, pars_: Parameters] := 
+ Parameters[[Position[Parameters, ToString[par]][[1, 1]], 3]]
+
 
 ChiSquareProbability[d_, chisq_] := Gamma[d/2, chisq/2]/Gamma[d/2]
  
