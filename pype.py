@@ -47,7 +47,7 @@ logging._handlerList[0].addFilter(hfil)
 
 data = utils.loaddata('/home/kkumer/pype/data/ep2epgamma', approach=Approach.hotfixedBMK)  
 data.update(utils.loaddata('/home/kkumer/pype/data/gammastarp2gammap', approach=Approach.hotfixedBMK))
-#db = shelve.open('/home/kkumer/pype/theories.db')
+db = shelve.open('/home/kkumer/pype/theories.db')
 dell = shelve.open('/home/kkumer/pype/dellB.db')
 
 ## [2] Choose subset of datapoints for fitting
@@ -86,13 +86,16 @@ BTSApoints = utils.select(data[53], criteria=['FTn==0'])
 #UNP5points = ALTGLO5points + BSSwpoints + BSDwpoints
 H1ZEUSpoints = DVCSpoints + data[48]
 H1ZEUSindependent = data[45] + data[39] + data[36] + data[46]
+H1ZEUSindependentNEW = data[45] + data[39] + data[63] + data[46]
 EICtest2 = data[1001]
+EICmockkk = data[1002]
+
 
 
 ## [3] Create a theory
 
 # Gepard only
-mGepard = Model.ComptonGepard(tdep='exponential')
+mGepard = Model.ComptonGepard(ansatz='FITEXP')
 tGepard = Approach.hotfixedBMK(mGepard)
 
 # DR only
@@ -128,11 +131,13 @@ tGepard = Approach.hotfixedBMK(mGepard)
 
 
 ## [4] Do the fit
-tGepard.model.fix_parameters('ALL')
-mGepard.parameters.update({'NS':0.1520391, 'AL0S':1.1575060, 'AL0G':1.2473167})
-mGepard.release_parameters('M02S', 'SECS', 'SECG')
-th = tGepard
-f = Fitter.FitterMinuit(EICtest2+H1ZEUSindependent, th)
+#tGepard.model.fix_parameters('ALL')
+#mGepard.parameters.update({'NS':0.1520391, 'AL0S':1.1575060, 'AL0G':1.2473167})
+#mGepard.parameters.update({'SECG':-0.8, 'SECS':-0.180, 'M02S':0.1498})
+#mGepard.parameters.update({'M02S':0.1})
+#mGepard.release_parameters('M02S', 'SECS', 'SECG')
+#th = tGepard
+#f = Fitter.FitterMinuit(EICmockkk+H1ZEUSindependentNEW, th)
 
 # Hybrid: Gepard+DR (can reuse above Gepard)
 #mDRsea = Model.ComptonModelDRsea()
@@ -157,7 +162,7 @@ f = Fitter.FitterMinuit(EICtest2+H1ZEUSindependent, th)
 
 ## [5] Some shortcuts ...
 
-pt0 = DVCSpoints[0]
+#pt0 = DVCSpoints[0]
 
 def ld(db):
     utils.listdb(db)

@@ -51,6 +51,8 @@ def test_gepardXDVCSt():
     aux = t.X(pt)
     assert_almost_equal(aux, 5607.5998541187819, 2)
 
+test_gepardXDVCSt.gepardsuite = 1
+
 def test_gepardXDVCSevol():
     """Calculate NLO DVCS cross section using gepard (+evolution)."""
     pt.W = 3.5          
@@ -64,6 +66,8 @@ def test_gepardXDVCSevol():
     # To get complete agreement with Fortran take
     # (slower) tquadrature = quadSciPy10 and:
     # assert_almost_equal(aux, 6.8612469682766850, 5)
+
+test_gepardXDVCSevol.gepardsuite = 1
 
 def test_hybrid():
     """GepardDR with switched-off DR should be same as Gepard."""

@@ -6,10 +6,11 @@ of some specific datasets and CFFs.
 
 #from IPython.Debugger import Tracer; debug_here = Tracer()
 
-import sys, os, math, copy, string
+import sys, os, math, copy, string, commands
 import numpy as np
 
 import matplotlib
+from matplotlib.backends.backend_pdf import PdfPages # for PDF creation
 if os.sys.platform == 'win32':
     matplotlib.use('WxAgg')
 #else: #linux
@@ -32,6 +33,25 @@ data.update(utils.loaddata('/home/kkumer/pype/data/gammastarp2gammap', approach=
  # wspace = 0.2   # the amount of width reserved for blank space between subplots
  # hspace = 0.2   # the amount of height reserved for white space between subplots
  # Usage: fig.subplots_adjust(wspace=0.7)
+
+def mkpdf(filename):
+    """Create publishable PDF and EPS figs."""
+    root = filename[:-4]  # assumed .pdf !
+    pp = PdfPages(filename)
+    pp.savefig()
+    pp.close()
+    # fix PDF's bounding box
+    commands.getoutput('pdfcrop --margins "0" --clip %s' % filename)
+    commands.getoutput('mv %s-crop.pdf %s' % (root, filename))
+    # create EPS
+    commands.getoutput('acroread -toPostScript %s' % filename)
+    commands.getoutput('ps2eps -f %s.ps' % root)
+    commands.getoutput('rm %s.ps' % root)
+    # fix EPS's bounding box
+    commands.getoutput('mv %s.eps tmpfile.eps' % root)
+    commands.getoutput('epstool --copy --bbox tmpfile.eps %s.eps' % root)
+    commands.getoutput('rm tmpfile.eps')
+
 
 #################################################################
 ##                                                             ##
@@ -156,15 +176,15 @@ def panel(ax, points=None, lines=None, bands=None, xaxis=None, xs=None,
     if bands:
         if not isinstance(bands, list): bands = [bands]
         bandcolors = ['red', 'green', 'blue', 'purple']
-        hatches = ['/', '\\', '|', '.']
+        hatches = ['//', '\\\\', '|', '.']
         bandn = 0
         for band in bands:
             for pts in points:
                 _axband(ax, lambda pt: band.predict(pt, error=True, CL=CL), pts, xaxis=xaxis,
-                        #hatch=hatches[bandn], 
-                        color=bandcolors[bandn],
-                        facecolor=bandcolors[bandn], # band  color
-                        #facecolor='none',
+                        hatch=hatches[bandn], 
+                        #color=bandcolors[bandn],
+                        #facecolor=bandcolors[bandn], # band  color
+                        facecolor='none',
                         edgecolor=bandcolors[bandn], # band edge color
                         linewidth=1,
                         label=band.name, **kwargs)
@@ -369,14 +389,14 @@ def HERMES09(path=None, fmt='png', **kwargs):
             else:
                 xlabels = ['$-t\\; [{\\rm GeV}^2]$', '$x_B$', '$Q^2\\; [{\\rm GeV}^2]$']
                 ax.set_xlabel(xlabels[npanel-7], fontsize=18)
-            if npanel == 1:
-                #ax.legend(bbox_to_anchor=(0., 1.), loc='upper left',
-                #        borderaxespad=0.).draw_frame(0)
+            if npanel == 3:
+                ax.legend(bbox_to_anchor=(0., 1.), loc='upper right',
+                        borderaxespad=0.).draw_frame(0)
                 pass
         #ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.2))  # tickmarks
             for label in ax.get_xticklabels() + ax.get_yticklabels():
                 label.set_fontsize(14)
-    fig.subplots_adjust(bottom=0.25, wspace=0.0, hspace=0.0)
+    fig.subplots_adjust(bottom=0.45, wspace=0.0, hspace=0.0)
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
@@ -630,9 +650,9 @@ def H1ZEUS(path=None, fmt='png', **kwargs):
     """Makes plot of H1 DVCS data with fit lines"""
 
     subsets = {}
-    subsets[1] = [utils.select(data[36], criteria=['Q2 == 8.']),
-            utils.select(data[36], criteria=['Q2 == 15.5']), 
-            utils.select(data[36], criteria=['Q2 == 25.'])]
+    subsets[1] = [utils.select(data[63], criteria=['Q2 == 8.']),
+            utils.select(data[63], criteria=['Q2 == 15.5']), 
+            utils.select(data[63], criteria=['Q2 == 25.'])]
     subsets[2] = [data[46]] # ZEUS t-dep
     subsets[3] = [data[48],
             utils.select(data[41], criteria=['Q2 == 8.']),
@@ -921,8 +941,8 @@ def EIC(lines=[], path=None, fmt='png'):
 
 def EICt(path=None, fmt='png', **kwargs):
     """Plot simulated EIC DVCS data."""
-    id = 1001
-    title = 'EIC - simulated'
+    id = 1002
+    title = 'EIC (HERA-like simulated)'
     fig = plt.figure()
     fig.canvas.set_window_title(title)
     fig.suptitle(title)
@@ -1097,7 +1117,7 @@ def CFF2(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
     cffs    -- List of CFFs to be plotted. Each produces two panels.
 
     """
-    title = 'NNDRCFF'
+    title = ''
     fig = plt.figure()
     #fig.canvas.set_window_title(title)
     #fig.suptitle(title)
@@ -1108,12 +1128,12 @@ def CFF2(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
     logxvals = np.logspace(-3.0, -0.01, 40)
     # ordinates 
     #ylims = {'ImH': (-4.3, 35), 'ReH': (-6.5, 8)}
-    ylims = {'ImH': (-4.3, 35), 'ReH': (-15, 8),
+    ylims = {'ImH': (-4.3, 35), 'ReH': (-6, 8),
              'ImE': (-40, 35), 'ReE': (-15, 30),
              'ImEt': (-50, 100), 'ReEt': (-50, 100),
              'ImHt': (-10, 20), 'ReHt': (-10, 20)}
     # Plot panels
-    ts = [-0.17, -0.33]
+    ts = [-0.3, -0.12]
     for n in range(len(cffs)):
         for nt in range(len(ts)):
             cff = cffs[n]
@@ -1128,7 +1148,7 @@ def CFF2(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
             ax.xaxis.set_major_formatter(matplotlib.ticker.FormatStrFormatter('%s'))
             if nt == 0:
                 # plot data-region vertical band for left panels
-                ax.axvspan(0.025, 0.136, facecolor='g', edgecolor='black', alpha=0.2)
+                #ax.axvspan(0.025, 0.136, facecolor='g', edgecolor='black', alpha=0.2)
                 ax.set_ylabel(toTeX['%s' % cff], fontsize=20)
             if nt == 1:
                 # no y tick labels on right panels
@@ -1141,22 +1161,24 @@ def CFF2(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
                 ax.set_xlabel(toTeX['xixB'], fontsize=18)
             if n == 0 and nt == 0:
                 # put legend in first panel
-                #ax.legend(loc='upper right')
-                #ax.legend(bbox_to_anchor=(0.85, 0.85), loc='upper right',
-                #        borderaxespad=0.).draw_frame(0)
+                ax.legend(loc='upper right')
+                ax.legend(bbox_to_anchor=(0.85, 0.85), loc='upper right',
+                        borderaxespad=0.).draw_frame(0)
                 pass
                 #ax.legend().draw_frame(0)
                 # 
-                ax.text(0.33, 0.95, "data region", transform=ax.transAxes, 
-                        fontsize=14, fontweight='bold', va='top')
+                #ax.text(0.33, 0.95, "data region", transform=ax.transAxes, 
+                #        fontsize=14, fontweight='bold', va='top')
             apply(ax.set_ylim, ylims[cff])
             ax.set_xlim(0.005, 1.0)
             #ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.02))  # tickmarks
             for label in ax.get_xticklabels() + ax.get_yticklabels():
                 label.set_fontsize(14)
-    fig.subplots_adjust(bottom=0.2, wspace=0.0, hspace=0.0)
+    fig.subplots_adjust(bottom=0.5, wspace=0.0, hspace=0.0)
     if path:
-        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+        #fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+        fig.set_size_inches((14, 16))
+        mkpdf(path)
     else:
         fig.canvas.draw()
         fig.show()

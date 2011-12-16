@@ -837,9 +837,10 @@ class ComptonGepard(ComptonFormFactors):
     cutq2 - Q2 at which evolution is frozen (default = 0 GeV^2)
     
     """
-    def __init__(self, cutq2=0.0, tdep='dipole', **kwargs):
+    def __init__(self, cutq2=0.0, ansatz='FIT', **kwargs):
         # initial values of parameters and limits on their values
         self.parameters = {
+        #  GPD H
                'NS' : 0.15,
              'AL0S' : 1.0,
              'ALPS' : 0.15,
@@ -859,7 +860,27 @@ class ComptonGepard(ComptonFormFactors):
              'SECG' : 0.0,
              'THIG' : 0.0,
              'KAPG' : 0.0,
-            'SKEWG' : 0.0   }
+            'SKEWG' : 0.0,
+             'DELB' : 0.0,
+        # GPD E
+             'EAL0S' : 1.0,
+             'EALPS' : 0.15,
+             'EM02S' : 1.0,    'limit_EM02S' : (0.1, 1.5),
+           'EDELM2S' : 0.0,
+               'EPS' : 2.0,
+             'ESECS' : 0.0,
+             'ETHIS' : 0.0,
+             'EKAPS' : 0.0,
+            'ESKEWS' : 0.0,
+             'EAL0G' : 1.1,
+             'EALPG' : 0.15,
+             'EM02G' : 0.7,    'limit_EM02G' : (0.1, 1.5),
+           'EDELM2G' : 0.0,
+               'EPG' : 2.0,
+             'ESECG' : 0.0,
+             'ETHIG' : 0.0,
+             'EKAPG' : 0.0,
+            'ESKEWG' : 0.0   }
 
 
         # gepard needs indices, not parameter names
@@ -883,14 +904,36 @@ class ComptonGepard(ComptonFormFactors):
              28 : 'KAPG',
              29 : 'SKEWG',
              32 : 'THIS',
-             42 : 'THIG' }
+             42 : 'THIG',
+             48 : 'DELB',
+            112 : 'EAL0S',
+            113 : 'EALPS',
+            114 : 'EM02S',
+            115 : 'EDELM2S',
+            116 : 'EPS',
+            117 : 'ESECS',
+            119 : 'ESKEWS',
+            122 : 'EAL0G',
+            123 : 'EALPG',
+            124 : 'EM02G',
+            125 : 'EDELM2G',
+            126 : 'EPG',
+            127 : 'ESECG',
+            129 : 'ESKEWG',
+            132 : 'ETHIS',
+            142 : 'ETHIG' }
 
         # order matters to fit.MinuitFitter, so it is defined by:
         self.parameter_names = [ 
            'NS', 'AL0S', 'ALPS', 'M02S',
            'DELM2S', 'PS', 'SECS', 'THIS', 'KAPS', 'SKEWS',
            'NG', 'AL0G', 'ALPG', 'M02G',
-           'DELM2G', 'PG', 'SECG', 'THIG', 'KAPG', 'SKEWG']
+           'DELM2G', 'PG', 'SECG', 'THIG', 'KAPG', 'SKEWG',
+           'DELB',
+           'EAL0S', 'EALPS', 'EM02S',
+           'EDELM2S', 'EPS', 'ESECS', 'ETHIS', 'ESKEWS',
+           'EAL0G', 'EALPG', 'EM02G',
+           'EDELM2G', 'EPG', 'ESECG', 'ETHIG', 'ESKEWG']
 
         # this was in Gepard's GEPARD.INI, which is not needed now
         # but look at it for documentation of what parameters below are
@@ -913,15 +956,17 @@ class ComptonGepard(ComptonFormFactors):
         g.mbcont.phind = 1.57
 
         g.parchr.scheme = array([c for c in 'CSBAR'])  # array(5)
-        if tdep == 'dipole':
-            g.parchr.ansatz = array([c for c in 'FIT   ']) # array(6)
-        elif tdep == 'exponential':
+
+        if ansatz not in ['FIT', 'FITEXP', 'EPH', 'EPHEXP', 'EFL', 'EFLEXP']:
+            raise ValueError, "Invalid ansatz: %s\n" % ansatz
+        g.parchr.ansatz = array([c for c in ansatz + (6-len(ansatz))*' ']) # array(6)
+        if ansatz == 'FITEXP':
             g.parchr.ansatz = array([c for c in 'FITEXP']) # array(6)
             self.parameters['ALPS'] = 0.0   # like in smallx.nb
             self.parameters['ALPG'] = 0.0
             self.parameters['M02G'] = 1./4.63 # from J/Psi production
-        else:
-            raise ValueError, "Invalid tdep: %s\n" % tdep
+            self.parameters['limit_M02S'] = (0.0, 1.5)
+            self.parameters['limit_M02G'] = (0.0, 1.5)
 
         # following two items usually came from driver file
         g.parchr.process = array([c for c in 'DVCS  '])  # array(6)

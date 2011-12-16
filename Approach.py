@@ -67,7 +67,6 @@ class Approach(object):
     def scan(self, parname, points, npoints=5):
         """Scan chi-square dependence on single parameter."""
         mem = self.m.parameters[parname]
-        chis = []
         for val in linspace(0.5*mem, 1.5 * mem, npoints):
             self.m.parameters[parname] = val
             self.m.ndparameters[self.m.parameter_names.index(parname)] = val

@@ -69,6 +69,8 @@ def test_gepardfitsimple():
     assert_almost_equal(chisq, 5.1423271052023196, 3)
     tGepard.model.fix_parameters('ALL')
 
+test_gepardfitsimple.gepardsuite = 1
+
 def test_gepardfitDVCSsumso3():
     """Test fitting to HERA DVCS via gepard in sum-so3 model
     
@@ -139,10 +141,14 @@ def test_gepardfitDVCSnlso3():
     f.fit()
     chisq = tGepard.chisq(DVCSpoints)[0]
     assert_almost_equal(chisq/1000, 95.9/1000, 3)
+    assert_almost_equal(tGepard.model.parameters['M02S'], 0.4782082809, 4)
+    assert_almost_equal(tGepard.model.parameters['SECS'], -0.15134045438, 4)
+    assert_almost_equal(tGepard.model.parameters['SECG'], -0.811942207227, 4)
     tGepard.model.fix_parameters('ALL')
 
 test_gepardfitDVCSnlso3.long = 1
 test_gepardfitDVCSnlso3.extendedtesting = 1
+test_gepardfitDVCSnlso3.gepardsuite = 1
 
 def test_gepardfitDVCSthi():
     """Test fitting to HERA DVCS via gepard in 3-PW nlso3 model."""

@@ -68,4 +68,5 @@ def test_gepardfitDVCSNLO():
     assert_almost_equal(mGepard.parameters['M02S'], 0.590339, 2)
 
 test_gepardfitDVCSNLO.long = 1
+test_gepardfitDVCSNLO.gepardsuite = 1
 #test_gepardfitDVCSNLO.newfeature = 1
