@@ -48,6 +48,9 @@ Open:
 
 20!! - gpdHtraj/zero gives P=0 result regardless of the value of P
 
+21 -  Some funny things with array dimensions (integra.F) should be
+      fixed  (see ifort errors)
+
 Fixed:
 ------
 
