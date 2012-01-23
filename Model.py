@@ -1120,6 +1120,9 @@ class ComptonHybrid(ComptonFormFactors):
 class ModelDR(ComptonModelDR, ElasticDipole):
     """Complete model as in arXiv:0904.0458.."""
 
+class Gepard(ComptonGepard, ElasticKelly):
+    """Complete model as in arXiv:0904.0458.."""
+
 
 class ModelDRKelly(ComptonModelDR, ElasticKelly):
     """Same, but with Kelly elastic form factors."""

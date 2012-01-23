@@ -45,8 +45,8 @@ logging._handlerList[0].addFilter(hfil)
 
 ## [1] Load experimental data and theoretical models
 
-data = utils.loaddata('/home/kkumer/pype/data/ep2epgamma', approach=Approach.hotfixedBMK)  
-data.update(utils.loaddata('/home/kkumer/pype/data/gammastarp2gammap', approach=Approach.hotfixedBMK))
+data = utils.loaddata('/home/kkumer/pype/data/ep2epgamma', approach=Approach.BMK)  
+data.update(utils.loaddata('/home/kkumer/pype/data/gammastarp2gammap', approach=Approach.BMK))
 db = shelve.open('/home/kkumer/pype/theories.db')
 dell = shelve.open('/home/kkumer/pype/dellB.db')
 
@@ -95,14 +95,98 @@ EICmockkk = data[1002]
 ## [3] Create a theory
 
 # Gepard only
-mGepard = Model.ComptonGepard(ansatz='FITEXP')
-tGepard = Approach.hotfixedBMK(mGepard)
+mGepard = Model.Gepard(ansatz='FITEXP')
+tGepard = Approach.BMK(mGepard)
+
+
+m = mGepard
+t = tGepard
+# nloLOParameters
+m.parameters['NS']     =  0.152039
+m.parameters['AL0S']   =  1.15751
+m.parameters['M02S']   =  0.478391
+m.parameters['SECS']   = -0.15152
+m.parameters['THIS']   =  0.0
+m.parameters['KAPS']   =  0.7
+m.parameters['SKEWS']  =  0.0
+
+m.parameters['AL0G']   =  1.24732
+m.parameters['M02G']   =  0.7
+m.parameters['SECG']   = -0.81217
+m.parameters['THIG']   =  0.0
+m.parameters['KAPG']   = -0.2
+m.parameters['SKEWG']  =  0.0
+
+m.parameters['DELB']   =  1.0
+
+m.parameters['EAL0S']   =  1.15751
+m.parameters['EM02S']   =  0.478391
+m.parameters['ESECS']   = -0.15152
+m.parameters['ETHIS']   =  0.0
+m.parameters['EKAPS']   =  0.7
+m.parameters['ESKEWS']  =  0.0
+
+m.parameters['EAL0G']   =  1.24732
+m.parameters['EM02G']   =  0.7
+m.parameters['ESECG']   = -0.81217
+m.parameters['ETHIG']   =  0.0
+#m.parameters['EKAPG']   = -0.2  #ignored par
+m.parameters['ESKEWG']  =  0.0
+
+pars = m.parameters
+
+pt = Data.DummyPoint()
+
+pt.Q2 = 8.
+pt.t = -0.2
+pt.xi = 0.01
+t.m.g.parint.p = 0
+t.m.g.init()
+print m.ImH(pt)
+
+m = Model.ComptonGepard(ansatz='FIT')
+t = Approach.hotfixedBMK(m)
+t.m.g.parint.p = 0
+t.m.g.init()
+m.parameters.update(pars)
+print m.ImH(pt)
+
+m = Model.ComptonGepard(ansatz='EPH')
+t = Approach.hotfixedBMK(m)
+m.parameters.update(pars)
+t.m.g.parint.p = 0
+t.m.g.init()
+print m.ImH(pt)
+
+m = Model.ComptonGepard(ansatz='EFL')
+t = Approach.hotfixedBMK(m)
+m.parameters.update(pars)
+t.m.g.parint.p = 0
+t.m.g.init()
+print m.ImH(pt)
+
+m = Model.ComptonGepard(ansatz='EPH')
+t = Approach.hotfixedBMK(m)
+m.parameters.update(pars)
+t.m.g.parint.p = 0
+t.m.g.init()
+print m.ImH(pt)
+
+m = Model.ComptonGepard(ansatz='EFL')
+t = Approach.hotfixedBMK(m)
+m.parameters.update(pars)
+t.m.g.parint.p = 0
+t.m.g.init()
+print m.ImH(pt)
+
+
+
 
 # DR only
-#mDRonly = Model.ModelDR()
-#tDR = Approach.hotfixedBMK(mDRonly)
-#tDR.name = 'KM09a'
-#tDR.m.parameters.update(DMepsGLO)
+mDRonly = Model.ModelDR()
+tDR = Approach.hotfixedBMK(mDRonly)
+tDR.name = 'KM09a'
+tDR.m.parameters.update(DMepsGLO)
 
 ## Hybrid: Gepard+DR (can reuse above Gepard)
 #mDRsea = Model.ComptonModelDRsea()
@@ -204,7 +288,8 @@ def ptfix(th, Q=1, pol=-1, Ee=160., xB=0.1, Q2=2.2, t=-0.1, phi=3.5, FTn=None):
 
 
 # collider datapoint
-def ptcol(th, Q=-1, pol=1, Ee=5, Ep=250, xB=0.001, Q2=4., t=-0.2, phi=1., FTn=None):
+def ptcol(th, Q=-1, pol=1, Ee=5, Ep=250, xB=0.001, Q2=4., t=-0.2, 
+        phi=1., varphi=0.5, FTn=None):
     ptc = Data.DummyPoint()
     ptc.in1energy = Ee
     ptc.in2energy = Ep
@@ -222,6 +307,7 @@ def ptcol(th, Q=-1, pol=1, Ee=5, Ep=250, xB=0.001, Q2=4., t=-0.2, phi=1., FTn=No
         ptc.units = {'phi': 'radian'}
     elif FTn:
         ptc.FTn = FTn
+    ptc.varphi = varphi
     ptc.frame = 'Trento'
     utils.fill_kinematics(ptc)
     th.to_conventions(ptc)
@@ -265,3 +351,5 @@ def der(th, pars, pts, f=False,  h=0.05):
         ders = np.array([_derpt(th, par, pt, f, h) for pt in pts])
         print '%4s  |  %5.2f' % (par, ders.mean())
 
+ptc = ptcol(tGepard)
+ptcb = ptcol(tGepard, varphi=0.5+np.pi)

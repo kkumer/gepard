@@ -120,9 +120,11 @@ def fill_kinematics(kin, old={}):
     # s is just copied from old, if there is one
     if old and old.has_key('s'):
         kin.s = old.s
-    # phi is copied from old, if possible and necessary
+    # phi and varphi are copied from old, if possible and necessary
     if not kin.has_key('phi') and old.has_key('phi'):
         kin.phi = old.phi
+    if not kin.has_key('varphi') and old.has_key('varphi'):
+        kin.varphi = old.varphi
     return kin
 
 def parse(datafile):

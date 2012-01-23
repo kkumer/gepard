@@ -318,6 +318,8 @@ class BMK(Approach):
 
     #### Bethe-Heitler amplitude squared Fourier coefficients
 
+    ######  Unpolarized target 
+
     def cBH0unpSX(self, pt):
         """ BKM Eq. (35) - small-x approximation """
         return 16. * pt.K2 * (pt.Q2/pt.t) * ( 
@@ -359,14 +361,50 @@ class BMK(Approach):
         return 8. * xB**2 * pt.K2 * brace
 
     def TBH2unp(self, pt):
-        """ Bethe-Heitler amplitude squared. BKM Eq. (25)  """
+        """ unp Bethe-Heitler amplitude squared. BKM Eq. (25)  """
         return  self.PreFacBH(pt) * ( self.cBH0unp(pt) + 
                    self.cBH1unp(pt)*cos(pt.phi) + self.cBH2unp(pt)*cos(2.*pt.phi) )
+
+    ###### Transversely polarized target 
+
+    def cBH0TP(self, pt):
+        """ BKM Eq. (40) """
+        xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
+        F1, F2 = self.m.F1(t), self.m.F2(t)
+        sqrt1yeps = sqrt(1-y-eps2*y**2/4.)
+        brace = ( xB**3*Mp2/Q2*(1-t/Q2)*(F1+F2) +
+                (1-(1-xB)*t/Q2)*(xB**2*Mp2/t*(1-t/Q2)*F1+xB/2.*F2) )
+        return (-8*pt.in1polarization*cos(pt.varphi)*(2-y)*y*sqrt(Q2)/Mp*
+                sqrt(1+eps2)*pt.K/sqrt1yeps*(F1+F2)*brace)
+
+    def cBH1TP(self, pt):
+        """ BKM Eq. (41) """
+        xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
+        F1, F2 = self.m.F1(t), self.m.F2(t)
+        sqrt1yeps = sqrt(1-y-eps2*y**2/4.)
+        brace = ( 2*pt.K**2*Q2/t/sqrt1yeps**2 * (xB*(1-t/Q2)*F1 +
+            t/4./Mp2*F2) + (1+eps2)*xB*(1-t/Q2)*(F1+t/4./Mp2*F2) )
+        return (-16*pt.in1polarization*cos(pt.varphi)*xB*y*
+                sqrt1yeps*Mp/sqrt(Q2)*sqrt(1+eps2)*(F1+F2)*brace)
+
+    def sBH1TP(self, pt):
+        """ BKM Eq. (42) """
+        xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
+        F1, F2 = self.m.F1(t), self.m.F2(t)
+        sqrt1yeps = sqrt(1-y-eps2*y**2/4.)
+        return (16*pt.in1polarization*sin(pt.varphi)*xB**2*y*
+                sqrt1yeps*Mp/sqrt(Q2)*sqrt((1+eps2)**3)*
+                (1-t/Q2)*(F1+F2)*(F1+t/4./Mp2*F2))
+
+    def TBH2TP(self, pt):
+        """ TP Bethe-Heitler amplitude squared. BKM Eq. (25)  """
+        return  self.PreFacBH(pt) * ( self.cBH0TP(pt) + 
+                   self.cBH1TP(pt)*cos(pt.phi) + self.sBH1TP(pt)*sin(pt.phi) )
 
 
     #### DVCS
 
-    # {\cal C} coefficients
+    ##### {\cal C} coefficients
 
     def CCALDVCSunp(self, pt):
         """ BKM Eq. (66) """
@@ -387,12 +425,30 @@ class BMK(Approach):
         brace = 4. * (1.-pt.xB) * parenHH - xB2 * parenEH - (xB2 
                 + (2.-pt.xB)**2 * pt.t/(4.*Mp2)) * parenEE - xB2 * pt.t/(4.*Mp2) * parenEtEt
         return brace / (2.-pt.xB)**2
+
+
+    def CCALDVCSTP(self, pt): 
+        """ BKM Eq. (68) returns tuple (CTP+, Im(CTP-))"""
+        xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
+        H = complex(self.m.ReH(pt), self.m.ImH(pt))
+        EE = complex(self.m.ReE(pt), self.m.ImE(pt))
+        tH = complex(self.m.ReHt(pt), self.m.ImHt(pt))
+        tE = complex(self.m.ReEt(pt), self.m.ImEt(pt))
+        HCC = complex(self.m.ReH(pt), -self.m.ImH(pt))
+        EECC = complex(self.m.ReE(pt), -self.m.ImE(pt))
+        tHCC = complex(self.m.ReHt(pt), -self.m.ImHt(pt))
+        tECC = complex(self.m.ReEt(pt), -self.m.ImEt(pt))
+        resp = ( 2*xB*(H*tECC+tE*HCC) - 2*(2-xB)*(tH*EECC+tHCC*EE) +
+                xB**2*(EE*tECC+tE*EECC) ) / (2.-xB)**2
+        resm = ((2-xB)*(H*EECC-EE*HCC) - xB*(tH*tECC-tE*tHCC))*2/(2.-xB)**2
+        return (resp.real, resm.imag)  # resp.real = resp
            
-    # DVCS amplitude squared Fourier coefficients
+    #### DVCS amplitude squared Fourier coefficients
+
+    ######  Unpolarized target 
 
     def CDVCSunpPP(self, pt):
         """BMK Eq. (43)"""
-
         return 2. * (2. - 2.*pt.y + pt.y**2)
 
 
@@ -401,10 +457,26 @@ class BMK(Approach):
         return self.CDVCSunpPP(pt) * self.CCALDVCSunp(pt)
 
     def TDVCS2unp(self, pt):
-        """ DVCS amplitude squared. BKM Eq. (26) - FIXME: only twist two now """
+        """ unp DVCS amplitude squared. BKM Eq. (26) - FIXME: only twist two now """
         return  self.PreFacDVCS(pt) * self.cDVCS0unp(pt)
 
+    ###### Transversely polarized target 
+
+    def cDVCS0TP(self, pt):
+        """ BKM Eq. (49) """
+        y = pt.y
+        ReCCp, ImCCm = self.CCALDVCSTP(pt)
+        bracket = ( -pt.in1polarization*y*(2-y)*cos(pt.varphi)*ReCCp +
+                (2-2*y+y**2)*sin(pt.varphi)*ImCCm )
+        return -sqrt(pt.Q2*pt.K2)/Mp/sqrt(1-y) * bracket
+
+    def TDVCS2TP(self, pt):
+        """ TP DVCS amplitude squared. BKM Eq. (26) - FIXME: only twist two now """
+        return  self.PreFacDVCS(pt) * self.cDVCS0TP(pt)
+
     #### Interference
+
+    ######  Unpolarized target 
 
     def ReCCALINTunp(self, pt):
         """ Real part of BKM Eq. (69) """
@@ -474,12 +546,106 @@ class BMK(Approach):
                 + self.sINT1unp(pt) * sin(pt.phi)
                 #+ lam * self.sINT2unp(pt) * sin(2.*pt.phi)
                 )
+
+    ###### Transversely polarized target 
+
+    def ReCCALINTTPp(self, pt):
+        """ Real part of BKM Eq. (71) """
+
+        xB, t, F1, F2 = pt.xB, pt.t, self.m.F1(pt.t), self.m.F2(pt.t)
+        H, E, Ht, Et = self.m.ReH(pt), self.m.ReE(pt), self.m.ReHt(pt), self.m.ReEt(pt)
+        brace1 = xB**2/(2-xB)*(H+xB/2.*E) + xB*t/4./Mp2*E
+        brace2 = 4*(1-xB)/(2-xB)*F2*Ht - (xB*F1+xB**2/(2-xB)*F2)*Et
+        return (F1+F2)*brace1 - xB**2/(2-xB)*F1*(Ht+xB/2.*Et) + t/4./Mp2*brace2
+
+    def ImCCALINTTPp(self, pt):
+        """ Imag part of BKM Eq. (71) FIXME: code duplication """
+
+        xB, t, F1, F2 = pt.xB, pt.t, self.m.F1(pt.t), self.m.F2(pt.t)
+        H, E, Ht, Et = self.m.ReH(pt), self.m.ReE(pt), self.m.ReHt(pt), self.m.ReEt(pt)
+        brace1 = xB**2/(2-xB)*(H+xB/2.*E) + xB*t/4./Mp2*E
+        brace2 = 4*(1-xB)/(2-xB)*F2*Ht - (xB*F1+xB**2/(2-xB)*F2)*Et
+        return (F1+F2)*brace1 - xB**2/(2-xB)*F1*(Ht+xB/2.*Et) + t/4./Mp2*brace2
            
-    #def TINTunpd(self, pt):
-    #    """ BH-DVCS interference. (Normalized) part surviving after taking difference 
-    #    of two lepton longitudinal polarization states.
-    #    BKM Eq. (27) - FIXME: only twist two """
-    #    return  - pt.in1charge * self.PreFacINT(pt) * self.sINT1unp(pt) * sin(pt.phi)
+    def ReCCALINTTPm(self, pt):
+        """ Real part of BKM Eq. (71) """
+
+        xB, t, F1, F2 = pt.xB, pt.t, self.m.F1(pt.t), self.m.F2(pt.t)
+        H, E, Ht, Et = self.m.ReH(pt), self.m.ReE(pt), self.m.ReHt(pt), self.m.ReEt(pt)
+        xBaux = xB**2/(2-xB)
+        paren1 = xB**2*F1 - (1-xB)*t/Mp2*F2
+        brace = t/4./Mp2*((2-xB)*F1 + xBaux*F2) + xBaux*F1
+        return paren1*H/(2-xB) + brace*E - xBaux*(F1+F2)*(Ht+t/4./Mp2*Et)
+           
+    def ImCCALINTTPm(self, pt):
+        """ Imag part of BKM Eq. (71)  FIXME: code duplication"""
+
+        xB, t, F1, F2 = pt.xB, pt.t, self.m.F1(pt.t), self.m.F2(pt.t)
+        H, E, Ht, Et = self.m.ReH(pt), self.m.ReE(pt), self.m.ReHt(pt), self.m.ReEt(pt)
+        xBaux = xB**2/(2-xB)
+        paren1 = xB**2*F1 - (1-xB)*t/Mp2*F2
+        brace = t/4./Mp2*((2-xB)*F1 + xBaux*F2) + xBaux*F1
+        return paren1*H/(2-xB) + brace*E - xBaux*(F1+F2)*(Ht+t/4./Mp2*Et)
+
+    def ReDELCCALINTTPp(self, pt):
+        """ Real part of BKM Eq. (74) """
+
+        xB, t, F1, F2 = pt.xB, pt.t, self.m.F1(pt.t), self.m.F2(pt.t)
+        Ht, Et = self.m.ReHt(pt), self.m.ReEt(pt)
+        return -t/Mp2*(F2*Ht - xB/(2-xB)*(F1+xB*F2/2)*Et)
+
+    def ImDELCCALINTTPp(self, pt):
+        """ Imag part of BKM Eq. (74) FIXME: code duplication """
+
+        xB, t, F1, F2 = pt.xB, pt.t, self.m.F1(pt.t), self.m.F2(pt.t)
+        Ht, Et = self.m.ImHt(pt), self.m.ImEt(pt)
+        return -t/Mp2*(F2*Ht - xB/(2-xB)*(F1+xB*F2/2)*Et)
+
+    def ReDELCCALINTTPm(self, pt):
+        """ Real part of BKM Eq. (75) """
+
+        xB, t, F1, F2 = pt.xB, pt.t, self.m.F1(pt.t), self.m.F2(pt.t)
+        H, E = self.m.ReH(pt), self.m.ReE(pt)
+        return t/Mp2*(F2*H - F1*E)
+
+    def ImDELCCALINTTPm(self, pt):
+        """ Imag part of BKM Eq. (75) FIXME: code duplication """
+
+        xB, t, F1, F2 = pt.xB, pt.t, self.m.F1(pt.t), self.m.F2(pt.t)
+        H, E = self.m.ImH(pt), self.m.ImE(pt)
+        return t/Mp2*(F2*H - F1*E)
+
+    def cINT0TP(self, pt):
+        """ BKM Eq. (61) """
+        y = pt.y
+        brace1 = ((2-y)**2/(1-y)+2)*self.ReCCALINTTPp(pt) + self.ReDELCCALINTTPp(pt)
+        brace2 = (2-y)**2/(1-y)*self.ImCCALINTTPm(pt) + self.ImDELCCALINTTPm(pt)
+        return 8*Mp*sqrt((1-y)*pt.K2/pt.Q2) * (
+            -pt.in1polarization*y*cos(pt.varphi)*brace1
+            +(2-y)*sin(pt.varphi)*brace2    )
+
+    def cINT1TP(self, pt):
+        """ BKM Eq. (62) """
+        y = pt.y
+        brace1 = -pt.in1polarization*y*(2-y)*self.ReCCALINTTPp(pt)
+        brace2 = 2-2*y+y**2*self.ImCCALINTTPm(pt)
+        return 8*Mp*sqrt((1-y)/pt.Q2) * (
+            cos(pt.varphi)*brace1 + sin(pt.varphi)*brace2    )
+
+    def sINT1TP(self, pt):
+        """ BKM Eq. (62) """
+        y = pt.y
+        brace1 = 2-2*y+y**2*self.ImCCALINTTPp(pt)
+        brace2 = pt.in1polarization*y*(2-y)*self.ReCCALINTTPm(pt)
+        return 8*Mp*sqrt((1-y)/pt.Q2) * (
+            cos(pt.varphi)*brace1 + sin(pt.varphi)*brace2    )
+
+    def TINTTP(self, pt):
+        """ BH-DVCS interference. BKM Eq. (27) - FIXME: only twist two """
+        return  - pt.in1charge * self.PreFacINT(pt) * ( self.cINT0TP(pt)  
+                + self.cINT1TP(pt) * cos(pt.phi)
+                + self.sINT1TP(pt) * sin(pt.phi)
+                )
 
 ## Observables ##
 
@@ -530,6 +696,121 @@ class BMK(Approach):
         return wgh * self.PreFacSigma(kin) * ( self.TBH2unp(kin) 
                 + self.TINTunp(kin) 
                 + self.TDVCS2unp(kin) )
+
+           
+    def XTP(self, pt, **kwargs):
+        """ Calculate 4-fold differential cross section for transversely polarized target. 
+
+        FIXME: Code should be merged with Xunp above (and XLP below)
+        
+        """
+        if kwargs.has_key('vars'):
+            ptvars = Data.DummyPoint(init=kwargs['vars'])
+            kin = utils.fill_kinematics(ptvars, old=pt)
+            BMK.prepare(kin)
+        else:
+            # just copy everything from pt
+            ptempty = Data.DummyPoint()
+            kin = utils.fill_kinematics(ptempty, old=pt)
+            BMK.prepare(kin)
+            ## Nothing seems to be gained by following approach:
+            #kin = dict((i, getattr(pt, i)) for i in 
+            #        ['xB', 'Q2', 'W', 's', 't', 'mt', 'phi', 'in1charge',
+            #            'in1polarization', 'in2particle'])
+
+        # copy non-kinematical info
+        for atr in ['in1charge', 'in1polarization', 'in2polarization']:
+            if pt.has_key(atr):
+                setattr(kin, atr, getattr(pt, atr))
+
+        if kwargs.has_key('zeropolarized') and kwargs['zeropolarized']:
+            kin.in1polarization = 0
+
+        if kwargs.has_key('flip') and kwargs['flip']:
+            if isinstance(kwargs['flip'], list):
+                for item in kwargs['flip']:
+                    setattr(kin, item, - getattr(pt, item))
+            else:
+                setattr(kin, kwargs['flip'], - getattr(pt, kwargs['flip']))
+
+        if kwargs.has_key('weighted') and kwargs['weighted']:
+            wgh = self.w(kin)
+        else:
+            wgh = 1
+
+        # Gepard needs resetting
+        if self.model.__dict__.has_key('Gepard'): self.m.g.newcall = 1
+
+        #print 'BH2 = ' + str(self.PreFacSigma(kin) *self.TBH2LP(kin))
+        #print 'DVCS2 = ' + str(self.PreFacSigma(kin) *self.TDVCS2LP(kin))
+        #print 'INT = ' + str(self.PreFacSigma(kin) *self.TINTLP(kin))
+        return wgh * self.PreFacSigma(kin) * ( self.TBH2TP(kin) 
+                + self.TINTTP(kin) 
+                + self.TDVCS2TP(kin) )
+
+    def TSD(self, pt, **kwargs):
+        """Difference of 4-fold cross sections with transversely polarized
+           target"""
+
+        R = kwargs.copy()
+        if R.has_key('vars'):
+            if R['vars'].has_key('varphi'):
+                # has vars kwarg and vars has varphi key = update varphi
+                R['vars'].update({'varphi':R['vars']['varphi']+pi})
+            else:
+                # has vars kwarg but vars has not varphi key = create varphi
+                R['vars'].update({'varphi':pt.varphi+pi})
+        else:
+            # doesn't have vars kwarg, create vars with varphi key
+            R['vars'] = {'varphi':pt.varphi+pi}
+        return ( self.XTP(pt, **kwargs) 
+                - self.XTP(pt, **R) ) / 2.
+
+    def TSS(self, pt, **kwargs):
+        """Difference of 4-fold cross sections with transversely polarized
+           target"""
+
+        R = kwargs.copy()
+        if R.has_key('vars'):
+            if R['vars'].has_key('varphi'):
+                # has vars kwarg and vars has varphi key = update varphi
+                R['vars'].update({'varphi':R['vars']['varphi']+pi})
+            else:
+                # has vars kwarg but vars has not varphi key = create varphi
+                R['vars'].update({'varphi':pt.varphi+pi})
+        else:
+            # doesn't have vars kwarg, create vars with varphi key
+            R['vars'] = {'varphi':pt.varphi+pi}
+        return ( self.XTP(pt, **kwargs) 
+                + self.XTP(pt, **R) ) / 2.
+
+
+    def _TSA(self, pt, **kwargs):
+        """Calculate trasversal target spin asymmetry (TTSA)."""
+
+        return self.TSD(pt, **kwargs) / self.TSS(pt, **kwargs)
+
+    def TSA(self, pt, **kwargs):
+        """Calculate trasversal target spin asymmetry or its harmonics."""
+        if pt.has_key('varphi'):
+            return self._TSA(pt, **kwargs)
+        elif pt.has_key('FTn'):
+            if pt.FTn < 0:
+                res = quadrature.Hquadrature(lambda phi: 
+                        self._TSA(pt, vars={'varphi':phi}) * sin(-pt.FTn*phi), 0, 2*pi)
+            elif pt.FTn > 0:
+                res = quadrature.Hquadrature(lambda phi: 
+                        self._TSA(pt, vars={'varphi':phi}) * cos(pt.FTn*phi), 0, 2*pi)
+            elif pt.FTn == 0:
+                res = quadrature.Hquadrature(lambda phi: 
+                        self._TSA(pt, vars={'varphi':phi}), 0, 2*pi)/2.
+            else:
+                raise ValeError('This should never happen!')
+            return  res / pi
+        else:
+            raise ValueError('[%s] has neither target polarization angle varphi\
+ nor harmonic FTn defined!' % pt)
+
 
     def BSD(self, pt, **kwargs):
         """Calculate 4-fold helicity-dependent cross section measured by HALL A """
