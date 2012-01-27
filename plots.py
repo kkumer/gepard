@@ -4,7 +4,7 @@ of some specific datasets and CFFs.
 
 """
 
-#from IPython.Debugger import Tracer; debug_here = Tracer()
+from IPython.Debugger import Tracer; debug_here = Tracer()
 
 import sys, os, math, copy, string, commands
 import numpy as np
@@ -571,6 +571,7 @@ def CLASTSA(path=None, fmt='png', **kwargs):
         fig.show()
     return fig
 
+
 def HallAFT(path=None, fmt='png', **kwargs):
     """Makes plot of harmonics of Hall-A data with fit lines"""
 
@@ -953,6 +954,80 @@ def EICt(path=None, fmt='png', **kwargs):
     panel(ax, points=data[id], xaxis='tm', **kwargs)
     ax.set_ylabel('$d\\sigma/dt\\quad [{\\rm nb/GeV}^2]$', fontsize=18)
     ax.set_xlabel('$-t\\quad [{\\rm GeV}^2]$', fontsize=18)
+    if path:
+        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+    else:
+        fig.canvas.draw()
+        fig.show()
+    return fig
+
+def EICTTSA(lines=[], path=None, fmt='png'):
+    """Plot EIC TTSA.
+    
+    FIXME: kinematic completion, charge etc. must be explicit here
+    """
+
+    title = 'EIC transversal target spin assymetry'
+    fig = plt.figure()
+    fig.canvas.set_window_title(title)
+    fig.suptitle(title)
+    fig.subplots_adjust(bottom=0.35, right=0.6)
+    # Asymmetry panel
+    pt = Data.DummyPoint()
+    pt.exptype = 'collider'
+    pt.in1particle = 'e'
+    pt.in1charge = -1
+    pt.in1energy = 20.
+    pt.in1polarization = 0.0
+    pt.in2particle = 'p'
+    pt.in2energy = 250.
+    pt.s = 2 * pt.in1energy * (pt.in2energy + math.sqrt(
+        pt.in2energy**2 - Mp2)) + Mp2
+    #pt.xB = 5.145e-4
+    pt.xB = 8.2e-4
+    pt.t = -0.275
+    pt.Q2 = 4.4
+    pt.varphi = -np.pi/2
+    pt.units = {'phi' : 'radian'}
+    ax = fig.add_subplot(1,1,1)
+    ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
+    phi = np.linspace(0., 2*np.pi, 50)
+    utils.fill_kinematics(pt)
+    linestyles = ['r-', 'g--', 'b-.', 'p:']
+    dasheslengths = [(None, None), (20,5), (20,5,5,5), (5,5)]
+    #labels = [r'$\sigma^{\uparrow}$ ' + t.name for t in lines]
+    pn = 0
+    for approach in lines:
+        approach.__class__.to_conventions(pt)
+        approach.__class__.prepare(pt)
+        mem = approach.m.parameters['KAPS']
+        for kaps in [-1.5, 0, 1.5]:
+            approach.m.parameters['KAPS'] = kaps
+            # Must go to BKM explicitely here
+            line = approach.TSA(pt, vars={'phi':np.pi-phi})
+            ax.plot(phi, line, linestyles[pn], dashes=dasheslengths[pn], linewidth=2, label='$\\kappa_{S}$ = % 4.1f' % kaps) 
+            pn += 1
+        approach.m.parameters['KAPS'] = mem
+
+    #labels = ['$(\\sigma^{\\uparrow} + \\sigma^{\\downarrow})/2$ ' + t.name for t in lines]
+    ax.set_xlim(0.0, 2*np.pi)
+    # axes labels
+    ax.set_xlabel('$\\phi\\quad {\\rm [rad]}$', fontsize=20)
+    ax.set_ylabel('$A_{\\rm UT}^{\\sin(\\phi - \\phi_S)}$', fontsize=20)
+    # Legend
+    leg = ax.legend(loc='upper center', handlelength=4.0, fancybox=True)
+    frame  = leg.get_frame()
+    frame.set_facecolor('0.90')    # set the frame face color to light gray
+    for t in leg.get_texts():
+        t.set_fontsize(18)    # the legend text fontsize
+    for l in leg.get_lines():
+        l.set_linewidth(2.0)  # the legend line width
+    #ax.text(0.2, -0.38, "EIC", fontsize=18)
+    ax.text(0.1, -0.37, "$E_e = %d \\,{\\rm GeV}$" % pt.in1energy, fontsize=18)
+    ax.text(0.1, -0.46, "$E_p = %d \\,{\\rm GeV}$" % pt.in2energy, fontsize=18)
+    ax.text(0.1, -0.55, "$x_B = %s$" % pt.xB, fontsize=18)
+    ax.text(0.1, -0.64, "$Q^2 = %s \\,{\\rm GeV}^2$" % pt.Q2, fontsize=18)
+    ax.text(0.1, -0.73, "$t = %s \\,{\\rm GeV}^2$" % pt.t, fontsize=18)
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:

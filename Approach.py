@@ -1,4 +1,4 @@
-#from IPython.Debugger import Tracer; debug_here = Tracer()
+from IPython.Debugger import Tracer; debug_here = Tracer()
 
 import copy, sys
 
@@ -131,12 +131,10 @@ class Approach(object):
                     h=sqrt(m.covariance[p,p])
                     mem = m.parameters[p]
                     m.parameters[p] = mem+h/2.
-                    if self.model.__dict__.has_key('Gepard') or \
-                            self.model.__dict__.has_key('g'): self.m.g.newcall = 1
+                    if self.model.__dict__.has_key('g'): self.m.g.newcall = 1
                     up = fun(pt)
                     m.parameters[p] = mem-h/2.
-                    if self.model.__dict__.has_key('Gepard') or \
-                            self.model.__dict__.has_key('g'): self.m.g.newcall = 1
+                    if self.model.__dict__.has_key('g'): self.m.g.newcall = 1
                     down = fun(pt)
                     m.parameters[p] = mem
                     dfdp[p] = (up-down)/h
@@ -163,8 +161,7 @@ class Approach(object):
                     # one sigma
                     result = (allnets.mean(), allnets.std())
         else:
-            if self.model.__dict__.has_key('Gepard') or \
-                    self.model.__dict__.has_key('g'): self.m.g.newcall = 1
+            if self.model.__dict__.has_key('g'): self.m.g.newcall = 1
             result = fun(pt)
             if isinstance(result, ndarray):
                 # we have neural net
@@ -536,7 +533,7 @@ class BMK(Approach):
 
     def sINT2unp(self, pt):
         """ BKM Eq. (55) """
-        return  16. * pt.K2 * pt.y / (2.-pt.xB) * self.ImCCALINTunpEFF(pt)
+        return  pt.in1polarization * 16. * pt.K2 * pt.y / (2.-pt.xB) * self.ImCCALINTunpEFF(pt)
 
     def TINTunp(self, pt):
         """ BH-DVCS interference. BKM Eq. (27) - FIXME: only twist two """
@@ -544,7 +541,7 @@ class BMK(Approach):
                 + self.cINT1unp(pt) * cos(pt.phi)
                 #+ self.cINT2unp(pt) * cos(2.*pt.phi) 
                 + self.sINT1unp(pt) * sin(pt.phi)
-                #+ lam * self.sINT2unp(pt) * sin(2.*pt.phi)
+                #+ self.sINT2unp(pt) * sin(2.*pt.phi)
                 )
 
     ###### Transversely polarized target 
@@ -562,7 +559,7 @@ class BMK(Approach):
         """ Imag part of BKM Eq. (71) FIXME: code duplication """
 
         xB, t, F1, F2 = pt.xB, pt.t, self.m.F1(pt.t), self.m.F2(pt.t)
-        H, E, Ht, Et = self.m.ReH(pt), self.m.ReE(pt), self.m.ReHt(pt), self.m.ReEt(pt)
+        H, E, Ht, Et = self.m.ImH(pt), self.m.ImE(pt), self.m.ImHt(pt), self.m.ImEt(pt)
         brace1 = xB**2/(2-xB)*(H+xB/2.*E) + xB*t/4./Mp2*E
         brace2 = 4*(1-xB)/(2-xB)*F2*Ht - (xB*F1+xB**2/(2-xB)*F2)*Et
         return (F1+F2)*brace1 - xB**2/(2-xB)*F1*(Ht+xB/2.*Et) + t/4./Mp2*brace2
@@ -581,7 +578,7 @@ class BMK(Approach):
         """ Imag part of BKM Eq. (71)  FIXME: code duplication"""
 
         xB, t, F1, F2 = pt.xB, pt.t, self.m.F1(pt.t), self.m.F2(pt.t)
-        H, E, Ht, Et = self.m.ReH(pt), self.m.ReE(pt), self.m.ReHt(pt), self.m.ReEt(pt)
+        H, E, Ht, Et = self.m.ImH(pt), self.m.ImE(pt), self.m.ImHt(pt), self.m.ImEt(pt)
         xBaux = xB**2/(2-xB)
         paren1 = xB**2*F1 - (1-xB)*t/Mp2*F2
         brace = t/4./Mp2*((2-xB)*F1 + xBaux*F2) + xBaux*F1
@@ -628,14 +625,14 @@ class BMK(Approach):
         """ BKM Eq. (62) """
         y = pt.y
         brace1 = -pt.in1polarization*y*(2-y)*self.ReCCALINTTPp(pt)
-        brace2 = 2-2*y+y**2*self.ImCCALINTTPm(pt)
+        brace2 = (2-2*y+y**2)*self.ImCCALINTTPm(pt)
         return 8*Mp*sqrt((1-y)/pt.Q2) * (
             cos(pt.varphi)*brace1 + sin(pt.varphi)*brace2    )
 
     def sINT1TP(self, pt):
         """ BKM Eq. (62) """
         y = pt.y
-        brace1 = 2-2*y+y**2*self.ImCCALINTTPp(pt)
+        brace1 = (2-2*y+y**2)*self.ImCCALINTTPp(pt)
         brace2 = pt.in1polarization*y*(2-y)*self.ReCCALINTTPm(pt)
         return 8*Mp*sqrt((1-y)/pt.Q2) * (
             cos(pt.varphi)*brace1 + sin(pt.varphi)*brace2    )
@@ -691,7 +688,7 @@ class BMK(Approach):
             wgh = 1
 
         # Gepard needs resetting
-        if self.model.__dict__.has_key('Gepard'): self.m.g.newcall = 1
+        if self.model.__dict__.has_key('g'): self.m.g.newcall = 1
 
         return wgh * self.PreFacSigma(kin) * ( self.TBH2unp(kin) 
                 + self.TINTunp(kin) 
@@ -739,11 +736,11 @@ class BMK(Approach):
             wgh = 1
 
         # Gepard needs resetting
-        if self.model.__dict__.has_key('Gepard'): self.m.g.newcall = 1
+        if self.model.__dict__.has_key('g'): self.m.g.newcall = 1
 
-        #print 'BH2 = ' + str(self.PreFacSigma(kin) *self.TBH2LP(kin))
-        #print 'DVCS2 = ' + str(self.PreFacSigma(kin) *self.TDVCS2LP(kin))
-        #print 'INT = ' + str(self.PreFacSigma(kin) *self.TINTLP(kin))
+        #print 'BH2_TP = ' + str(self.PreFacSigma(kin) *self.TBH2TP(kin))
+        #print 'DVCS2_TP = ' + str(self.PreFacSigma(kin) *self.TDVCS2TP(kin))
+        #print 'INT_TP = ' + str(self.PreFacSigma(kin) *self.TINTTP(kin))
         return wgh * self.PreFacSigma(kin) * ( self.TBH2TP(kin) 
                 + self.TINTTP(kin) 
                 + self.TDVCS2TP(kin) )
@@ -752,7 +749,7 @@ class BMK(Approach):
         """Difference of 4-fold cross sections with transversely polarized
            target"""
 
-        R = kwargs.copy()
+        R = copy.deepcopy(kwargs)
         if R.has_key('vars'):
             if R['vars'].has_key('varphi'):
                 # has vars kwarg and vars has varphi key = update varphi
@@ -766,50 +763,17 @@ class BMK(Approach):
         return ( self.XTP(pt, **kwargs) 
                 - self.XTP(pt, **R) ) / 2.
 
-    def TSS(self, pt, **kwargs):
-        """Difference of 4-fold cross sections with transversely polarized
-           target"""
-
-        R = kwargs.copy()
-        if R.has_key('vars'):
-            if R['vars'].has_key('varphi'):
-                # has vars kwarg and vars has varphi key = update varphi
-                R['vars'].update({'varphi':R['vars']['varphi']+pi})
-            else:
-                # has vars kwarg but vars has not varphi key = create varphi
-                R['vars'].update({'varphi':pt.varphi+pi})
-        else:
-            # doesn't have vars kwarg, create vars with varphi key
-            R['vars'] = {'varphi':pt.varphi+pi}
-        return ( self.XTP(pt, **kwargs) 
-                + self.XTP(pt, **R) ) / 2.
-
-
     def _TSA(self, pt, **kwargs):
         """Calculate trasversal target spin asymmetry (TTSA)."""
 
-        return self.TSD(pt, **kwargs) / self.TSS(pt, **kwargs)
+        return self.XTP(pt, **kwargs) / self.Xunp(pt, **kwargs)
 
     def TSA(self, pt, **kwargs):
         """Calculate trasversal target spin asymmetry or its harmonics."""
         if pt.has_key('varphi'):
             return self._TSA(pt, **kwargs)
-        elif pt.has_key('FTn'):
-            if pt.FTn < 0:
-                res = quadrature.Hquadrature(lambda phi: 
-                        self._TSA(pt, vars={'varphi':phi}) * sin(-pt.FTn*phi), 0, 2*pi)
-            elif pt.FTn > 0:
-                res = quadrature.Hquadrature(lambda phi: 
-                        self._TSA(pt, vars={'varphi':phi}) * cos(pt.FTn*phi), 0, 2*pi)
-            elif pt.FTn == 0:
-                res = quadrature.Hquadrature(lambda phi: 
-                        self._TSA(pt, vars={'varphi':phi}), 0, 2*pi)/2.
-            else:
-                raise ValeError('This should never happen!')
-            return  res / pi
         else:
-            raise ValueError('[%s] has neither target polarization angle varphi\
- nor harmonic FTn defined!' % pt)
+            raise ValueError('[%s] doesnt have target polarization angle varphi defined!' % pt)
 
 
     def BSD(self, pt, **kwargs):
@@ -989,7 +953,7 @@ class BMK(Approach):
         return array(aux)
 
 
-    def _XDVCSt(self, pt):
+    def _XDVCStApprox(self, pt):
         """Partial DVCS cross section w.r.t. Mandelstam t."""
 
         W2 = pt.W * pt.W
@@ -999,9 +963,22 @@ class BMK(Approach):
                 (self.m.ImH(pt)**2 + self.m.ReH(pt)**2)
                 - pt.t/(4.*Mp2)*(self.m.ReE(pt)**2 + self.m.ImE(pt)**2)) / (
             (W2 + pt.Q2) * (2.0 * W2 + pt.Q2)**2 )
-        #sys.stderr.write('%s\n' % (res,))
         return res
 
+    def _XDVCStEx(self, pt):
+        """Partial DVCS cross section w.r.t. Mandelstam t."""
+
+        eps2 = 4. * pt.xB**2 * Mp2 / pt.Q2
+        self.m.g.newcall = 1
+        ImH, ReH, ImE, ReE = self.m.ImH(pt), self.m.ReH(pt), self.m.ImE(pt), self.m.ReE(pt)
+        res = 65.14079453579676 * ( pt.xB**2 / pt.Q2**2 / (1-pt.xB) / (2-pt.xB)**2 /
+                sqrt(1 + eps2) * (
+                    4 * (1 - pt.xB) * (ImH**2 + ReH**2)
+                - pt.xB**2 * (ReE**2+ImE**2 + 2*ReE*ReH + 2*ImE*ImH)
+                - (2-pt.xB)**2 *pt.t/4/Mp2*(ImE**2+ReE**2) ) )
+        return res
+
+    _XDVCSt = _XDVCStApprox
 
     def X(self, pt):
         """Total DVCS cross section.
@@ -3364,7 +3341,7 @@ class BM10ex(hotfixedBMK):
             wgh = 1
 
         # Gepard needs resetting
-        if self.model.__dict__.has_key('Gepard'): self.m.g.newcall = 1
+        if self.model.__dict__.has_key('g'): self.m.g.newcall = 1
 
         #print 'BH2 = ' + str(self.PreFacSigma(kin) *self.TBH2LP(kin))
         #print 'DVCS2 = ' + str(self.PreFacSigma(kin) *self.TDVCS2LP(kin))
@@ -3399,7 +3376,7 @@ class BM10ex(hotfixedBMK):
         else:
             raise ValueError('[%s] has neither azimuthal angle phi\
  nor harmonic FTn defined!' % pt)
-
+            
     def _BTSA(self, pt, **kwargs):
         """Calculate beam-target spin asymmetry (BTSA)."""
 

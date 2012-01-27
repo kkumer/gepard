@@ -47,8 +47,10 @@ logging._handlerList[0].addFilter(hfil)
 
 data = utils.loaddata('/home/kkumer/pype/data/ep2epgamma', approach=Approach.BMK)  
 data.update(utils.loaddata('/home/kkumer/pype/data/gammastarp2gammap', approach=Approach.BMK))
-db = shelve.open('/home/kkumer/pype/theories.db')
-dell = shelve.open('/home/kkumer/pype/dellB.db')
+data.update(utils.loaddata('/home/kkumer/pype/data/gammastarp2gammap/EIC', approach=Approach.BMK))
+data.update(utils.loaddata('/home/kkumer/pype/data/ep2epgamma/EIC', approach=Approach.BMK))
+#db = shelve.open('/home/kkumer/pype/theories.db')
+#dell = shelve.open('/home/kkumer/pype/dellB.db')
 
 ## [2] Choose subset of datapoints for fitting
 
@@ -88,130 +90,22 @@ H1ZEUSpoints = DVCSpoints + data[48]
 H1ZEUSindependent = data[45] + data[39] + data[36] + data[46]
 H1ZEUSindependentNEW = data[45] + data[39] + data[63] + data[46]
 EICtest2 = data[1001]
-EICmockkk = data[1002]
-
+EICX = data[2002]
+for n in range(2003,2024):
+    EICX = EICX + data[n]
+EICTSA = data[2102]
+for n in range(2103,2110) + range(2111,2118) + range(2119,2125):
+    EICTSA = EICTSA + data[n]
+#EICmockkk = data[1002]
 
 
 ## [3] Create a theory
 
 # Gepard only
-mGepard = Model.Gepard(ansatz='FITEXP')
-tGepard = Approach.BMK(mGepard)
-
-
-m = mGepard
-t = tGepard
-# nloLOParameters
-m.parameters['NS']     =  0.152039
-m.parameters['AL0S']   =  1.15751
-m.parameters['M02S']   =  0.478391
-m.parameters['SECS']   = -0.15152
-m.parameters['THIS']   =  0.0
-m.parameters['KAPS']   =  0.7
-m.parameters['SKEWS']  =  0.0
-
-m.parameters['AL0G']   =  1.24732
-m.parameters['M02G']   =  0.7
-m.parameters['SECG']   = -0.81217
-m.parameters['THIG']   =  0.0
-m.parameters['KAPG']   = -0.2
-m.parameters['SKEWG']  =  0.0
-
-m.parameters['DELB']   =  1.0
-
-m.parameters['EAL0S']   =  1.15751
-m.parameters['EM02S']   =  0.478391
-m.parameters['ESECS']   = -0.15152
-m.parameters['ETHIS']   =  0.0
-m.parameters['EKAPS']   =  0.7
-m.parameters['ESKEWS']  =  0.0
-
-m.parameters['EAL0G']   =  1.24732
-m.parameters['EM02G']   =  0.7
-m.parameters['ESECG']   = -0.81217
-m.parameters['ETHIG']   =  0.0
-#m.parameters['EKAPG']   = -0.2  #ignored par
-m.parameters['ESKEWG']  =  0.0
-
-pars = m.parameters
-
-pt = Data.DummyPoint()
-
-pt.Q2 = 8.
-pt.t = -0.2
-pt.xi = 0.01
-t.m.g.parint.p = 0
-t.m.g.init()
-print m.ImH(pt)
-
-m = Model.ComptonGepard(ansatz='FIT')
-t = Approach.hotfixedBMK(m)
-t.m.g.parint.p = 0
-t.m.g.init()
-m.parameters.update(pars)
-print m.ImH(pt)
-
-m = Model.ComptonGepard(ansatz='EPH')
-t = Approach.hotfixedBMK(m)
-m.parameters.update(pars)
-t.m.g.parint.p = 0
-t.m.g.init()
-print m.ImH(pt)
-
-m = Model.ComptonGepard(ansatz='EFL')
-t = Approach.hotfixedBMK(m)
-m.parameters.update(pars)
-t.m.g.parint.p = 0
-t.m.g.init()
-print m.ImH(pt)
-
-m = Model.ComptonGepard(ansatz='EPH')
-t = Approach.hotfixedBMK(m)
-m.parameters.update(pars)
-t.m.g.parint.p = 0
-t.m.g.init()
-print m.ImH(pt)
-
-m = Model.ComptonGepard(ansatz='EFL')
-t = Approach.hotfixedBMK(m)
-m.parameters.update(pars)
-t.m.g.parint.p = 0
-t.m.g.init()
-print m.ImH(pt)
-
-
-
-
-# DR only
-mDRonly = Model.ModelDR()
-tDR = Approach.hotfixedBMK(mDRonly)
-tDR.name = 'KM09a'
-tDR.m.parameters.update(DMepsGLO)
-
-## Hybrid: Gepard+DR (can reuse above Gepard)
-#mDRsea = Model.ComptonModelDRsea()
-#m = Model.HybridDipole(mGepard, mDRsea)
-#th = Approach.hotfixedBMK(m)
-#th.name = 'KM10a'
-#th.m.parameters.update(KM10a)  
-#g = th.m.g
-
-#mDRPPsea = Model.ComptonModelDRPPsea()
-#m = Model.HybridDipole(mGepard, mDRPPsea)
-#m = Model.HybridKelly(mGepard, mDRPPsea)
-#th = Approach.BM10(m)
-#th.name = 'KM10'
-#g = th.m.g
-#th.m.parameters.update(KM10)
-#th.m.covariance = KM10cov
-
-# NN
-#mNN = Model.ModelNN(hidden_layers=[9], endpointpower=3.0)
-#mNN = Model.ModelNN(hidden_layers=[11], output_layer=['ImH'], useDR=['ReH'])
-#tNN = Approach.hotfixedBMK(mNN)
-#tNN.name = 'NNDR'
-#tNN.description = 'x 2-11-1 DR / H6'
-
+m = Model.Gepard(ansatz='EFLEXP')
+m.parameters.update(DM12)
+#m.parameters['KAPS'] = 0
+th = Approach.BMK(m)
 
 
 ## [4] Do the fit
@@ -223,30 +117,12 @@ tDR.m.parameters.update(DMepsGLO)
 #th = tGepard
 #f = Fitter.FitterMinuit(EICmockkk+H1ZEUSindependentNEW, th)
 
-# Hybrid: Gepard+DR (can reuse above Gepard)
-#mDRsea = Model.ComptonModelDRsea()
-#mDRseaopt = Model.ComptonModelDRsea(optimization=True)
-#m = Model.HybridDipole(mGepard, mDRsea)
-#mopt = Model.HybridDipole(mGepard, mDRseaopt)
-#t = Approach.hotfixedBMK(m)
-#topt = Approach.hotfixedBMK(mopt)
-
 #f.minuit.tol = 80
 #f.minuit.maxcalls = 100
 #f.minuit.printMode = 1
 
 
-#f = Fitter.FitterBrain(Hpoints[:6]+Hpoints[18:24], tNN, nnets=10, crossvalidation=True, nbatch=20, verbose=2)
-#f.fit()
-#f.prune(minprob=0.5)
-#tNN.m.parameters['nnet'] = 'ALL'
-#tNN.save(db)
-#db.close()
-
-
 ## [5] Some shortcuts ...
-
-#pt0 = DVCSpoints[0]
 
 def ld(db):
     utils.listdb(db)
@@ -288,14 +164,16 @@ def ptfix(th, Q=1, pol=-1, Ee=160., xB=0.1, Q2=2.2, t=-0.1, phi=3.5, FTn=None):
 
 
 # collider datapoint
-def ptcol(th, Q=-1, pol=1, Ee=5, Ep=250, xB=0.001, Q2=4., t=-0.2, 
-        phi=1., varphi=0.5, FTn=None):
+def ptcol(th, Q=-1, pol=0, Ee=20, Ep=250, xB=5.145e-4, Q2=4.4, t=-0.275, 
+        phi=np.pi, varphi=-np.pi/2., FTn=None):
+#def ptcol(th, Q=-1, pol=0, Ee=20, Ep=250, xB=0.002, Q2=7.3, t=-0.275, 
+#        phi=np.pi, varphi=-np.pi/2., FTn=None):
     ptc = Data.DummyPoint()
     ptc.in1energy = Ee
     ptc.in2energy = Ep
     ptc.s = 2 * ptc.in1energy * (ptc.in2energy + sqrt(
                 ptc.in2energy**2 - Mp2)) + Mp2
-    ptc.in1charge =  Q
+    ptc.in1charge = Q
     ptc.in1polarization = pol
     ptc.in2polarization = 1 # relevant only for XLP and TSA
     ptc.xB = xB
@@ -351,5 +229,5 @@ def der(th, pars, pts, f=False,  h=0.05):
         ders = np.array([_derpt(th, par, pt, f, h) for pt in pts])
         print '%4s  |  %5.2f' % (par, ders.mean())
 
-ptc = ptcol(tGepard)
-ptcb = ptcol(tGepard, varphi=0.5+np.pi)
+ptc = ptcol(th)
+ptcb = ptcol(th, varphi=0.5-np.pi)

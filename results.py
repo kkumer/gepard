@@ -1172,3 +1172,24 @@ zeroHt.update({
   'rpi' : 2.93138,
   'Mpi' : 4
 })
+
+DM12 = {
+"NS" : 0.152, "AL0S" : 1.1575, "ALPS" : 0.1, 
+"M02S" : 0.17857142857142858, "DELM2S" : 0., "PS" : 2., 
+"SECS" : 0.5127, "THIS" : -0.21, 
+"SKEWS" : 0., "AL0G" : 1.2473, "ALPG" : 0.1, "M02G" : 0.25, "DELM2G" : 0., "PG" : 2., 
+"SECG" : -4.8055, "THIG" : 1.8638, "SKEWG" : 0., 
+"KAPS" : 1.5, "EAL0S" : 1.1575, "EALPS" : 0.02, "EM02S" : 1./6.6, "EDELM2S" : 0., 
+"EPS" : 2., "ESECS" : 0.5127, "ETHIS" : -0.21, 
+"ESKEWS" : 0., "EAL0G" : 1.2473, "EALPG" : 0.05, "EM02G" : 0.2, "EDELM2G" : 0., "EPG" : 2., 
+"ESECG" : -4.8055, "ETHIG" : 1.8638, "ESKEWG" : 0.}
+
+DM12B = {"NS" : 0.152, "AL0S" : 1.1575, "ALPS" : 0.101, "M02S" : 0.1799, 
+ "DELM2S" : 0., "PS" : 2., "SECS" : 0.5181, "THIS" : -0.2113, 
+ "SKEWS" : 0., "AL0G" : 1.2473, "ALPG" : 0.0727, "M02G" : 0.2401, 
+ "DELM2G" : 0., "PG" : 2., "SECG" : -4.6367, "THIG" : 1.7804, 
+ "SKEWG" : 0., "KAPS" : 1.3607, "EAL0S" : 1.1726, 
+ "EALPS" : 0.0178, "EM02S" : 0.1515, "EDELM2S" : 0., "EPS" : 2., 
+ "ESECS" : 0.4588, "ETHIS" : -0.1941, "ESKEWS" : 0., 
+ "EAL0G" : 1.3516, "EALPG" : 0.05, "EM02G" : 0.2, "EDELM2G" : 0., 
+ "EPG" : 2., "ESECG" : -4.8082, "ETHIG" : 1.8638, "ESKEWG" : 0.}

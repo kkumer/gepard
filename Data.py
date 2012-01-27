@@ -135,6 +135,13 @@ class DataPoint(DummyPoint):
                 self.err = self.stat
         # 2e. calculate standard kinematical variables
         utils.fill_kinematics(self)
+        # 2f. polarizations
+        # Unpolarized in1 particle
+        if not self.has_key('in1polarization'):
+            self.in1polarization = 0
+        # For transversaly polarized target \varphi = pol.
+        if self.has_key('in2polarization') and self.in2polarizationvector == 'T':
+            self.varphi = self.in2polarization
         return
 
     def __repr__(self):
