@@ -680,6 +680,7 @@ class ComptonNeuralNets(Model):
 
     # FIXME: this variable should be purged out of the code most likely
     allCFFs = ['ImH', 'ReH', 'ImE', 'ReE', 'ImHt', 'ReHt', 'ImEt', 'ReEt']
+    allGPDs = []
 
     def __init__(self, hidden_layers=[7], output_layer=['ImH', 'ReH'], endpointpower=None, useDR=None):
         """Model CFFs by neural networks.
