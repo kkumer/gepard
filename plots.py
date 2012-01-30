@@ -82,6 +82,9 @@ def _axline(ax, fun, points, xaxis, **kwargs):
     for pts in points:
         xvals = [getattr(pt, xaxis) for pt in pts]
         yvals = [fun(pt) for pt in pts]
+        if kwargs.pop('xF', False):  # do we want  xF(x) plotted?
+            xBs = np.array([pt.xB for pt in pts])
+            yvals = xBs*np.array(yvals)
         ax.plot(xvals, yvals, **kwargs)
 
 def _axband(ax, fun, pts, xaxis, **kwargs):
@@ -104,6 +107,9 @@ def _axband(ax, fun, pts, xaxis, **kwargs):
     up, down = np.array([(m+errp, m-errm) for m,errp,errm in res]).transpose()
     x = plt.concatenate( (xvals, xvals[::-1]) )
     y = plt.concatenate( (up, down[::-1]) )
+    if kwargs.pop('xF', False):  # do we want  xF(x) plotted?
+        xBs = np.array([pt.xB for pt in pts+pts[::-1]])
+        y = xBs*y
     ax.fill(x, y, alpha=0.5, **kwargs)
 
 
@@ -1305,7 +1311,50 @@ def CFFt(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
                     fontsize=15)
             ax.text(0.03, 0.4, "$Q^2 = 4\\, {\\rm GeV}^2$",# transform=ax.transAxes, 
                     fontsize=15)
-    fig.subplots_adjust(bottom=0.4)
+    fig.subplots_adjust(bottom=0.1)
+    if path:
+        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+    else:
+        fig.canvas.draw()
+        fig.show()
+    return fig
+
+def CFF3(path=None, fmt='png', **kwargs):
+    """Makes plots of cffs given by various theories/models
+    
+    cffs    -- List of CFFs to be plotted. Each produces two panels.
+
+    """
+    title = ''
+    fig = plt.figure()
+    fig.canvas.set_window_title(title)
+    fig.suptitle(title)
+    colors = ['red', 'brown']     # worm human colors :-)
+    nncolors = ['blue', 'green']  # cold computer colors
+    linestyles = ['solid', 'dashed']
+    # Define abscissas
+    logxvals = np.logspace(-5.0, -2, 20) 
+    # ordinates 
+    leftcffs = ['ImH', 'ImE']
+    rightcffs = ['ReH', 'ReE']
+    for n in range(2):
+        # left panel
+        leftcff = leftcffs[n]
+        ax = fig.add_subplot(2, 2, 2*n+1)
+        ax.set_xscale('log')  # x-axis to be logarithmic
+        panel(ax, xaxis='xi', xs=logxvals, kins={'yaxis':leftcff, 't':-0.2, 'Q2':4.}, **kwargs)
+        ax.set_xlabel(toTeX['xixB'], fontsize=15)
+        ax.set_ylabel(toTeX['%s' % leftcff], fontsize=18)
+        ax.axhspan(-0.0005, 0.0005, facecolor='g', alpha=0.6)  # horizontal bar
+        # right panel
+        rightcff = rightcffs[n]
+        ax = fig.add_subplot(2, 2, 2*n+2)
+        ax.set_xscale('log')  # x-axis to be logarithmic
+        panel(ax, xaxis='xi', xs=logxvals, kins={'yaxis':rightcff, 't':-0.2, 'Q2':4.}, **kwargs)
+        ax.set_xlabel(toTeX['xixB'], fontsize=15)
+        ax.set_ylabel(toTeX['%s' % rightcff], fontsize=18)
+        ax.axhspan(-0.0005, 0.0005, facecolor='g', alpha=0.6)  # horizontal bar
+    fig.subplots_adjust(bottom=0.10)
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:

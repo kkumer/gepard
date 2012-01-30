@@ -104,3 +104,12 @@ def test_XunpBM10opt():
     assert_almost_equal(topt.Xunp(pt1), 0.028719982588252427)
 
 test_XunpBM10opt.optimization = 1
+
+def test_XTP():
+    """Calculate transv. polarized cross section XTP in BMK Approach."""
+    pt1.varphi = 1.
+    assert_almost_equal(t.PreFacSigma(pt1)*t.TBH2TP(pt1), 0.0021662047872426475)
+    assert_almost_equal(t.PreFacSigma(pt1)*t.TDVCS2TP(pt1), -0.0021305191589529025)
+    assert_almost_equal(t.PreFacSigma(pt1)*t.TINTTP(pt1), -0.0098483713204748375)
+    assert_almost_equal(t.XTP(pt1), -0.009812685692185092)
+
