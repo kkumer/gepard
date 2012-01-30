@@ -79,3 +79,6 @@ Hquadrature = quadSciPy10transposed
 # Choice of routine used for t-integration
 tquadrature = quadSciPy5
 
+# Choice of routine used for t->b Fourier transform
+bquadrature = quadSciPy10
+

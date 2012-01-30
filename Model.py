@@ -11,11 +11,11 @@ import pickle, sys, logging
 
 from numpy import log, pi, imag, real, sqrt
 from numpy import ndarray, array
+from scipy.special import j0
 
-
-from quadrature import PVquadrature
+from quadrature import PVquadrature, bquadrature
 from utils import flatten, hubDict, stringcolor
-from constants import tolerance2
+from constants import tolerance2, GeVfm
 import dispersion as DR
 
 import pygepard as g
@@ -937,7 +937,8 @@ class ComptonGepard(ComptonFormFactors):
            'EAL0G', 'EALPG', 'EM02G',
            'EDELM2G', 'EPG', 'ESECG', 'ETHIG', 'ESKEWG']
 
-        self.allGPDs = ['gpdHtrajQ', 'gpdHtrajG', 'gpdEtrajQ', 'gpdEtrajG']
+        self.allGPDs = ['gpdHtrajQ', 'gpdHtrajG', 'gpdEtrajQ', 'gpdEtrajG',
+                        'gpdHzeroQ', 'gpdHzeroG', 'gpdEzeroQ', 'gpdEzeroG']
         # this was in Gepard's GEPARD.INI, which is not needed now
         # but look at it for documentation of what parameters below are
         g.parint.speed = 1
@@ -1013,24 +1014,13 @@ class ComptonGepard(ComptonFormFactors):
             self.g.evolc(2, nqs)
             self.g.evolc(3, nqs)
 
-    def _GepardCFFs(self, pt, xi=0):
+    def _GepardCFFs(self, pt):
         """Call gepard routine that calculates CFFs."""
         for i in self.parameters_index:
             g.par.par[i-1] = self.parameters[self.parameters_index[i]]
 
-        # FIXME: The following solution is not elegant
-        if isinstance(xi, ndarray):
-            # function was called with third argument that is xi nd array
-            x = xi
-        elif xi != 0:
-            # function was called with third argument that is xi number
-            x = xi
-        else:
-            # xi should be taken from pt object
-            x = pt.xi
-
         g.kinematics.q2 = pt.Q2
-        g.kinematics.xi = x
+        g.kinematics.xi = pt.xi
         g.kinematics.del2 = pt.t
 
         if not self.qdict.has_key(pt.Q2):
@@ -1085,11 +1075,58 @@ class ComptonGepard(ComptonFormFactors):
         g.newcall = 1
         return pt.xi*self.ImE(pt)/pi
 
+    def gpdHzeroQ(self, pt):
+        """GPD H^q on xi=0 trajectory.
+        FIXME: After this, calling self.ImH is broken!!
+        """
+        g.parchr.process = array([c for c in 'DVCSZQ'])  # array(6)
+        g.init()
+        # Need to reset stored evolC(Q2) which are now likely invalid
+        g.nqs.nqs = 0
+        self.qdict={}
+        g.newcall = 1
+        return self.ImH(pt)/pi
 
-    def ImH(self, pt, xi=0):
+    def gpdHzeroG(self, pt):
+        """GPD H^g on xi=0 trajectory."""
+        g.parchr.process = array([c for c in 'DVCSZG'])  # array(6)
+        g.init()
+        # Need to reset stored evolC(Q2) which are now likely invalid
+        g.nqs.nqs = 0
+        self.qdict={}
+        g.newcall = 1
+        return pt.xi*self.ImH(pt)/pi
+
+    def gpdEzeroQ(self, pt):
+        """GPD E on xi=0 trajectory."""
+        g.parchr.process = array([c for c in 'DVCSZQ'])  # array(6)
+        g.init()
+        # Need to reset stored evolC(Q2) which are now likely invalid
+        g.nqs.nqs = 0
+        self.qdict={}
+        g.newcall = 1
+        return self.ImE(pt)/pi
+
+    def gpdEzeroG(self, pt):
+        """GPD H^g on xi=x trajectory."""
+        g.parchr.process = array([c for c in 'DVCSZG'])  # array(6)
+        g.init()
+        # Need to reset stored evolC(Q2) which are now likely invalid
+        g.nqs.nqs = 0
+        self.qdict={}
+        g.newcall = 1
+        return pt.xi*self.ImE(pt)/pi
+
+    def gpdHQb(self, pt, b):
+        """GPD H^sea in b space."""
+        memt = pt.t
+        res = bquadrature(lambda d: d*j0(b*d/GeVfm)*self.gpdHzeroQ(pt), 0, 1.5)
+
+
+    def ImH(self, pt):
         """Imaginary part of CFF H."""
         if self.g.newcall:
-            self._GepardCFFs(pt, xi)
+            self._GepardCFFs(pt)
         return imag(g.cff.cff[g.parint.p])
 
     def ReH(self, pt):
@@ -1136,7 +1173,7 @@ class ComptonHybrid(ComptonFormFactors):
                )
 
     def ImH(self, pt, xi=0):
-        return  self.Gepard.ImH(pt, xi) + self.DR.ImH(pt, xi)
+        return  self.Gepard.ImH(pt) + self.DR.ImH(pt, xi)
 
     def ReH(self, pt):
         return  self.Gepard.ReH(pt) + self.DR.ReH(pt)

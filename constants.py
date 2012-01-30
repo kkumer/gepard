@@ -10,6 +10,7 @@ Mp2 = Mp**2
 alpha = 1./137.036  # inverse of fine structure constant
 # WolframAlpha: (hbar^2 c^2 / GeV^2)  in nanobarns
 GeV2nb = 389379.
+GeVfm = 0.197327
 
 tolerance2 = 1.0   # sqrt(2*Npoints)/1.65^2 according to GJV/MRST
 
