@@ -83,8 +83,8 @@ def _axline(ax, fun, points, xaxis, **kwargs):
         xvals = [getattr(pt, xaxis) for pt in pts]
         yvals = [fun(pt) for pt in pts]
         if kwargs.pop('xF', False):  # do we want  xF(x) plotted?
-            xBs = np.array([pt.xB for pt in pts])
-            yvals = xBs*np.array(yvals)
+            xis = np.array([pt.xi for pt in pts])
+            yvals = xis*np.array(yvals)
         ax.plot(xvals, yvals, **kwargs)
 
 def _axband(ax, fun, pts, xaxis, **kwargs):
@@ -108,8 +108,8 @@ def _axband(ax, fun, pts, xaxis, **kwargs):
     x = plt.concatenate( (xvals, xvals[::-1]) )
     y = plt.concatenate( (up, down[::-1]) )
     if kwargs.pop('xF', False):  # do we want  xF(x) plotted?
-        xBs = np.array([pt.xB for pt in pts+pts[::-1]])
-        y = xBs*y
+        xis = np.array([pt.xi for pt in pts+pts[::-1]])
+        y = xis*y
     ax.fill(x, y, alpha=0.5, **kwargs)
 
 
@@ -1361,6 +1361,47 @@ def CFF3(path=None, fmt='png', **kwargs):
         fig.canvas.draw()
         fig.show()
     return fig
+
+def GPDt(path=None, fmt='png', **kwargs):
+    """Makes plots of GPDs as function of t given by various theories/models
+
+    """
+    title = ''
+    fig = plt.figure()
+    fig.canvas.set_window_title(title)
+    fig.suptitle(title)
+    colors = ['red', 'blue', 'brown', 'violet']
+    linestyles = ['solid', 'dashed', 'solid', 'dashed']
+    # Define abscissas
+    tmvals = np.linspace(0.02, 0.8, 20) # right panel
+    # ordinates 
+    #ylims = {'ImH': (-4.3, 35), 'ReH': (-6.5, 8),
+    # Plot panels
+    obses = ['gpdHtrajQ', 'gpdHtrajG', 'gpdEtrajQ', 'gpdEtrajG']
+    for n in range(len(obses)):
+        obs = obses[n]
+        ax = fig.add_subplot(2, 2, n+1)
+        panel(ax, xaxis='tm', xs=tmvals, kins={'yaxis':obs, 'xB':0.001998, 'Q2':4.},
+                xF=(obs[-1]=='Q'), **kwargs)
+        ax.set_xlabel(toTeX['tm'], fontsize=15)
+        #ax.set_ylabel(toTeX['%s' % cff], fontsize=18)
+        ax.set_ylabel(obs, fontsize=18)
+        ax.axhspan(-0.0005, 0.0005, facecolor='g', alpha=0.6)  # horizontal bar
+        if n == 0:
+            ax.legend(loc='upper right')
+            ax.legend().draw_frame(0)
+            ax.text(0.3, 60, "$x_B = 0.001$",# transform=ax.transAxes, 
+                    fontsize=15)
+            ax.text(0.3, 3000, "$Q^2 = 4\\, {\\rm GeV}^2$",# transform=ax.transAxes, 
+                    fontsize=15)
+    fig.subplots_adjust(bottom=0.1)
+    if path:
+        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+    else:
+        fig.canvas.draw()
+        fig.show()
+    return fig
+
 
 def jbod(path=None, fmt='png', **kwargs):
     """Plot "just a bunch of data" with lines

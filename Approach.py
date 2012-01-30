@@ -114,7 +114,7 @@ class Approach(object):
         #    else:
         #        return result.mean()
 
-        if obs in m.allCFFs:
+        if obs in m.allCFFs or obs in m.allGPDs:
             # we need a CFF
             fun = getattr(m, obs)
         else:

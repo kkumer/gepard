@@ -288,6 +288,7 @@ class ComptonFormFactors(Model):
     allCFFs = ['ImH', 'ReH', 'ImE', 'ReE', 'ImHt', 'ReHt', 'ImEt', 'ReEt']
     allCFFeffs = ['ImHeff', 'ReHeff', 'ImEeff', 'ReEeff', 
                      'ImHteff', 'ReHteff', 'ImEteff', 'ReEteff']
+    allGPDs = []
 
     def CFFvalues(self, pt):
         """Print values of CFFs. Pastable into Mathematica."""
@@ -935,6 +936,7 @@ class ComptonGepard(ComptonFormFactors):
            'EAL0G', 'EALPG', 'EM02G',
            'EDELM2G', 'EPG', 'ESECG', 'ETHIG', 'ESKEWG']
 
+        self.allGPDs = ['gpdHtrajQ', 'gpdHtrajG', 'gpdEtrajQ', 'gpdEtrajG']
         # this was in Gepard's GEPARD.INI, which is not needed now
         # but look at it for documentation of what parameters below are
         g.parint.speed = 1
@@ -1039,6 +1041,49 @@ class ComptonGepard(ComptonFormFactors):
 
         g.cfff()
         g.newcall = 0
+
+    def gpdHtrajQ(self, pt):
+        """GPD H^q on xi=x trajectory.
+        FIXME: After this, calling self.ImH is broken!!
+        """
+        g.parchr.process = array([c for c in 'DVCSTQ'])  # array(6)
+        g.init()
+        # Need to reset stored evolC(Q2) which are now likely invalid
+        g.nqs.nqs = 0
+        self.qdict={}
+        g.newcall = 1
+        return self.ImH(pt)/pi
+
+    def gpdHtrajG(self, pt):
+        """GPD H^g on xi=x trajectory."""
+        g.parchr.process = array([c for c in 'DVCSTG'])  # array(6)
+        g.init()
+        # Need to reset stored evolC(Q2) which are now likely invalid
+        g.nqs.nqs = 0
+        self.qdict={}
+        g.newcall = 1
+        return pt.xi*self.ImH(pt)/pi
+
+    def gpdEtrajQ(self, pt):
+        """GPD E on xi=x trajectory."""
+        g.parchr.process = array([c for c in 'DVCSTQ'])  # array(6)
+        g.init()
+        # Need to reset stored evolC(Q2) which are now likely invalid
+        g.nqs.nqs = 0
+        self.qdict={}
+        g.newcall = 1
+        return self.ImE(pt)/pi
+
+    def gpdEtrajG(self, pt):
+        """GPD H^g on xi=x trajectory."""
+        g.parchr.process = array([c for c in 'DVCSTG'])  # array(6)
+        g.init()
+        # Need to reset stored evolC(Q2) which are now likely invalid
+        g.nqs.nqs = 0
+        self.qdict={}
+        g.newcall = 1
+        return pt.xi*self.ImE(pt)/pi
+
 
     def ImH(self, pt, xi=0):
         """Imaginary part of CFF H."""
