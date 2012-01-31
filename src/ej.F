@@ -112,9 +112,9 @@ C
 *        same for ENG = NG  = 0.6 - NS
           PAR(121) = (0.6d0 - PAR(11))
           FCM(1) = QJ(J, 9, PAR(111), PAR(112), PAR(113), PAR(119)) *
-     &                BETAEXP(PAR(14))
+     &                BETAEXP(PAR(114))
           FCM(2) = QJ(J, 7, PAR(121), PAR(122), PAR(123), PAR(129)) *
-     &                BETAEXP(PAR(24))
+     &                BETAEXP(PAR(124))
       ELSE IF (ANSATZ .EQ. 'FITNG') THEN
 * Don't use first sum-rule constraint (and not that pochs are different!)
           ALPT(1) = PAR(12) + PAR(13)*DEL2
