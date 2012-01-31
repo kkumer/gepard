@@ -1450,7 +1450,8 @@ def bspace(th, path=None, fmt='png', error=False, **kwargs):
     ys = []
     ypols = []
     for b in bvals:
-        pt.b = b
+        pt.by = b
+        pt.bx = 0
         ys.append(th.predict(pt, observable='gpdHQb', error=error))
         ypols.append(th.predict(pt, observable='gpdHQbpol', error=error))
     ax = fig.add_subplot(1, 2, 1)
@@ -1470,8 +1471,8 @@ def bspace(th, path=None, fmt='png', error=False, **kwargs):
     #obses = ['gpdHtrajQ', 'gpdHtrajG', 'gpdEtrajQ', 'gpdEtrajG']
     ax.set_xlabel('b', fontsize=15)
     ax.set_ylabel('HQ', fontsize=18)
-    ax.axhspan(-0.0005, 0.0005, facecolor='g', alpha=0.6)  # horizontal bar
-    ax.axvspan(-0.0005, 0.0005, facecolor='g', alpha=0.6)  # horizontal bar
+    ax.axhline(y=0, color="black", linestyle="--", linewidth=1)    
+    ax.axvline(x=0, color="black", linestyle="--", linewidth=1)    
     ax.set_ylim(0, 1.8)
     ax = fig.add_subplot(1, 2, 2)
     if error:
@@ -1480,8 +1481,8 @@ def bspace(th, path=None, fmt='png', error=False, **kwargs):
         ax.plot(bvals, pt.xi*ypols, 'r-')
     ax.set_xlabel('b', fontsize=15)
     ax.set_ylabel('HQpol', fontsize=18)
-    ax.axvspan(-0.0005, 0.0005, facecolor='g', alpha=0.6)  # horizontal bar
-    ax.axhspan(-0.0005, 0.0005, facecolor='g', alpha=0.6)  # horizontal bar
+    ax.axhline(y=0, color="black", linestyle="--", linewidth=1)    
+    ax.axvline(x=0, color="black", linestyle="--", linewidth=1)    
     ax.set_ylim(0, 1.8)
     fig.subplots_adjust(bottom=0.1)
     if path:
@@ -1491,6 +1492,56 @@ def bspace(th, path=None, fmt='png', error=False, **kwargs):
         fig.show()
     return fig
 
+def bspace2D(th, path=None, fmt='png', **kwargs):
+    """Makes b-space distribution plot of theory th.
+
+    """
+    title = ''
+    fig = plt.figure()
+    fig.canvas.set_window_title(title)
+    fig.suptitle(title)
+    pt = Data.DummyPoint()
+    pt.xi = 0.001
+    pt.Q2 = 4.0
+    pt.t = -0.2
+    # ordinates 
+    bxs = np.linspace(-1.7, 1.7, 20)
+    bys = np.linspace(-1.7, 1.7, 20)
+    X, Y = np.meshgrid(bxs, bys)
+    Z = []
+    Zpol = []
+    for by in bys:
+        pt.by = by
+        aux = []
+        auxpol = []
+        for bx in bxs:
+            pt.bx = bx
+            aux.append(pt.xi*th.m.gpdHQb(pt))
+            auxpol.append(pt.xi*th.m.gpdHQbpol(pt))
+        Z.append(aux)
+        Zpol.append(auxpol)
+    ax = fig.add_subplot(1, 2, 1)
+    CS = ax.contourf(X, Y, Z, cmap=plt.cm.jet)
+    plt.colorbar(CS)
+    ax.set_xlabel('bx', fontsize=15)
+    ax.set_ylabel('by', fontsize=18)
+    props = dict(color="black", linestyle="--", linewidth=1)
+    ax.axvline(x=0, **props)
+    ax.axhline(y=0, **props)    
+    ax = fig.add_subplot(1, 2, 2)
+    ax.contourf(X, Y, Zpol, cmap=plt.cm.jet)
+    ax.set_xlabel('bx', fontsize=15)
+    ax.set_ylabel('by', fontsize=18)
+    props = dict(color="black", linestyle="--", linewidth=1)
+    ax.axvline(x=0, **props)
+    ax.axhline(y=0, **props)    
+    #fig.subplots_adjust(bottom=0.1)
+    if path:
+        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+    else:
+        fig.canvas.draw()
+        fig.show()
+    return fig
 
 def beff(m, pars1, pars2, path=None, fmt='png', **kwargs):
     """Makes beff slope plot

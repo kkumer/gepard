@@ -103,8 +103,8 @@ for n in range(2103,2110) + range(2111,2118) + range(2119,2125):
 
 # Gepard only
 m = Model.Gepard(ansatz='EFLEXP')
-m.parameters.update(EIC12C)
-m.covariance = EIC12Ccov
+m.parameters.update(DM12)
+#m.covariance = EIC12Acov
 #m.parameters['KAPS'] = 0
 th = Approach.BMK(m)
 
@@ -165,7 +165,7 @@ def ptfix(th, Q=1, pol=-1, Ee=160., xB=0.1, Q2=2.2, t=-0.1, phi=3.5, FTn=None):
 
 
 # collider datapoint
-def ptcol(th, Q=-1, pol=0, Ee=20, Ep=250, xB=5.145e-4, Q2=4.4, t=-0.275, 
+def ptcol(th, Q=-1, pol=0, Ee=20, Ep=250, xB=0.001998, Q2=4., t=-0.1, 
         phi=np.pi, varphi=-np.pi/2., FTn=None):
 #def ptcol(th, Q=-1, pol=0, Ee=20, Ep=250, xB=0.002, Q2=7.3, t=-0.275, 
 #        phi=np.pi, varphi=-np.pi/2., FTn=None):
@@ -231,4 +231,5 @@ def der(th, pars, pts, f=False,  h=0.05):
         print '%4s  |  %5.2f' % (par, ders.mean())
 
 ptc = ptcol(th)
-ptc.b = 0.1
+ptc.bx = 0.1
+ptc.by = 0.1

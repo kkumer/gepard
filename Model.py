@@ -1080,6 +1080,13 @@ class ComptonGepard(ComptonFormFactors):
         """GPD H^q on xi=0 trajectory.
         FIXME: After this, calling self.ImH is broken!!
         """
+        memsub = {'SECS': self.parameters['SECS'],    'SECG': self.parameters['SECG'], 
+                'ESECS' : self.parameters['ESECS'], 'ESECG' : self.parameters['ESECG'],
+                  'THIS': self.parameters['THIS'],    'THIG': self.parameters['THIG'],
+                'ETHIS' : self.parameters['ETHIS'], 'ETHIG' : self.parameters['ETHIG']}
+        zerosub = {'SECS': 0, 'SECG': 0, 'ESECS' : 0, 'ESECG' : 0,
+                   'THIS': 0, 'THIG': 0, 'ETHIS' : 0, 'ETHIG' : 0}
+        self.parameters.update(zerosub)
         g.parchr.process = array([c for c in 'DVCSZQ'])  # array(6)
         g.init()
         # Need to reset stored evolC(Q2) which are now likely invalid
@@ -1092,24 +1099,43 @@ class ComptonGepard(ComptonFormFactors):
                 pt.t = t
                 g.newcall = 1
                 res.append(self.ImH(pt))
+                self.parameters.update(memsub)
             pt.t = tmem
             return array(res)/pi
         else:
             g.newcall = 1
-            return self.ImH(pt)/pi
+            res = self.ImH(pt)
+            self.parameters.update(memsub)
+            return res/pi
 
     def gpdHzeroG(self, pt):
         """GPD H^g on xi=0 trajectory."""
+        memsub = {'SECS': self.parameters['SECS'],    'SECG': self.parameters['SECG'], 
+                'ESECS' : self.parameters['ESECS'], 'ESECG' : self.parameters['ESECG'],
+                  'THIS': self.parameters['THIS'],    'THIG': self.parameters['THIG'],
+                'ETHIS' : self.parameters['ETHIS'], 'ETHIG' : self.parameters['ETHIG']}
+        zerosub = {'SECS': 0, 'SECG': 0, 'ESECS' : 0, 'ESECG' : 0,
+                   'THIS': 0, 'THIG': 0, 'ETHIS' : 0, 'ETHIG' : 0}
+        self.parameters.update(zerosub)
         g.parchr.process = array([c for c in 'DVCSZG'])  # array(6)
         g.init()
         # Need to reset stored evolC(Q2) which are now likely invalid
         g.nqs.nqs = 0
         self.qdict={}
         g.newcall = 1
-        return pt.xi*self.ImH(pt)/pi
+        res = self.ImH(pt)
+        self.parameters.update(memsub)
+        return pt.xi*res/pi
 
     def gpdEzeroQ(self, pt, ts=None):
         """GPD E on xi=0 trajectory."""
+        memsub = {'SECS': self.parameters['SECS'],    'SECG': self.parameters['SECG'], 
+                'ESECS' : self.parameters['ESECS'], 'ESECG' : self.parameters['ESECG'],
+                  'THIS': self.parameters['THIS'],    'THIG': self.parameters['THIG'],
+                'ETHIS' : self.parameters['ETHIS'], 'ETHIG' : self.parameters['ETHIG']}
+        zerosub = {'SECS': 0, 'SECG': 0, 'ESECS' : 0, 'ESECG' : 0,
+                   'THIS': 0, 'THIG': 0, 'ETHIS' : 0, 'ETHIG' : 0}
+        self.parameters.update(zerosub)
         g.parchr.process = array([c for c in 'DVCSZQ'])  # array(6)
         g.init()
         # Need to reset stored evolC(Q2) which are now likely invalid
@@ -1122,33 +1148,44 @@ class ComptonGepard(ComptonFormFactors):
                 pt.t = t
                 g.newcall = 1
                 res.append(self.ImE(pt))
+                self.parameters.update(memsub)
             pt.t = tmem
             return array(res)/pi
         else:
             g.newcall = 1
-            return self.ImE(pt)/pi
+            res = self.ImE(pt)
+            self.parameters.update(memsub)
+            return res/pi
 
     def gpdEzeroG(self, pt):
         """GPD H^g on xi=x trajectory."""
+        memsub = {'SECS': self.parameters['SECS'],    'SECG': self.parameters['SECG'], 
+                'ESECS' : self.parameters['ESECS'], 'ESECG' : self.parameters['ESECG'],
+                  'THIS': self.parameters['THIS'],    'THIG': self.parameters['THIG'],
+                'ETHIS' : self.parameters['ETHIS'], 'ETHIG' : self.parameters['ETHIG']}
+        zerosub = {'SECS': 0, 'SECG': 0, 'ESECS' : 0, 'ESECG' : 0,
+                   'THIS': 0, 'THIG': 0, 'ETHIS' : 0, 'ETHIG' : 0}
+        self.parameters.update(zerosub)
         g.parchr.process = array([c for c in 'DVCSZG'])  # array(6)
         g.init()
         # Need to reset stored evolC(Q2) which are now likely invalid
         g.nqs.nqs = 0
         self.qdict={}
         g.newcall = 1
-        return pt.xi*self.ImE(pt)/pi
+        res = self.ImE(pt)
+        self.parameters.update(memsub)
+        return pt.xi*res/pi
 
     def gpdHQb(self, pt):
         """GPD H^sea in b space."""
-        b = abs(pt.b)
+        b = sqrt(pt.bx**2 + pt.by**2)
         return pi*bquadrature(lambda d: d*j0(b*d/GeVfm)*self.gpdHzeroQ(pt, ts=-d**2), 0.0, 1.3)
 
     def gpdHQbpol(self, pt):
         """polarized GPD H^sea in b space."""
-        sgn = pt.b/abs(pt.b)
-        b = abs(pt.b)
-        aux = pi*bquadrature(lambda d: d**2*j1(b*d/GeVfm)*self.gpdEzeroQ(pt, ts=-d**2), 0.0, 1.3)
-        return self.gpdHQb(pt) + sgn*aux/2/Mp
+        b = sqrt(pt.bx**2 + pt.by**2)
+        aux = pi*bquadrature(lambda d: d**2*j1(b*d/GeVfm)*self.gpdEzeroQ(pt, ts=-d**2), 0.3, 0.7)
+        return self.gpdHQb(pt) + pt.by*aux/(2*b*Mp)
 
     def beff(self, pt):
         """slope of  CFFH."""

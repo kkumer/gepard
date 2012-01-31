@@ -1,3 +1,6 @@
+ - after calling gpdF.... stuff everything is broken because
+   g...process is changed and gepard must be completely reinitialized
+
  - some XDVCS points have pt.t attribute (This is now dangerous
    bug because X relies on pt.t. Is it still true?)
 
