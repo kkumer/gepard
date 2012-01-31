@@ -11,11 +11,11 @@ import pickle, sys, logging
 
 from numpy import log, pi, imag, real, sqrt
 from numpy import ndarray, array
-from scipy.special import j0
+from scipy.special import j0, j1
 
 from quadrature import PVquadrature, bquadrature
 from utils import flatten, hubDict, stringcolor
-from constants import tolerance2, GeVfm
+from constants import tolerance2, GeVfm, Mp
 import dispersion as DR
 
 import pygepard as g
@@ -938,7 +938,8 @@ class ComptonGepard(ComptonFormFactors):
            'EDELM2G', 'EPG', 'ESECG', 'ETHIG', 'ESKEWG']
 
         self.allGPDs = ['gpdHtrajQ', 'gpdHtrajG', 'gpdEtrajQ', 'gpdEtrajG',
-                        'gpdHzeroQ', 'gpdHzeroG', 'gpdEzeroQ', 'gpdEzeroG']
+                        'gpdHzeroQ', 'gpdHzeroG', 'gpdEzeroQ', 'gpdEzeroG',
+                        'gpdHQb', 'gpdHQbpol']
         # this was in Gepard's GEPARD.INI, which is not needed now
         # but look at it for documentation of what parameters below are
         g.parint.speed = 1
@@ -1075,7 +1076,7 @@ class ComptonGepard(ComptonFormFactors):
         g.newcall = 1
         return pt.xi*self.ImE(pt)/pi
 
-    def gpdHzeroQ(self, pt):
+    def gpdHzeroQ(self, pt, ts=None):
         """GPD H^q on xi=0 trajectory.
         FIXME: After this, calling self.ImH is broken!!
         """
@@ -1084,8 +1085,18 @@ class ComptonGepard(ComptonFormFactors):
         # Need to reset stored evolC(Q2) which are now likely invalid
         g.nqs.nqs = 0
         self.qdict={}
-        g.newcall = 1
-        return self.ImH(pt)/pi
+        if isinstance(ts, ndarray):
+            tmem = pt.t
+            res = []
+            for t in ts:
+                pt.t = t
+                g.newcall = 1
+                res.append(self.ImH(pt))
+            pt.t = tmem
+            return array(res)/pi
+        else:
+            g.newcall = 1
+            return self.ImH(pt)/pi
 
     def gpdHzeroG(self, pt):
         """GPD H^g on xi=0 trajectory."""
@@ -1097,15 +1108,25 @@ class ComptonGepard(ComptonFormFactors):
         g.newcall = 1
         return pt.xi*self.ImH(pt)/pi
 
-    def gpdEzeroQ(self, pt):
+    def gpdEzeroQ(self, pt, ts=None):
         """GPD E on xi=0 trajectory."""
         g.parchr.process = array([c for c in 'DVCSZQ'])  # array(6)
         g.init()
         # Need to reset stored evolC(Q2) which are now likely invalid
         g.nqs.nqs = 0
         self.qdict={}
-        g.newcall = 1
-        return self.ImE(pt)/pi
+        if isinstance(ts, ndarray):
+            tmem = pt.t
+            res = []
+            for t in ts:
+                pt.t = t
+                g.newcall = 1
+                res.append(self.ImE(pt))
+            pt.t = tmem
+            return array(res)/pi
+        else:
+            g.newcall = 1
+            return self.ImE(pt)/pi
 
     def gpdEzeroG(self, pt):
         """GPD H^g on xi=x trajectory."""
@@ -1117,10 +1138,29 @@ class ComptonGepard(ComptonFormFactors):
         g.newcall = 1
         return pt.xi*self.ImE(pt)/pi
 
-    def gpdHQb(self, pt, b):
+    def gpdHQb(self, pt):
         """GPD H^sea in b space."""
-        memt = pt.t
-        res = bquadrature(lambda d: d*j0(b*d/GeVfm)*self.gpdHzeroQ(pt), 0, 1.5)
+        b = abs(pt.b)
+        return pi*bquadrature(lambda d: d*j0(b*d/GeVfm)*self.gpdHzeroQ(pt, ts=-d**2), 0.0, 1.3)
+
+    def gpdHQbpol(self, pt):
+        """polarized GPD H^sea in b space."""
+        sgn = pt.b/abs(pt.b)
+        b = abs(pt.b)
+        aux = pi*bquadrature(lambda d: d**2*j1(b*d/GeVfm)*self.gpdEzeroQ(pt, ts=-d**2), 0.0, 1.3)
+        return self.gpdHQb(pt) + sgn*aux/2/Mp
+
+    def beff(self, pt):
+        """slope of  CFFH."""
+        tmem = pt.t
+        pt.t = -0.7
+        g.newcall = 1
+        up = self.ImH(pt)
+        pt.t = -0.1
+        g.newcall = 1
+        down = self.ImH(pt)
+        pt.t = tmem
+        return - 2 * log(up/down)/0.7
 
 
     def ImH(self, pt):

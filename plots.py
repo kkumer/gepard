@@ -1430,3 +1430,126 @@ def jbod(path=None, fmt='png', **kwargs):
         fig.show()
     return fig
 
+def bspace(th, path=None, fmt='png', error=False, **kwargs):
+    """Makes b-space distribution plot of theory th.
+
+    """
+    title = ''
+    fig = plt.figure()
+    fig.canvas.set_window_title(title)
+    fig.suptitle(title)
+    colors = ['red', 'blue', 'brown', 'violet']
+    linestyles = ['solid', 'dashed', 'solid', 'dashed']
+    pt = Data.DummyPoint()
+    pt.xi = 0.001
+    pt.Q2 = 4.0
+    pt.t = -0.2 # not used
+    # Define abscissas
+    bvals = np.linspace(-1.8, 1.8, 30)
+    # ordinates 
+    ys = []
+    ypols = []
+    for b in bvals:
+        pt.b = b
+        ys.append(th.predict(pt, observable='gpdHQb', error=error))
+        ypols.append(th.predict(pt, observable='gpdHQbpol', error=error))
+    ax = fig.add_subplot(1, 2, 1)
+    ys = np.array(ys)
+    ypols = np.array(ypols)
+    if error:
+        yup, ydown = np.array([(m+err, m-err) for m,err in ys]).transpose()
+        ypolup, ypoldown = np.array([(m+err, m-err) for m,err in ypols]).transpose()
+        x = plt.concatenate( (bvals, bvals[::-1]) )
+        y = pt.xi*plt.concatenate( (yup, ydown[::-1]) )
+        ypol = pt.xi*plt.concatenate( (ypolup, ypoldown[::-1]) )
+        ax.fill(x, y, alpha=0.5, **kwargs)
+    else:
+        ax.plot(bvals, pt.xi*ys, 'r-')
+    #ylims = {'ImH': (-4.3, 35), 'ReH': (-6.5, 8),
+    # Plot panels
+    #obses = ['gpdHtrajQ', 'gpdHtrajG', 'gpdEtrajQ', 'gpdEtrajG']
+    ax.set_xlabel('b', fontsize=15)
+    ax.set_ylabel('HQ', fontsize=18)
+    ax.axhspan(-0.0005, 0.0005, facecolor='g', alpha=0.6)  # horizontal bar
+    ax.axvspan(-0.0005, 0.0005, facecolor='g', alpha=0.6)  # horizontal bar
+    ax.set_ylim(0, 1.8)
+    ax = fig.add_subplot(1, 2, 2)
+    if error:
+        ax.fill(x, ypol, alpha=0.5, **kwargs)
+    else:
+        ax.plot(bvals, pt.xi*ypols, 'r-')
+    ax.set_xlabel('b', fontsize=15)
+    ax.set_ylabel('HQpol', fontsize=18)
+    ax.axvspan(-0.0005, 0.0005, facecolor='g', alpha=0.6)  # horizontal bar
+    ax.axhspan(-0.0005, 0.0005, facecolor='g', alpha=0.6)  # horizontal bar
+    ax.set_ylim(0, 1.8)
+    fig.subplots_adjust(bottom=0.1)
+    if path:
+        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+    else:
+        fig.canvas.draw()
+        fig.show()
+    return fig
+
+
+def beff(m, pars1, pars2, path=None, fmt='png', **kwargs):
+    """Makes beff slope plot
+
+    """
+    title = ''
+    fig = plt.figure()
+    fig.canvas.set_window_title(title)
+    fig.suptitle(title)
+    colors = ['red', 'blue', 'brown', 'violet']
+    linestyles = ['solid', 'dashed', 'solid', 'dashed']
+    pt = Data.DummyPoint()
+    pt.t = -0.2 # not used
+    ax = fig.add_subplot(1, 2, 1)
+    ax.set_xscale('log')  # x-axis to be logarithmic
+    # Define abscissas
+    logxBvals = np.logspace(-4, -2)
+    # ordinates 
+    n = 0
+    m.parameters.update(pars1)
+    for Q2 in [4., 8., 16.]:
+        pt.Q2 = Q2
+        beffs = []
+        for xB in logxBvals:
+            pt.xB = xB
+            pt.xi = xB/(2.-xB)
+            beffs.append(m.beff(pt))
+        ax.plot(logxBvals, beffs, linestyle=linestyles[n], color=colors[n])
+        n += 1
+    ax.set_xlabel('xB', fontsize=15)
+    ax.set_ylabel('b_eff(ImH)', fontsize=18)
+    ax.axhspan(-0.0005, 0.0005, facecolor='g', alpha=0.6)  # horizontal bar
+    ax.set_xlim(1e-4, 1e-2)
+    ax.set_ylim(0, 7)
+    ax = fig.add_subplot(1, 2, 2)
+    ax.set_xscale('log')  # x-axis to be logarithmic
+    # Define abscissas
+    logxBvals = np.logspace(-4, -2)
+    # ordinates 
+    n = 0
+    m.parameters.update(pars2)
+    for Q2 in [4., 8., 16.]:
+        pt.Q2 = Q2
+        beffs = []
+        for xB in logxBvals:
+            pt.xB = xB
+            pt.xi = xB/(2.-xB)
+            beffs.append(m.beff(pt))
+        ax.plot(logxBvals, beffs, linestyle=linestyles[n], color=colors[n])
+        n += 1
+    ax.set_xlabel('xB', fontsize=15)
+    ax.set_ylabel('b_eff(ImH)', fontsize=18)
+    ax.axhspan(-0.0005, 0.0005, facecolor='g', alpha=0.6)  # horizontal bar
+    ax.set_xlim(1e-4, 1e-2)
+    ax.set_ylim(0, 7)
+    fig.subplots_adjust(bottom=0.1)
+    if path:
+        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+    else:
+        fig.canvas.draw()
+        fig.show()
+    return fig

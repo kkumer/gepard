@@ -1179,10 +1179,14 @@ DM12 = {
 "SECS" : 0.5127, "THIS" : -0.21, 
 "SKEWS" : 0., "AL0G" : 1.2473, "ALPG" : 0.1, "M02G" : 0.25, "DELM2G" : 0., "PG" : 2., 
 "SECG" : -4.8055, "THIG" : 1.8638, "SKEWG" : 0., 
-"KAPS" : 1.5, "EAL0S" : 1.1575, "EALPS" : 0.02, "EM02S" : 1./6.6, "EDELM2S" : 0., 
+"KAPS" : 1.5, "EAL0S" : 1.1575, "EALPS" : 0.02, "EM02S" : 0.178571, "EDELM2S" : 0., 
 "EPS" : 2., "ESECS" : 0.5127, "ETHIS" : -0.21, 
-"ESKEWS" : 0., "EAL0G" : 1.2473, "EALPG" : 0.05, "EM02G" : 0.2, "EDELM2G" : 0., "EPG" : 2., 
-"ESECG" : -4.8055, "ETHIG" : 1.8638, "ESKEWG" : 0.}
+"ESKEWS" : 0., "EAL0G" : 1.2473, "EALPG" : 0.05, "EM02G" : 0.25, "EDELM2G" : 0., "EPG" : 2., 
+"ESECG" : -4.8055, "ETHIG" : 1.8638, "ESKEWG" : 0.,
+'fix_ALPS' : False, 'fix_M02S' : False, 'fix_SECS' : False, 'fix_THIS' : False, 'fix_KAPS' : False,
+'fix_ALPG' : False, 'fix_M02G' : False, 'fix_SECG' : False, 'fix_THIG' : False, 'fix_EAL0S' : False,
+'fix_EALPS' : False, 'fix_ESECS' : False, 'fix_ETHIS' : False, 'fix_EAL0G' : False, 'fix_ETHIG' : False}
+
 
 DM12B = {"NS" : 0.152, "AL0S" : 1.1575, "ALPS" : 0.101, "M02S" : 0.1799, 
  "DELM2S" : 0., "PS" : 2., "SECS" : 0.5181, "THIS" : -0.2113, 
@@ -1199,8 +1203,8 @@ EIC12 = {'EAL0G': 1.3597814352989468, 'KAPS': 1.4826933110382694, 'fix_ALPG': Fa
 'fix_ETHIG': False, 'EPG': 2.0, 'EDELM2G': 0.0, 'SECG': -4.80030098989329,
 'EKAPG': 0.0, 'ESKEWG': 0.0, 'fix_KAPG': True, 'M02S': 0.17937862461764434,
 'NG': 0.5, 'fix_KAPS': False, 'SECS': 0.51226256188813835, 'EKAPS': 0.0, 'NS':
-0.152, 'fix_PG': True, 'ALPS': 0.089373302356791487, 'fix_EM02G': False,
-'fix_DELM2S': True, 'SKEWG': 0.0, 'fix_EM02S': False, 'SKEWS': 0.0, 'fix_THIS':
+0.152, 'fix_PG': True, 'ALPS': 0.089373302356791487, 'fix_EM02G': True,
+'fix_DELM2S': True, 'SKEWG': 0.0, 'fix_EM02S': True, 'SKEWS': 0.0, 'fix_THIS':
 False, 'fix_ESKEWS': True, 'fix_ETHIS': False, 'fix_NG': True, 'THIS':
 -0.21016444056375719, 'fix_EDELM2S': True, 'fix_NS': True, 'fix_THIG': False,
 'fix_DELB': True, 'THIG': 1.8656572821913338, 'fix_EDELM2G': True, 'fix_EPG':

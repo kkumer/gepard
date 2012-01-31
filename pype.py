@@ -103,8 +103,8 @@ for n in range(2103,2110) + range(2111,2118) + range(2119,2125):
 
 # Gepard only
 m = Model.Gepard(ansatz='EFLEXP')
-m.parameters.update(EIC12)
-m.covariance = EIC12cov
+m.parameters.update(EIC12C)
+m.covariance = EIC12Ccov
 #m.parameters['KAPS'] = 0
 th = Approach.BMK(m)
 
@@ -231,4 +231,4 @@ def der(th, pars, pts, f=False,  h=0.05):
         print '%4s  |  %5.2f' % (par, ders.mean())
 
 ptc = ptcol(th)
-ptcb = ptcol(th, varphi=0.5-np.pi)
+ptc.b = 0.1
