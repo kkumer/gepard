@@ -937,21 +937,6 @@ class BMK(Approach):
         """Beam charge-spin asymmetry as measured by COMPASS. """
         return  self.BCSD(pt, **kwargs) / self.BCSS(pt, **kwargs)
 
-    def _XDVCSt4int(self, t, pt):
-        """Same as _XDVCSt but with additional variable t 
-        to facilitate integration over it.
-        
-        """
-        aux = []
-        for t_single in t:
-            pt.t = t_single
-            res = self._XDVCSt(pt)
-            del pt.t
-            #if debug == 2: print "t = %s  =>  dsig/dt = %s" % (t_single, res)
-            aux.append(res)
-
-        return array(aux)
-
 
     def _XDVCStApprox(self, pt):
         """Partial DVCS cross section w.r.t. Mandelstam t.
@@ -979,7 +964,21 @@ class BMK(Approach):
                 - (2-pt.xB)**2 *pt.t/4/Mp2*(ImE**2+ReE**2) ) )
         return res
 
-    _XDVCSt = _XDVCStApprox
+    _XDVCSt = _XDVCStEx
+
+    def _XDVCSt4int(self, t, pt):
+        """Same as _XDVCSt but with additional variable t 
+        to facilitate integration over it.
+        
+        """
+        aux = []
+        for t_single in t:
+            pt.t = t_single
+            res = self._XDVCSt(pt)
+            del pt.t
+            #if debug == 2: print "t = %s  =>  dsig/dt = %s" % (t_single, res)
+            aux.append(res)
+        return array(aux)
 
     def X(self, pt):
         """Total DVCS cross section.

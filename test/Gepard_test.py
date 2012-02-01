@@ -50,22 +50,25 @@ def test_gepardXDVCSt():
     t.m.g.parint.p = 0
     t.m.g.init()
     aux = t.X(pt)
-    assert_almost_equal(aux, 5607.5998541187819, 2)
+    assert_almost_equal(aux, 5608.42804256, 2)
 
 test_gepardXDVCSt.gepardsuite = 1
 
 def test_gepardXDVCSevol():
     """Calculate NLO DVCS cross section using gepard (+evolution)."""
-    pt.W = 3.5          
+    pt.W = 55          
     pt.Q2 = 3.          
     pt.xi = pt.Q2 / ( 2.0 * pt.W * pt.W + pt.Q2)
+    pt.xB = 2*pt.xi/(1.+pt.xi)
+    pt.t = 0  #in case this test is run alone
     del pt.t
     t.m.g.parint.p = 1
     t.m.g.init()
     aux = t.X(pt)
-    assert_almost_equal(aux, 6.8606314494041793)
+    assert_almost_equal(aux, 32.29728102)
     # To get complete agreement with Fortran take
     # (slower) tquadrature = quadSciPy10 and:
+    # set pt.W=3.5  and use XDVCStApprox and
     # assert_almost_equal(aux, 6.8612469682766850, 5)
 
 test_gepardXDVCSevol.gepardsuite = 1
@@ -81,10 +84,11 @@ def test_hybrid():
     pt.Q2 = 1.
     pt.t = 0.0
     pt.xi = pt.Q2 / ( 2.0 * pt.W * pt.W + pt.Q2)
+    pt.xB = 2*pt.xi/(1.+pt.xi)
     tBoth.m.g.parint.p = 0
     tBoth.m.g.init()
     aux = tBoth.X(pt)/1.e4
-    assert_almost_equal(aux, 0.56075998541187819, 3)
+    assert_almost_equal(aux, 0.56084280, 3)
 
 def test_hybridopt():
     """GepardDR optimized with switched-off DR should be same as Gepard."""
@@ -99,6 +103,7 @@ def test_hybridopt():
     pt.Q2 = 1.
     pt.t = 0.0
     pt.xi = pt.Q2 / ( 2.0 * pt.W * pt.W + pt.Q2)
+    pt.xB = 2*pt.xi/(1.+pt.xi)
     tBoth.m.g.parint.p = 0
     tBoth.m.g.init()
     aux = tBoth.X(pt)/1.e4

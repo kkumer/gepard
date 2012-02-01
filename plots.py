@@ -1498,7 +1498,7 @@ def bspace(th, path=None, fmt='png', error=False, **kwargs):
     ax.set_ylabel('-HG', fontsize=18)
     ax.axhline(y=0, color="black", linestyle="--", linewidth=1)    
     ax.axvline(x=0, color="black", linestyle="--", linewidth=1)    
-    ax.set_ylim(0, 15)
+    ax.set_ylim(0, 18)
     fig.subplots_adjust(bottom=0.1)
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)

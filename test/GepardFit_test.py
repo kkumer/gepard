@@ -66,7 +66,7 @@ def test_gepardfitsimple():
     f = Fitter.FitterMinuit(fitpoints, tGepard)
     f.fit()
     chisq = tGepard.chisq(fitpoints)[0]
-    assert_almost_equal(chisq, 5.1423271052023196, 3)
+    assert_almost_equal(chisq, 5.14343218, 3)
     tGepard.model.fix_parameters('ALL')
 
 test_gepardfitsimple.gepardsuite = 1

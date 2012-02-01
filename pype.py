@@ -104,9 +104,8 @@ for n in range(2103,2110) + range(2111,2118) + range(2119,2125):
 
 # Gepard only
 m = Model.Gepard(ansatz='EFLEXP')
-m.parameters.update(EIC12A)
 m.parameters.update(DM12)
-m.covariance = EIC12Acov
+#m.covariance = EIC12Acov
 #m.parameters['KAPS'] = 0
 th = Approach.BMK(m)
 

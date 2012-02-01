@@ -1187,7 +1187,8 @@ DM12 = {"NS" : 0.152, "AL0S" : 1.1575, "ALPS" : 0.1028, "M02S" : 0.1814, "DELM2S
 "ESECG" : -4.6366, "ETHIG" : 1.8638, "ESKEWG" : 0.,
 'fix_ALPS' : False, 'fix_M02S' : False, 'fix_SECS' : False, 'fix_THIS' : False, 'fix_KAPS' : False,
 'fix_ALPG' : False, 'fix_M02G' : False, 'fix_SECG' : False, 'fix_THIG' : False, 'fix_EAL0S' : False,
-'fix_EALPS' : False, 'fix_ESECS' : False, 'fix_ETHIS' : False, 'fix_EAL0G' : False, 'fix_ESECG' : False}
+'fix_EALPS' : False, 'fix_EM02S': False, 'fix_ESECS' : False, 'fix_ETHIS' : False, 'fix_EAL0G' : False, 
+'fix_EM02G' : False, 'fix_ESECG' : False}
 
 
 #     Estimate    Standard Error    t Statistic    P-Value
