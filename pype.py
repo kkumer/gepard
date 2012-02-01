@@ -111,17 +111,26 @@ th = Approach.BMK(m)
 
 
 ## [4] Do the fit
-#tGepard.model.fix_parameters('ALL')
-#mGepard.parameters.update({'NS':0.1520391, 'AL0S':1.1575060, 'AL0G':1.2473167})
-#mGepard.parameters.update({'SECG':-0.8, 'SECS':-0.180, 'M02S':0.1498})
-#mGepard.parameters.update({'M02S':0.1})
-#mGepard.release_parameters('M02S', 'SECS', 'SECG')
-#th = tGepard
-#f = Fitter.FitterMinuit(EICmockkk+H2ZEUSindependentNEW, th)
+th.model.fix_parameters('ALL')
+th.model.release_parameters(
+   'ALPS', 'M02S', 'SECS', 'THIS', 'ALPG', 'M02G', 'SECG', 'THIG')
+th.model.release_parameters(
+   'EAL0S', 'EALPS', 'EM02S', 'ESECS', 'ETHIS', 'KAPS',
+   'EAL0G', 'EM02G',  'ESECG')
+f = Fitter.FitterMinuit(EICTSA+EICX+H1ZEUS, th)
 
-#f.minuit.tol = 80
+f.minuit.tol = 80
+f.minuit.printMode = 1
 #f.minuit.maxcalls = 100
-#f.minuit.printMode = 1
+
+#f.fit()
+#fl = open('aux.par')
+#fl.write(str(th.m.chisq(f.fitpoints)))
+#fl.write(str(th.m.parameters))
+#fl.write('\n')
+#fl.write(str(th.m.covariance))
+#fl.close()
+#f.fit()
 
 
 ## [5] Some shortcuts ...
