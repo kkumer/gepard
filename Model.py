@@ -839,7 +839,7 @@ class ComptonGepard(ComptonFormFactors):
     cutq2 - Q2 at which evolution is frozen (default = 0 GeV^2)
     
     """
-    def __init__(self, cutq2=0.0, ansatz='FIT', **kwargs):
+    def __init__(self, cutq2=0.0, ansatz='FIT', speed=1, **kwargs):
         # initial values of parameters and limits on their values
         self.parameters = {
         #  GPD H
@@ -942,7 +942,7 @@ class ComptonGepard(ComptonFormFactors):
                         'gpdHQb', 'gpdHQbpol', 'gpdHGb']
         # this was in Gepard's GEPARD.INI, which is not needed now
         # but look at it for documentation of what parameters below are
-        g.parint.speed = 1
+        g.parint.speed = speed
         g.parint.acc = 3
         g.parint.p = 0
         g.parint.nf = 4
@@ -1077,7 +1077,7 @@ class ComptonGepard(ComptonFormFactors):
         return pt.xi*self.ImE(pt)/pi
 
     def gpdHzeroQ(self, pt, ts=None):
-        """GPD H^q on xi=0 trajectory.
+        """GPD H^sea on xi=0 trajectory.
         FIXME: After this, calling self.ImH is broken!!
         """
         memsub = {'SECS': self.parameters['SECS'],    'SECG': self.parameters['SECG'], 
@@ -1099,7 +1099,7 @@ class ComptonGepard(ComptonFormFactors):
                 pt.t = t
                 g.newcall = 1
                 res.append(self.ImH(pt))
-                self.parameters.update(memsub)
+            self.parameters.update(memsub)
             pt.t = tmem
             return array(res)/pi
         else:
@@ -1129,7 +1129,7 @@ class ComptonGepard(ComptonFormFactors):
                 pt.t = t
                 g.newcall = 1
                 res.append(self.ImH(pt))
-                self.parameters.update(memsub)
+            self.parameters.update(memsub)
             pt.t = tmem
             return pt.xi*array(res)/pi
         else:
@@ -1139,7 +1139,7 @@ class ComptonGepard(ComptonFormFactors):
             return pt.xi*res/pi
 
     def gpdEzeroQ(self, pt, ts=None):
-        """GPD E on xi=0 trajectory."""
+        """GPD E^sea on xi=0 trajectory."""
         memsub = {'SECS': self.parameters['SECS'],    'SECG': self.parameters['SECG'], 
                 'ESECS' : self.parameters['ESECS'], 'ESECG' : self.parameters['ESECG'],
                   'THIS': self.parameters['THIS'],    'THIG': self.parameters['THIG'],
@@ -1159,7 +1159,7 @@ class ComptonGepard(ComptonFormFactors):
                 pt.t = t
                 g.newcall = 1
                 res.append(self.ImE(pt))
-                self.parameters.update(memsub)
+            self.parameters.update(memsub)
             pt.t = tmem
             return array(res)/pi
         else:
@@ -1168,8 +1168,8 @@ class ComptonGepard(ComptonFormFactors):
             self.parameters.update(memsub)
             return res/pi
 
-    def gpdEzeroG(self, pt):
-        """GPD H^g on xi=x trajectory."""
+    def gpdEzeroG(self, pt, ts=None):
+        """GPD E^g on xi=0 trajectory."""
         memsub = {'SECS': self.parameters['SECS'],    'SECG': self.parameters['SECG'], 
                 'ESECS' : self.parameters['ESECS'], 'ESECG' : self.parameters['ESECG'],
                   'THIS': self.parameters['THIS'],    'THIG': self.parameters['THIG'],
@@ -1182,10 +1182,21 @@ class ComptonGepard(ComptonFormFactors):
         # Need to reset stored evolC(Q2) which are now likely invalid
         g.nqs.nqs = 0
         self.qdict={}
-        g.newcall = 1
-        res = self.ImE(pt)
-        self.parameters.update(memsub)
-        return pt.xi*res/pi
+        if isinstance(ts, ndarray):
+            tmem = pt.t
+            res = []
+            for t in ts:
+                pt.t = t
+                g.newcall = 1
+                res.append(self.ImE(pt))
+            self.parameters.update(memsub)
+            pt.t = tmem
+            return pt.xi*array(res)/pi
+        else:
+            g.newcall = 1
+            res = self.ImE(pt)
+            self.parameters.update(memsub)
+            return pt.xi*res/pi
 
     def gpdHQb(self, pt):
         """GPD H^sea in b space."""

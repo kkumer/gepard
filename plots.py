@@ -1430,76 +1430,100 @@ def jbod(path=None, fmt='png', **kwargs):
         fig.show()
     return fig
 
-def bspace(th, path=None, fmt='png', error=False, **kwargs):
-    """Makes b-space distribution plot of theory th.
+def bspace(th, parsets=False, path=None, fmt='png', error=False, **kwargs):
+    """Makes b-space distribution plot of theory th. and pars ...
 
     """
     title = ''
     fig = plt.figure()
     fig.canvas.set_window_title(title)
     fig.suptitle(title)
-    colors = ['red', 'blue', 'brown', 'violet']
+    colors = ['red', 'blue', 'black', 'violet']
     linestyles = ['solid', 'dashed', 'solid', 'dashed']
     pt = Data.DummyPoint()
     pt.xi = 0.001
     pt.Q2 = 4.0
     pt.t = -0.2 # not used
+    if not parsets:
+        parsets = [th.m.parameters]
     # Define abscissas
-    bvals = np.linspace(-1.8, 1.8, 30)
-    # ordinates 
-    ys = []
-    ypols = []
-    gys = []
-    for b in bvals:
-        pt.by = b
-        pt.bx = 0
-        ys.append(th.predict(pt, observable='gpdHQb', error=error))
-        ypols.append(th.predict(pt, observable='gpdHQbpol', error=error))
-        gys.append(th.predict(pt, observable='gpdHGb', error=error))
-    ys = np.array(ys)
-    ypols = np.array(ypols)
-    gys = np.array(gys)
+    bvals = np.linspace(-1.8, 1.8, 50)
+    ###    FIRST panel
+    k = 0
     ax = fig.add_subplot(1, 3, 1)
-    if error:
-        yup, ydown = np.array([(m+err, m-err) for m,err in ys]).transpose()
-        ypolup, ypoldown = np.array([(m+err, m-err) for m,err in ypols]).transpose()
-        gyup, gydown = np.array([(m+err, m-err) for m,err in gys]).transpose()
-        x = plt.concatenate( (bvals, bvals[::-1]) )
-        y = pt.xi*plt.concatenate( (yup, ydown[::-1]) )
-        ypol = pt.xi*plt.concatenate( (ypolup, ypoldown[::-1]) )
-        gy = plt.concatenate( (gyup, gydown[::-1]) )
-        ax.fill(x, y, alpha=0.5, **kwargs)
-    else:
-        ax.plot(bvals, pt.xi*ys, 'r-')
-    #ylims = {'ImH': (-4.3, 35), 'ReH': (-6.5, 8),
-    # Plot panels
-    #obses = ['gpdHtrajQ', 'gpdHtrajG', 'gpdEtrajQ', 'gpdEtrajG']
+    for pars in parsets:
+        th.m.parameters.update(pars)
+        # ordinates 
+        ys = []
+        for b in bvals:
+            pt.by = b
+            pt.bx = 0
+            ys.append(th.predict(pt, observable='gpdHQb', error=error))
+        ys = np.array(ys)
+        if error:
+            yup, ydown = np.array([(m+err, m-err) for m,err in ys]).transpose()
+            x = plt.concatenate( (bvals, bvals[::-1]) )
+            y = pt.xi*plt.concatenate( (yup, ydown[::-1]) )
+            ax.fill(x, y, alpha=0.5, color=colors[k+1], **kwargs)
+        else:
+            ax.plot(bvals, pt.xi*ys, color=colors[k])
+        k += 1
     ax.set_xlabel('b', fontsize=15)
     ax.set_ylabel('HQ', fontsize=18)
     ax.axhline(y=0, color="black", linestyle="--", linewidth=1)    
     ax.axvline(x=0, color="black", linestyle="--", linewidth=1)    
     ax.set_ylim(0, 1.8)
+    ###    SECOND panel
+    k = 0
     ax = fig.add_subplot(1, 3, 2)
-    if error:
-        ax.fill(x, ypol, alpha=0.5, **kwargs)
-    else:
-        ax.plot(bvals, pt.xi*ypols, 'r-')
+    for pars in parsets:
+        th.m.parameters.update(pars)
+        # ordinates 
+        ys = []
+        for b in bvals:
+            pt.by = b
+            pt.bx = 0
+            ys.append(th.predict(pt, observable='gpdHQbpol', error=error))
+        ys = np.array(ys)
+        if error:
+            yup, ydown = np.array([(m+err, m-err) for m,err in ys]).transpose()
+            x = plt.concatenate( (bvals, bvals[::-1]) )
+            y = pt.xi*plt.concatenate( (yup, ydown[::-1]) )
+            ax.fill(x, y, alpha=0.5, color=colors[k+1], **kwargs)
+        else:
+            ax.plot(bvals, pt.xi*ys, color=colors[k])
+        k += 1
     ax.set_xlabel('b', fontsize=15)
     ax.set_ylabel('HQpol', fontsize=18)
     ax.axhline(y=0, color="black", linestyle="--", linewidth=1)    
     ax.axvline(x=0, color="black", linestyle="--", linewidth=1)    
     ax.set_ylim(0, 1.8)
+    ###    THIRD panel
+    k = 0
     ax = fig.add_subplot(1, 3, 3)
-    if error:
-        ax.fill(x, -gy, alpha=0.5, **kwargs)
-    else:
-        ax.plot(bvals, -gys, 'r-')
+    for pars in parsets:
+        th.m.parameters.update(pars)
+        # ordinates 
+        ys = []
+        for b in bvals:
+            pt.by = b
+            pt.bx = 0
+            ys.append(th.predict(pt, observable='gpdHGb', error=error))
+        ys = np.array(ys)
+        if error:
+            yup, ydown = np.array([(m+err, m-err) for m,err in ys]).transpose()
+            x = plt.concatenate( (bvals, bvals[::-1]) )
+            y = plt.concatenate( (yup, ydown[::-1]) )
+            ax.fill(x, y, alpha=0.5, color=colors[k+1], **kwargs)
+        else:
+            ax.plot(bvals, ys, color=colors[k])
+        k += 1
     ax.set_xlabel('b', fontsize=15)
-    ax.set_ylabel('-HG', fontsize=18)
+    ax.set_ylabel('HG', fontsize=18)
     ax.axhline(y=0, color="black", linestyle="--", linewidth=1)    
     ax.axvline(x=0, color="black", linestyle="--", linewidth=1)    
-    ax.set_ylim(0, 18)
-    fig.subplots_adjust(bottom=0.1)
+    ax.set_ylim(0, 15)
+    fig.subplots_adjust(bottom=0.5)
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
