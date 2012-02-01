@@ -304,7 +304,7 @@ def test_hybridfit():
     f.minuit.printMode = 0
     f.fit()
     chisq = t.chisq(fitpoints+DVCSpoints[:6])[0]
-    assert_almost_equal(chisq, 24.814072429462982, 2)
+    assert_almost_equal(chisq, 24.830217692733402, 4)
     tGepard.model.fix_parameters('ALL')
 
 test_hybridfit.long = 1
