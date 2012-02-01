@@ -954,7 +954,8 @@ class BMK(Approach):
 
 
     def _XDVCStApprox(self, pt):
-        """Partial DVCS cross section w.r.t. Mandelstam t."""
+        """Partial DVCS cross section w.r.t. Mandelstam t.
+         Approx. formula used in NPB10 paper."""
 
         W2 = pt.W * pt.W
         self.m.g.newcall = 1

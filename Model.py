@@ -147,10 +147,10 @@ class Model(object):
         """
         # fitting parameters (not fixed)
         pars = self.free_parameters()
-        header = '     |' + len(pars)*'%5s   ' + '\n-----+' + len(pars)*'--------'+'\n'
+        header = '      |' + len(pars)*'  %5s ' + '\n------+' + len(pars)*'--------'+'\n'
         sys.stdout.write(header % tuple(pars))
         for prow in pars:
-            sys.stdout.write('%4s |' % prow)
+            sys.stdout.write('%5s |' % prow)
             for pcol in pars:
                 cov = self.covariance[prow, pcol]
                 cor = cov/sqrt(self.covariance[prow, prow])/sqrt(
@@ -939,7 +939,7 @@ class ComptonGepard(ComptonFormFactors):
 
         self.allGPDs = ['gpdHtrajQ', 'gpdHtrajG', 'gpdEtrajQ', 'gpdEtrajG',
                         'gpdHzeroQ', 'gpdHzeroG', 'gpdEzeroQ', 'gpdEzeroG',
-                        'gpdHQb', 'gpdHQbpol']
+                        'gpdHQb', 'gpdHQbpol', 'gpdHGb']
         # this was in Gepard's GEPARD.INI, which is not needed now
         # but look at it for documentation of what parameters below are
         g.parint.speed = 1
@@ -1108,7 +1108,7 @@ class ComptonGepard(ComptonFormFactors):
             self.parameters.update(memsub)
             return res/pi
 
-    def gpdHzeroG(self, pt):
+    def gpdHzeroG(self, pt, ts=None):
         """GPD H^g on xi=0 trajectory."""
         memsub = {'SECS': self.parameters['SECS'],    'SECG': self.parameters['SECG'], 
                 'ESECS' : self.parameters['ESECS'], 'ESECG' : self.parameters['ESECG'],
@@ -1122,10 +1122,21 @@ class ComptonGepard(ComptonFormFactors):
         # Need to reset stored evolC(Q2) which are now likely invalid
         g.nqs.nqs = 0
         self.qdict={}
-        g.newcall = 1
-        res = self.ImH(pt)
-        self.parameters.update(memsub)
-        return pt.xi*res/pi
+        if isinstance(ts, ndarray):
+            tmem = pt.t
+            res = []
+            for t in ts:
+                pt.t = t
+                g.newcall = 1
+                res.append(self.ImH(pt))
+                self.parameters.update(memsub)
+            pt.t = tmem
+            return pt.xi*array(res)/pi
+        else:
+            g.newcall = 1
+            res = self.ImH(pt)
+            self.parameters.update(memsub)
+            return pt.xi*res/pi
 
     def gpdEzeroQ(self, pt, ts=None):
         """GPD E on xi=0 trajectory."""
@@ -1186,6 +1197,12 @@ class ComptonGepard(ComptonFormFactors):
         b = sqrt(pt.bx**2 + pt.by**2)
         aux = pi*bquadrature(lambda d: d**2*j1(b*d/GeVfm)*self.gpdEzeroQ(pt, ts=-d**2), 0.3, 0.7)
         return self.gpdHQb(pt) + pt.by*aux/(2*b*Mp)
+    
+    def gpdHGb(self, pt):
+        """GPD H^G in b space."""
+        b = sqrt(pt.bx**2 + pt.by**2)
+        return pi*bquadrature(lambda d: d*j0(b*d/GeVfm)*self.gpdHzeroG(pt, ts=-d**2), 0.0, 1.3)
+
 
     def beff(self, pt):
         """slope of  CFFH."""

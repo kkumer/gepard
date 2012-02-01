@@ -89,9 +89,10 @@ BTSApoints = utils.select(data[53], criteria=['FTn==0'])
 H1ZEUSpoints = DVCSpoints + data[48]
 H1ZEUSindependent = data[45] + data[39] + data[36] + data[46]
 H1ZEUSindependentNEW = data[45] + data[39] + data[63] + data[46]
+H1ZEUS = H1ZEUSindependentNEW + utils.select(data[47], criteria=['Q2 >= 4.0'])
 EICtest2 = data[1001]
-EICX = data[2002]
-for n in range(2003,2024):
+EICX = data[2001]
+for n in range(2002,2024):
     EICX = EICX + data[n]
 EICTSA = data[2102]
 for n in range(2103,2110) + range(2111,2118) + range(2119,2125):
@@ -103,8 +104,9 @@ for n in range(2103,2110) + range(2111,2118) + range(2119,2125):
 
 # Gepard only
 m = Model.Gepard(ansatz='EFLEXP')
+m.parameters.update(EIC12A)
 m.parameters.update(DM12)
-#m.covariance = EIC12Acov
+m.covariance = EIC12Acov
 #m.parameters['KAPS'] = 0
 th = Approach.BMK(m)
 
@@ -116,7 +118,7 @@ th = Approach.BMK(m)
 #mGepard.parameters.update({'M02S':0.1})
 #mGepard.release_parameters('M02S', 'SECS', 'SECG')
 #th = tGepard
-#f = Fitter.FitterMinuit(EICmockkk+H1ZEUSindependentNEW, th)
+#f = Fitter.FitterMinuit(EICmockkk+H2ZEUSindependentNEW, th)
 
 #f.minuit.tol = 80
 #f.minuit.maxcalls = 100

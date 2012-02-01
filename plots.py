@@ -1449,20 +1449,25 @@ def bspace(th, path=None, fmt='png', error=False, **kwargs):
     # ordinates 
     ys = []
     ypols = []
+    gys = []
     for b in bvals:
         pt.by = b
         pt.bx = 0
         ys.append(th.predict(pt, observable='gpdHQb', error=error))
         ypols.append(th.predict(pt, observable='gpdHQbpol', error=error))
-    ax = fig.add_subplot(1, 2, 1)
+        gys.append(th.predict(pt, observable='gpdHGb', error=error))
     ys = np.array(ys)
     ypols = np.array(ypols)
+    gys = np.array(gys)
+    ax = fig.add_subplot(1, 3, 1)
     if error:
         yup, ydown = np.array([(m+err, m-err) for m,err in ys]).transpose()
         ypolup, ypoldown = np.array([(m+err, m-err) for m,err in ypols]).transpose()
+        gyup, gydown = np.array([(m+err, m-err) for m,err in gys]).transpose()
         x = plt.concatenate( (bvals, bvals[::-1]) )
         y = pt.xi*plt.concatenate( (yup, ydown[::-1]) )
         ypol = pt.xi*plt.concatenate( (ypolup, ypoldown[::-1]) )
+        gy = plt.concatenate( (gyup, gydown[::-1]) )
         ax.fill(x, y, alpha=0.5, **kwargs)
     else:
         ax.plot(bvals, pt.xi*ys, 'r-')
@@ -1474,7 +1479,7 @@ def bspace(th, path=None, fmt='png', error=False, **kwargs):
     ax.axhline(y=0, color="black", linestyle="--", linewidth=1)    
     ax.axvline(x=0, color="black", linestyle="--", linewidth=1)    
     ax.set_ylim(0, 1.8)
-    ax = fig.add_subplot(1, 2, 2)
+    ax = fig.add_subplot(1, 3, 2)
     if error:
         ax.fill(x, ypol, alpha=0.5, **kwargs)
     else:
@@ -1484,6 +1489,16 @@ def bspace(th, path=None, fmt='png', error=False, **kwargs):
     ax.axhline(y=0, color="black", linestyle="--", linewidth=1)    
     ax.axvline(x=0, color="black", linestyle="--", linewidth=1)    
     ax.set_ylim(0, 1.8)
+    ax = fig.add_subplot(1, 3, 3)
+    if error:
+        ax.fill(x, -gy, alpha=0.5, **kwargs)
+    else:
+        ax.plot(bvals, -gys, 'r-')
+    ax.set_xlabel('b', fontsize=15)
+    ax.set_ylabel('-HG', fontsize=18)
+    ax.axhline(y=0, color="black", linestyle="--", linewidth=1)    
+    ax.axvline(x=0, color="black", linestyle="--", linewidth=1)    
+    ax.set_ylim(0, 15)
     fig.subplots_adjust(bottom=0.1)
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)

@@ -46,6 +46,7 @@ def test_gepardXDVCSt():
     pt.Q2 = 1.
     pt.t = 0.0
     pt.xi = pt.Q2 / ( 2.0 * pt.W * pt.W + pt.Q2)
+    pt.xB = 2*pt.xi/(1.+pt.xi)
     t.m.g.parint.p = 0
     t.m.g.init()
     aux = t.X(pt)
