@@ -1201,18 +1201,24 @@ class ComptonGepard(ComptonFormFactors):
     def gpdHQb(self, pt):
         """GPD H^sea in b space."""
         b = sqrt(pt.bx**2 + pt.by**2)
-        return pi*bquadrature(lambda d: d*j0(b*d/GeVfm)*self.gpdHzeroQ(pt, ts=-d**2), 0.0, 1.3)
+        return pi*bquadrature(lambda d: d*j0(b*d/GeVfm)*self.gpdHzeroQ(pt, ts=-d**2), 0.0, 2.5)
 
     def gpdHQbpol(self, pt):
         """polarized GPD H^sea in b space."""
         b = sqrt(pt.bx**2 + pt.by**2)
-        aux = pi*bquadrature(lambda d: d**2*j1(b*d/GeVfm)*self.gpdEzeroQ(pt, ts=-d**2), 0.3, 0.7)
+        aux = pi*bquadrature(lambda d: d**2*j1(b*d/GeVfm)*self.gpdEzeroQ(pt, ts=-d**2), 0.0, 2.5)
         return self.gpdHQb(pt) + pt.by*aux/(2*b*Mp)
     
     def gpdHGb(self, pt):
         """GPD H^G in b space."""
         b = sqrt(pt.bx**2 + pt.by**2)
-        return pi*bquadrature(lambda d: d*j0(b*d/GeVfm)*self.gpdHzeroG(pt, ts=-d**2), 0.0, 1.3)
+        return pi*bquadrature(lambda d: d*j0(b*d/GeVfm)*self.gpdHzeroG(pt, ts=-d**2), 0.0, 2.5)
+
+    def gpdHGbpol(self, pt):
+        """polarized GPD H^sea in b space."""
+        b = sqrt(pt.bx**2 + pt.by**2)
+        aux = pi*bquadrature(lambda d: d**2*j1(b*d/GeVfm)*self.gpdEzeroG(pt, ts=-d**2), 0.0, 2.5)
+        return self.gpdHGb(pt) + pt.by*aux/(2*b*Mp)
 
 
     def beff(self, pt):

@@ -20,6 +20,7 @@ import pylab as plt
 
 import Data, Approach, utils
 from constants import toTeX, Mp2, Mp
+from results import *
 
 # load experimental data
 data = utils.loaddata('/home/kkumer/pype/data/ep2epgamma', approach=Approach.hotfixedBMK) 
@@ -1452,7 +1453,8 @@ def bspace(th, parsets=False, path=None, fmt='png', error=False, **kwargs):
     k = 0
     ax = fig.add_subplot(1, 3, 1)
     for pars in parsets:
-        th.m.parameters.update(pars)
+        th.m.parameters.update(eval(pars))
+        if error: th.m.covariance = eval(pars+'cov')
         # ordinates 
         ys = []
         for b in bvals:
@@ -1477,7 +1479,8 @@ def bspace(th, parsets=False, path=None, fmt='png', error=False, **kwargs):
     k = 0
     ax = fig.add_subplot(1, 3, 2)
     for pars in parsets:
-        th.m.parameters.update(pars)
+        th.m.parameters.update(eval(pars))
+        if error: th.m.covariance = eval(pars+'cov')
         # ordinates 
         ys = []
         for b in bvals:
@@ -1502,7 +1505,8 @@ def bspace(th, parsets=False, path=None, fmt='png', error=False, **kwargs):
     k = 0
     ax = fig.add_subplot(1, 3, 3)
     for pars in parsets:
-        th.m.parameters.update(pars)
+        th.m.parameters.update(eval(pars))
+        if error: th.m.covariance = eval(pars+'cov')
         # ordinates 
         ys = []
         for b in bvals:
@@ -1531,7 +1535,7 @@ def bspace(th, parsets=False, path=None, fmt='png', error=False, **kwargs):
         fig.show()
     return fig
 
-def bspace2D(th, path=None, fmt='png', **kwargs):
+def bspace2D(th, flavor='Q', path=None, fmt='png', **kwargs):
     """Makes b-space distribution plot of theory th.
 
     """
@@ -1555,8 +1559,14 @@ def bspace2D(th, path=None, fmt='png', **kwargs):
         auxpol = []
         for bx in bxs:
             pt.bx = bx
-            aux.append(pt.xi*th.m.gpdHQb(pt))
-            auxpol.append(pt.xi*th.m.gpdHQbpol(pt))
+            if flavor=='Q':
+                aux.append(pt.xi*th.m.gpdHQb(pt))
+                auxpol.append(pt.xi*th.m.gpdHQbpol(pt))
+            elif flavor=='G':
+                aux.append(th.m.gpdHGb(pt))
+                auxpol.append(th.m.gpdHGbpol(pt))
+            else:
+                raise ValueError('Flavor %s is unknown' % flavor)
         Z.append(aux)
         Zpol.append(auxpol)
     ax = fig.add_subplot(1, 2, 1)
