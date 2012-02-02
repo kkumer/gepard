@@ -1473,7 +1473,7 @@ def bspace(th, parsets=False, path=None, fmt='png', error=False, **kwargs):
             ax.plot(bvals, pt.xi*ys, color=colors[k])
         k += 1
     ax.set_xlabel('$b_y \\quad {\\rm [fm]}$', fontsize=24)
-    ax.set_ylabel('$x q(x, b)$', fontsize=24)
+    ax.set_ylabel('$x q(x, b) \\quad {\\rm [fm}^{-2}{\\rm ]}$', fontsize=24)
     ax.axhline(y=0, color="black", linestyle="--", linewidth=1)    
     ax.axvline(x=0, color="black", linestyle="--", linewidth=1)    
     ax.set_ylim(0, 1.8)
@@ -1499,7 +1499,7 @@ def bspace(th, parsets=False, path=None, fmt='png', error=False, **kwargs):
             ax.plot(bvals, pt.xi*ys, color=colors[k])
         k += 1
     ax.set_xlabel('$b_y \\quad {\\rm [fm]}$', fontsize=24)
-    ax.set_ylabel('$x q^{\\uparrow}(x, b)$', fontsize=24)
+    ax.set_ylabel('$x q^{\\uparrow}(x, b) \\quad {\\rm [fm}^{-2}{\\rm ]}$', fontsize=24)
     ax.axhline(y=0, color="black", linestyle="--", linewidth=1)    
     ax.axvline(x=0, color="black", linestyle="--", linewidth=1)    
     ax.set_ylim(0, 1.8)
@@ -1525,10 +1525,10 @@ def bspace(th, parsets=False, path=None, fmt='png', error=False, **kwargs):
             ax.plot(bvals, ys, color=colors[k])
         k += 1
     ax.set_xlabel('$b_y \\quad {\\rm [fm]}$', fontsize=24)
-    ax.set_ylabel('$x g(x, b)$', fontsize=24)
+    ax.set_ylabel('$x g(x, b) \\quad {\\rm [fm}^{-2}{\\rm ]}$', fontsize=24)
     ax.axhline(y=0, color="black", linestyle="--", linewidth=1)    
     ax.axvline(x=0, color="black", linestyle="--", linewidth=1)    
-    ax.set_ylim(0, 15)
+    ax.set_ylim(0, 10)
     fig.subplots_adjust(bottom=0.5)
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
