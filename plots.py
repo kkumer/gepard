@@ -1445,8 +1445,10 @@ def bspace(th, parsets=False, path=None, fmt='png', error=False, **kwargs):
     pt.xi = 0.001
     pt.Q2 = 4.0
     pt.t = -0.2 # not used
+    cov = True
     if not parsets:
-        parsets = [th.m.parameters]
+        parsets = ['{}']
+        cov = False
     # Define abscissas
     bvals = np.linspace(-1.8, 1.8, 50)
     ###    FIRST panel
@@ -1454,7 +1456,7 @@ def bspace(th, parsets=False, path=None, fmt='png', error=False, **kwargs):
     ax = fig.add_subplot(1, 3, 1)
     for pars in parsets:
         th.m.parameters.update(eval(pars))
-        if error: th.m.covariance = eval(pars+'cov')
+        if (error and cov): th.m.covariance = eval(pars+'cov')
         # ordinates 
         ys = []
         for b in bvals:
@@ -1470,8 +1472,8 @@ def bspace(th, parsets=False, path=None, fmt='png', error=False, **kwargs):
         else:
             ax.plot(bvals, pt.xi*ys, color=colors[k])
         k += 1
-    ax.set_xlabel('b', fontsize=15)
-    ax.set_ylabel('HQ', fontsize=18)
+    ax.set_xlabel('$b_y \\quad {\\rm [fm]}$', fontsize=24)
+    ax.set_ylabel('$x q(x, b)$', fontsize=24)
     ax.axhline(y=0, color="black", linestyle="--", linewidth=1)    
     ax.axvline(x=0, color="black", linestyle="--", linewidth=1)    
     ax.set_ylim(0, 1.8)
@@ -1480,7 +1482,7 @@ def bspace(th, parsets=False, path=None, fmt='png', error=False, **kwargs):
     ax = fig.add_subplot(1, 3, 2)
     for pars in parsets:
         th.m.parameters.update(eval(pars))
-        if error: th.m.covariance = eval(pars+'cov')
+        if (error and cov): th.m.covariance = eval(pars+'cov')
         # ordinates 
         ys = []
         for b in bvals:
@@ -1496,8 +1498,8 @@ def bspace(th, parsets=False, path=None, fmt='png', error=False, **kwargs):
         else:
             ax.plot(bvals, pt.xi*ys, color=colors[k])
         k += 1
-    ax.set_xlabel('b', fontsize=15)
-    ax.set_ylabel('HQpol', fontsize=18)
+    ax.set_xlabel('$b_y \\quad {\\rm [fm]}$', fontsize=24)
+    ax.set_ylabel('$x q^{\\uparrow}(x, b)$', fontsize=24)
     ax.axhline(y=0, color="black", linestyle="--", linewidth=1)    
     ax.axvline(x=0, color="black", linestyle="--", linewidth=1)    
     ax.set_ylim(0, 1.8)
@@ -1506,7 +1508,7 @@ def bspace(th, parsets=False, path=None, fmt='png', error=False, **kwargs):
     ax = fig.add_subplot(1, 3, 3)
     for pars in parsets:
         th.m.parameters.update(eval(pars))
-        if error: th.m.covariance = eval(pars+'cov')
+        if (error and cov): th.m.covariance = eval(pars+'cov')
         # ordinates 
         ys = []
         for b in bvals:
@@ -1522,8 +1524,8 @@ def bspace(th, parsets=False, path=None, fmt='png', error=False, **kwargs):
         else:
             ax.plot(bvals, ys, color=colors[k])
         k += 1
-    ax.set_xlabel('b', fontsize=15)
-    ax.set_ylabel('HG', fontsize=18)
+    ax.set_xlabel('$b_y \\quad {\\rm [fm]}$', fontsize=24)
+    ax.set_ylabel('$x g(x, b)$', fontsize=24)
     ax.axhline(y=0, color="black", linestyle="--", linewidth=1)    
     ax.axvline(x=0, color="black", linestyle="--", linewidth=1)    
     ax.set_ylim(0, 15)
