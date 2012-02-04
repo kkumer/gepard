@@ -505,6 +505,56 @@ def HERMES10TP(obs='TSA', path=None, fmt='png', **kwargs):
         fig.show()
     return fig
 
+def HERMES08TTSA(path=None, fmt='png', **kwargs):
+    """Plot HERMES 08 TTSA data with fit lines."""
+
+    title = 'HERMES-08 TTSA'
+    fig = plt.figure()
+    fig.canvas.set_window_title(title)
+    fig.suptitle(title)
+    xaxes = ['tm', 'xB', 'Q2']
+    ylims = [(-0.42, 0.15), (-0.42, 0.15)]
+    xlims = [(0.0, 0.48), (0.04, 0.27), (0.85, 6)]
+    # we have 2x12=24 points to be separated in six panels four points each:
+    for y, id, shift in zip(range(2), [66, 65], [12, 0]):
+        for x in range(3):
+            npanel = 3*y + x + 1  # 1, 2, ..., 6
+            ax = fig.add_subplot(2,3,npanel)
+            ax.yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))  # tickmarks
+            panel(ax, points=data[id][x*4+shift:x*4+4+shift], xaxis=xaxes[x], **kwargs)
+            apply(ax.set_ylim, ylims[y])
+            apply(ax.set_xlim, xlims[x])
+            if (npanel % 3) != 1:
+                # Leave labels only on leftmost panels
+                ax.set_ylabel('')
+                ax.set_yticklabels([])
+            else:
+                ylabels = ['$A_{UT,I}^{\\sin(\\phi-\\phi_S)\\cos\\phi}$', 
+                           '$A_{UT,DVCS}^{\\sin(\\phi-\\phi_S)}$']
+                ax.set_ylabel(ylabels[(npanel-1)/3], fontsize=20)
+            if npanel < 4:
+                # Leave labels only on lowest panels
+                ax.set_xlabel('')
+                ax.set_xticklabels([])
+            else:
+                xlabels = ['$-t\\; [{\\rm GeV}^2]$', '$x_B$', '$Q^2\\; [{\\rm GeV}^2]$']
+                ax.set_xlabel(xlabels[npanel-7], fontsize=18)
+            if npanel == 3 and kwargs:
+                ax.legend(bbox_to_anchor=(0., 1.), loc='upper right',
+                        borderaxespad=0.).draw_frame(0)
+                pass
+            ax.yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.2))  # tickmarks
+            ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
+            for label in ax.get_xticklabels() + ax.get_yticklabels():
+                label.set_fontsize(14)
+    fig.subplots_adjust(bottom=0.35, wspace=0.0, hspace=0.0)
+    if path:
+        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+    else:
+        fig.canvas.draw()
+        fig.show()
+    return fig
+
 def CLAS(path=None, fmt='png', **kwargs):
     """Makes plot of CLAS BSA data with fit lines and bands"""
 

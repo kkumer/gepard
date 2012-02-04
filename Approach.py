@@ -644,7 +644,9 @@ class BMK(Approach):
                 + self.sINT1TP(pt) * sin(pt.phi)
                 )
 
-## Observables ##
+#####   Observables   ##
+
+## Cross-sections
 
     def Xunp(self, pt, **kwargs):
         """ Calculate 4-fold differential cross section for unpolarized target. 
@@ -693,7 +695,6 @@ class BMK(Approach):
         return wgh * self.PreFacSigma(kin) * ( self.TBH2unp(kin) 
                 + self.TINTunp(kin) 
                 + self.TDVCS2unp(kin) )
-
            
     def XTP(self, pt, **kwargs):
         """ Calculate 4-fold differential cross section for transversely polarized target. 
@@ -744,6 +745,71 @@ class BMK(Approach):
         return wgh * self.PreFacSigma(kin) * ( self.TBH2TP(kin) 
                 + self.TINTTP(kin) 
                 + self.TDVCS2TP(kin) )
+
+    def _XDVCStApprox(self, pt):
+        """Partial DVCS cross section w.r.t. Mandelstam t.
+         Approx. formula used in NPB10 paper."""
+
+        W2 = pt.W * pt.W
+        self.m.g.newcall = 1
+        # Simplified formula used also in Fortran gepard code
+        res = 260.5633976788416 * W2 * ( 
+                (self.m.ImH(pt)**2 + self.m.ReH(pt)**2)
+                - pt.t/(4.*Mp2)*(self.m.ReE(pt)**2 + self.m.ImE(pt)**2)) / (
+            (W2 + pt.Q2) * (2.0 * W2 + pt.Q2)**2 )
+        return res
+
+    def _XDVCStEx(self, pt):
+        """Partial DVCS cross section w.r.t. Mandelstam t."""
+
+        eps2 = 4. * pt.xB**2 * Mp2 / pt.Q2
+        self.m.g.newcall = 1
+        ImH, ReH, ImE, ReE = self.m.ImH(pt), self.m.ReH(pt), self.m.ImE(pt), self.m.ReE(pt)
+        res = 65.14079453579676 * ( pt.xB**2 / pt.Q2**2 / (1-pt.xB) / (2-pt.xB)**2 /
+                sqrt(1 + eps2) * (
+                    4 * (1 - pt.xB) * (ImH**2 + ReH**2)
+                - pt.xB**2 * (ReE**2+ImE**2 + 2*ReE*ReH + 2*ImE*ImH)
+                - (2-pt.xB)**2 *pt.t/4/Mp2*(ImE**2+ReE**2) ) )
+        return res
+
+    _XDVCSt = _XDVCStEx
+
+    def _XDVCSt4int(self, t, pt):
+        """Same as _XDVCSt but with additional variable t 
+        to facilitate integration over it.
+        
+        """
+        aux = []
+        for t_single in t:
+            pt.t = t_single
+            res = self._XDVCSt(pt)
+            del pt.t
+            #if debug == 2: print "t = %s  =>  dsig/dt = %s" % (t_single, res)
+            aux.append(res)
+        return array(aux)
+
+    def X(self, pt):
+        """Total DVCS cross section.
+
+        FIXME: should be universal total xs and should look into 'process'
+
+        """
+        # if pt.process = 'gammastarp2gammap':
+        #debug_here()
+        if pt.has_key('t') or pt.has_key('tm'):
+            # partial XS w.r.t momentum transfer t
+            return self._XDVCSt(pt)
+        else:
+            # total XS
+            if pt.has_key('tmmax'):
+                tmmax = pt.tmmax
+            else:
+                tmmax = 1.  # default -t cuttoff in GeV^2
+            res = quadrature.tquadrature(lambda t: self._XDVCSt4int(t, pt), -tmmax, 0)
+            return res
+
+
+## Assymetries
 
     def TSD(self, pt, **kwargs):
         """Difference of 4-fold cross sections with transversely polarized
@@ -823,6 +889,7 @@ class BMK(Approach):
         else:
             raise ValueError('[%s] has neither azimuthal angle phi\
  nor harmonic FTn defined!' % pt)
+            
 
     def _ALUDVCS(self, pt, **kwargs):
         """Calculate BSA as defined by HERMES 0909.3587 Eq. (2.3) """
@@ -937,68 +1004,6 @@ class BMK(Approach):
         """Beam charge-spin asymmetry as measured by COMPASS. """
         return  self.BCSD(pt, **kwargs) / self.BCSS(pt, **kwargs)
 
-
-    def _XDVCStApprox(self, pt):
-        """Partial DVCS cross section w.r.t. Mandelstam t.
-         Approx. formula used in NPB10 paper."""
-
-        W2 = pt.W * pt.W
-        self.m.g.newcall = 1
-        # Simplified formula used also in Fortran gepard code
-        res = 260.5633976788416 * W2 * ( 
-                (self.m.ImH(pt)**2 + self.m.ReH(pt)**2)
-                - pt.t/(4.*Mp2)*(self.m.ReE(pt)**2 + self.m.ImE(pt)**2)) / (
-            (W2 + pt.Q2) * (2.0 * W2 + pt.Q2)**2 )
-        return res
-
-    def _XDVCStEx(self, pt):
-        """Partial DVCS cross section w.r.t. Mandelstam t."""
-
-        eps2 = 4. * pt.xB**2 * Mp2 / pt.Q2
-        self.m.g.newcall = 1
-        ImH, ReH, ImE, ReE = self.m.ImH(pt), self.m.ReH(pt), self.m.ImE(pt), self.m.ReE(pt)
-        res = 65.14079453579676 * ( pt.xB**2 / pt.Q2**2 / (1-pt.xB) / (2-pt.xB)**2 /
-                sqrt(1 + eps2) * (
-                    4 * (1 - pt.xB) * (ImH**2 + ReH**2)
-                - pt.xB**2 * (ReE**2+ImE**2 + 2*ReE*ReH + 2*ImE*ImH)
-                - (2-pt.xB)**2 *pt.t/4/Mp2*(ImE**2+ReE**2) ) )
-        return res
-
-    _XDVCSt = _XDVCStEx
-
-    def _XDVCSt4int(self, t, pt):
-        """Same as _XDVCSt but with additional variable t 
-        to facilitate integration over it.
-        
-        """
-        aux = []
-        for t_single in t:
-            pt.t = t_single
-            res = self._XDVCSt(pt)
-            del pt.t
-            #if debug == 2: print "t = %s  =>  dsig/dt = %s" % (t_single, res)
-            aux.append(res)
-        return array(aux)
-
-    def X(self, pt):
-        """Total DVCS cross section.
-
-        FIXME: should be universal total xs and should look into 'process'
-
-        """
-        # if pt.process = 'gammastarp2gammap':
-        #debug_here()
-        if pt.has_key('t') or pt.has_key('tm'):
-            # partial XS w.r.t momentum transfer t
-            return self._XDVCSt(pt)
-        else:
-            # total XS
-            if pt.has_key('tmmax'):
-                tmmax = pt.tmmax
-            else:
-                tmmax = 1.  # default -t cuttoff in GeV^2
-            res = quadrature.tquadrature(lambda t: self._XDVCSt4int(t, pt), -tmmax, 0)
-            return res
 
     def BCA0minusr1(self, pt):
         return self.BCAcos0(pt) - pt.r * self.BCAcos1(pt)

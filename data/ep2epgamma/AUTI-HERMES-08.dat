@@ -42,7 +42,7 @@ y1errorsystematic = column8
 
 ### x-axes
 
-x1name = t
+x1name = tm
 x1unit = GeV^2
 x1value = column1
 
@@ -66,7 +66,7 @@ x5value = column5
 
 ### Data
 table =
-#  t    x_B    Q^2  varFTn FTn    asym   stat.  syst.
+# -t    x_B    Q^2  varFTn FTn    asym   stat.  syst.
 ######################################################
 
 #  A_{UT,I}^{sin(phi-phi_S)}

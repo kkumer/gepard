@@ -1,3 +1,5 @@
+ - ii is not possible to plot different gepard models (ANSATZs)
+
  - after calling gpdF.... stuff everything is broken because
    g...process is changed and gepard must be completely reinitialized
 

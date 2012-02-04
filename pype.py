@@ -49,7 +49,7 @@ data = utils.loaddata('/home/kkumer/pype/data/ep2epgamma', approach=Approach.BMK
 data.update(utils.loaddata('/home/kkumer/pype/data/gammastarp2gammap', approach=Approach.BMK))
 data.update(utils.loaddata('/home/kkumer/pype/data/gammastarp2gammap/EIC', approach=Approach.BMK))
 data.update(utils.loaddata('/home/kkumer/pype/data/ep2epgamma/EIC', approach=Approach.BMK))
-#db = shelve.open('/home/kkumer/pype/theories.db')
+db = shelve.open('/home/kkumer/pype/theories.db')
 #dell = shelve.open('/home/kkumer/pype/dellB.db')
 
 ## [2] Choose subset of datapoints for fitting
@@ -63,9 +63,9 @@ data.update(utils.loaddata('/home/kkumer/pype/data/ep2epgamma/EIC', approach=App
 ##HA17 = utils.select(data[34], criteria=['t == -0.17'])
 ##HA28 = utils.select(data[34], criteria=['t == -0.28'])
 ##HA33 = utils.select(data[34], criteria=['t == -0.33'])
-DVCSpoints = data[36] + data[37] + data[38] + data[39] + \
-  data[40] + data[41] + data[42] + data[43] + data[44] + \
-  data[45]
+#DVCSpoints = data[36] + data[37] + data[38] + data[39] + \
+#  data[40] + data[41] + data[42] + data[43] + data[44] + \
+#  data[45]
 #ALTGLOpoints = data[5] + data[25] + data[32][18:]  # KK's CLAS BSA
 ##ALTGLO1points = data[5] + data[25] + data[32] + HAD17 + HA17
 ##ALTGLO2points = data[5] + data[25] + data[32][18:] + HAD17[::2] + HA17[::2]
@@ -86,17 +86,16 @@ DVCSpoints = data[36] + data[37] + data[38] + data[39] + \
 BTSApoints = utils.select(data[53], criteria=['FTn==0'])
 #UNPpoints = ALTGLOpoints + BSSwpoints + BSDwpoints
 #UNP5points = ALTGLO5points + BSSwpoints + BSDwpoints
-H1ZEUSpoints = DVCSpoints + data[48]
-H1ZEUSindependent = data[45] + data[39] + data[36] + data[46]
+#H1ZEUSpoints = DVCSpoints + data[48]
+#H1ZEUSindependent = data[45] + data[39] + data[36] + data[46]
 H1ZEUSindependentNEW = data[45] + data[39] + data[63] + data[46]
 H1ZEUS = H1ZEUSindependentNEW + utils.select(data[47], criteria=['Q2 >= 4.0'])
-EICtest2 = data[1001]
-EICX = data[2001]
-for n in range(2002,2024):
-    EICX = EICX + data[n]
-EICTSA = data[2102]
-for n in range(2103,2110) + range(2111,2118) + range(2119,2125):
-    EICTSA = EICTSA + data[n]
+#EICX = data[2001]
+#for n in range(2002,2024):
+#    EICX = EICX + data[n]
+#EICTSA = data[2102]
+#for n in range(2103,2110) + range(2111,2118) + range(2119,2125):
+#    EICTSA = EICTSA + data[n]
 #EICmockkk = data[1002]
 
 
@@ -111,16 +110,16 @@ th = Approach.BMK(m)
 
 
 ## [4] Do the fit
-th.model.fix_parameters('ALL')
-th.model.release_parameters(
-   'ALPS', 'M02S', 'SECS', 'THIS', 'ALPG', 'M02G', 'SECG', 'THIG')
-th.model.release_parameters(
-   'EAL0S', 'EALPS', 'EM02S', 'ESECS', 'ETHIS', 'KAPS',
-   'EAL0G', 'EM02G',  'ESECG')
-f = Fitter.FitterMinuit(EICTSA+EICX+H1ZEUS, th)
+#th.model.fix_parameters('ALL')
+#th.model.release_parameters(
+#   'ALPS', 'M02S', 'SECS', 'THIS', 'ALPG', 'M02G', 'SECG', 'THIG')
+#th.model.release_parameters(
+#   'EAL0S', 'EALPS', 'EM02S', 'ESECS', 'ETHIS', 'KAPS',
+#   'EAL0G', 'EM02G',  'ESECG')
+#f = Fitter.FitterMinuit(EICTSA+EICX+H1ZEUS, th)
 
-f.minuit.tol = 80
-f.minuit.printMode = 1
+#f.minuit.tol = 80
+#f.minuit.printMode = 1
 #f.minuit.maxcalls = 100
 
 #f.fit()
