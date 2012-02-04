@@ -240,7 +240,7 @@ SpliceToFortran[path_String, tfor_] :=
     Splice[StringJoin[path, "/splice_template.f"], 
       StringJoin[path, "/splice.f"], FormatType -> OutputForm]]
 
-Install["gepard.exe"] (*   Installing C and Fortran routines. *)
+Install["gepard.exe"]  (*  Installing C and Fortran routines. *)
 
 defaultopts = {SPEED -> -1, P -> -1, SCHEME -> "DFLT", 
               ANSATZ -> "DFLT", DATFILE -> "DFLT", OUTFILE -> "DFLT"};

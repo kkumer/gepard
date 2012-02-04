@@ -272,7 +272,13 @@ C
 *       correction factor from Eq. (57), same for quarks and G
         CORR = EXP(   CLNGAMMA(DBLCMPLX(7.0d0 + AL0, 0.0d0)) -
      &         CLNGAMMA(DBLCMPLX(7.0d0 + ALPT, 0.0d0))   )
-        QJ = NORM * POCHHAMMER(DBLCMPLX(2.0d0 - AL0, 0.0d0)
+        IF ((ABS(SKEW) .LE. 1e-6) .OR. (XI .LE. 1e-12)) THEN
+*          don't need resummed subleading waves
+          QJ = NORM * POCHHAMMER(DBLCMPLX(2.0d0 - AL0, 0.0d0)
+     &            , POCH) / POCHHAMMER(1.0d0 - AL0
+     &        + J , POCH) * (1.0d0 - AL0 + J) / (1.0d0 + JMA)
+        ELSE
+          QJ = NORM * POCHHAMMER(DBLCMPLX(2.0d0 - AL0, 0.0d0)
      &            , POCH) / POCHHAMMER(1.0d0 - AL0
      &        + J , POCH) * (1.0d0 - AL0 + J) / (1.0d0 + JMA) *
      &      ( 1.0d0 - SKEW*PI*(XI/2.0d0)**(JMA+1.0d0)*SQRT(PI)*
@@ -282,6 +288,7 @@ C
      &         DBLCMPLX(ALPT, 0.0d0)) ) / SIN(PI*ALPT) *
      &        (1.0d0 - (SIN(PI*ALPT) -
      &         SIN(J*PI))/SIN(PI*JMA) ) * CORR  )
+        END IF
       END IF
       RETURN
       END
