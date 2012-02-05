@@ -90,12 +90,12 @@ BTSApoints = utils.select(data[53], criteria=['FTn==0'])
 #H1ZEUSindependent = data[45] + data[39] + data[36] + data[46]
 H1ZEUSindependentNEW = data[45] + data[39] + data[63] + data[46]
 H1ZEUS = H1ZEUSindependentNEW + utils.select(data[47], criteria=['Q2 >= 4.0'])
-#EICX = data[2001]
-#for n in range(2002,2024):
-#    EICX = EICX + data[n]
-#EICTSA = data[2102]
-#for n in range(2103,2110) + range(2111,2118) + range(2119,2125):
-#    EICTSA = EICTSA + data[n]
+EICX = data[2001]
+for n in range(2002,2024):
+    EICX = EICX + data[n]
+EICTSA = data[2102]
+for n in range(2103,2110) + range(2111,2118) + range(2119,2125):
+    EICTSA = EICTSA + data[n]
 #EICmockkk = data[1002]
 
 

@@ -15,6 +15,7 @@ DummyPoint -- class for points which have just few relevant attributes
 # number and names of attributes
 
 import os, re, math
+from numpy import pi
 
 # import pylab as plt
 
@@ -139,9 +140,11 @@ class DataPoint(DummyPoint):
         # Unpolarized in1 particle
         if not self.has_key('in1polarization'):
             self.in1polarization = 0
-        # For transversaly polarized target \varphi = pol.
-        if self.has_key('in2polarization') and self.in2polarizationvector == 'T':
-            self.varphi = self.in2polarization
+        # For transversaly polarized target set, if needed and
+        # if not already set, by default take dominant sine-varphi harmonic
+        if (self.has_key('in2polarizationvector') and self.in2polarizationvector == 'T' and 
+                not self.has_key('varFTn')):
+            self.varFTn = -1
         return
 
     def __repr__(self):

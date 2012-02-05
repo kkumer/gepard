@@ -644,12 +644,23 @@ class BMK(Approach):
                 + self.sINT1TP(pt) * sin(pt.phi)
                 )
 
+## Placeholder for original BMK longitudinally polarized target formulas
+
+    def TBH2LP(self, pt):
+        raise ValueError('X_TP not implemented for BMK model! Use BM10')
+
+    def TDVCS2LP(self, pt):
+        raise ValueError('X_TP not implemented for BMK model! Use BM10')
+
+    def TINTLP(self, pt):
+        raise ValueError('X_TP not implemented for BMK model! Use BM10')
+
 #####   Observables   ##
 
 ## Cross-sections
 
     def XS(self, pt, **kwargs):
-        """Differential e p --> e p gamma cross section. 
+        """Differential 5-fold e p --> e p gamma cross section. 
         
         """
         # Overriding pt kinematics with those from kwargs
@@ -694,15 +705,20 @@ class BMK(Approach):
         if self.model.__dict__.has_key('g'): self.m.g.newcall = 1
 
         # Finally, we build up the cross-section
-        # 1. unpolarized part
+        # 1. unpolarized target part
         aux = self.TBH2unp(kin) + self.TINTunp(kin) + self.TDVCS2unp(kin)
         if hasattr(pt, 'in2polarizationvector'):
-            # 2. longitudinal target part
+            # 2. longitudinally polarized target part
             if pt.in2polarizationvector == 'L':
                 aux += kin.in2polarization*(
                         self.TBH2LP(kin) + self.TINTLP(kin) + self.TDVCS2LP(kin))
             elif pt.in2polarizationvector == 'T':
-            # 3. transversal target part
+            # 3. transversally polarized target part
+            # We directly take cos(varphi) or sin(varphi) terms depending if
+            # varFTn is specified
+                if hasattr(pt, 'varFTn'):
+                    # FIXME: should deal with Trento/BKM differences
+                    kin.varphi = (pt.varFTn-1)*pi/4.  # 0 for cos, -pi/2 for sin
                 aux += kin.in2polarization*(
                         self.TBH2TP(kin) + self.TINTTP(kin) + self.TDVCS2TP(kin))
             else:
@@ -722,6 +738,18 @@ class BMK(Approach):
         if mem: pt.in2polarization = mem
         return res
            
+    def XLP(self, pt, **kwargs):
+        """ Calculate 4-fold differential cross section for transversely polarized target. 
+        
+        """
+        pt.in2polarizationvector = 'L'
+        pt.in2polarization = 1
+        pol = kwargs.copy()
+        pol.update({'flip':'in2polarization'})
+        o =  self.XS(pt, **kwargs)
+        f =  self.XS(pt, **pol)
+        return (o-f)/2.
+
     def XTP(self, pt, **kwargs):
         """ Calculate 4-fold differential cross section for transversely polarized target. 
         
@@ -733,9 +761,6 @@ class BMK(Approach):
         o =  self.XS(pt, **kwargs)
         f =  self.XS(pt, **pol)
         return (o-f)/2.
-
-    def XLP(self, pt, **kwargs):
-        raise ValueError('X_LP is not implemented for BMK model! Use BM10.')
 
     def _XDVCStApprox(self, pt):
         """Partial DVCS cross section w.r.t. Mandelstam t.
@@ -800,38 +825,82 @@ class BMK(Approach):
             return res
 
 
-## Assymetries
+## General assymetries
 
-    def TSD(self, pt, **kwargs):
-        """Difference of 4-fold cross sections with transversely polarized
-           target"""
-
-        R = copy.deepcopy(kwargs)
-        if R.has_key('vars'):
-            if R['vars'].has_key('varphi'):
-                # has vars kwarg and vars has varphi key = update varphi
-                R['vars'].update({'varphi':R['vars']['varphi']+pi})
+    def _phiharmonic(self, fun, pt, **kwargs):
+        """Return fun evaluated for phi=pt.phi, or harmonic of fun
+        corresponding to pt.FTn.
+        
+        """
+        if pt.has_key('phi'):
+            return fun(pt, **kwargs)
+        elif pt.has_key('FTn'):
+            if pt.FTn < 0:
+                res = quadrature.Hquadrature(lambda phi: 
+                        fun(pt, vars={'phi':phi}) * sin(-pt.FTn*phi), 0, 2*pi)
+            elif pt.FTn > 0:
+                res = quadrature.Hquadrature(lambda phi: 
+                        fun(pt, vars={'phi':phi}) * cos(pt.FTn*phi), 0, 2*pi)
+            elif pt.FTn == 0:
+                res = quadrature.Hquadrature(lambda phi: 
+                        fun(pt, vars={'phi':phi}), 0, 2*pi)/2.
             else:
-                # has vars kwarg but vars has not varphi key = create varphi
-                R['vars'].update({'varphi':pt.varphi+pi})
+                raise ValeError('This should never happen!')
+            return  res / pi
         else:
-            # doesn't have vars kwarg, create vars with varphi key
-            R['vars'] = {'varphi':pt.varphi+pi}
-        return ( self.XTP(pt, **kwargs) 
-                - self.XTP(pt, **R) ) / 2.
+            raise ValueError('[%s] has neither azimuthal angle phi nor harmonic FTn defined!' % pt)
 
     def _TSA(self, pt, **kwargs):
-        """Calculate trasversal target spin asymmetry (TTSA)."""
+        """Target spin asymmetry (transversal or longitudinal)."""
+        pol = kwargs.copy()
+        pol.update({'flip':'in2polarization'})
+        o =  self.XS(pt, **kwargs)
+        p =  self.XS(pt, **pol)
+        return (o-p)/(o+p)
 
-        return self.XTP(pt, **kwargs) / self.Xunp(pt, **kwargs)
+    def _TTSAlong(self, pt, **kwargs):
+        """Calculate target spin asymmetry (TSA).
+        
+        According to 1004.0177 Eq. (1.6)
+
+        """
+        bpol = kwargs.copy()
+        bpol.update({'flip':'in1polarization'})
+        tpol = kwargs.copy()
+        tpol.update({'flip':'in2polarization'})
+        both = kwargs.copy()
+        both.update({'flip':['in1polarization', 'in2polarization']})
+        o =  self.XS(pt, **kwargs)
+        p =  self.XS(pt, **bpol)
+        t =  self.XS(pt, **tpol)
+        b =  self.XS(pt, **both)
+        return ((p+o) - (b+t)) / ((p+o) + (b+t))
 
     def TSA(self, pt, **kwargs):
-        """Calculate trasversal target spin asymmetry or its harmonics."""
-        if pt.has_key('varphi'):
-            return self._TSA(pt, **kwargs)
-        else:
-            raise ValueError('[%s] doesnt have target polarization angle varphi defined!' % pt)
+        """Target spin asymmetry (transversal or longitudinal) or its harmonics."""
+        return self._phiharmonic(self._TSA, pt, **kwargs)
 
+    def _BTSA(self, pt, **kwargs):
+        """Calculate beam-target spin asymmetry (BTSA).
+        
+        According to 1004.0177 Eq. (1.8)
+
+        """
+        bpol = kwargs.copy()
+        bpol.update({'flip':'in1polarization'})
+        tpol = kwargs.copy()
+        tpol.update({'flip':'in2polarization'})
+        both = kwargs.copy()
+        both.update({'flip':['in1polarization', 'in2polarization']})
+        o =  self.XS(pt, **kwargs)
+        p =  self.XS(pt, **bpol)
+        t =  self.XS(pt, **tpol)
+        b =  self.XS(pt, **both)
+        return ((o+b) - (p+t)) / ((o+b) + (p+t))
+
+    def BTSA(self, pt, **kwargs):
+        """Calculate beam-target spin asymmetry or its harmonics."""
+        return self._phiharmonic(self._BTSA, pt, **kwargs)
 
     def BSD(self, pt, **kwargs):
         """Calculate 4-fold helicity-dependent cross section measured by HALL A """
@@ -850,37 +919,21 @@ class BMK(Approach):
 
     def _ALUI(self, pt, **kwargs):
         """Calculate BSA as defined by HERMES 0909.3587 Eq. (2.2) """
-
         pol = kwargs.copy()
         pol.update({'flip':'in1polarization'})
         chg = kwargs.copy()
         chg.update({'flip':'in1charge'})
         both = kwargs.copy()
         both.update({'flip':['in1polarization', 'in1charge']})
-        o =  self.Xunp(pt, **kwargs)
-        p =  self.Xunp(pt, **pol)
-        c =  self.Xunp(pt, **chg)
-        b =  self.Xunp(pt, **both)
+        o =  self.XS(pt, **kwargs)
+        p =  self.XS(pt, **pol)
+        c =  self.XS(pt, **chg)
+        b =  self.XS(pt, **both)
         return ((o-p) - (c-b)) / ((o+p) + (c+b))
 
-    def ALUI(self, pt):
-        """Calculate BSA as defined by HERMES 0909.3587 Eq. (2.2) or
-        its harmonics."""
-
-        if pt.has_key('phi'):
-            return self._ALUI(pt)
-        elif pt.has_key('FTn') and pt.FTn == -1:
-            res = quadrature.Hquadrature(lambda phi: 
-                    self._ALUI(pt, vars={'phi':phi}) * sin(phi), 0, 2*pi)
-            return  res / pi
-        elif pt.has_key('FTn') and pt.FTn == -2:
-            res = quadrature.Hquadrature(lambda phi: 
-                    self._ALUI(pt, vars={'phi':phi}) * sin(2.*phi), 0, 2*pi)
-            return  res / pi
-        else:
-            raise ValueError('[%s] has neither azimuthal angle phi nor harmonic FTn defined!' % pt)
-            
-
+    def ALUI(self, pt, **kwargs):
+        """Calculate BSA as defined by HERMES 0909.3587 Eq. (2.2) or its harmonics."""
+        return self._phiharmonic(self._ALUI, pt, **kwargs)
 
     def _ALUDVCS(self, pt, **kwargs):
         """Calculate BSA as defined by HERMES 0909.3587 Eq. (2.3) """
@@ -891,28 +944,15 @@ class BMK(Approach):
         chg.update({'flip':'in1charge'})
         both = kwargs.copy()
         both.update({'flip':['in1polarization', 'in1charge']})
-        o =  self.Xunp(pt, **kwargs)
-        p =  self.Xunp(pt, **pol)
-        c =  self.Xunp(pt, **chg)
-        b =  self.Xunp(pt, **both)
+        o =  self.XS(pt, **kwargs)
+        p =  self.XS(pt, **pol)
+        c =  self.XS(pt, **chg)
+        b =  self.XS(pt, **both)
         return ((o-p) + (c-b)) / ((o+p) + (c+b))
 
     def ALUDVCS(self, pt):
-        """Calculate BSA as defined by HERMES 0909.3587 Eq. (2.3) or
-        its harmonics."""
-
-        if pt.has_key('phi'):
-            return self._ALUDVCS(pt)
-        elif pt.has_key('FTn') and pt.FTn == -1:
-            res = quadrature.Hquadrature(lambda phi: 
-                    self._ALUDVCS(pt, vars={'phi':phi}) * sin(phi), 0, 2*pi)
-            return  res / pi
-        elif pt.has_key('FTn') and pt.FTn == -2:
-            res = quadrature.Hquadrature(lambda phi: 
-                    self._ALUDVCS(pt, vars={'phi':phi}) * sin(2.*phi), 0, 2*pi)
-            return  res / pi
-        else:
-            raise ValueError('[%s] has neither azimuthal angle phi nor harmonic FTn defined!' % pt)
+        """Calculate BSA as defined by HERMES 0909.3587 Eq. (2.3) or its harmonics."""
+        return self._phiharmonic(self._ALUDVCS, pt, **kwargs)
 
     def _AUTI(self, pt, **kwargs):
         """Calculate TTSA as defined by HERMES 0802.2499 Eq. (15) """
@@ -923,27 +963,15 @@ class BMK(Approach):
         chg.update({'flip':'in1charge'})
         both = kwargs.copy()
         both.update({'flip':['in2polarization', 'in1charge']})
-        o =  self.Xunp(pt, **kwargs)
-        p =  self.Xunp(pt, **pol)
-        c =  self.Xunp(pt, **chg)
-        b =  self.Xunp(pt, **both)
+        o =  self.XS(pt, **kwargs)
+        p =  self.XS(pt, **pol)
+        c =  self.XS(pt, **chg)
+        b =  self.XS(pt, **both)
         return ((o-p) - (c-b)) / ((o+p) + (c+b))
 
     def AUTI(self, pt):
         """Calculate TTSA as defined by HERMES 0802.2499 Eq. (15) or its phi-harmonics."""
-
-        if pt.has_key('phi'):
-            return self._ALUI(pt)
-        elif pt.has_key('FTn') and pt.FTn == -1:
-            res = quadrature.Hquadrature(lambda phi: 
-                    self._ALUI(pt, vars={'phi':phi}) * sin(phi), 0, 2*pi)
-            return  res / pi
-        elif pt.has_key('FTn') and pt.FTn == -2:
-            res = quadrature.Hquadrature(lambda phi: 
-                    self._ALUI(pt, vars={'phi':phi}) * sin(2.*phi), 0, 2*pi)
-            return  res / pi
-        else:
-            raise ValueError('[%s] has neither azimuthal angle phi nor harmonic FTn defined!' % pt)
+        return self._phiharmonic(self._AUTI, pt, **kwargs)
 
     def _BSA(self, pt, **kwargs):
         """Calculate beam spin asymmetry (BSA)."""
@@ -1004,8 +1032,7 @@ class BMK(Approach):
                     self._BCA(pt, vars={'phi':phi}) * cos(3.*phi), 0, 2*pi)
             return  - res / pi
         else:
-            raise ValueError('[%s] has neither azimuthal angle phi\
- nor harmonic FTn defined!' % pt)
+            raise ValueError('[%s] has neither azimuthal angle phi nor harmonic FTn defined!' % pt)
 
     def BCSD(self, pt, **kwargs):
         """4-fold beam charge-spin cross section difference measured by COMPASS """
@@ -1024,7 +1051,6 @@ class BMK(Approach):
     def BCSA(self, pt, **kwargs):
         """Beam charge-spin asymmetry as measured by COMPASS. """
         return  self.BCSD(pt, **kwargs) / self.BCSS(pt, **kwargs)
-
 
     def BCA0minusr1(self, pt):
         return self.BCAcos0(pt) - pt.r * self.BCAcos1(pt)
@@ -1124,6 +1150,7 @@ class BMK(Approach):
         b1 = quadrature.Hquadrature(lambda phi: self.BSS(pt, vars={'phi':phi}, weighted=True) * cos(phi), 
                 0, 2.0*pi) / pi
         return b1/b0
+
 
 
 class hotfixedBMK(BMK):
@@ -2721,7 +2748,6 @@ class BM10ex(hotfixedBMK):
 
         return 0
     
-    
     SINT['LPA', (0, 1), (3)] = SINTLPA013
 
     def SINTLPA111(self, pt):
@@ -3319,132 +3345,6 @@ class BM10ex(hotfixedBMK):
                 + self.sINT2LP(pt) * sin(2.*pt.phi)
                 + self.sINT3LP(pt) * sin(3.*pt.phi)
                 )
-
-    #### OBSERVABLES
-           
-    def XLP(self, pt, **kwargs):
-        """ Calculate longitudinally polarized target part of XS. 
-        
-        """
-        pt.in2polarizationvector = 'L'
-        pt.in2polarization = 1
-        pol = kwargs.copy()
-        pol.update({'flip':'in2polarization'})
-        o =  self.XS(pt, **kwargs)
-        f =  self.XS(pt, **pol)
-        return (o-f)/2.
-
-    def XLPold(self, pt, **kwargs):
-        """ Calculate 4-fold differential cross section for polarized target. 
-
-        FIXME: Is this 'phi' bussiness below ugly?
-        FIXME: Code should be merged with Xunp above taking into account
-               pt.in2polarization
-        
-        """
-        if kwargs.has_key('vars'):
-            ptvars = Data.DummyPoint(init=kwargs['vars'])
-            kin = utils.fill_kinematics(ptvars, old=pt)
-            BMK.prepare(kin)
-        else:
-            # just copy everything from pt
-            ptempty = Data.DummyPoint()
-            kin = utils.fill_kinematics(ptempty, old=pt)
-            BMK.prepare(kin)
-            ## Nothing seems to be gained by following approach:
-            #kin = dict((i, getattr(pt, i)) for i in 
-            #        ['xB', 'Q2', 'W', 's', 't', 'mt', 'phi', 'in1charge',
-            #            'in1polarization', 'in2particle'])
-
-        # copy non-kinematical info
-        for atr in ['in1charge', 'in1polarization', 'in2polarization']:
-            if pt.has_key(atr):
-                setattr(kin, atr, getattr(pt, atr))
-
-        if kwargs.has_key('zeropolarized') and kwargs['zeropolarized']:
-            kin.in1polarization = 0
-
-        if kwargs.has_key('flip') and kwargs['flip']:
-            if isinstance(kwargs['flip'], list):
-                for item in kwargs['flip']:
-                    setattr(kin, item, - getattr(pt, item))
-            else:
-                setattr(kin, kwargs['flip'], - getattr(pt, kwargs['flip']))
-
-        if kwargs.has_key('weighted') and kwargs['weighted']:
-            wgh = self.w(kin)
-        else:
-            wgh = 1
-
-        # Gepard needs resetting
-        if self.model.__dict__.has_key('g'): self.m.g.newcall = 1
-
-        #print 'BH2 = ' + str(self.PreFacSigma(kin) *self.TBH2LP(kin))
-        #print 'DVCS2 = ' + str(self.PreFacSigma(kin) *self.TDVCS2LP(kin))
-        #print 'INT = ' + str(self.PreFacSigma(kin) *self.TINTLP(kin))
-        return wgh * self.PreFacSigma(kin) * ( self.TBH2LP(kin) 
-                + self.TINTLP(kin) 
-                + self.TDVCS2LP(kin) )
-
-    def _TSA(self, pt, **kwargs):
-        """Calculate target spin asymmetry (TSA)."""
-
-        kwargs.update({'zeropolarized':True})
-        return self.XLP(pt, **kwargs) / self.Xunp(pt, **kwargs)
-
-    def TSA(self, pt, **kwargs):
-        """Calculate target spin asymmetry or its harmonics."""
-        if pt.has_key('phi'):
-            return self._TSA(pt, **kwargs)
-        elif pt.has_key('FTn'):
-            if pt.FTn < 0:
-                res = quadrature.Hquadrature(lambda phi: 
-                        self._TSA(pt, vars={'phi':phi}) * sin(-pt.FTn*phi), 0, 2*pi)
-            elif pt.FTn > 0:
-                res = quadrature.Hquadrature(lambda phi: 
-                        self._TSA(pt, vars={'phi':phi}) * cos(pt.FTn*phi), 0, 2*pi)
-            elif pt.FTn == 0:
-                res = quadrature.Hquadrature(lambda phi: 
-                        self._TSA(pt, vars={'phi':phi}), 0, 2*pi)/2.
-            else:
-                raise ValeError('This should never happen!')
-            return  res / pi
-        else:
-            raise ValueError('[%s] has neither azimuthal angle phi\
- nor harmonic FTn defined!' % pt)
-            
-    def _BTSA(self, pt, **kwargs):
-        """Calculate beam-target spin asymmetry (BTSA)."""
-
-        R = kwargs.copy()
-        R.update({'flip':'in1polarization'})
-        return (
-           self.XLP(pt, **kwargs) 
-             - self.XLP(pt, **R) )/(
-           self.Xunp(pt, **kwargs )
-             + self.Xunp(pt, **R) )
-
-    def BTSA(self, pt, **kwargs):
-        """Calculate beam-target spin asymmetry or its harmonics."""
-        if pt.has_key('phi'):
-            return self._BTSA(pt, **kwargs)
-        elif pt.has_key('FTn'):
-            if pt.FTn < 0:
-                res = quadrature.Hquadrature(lambda phi: 
-                        self._BTSA(pt, vars={'phi':phi}) * sin(-pt.FTn*phi), 0, 2*pi)
-            elif pt.FTn > 0:
-                res = quadrature.Hquadrature(lambda phi: 
-                        self._BTSA(pt, vars={'phi':phi}) * cos(pt.FTn*phi), 0, 2*pi)
-            elif pt.FTn == 0:
-                res = quadrature.Hquadrature(lambda phi: 
-                        self._BTSA(pt, vars={'phi':phi}), 0, 2*pi)/2.
-            else:
-                raise ValeError('This should never happen!')
-            return  res / pi
-        else:
-            raise ValueError('[%s] has neither azimuthal angle phi\
- nor harmonic FTn defined!' % pt)
-
 
 class BM10(BM10ex):
     """According to BM arXiv:1005.5209 [hep-ph]

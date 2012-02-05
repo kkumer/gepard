@@ -1,5 +1,5 @@
 
-import copy
+import copy, sys
 from nose.tools import *
 import numpy as np
 
@@ -46,7 +46,6 @@ pttrans = copy.deepcopy(ptt)
 pttrans.phi = 0.5
 pttrans.in2polarizationvector = 'T'
 pttrans.varFTn = 1
-pttrans.varphi = -np.pi/2  # remove after initial check
 
 def test_CFF():
     """Calculate CFF H."""
@@ -138,10 +137,10 @@ def test_TSA():
     assert_almost_equal(tBM10.TSA(ptt), -0.47969623208934847)
 
 def test_BTSA():
-    """Calculate longitudinal TSA in BM10 Approach."""
+    """Calculate longitudinal BTSA in BM10 Approach."""
     assert_almost_equal(tBM10.BTSA(ptb), 0.25592806446362842)
 
 def test_TTSA():
     """Calculate transversal TSA in BMK Approach."""
-    assert_almost_equal(t.TSA(pttrans), 0.079971683621000239)
+    assert_almost_equal(t.TSA(pttrans), 0.080468284490077271)
 
