@@ -26,12 +26,27 @@ topt = Approach.BM10(mopt, optimization = False)
 pt0 = copy.deepcopy(data[31][12])  # was data[1][0]
 pt0.in1polarization = 1
 pt0.in1charge = -1
+pt0.FTn = -1
+pt0.prepare(Approach.hotfixedBMK)
 
 # testing data point for BM10
 pt1 = copy.deepcopy(data[33][-1])
 pt1.in2polarization = 1
 pt1.phi = 2.*np.pi/5.
 pt1.prepare(Approach.BM10)
+
+# testing data points for BM10 and long. TSA and BTSA
+ptt = copy.deepcopy(data[52][6])
+ptt.prepare(Approach.BM10)
+ptb = copy.deepcopy(data[53][3])
+ptb.prepare(Approach.BM10)
+
+# testing data point for transversal TSA in BMK
+pttrans = copy.deepcopy(ptt)
+pttrans.phi = 0.5
+pttrans.in2polarizationvector = 'T'
+pttrans.varFTn = 1
+pttrans.varphi = -np.pi/2  # remove after initial check
 
 def test_CFF():
     """Calculate CFF H."""
@@ -112,4 +127,21 @@ def test_XTP():
     assert_almost_equal(t.PreFacSigma(pt1)*t.TDVCS2TP(pt1), -0.0021305191589529025)
     assert_almost_equal(t.PreFacSigma(pt1)*t.TINTTP(pt1), -0.0098483713204748375)
     assert_almost_equal(t.XTP(pt1), -0.009812685692185092)
+
+def test_BSA():
+    """Calculate BSA in BMK Approach."""
+    assert_almost_equal(t.BSA(pt0), 0.1845304070958366)
+    assert_almost_equal(t.ALUI(pt0), 0.1819945876282851)
+
+def test_TSA():
+    """Calculate longitudinal TSA in BM10 Approach."""
+    assert_almost_equal(tBM10.TSA(ptt), -0.47969623208934847)
+
+def test_BTSA():
+    """Calculate longitudinal TSA in BM10 Approach."""
+    assert_almost_equal(tBM10.BTSA(ptb), 0.25592806446362842)
+
+def test_TTSA():
+    """Calculate transversal TSA in BMK Approach."""
+    assert_almost_equal(t.TSA(pttrans), 0.079971683621000239)
 
