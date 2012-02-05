@@ -1,6 +1,6 @@
 from IPython.Debugger import Tracer; debug_here = Tracer()
 
-import copy, sys
+import copy
 
 from numpy import sin, cos, pi, sqrt, array, linspace, ndarray
 from scipy.special import gammainc
@@ -739,9 +739,7 @@ class BMK(Approach):
         return res
            
     def XLP(self, pt, **kwargs):
-        """ Calculate 4-fold differential cross section for transversely polarized target. 
-        
-        """
+        """ Differential cross section - part for transversely polarized target."""
         pt.in2polarizationvector = 'L'
         pt.in2polarization = 1
         pol = kwargs.copy()
@@ -751,9 +749,7 @@ class BMK(Approach):
         return (o-f)/2.
 
     def XTP(self, pt, **kwargs):
-        """ Calculate 4-fold differential cross section for transversely polarized target. 
-        
-        """
+        """Differential cross section - part for transversely polarized target."""
         pt.in2polarizationvector = 'T'
         pt.in2polarization = 1
         pol = kwargs.copy()
@@ -826,6 +822,7 @@ class BMK(Approach):
 
 
 ## General assymetries
+## TODO: Lot of code duplication here - this should be united in one clever function
 
     def _phiharmonic(self, fun, pt, **kwargs):
         """Return fun evaluated for phi=pt.phi, or harmonic of fun
@@ -837,15 +834,15 @@ class BMK(Approach):
         elif pt.has_key('FTn'):
             if pt.FTn < 0:
                 res = quadrature.Hquadrature(lambda phi: 
-                        fun(pt, vars={'phi':phi}) * sin(-pt.FTn*phi), 0, 2*pi)
+                        fun(pt, vars={'phi':phi}, **kwargs) * sin(-pt.FTn*phi), 0, 2*pi)
             elif pt.FTn > 0:
                 res = quadrature.Hquadrature(lambda phi: 
-                        fun(pt, vars={'phi':phi}) * cos(pt.FTn*phi), 0, 2*pi)
+                        fun(pt, vars={'phi':phi}, **kwargs) * cos(pt.FTn*phi), 0, 2*pi)
             elif pt.FTn == 0:
                 res = quadrature.Hquadrature(lambda phi: 
-                        fun(pt, vars={'phi':phi}), 0, 2*pi)/2.
+                        fun(pt, vars={'phi':phi}, **kwargs), 0, 2*pi)/2.
             else:
-                raise ValeError('This should never happen!')
+                raise ValueError('FTn = % is weird!' % str(pt.FTn))
             return  res / pi
         else:
             raise ValueError('[%s] has neither azimuthal angle phi nor harmonic FTn defined!' % pt)
@@ -969,9 +966,28 @@ class BMK(Approach):
         b =  self.XS(pt, **both)
         return ((o-p) - (c-b)) / ((o+p) + (c+b))
 
-    def AUTI(self, pt):
+    def AUTI(self, pt, **kwargs):
         """Calculate TTSA as defined by HERMES 0802.2499 Eq. (15) or its phi-harmonics."""
         return self._phiharmonic(self._AUTI, pt, **kwargs)
+
+    def _AUTDVCS(self, pt, **kwargs):
+        """Calculate TTSA as defined by HERMES 0802.2499 Eq. (14) """
+
+        pol = kwargs.copy()
+        pol.update({'flip':'in2polarization'})
+        chg = kwargs.copy()
+        chg.update({'flip':'in1charge'})
+        both = kwargs.copy()
+        both.update({'flip':['in2polarization', 'in1charge']})
+        o =  self.XS(pt, **kwargs)
+        p =  self.XS(pt, **pol)
+        c =  self.XS(pt, **chg)
+        b =  self.XS(pt, **both)
+        return ((o-p) + (c-b)) / ((o+p) + (c+b))
+
+    def AUTDVCS(self, pt, **kwargs):
+        """Calculate TTSA as defined by HERMES 0802.2499 Eq. (15) or its phi-harmonics."""
+        return self._phiharmonic(self._AUTDVCS, pt, **kwargs)
 
     def _BSA(self, pt, **kwargs):
         """Calculate beam spin asymmetry (BSA)."""
@@ -1011,28 +1027,14 @@ class BMK(Approach):
         # return  self.TINTunp(pt, phi, 0, 1) / ( 
         #               self.TBH2unp(pt, phi) + self.TDVCS2unp(pt, phi) )
 
-    def BCA(self, pt):
+    def BCA(self, pt, **kwargs):
         """Calculate beam charge asymmetry (BCA) or its harmonics."""
-        if pt.has_key('phi'):
-            return self._BCA(pt)
-        elif pt.has_key('FTn') and pt.FTn == 0:
-            res = quadrature.Hquadrature(lambda phi: 
-                    self._BCA(pt, vars={'phi':phi}), 0, 2.0*pi)
-            return res / (2.0*pi)
-        elif pt.has_key('FTn') and pt.FTn == 1:
-            res = quadrature.Hquadrature(lambda phi: 
-                    self._BCA(pt, vars={'phi':phi}) * cos(phi), 0, 2*pi)
-            return  - res / pi
-        elif pt.has_key('FTn') and pt.FTn == 2:
-            res = quadrature.Hquadrature(lambda phi: 
-                    self._BCA(pt, vars={'phi':phi}) * cos(2.*phi), 0, 2*pi)
-            return  res / pi
-        elif pt.has_key('FTn') and pt.FTn == 3:
-            res = quadrature.Hquadrature(lambda phi: 
-                    self._BCA(pt, vars={'phi':phi}) * cos(3.*phi), 0, 2*pi)
-            return  - res / pi
-        else:
-            raise ValueError('[%s] has neither azimuthal angle phi nor harmonic FTn defined!' % pt)
+        res = self._phiharmonic(self._BCA, pt, **kwargs)
+        # FIXME: the following has to be dealt with during 
+        # conventions translation, and not here?
+        if pt.has_key('FTn') and (pt.FTn == 1 or pt.FTn == 3):
+            res = -res
+        return  res
 
     def BCSD(self, pt, **kwargs):
         """4-fold beam charge-spin cross section difference measured by COMPASS """
@@ -1071,80 +1073,18 @@ class BMK(Approach):
         elif pt.FTn == 1:
             return self.ReCCALINTunp(pt)
 
-    def BSDw(self, pt):
-        """Weighted BSD harmonics.
-
-        """
-        if pt.FTn == -1:
-            return quadrature.Hquadrature(lambda phi: self.BSD(pt, vars={'phi':phi},
-                weighted=True) * sin(phi), 0, 2.0*pi) / pi
-        elif pt.FTn == -2:
-            return quadrature.Hquadrature(lambda phi: self.BSS(pt, vars={'phi':phi},
-                weighted=True) * sin(2.*phi), 0, 2.0*pi) / pi
-
     def BSDw(self, pt, **kwargs):
         """Calculate weighted beam spin difference (BSD) or its harmonics."""
-        if pt.has_key('phi'):
-            kwargs[weighted] = True
-            #return self.BSD(pt, **kwargs)
-            raise ValueError('Untested!')
-        elif pt.has_key('FTn'):
-            if pt.FTn < 0:
-                res = quadrature.Hquadrature(lambda phi: self.BSD(pt, vars={'phi':phi},
-                weighted=True) * sin(-pt.FTn*phi), 0, 2.0*pi)
-            elif pt.FTn > 0:
-                res = quadrature.Hquadrature(lambda phi: self.BSD(pt, vars={'phi':phi},
-                weighted=True) * cos(pt.FTn*phi), 0, 2.0*pi)
-            elif pt.FTn == 0:
-                res = quadrature.Hquadrature(lambda phi: self.BSD(pt, vars={'phi':phi},
-                weighted=True), 0, 2.0*pi) / 2.0
-            else:
-                raise ValueError('This should never happen!')
-            return  res / pi
-        else:
-            raise ValueError('[%s] has neither azimuthal angle phi\
- nor harmonic FTn defined!' % pt)
+        kwargs['weighted'] = True
+        return self._phiharmonic(self.BSD, pt, **kwargs)
 
     def BSSw(self, pt, **kwargs):
         """Calculate weighted beam spin sum (BSS) or its harmonics."""
-        if pt.has_key('phi'):
-            kwargs[weighted] = True
-            #return self.BSS(pt, **kwargs)
-            raise ValueError('Untested!')
-        elif pt.has_key('FTn'):
-            if pt.FTn < 0:
-                res = quadrature.Hquadrature(lambda phi: self.BSS(pt, vars={'phi':phi},
-                weighted=True) * sin(-pt.FTn*phi), 0, 2.0*pi)
-            elif pt.FTn > 0:
-                res = quadrature.Hquadrature(lambda phi: self.BSS(pt, vars={'phi':phi},
-                weighted=True) * cos(pt.FTn*phi), 0, 2.0*pi)
-            elif pt.FTn == 0:
-                res = quadrature.Hquadrature(lambda phi: self.BSS(pt, vars={'phi':phi},
-                weighted=True), 0, 2.0*pi) / 2.0
-            else:
-                raise ValueError('This should never happen!')
-            return  res / pi
-        else:
-            raise ValueError('[%s] has neither azimuthal angle phi\
- nor harmonic FTn defined!' % pt)
-
-    def BSSwOLD(self, pt):
-        """Weighted BSS harmonics.
-
-        """
-        if pt.FTn == 0:
-            return quadrature.Hquadrature(lambda phi: self.BSS(pt, vars={'phi':phi}, 
-                weighted=True), 0, 2.0*pi) / (2.0*pi)
-        elif pt.FTn == 1:
-            return quadrature.Hquadrature(lambda phi: self.BSS(pt, vars={'phi':phi},
-                weighted=True) * cos(phi), 0, 2.0*pi) / pi
-        elif pt.FTn == 2:
-            return quadrature.Hquadrature(lambda phi: self.BSS(pt, vars={'phi':phi},
-                weighted=True) * cos(2.*phi), 0, 2.0*pi) / pi
+        kwargs['weighted'] = True
+        return self._phiharmonic(self.BSS, pt, **kwargs)
 
     def XwA(self, pt):
         """Ratio of first two cos harmonics of w-weighted cross section. In BMK, not Trento??"""
-
         b0 = quadrature.Hquadrature(lambda phi: self.BSS(pt, vars={'phi':phi}, weighted=True), 
                 0, 2.0*pi) / (2.0*pi)
         b1 = quadrature.Hquadrature(lambda phi: self.BSS(pt, vars={'phi':phi}, weighted=True) * cos(phi), 

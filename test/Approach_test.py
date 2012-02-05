@@ -4,7 +4,7 @@ from nose.tools import *
 import numpy as np
 
 import utils, Model, Approach
-from results import DMGLO1, DMepsGLO1  #use some testpars here?
+from results import DMGLO1, DMepsGLO1, DM12  #use some testpars here?
 
 data = utils.loaddata('data/ep2epgamma', approach=Approach.hotfixedBMK)  
 
@@ -21,6 +21,12 @@ mopt = Model.ModelDR(optimization = True)
 mopt.parameters.update(DMepsGLO1)
 mopt.ndparameters = np.array([mopt.parameters[name] for name in mopt.parameter_names]+[0.,0.])
 topt = Approach.BM10(mopt, optimization = False)
+
+# Gepard model
+mGepard = Model.Gepard(ansatz='EFLEXP')
+th = Approach.BMK(mGepard)
+mGepard.parameters.update(DM12)
+
 
 # testing data point for hotfixedBMK
 pt0 = copy.deepcopy(data[31][12])  # was data[1][0]
@@ -46,6 +52,11 @@ pttrans = copy.deepcopy(ptt)
 pttrans.phi = 0.5
 pttrans.in2polarizationvector = 'T'
 pttrans.varFTn = 1
+
+# testing data point for wBSS
+ptw = data[56][0]
+# testing data point for wBSD
+ptwd = data[55][0]
 
 def test_CFF():
     """Calculate CFF H."""
@@ -143,4 +154,22 @@ def test_BTSA():
 def test_TTSA():
     """Calculate transversal TSA in BMK Approach."""
     assert_almost_equal(t.TSA(pttrans), 0.080468284490077271)
+
+def test_BSSw():
+    """Calculate weighted BSS"""
+    assert_almost_equal(t.BSSw(ptw), 0.056334042569159554)
+
+def test_BSDw():
+    """Calculate weighted BSD"""
+    assert_almost_equal(t.BSDw(ptwd)*1e3, 8.91853141911449)
+
+def test_AUTI():
+    """Calculate transversal TSA - INT part - in BMK Approach."""
+    assert_almost_equal(t.AUTI(pttrans), 0.075300023640416394)
+
+def test_AUTDVCS():
+    """Calculate transversal TSA - DVCS part - in BMK Approach."""
+    pttrans.varFTn = -1
+    assert_almost_equal(th.AUTDVCS(pttrans)*1e3, 1.5171462298928092)
+
 
