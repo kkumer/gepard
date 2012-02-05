@@ -242,3 +242,6 @@ def der(th, pars, pts, f=False,  h=0.05):
 ptc = ptcol(th)
 ptc.bx = 0.1
 ptc.by = 0.1
+
+pti = data[66][13]
+ptd = data[65][0]

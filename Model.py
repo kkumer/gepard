@@ -1079,6 +1079,7 @@ class ComptonGepard(ComptonFormFactors):
     def gpdHzeroQ(self, pt, ts=None):
         """GPD H^sea on xi=0 trajectory.
         FIXME: After this, calling self.ImH is broken!!
+        FIXME: LOT of code duplication here!!
         """
         memsub = {'SECS': self.parameters['SECS'],    'SECG': self.parameters['SECG'], 
                 'ESECS' : self.parameters['ESECS'], 'ESECG' : self.parameters['ESECG'],

@@ -648,13 +648,11 @@ class BMK(Approach):
 
 ## Cross-sections
 
-    def Xunp(self, pt, **kwargs):
-        """ Calculate 4-fold differential cross section for unpolarized target. 
-
-        lam is lepton polarization \lambda .
-        FIXME: Is this 'phi' bussiness below ugly?
+    def XS(self, pt, **kwargs):
+        """Differential e p --> e p gamma cross section. 
         
         """
+        # Overriding pt kinematics with those from kwargs
         if kwargs.has_key('vars'):
             ptvars = Data.DummyPoint(init=kwargs['vars'])
             kin = utils.fill_kinematics(ptvars, old=pt)
@@ -669,14 +667,16 @@ class BMK(Approach):
             #        ['xB', 'Q2', 'W', 's', 't', 'mt', 'phi', 'in1charge',
             #            'in1polarization', 'in2particle'])
 
-        # copy non-kinematical info
+        # Copy non-kinematical info
         for atr in ['in1charge', 'in1polarization', 'in2polarization']:
             if pt.has_key(atr):
                 setattr(kin, atr, getattr(pt, atr))
 
+        # For efficient calculation of XS with unpolarized beam
         if kwargs.has_key('zeropolarized') and kwargs['zeropolarized']:
             kin.in1polarization = 0
 
+        # Flipping spins and/or charges for asymmetries
         if kwargs.has_key('flip') and kwargs['flip']:
             if isinstance(kwargs['flip'], list):
                 for item in kwargs['flip']:
@@ -684,67 +684,58 @@ class BMK(Approach):
             else:
                 setattr(kin, kwargs['flip'], - getattr(pt, kwargs['flip']))
 
+        # Weighting the integrand by BH propagators
         if kwargs.has_key('weighted') and kwargs['weighted']:
             wgh = self.w(kin)
         else:
             wgh = 1
 
-        # Gepard needs resetting
+        # Gepard may need resetting
         if self.model.__dict__.has_key('g'): self.m.g.newcall = 1
 
-        return wgh * self.PreFacSigma(kin) * ( self.TBH2unp(kin) 
-                + self.TINTunp(kin) 
-                + self.TDVCS2unp(kin) )
+        # Finally, we build up the cross-section
+        # 1. unpolarized part
+        aux = self.TBH2unp(kin) + self.TINTunp(kin) + self.TDVCS2unp(kin)
+        if hasattr(pt, 'in2polarizationvector'):
+            # 2. longitudinal target part
+            if pt.in2polarizationvector == 'L':
+                aux += kin.in2polarization*(
+                        self.TBH2LP(kin) + self.TINTLP(kin) + self.TDVCS2LP(kin))
+            elif pt.in2polarizationvector == 'T':
+            # 3. transversal target part
+                aux += kin.in2polarization*(
+                        self.TBH2TP(kin) + self.TINTTP(kin) + self.TDVCS2TP(kin))
+            else:
+                raise ValueError('in2polarizationvector must be either L or T!')
+        return wgh * self.PreFacSigma(kin) * aux
+
+
+    def Xunp(self, pt, **kwargs):
+        """ Calculate 4-fold differential cross section for unpolarized target. 
+        
+        """
+        # set target polarization to zero, but first write it down
+        mem = pt.__dict__.pop('in2polarization', None)
+        pt.in2polarization = 0
+        res = self.XS(pt, **kwargs)
+        # restore old value
+        if mem: pt.in2polarization = mem
+        return res
            
     def XTP(self, pt, **kwargs):
         """ Calculate 4-fold differential cross section for transversely polarized target. 
-
-        FIXME: Code should be merged with Xunp above (and XLP below)
         
         """
-        if kwargs.has_key('vars'):
-            ptvars = Data.DummyPoint(init=kwargs['vars'])
-            kin = utils.fill_kinematics(ptvars, old=pt)
-            BMK.prepare(kin)
-        else:
-            # just copy everything from pt
-            ptempty = Data.DummyPoint()
-            kin = utils.fill_kinematics(ptempty, old=pt)
-            BMK.prepare(kin)
-            ## Nothing seems to be gained by following approach:
-            #kin = dict((i, getattr(pt, i)) for i in 
-            #        ['xB', 'Q2', 'W', 's', 't', 'mt', 'phi', 'in1charge',
-            #            'in1polarization', 'in2particle'])
+        pt.in2polarizationvector = 'T'
+        pt.in2polarization = 1
+        pol = kwargs.copy()
+        pol.update({'flip':'in2polarization'})
+        o =  self.XS(pt, **kwargs)
+        f =  self.XS(pt, **pol)
+        return (o-f)/2.
 
-        # copy non-kinematical info
-        for atr in ['in1charge', 'in1polarization', 'in2polarization']:
-            if pt.has_key(atr):
-                setattr(kin, atr, getattr(pt, atr))
-
-        if kwargs.has_key('zeropolarized') and kwargs['zeropolarized']:
-            kin.in1polarization = 0
-
-        if kwargs.has_key('flip') and kwargs['flip']:
-            if isinstance(kwargs['flip'], list):
-                for item in kwargs['flip']:
-                    setattr(kin, item, - getattr(pt, item))
-            else:
-                setattr(kin, kwargs['flip'], - getattr(pt, kwargs['flip']))
-
-        if kwargs.has_key('weighted') and kwargs['weighted']:
-            wgh = self.w(kin)
-        else:
-            wgh = 1
-
-        # Gepard needs resetting
-        if self.model.__dict__.has_key('g'): self.m.g.newcall = 1
-
-        #print 'BH2_TP = ' + str(self.PreFacSigma(kin) *self.TBH2TP(kin))
-        #print 'DVCS2_TP = ' + str(self.PreFacSigma(kin) *self.TDVCS2TP(kin))
-        #print 'INT_TP = ' + str(self.PreFacSigma(kin) *self.TINTTP(kin))
-        return wgh * self.PreFacSigma(kin) * ( self.TBH2TP(kin) 
-                + self.TINTTP(kin) 
-                + self.TDVCS2TP(kin) )
+    def XLP(self, pt, **kwargs):
+        raise ValueError('X_LP is not implemented for BMK model! Use BM10.')
 
     def _XDVCStApprox(self, pt):
         """Partial DVCS cross section w.r.t. Mandelstam t.
@@ -887,9 +878,9 @@ class BMK(Approach):
                     self._ALUI(pt, vars={'phi':phi}) * sin(2.*phi), 0, 2*pi)
             return  res / pi
         else:
-            raise ValueError('[%s] has neither azimuthal angle phi\
- nor harmonic FTn defined!' % pt)
+            raise ValueError('[%s] has neither azimuthal angle phi nor harmonic FTn defined!' % pt)
             
+
 
     def _ALUDVCS(self, pt, **kwargs):
         """Calculate BSA as defined by HERMES 0909.3587 Eq. (2.3) """
@@ -921,8 +912,38 @@ class BMK(Approach):
                     self._ALUDVCS(pt, vars={'phi':phi}) * sin(2.*phi), 0, 2*pi)
             return  res / pi
         else:
-            raise ValueError('[%s] has neither azimuthal angle phi\
- nor harmonic FTn defined!' % pt)
+            raise ValueError('[%s] has neither azimuthal angle phi nor harmonic FTn defined!' % pt)
+
+    def _AUTI(self, pt, **kwargs):
+        """Calculate TTSA as defined by HERMES 0802.2499 Eq. (15) """
+
+        pol = kwargs.copy()
+        pol.update({'flip':'in2polarization'})
+        chg = kwargs.copy()
+        chg.update({'flip':'in1charge'})
+        both = kwargs.copy()
+        both.update({'flip':['in2polarization', 'in1charge']})
+        o =  self.Xunp(pt, **kwargs)
+        p =  self.Xunp(pt, **pol)
+        c =  self.Xunp(pt, **chg)
+        b =  self.Xunp(pt, **both)
+        return ((o-p) - (c-b)) / ((o+p) + (c+b))
+
+    def AUTI(self, pt):
+        """Calculate TTSA as defined by HERMES 0802.2499 Eq. (15) or its phi-harmonics."""
+
+        if pt.has_key('phi'):
+            return self._ALUI(pt)
+        elif pt.has_key('FTn') and pt.FTn == -1:
+            res = quadrature.Hquadrature(lambda phi: 
+                    self._ALUI(pt, vars={'phi':phi}) * sin(phi), 0, 2*pi)
+            return  res / pi
+        elif pt.has_key('FTn') and pt.FTn == -2:
+            res = quadrature.Hquadrature(lambda phi: 
+                    self._ALUI(pt, vars={'phi':phi}) * sin(2.*phi), 0, 2*pi)
+            return  res / pi
+        else:
+            raise ValueError('[%s] has neither azimuthal angle phi nor harmonic FTn defined!' % pt)
 
     def _BSA(self, pt, **kwargs):
         """Calculate beam spin asymmetry (BSA)."""
@@ -1203,7 +1224,7 @@ class BM10ex(hotfixedBMK):
                 xB*(1-2*xB)*t**2/Q2**2 )
         bracket3 = ( (xB**2*Mp2/t) * (1+t/Q2)**2 +
                 (1.-xB)*(1.+xB*t/Q2) )
-        return ( 8.*pt.in1polarization*pt.in2polarization*xB*(2.-y) *
+        return ( 8.*pt.in1polarization*xB*(2.-y) *
                 y*sqrt(1.+eps2)/(1.-t/(4.*Mp2)) * FM * (
                     0.5*bracket1*bracket2*FM +
                     (1.-(1.-xB)*t/Q2)*bracket3*FE ) )
@@ -1216,7 +1237,7 @@ class BM10ex(hotfixedBMK):
         bracket1 = t/(2.*Mp2) - xB*(1.-t/Q2)
         bracket2 = ( 1.+xB-(3.-2.*xB)*(1.+xB*t/Q2) - 
                 4.*xB**2*Mp2/t*(1.+t**2/Q2**2) )
-        return ( -8.*pt.in1polarization*pt.in2polarization*xB*y*pt.K * 
+        return ( -8.*pt.in1polarization*xB*y*pt.K * 
                 sqrt(1.+eps2)/(1.-t/(4.*Mp2)) * FM * (
                     bracket1 * (1.-xB+xB*t/Q2) * FM + bracket2 * FE ) )
 
@@ -1253,20 +1274,20 @@ class BM10ex(hotfixedBMK):
     def cDVCS0LP(self, pt):
         """ BM10 (2.20)"""
 
-        return 2.*pt.in1polarization*pt.in2polarization*pt.y*(
+        return 2.*pt.in1polarization*pt.y*(
                 2.-pt.y)/sqrt(1.+pt.eps2) * self.CCALDVCSLP(pt) 
 
     def cDVCS1LP(self, pt):
         """ BM10 (2.21)"""
 
-        PP = - 8.*pt.in2polarization*pt.K/(2.-pt.xB)/(1+pt.eps2)
+        PP = - 8.*pt.K/(2.-pt.xB)/(1+pt.eps2)
         return PP*(- pt.in1polarization * pt.y 
                 * sqrt(1.+pt.eps2)) * self.CCALDVCSLP(pt, im=0, leff=1)
 
     def sDVCS1LP(self, pt):
         """ BM10 (2.21)"""
 
-        PP = - 8.*pt.in2polarization*pt.K/(2.-pt.xB)/(1+pt.eps2)
+        PP = - 8.*pt.K/(2.-pt.xB)/(1+pt.eps2)
         return PP*(2.-pt.y) * self.CCALDVCSLP(pt, im=1, leff=1)
 
     def CCALDVCSunp(self, pt, im=0, leff=0, reff=0): 
@@ -1515,7 +1536,7 @@ class BM10ex(hotfixedBMK):
 
         
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
-        return ( (-pt.in2polarization)*((4*pt.in1polarization*y)/
+        return ( -((4*pt.in1polarization*y)/
       (1 + eps2)**(5/2.))*
      ((pt.tK2*(2 - y)**2*(-1 + sqrt(1 + eps2)))/pt.Q2 + 
       (1 - y - (y**2*eps2)/4)*((xB*t)/pt.Q2 - 
@@ -1531,7 +1552,7 @@ class BM10ex(hotfixedBMK):
 
         
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
-        return ( (-pt.in2polarization)*((4*pt.K*y*(2 - y)*pt.in1polarization)/
+        return ( -((4*pt.K*y*(2 - y)*pt.in1polarization)/
       (1 + eps2)**(5/2.))*(-1 + eps2 + sqrt(1 + eps2) - 
       (t*(-1 + eps2 + sqrt(1 + eps2) + 
          2*xB*(2 - sqrt(1 + eps2))))/pt.Q2)
@@ -1544,8 +1565,8 @@ class BM10ex(hotfixedBMK):
 
         
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
-        return ( (-pt.in2polarization)*
-     ((2*pt.in1polarization*y*(1 - y - (y**2*eps2)/4))/
+        return ( 
+     -((2*pt.in1polarization*y*(1 - y - (y**2*eps2)/4))/
       (1 + eps2)**(5/2.))*(eps2*(1 + sqrt(1 + eps2)) - 
       (t/pt.Q2)*((t*(2*xB + eps2)*
           (-1 + 2*xB + sqrt(1 + eps2)))/pt.Q2 + 
@@ -1569,7 +1590,7 @@ class BM10ex(hotfixedBMK):
 
         
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
-        return ( pt.in2polarization*
+        return ( 
      ((8*sqrt(2)*pt.K*(1 - xB)*y*sqrt(1 - y - (y**2*eps2)/4)*pt.in1polarization)/
       (1 + eps2)**2)*(t/pt.Q2)
     )
@@ -1581,8 +1602,8 @@ class BM10ex(hotfixedBMK):
 
         
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
-        return ( (-pt.in2polarization)*
-     ((8*sqrt(2)*(2 - y)*y*sqrt(1 - y - (y**2*eps2)/4)*pt.in1polarization)/
+        return ( 
+     -((8*sqrt(2)*(2 - y)*y*sqrt(1 - y - (y**2*eps2)/4)*pt.in1polarization)/
       (1 + eps2)**2)*(pt.tK2/pt.Q2)
     )
     
@@ -1593,8 +1614,8 @@ class BM10ex(hotfixedBMK):
 
         
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
-        return ( (-pt.in2polarization)*
-     ((8*sqrt(2)*pt.K*y*sqrt(1 - y - (y**2*eps2)/4)*pt.in1polarization)/
+        return ( 
+     -((8*sqrt(2)*pt.K*y*sqrt(1 - y - (y**2*eps2)/4)*pt.in1polarization)/
       (1 + eps2)**2)*(1 + (xB*t)/pt.Q2)
     )
     
@@ -1615,8 +1636,8 @@ class BM10ex(hotfixedBMK):
 
         
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
-        return ( (-((4*(1 + sqrt(1 + eps2))*y*pt.in1polarization*
-        pt.in2polarization)/(1 + eps2)**(5/2.)))*
+        return ( (-((4*(1 + sqrt(1 + eps2))*y*pt.in1polarization
+        )/(1 + eps2)**(5/2.)))*
      ((2 - y)**2*(pt.tK2/pt.Q2) + (1 - y - (y**2*eps2)/4)*
        ((xB*t)/pt.Q2 - (1/2.)*(1 - t/pt.Q2)*
          eps2)*(1 + ((sqrt(1 + eps2) - 1 + 2*xB)/
@@ -1630,7 +1651,7 @@ class BM10ex(hotfixedBMK):
 
         
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
-        return ( (-((8*pt.K*(2 - y)*y*pt.in1polarization*pt.in2polarization)/
+        return ( (-((8*pt.K*(2 - y)*y*pt.in1polarization)/
        (1 + eps2)**(5/2.)))*((1 + sqrt(1 + eps2) - 
        eps2)/2)*(1 - (1 - (2*xB*(2 + sqrt(1 + eps2)))/
          (1 - eps2 + sqrt(1 + eps2)))*(t/pt.Q2))
@@ -1643,8 +1664,8 @@ class BM10ex(hotfixedBMK):
 
         
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
-        return ( (-((4*(1 - y - (y**2*eps2)/4)*y*pt.in1polarization*
-        pt.in2polarization)/(1 + eps2)**(5/2.)))*
+        return ( (-((4*(1 - y - (y**2*eps2)/4)*y*pt.in1polarization
+        )/(1 + eps2)**(5/2.)))*
      ((xB*t)/pt.Q2 - (1 - t/pt.Q2)*
        (eps2/2.))*(1 - sqrt(1 + eps2) - 
       (1 + sqrt(1 + eps2) - 2*xB)*(t/pt.Q2))
@@ -1673,7 +1694,7 @@ class BM10ex(hotfixedBMK):
           4) - (1 - (t*(1 - 2*xB))/pt.Q2)*
         (1 - y - (y**2*eps2)/4)*(1 - sqrt(1 + eps2) - 
          (t*(1 - 2*xB + sqrt(1 + eps2)))/pt.Q2))*
-      pt.in1polarization*pt.in2polarization)/(pt.Q2*
+      pt.in1polarization)/(pt.Q2*
       (1 + eps2)**(5/2.))
     )
     
@@ -1685,7 +1706,7 @@ class BM10ex(hotfixedBMK):
         
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
         return ( (-16*pt.K*t*xB*(2 - y)*y*
-      (1 - (t*(1 - 2*xB))/pt.Q2)*pt.in1polarization*pt.in2polarization)/
+      (1 - (t*(1 - 2*xB))/pt.Q2)*pt.in1polarization)/
      (pt.Q2*(1 + eps2)**(5/2.))
     )
     
@@ -1700,7 +1721,7 @@ class BM10ex(hotfixedBMK):
     (-4*t*xB*y*(1 - (t*(1 - 2*xB))/pt.Q2)*
       (1 - y - (y**2*eps2)/4)*(1 + sqrt(1 + eps2) + 
        (t*(-1 + 2*xB + sqrt(1 + eps2)))/pt.Q2)*
-      pt.in1polarization*pt.in2polarization)/(pt.Q2*
+      pt.in1polarization)/(pt.Q2*
       (1 + eps2)**(5/2.))
     )
     
@@ -1722,7 +1743,7 @@ class BM10ex(hotfixedBMK):
         
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
         return ( (-8*sqrt(2)*pt.K*t*xB*y*(1 + t/pt.Q2)*
-      sqrt(1 - y - (y**2*eps2)/4)*pt.in1polarization*pt.in2polarization)/
+      sqrt(1 - y - (y**2*eps2)/4)*pt.in1polarization)/
      (pt.Q2*(1 + eps2)**2)
     )
     
@@ -1744,7 +1765,7 @@ class BM10ex(hotfixedBMK):
         
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
         return ( (8*sqrt(2)*pt.K*t*xB*y*(1 + t/pt.Q2)*
-      sqrt(1 - y - (y**2*eps2)/4)*pt.in1polarization*pt.in2polarization)/
+      sqrt(1 - y - (y**2*eps2)/4)*pt.in1polarization)/
      (pt.Q2*(1 + eps2)**2)
     )
     
@@ -1769,7 +1790,7 @@ class BM10ex(hotfixedBMK):
        ((1 - (t*(1 - 2*xB))/pt.Q2)*
          (1 - y - (y**2*eps2)/4)*(1 + sqrt(1 + eps2))*
          (1 + (t*(-1 + 2*xB + sqrt(1 + eps2)))/(pt.Q2*
-            (1 + sqrt(1 + eps2)))))/2)*pt.in1polarization*pt.in2polarization)/
+            (1 + sqrt(1 + eps2)))))/2)*pt.in1polarization)/
      (pt.Q2*(1 + eps2)**(5/2.))
     )
     
@@ -1781,7 +1802,7 @@ class BM10ex(hotfixedBMK):
         
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
         return ( (16*pt.K*t*xB*(2 - y)*y*
-      (1 - (t*(1 - 2*xB))/pt.Q2)*pt.in1polarization*pt.in2polarization)/
+      (1 - (t*(1 - 2*xB))/pt.Q2)*pt.in1polarization)/
      (pt.Q2*(1 + eps2)**(5/2.))
     )
     
@@ -1794,8 +1815,8 @@ class BM10ex(hotfixedBMK):
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
         return ( (4*t*xB*y*(1 - (t*(1 - 2*xB))/pt.Q2)*
       (1 - y - (y**2*eps2)/4)*(1 - sqrt(1 + eps2) - 
-       (t*(1 - 2*xB + sqrt(1 + eps2)))/pt.Q2)*pt.in1polarization*
-      pt.in2polarization)/(pt.Q2*(1 + eps2)**(5/2.))
+       (t*(1 - 2*xB + sqrt(1 + eps2)))/pt.Q2)*pt.in1polarization
+      )/(pt.Q2*(1 + eps2)**(5/2.))
     )
     
     CINT['LPA', (1, 1), (2)] = CINTLPA112
@@ -1822,7 +1843,7 @@ class BM10ex(hotfixedBMK):
         (1 + (t*(4*(1 - xB)*xB + eps2))/(pt.Q2*
            (4 - 2*xB + 3*eps2)))*(-1 + sqrt(1 + eps2) + 
          (t*(1 - 2*xB + sqrt(1 + eps2)))/pt.Q2))*
-      pt.in1polarization*pt.in2polarization)/(pt.Q2*
+      pt.in1polarization)/(pt.Q2*
       (1 + eps2)**(5/2.))
     )
     
@@ -1836,8 +1857,8 @@ class BM10ex(hotfixedBMK):
         return ( (-4*pt.K*t*(2 - y)*y*(5 - 4*xB + 3*eps2 - 
        sqrt(1 + eps2) - (t*(1 - eps2 - 
           sqrt(1 + eps2) + 2*xB*(-4 + 4*xB + 
-            sqrt(1 + eps2))))/pt.Q2)*pt.in1polarization*
-      pt.in2polarization)/(pt.Q2*(1 + eps2)**(5/2.))
+            sqrt(1 + eps2))))/pt.Q2)*pt.in1polarization
+      )/(pt.Q2*(1 + eps2)**(5/2.))
     )
     
     CINT['LPV', (-1, 1), (1)] = CINTLPV211
@@ -1851,7 +1872,7 @@ class BM10ex(hotfixedBMK):
       (4 - 2*xB + 3*eps2 + (t*(4*xB - 4*xB**2 + eps2))/
         pt.Q2)*(1 + sqrt(1 + eps2) + 
        (t*(-1 + 2*xB + sqrt(1 + eps2)))/pt.Q2)*
-      pt.in1polarization*pt.in2polarization)/(pt.Q2*
+      pt.in1polarization)/(pt.Q2*
       (1 + eps2)**(5/2.))
     )
     
@@ -1874,7 +1895,7 @@ class BM10ex(hotfixedBMK):
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
         return ( (-8*sqrt(2)*pt.K*t*y*
       (-xB + (t*(1 - 2*xB))/pt.Q2)*
-      sqrt(1 - y - (y**2*eps2)/4)*pt.in1polarization*pt.in2polarization)/
+      sqrt(1 - y - (y**2*eps2)/4)*pt.in1polarization)/
      (pt.Q2*(1 + eps2)**2)
     )
     
@@ -1886,7 +1907,7 @@ class BM10ex(hotfixedBMK):
         
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
         return ( (8*sqrt(2)*t*pt.tK2*(2 - y)*y*
-      sqrt(1 - y - (y**2*eps2)/4)*pt.in1polarization*pt.in2polarization)/
+      sqrt(1 - y - (y**2*eps2)/4)*pt.in1polarization)/
      (pt.Q2**2*(1 + eps2)**2)
     )
     
@@ -1898,7 +1919,7 @@ class BM10ex(hotfixedBMK):
         
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
         return ( (8*sqrt(2)*pt.K*t*(1 - xB)*y*
-      sqrt(1 - y - (y**2*eps2)/4)*pt.in1polarization*pt.in2polarization)/
+      sqrt(1 - y - (y**2*eps2)/4)*pt.in1polarization)/
      (pt.Q2*(1 + eps2)**2)
     )
     
@@ -1926,7 +1947,7 @@ class BM10ex(hotfixedBMK):
         (1 + (t*(4*(1 - xB)*xB + eps2))/(pt.Q2*
            (4 - 2*xB + 3*eps2)))*
         (1 + (t*(-1 + 2*xB + sqrt(1 + eps2)))/(pt.Q2*
-           (1 + sqrt(1 + eps2)))))*pt.in1polarization*pt.in2polarization)/
+           (1 + sqrt(1 + eps2)))))*pt.in1polarization)/
      (pt.Q2*(1 + eps2)**(5/2.))
     )
     
@@ -1942,7 +1963,7 @@ class BM10ex(hotfixedBMK):
       (1 - ((t - self.tmin(Q2, xB, eps2))*(1 + (1 - eps2)/sqrt(1 + eps2) - 
           2*xB*(1 + (4*(1 - xB))/sqrt(1 + eps2))))/
         (2*pt.Q2*(2*(1 - xB) + sqrt(1 + eps2))))*
-      pt.in1polarization*pt.in2polarization)/(pt.Q2*(1 + eps2)**2)
+      pt.in1polarization)/(pt.Q2*(1 + eps2)**2)
     )
     
     CINT['LPV', (1, 1), (1)] = CINTLPV111
@@ -1956,7 +1977,7 @@ class BM10ex(hotfixedBMK):
       (1 - y - (y**2*eps2)/4)*(1 + (t*(4*(1 - xB)*xB + eps2))/
         (pt.Q2*(4 - 2*xB + 3*eps2)))*
       (-1 + sqrt(1 + eps2) + (t*(1 - 2*xB + sqrt(1 + eps2)))/
-        pt.Q2)*pt.in1polarization*pt.in2polarization)/
+        pt.Q2)*pt.in1polarization)/
      (pt.Q2*(1 + eps2)**(5/2.))
     )
     
@@ -2500,7 +2521,7 @@ class BM10ex(hotfixedBMK):
 
         
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
-        return ( (-pt.in2polarization)*((4*K)/(1 + eps2)**3)*
+        return ( -((4*K)/(1 + eps2)**3)*
      ((-(2 - y)**2)*(-1 - 2*eps2 + sqrt(1 + eps2) + 
         (t*(-1 + 2*xB + sqrt(1 + eps2)))/pt.Q2) + 
       (1 - y - (y**2*eps2)/4)*(-2 - eps2 + 
@@ -2516,8 +2537,8 @@ class BM10ex(hotfixedBMK):
 
         
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
-        return ( (-pt.in2polarization)*
-     ((4*(2 - y)*(1 - y - (y**2*eps2)/4))/(1 + eps2)**3)*
+        return ( 
+     -((4*(2 - y)*(1 - y - (y**2*eps2)/4))/(1 + eps2)**3)*
      (eps2*(1 + sqrt(1 + eps2)) + 
       (t*(2 + 2*sqrt(1 + eps2) + eps2*
           sqrt(1 + eps2) + xB*(-3 + eps2 - 
@@ -2533,7 +2554,7 @@ class BM10ex(hotfixedBMK):
 
         
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
-        return ( pt.in2polarization*
+        return ( 
      ((4*pt.K*(1 - y - (y**2*eps2)/4))/(1 + eps2)**3)*
      (2 + eps2 + 2*sqrt(1 + eps2) + 
       (t*(eps2 + 2*xB*(1 + sqrt(1 + eps2))))/
@@ -2547,7 +2568,7 @@ class BM10ex(hotfixedBMK):
 
         
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
-        return ( pt.in2polarization*
+        return ( 
      ((8*sqrt(2)*sqrt(1 - y - (y**2*eps2)/4))/
       (1 + eps2)**(5/2.))*((pt.tK2*(2 - y)**2)/pt.Q2 + 
       (1 + t/pt.Q2)*(1 - y - (y**2*eps2)/4)*
@@ -2562,7 +2583,7 @@ class BM10ex(hotfixedBMK):
 
         
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
-        return ( pt.in2polarization*
+        return ( 
      ((8*sqrt(2)*pt.K*(2 - y)*sqrt(1 - y - (y**2*eps2)/4))/
       (1 + eps2)**(5/2.))*(1 + (xB*t)/pt.Q2)
     )
@@ -2585,11 +2606,11 @@ class BM10ex(hotfixedBMK):
         
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
         return ( 
-    ((8*pt.K*pt.in2polarization*(2 - 2*y + y**2 + (y**2*eps2)/2))/
+    ((8*pt.K*(2 - 2*y + y**2 + (y**2*eps2)/2))/
        (1 + eps2)**3)*((1 + sqrt(1 + eps2))/2)*
       (2*sqrt(1 + eps2) - 1 + (t/pt.Q2)*
         ((1 + sqrt(1 + eps2) - 2*xB)/(1 + sqrt(1 + eps2)))) + 
-     ((8*pt.K*pt.in2polarization*(1 - y - (y**2*eps2)/4))/
+     ((8*pt.K*(1 - y - (y**2*eps2)/4))/
        (1 + eps2)**3)*((3*eps2)/2 + 
        (1 - sqrt(1 + eps2) - eps2/2. - 
          xB*(3 - sqrt(1 + eps2)))*(t/pt.Q2))
@@ -2602,7 +2623,7 @@ class BM10ex(hotfixedBMK):
 
         
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
-        return ( ((-8*pt.in2polarization*(2 - y)*
+        return ( ((-8*(2 - y)*
        (1 - y - (y**2*eps2)/4))/(1 + eps2)**(5/2.))*
      ((2*pt.tK2)/(pt.Q2*sqrt(1 + eps2)) + 
       ((1 + sqrt(1 + eps2) - 2*xB)/2)*(1 + sqrt(1 + eps2) + 
@@ -2617,7 +2638,7 @@ class BM10ex(hotfixedBMK):
         
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
         return ( 
-    ((-8*pt.K*pt.in2polarization*(1 - y - (y**2*eps2)/4))/
+    ((-8*pt.K*(1 - y - (y**2*eps2)/4))/
       (1 + eps2)**3)*((1 + sqrt(1 + eps2) - 2*xB)/
       (2*(sqrt(1 + eps2) + 1)))*eps2*
      ((t - self.tmin(Q2, xB, eps2))/pt.Q2)
@@ -2632,12 +2653,12 @@ class BM10ex(hotfixedBMK):
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
         return ( (-8*pt.K*t*xB*(1 - y - (y**2*eps2)/4)*
        (3 - sqrt(1 + eps2) - (t*(3 - 6*xB + sqrt(1 + eps2)))/
-         pt.Q2)*pt.in2polarization)/(pt.Q2*
+         pt.Q2))/(pt.Q2*
        (1 + eps2)**3) - 
      (8*pt.K*t*xB*(2 - 2*y + y**2 + (y**2*eps2)/2)*
        (1 + sqrt(1 + eps2))*
        (1 + (t*(-1 + 2*xB + sqrt(1 + eps2)))/(pt.Q2*
-          (1 + sqrt(1 + eps2))))*pt.in2polarization)/
+          (1 + sqrt(1 + eps2)))))/
       (pt.Q2*(1 + eps2)**3)
     )
     
@@ -2652,7 +2673,7 @@ class BM10ex(hotfixedBMK):
       (1 + (4*pt.tK2)/pt.Q2 + sqrt(1 + eps2) - 
        (t*(2 - (t*(1 - 2*xB)*(1 - 2*xB - sqrt(1 + eps2)))/
            pt.Q2 - 2*xB*(2 + sqrt(1 + eps2))))/
-        pt.Q2)*pt.in2polarization)/(pt.Q2*
+        pt.Q2))/(pt.Q2*
       (1 + eps2)**3)
     )
     
@@ -2665,7 +2686,7 @@ class BM10ex(hotfixedBMK):
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
         return ( (-8*pt.K*t*xB*(1 - y - (y**2*eps2)/4)*
       (1 + sqrt(1 + eps2) - (t*(1 - 2*xB - sqrt(1 + eps2)))/
-        pt.Q2)*pt.in2polarization)/(pt.Q2*
+        pt.Q2))/(pt.Q2*
       (1 + eps2)**3)
     )
     
@@ -2678,7 +2699,7 @@ class BM10ex(hotfixedBMK):
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
         return ( (-16*sqrt(2)*t*xB*(1 + t/pt.Q2)*
       (1 - (t*(1 - 2*xB))/pt.Q2)*(1 - y - (y**2*eps2)/4)**
-       (3/2.)*pt.in2polarization)/(pt.Q2*(1 + eps2)**(5/2.))
+       (3/2.))/(pt.Q2*(1 + eps2)**(5/2.))
     )
     
     SINT['LPA', (0, 1), (1)] = SINTLPA011
@@ -2689,8 +2710,8 @@ class BM10ex(hotfixedBMK):
         
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
         return ( (-8*sqrt(2)*pt.K*t*xB*(2 - y)*
-      (1 + t/pt.Q2)*sqrt(1 - y - (y**2*eps2)/4)*
-      pt.in2polarization)/(pt.Q2*(1 + eps2)**(5/2.))
+      (1 + t/pt.Q2)*sqrt(1 - y - (y**2*eps2)/4)
+      )/(pt.Q2*(1 + eps2)**(5/2.))
     )
     
     SINT['LPA', (0, 1), (2)] = SINTLPA012
@@ -2698,10 +2719,8 @@ class BM10ex(hotfixedBMK):
     def SINTLPA013(self, pt):
         """Same as SINT["LPA", (0, 1), (3)] """
 
-        
-        xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
-        return ( 0
-    )
+        return 0
+    
     
     SINT['LPA', (0, 1), (3)] = SINTLPA013
 
@@ -2713,11 +2732,11 @@ class BM10ex(hotfixedBMK):
         return ( (8*pt.K*t*xB*(1 - y - (y**2*eps2)/4)*
        (3 + sqrt(1 + eps2))*
        (1 - (t*(3 - 6*xB - sqrt(1 + eps2)))/(pt.Q2*
-          (3 + sqrt(1 + eps2))))*pt.in2polarization)/
+          (3 + sqrt(1 + eps2)))))/
       (pt.Q2*(1 + eps2)**3) - 
      (8*pt.K*t*xB*(2 - 2*y + y**2 + (y**2*eps2)/2)*
        (-1 + sqrt(1 + eps2) + (t*(1 - 2*xB + sqrt(1 + eps2)))/
-         pt.Q2)*pt.in2polarization)/(pt.Q2*
+         pt.Q2))/(pt.Q2*
        (1 + eps2)**3)
     )
     
@@ -2731,8 +2750,8 @@ class BM10ex(hotfixedBMK):
         return ( (8*t*xB*(2 - y)*(1 - y - (y**2*eps2)/4)*
       ((2*pt.tK2)/pt.Q2 - 
        ((t - self.tmin(Q2, xB, eps2))*(1 - (t*(1 - 2*xB))/pt.Q2)*
-         (1 - 2*xB + sqrt(1 + eps2)))/(2*pt.Q2))*
-      pt.in2polarization)/(pt.Q2*(1 + eps2)**3)
+         (1 - 2*xB + sqrt(1 + eps2)))/(2*pt.Q2))
+      )/(pt.Q2*(1 + eps2)**3)
     )
     
     SINT['LPA', (1, 1), (2)] = SINTLPA112
@@ -2743,8 +2762,8 @@ class BM10ex(hotfixedBMK):
         
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
         return ( (-8*pt.K*t*(t - self.tmin(Q2, xB, eps2))*xB*
-      (1 - y - (y**2*eps2)/4)*(1 - 2*xB + sqrt(1 + eps2))*
-      pt.in2polarization)/(pt.Q2**2*(1 + eps2)**3)
+      (1 - y - (y**2*eps2)/4)*(1 - 2*xB + sqrt(1 + eps2))
+      )/(pt.Q2**2*(1 + eps2)**3)
     )
     
     SINT['LPA', (1, 1), (3)] = SINTLPA113
@@ -2762,7 +2781,7 @@ class BM10ex(hotfixedBMK):
         (8 + 5*eps2 + 2*xB*(-3 + sqrt(1 + eps2)) - 
          (t*(2 - eps2 + 2*sqrt(1 + eps2) - 
             4*xB*(3*(1 - xB) + sqrt(1 + eps2))))/sqrt(pt.Q2)**
-           2))*pt.in2polarization)/(pt.Q2*(1 + eps2)**3)
+           2)))/(pt.Q2*(1 + eps2)**3)
     )
     
     SINT['LPV', (-1, 1), (1)] = SINTLPV211
@@ -2777,7 +2796,7 @@ class BM10ex(hotfixedBMK):
          sqrt(1 + eps2)) + 2*sqrt(1 + eps2) - 
        xB*(1 + sqrt(1 + eps2)) + 
        (t*(eps2 + xB*(3 - 2*xB + sqrt(1 + eps2))))/
-        pt.Q2)*pt.in2polarization)/(pt.Q2*
+        pt.Q2))/(pt.Q2*
       (1 + eps2)**(5/2.))
     )
     
@@ -2790,7 +2809,7 @@ class BM10ex(hotfixedBMK):
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
         return ( (-16*pt.K*t*(1 - y - (y**2*eps2)/4)*
       (1 - xB + ((t - self.tmin(Q2, xB, eps2))*((1 - xB)*xB + eps2/4))/
-        (pt.Q2*sqrt(1 + eps2)))*pt.in2polarization)/
+        (pt.Q2*sqrt(1 + eps2))))/
      (pt.Q2*(1 + eps2)**(5/2.))
     )
     
@@ -2804,8 +2823,8 @@ class BM10ex(hotfixedBMK):
         return ( (-8*sqrt(2)*t*sqrt(1 - y - (y**2*eps2)/4)*
       ((pt.tK2*(2 - y)**2)/pt.Q2 + (1 + t/pt.Q2)*
         (1 - y - (y**2*eps2)/4)*(4 - 2*xB + 3*eps2 + 
-         (t*(4*xB - 4*xB**2 + eps2))/pt.Q2))*
-      pt.in2polarization)/(pt.Q2*(1 + eps2)**(5/2.))
+         (t*(4*xB - 4*xB**2 + eps2))/pt.Q2))
+      )/(pt.Q2*(1 + eps2)**(5/2.))
     )
     
     SINT['LPV', (0, 1), (1)] = SINTLPV011
@@ -2816,7 +2835,7 @@ class BM10ex(hotfixedBMK):
         
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
         return ( (-8*sqrt(2)*pt.K*t*(1 - xB)*(2 - y)*
-      sqrt(1 - y - (y**2*eps2)/4)*pt.in2polarization)/
+      sqrt(1 - y - (y**2*eps2)/4))/
      (pt.Q2*(1 + eps2)**(5/2.))
     )
     
@@ -2839,14 +2858,14 @@ class BM10ex(hotfixedBMK):
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
         return ( (8*pt.K*t*(2 - 2*y + y**2 + (y**2*eps2)/2)*
        (1 - ((t - self.tmin(Q2, xB, eps2))*(1 - 2*xB)*(1 - 2*xB + sqrt(1 + eps2)))/
-         (2*pt.Q2*(1 + eps2)))*pt.in2polarization)/
+         (2*pt.Q2*(1 + eps2))))/
       (pt.Q2*(1 + eps2)**2) + 
      (32*pt.K*t*(1 - y - (y**2*eps2)/4)*(1 + (5*eps2)/8 - 
         (xB*(3 + sqrt(1 + eps2)))/4)*
        (1 - (t*(1 - eps2/2. - sqrt(1 + eps2) - 
            2*xB*(3*(1 - xB) - sqrt(1 + eps2))))/(pt.Q2*
-          (4 + (5*eps2)/2 - xB*(3 + sqrt(1 + eps2)))))*
-       pt.in2polarization)/(pt.Q2*(1 + eps2)**3)
+          (4 + (5*eps2)/2 - xB*(3 + sqrt(1 + eps2)))))
+       )/(pt.Q2*(1 + eps2)**3)
     )
     
     SINT['LPV', (1, 1), (1)] = SINTLPV111
@@ -2859,8 +2878,8 @@ class BM10ex(hotfixedBMK):
         return ( (4*t*(2 - y)*(1 - y - (y**2*eps2)/4)*
       ((4*pt.tK2*(1 - 2*xB))/(pt.Q2*sqrt(1 + eps2)) - 
        ((t - self.tmin(Q2, xB, eps2))*(-2*xB**2 + eps2 + 
-          xB*(3 - sqrt(1 + eps2))))/pt.Q2)*
-      pt.in2polarization)/(pt.Q2*(1 + eps2)**(5/2.))
+          xB*(3 - sqrt(1 + eps2))))/pt.Q2)
+      )/(pt.Q2*(1 + eps2)**(5/2.))
     )
     
     SINT['LPV', (1, 1), (2)] = SINTLPV112
@@ -2871,7 +2890,7 @@ class BM10ex(hotfixedBMK):
         
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
         return ( (16*pt.K*t*(t - self.tmin(Q2, xB, eps2))*((1 - xB)*xB + eps2/4)*
-      (1 - y - (y**2*eps2)/4)*pt.in2polarization)/
+      (1 - y - (y**2*eps2)/4))/
      (pt.Q2**2*(1 + eps2)**3)
     )
     
@@ -3304,6 +3323,18 @@ class BM10ex(hotfixedBMK):
     #### OBSERVABLES
            
     def XLP(self, pt, **kwargs):
+        """ Calculate longitudinally polarized target part of XS. 
+        
+        """
+        pt.in2polarizationvector = 'L'
+        pt.in2polarization = 1
+        pol = kwargs.copy()
+        pol.update({'flip':'in2polarization'})
+        o =  self.XS(pt, **kwargs)
+        f =  self.XS(pt, **pol)
+        return (o-f)/2.
+
+    def XLPold(self, pt, **kwargs):
         """ Calculate 4-fold differential cross section for polarized target. 
 
         FIXME: Is this 'phi' bussiness below ugly?
