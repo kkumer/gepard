@@ -37,6 +37,7 @@ def test_fitNN():
     chisq = tNN.chisq(2*fitpoints)[0]
     assert_almost_equal(chisq, 22.754514666801569)
 
-#test_fitNN.long = 1
+# Actually this test was broken by Approach.observables consolidation
+test_fitNN.newfeature = 1
 
 db.close()

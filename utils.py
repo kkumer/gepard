@@ -35,7 +35,7 @@ def loaddata(datadir='data', approach=False):
     """Return dictionary {id : `DataSet`, ...}  out of datadir/*dat files.
     
     approach defines conventions for frame, kinematics etc. to which data
-    is adapted. By default it is hotfixedBMK (Belitsky, Mueller).
+    is adapted.
     
     """
     data = {}

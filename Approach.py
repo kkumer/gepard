@@ -92,6 +92,8 @@ class Approach(object):
         observable - string. Default is pt.yaxis. It is acceptable also
                      to pass CFF as observable, e.g., observable = 'ImH'
         parameters - dictionary which will temporarily update model's one
+        orig_conventions - give prediction using original conventions of
+                           the given DataPoint (e.g. for plotting)
 
         """
         m = self.model
@@ -142,7 +144,6 @@ class Approach(object):
                     for p2 in pars:
                         var += dfdp[p1]*m.covariance[p1,p2]*dfdp[p2]
                 var = tolerance2 * var
-                result = (fun(pt), sqrt(var))
             except KeyError:
                 # we have neural net
                 allnets = fun(pt)
@@ -171,6 +172,12 @@ class Approach(object):
             # restore old values
             self.model.parameters.update(old)
 
+        if kwargs.pop('orig_conventions', False):
+            # express result in conventions of original datapoint
+            try:
+                result = (self.orig_conventions(pt, result[0]),) + result[1:]
+            except IndexError:
+                result = self.orig_conventions(pt, result)
         return result
 
 
@@ -258,33 +265,47 @@ class BMK(Approach):
         return 2.*pi*pt.P1P2 / pt.intP1P2
 
     def to_conventions(pt):
-        """Transform stuff into Approach's conventions."""
-        ##  --- go to BMK conventions ----
-        # C1. azimutal angle phi should be in radians ...
-        if pt.has_key('phi'):
-            if pt.units['phi'][:3]== 'deg': # deg, degree, degrees -> radians
-                pt.phi = pt.phi * pi / 180.
-                pt.newunits['phi'] = 'rad'
-        # C2. ... and in BMK convention. `frame` attribute is
-        # obligatory for phi-dependent data.
-            if pt.frame == 'Trento':  # Trento -> BMK
+        """Transform stuff into BMK conventions."""
+        # C1. azimutal angle phi should be in radians.
+        if pt.has_key('phi') and pt.units['phi'][:3]=='deg':
+            pt.phi = pt.phi * pi / 180.
+            pt.newunits['phi'] = 'rad'
+        # C2. phi_{Trento} -> (pi - phi_{BKM})
+        if pt.has_key('frame') and pt.frame == 'Trento':
+            if pt.has_key('phi'):
                 pt.phi = pi - pt.phi
-                pt.newframe = 'BMK'
+            elif pt.has_key('FTn'):
+                if pt.FTn == 1 or pt.FTn == 3:
+                    pt.val = - pt.val
+            pt.newframe = 'BMK'
     to_conventions = staticmethod(to_conventions)
 
     def from_conventions(pt):
         """Transform stuff from Approach's conventions into original data's."""
         # This method is never used presently!!
-        # C1. azimutal angle phi should be in radians ...
-        if pt.has_key('phi'):
-            if pt.units['phi'][:3]== 'deg': # deg, degree, degrees -> radians
-                pt.phi = pt.phi * pi / 180.
-                pt.units['phi'] = 'rad'
-        # C2. ... and in BKM convention. `frame` attribute is
-        # obligatory for phi-dependent data.
-            if pt.frame == 'Trento':  # Trento -> BKM
+        # C1. azimutal angle phi back to degrees
+        if pt.has_key('phi') and pt.units['phi'][:3]=='deg':
+            pt.phi = pt.phi / pi * 180.
+        # C2. phi_{BKM} -> (pi - phi_{Trento})
+        if pt.has_key('frame') and pt.frame == 'Trento':
+            if pt.has_key('phi'):
                 pt.phi = pi - pt.phi
+            elif pt.has_key('FTn'):
+                if pt.FTn == 1 or pt.FTn == 3:
+                    pt.val = - pt.val
+            pt.newframe = 'BMK'
+        return pt
     from_conventions = staticmethod(from_conventions)
+
+    def orig_conventions(pt, val):
+        """Like from_conventions, but for the prediction val."""
+        # This doesn't touches pt
+        # C2. phi_{BKM} -> (pi - phi_{Trento})
+        if pt.has_key('frame') and pt.frame == 'Trento' and pt.has_key('FTn'):
+            if pt.FTn == 1 or pt.FTn == 3:
+                val = - val
+        return val
+    orig_conventions = staticmethod(orig_conventions)
 
     def prepare(pt):
         """Pre-calculate GPD-independent kinamatical constants and functions."""
@@ -647,7 +668,7 @@ class BMK(Approach):
 ## Placeholder for original BMK longitudinally polarized target formulas
 
     def TBH2LP(self, pt):
-        raise ValueError('X_TP not implemented for BMK model! Use BM10')
+        raise ValueError('X_LP not implemented for BMK model! Use BM10')
 
     def TDVCS2LP(self, pt):
         raise ValueError('X_TP not implemented for BMK model! Use BM10')
@@ -829,7 +850,8 @@ class BMK(Approach):
         corresponding to pt.FTn.
         
         """
-        if pt.has_key('phi'):
+        if pt.has_key('phi') or (kwargs.has_key('vars')
+                and kwargs['vars'].has_key('phi')):
             return fun(pt, **kwargs)
         elif pt.has_key('FTn'):
             if pt.FTn < 0:
@@ -1032,8 +1054,8 @@ class BMK(Approach):
         res = self._phiharmonic(self._BCA, pt, **kwargs)
         # FIXME: the following has to be dealt with during 
         # conventions translation, and not here?
-        if pt.has_key('FTn') and (pt.FTn == 1 or pt.FTn == 3):
-            res = -res
+        #if pt.has_key('FTn') and (pt.FTn == 1 or pt.FTn == 3):
+        #    res = -res
         return  res
 
     def BCSD(self, pt, **kwargs):
@@ -3494,3 +3516,11 @@ class BM10(BM10ex):
         else:
             return res.real
     
+# 
+# class Trento(BMK):
+#     """ This is just for data loading when one wants to stay in Trento frame
+#     Needed for plotting.
+# 
+#     """
+#     def to_conventions(pt):
+#         pass

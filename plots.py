@@ -23,8 +23,8 @@ from constants import toTeX, Mp2, Mp
 from results import *
 
 # load experimental data
-data = utils.loaddata('/home/kkumer/pype/data/ep2epgamma', approach=Approach.hotfixedBMK) 
-data.update(utils.loaddata('/home/kkumer/pype/data/gammastarp2gammap', approach=Approach.hotfixedBMK)) 
+data = utils.loaddata('/home/kkumer/pype/data/ep2epgamma', approach=Approach.BMK) 
+data.update(utils.loaddata('/home/kkumer/pype/data/gammastarp2gammap', approach=Approach.BMK)) 
 
 ###  subplots_adjust options and their meanings:
  # left  = 0.125  # the left side of the subplots of the figure
@@ -67,6 +67,7 @@ def _axpoints(ax, pts, xaxis, **kwargs):
     xaxis -- 'Q2', 't', 'xB', ...
 
     """
+    pts = [Approach.BMK.from_conventions(pt.copy()) for pt in pts]
     xvals = [getattr(pt, xaxis) for pt in pts]
     yvals = [pt.val for pt in pts]
     yerrs = [pt.err for pt in pts]
@@ -175,7 +176,7 @@ def panel(ax, points=None, lines=None, bands=None, xaxis=None, xs=None,
         linestyles = ['-', '--', '-.', ':']  # solid, dashed, dot-dashed, dotted
         linen = 0
         for line in lines:
-            _axline(ax, lambda pt: line.predict(pt), points, xaxis=xaxis,
+            _axline(ax, lambda pt: line.predict(pt, orig_conventions=True), points, xaxis=xaxis,
                     color=linecolors[linen], linestyle=linestyles[linen], 
                     linewidth=2, label=line.name, **kwargs)
             linen += 1
@@ -187,7 +188,7 @@ def panel(ax, points=None, lines=None, bands=None, xaxis=None, xs=None,
         bandn = 0
         for band in bands:
             for pts in points:
-                _axband(ax, lambda pt: band.predict(pt, error=True, CL=CL), pts, xaxis=xaxis,
+                _axband(ax, lambda pt: band.predict(pt, error=True, CL=CL, orig_conventions=True), pts, xaxis=xaxis,
                         hatch=hatches[bandn], 
                         #color=bandcolors[bandn],
                         #facecolor=bandcolors[bandn], # band  color
@@ -628,7 +629,6 @@ def CLASTSA(path=None, fmt='png', **kwargs):
         fig.show()
     return fig
 
-
 def HallAFT(path=None, fmt='png', **kwargs):
     """Makes plot of harmonics of Hall-A data with fit lines"""
 
@@ -785,7 +785,7 @@ def COMPASSt(path=None, fmt='png', **kwargs):
     ks['s'] = 2 * Mp * ks['in1energy'] + Mp2
     ks['phi'] = 3.141
     ks['units'] = {'phi' : 'radian'}
-    ks['frame'] = 'BKM'
+    ks['frame'] = 'BMK'
     ks['yaxis'] = 'BCSA'
     for xB, Q2 in kinpoints:
         ax = fig.add_subplot(2,3,pn)
@@ -1038,6 +1038,8 @@ def EICTTSA(lines=[], path=None, fmt='png'):
     pt.in1polarization = 0.0
     pt.in2particle = 'p'
     pt.in2energy = 250.
+    pt.in2polarizationvector = 'T'
+    pt.in2polarization = 1
     pt.s = 2 * pt.in1energy * (pt.in2energy + math.sqrt(
         pt.in2energy**2 - Mp2)) + Mp2
     #pt.xB = 5.145e-4

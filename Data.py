@@ -14,7 +14,7 @@ DummyPoint -- class for points which have just few relevant attributes
 # FIXME: Could use __slots__ to optimize DataPoint and the
 # number and names of attributes
 
-import os, re, math
+import os, re, math, copy
 from numpy import pi
 
 # import pylab as plt
@@ -48,6 +48,9 @@ class DummyPoint(object):
         approach.prepare(self)
         return
 
+    def copy(self):
+        # Do we need copy.deepcopy?
+        return copy.copy(self)
 
 class DataPoint(DummyPoint):
 
