@@ -412,47 +412,7 @@ def HERMES09(path=None, fmt='png', **kwargs):
         fig.show()
     return fig
 
-def HERMES09OLD(path=None, fmt='png', **kwargs):
-    """Plot HERMES 0909.3587 BCA and BSA data with fit lines."""
-
-    #ids = [2, 4, 5]
-    title = ''#HERMES-09'
-    fig = plt.figure()
-    fig.canvas.set_window_title(title)
-    fig.suptitle(title)
-    xaxes = ['tm', 'xB', 'Q2']
-    ylims = [(-0.05, 0.3), (-0.15, 0.15), (-0.45, 0.05)]
-    # we have 3x18=54 points to be separated in nine panels six points each:
-    for y, id, shift in zip(range(3), [32, 32, 5], [18, 0, 0]):
-        for x in range(3):
-            npanel = 3*y + x + 1  # 1, 2, ..., 9
-            ax = fig.add_subplot(3,3,npanel)
-            ax.yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))  # tickmarks
-            panel(ax, points=data[id][x*6+shift:x*6+6+shift], xaxis=xaxes[x], **kwargs)
-            apply(ax.set_ylim, ylims[y])
-            if (npanel % 3) != 1:
-                # Leave labels only on leftmost panels
-                ax.set_ylabel('')
-            else:
-                ylabels = ['$BCA\\; \\cos \\phi$', '$BCA\\; \\cos 0\\phi$', '$BSA\\; \\sin\\phi$']
-                ax.set_ylabel(ylabels[(npanel-1)/3], fontsize=18)
-            if npanel < 7:
-                # Leave labels only on lowest panels
-                ax.set_xlabel('')
-            else:
-                xlabels = ['$-t\\; [{\\rm GeV}^2]$', '$x_B$', '$Q^2\\; [{\\rm GeV}^2]$']
-                ax.set_xlabel(xlabels[npanel-7], fontsize=18)
-            if (npanel % 3) == 2:
-                # Adjust x-axis on middle column
-                ax.set_xlim(0.04, 0.25)
-    if path:
-        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
-    else:
-        fig.canvas.draw()
-        fig.show()
-    return fig
-
-def HERMES10TP(obs='TSA', path=None, fmt='png', **kwargs):
+def HERMES10LP(obs='TSA', path=None, fmt='png', **kwargs):
     """Plot HERMES 1004.0177 TSA data with fit lines."""
 
     title = 'HERMES-10-'+obs
@@ -506,7 +466,7 @@ def HERMES10TP(obs='TSA', path=None, fmt='png', **kwargs):
         fig.show()
     return fig
 
-def HERMES08TTSA(path=None, fmt='png', **kwargs):
+def HERMES08TP(path=None, fmt='png', **kwargs):
     """Plot HERMES 08 TTSA data with fit lines."""
 
     title = 'HERMES-08 TTSA'
@@ -1639,6 +1599,87 @@ def bspace2D(th, flavor='Q', path=None, fmt='png', **kwargs):
     ax.axvline(x=0, **props)
     ax.axhline(y=0, **props)    
     #fig.subplots_adjust(bottom=0.1)
+    if path:
+        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+    else:
+        fig.canvas.draw()
+        fig.show()
+    return fig
+
+def markus(th, error=False, path=None, fmt='png', **kwargs):
+    """Makes b-space distribution plot of theory th.
+
+    """
+    title = ''
+    fig = plt.figure(figsize=(9,10), edgecolor='b')
+    fig.canvas.set_window_title(title)
+    fig.suptitle(title)
+    pt = Data.DummyPoint()
+    pt.xi = 0.001
+    pt.Q2 = 4.0
+    pt.t = -0.2
+    #
+    resolution = 50
+    bxs = np.linspace(-1.7, 1.7, resolution)
+    bys = np.linspace(-1.7, 1.7, resolution)
+    ### 1D panel
+    ax = fig.add_subplot(2, 1, 1)
+    ys = []
+    for b in bxs:
+        pt.by = 0
+        pt.bx = b
+        ys.append(th.predict(pt, observable='gpdHQbpol', error=error))
+    ys = np.array(ys)
+    if error:
+        yup, ydown = np.array([(m+err, m-err) for m,err in ys]).transpose()
+        x = plt.concatenate( (bxs, bxs[::-1]) )
+        y = pt.xi*plt.concatenate( (yup, ydown[::-1]) )
+        ax.fill(x, y, alpha=0.7, color='blue', **kwargs)
+    else:
+        ax.plot(bxs, pt.xi*ys, color='blue')
+    ax.set_xlim(-1.7, 1.7)
+    ax.set_ylim(0, 2.1)
+    ax.set_xlabel('$b_x \\; {\\rm [fm]}$', fontsize=24)
+    ax.set_ylabel('$x q^{\\Uparrow}(x, b) \\; {\\rm [fm}^{-2}{\\rm ]}$', fontsize=24)
+    props = dict(color="green", linestyle="-.", linewidth=1)
+    ax.axvline(x=0, **props)
+    for label in ax.get_yticklabels():
+        label.set_fontsize(16)
+    ### 2D panel
+    X, Y = np.meshgrid(bxs, bys)
+    Z = []
+    Zpol = []
+    for by in bys:
+        pt.by = by
+        auxpol = []
+        for bx in bxs:
+            pt.bx = bx
+            auxpol.append(pt.xi*max(th.m.gpdHQbpol(pt),0.01))
+        Zpol.append(auxpol)
+    ax = fig.add_subplot(2, 1, 2)
+    #actual contour plot
+    im = ax.contourf(X, Y, Zpol, np.linspace(0, 2, 40), cmap=plt.cm.Blues)
+    # Just the single border line
+    cs = ax.contour(X, Y, Zpol, np.array([0.15]), linestyle='--')
+    for c in cs.collections:
+        c.set_linestyle('dashed')
+        c.set_linewidth(0.5)
+    cb = plt.colorbar(im)
+    cb.ax.set_yticks([0, 0.5, 1])
+    cb.ax.set_yticklabels(['0.', '1.', '2.'])
+    l,b,w,h = fig.gca().get_position().bounds
+    ll,bb,ww,hh = cb.ax.get_position().bounds
+    cb.ax.set_position([ll-0.07, b+0.0*h, ww, h*1.1])
+    ax.set_ylim(-1.7, 1.7)
+    ax.set_xlim(-1.7, 1.7)
+    ax.set_xlabel('$b_x \\; {\\rm [fm]}$', fontsize=24)
+    ax.set_ylabel('$b_y \\; {\\rm [fm]}$', fontsize=24)
+    ax.axvline(x=0, **props)
+    ax.axhline(y=0, **props)    
+    #ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.02))  # tickmarks
+    for label in ax.get_xticklabels() + ax.get_yticklabels():
+        label.set_fontsize(16)
+    fig.subplots_adjust(left=0.2, right=0.7, hspace=0)
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:

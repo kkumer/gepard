@@ -102,31 +102,30 @@ for n in range(2103,2110) + range(2111,2118) + range(2119,2125):
 ## [3] Create a theory
 
 # Gepard only
-#m = Model.Gepard(ansatz='EFLEXP')
-#m.parameters.update(DM12KK)
-#m.covariance = DM12KKcov
-#m.parameters['KAPS'] = 0
-#th = Approach.BMK(m)
+m = Model.Gepard(ansatz='EFLEXP')
+m.parameters.update(DM12KK)
+m.covariance = DM12KKcov
+th = Approach.BMK(m)
 
 # DR
-mDRonly = Model.ModelDR()
-tDR = Approach.hotfixedBMK(mDRonly)
-tDR.name = 'KM09a'
-tDR.m.parameters.update(DMepsGLO)
-mDRonly1 = Model.ModelDR()
-tDR1 = Approach.hotfixedBMK(mDRonly1)
-tDR1.name = 'KM09b'
-tDR1.m.parameters.update(DMepsGLO1)
+#mDRonly = Model.ModelDR()
+#tDR = Approach.hotfixedBMK(mDRonly)
+#tDR.name = 'KM09a'
+#tDR.m.parameters.update(DMepsGLO)
+#mDRonly1 = Model.ModelDR()
+#tDR1 = Approach.hotfixedBMK(mDRonly1)
+#tDR1.name = 'KM09b'
+#tDR1.m.parameters.update(DMepsGLO1)
 
 
-# Hybrid KM10
-mGepard = Model.ComptonGepard(cutq2=0.5)
-mDRPPsea = Model.ComptonModelDRPPsea()
-m = Model.HybridDipole(mGepard, mDRPPsea)
-tKM10 = Approach.BM10(m)
-tKM10.name = 'KM10'
-g = tKM10.m.g
-tKM10.m.parameters.update(KM10)  # KKunp5
+# Hybrid KM10b
+#mGepard = Model.ComptonGepard(cutq2=0.5)
+#mDRPPsea = Model.ComptonModelDRPPsea()
+#m = Model.HybridKelly(mGepard, mDRPPsea)
+#thKM10b = Approach.BM10(m)
+#thKM10b.name = 'KM10b'
+#g = thKM10b.m.g
+#thKM10b.m.parameters.update(KM10b)  # DM email only!
 
 
 ## [4] Do the fit

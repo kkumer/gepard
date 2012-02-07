@@ -1210,7 +1210,7 @@ class ComptonGepard(ComptonFormFactors):
         b = sqrt(pt.bx**2 + pt.by**2)
         aux = bquadrature(lambda d: d**2*j1(b*d/GeVfm)*self.gpdEzeroQ(pt, ts=-d**2), 
                 0.0, 2.5) / (2*pi*GeVfm**2)
-        return self.gpdHQb(pt) + pt.by*aux/(2*b*Mp)
+        return self.gpdHQb(pt) + pt.bx*aux/(2*b*Mp)
     
     def gpdHGb(self, pt):
         """GPD H^G in b space in fm^-2."""

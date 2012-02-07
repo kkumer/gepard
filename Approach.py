@@ -144,6 +144,7 @@ class Approach(object):
                     for p2 in pars:
                         var += dfdp[p1]*m.covariance[p1,p2]*dfdp[p2]
                 var = tolerance2 * var
+                result = (fun(pt), sqrt(var))
             except KeyError:
                 # we have neural net
                 allnets = fun(pt)
