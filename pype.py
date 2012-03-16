@@ -55,7 +55,7 @@ db = shelve.open('/home/kkumer/pype/theories.db')
 ## [2] Choose subset of datapoints for fitting
 
 #testpoints = data[31][12:14] + data[8][1:3] + data[30][2:4]  # test set
-#GLOpoints = data[31][12:] + data[8] + data[29]  # DM's GLO set
+GLOpoints = data[31][12:] + data[8] + data[29]  # DM's GLO set
 #GLO1points = data[31][12:] + data[8] + data[29] + data[30]  # DM's GLO1 set
 ##HERMESpoints = data[31][12:] +  data[29]
 ##BSApoints = data[8] + data[29]
@@ -63,29 +63,33 @@ db = shelve.open('/home/kkumer/pype/theories.db')
 ##HA17 = utils.select(data[34], criteria=['t == -0.17'])
 ##HA28 = utils.select(data[34], criteria=['t == -0.28'])
 ##HA33 = utils.select(data[34], criteria=['t == -0.33'])
-#DVCSpoints = data[36] + data[37] + data[38] + data[39] + \
-#  data[40] + data[41] + data[42] + data[43] + data[44] + \
-#  data[45]
+DVCSpoints = data[36] + data[37] + data[38] + data[39] + \
+  data[40] + data[41] + data[42] + data[43] + data[44] + \
+  data[45]
 #ALTGLOpoints = data[5] + data[25] + data[32][18:]  # KK's CLAS BSA
 ##ALTGLO1points = data[5] + data[25] + data[32] + HAD17 + HA17
 ##ALTGLO2points = data[5] + data[25] + data[32][18:] + HAD17[::2] + HA17[::2]
 ##ALTGLO3points = data[5] + data[25] + data[32][18:] + data[30] + HA17
 #ALTGLO4points = data[25] + data[32][18:]
-#ALTGLO5points = data[5] + data[8] + data[32][18:]   # DM's CLAS BSA
+ALTGLO5points = data[5] + data[8] + data[32][18:]   # DM's CLAS BSA
 #Hpoints = data[5] + data[32][18:]
 ##BSDw2Cpoints = utils.select(data[26], criteria=['Q2 == 2.3'])
 ##BSDw2CDpoints = utils.select(data[50], criteria=['Q2 == 2.3'])
-#BSDwpoints = utils.select(data[50], criteria=['FTn == -1'])
-#BSSwpoints = utils.select(data[51], criteria=['FTn>=0', 'FTn <= 1'])
+BSDwpoints = utils.select(data[50], criteria=['FTn == -1'])
+BSSwpoints = utils.select(data[51], criteria=['FTn>=0', 'FTn <= 1'])
 #BSDwDMpoints = utils.select(data[55], criteria=['FTn == -1'])
 #BSSwDMpoints = utils.select(data[56], criteria=['FTn>=0', 'FTn <= 1'])
-#TSA1points = utils.select(data[52], criteria=['FTn == -1'])
+TSA1points = utils.select(data[52], criteria=['FTn == -1'])  # HERMES A_UL
 #DMpoints = data[5] + data[32][18:] + data[8] + data[30]
 #DMTSApoints = data[5] + data[32][18:] + TSA1points + data[8] + data[30]
-#TSApoints = TSA1points + data[54]
-BTSApoints = utils.select(data[53], criteria=['FTn==0'])
+TSApoints = TSA1points + data[54]  # HERMES+CLAS  A_UL
+BTSApoints = utils.select(data[53], criteria=['FTn==0'])   # HERMES A_LL
+LPpoints = TSApoints + BTSApoints  # longitudinal target
+AUTIpoints = utils.select(data[66], criteria=['FTn==1'])
+AUTDVCSpoints = data[65]
+TPpoints = AUTIpoints + AUTDVCSpoints
 #UNPpoints = ALTGLOpoints + BSSwpoints + BSDwpoints
-#UNP5points = ALTGLO5points + BSSwpoints + BSDwpoints
+UNP5points = ALTGLO5points + BSSwpoints + BSDwpoints
 #H1ZEUSpoints = DVCSpoints + data[48]
 #H1ZEUSindependent = data[45] + data[39] + data[36] + data[46]
 H1ZEUSindependentNEW = data[45] + data[39] + data[63] + data[46]
@@ -97,6 +101,7 @@ EICTSA = data[2102]
 for n in range(2103,2110) + range(2111,2118) + range(2119,2125):
     EICTSA = EICTSA + data[n]
 #EICmockkk = data[1002]
+GLO12 = H1ZEUS + UNP5points + LPpoints + TPpoints
 
 
 ## [3] Create a theory
@@ -126,6 +131,16 @@ th = Approach.BMK(m)
 #thKM10b.name = 'KM10b'
 #g = thKM10b.m.g
 #thKM10b.m.parameters.update(KM10b)  # DM email only!
+th = tKM10
+
+# New Hybrid KM12
+#mGepard = Model.ComptonGepard(ansatz='EFL', speed=2)
+#mDRsea = Model.ComptonModelDRsea()
+#m = Model.HybridDipole(mGepard, mDRsea)
+#th = Approach.BM10(m)
+#th.name = 'hy12'
+#g = m.g
+#th.m.parameters.update(KM10a) 
 
 
 ## [4] Do the fit
@@ -135,7 +150,15 @@ th = Approach.BMK(m)
 #th.model.release_parameters(
 #   'EAL0S', 'EALPS', 'EM02S', 'ESECS', 'ETHIS', 'KAPS',
 #   'EAL0G', 'EM02G',  'ESECG')
-#f = Fitter.FitterMinuit(EICTSA+EICX+H1ZEUS, th)
+#th.model.release_parameters(
+#  'KAPS',  'M02S', 'M02G', 'SECS', 'SECG', 'EAL0S', 'EM02S', 'ESECS', 'EAL0G')
+#th.model.release_parameters(
+#    'M02S', 'M02G', 'SECS', 'SECG')
+#th.model.release_parameters(
+#   'rv', 'Mv', 'bv', 'C', 'MC', 'trv', 'tbv')
+#th.model.release_parameters('M02S', 'SECS', 'SECG', 'THIS', 'THIG', 
+#   'rv', 'bv', 'Mv', 'C', 'MC', 'trv', 'tbv', 'tMv')
+#f = Fitter.FitterMinuit(DVCSpoints+GLOpoints, th)
 
 #f.minuit.tol = 80
 #f.minuit.printMode = 1
@@ -156,9 +179,13 @@ th = Approach.BMK(m)
 def ld(db):
     utils.listdb(db)
 
+GLO12 = H1ZEUS + UNP5points + LPpoints + TPpoints
+
 def pc(th):
-    exps = ['UNP5points', 'ALTGLO5', 'CLAS', 'CLASDM', 'BSDw', 'BSSw', 'TSA1', 'BTSA']
-    ptssets = [UNP5points, ALTGLO5points, data[25], data[8], BSDwpoints, BSSwpoints, TSA1points, BTSApoints]
+    #exps = ['UNP5points', 'ALTGLO5', 'CLAS', 'CLASDM', 'BSDw', 'BSSw', 'TSA1', 'BTSA', 'TPpoints']
+    #ptssets = [UNP5points, ALTGLO5points, data[25], data[8], BSDwpoints, BSSwpoints, TSA1points, BTSApoints, TPpoints]
+    exps = ['H1ZEUS', 'UNP5points', 'ALTGLO5', 'CLASDM', 'BSDw', 'BSSw', 'TSA_H', 'TSA_C', 'BTSA', 'TPpoints']
+    ptssets = [H1ZEUS, UNP5points, ALTGLO5points, data[8], BSDwpoints, BSSwpoints, TSA1points, data[54], BTSApoints, TPpoints]
     for name, pts in zip(exps,ptssets):
         print '%10s: chi/npts = %6.2f/%d' % (name, th.chisq(pts)[0], len(pts))
         #cutpts = utils.select(pts, criteria=['Q2>=1.6'])
