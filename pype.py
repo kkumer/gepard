@@ -107,10 +107,10 @@ GLO12 = H1ZEUS + UNP5points + LPpoints + TPpoints
 ## [3] Create a theory
 
 # Gepard only
-m = Model.Gepard(ansatz='EFLEXP')
-m.parameters.update(DM12KK)
-m.covariance = DM12KKcov
-th = Approach.BMK(m)
+#m = Model.Gepard(ansatz='EFLEXP')
+#m.parameters.update(DM12KK)
+#m.covariance = DM12KKcov
+#th = Approach.BMK(m)
 
 # DR
 #mDRonly = Model.ModelDR()
@@ -123,15 +123,14 @@ th = Approach.BMK(m)
 #tDR1.m.parameters.update(DMepsGLO1)
 
 
-# Hybrid KM10b
-#mGepard = Model.ComptonGepard(cutq2=0.5)
-#mDRPPsea = Model.ComptonModelDRPPsea()
-#m = Model.HybridKelly(mGepard, mDRPPsea)
-#thKM10b = Approach.BM10(m)
-#thKM10b.name = 'KM10b'
-#g = thKM10b.m.g
-#thKM10b.m.parameters.update(KM10b)  # DM email only!
-th = tKM10
+# Hybrid KM10
+mGepard = Model.ComptonGepard(cutq2=0.5)
+mDRPPsea = Model.ComptonModelDRPPsea()
+m = Model.HybridDipole(mGepard, mDRPPsea)
+th = Approach.BM10(m)
+th.name = 'KM10'
+g = th.m.g
+th.m.parameters.update(KM10)  # KKunp5
 
 # New Hybrid KM12
 #mGepard = Model.ComptonGepard(ansatz='EFL', speed=2)
@@ -231,6 +230,7 @@ def ptcol(th, Q=-1, pol=0, Ee=20, Ep=250, xB=0.001998, Q2=4., t=-0.1,
                 ptc.in2energy**2 - Mp2)) + Mp2
     ptc.in1charge = Q
     ptc.in1polarization = pol
+    ptc.in2polarizationvector = 'T'
     ptc.in2polarization = 1 # relevant only for XLP and TSA
     ptc.xB = xB
     ptc.Q2 = Q2
@@ -248,7 +248,7 @@ def ptcol(th, Q=-1, pol=0, Ee=20, Ep=250, xB=0.001998, Q2=4., t=-0.1,
     th.prepare(ptc)
     return ptc
 
-#ptc = ptcol(th, Q=1, pol=0, Ee=5, Ep=350, phi=3.14/2., xB=1e-2)
+ptc = ptcol(th, Q=1, pol=0, Ee=5, Ep=100, phi=0.1, Q2=4.4, xB=8.2e-3, t=-0.25)
 
 def ccals(th, pt):
     cals = ['DVCSunp', 'INTunp', 'INTunpV', 'INTunpA']

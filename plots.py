@@ -1107,12 +1107,8 @@ def H(theories=[], path=None, fmt='png'):
         fig.show()
     return fig
 
-def EICspin(th, path=None, fmt='png'):
-    """Plot EIC TTSA.
-    
-    FIXME: kinematic completion, charge etc. must be explicit here
-    """
-
+def EICspinALU(th, path=None, fmt='png'):
+    """Plot EIC BSA (A_LU).  """
     title = ''
     fig = plt.figure()
     fig.canvas.set_window_title(title)
@@ -1123,27 +1119,148 @@ def EICspin(th, path=None, fmt='png'):
     pt.exptype = 'collider'
     pt.in1particle = 'e'
     pt.in1charge = -1
-    pt.in1energy = 20.
-    pt.in1polarization = 0.0
+    pt.in1energy = 5.
+    pt.in1polarizationvector = 'L'
+    pt.in1polarization = 1
     pt.in2particle = 'p'
-    pt.in2energy = 250.
-    pt.in2polarizationvector = 'T'
-    pt.in2polarization = 1
+    pt.in2energy = 100.
     pt.s = 2 * pt.in1energy * (pt.in2energy + math.sqrt(
         pt.in2energy**2 - Mp2)) + Mp2
-    #pt.xB = 5.145e-4
-    pt.xB = 8.2e-4
+    pt.xB = 3.2e-3
     pt.t = -0.25
     pt.Q2 = 4.4
-    pt.varphi = -np.pi/2
     pt.units = {'phi' : 'radian'}
+    ########   TSA  ###################
     #
     ###  phi panel
     ax = fig.add_subplot(1,3,1)
     ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
     phi = np.linspace(0., 2*np.pi, 50)
     utils.fill_kinematics(pt)
-    linestyles = ['g--', 'g--', 'r-', 'b-.', 'p:']
+    linestyles = ['r--', 'r--', 'g-', 'b-.', 'p:']
+    dasheslengths = [(None, None), (20,5), (20,5,5,5), (5,5)]
+    #labels = [r'$\sigma^{\uparrow}$ ' + t.name for t in lines]
+    pn = 0
+    th.__class__.to_conventions(pt)
+    th.__class__.prepare(pt)
+    # Must go to BKM explicitely here
+    line = th._BSA(pt, vars={'phi':np.pi-phi})
+    ax.plot(phi, line, linestyles[pn], dashes=dasheslengths[pn], linewidth=2, label=th.name) 
+    ax.set_xlim(0.0, 2*np.pi)
+    ax.set_ylim(-0.65, 0.65)
+    # axes labels
+    ax.set_xlabel('$\\phi\\quad {\\rm [rad]}$', fontsize=20)
+    ax.set_ylabel('$A_{\\rm LU}$', fontsize=20)
+    ax.text(1, 0.35, "$t = %s \\,{\\rm GeV}^2$" % pt.t, fontsize=14)
+    ax.set_xticks([0, np.pi/2, np.pi, 3*np.pi/2])
+    ax.set_xticklabels(['$0$', '$\\pi/2$', '$\\pi$', '$3 \\pi/2$'])
+    # Legend
+    leg = ax.legend(loc='upper center', handlelength=4.0, fancybox=True)
+    frame  = leg.get_frame()
+    frame.set_facecolor('0.90')    # set the frame face color to light gray
+    for t in leg.get_texts():
+        t.set_fontsize(18)    # the legend text fontsize
+    for l in leg.get_lines():
+        l.set_linewidth(2.0)  # the legend line width
+    #
+    ###  t panel
+    pt.FTn = -1
+    ax = fig.add_subplot(1,3,2)
+    ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
+    tms = list(np.linspace(0.,0.1))+list(np.linspace(0.1, 0.85))
+    line = []
+    for tm in tms:
+        pt.t = -tm
+        line.append(th.BSA(pt))
+    ax.plot(tms, line, linestyles[pn], dashes=dasheslengths[pn], linewidth=2) 
+    ax.set_xlim(0., 0.9)
+    ax.set_ylim(-0.65, 0.65)
+    ax.set_xlabel('$-t \\,{\\rm [GeV}^2{\\rm ]}$', fontsize=20)
+    ax.set_yticklabels([])
+    ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.2))  # tickmarks
+    ax.text(0.1, -0.17, "$E_e = %d \\,{\\rm GeV}$" % pt.in1energy, fontsize=14)
+    ax.text(0.1, -0.26, "$E_p = %d \\,{\\rm GeV}$" % pt.in2energy, fontsize=14)
+    ax.text(0.1, -0.35, "$x_B = %s$" % pt.xB, fontsize=14)
+    ax.text(0.1, -0.44, "$Q^2 = %s \\,{\\rm GeV}^2$" % pt.Q2, fontsize=14)
+    #
+    ###  xB panel
+    pt.t = -0.25
+    pt.tm = 0.25
+    ax = fig.add_subplot(1,3,3)
+    ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
+    xBs = np.logspace(-4., -1., 40)
+    line = []
+    pt.Q2 = 2.5
+    for xB in xBs:
+        del pt.W
+        pt.xB = xB
+        utils._complete_xBWQ2(pt)
+        line.append(th.BSA(pt))
+    ax.semilogx(xBs, line, linestyles[pn], dashes=dasheslengths[pn], linewidth=2,
+            label="$Q^2= %s \\,{\\rm GeV}^2$" % pt.Q2) 
+    pn += 1
+    line = []
+    pt.Q2 = 13.9
+    for xB in xBs:
+        del pt.W
+        pt.xB = xB
+        utils._complete_xBWQ2(pt)
+        line.append(th.BSA(pt))
+    ax.semilogx(xBs, line, linestyles[pn], dashes=dasheslengths[pn], linewidth=2,
+            label="$Q^2= %s \\,{\\rm GeV}^2$" % pt.Q2) 
+    ax.set_xlim(5.e-5, 0.2)
+    ax.set_ylim(-0.65, 0.65)
+    ax.set_xlabel('$x_{\\rm B}$', fontsize=20)
+    ax.set_yticklabels([])
+    ax.text(0.001, 0.35, "$t = %s \\,{\\rm GeV}^2$" % pt.t, fontsize=14)
+    # Legend
+    leg = ax.legend(loc='lower center', handlelength=4.0, fancybox=True)
+    frame  = leg.get_frame()
+    frame.set_facecolor('0.90')    # set the frame face color to light gray
+    for t in leg.get_texts():
+        t.set_fontsize(14)    # the legend text fontsize
+    for l in leg.get_lines():
+        l.set_linewidth(2.0)  # the legend line width
+    if path:
+        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+    else:
+        fig.canvas.draw()
+        fig.show()
+    return fig
+
+def EICspinAUT(th, path=None, fmt='png'):
+    """Plot EIC TTSA.  """
+    title = ''
+    fig = plt.figure()
+    fig.canvas.set_window_title(title)
+    fig.suptitle(title)
+    fig.subplots_adjust(bottom=0.6, right=0.9, wspace=0.)
+    # Asymmetry panel
+    pt = Data.DummyPoint()
+    pt.exptype = 'collider'
+    pt.in1particle = 'e'
+    pt.in1charge = -1
+    pt.in1energy = 5.
+    pt.in1polarization = 0.0
+    pt.in2particle = 'p'
+    pt.in2energy = 100.
+    pt.in2polarizationvector = 'T'
+    pt.in2polarization = 1
+    pt.s = 2 * pt.in1energy * (pt.in2energy + math.sqrt(
+        pt.in2energy**2 - Mp2)) + Mp2
+    pt.xB = 8.155e-3
+    pt.t = -0.25
+    pt.Q2 = 4.4
+    pt.varphi = -np.pi/2
+    pt.units = {'phi' : 'radian'}
+    ########   TSA  ###################
+    #
+    ###  phi panel
+    ax = fig.add_subplot(1,3,1)
+    ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
+    phi = np.linspace(0., 2*np.pi, 50)
+    utils.fill_kinematics(pt)
+    linestyles = ['r--', 'r--', 'g-', 'b-.', 'p:']
     dasheslengths = [(None, None), (20,5), (20,5,5,5), (5,5)]
     #labels = [r'$\sigma^{\uparrow}$ ' + t.name for t in lines]
     pn = 0
@@ -1170,10 +1287,134 @@ def EICspin(th, path=None, fmt='png'):
         l.set_linewidth(2.0)  # the legend line width
     #
     ###  t panel
-    pt.phi = np.pi
+    pt.FTn = 1
     ax = fig.add_subplot(1,3,2)
     ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
-    tms = np.linspace(0., 0.85, 40)
+    tms = list(np.linspace(0.,0.1))+list(np.linspace(0.1, 0.85))
+    line = []
+    for tm in tms:
+        pt.t = -tm
+        # Must change sign to go to Trento:
+        line.append(-th.TSA(pt))
+    ax.plot(tms, line, linestyles[pn], dashes=dasheslengths[pn], linewidth=2) 
+    ax.set_xlim(0., 0.9)
+    ax.set_ylim(-0.65, 0.65)
+    ax.set_xlabel('$-t \\,{\\rm [GeV}^2{\\rm ]}$', fontsize=20)
+    ax.set_yticklabels([])
+    ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.2))  # tickmarks
+    ax.text(0.1, -0.17, "$E_e = %d \\,{\\rm GeV}$" % pt.in1energy, fontsize=14)
+    ax.text(0.1, -0.26, "$E_p = %d \\,{\\rm GeV}$" % pt.in2energy, fontsize=14)
+    ax.text(0.1, -0.35, "$x_B = %s$" % pt.xB, fontsize=14)
+    ax.text(0.1, -0.44, "$Q^2 = %s \\,{\\rm GeV}^2$" % pt.Q2, fontsize=14)
+    #
+    ###  xB panel
+    pt.t = -0.25
+    pt.tm = 0.25
+    ax = fig.add_subplot(1,3,3)
+    ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
+    xBs = np.logspace(-4., -1., 40)
+    line = []
+    pt.Q2 = 2.5
+    for xB in xBs:
+        del pt.W
+        pt.xB = xB
+        utils._complete_xBWQ2(pt)
+        # Must change sign to go to Trento:
+        line.append(-th.TSA(pt))
+    ax.semilogx(xBs, line, linestyles[pn], dashes=dasheslengths[pn], linewidth=2,
+            label="$Q^2 = %s \\,{\\rm GeV}^2$" % pt.Q2) 
+    pn += 1
+    line = []
+    pt.Q2 = 13.9
+    for xB in xBs:
+        del pt.W
+        pt.xB = xB
+        utils._complete_xBWQ2(pt)
+        line.append(-th.TSA(pt))
+    ax.semilogx(xBs, line, linestyles[pn], dashes=dasheslengths[pn], linewidth=2,
+            label="$Q^2 = %s \\,{\\rm GeV}^2$" % pt.Q2) 
+    ax.set_xlim(5.e-5, 0.2)
+    ax.set_ylim(-0.65, 0.65)
+    ax.set_xlabel('$x_{\\rm B}$', fontsize=20)
+    ax.set_yticklabels([])
+    ax.text(0.001, 0.35, "$t = %s \\,{\\rm GeV}^2$" % pt.t, fontsize=14)
+    # Legend
+    leg = ax.legend(loc='lower center', handlelength=4.0, fancybox=True)
+    frame  = leg.get_frame()
+    frame.set_facecolor('0.90')    # set the frame face color to light gray
+    for t in leg.get_texts():
+        t.set_fontsize(14)    # the legend text fontsize
+    for l in leg.get_lines():
+        l.set_linewidth(2.0)  # the legend line width
+    if path:
+        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+    else:
+        fig.canvas.draw()
+        fig.show()
+    return fig
+
+def EICspinAUL(th, path=None, fmt='png'):
+    """Plot EIC LTSA.  """
+    title = ''
+    fig = plt.figure()
+    fig.canvas.set_window_title(title)
+    fig.suptitle(title)
+    fig.subplots_adjust(bottom=0.6, right=0.9, wspace=0.)
+    # Asymmetry panel
+    pt = Data.DummyPoint()
+    pt.exptype = 'collider'
+    pt.in1particle = 'e'
+    pt.in1charge = -1
+    pt.in1energy = 5.
+    pt.in1polarization = 0.0
+    pt.in2particle = 'p'
+    pt.in2energy = 100.
+    pt.in2polarizationvector = 'L'
+    pt.in2polarization = 1
+    pt.s = 2 * pt.in1energy * (pt.in2energy + math.sqrt(
+        pt.in2energy**2 - Mp2)) + Mp2
+    pt.xB = 1.3e-2
+    pt.t = -0.25
+    pt.Q2 = 4.4
+    pt.units = {'phi' : 'radian'}
+    ########   TSA  ###################
+    #
+    ###  phi panel
+    ax = fig.add_subplot(1,3,1)
+    ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
+    phi = np.linspace(0., 2*np.pi, 50)
+    utils.fill_kinematics(pt)
+    linestyles = ['r--', 'r--', 'g-', 'b-.', 'p:']
+    dasheslengths = [(None, None), (20,5), (20,5,5,5), (5,5)]
+    #labels = [r'$\sigma^{\uparrow}$ ' + t.name for t in lines]
+    pn = 0
+    th.__class__.to_conventions(pt)
+    th.__class__.prepare(pt)
+    # Must go to BKM explicitely here
+    line = th.TSA(pt, vars={'phi':np.pi-phi})
+    ax.plot(phi, line, linestyles[pn], dashes=dasheslengths[pn], linewidth=2, label=th.name) 
+    ax.set_xlim(0.0, 2*np.pi)
+    ax.set_ylim(-0.65, 0.65)
+    # axes labels
+    ax.set_xlabel('$\\phi\\quad {\\rm [rad]}$', fontsize=20)
+    ax.set_ylabel('$A_{\\rm UL}$', fontsize=20)
+    ax.text(1, 0.35, "$t = %s \\,{\\rm GeV}^2$" % pt.t, fontsize=14)
+    ax.set_xticks([0, np.pi/2, np.pi, 3*np.pi/2])
+    ax.set_xticklabels(['$0$', '$\\pi/2$', '$\\pi$', '$3 \\pi/2$'])
+    # Legend
+    leg = ax.legend(loc='upper center', handlelength=4.0, fancybox=True)
+    frame  = leg.get_frame()
+    frame.set_facecolor('0.90')    # set the frame face color to light gray
+    for t in leg.get_texts():
+        t.set_fontsize(18)    # the legend text fontsize
+    for l in leg.get_lines():
+        l.set_linewidth(2.0)  # the legend line width
+    #
+    ###  t panel
+    pt.FTn = -1
+    ax = fig.add_subplot(1,3,2)
+    ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
+    tms = list(np.linspace(0.,0.1))+list(np.linspace(0.1, 0.85))
     line = []
     for tm in tms:
         pt.t = -tm
@@ -1196,7 +1437,7 @@ def EICspin(th, path=None, fmt='png'):
     ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
     xBs = np.logspace(-4., -1., 40)
     line = []
-    pt.Q2 = 4.5
+    pt.Q2 = 2.5
     for xB in xBs:
         del pt.W
         pt.xB = xB
@@ -1214,7 +1455,7 @@ def EICspin(th, path=None, fmt='png'):
         line.append(th.TSA(pt))
     ax.semilogx(xBs, line, linestyles[pn], dashes=dasheslengths[pn], linewidth=2,
             label="$Q^2 = %s \\,{\\rm GeV}^2$" % pt.Q2) 
-    ax.set_xlim(5.e-5, 0.1)
+    ax.set_xlim(5.e-5, 0.2)
     ax.set_ylim(-0.65, 0.65)
     ax.set_xlabel('$x_{\\rm B}$', fontsize=20)
     ax.set_yticklabels([])
@@ -1227,6 +1468,504 @@ def EICspin(th, path=None, fmt='png'):
         t.set_fontsize(14)    # the legend text fontsize
     for l in leg.get_lines():
         l.set_linewidth(2.0)  # the legend line width
+    if path:
+        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+    else:
+        fig.canvas.draw()
+        fig.show()
+    return fig
+
+def EICcharge(th, path=None, fmt='png'):
+    """Plot EIC BCA (A_C).  """
+    title = ''
+    fig = plt.figure()
+    fig.canvas.set_window_title(title)
+    fig.suptitle(title)
+    fig.subplots_adjust(bottom=0.6, right=0.9, wspace=0.)
+    # Asymmetry panel
+    pt = Data.DummyPoint()
+    pt.exptype = 'collider'
+    pt.in1particle = 'e'
+    pt.in1charge = 1
+    pt.in1energy = 5.
+    pt.in1polarization = 0
+    pt.in2particle = 'p'
+    pt.in2energy = 100.
+    pt.s = 2 * pt.in1energy * (pt.in2energy + math.sqrt(
+        pt.in2energy**2 - Mp2)) + Mp2
+    pt.xB = 5.1e-3
+    pt.t = -0.25
+    pt.Q2 = 4.4
+    pt.units = {'phi' : 'radian'}
+    ########   TSA  ###################
+    #
+    ###  phi panel
+    ax = fig.add_subplot(1,3,1)
+    ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
+    phi = np.linspace(0., 2*np.pi, 50)
+    utils.fill_kinematics(pt)
+    linestyles = ['r--', 'r--', 'g-', 'b-.', 'p:']
+    dasheslengths = [(None, None), (20,5), (20,5,5,5), (5,5)]
+    #labels = [r'$\sigma^{\uparrow}$ ' + t.name for t in lines]
+    pn = 0
+    th.__class__.to_conventions(pt)
+    th.__class__.prepare(pt)
+    # Must go to BKM explicitely here
+    line = th.BCA(pt, vars={'phi':np.pi-phi})
+    ax.plot(phi, line, linestyles[pn], dashes=dasheslengths[pn], linewidth=2, label=th.name) 
+    ax.set_xlim(0.0, 2*np.pi)
+    ax.set_ylim(-0.45, 0.45)
+    # axes labels
+    ax.set_xlabel('$\\phi\\quad {\\rm [rad]}$', fontsize=20)
+    ax.set_ylabel('$A_{\\rm C}$', fontsize=20)
+    ax.text(1, 0.35, "$t = %s \\,{\\rm GeV}^2$" % pt.t, fontsize=14)
+    ax.set_xticks([0, np.pi/2, np.pi, 3*np.pi/2])
+    ax.set_xticklabels(['$0$', '$\\pi/2$', '$\\pi$', '$3 \\pi/2$'])
+    # Legend
+    leg = ax.legend(loc='upper center', handlelength=4.0, fancybox=True)
+    frame  = leg.get_frame()
+    frame.set_facecolor('0.90')    # set the frame face color to light gray
+    for t in leg.get_texts():
+        t.set_fontsize(18)    # the legend text fontsize
+    for l in leg.get_lines():
+        l.set_linewidth(2.0)  # the legend line width
+    #
+    ###  t panel
+    pt.FTn = 1
+    ax = fig.add_subplot(1,3,2)
+    ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
+    tms = list(np.linspace(0.,0.1))+list(np.linspace(0.1, 0.85))
+    line = []
+    for tm in tms:
+        pt.t = -tm
+        # Change sign to go to Trento
+        line.append(-th.BCA(pt))
+    ax.plot(tms, line, linestyles[pn], dashes=dasheslengths[pn], linewidth=2) 
+    ax.set_xlim(0., 0.9)
+    ax.set_ylim(-0.45, 0.45)
+    ax.set_xlabel('$-t \\,{\\rm [GeV}^2{\\rm ]}$', fontsize=20)
+    ax.set_yticklabels([])
+    ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.2))  # tickmarks
+    ax.text(0.1, -0.17, "$E_e = %d \\,{\\rm GeV}$" % pt.in1energy, fontsize=14)
+    ax.text(0.1, -0.26, "$E_p = %d \\,{\\rm GeV}$" % pt.in2energy, fontsize=14)
+    ax.text(0.1, -0.35, "$x_B = %s$" % pt.xB, fontsize=14)
+    ax.text(0.1, -0.44, "$Q^2 = %s \\,{\\rm GeV}^2$" % pt.Q2, fontsize=14)
+    #
+    ###  xB panel
+    pt.t = -0.25
+    pt.tm = 0.25
+    ax = fig.add_subplot(1,3,3)
+    ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
+    xBs = np.logspace(-4., -0.7, 40)
+    line = []
+    pt.Q2 = 2.5
+    for xB in xBs:
+        del pt.W
+        pt.xB = xB
+        utils._complete_xBWQ2(pt)
+        line.append(-th.BCA(pt))
+    ax.semilogx(xBs, line, linestyles[pn], dashes=dasheslengths[pn], linewidth=2,
+            label="$Q^2= %s \\,{\\rm GeV}^2$" % pt.Q2) 
+    pn += 1
+    line = []
+    pt.Q2 = 13.9
+    for xB in xBs:
+        del pt.W
+        pt.xB = xB
+        utils._complete_xBWQ2(pt)
+        line.append(-th.BCA(pt))
+    ax.semilogx(xBs, line, linestyles[pn], dashes=dasheslengths[pn], linewidth=2,
+            label="$Q^2= %s \\,{\\rm GeV}^2$" % pt.Q2) 
+    ax.set_xlim(5.e-5, 0.2)
+    ax.set_ylim(-0.45, 0.45)
+    ax.set_xlabel('$x_{\\rm B}$', fontsize=20)
+    ax.set_yticklabels([])
+    ax.text(0.001, 0.35, "$t = %s \\,{\\rm GeV}^2$" % pt.t, fontsize=14)
+    # Legend
+    leg = ax.legend(loc='lower center', handlelength=4.0, fancybox=True)
+    frame  = leg.get_frame()
+    frame.set_facecolor('0.90')    # set the frame face color to light gray
+    for t in leg.get_texts():
+        t.set_fontsize(14)    # the legend text fontsize
+    for l in leg.get_lines():
+        l.set_linewidth(2.0)  # the legend line width
+    if path:
+        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+    else:
+        fig.canvas.draw()
+        fig.show()
+    return fig
+
+def EICphase1(th, path=None, fmt='png'):
+    """Plot various EIC 5x100 asymmetries.  """
+    title = ''
+    fig = plt.figure()
+    fig.canvas.set_window_title(title)
+    fig.suptitle(title)
+    fig.subplots_adjust(wspace=0.,hspace=0.)
+    # Asymmetry panel
+    pt = Data.DummyPoint()
+    pt.exptype = 'collider'
+    pt.in1particle = 'e'
+    pt.in1charge = -1
+    pt.in1energy = 5.
+    pt.in1polarizationvector = 'L'
+    pt.in1polarization = 1
+    pt.in2particle = 'p'
+    pt.in2energy = 100.
+    pt.s = 2 * pt.in1energy * (pt.in2energy + math.sqrt(
+        pt.in2energy**2 - Mp2)) + Mp2
+    pt.xB = 3.2e-3
+    pt.t = -0.25
+    pt.Q2 = 4.4
+    pt.units = {'phi' : 'radian'}
+    ########   TSA  ###################
+    #
+    ###  phi panel
+    ax = fig.add_subplot(4,3,1)
+    ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
+    phi = np.linspace(0., 2*np.pi, 50)
+    utils.fill_kinematics(pt)
+    linestyles = ['r--', 'r--', 'g-', 'b-.', 'p:']
+    dasheslengths = [(None, None), (20,5), (20,5,5,5), (5,5)]
+    #labels = [r'$\sigma^{\uparrow}$ ' + t.name for t in lines]
+    pn = 0
+    th.__class__.to_conventions(pt)
+    th.__class__.prepare(pt)
+    # Must go to BKM explicitely here
+    line = th._BSA(pt, vars={'phi':np.pi-phi})
+    ax.plot(phi, line, linestyles[pn], dashes=dasheslengths[pn], linewidth=2, label=th.name) 
+    ax.set_xlim(0.0, 2*np.pi)
+    ax.set_ylim(-0.65, 0.65)
+    # axes labels
+    ax.set_ylabel('$A_{\\rm LU}$', fontsize=20)
+    ax.set_xticks([0, np.pi/2, np.pi, 3*np.pi/2])
+    ax.set_xticklabels(['$0$', '$\\pi/2$', '$\\pi$', '$3 \\pi/2$'])
+    ax.text(0.1, -0.17, "$E_e = %d \\,{\\rm GeV}$" % pt.in1energy, fontsize=14)
+    ax.text(0.1, -0.35, "$E_p = %d \\,{\\rm GeV}$" % pt.in2energy, fontsize=14)
+    ax.text(0.1, -0.55, "$Q^2 = %s \\,{\\rm GeV}^2$" % pt.Q2, fontsize=14)
+    # Legend
+    leg = ax.legend(loc='upper center', handlelength=4.0, fancybox=True)
+    frame  = leg.get_frame()
+    frame.set_facecolor('0.90')    # set the frame face color to light gray
+    for t in leg.get_texts():
+        t.set_fontsize(18)    # the legend text fontsize
+    for l in leg.get_lines():
+        l.set_linewidth(2.0)  # the legend line width
+    #
+    ###  t panel
+    pt.FTn = -1
+    ax = fig.add_subplot(4,3,2)
+    ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
+    tms = list(np.linspace(0.,0.1))+list(np.linspace(0.1, 0.85))
+    line = []
+    for tm in tms:
+        pt.t = -tm
+        line.append(th.BSA(pt))
+    ax.plot(tms, line, linestyles[pn], dashes=dasheslengths[pn], linewidth=2) 
+    ax.set_xlim(0., 0.9)
+    ax.set_ylim(-0.65, 0.65)
+    ax.set_yticklabels([])
+    ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.2))  # tickmarks
+    ax.text(0.1, -0.35, "$x_B = %s$" % pt.xB, fontsize=14)
+    #
+    ###  xB panel
+    pt.t = -0.25
+    pt.tm = 0.25
+    ax = fig.add_subplot(4,3,3)
+    ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
+    xBs = np.logspace(-4., -1., 40)
+    line = []
+    pt.Q2 = 2.5
+    for xB in xBs:
+        del pt.W
+        pt.xB = xB
+        utils._complete_xBWQ2(pt)
+        line.append(th.BSA(pt))
+    ax.semilogx(xBs, line, linestyles[pn], dashes=dasheslengths[pn], linewidth=2,
+            label="$Q^2= %s \\,{\\rm GeV}^2$" % pt.Q2) 
+    pn += 1
+    line = []
+    pt.Q2 = 13.9
+    for xB in xBs:
+        del pt.W
+        pt.xB = xB
+        utils._complete_xBWQ2(pt)
+        line.append(th.BSA(pt))
+    ax.semilogx(xBs, line, linestyles[pn], dashes=dasheslengths[pn], linewidth=2,
+            label="$Q^2= %s \\,{\\rm GeV}^2$" % pt.Q2) 
+    ax.set_xlim(5.e-5, 0.2)
+    ax.set_ylim(-0.65, 0.65)
+    ax.set_yticklabels([])
+    # Legend
+    leg = ax.legend(loc='lower center', handlelength=4.0, fancybox=True)
+    frame  = leg.get_frame()
+    frame.set_facecolor('0.90')    # set the frame face color to light gray
+    for t in leg.get_texts():
+        t.set_fontsize(10)    # the legend text fontsize
+    for l in leg.get_lines():
+        l.set_linewidth(2.0)  # the legend line width
+    #
+    ####    AUT
+    #
+    # Asymmetry panel
+    pt = Data.DummyPoint()
+    pt.exptype = 'collider'
+    pt.in1particle = 'e'
+    pt.in1charge = -1
+    pt.in1energy = 5.
+    pt.in1polarization = 0.0
+    pt.in2particle = 'p'
+    pt.in2energy = 100.
+    pt.in2polarizationvector = 'T'
+    pt.in2polarization = 1
+    pt.s = 2 * pt.in1energy * (pt.in2energy + math.sqrt(
+        pt.in2energy**2 - Mp2)) + Mp2
+    pt.xB = 8.155e-3
+    pt.t = -0.25
+    pt.Q2 = 4.4
+    pt.varphi = -np.pi/2
+    pt.units = {'phi' : 'radian'}
+    ########   TSA  ###################
+    #
+    ###  phi panel
+    ax = fig.add_subplot(4,3,4)
+    ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
+    phi = np.linspace(0., 2*np.pi, 50)
+    utils.fill_kinematics(pt)
+    linestyles = ['r--', 'r--', 'g-', 'b-.', 'p:']
+    dasheslengths = [(None, None), (20,5), (20,5,5,5), (5,5)]
+    #labels = [r'$\sigma^{\uparrow}$ ' + t.name for t in lines]
+    pn = 0
+    th.__class__.to_conventions(pt)
+    th.__class__.prepare(pt)
+    # Must go to BKM explicitely here
+    line = th.TSA(pt, vars={'phi':np.pi-phi})
+    ax.plot(phi, line, linestyles[pn], dashes=dasheslengths[pn], linewidth=2, label=th.name) 
+    ax.set_xlim(0.0, 2*np.pi)
+    ax.set_ylim(-0.65, 0.65)
+    # axes labels
+    ax.set_ylabel('$A_{\\rm UT}^{\\sin(\\phi - \\phi_S)}$', fontsize=20)
+    ax.set_xticks([0, np.pi/2, np.pi, 3*np.pi/2])
+    ax.set_xticklabels(['$0$', '$\\pi/2$', '$\\pi$', '$3 \\pi/2$'])
+    #
+    ###  t panel
+    pt.FTn = 1
+    ax = fig.add_subplot(4,3,5)
+    ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
+    tms = list(np.linspace(0.,0.1))+list(np.linspace(0.1, 0.85))
+    line = []
+    for tm in tms:
+        pt.t = -tm
+        # Must change sign to go to Trento:
+        line.append(-th.TSA(pt))
+    ax.plot(tms, line, linestyles[pn], dashes=dasheslengths[pn], linewidth=2) 
+    ax.set_xlim(0., 0.9)
+    ax.set_ylim(-0.65, 0.65)
+    ax.set_yticklabels([])
+    ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.2))  # tickmarks
+    ax.text(0.1, -0.35, "$x_B = %s$" % pt.xB, fontsize=14)
+    #
+    ###  xB panel
+    pt.t = -0.25
+    pt.tm = 0.25
+    ax = fig.add_subplot(4,3,6)
+    ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
+    xBs = np.logspace(-4., -1., 40)
+    line = []
+    pt.Q2 = 2.5
+    for xB in xBs:
+        del pt.W
+        pt.xB = xB
+        utils._complete_xBWQ2(pt)
+        # Must change sign to go to Trento:
+        line.append(-th.TSA(pt))
+    ax.semilogx(xBs, line, linestyles[pn], dashes=dasheslengths[pn], linewidth=2,
+            label="$Q^2 = %s \\,{\\rm GeV}^2$" % pt.Q2) 
+    pn += 1
+    line = []
+    pt.Q2 = 13.9
+    for xB in xBs:
+        del pt.W
+        pt.xB = xB
+        utils._complete_xBWQ2(pt)
+        line.append(-th.TSA(pt))
+    ax.semilogx(xBs, line, linestyles[pn], dashes=dasheslengths[pn], linewidth=2,
+            label="$Q^2 = %s \\,{\\rm GeV}^2$" % pt.Q2) 
+    ax.set_xlim(5.e-5, 0.2)
+    ax.set_ylim(-0.65, 0.65)
+    ax.set_yticklabels([])
+    #
+    #   A_UL
+    # 
+    pt = Data.DummyPoint()
+    pt.exptype = 'collider'
+    pt.in1particle = 'e'
+    pt.in1charge = -1
+    pt.in1energy = 5.
+    pt.in1polarization = 0.0
+    pt.in2particle = 'p'
+    pt.in2energy = 100.
+    pt.in2polarizationvector = 'L'
+    pt.in2polarization = 1
+    pt.s = 2 * pt.in1energy * (pt.in2energy + math.sqrt(
+        pt.in2energy**2 - Mp2)) + Mp2
+    pt.xB = 1.3e-2
+    pt.t = -0.25
+    pt.Q2 = 4.4
+    pt.units = {'phi' : 'radian'}
+    ########   TSA  ###################
+    #
+    ###  phi panel
+    ax = fig.add_subplot(4,3,7)
+    ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
+    phi = np.linspace(0., 2*np.pi, 50)
+    utils.fill_kinematics(pt)
+    linestyles = ['r--', 'r--', 'g-', 'b-.', 'p:']
+    dasheslengths = [(None, None), (20,5), (20,5,5,5), (5,5)]
+    #labels = [r'$\sigma^{\uparrow}$ ' + t.name for t in lines]
+    pn = 0
+    th.__class__.to_conventions(pt)
+    th.__class__.prepare(pt)
+    # Must go to BKM explicitely here
+    line = th.TSA(pt, vars={'phi':np.pi-phi})
+    ax.plot(phi, line, linestyles[pn], dashes=dasheslengths[pn], linewidth=2, label=th.name) 
+    ax.set_xlim(0.0, 2*np.pi)
+    ax.set_ylim(-0.65, 0.65)
+    # axes labels
+    ax.set_ylabel('$A_{\\rm UL}$', fontsize=20)
+    ax.text(1, 0.35, "$t = %s \\,{\\rm GeV}^2$" % pt.t, fontsize=14)
+    ax.set_xticks([0, np.pi/2, np.pi, 3*np.pi/2])
+    ax.set_xticklabels(['$0$', '$\\pi/2$', '$\\pi$', '$3 \\pi/2$'])
+    ###  t panel
+    pt.FTn = -1
+    ax = fig.add_subplot(4,3,8)
+    ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
+    tms = list(np.linspace(0.,0.1))+list(np.linspace(0.1, 0.85))
+    line = []
+    for tm in tms:
+        pt.t = -tm
+        line.append(th.TSA(pt))
+    ax.plot(tms, line, linestyles[pn], dashes=dasheslengths[pn], linewidth=2) 
+    ax.set_xlim(0., 0.9)
+    ax.set_ylim(-0.65, 0.65)
+    ax.set_yticklabels([])
+    ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.2))  # tickmarks
+    ax.text(0.1, -0.35, "$x_B = %s$" % pt.xB, fontsize=14)
+    #
+    ###  xB panel
+    pt.t = -0.25
+    pt.tm = 0.25
+    ax = fig.add_subplot(4,3,9)
+    ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
+    xBs = np.logspace(-4., -1., 40)
+    line = []
+    pt.Q2 = 2.5
+    for xB in xBs:
+        del pt.W
+        pt.xB = xB
+        utils._complete_xBWQ2(pt)
+        line.append(th.TSA(pt))
+    ax.semilogx(xBs, line, linestyles[pn], dashes=dasheslengths[pn], linewidth=2,
+            label="$Q^2 = %s \\,{\\rm GeV}^2$" % pt.Q2) 
+    pn += 1
+    line = []
+    pt.Q2 = 13.9
+    for xB in xBs:
+        del pt.W
+        pt.xB = xB
+        utils._complete_xBWQ2(pt)
+        line.append(th.TSA(pt))
+    ax.semilogx(xBs, line, linestyles[pn], dashes=dasheslengths[pn], linewidth=2,
+            label="$Q^2 = %s \\,{\\rm GeV}^2$" % pt.Q2) 
+    ax.set_xlim(5.e-5, 0.2)
+    ax.set_ylim(-0.65, 0.65)
+    ax.set_yticklabels([])
+    #
+    ###    BCA
+    #
+    pt = Data.DummyPoint()
+    pt.exptype = 'collider'
+    pt.in1particle = 'e'
+    pt.in1charge = 1
+    pt.in1energy = 5.
+    pt.in1polarization = 0
+    pt.in2particle = 'p'
+    pt.in2energy = 100.
+    pt.s = 2 * pt.in1energy * (pt.in2energy + math.sqrt(
+        pt.in2energy**2 - Mp2)) + Mp2
+    pt.xB = 5.1e-3
+    pt.t = -0.25
+    pt.Q2 = 4.4
+    pt.units = {'phi' : 'radian'}
+    ###  phi panel
+    ax = fig.add_subplot(4,3,10)
+    ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
+    phi = np.linspace(0., 2*np.pi, 50)
+    utils.fill_kinematics(pt)
+    linestyles = ['r--', 'r--', 'g-', 'b-.', 'p:']
+    dasheslengths = [(None, None), (20,5), (20,5,5,5), (5,5)]
+    #labels = [r'$\sigma^{\uparrow}$ ' + t.name for t in lines]
+    pn = 0
+    th.__class__.to_conventions(pt)
+    th.__class__.prepare(pt)
+    # Must go to BKM explicitely here
+    line = th.BCA(pt, vars={'phi':np.pi-phi})
+    ax.plot(phi, line, linestyles[pn], dashes=dasheslengths[pn], linewidth=2, label=th.name) 
+    ax.set_xlim(0.0, 2*np.pi)
+    ax.set_ylim(-0.45, 0.45)
+    # axes labels
+    ax.set_xlabel('$\\phi\\quad {\\rm [rad]}$', fontsize=20)
+    ax.set_ylabel('$A_{\\rm C}$', fontsize=20)
+    ax.set_xticks([0, np.pi/2, np.pi, 3*np.pi/2])
+    ax.set_xticklabels(['$0$', '$\\pi/2$', '$\\pi$', '$3 \\pi/2$'])
+    ###  t panel
+    pt.FTn = 1
+    ax = fig.add_subplot(4,3,11)
+    ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
+    tms = list(np.linspace(0.,0.1))+list(np.linspace(0.1, 0.85))
+    line = []
+    for tm in tms:
+        pt.t = -tm
+        # Change sign to go to Trento
+        line.append(-th.BCA(pt))
+    ax.plot(tms, line, linestyles[pn], dashes=dasheslengths[pn], linewidth=2) 
+    ax.set_xlim(0., 0.9)
+    ax.set_ylim(-0.45, 0.45)
+    ax.set_xlabel('$-t \\,{\\rm [GeV}^2{\\rm ]}$', fontsize=20)
+    ax.set_yticklabels([])
+    ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.2))  # tickmarks
+    ax.text(0.1, -0.35, "$x_B = %s$" % pt.xB, fontsize=14)
+    #
+    ###  xB panel
+    pt.t = -0.25
+    pt.tm = 0.25
+    ax = fig.add_subplot(4,3,12)
+    ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
+    xBs = np.logspace(-4., -0.7, 40)
+    line = []
+    pt.Q2 = 2.5
+    for xB in xBs:
+        del pt.W
+        pt.xB = xB
+        utils._complete_xBWQ2(pt)
+        line.append(-th.BCA(pt))
+    ax.semilogx(xBs, line, linestyles[pn], dashes=dasheslengths[pn], linewidth=2,
+            label="$Q^2= %s \\,{\\rm GeV}^2$" % pt.Q2) 
+    pn += 1
+    line = []
+    pt.Q2 = 13.9
+    for xB in xBs:
+        del pt.W
+        pt.xB = xB
+        utils._complete_xBWQ2(pt)
+        line.append(-th.BCA(pt))
+    ax.semilogx(xBs, line, linestyles[pn], dashes=dasheslengths[pn], linewidth=2,
+            label="$Q^2= %s \\,{\\rm GeV}^2$" % pt.Q2) 
+    ax.set_xlim(5.e-5, 0.2)
+    ax.set_ylim(-0.45, 0.45)
+    ax.set_xlabel('$x_{\\rm B}$', fontsize=20)
+    ax.set_yticklabels([])
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
