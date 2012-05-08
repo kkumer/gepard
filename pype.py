@@ -17,6 +17,7 @@ from results import *
 from math import sqrt
 
 from dispersion import *
+from quadrature import rthtquadrature
 
 class HFilter(logging.Filter):
 
@@ -106,11 +107,18 @@ GLO12 = H1ZEUS + UNP5points + LPpoints + TPpoints
 
 ## [3] Create a theory
 
-# Gepard only
-#m = Model.Gepard(ansatz='EFLEXP')
-#m.parameters.update(DM12KK)
-#m.covariance = DM12KKcov
+# Gepard only - NPB08
+#m = Model.Gepard(ansatz='FIT')
+#m.parameters.update(NPB08NNLO)
 #th = Approach.BMK(m)
+#th.name = 'NPB08_NNLO'
+
+# Gepard only - EIC fit
+m = Model.Gepard(ansatz='EFLEXP')
+m.parameters.update(EIC12C)
+m.covariance = EIC12Ccov
+th = Approach.BMK(m)
+th.name = 'EIC_fit'
 
 # DR
 #mDRonly = Model.ModelDR()
@@ -123,14 +131,15 @@ GLO12 = H1ZEUS + UNP5points + LPpoints + TPpoints
 #tDR1.m.parameters.update(DMepsGLO1)
 
 
-# Hybrid KM10
-mGepard = Model.ComptonGepard(cutq2=0.5)
-mDRPPsea = Model.ComptonModelDRPPsea()
-m = Model.HybridDipole(mGepard, mDRPPsea)
-th = Approach.BM10(m)
-th.name = 'KM10'
-g = th.m.g
-th.m.parameters.update(KM10)  # KKunp5
+# Hybrid KM10b
+#mGepard = Model.ComptonGepard()
+#mDRPPsea = Model.ComptonModelDRPPsea()
+#m = Model.HybridKelly(mGepard, mDRPPsea)
+#thKM10b = Approach.BM10(m)
+#thKM10b.name = 'KM10b'
+#g = thKM10b.m.g
+#thKM10b.m.parameters.update(KM10b)  # DM email only!
+#th = tKM10
 
 # New Hybrid KM12
 #mGepard = Model.ComptonGepard(ansatz='EFL', speed=2)
@@ -287,3 +296,16 @@ def der(th, pars, pts, f=False,  h=0.05):
 
 pti = data[66][13]
 ptd = data[65][0]
+
+
+def rth(m, pt, tht):
+    """Calculate <r(tht)> for model m."""
+    norm = rthtquadrature(lambda r: m.gpdHQbpolpol(pt, r, tht), 0.0, 2.5)
+    aux = rthtquadrature(lambda r: r*m.gpdHQbpolpol(pt, r, tht), 0.0, 2.5)
+    return aux/norm
+
+def bsq(m, pt):
+    """Calculate <b^2> for model m."""
+    norm = rthtquadrature(lambda b: b*m.gpdHQbIntg(pt, b), 0.0, 2.5)
+    aux = rthtquadrature(lambda b: b**3*m.gpdHQbIntg(pt, b), 0.0, 2.5)
+    return aux/norm

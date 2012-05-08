@@ -82,3 +82,5 @@ tquadrature = quadSciPy5
 # Choice of routine used for t->b Fourier transform
 bquadrature = quadSciPy10
 
+# Choice of routine used for <r(theta)> integrals
+rthtquadrature = quadSciPy10

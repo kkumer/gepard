@@ -2485,7 +2485,7 @@ def markus(th, error=False, path=None, fmt='png', **kwargs):
     pt.Q2 = 4.0
     pt.t = -0.2
     #
-    resolution = 50
+    resolution = 6
     bxs = np.linspace(-1.7, 1.7, resolution)
     bys = np.linspace(-1.7, 1.7, resolution)
     ### 1D panel
@@ -2525,11 +2525,19 @@ def markus(th, error=False, path=None, fmt='png', **kwargs):
     ax = fig.add_subplot(2, 1, 2)
     #actual contour plot
     im = ax.contourf(X, Y, Zpol, np.linspace(0, 2, 40), cmap=plt.cm.Blues)
-    # Just the single border line
-    cs = ax.contour(X, Y, Zpol, np.array([0.15]), linestyle='--')
-    for c in cs.collections:
-        c.set_linestyle('dashed')
-        c.set_linewidth(0.5)
+    # Just the single border line - contour style
+    #cs = ax.contour(X, Y, Zpol, np.array([0.15]), linestyle='--')
+    #for c in cs.collections:
+    #    c.set_linestyle('dashed')
+    #    c.set_linewidth(0.5)
+    # Just the single border line - plot style
+    phis = np.linspace(0, 2*np.pi, 20)
+    bees = []
+    for phi in phis:
+        bees.append(th.m.rth(pt, phi))
+    bees = np.array(bees)
+    ax.plot(bees*np.cos(phis), bees*np.sin(phis), 'r--')
+    # colorbar
     cb = plt.colorbar(im)
     cb.ax.set_yticks([0, 0.5, 1])
     cb.ax.set_yticklabels(['0.', '1.', '2.'])

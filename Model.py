@@ -9,11 +9,11 @@ and parameter values can calculate observables.
 #from IPython.Debugger import Tracer; debug_here = Tracer()
 import pickle, sys, logging
 
-from numpy import log, pi, imag, real, sqrt
+from numpy import log, pi, imag, real, sqrt, cos, sin
 from numpy import ndarray, array
 from scipy.special import j0, j1
 
-from quadrature import PVquadrature, bquadrature
+from quadrature import PVquadrature, bquadrature, rthtquadrature
 from utils import flatten, hubDict, stringcolor
 from constants import tolerance2, GeVfm, Mp
 import dispersion as DR
@@ -1211,6 +1211,50 @@ class ComptonGepard(ComptonFormFactors):
         aux = bquadrature(lambda d: d**2*j1(b*d/GeVfm)*self.gpdEzeroQ(pt, ts=-d**2), 
                 0.0, 2.5) / (2*pi*GeVfm**2)
         return self.gpdHQb(pt) + pt.bx*aux/(2*b*Mp)
+
+    def gpdHQbpolpol(self, pt, r, tht):
+        """Same as gpdHQbpol but in polar coordinate system.
+        FIXME: some ugly coding here.
+        """
+        if not isinstance(r, ndarray):
+            assert isinstance(r, (int, long, float)) 
+            ra = array([r])
+        else:
+            ra = r
+        res = []
+        for rr in ra:
+            pt.bx = rr*cos(tht)
+            pt.by = rr*sin(tht)
+            b = sqrt(pt.bx**2 + pt.by**2)
+            aux = bquadrature(lambda d: d**2*j1(b*d/GeVfm)*self.gpdEzeroQ(pt, ts=-d**2), 
+                    0.0, 2.5) / (2*pi*GeVfm**2)
+            res.append(self.gpdHQb(pt) + pt.bx*aux/(2*b*Mp))
+        if not isinstance(r, ndarray):
+            r = ra[0]
+        else:
+            r = ra
+        return array(res)
+
+    def rth(self, pt, tht):
+        """Calculate <r(tht)> """
+        norm = rthtquadrature(lambda r: r*self.gpdHQbpolpol(pt, r, tht), 0.0, 2.5)
+        prob = rthtquadrature(lambda r: r*r*self.gpdHQbpolpol(pt, r, tht), 0.0, 2.5)
+        return prob/norm
+
+    def gpdHQbIntg(self, pt, ba):
+        """Same as gpdHQb but convenient as integrand."""
+        res = []
+        for b in ba:
+            aux = bquadrature(lambda d: d*j0(b*d/GeVfm)*self.gpdHzeroQ(pt, ts=-d**2), 
+                0.0, 2.5) / (2*pi*GeVfm**2)
+            res.append(aux)
+        return array(res)
+
+    def bsq(self, pt):
+        """Calculate unpolarized <b^2> for model m."""
+        norm = rthtquadrature(lambda b: b*self.gpdHQbIntg(pt, b), 0.0, 2.5)
+        aux = rthtquadrature(lambda b: b**3*self.gpdHQbIntg(pt, b), 0.0, 2.5)
+        return aux/norm
     
     def gpdHGb(self, pt):
         """GPD H^G in b space in fm^-2."""
