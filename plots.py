@@ -2485,7 +2485,7 @@ def markus(th, error=False, path=None, fmt='png', **kwargs):
     pt.Q2 = 4.0
     pt.t = -0.2
     #
-    resolution = 6
+    resolution = 20
     bxs = np.linspace(-1.7, 1.7, resolution)
     bys = np.linspace(-1.7, 1.7, resolution)
     ### 1D panel

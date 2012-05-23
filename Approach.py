@@ -970,7 +970,7 @@ class BMK(Approach):
         b =  self.XS(pt, **both)
         return ((o-p) + (c-b)) / ((o+p) + (c+b))
 
-    def ALUDVCS(self, pt):
+    def ALUDVCS(self, pt, **kwargs):
         """Calculate BSA as defined by HERMES 0909.3587 Eq. (2.3) or its harmonics."""
         return self._phiharmonic(self._ALUDVCS, pt, **kwargs)
 

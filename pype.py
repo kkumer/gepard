@@ -114,22 +114,31 @@ GLO12 = H1ZEUS + UNP5points + LPpoints + TPpoints
 #th.name = 'NPB08_NNLO'
 
 # Gepard only - EIC fit
-m = Model.Gepard(ansatz='EFLEXP')
-m.parameters.update(EIC12C)
-m.covariance = EIC12Ccov
-th = Approach.BMK(m)
-th.name = 'EIC_fit'
+#m = Model.Gepard(ansatz='EFLEXP')
+#m.parameters.update(EIC12C)
+#m.covariance = EIC12Ccov
+#th = Approach.BMK(m)
+#th.name = 'EIC_fit'
 
 # DR
-#mDRonly = Model.ModelDR()
-#tDR = Approach.hotfixedBMK(mDRonly)
-#tDR.name = 'KM09a'
-#tDR.m.parameters.update(DMepsGLO)
-#mDRonly1 = Model.ModelDR()
-#tDR1 = Approach.hotfixedBMK(mDRonly1)
-#tDR1.name = 'KM09b'
-#tDR1.m.parameters.update(DMepsGLO1)
+mDRonly = Model.ModelDR()
+tDR = Approach.hotfixedBMK(mDRonly)
+tDR.name = 'KM09a'
+tDR.m.parameters.update(DMepsGLO)
+mDRonly1 = Model.ModelDR()
+tDR1 = Approach.hotfixedBMK(mDRonly1)
+tDR1.name = 'KM09b'
+tDR1.m.parameters.update(DMepsGLO1)
 
+
+# Hybrid KM10a
+mGepard = Model.ComptonGepard(cutq2=0.5)
+mDRsea = Model.ComptonModelDRsea()
+m = Model.HybridDipole(mGepard, mDRsea)
+th = Approach.hotfixedBMK(m)
+th.name = 'KM10a'
+g = th.m.g
+th.m.parameters.update(KM10a)  # ALTGLO
 
 # Hybrid KM10b
 #mGepard = Model.ComptonGepard()
@@ -139,7 +148,7 @@ th.name = 'EIC_fit'
 #thKM10b.name = 'KM10b'
 #g = thKM10b.m.g
 #thKM10b.m.parameters.update(KM10b)  # DM email only!
-#th = tKM10
+#th = thKM10b
 
 # New Hybrid KM12
 #mGepard = Model.ComptonGepard(ansatz='EFL', speed=2)
