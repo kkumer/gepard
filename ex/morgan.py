@@ -79,8 +79,8 @@ kins = [
 obs = [('BCA', 0), ('BCA', 1), ('BCA', 2), ('ALUI', -1), ('ALUDVCS', -1), ('ALUI', -2)]
 
 models = [tDR, tDR1]
-descriptions = ['Model KM10a (without Hall A)  NPB841 (2010) 1-58, arXiv:0904.0458',
-                'Model KM10b (with Hall A)  NPB841 (2010) 1-58, arXiv:0904.0458']
+descriptions = ['Model KM09a (without Hall A)  NPB841 (2010) 1-58, arXiv:0904.0458',
+                'Model KM09b (with Hall A)  NPB841 (2010) 1-58, arXiv:0904.0458']
 
 for m, d in zip(models, descriptions):
     sys.stdout.write('\n')
