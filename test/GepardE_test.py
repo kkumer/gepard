@@ -26,12 +26,12 @@ t = Approach.hotfixedBMK(m)
 # 23 : 'ALPG',      126 : 'EPG',
 # 24 : 'M02G',      127 : 'ESECG',
 # 25 : 'DELM2G',    129 : 'ESKEWG',
-# 26 : 'PG',        132 : 'ETHIS',
-# 27 : 'SECG',      142 : 'ETHIG' }
+# 26 : 'PG',        137 : 'ETHIS',
+# 27 : 'SECG',      147 : 'ETHIG' }
 # 28 : 'KAPG',
 # 29 : 'SKEWG',
-# 32 : 'THIS',
-# 42 : 'THIG',
+# 37 : 'THIS',
+# 47 : 'THIG',
 # 48 : 'DELB',
 
 # nloLOParameters

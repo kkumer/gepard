@@ -58,8 +58,8 @@ def test_gepardfitsimple():
     setpar(27, 0.0)   
     setpar(18, 0.0)   
     setpar(28, 0.0)   
-    setpar(32, 0.0)
-    setpar(42, 0.0)
+    setpar(37, 0.0)
+    setpar(47, 0.0)
     mGepard.g.parint.p = 0
     mGepard.g.init()
     tGepard.model.release_parameters('M02S', 'SKEWS')
@@ -93,8 +93,8 @@ def test_gepardfitDVCSsumso3():
     setpar(27,  0.)
     setpar(28,  0.)
     setpar(29,  0.)
-    setpar(32,  0.)
-    setpar(42,  0.)
+    setpar(37,  0.)
+    setpar(47,  0.)
     mGepard.g.parint.p = 0
     mGepard.g.init()
     tGepard.model.release_parameters('M02S','SKEWS','SKEWG')
@@ -132,8 +132,8 @@ def test_gepardfitDVCSnlso3():
     setpar(27,  0.)
     setpar(28,  0.)
     setpar(29,  0.)
-    setpar(32,  0.)
-    setpar(42,  0.)
+    setpar(37,  0.)
+    setpar(47,  0.)
     mGepard.g.parint.p = 0
     mGepard.g.init()
     tGepard.model.release_parameters('M02S','SECS','SECG')
@@ -169,9 +169,8 @@ def test_gepardfitDVCSthi():
     setpar(27, -0.81)
     setpar(28,  0.)
     setpar(29,  0.)
-    setpar(32,  0.)
-    #setpar(42,  0.1)
-    setpar(42,  0.0)
+    setpar(37,  0.)
+    setpar(47,  0.0)
     mGepard.g.parint.p = 0
     mGepard.g.init()
     tGepard.model.release_parameters('M02S','SECG','THIG')
@@ -205,8 +204,8 @@ def test_hybridfitGepard():
     setpar(27, 0.0)   
     setpar(18, 0.0)   
     setpar(28, 0.0)   
-    setpar(32, 0.0)
-    setpar(42, 0.0)
+    setpar(37, 0.0)
+    setpar(47, 0.0)
     t.m.parameters['Nv'] = 0
     t.m.parameters['C'] = 0
     t.m.g.parint.p = 0
@@ -242,8 +241,8 @@ def test_hybridfitDVCS():
     setpar(27,  0.)
     setpar(28,  0.)
     setpar(29,  0.)
-    setpar(32, 0.0)
-    setpar(42, 0.0)
+    setpar(37, 0.0)
+    setpar(47, 0.0)
     t.m.parameters['Nv'] = 0
     t.m.parameters['C'] = 0
     t.m.g.parint.p = 0
@@ -293,8 +292,8 @@ def test_hybridfit():
     setpar(27,  -2.51)
     setpar(28,  0.)
     setpar(29,  0.)
-    setpar(32, 0.09)
-    setpar(42, 0.89)
+    setpar(37, 0.09)
+    setpar(47, 0.89)
     t.m.parameters['C'] = 0
     t.m.g.parint.p = 0
     t.m.g.parchr.scheme = np.array([c for c in 'CSBAR'])
@@ -332,8 +331,8 @@ def test_hybridfitopt():
     setpar(27,  -2.51)
     setpar(28,  0.)
     setpar(29,  0.)
-    setpar(32, 0.09)
-    setpar(42, 0.89)
+    setpar(37, 0.09)
+    setpar(47, 0.89)
     topt.m.parameters['C'] = 0
     topt.m.ndparameters[12] = 0
     topt.m.g.parint.p = 0

@@ -839,7 +839,7 @@ class ComptonGepard(ComptonFormFactors):
     cutq2 - Q2 at which evolution is frozen (default = 0 GeV^2)
     
     """
-    def __init__(self, cutq2=0.0, ansatz='FIT', speed=1, **kwargs):
+    def __init__(self, cutq2=0.0, ansatz='FIT', speed=1, q02=4.0, **kwargs):
         # initial values of parameters and limits on their values
         self.parameters = {
         #  GPD H
@@ -905,8 +905,8 @@ class ComptonGepard(ComptonFormFactors):
              27 : 'SECG',
              28 : 'KAPG',
              29 : 'SKEWG',
-             32 : 'THIS',
-             42 : 'THIG',
+             37 : 'THIS',
+             47 : 'THIG',
              48 : 'DELB',
             112 : 'EAL0S',
             113 : 'EALPS',
@@ -922,8 +922,8 @@ class ComptonGepard(ComptonFormFactors):
             126 : 'EPG',
             127 : 'ESECG',
             129 : 'ESKEWG',
-            132 : 'ETHIS',
-            142 : 'ETHIG' }
+            137 : 'ETHIS',
+            147 : 'ETHIG' }
 
         # order matters to fit.MinuitFitter, so it is defined by:
         self.parameter_names = [ 
@@ -951,7 +951,7 @@ class ComptonGepard(ComptonFormFactors):
         g.astrong.mu02 = 2.5
         g.astrong.asp = array([0.0606, 0.0518, 0.0488])
 
-        g.parflt.q02 = 4.0
+        g.parflt.q02 = q02
         g.parflt.rf2 = 1.0
         g.parflt.rr2 = 1.0
 
@@ -962,7 +962,21 @@ class ComptonGepard(ComptonFormFactors):
 
         g.parchr.scheme = array([c for c in 'CSBAR'])  # array(5)
 
-        if ansatz not in ['FIT', 'FITEXP', 'EPH', 'EPHEXP', 'EFL', 'EFLEXP']:
+        if ansatz == 'NSFIT' or ansatz == 'FITBP':
+            self.parameters_index.update({
+                 31 : 'NU',
+                 32 : 'AL0U',
+                 33 : 'ALPU',
+                 34 : 'M02U',
+                 35 : 'DELM2U',
+                 36 : 'PU',
+                 41 : 'ND',  
+                 42 : 'AL0D',
+                 43 : 'ALPD',
+                 44 : 'M02D',
+                 45 : 'DELM2D',
+                 46 : 'PD'})
+        elif ansatz not in ['FIT', 'FITEXP', 'EPH', 'EPHEXP', 'EFL', 'EFLEXP']:
             raise ValueError, "Invalid ansatz: %s\n" % ansatz
         g.parchr.ansatz = array([c for c in ansatz + (6-len(ansatz))*' ']) # array(6)
         if ansatz == 'FITEXP':

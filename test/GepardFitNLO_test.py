@@ -55,8 +55,8 @@ def test_gepardfitDVCSNLO():
     setpar(27,  0.)
     setpar(28,  0.)
     setpar(29,  0.)
-    setpar(32,  0.)
-    setpar(42,  0.)
+    setpar(37,  0.)
+    setpar(47,  0.)
     mGepard.g.parint.p = 1
     mGepard.g.parchr.scheme = np.array([c for c in 'MSBAR'])
     mGepard.g.init()

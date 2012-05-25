@@ -49,8 +49,8 @@ def test_gepardfitDVCSexp():
     setpar(27,  0.)
     setpar(28,  0.)
     setpar(29,  0.)
-    setpar(32,  0.)
-    setpar(42,  0.)
+    setpar(37,  0.)
+    setpar(47,  0.)
     mGepard.g.parint.p = 0
     mGepard.g.init()
     tGepard.model.release_parameters('M02S','SECS','SECG')
