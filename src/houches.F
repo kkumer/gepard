@@ -154,8 +154,6 @@ C
 *   Following artifical renorm. scheme has C = (0, 1) at
 *   all orders, thus effectively putting F_2 -> Q_s^2 x g(x)
 
-      WRITE (*,*) 'This test is presently broken!'
-*   FIXME: understand how to change (old) PROCESS = 'EVOLG' into this:
       PROCESS = 'DVCSZG'
       
 
@@ -203,8 +201,9 @@ C
         J = N(1,K) - 1
         FCM(1) = MBGPD(K, 1)
         FCM(2) = MBGPD(K, 2)
-        FPW = CGRIDDIS(QIND,K,1) * FCM(1) + CGRIDDIS(QIND,K,2) * FCM(2)
+        FPW = CGRID(1,QIND,K,1) * FCM(1) + CGRID(1,QIND,K,2) * FCM(2)
         F2IMAG = IMAGPART(EPH * (1.0d0/XI)**(J-C) * FPW )
+*       WRITE (*,*) CGRID(1,QIND, K, 1)
         RES = RES + WG(K)*F2IMAG
  30     CONTINUE
 
@@ -230,7 +229,7 @@ C
         J = N(1,K) - 1
         FCM(1) = MBGPD(K, 1)
         FCM(2) = MBGPD(K, 2)
-        FPW = CGRIDDIS(QIND,K,1) * FCM(1) + CGRIDDIS(QIND,K,2) * FCM(2)
+        FPW = CGRID(1,QIND,K,1) * FCM(1) + CGRID(1,QIND,K,2) * FCM(2)
         F2IMAG = IMAGPART(EPH * (1.0d0/XI)**(J-C) * FPW )
         RES = RES + WG(K)*F2IMAG
  40     CONTINUE
