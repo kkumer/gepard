@@ -101,7 +101,7 @@ endif
 # -- 2. MathLink related things
 #
 # Put your version of Mathematica here and it's root dir (final slash needed!)
-export MMAVERSION=7.0
+export MMAVERSION=8.0
 export MMAROOT = /usr/local/Wolfram/Mathematica/
 # export MMAROOT = /cygdrive/c/Program\ Files/Wolfram\ Research/Mathematica/
 #export MMAROOT = /psi/math-

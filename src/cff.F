@@ -88,8 +88,8 @@ C
      &              PAR(17) * CGRID(2,QIND,K,1) * MBGPD(K,1) + 
      &              PAR(27) * CGRID(2,QIND,K,2) * MBGPD(K,2)
         FPWH = FPWH +  
-     &              PAR(32) * CGRID(3,QIND,K,1) * MBGPD(K,1) + 
-     &              PAR(42) * CGRID(3,QIND,K,2) * MBGPD(K,2)
+     &              PAR(37) * CGRID(3,QIND,K,1) * MBGPD(K,1) + 
+     &              PAR(47) * CGRID(3,QIND,K,2) * MBGPD(K,2)
 *            --- CFF E ---
         IF (.NOT. ( (ANSATZ .EQ. 'EFL') .OR. (ANSATZ .EQ. 'EFLEXP')
      &           )) THEN
@@ -97,8 +97,8 @@ C
 *         to get full proportionality  E \propto H
           PAR(117) = PAR(17)
           PAR(127) = PAR(27)
-          PAR(132) = PAR(32)
-          PAR(142) = PAR(42)
+          PAR(137) = PAR(37)
+          PAR(147) = PAR(47)
         END IF
         IF (ANSATZ(:1) .EQ. 'E') THEN
 *         we implement BS + BG = 0 sum rule
@@ -111,8 +111,8 @@ C
      &            PAR(18) * PAR(117) * CGRID(2,QIND,K,1) * MBGPD(K,3) + 
      &            PAR(28) * PAR(127) * CGRID(2,QIND,K,2) * MBGPD(K,4)
         FPWE = FPWE +  
-     &            PAR(18) * PAR(132) * CGRID(3,QIND,K,1) * MBGPD(K,3) + 
-     &            PAR(28) * PAR(142) * CGRID(3,QIND,K,2) * MBGPD(K,4)
+     &            PAR(18) * PAR(137) * CGRID(3,QIND,K,1) * MBGPD(K,3) + 
+     &            PAR(28) * PAR(147) * CGRID(3,QIND,K,2) * MBGPD(K,4)
       END IF
 
       IF (ANSATZ(:1) .EQ. 'E') THEN

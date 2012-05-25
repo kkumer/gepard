@@ -22,9 +22,9 @@ C                            radQ) with 12 sets of point coordinates
 C                            (\xi, K_\lambda) or (\xi, \delta\varphi),
 C                            corresponding to 12 lines on a graph
 C  IDENTIFIERS
-C          NPOINTS -- number of points on each line
-C              Q2S -- array(NPOINTS), values of Q2
-C           POINTS -- array(2, 12, NPOINTS), holds results for
+C          LNPOINTS -- number of points on each line
+C              Q2S -- array(LNPOINTS), values of Q2
+C           POINTS -- array(2, 12, LNPOINTS), holds results for
 C                 two panels (Fig 8?, in order  a, b)
 C                 12 lines depicted on these panels:
 C                   1-3 LO, NLO, NNLO 5e-1 (x 0.9 )
@@ -43,19 +43,20 @@ C  SYNOPSIS
 C  SOURCE
 C
       IMPLICIT NONE
-      INTEGER PT, NPOINTS, LN, NXI, PANEL
+      INTEGER PT, LNPOINTS, LN, NXI, PANEL
       DOUBLE PRECISION Q2START, Q2END, Q2STEP, MP
       DOUBLE PRECISION COLQ2START, COLQ2END
       DOUBLE PRECISION DCARG
-      PARAMETER ( NPOINTS = 40 )
-      DOUBLE PRECISION POINTS(0:3, 12, NPOINTS)
-      DOUBLE PRECISION Q2S(NPOINTS), XIS(4), FACT(4), ADDF(4)
+      PARAMETER ( LNPOINTS = 40 )
+      DOUBLE PRECISION POINTS(0:3, 12, LNPOINTS)
+      DOUBLE PRECISION Q2S(LNPOINTS), XIS(4), FACT(4), ADDF(4)
       PARAMETER ( COLQ2START = 2.5d0, COLQ2END =  100.0d0 )
 *     Proton mass:
       PARAMETER (MP = 0.938272d0 )
 
 #include "../header.F"
 
+      WRITE (*,*) 'Warning: This one is still broken!'
       PROCESS = 'DVCS'
       FFTYPE = 'SINGLET'
 
@@ -87,7 +88,7 @@ C
 *   We do collider kinematics
       Q2START = COLQ2START
       Q2END = COLQ2END
-      Q2STEP = (Q2END - Q2START) / (NPOINTS - 1)
+      Q2STEP = (Q2END - Q2START) / (LNPOINTS - 1)
 
 *   \xi points
       XIS(1) = 5.0d-1
@@ -106,7 +107,7 @@ C
 
 *     Looping over Q2's
 
-      DO 30 PT = 1, NPOINTS
+      DO 30 PT = 1, LNPOINTS
 
         Q2 = Q2START + (PT - 1) * Q2STEP
         Q2S(PT) = Q2
@@ -125,7 +126,7 @@ C
 
           DO 10 P = 0, 2
 
-            CALL EVOLC(1)
+            CALL EVOLC(1,1)
             CALL CFFF 
 
 *         ... and saving them to array
@@ -143,7 +144,7 @@ C
       DO 60 NXI = 1, 4
         DO 50  P = 0, 2
           LN = 3 * (NXI - 1) + P + 1
-          DO 40 PT = 1, NPOINTS
+          DO 40 PT = 1, LNPOINTS
              WRITE (UNIT=10,FMT=998) Q2S(PT), POINTS(0,LN,PT)
              WRITE (UNIT=11,FMT=998) Q2S(PT), POINTS(1,LN,PT)
  40       CONTINUE

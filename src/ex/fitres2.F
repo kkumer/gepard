@@ -22,10 +22,8 @@ C       fitres2[0-3].dat  --  4 files (one for each panel of Figure
 C                            fitres2) with 1-3 sets of point coordinates
 C                            corresponding to 1-3 lines on a graph
 C  IDENTIFIERS
-C          NPOINTS -- number of points on each line
-C              XS  -- array(NPOINTS), values of x-coordinates (-tt, Q2, W)
-C           POINTS -- array(4, 3, NPOINTS), holds results for
-C                 four panels (Fig ?, in order  a, b, c, d)
+C          LNPOINTS -- number of points on each line
+C              XS  -- array(LNPOINTS), values of x-coordinates (-tt, Q2, W)
 C
 C                P -- approximation order N^{P}LO P=0,1,2
 C
@@ -34,10 +32,9 @@ C      READPAR, INIT, CFFF, DCARG
 C  SOURCE
 C
       IMPLICIT NONE
-      INTEGER PT, NPOINTS, LN, PANEL, K
+      INTEGER PT, LNPOINTS, LN, PANEL, K
       DOUBLE PRECISION MT, MP, LSTART, LEND, LSTEP
-      PARAMETER ( NPOINTS = 40 )
-      DOUBLE PRECISION POINTS(0:3, 4, NPOINTS)
+      PARAMETER ( LNPOINTS = 40 )
       DOUBLE PRECISION W, PARSIGMA, SIGMA
       CHARACTER FNAME*30
 *     Proton mass:
@@ -146,14 +143,14 @@ C
 
         CALL INIT
         QS(1) = Q2
-        CALL EVOLC(1)
+        CALL EVOLC(1,1)
         
 *     Looping over MT
         LSTART = 0.05
         LEND = 0.9
-        LSTEP = (LEND - LSTART) / (NPOINTS - 1)
+        LSTEP = (LEND - LSTART) / (LNPOINTS - 1)
 
-        DO 10 PT = 1, NPOINTS
+        DO 10 PT = 1, LNPOINTS
 
           MT = LSTART + (PT - 1) * LSTEP
           MTIND = NMTS + NMTSEXP + 1
@@ -186,14 +183,14 @@ C
 *     Looping over Q2
         LSTART = 3.0d0
         LEND = 90.0d0
-        LSTEP = (LEND - LSTART) / (NPOINTS - 1)
+        LSTEP = (LEND - LSTART) / (LNPOINTS - 1)
 
-        DO 40 PT = 1, NPOINTS
+        DO 40 PT = 1, LNPOINTS
 
           Q2 = LSTART + (PT - 1) * LSTEP
           XI = Q2 / ( 2.0d0 * W**2 + Q2)
           QS(1) = Q2
-          CALL EVOLC(1)
+          CALL EVOLC(1,1)
           WRITE (UNIT=11,FMT=998) Q2, SIGMA(), 0.0
 
  40     CONTINUE
@@ -218,14 +215,14 @@ C
 
         CALL INIT
         QS(1) = Q2
-        CALL EVOLC(1)
+        CALL EVOLC(1,1)
         
 *     Looping over W
         LSTART = 30.d0
         LEND = 140.d0
-        LSTEP = (LEND - LSTART) / (NPOINTS - 1)
+        LSTEP = (LEND - LSTART) / (LNPOINTS - 1)
 
-        DO 60 PT = 1, NPOINTS
+        DO 60 PT = 1, LNPOINTS
 
           W = LSTART + (PT - 1) * LSTEP
           XI = Q2 / ( 2.0d0 * W**2 + Q2)
@@ -266,13 +263,13 @@ C
 *     Looping over Q2
         LSTART = 2.d0
         LEND = 95.d0
-        LSTEP = (LEND - LSTART) / (NPOINTS - 1)
+        LSTEP = (LEND - LSTART) / (LNPOINTS - 1)
 
-        DO 80 PT = 1, NPOINTS
+        DO 80 PT = 1, LNPOINTS
 
           Q2 = LSTART + (PT - 1) * LSTEP
           QSDIS(1) = Q2
-          CALL EVOLC(1)
+          CALL EVOLC(1,1)
           CALL F2F
           WRITE (UNIT=13,FMT=998) Q2, F2(P), 0.0
 

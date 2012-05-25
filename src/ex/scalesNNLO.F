@@ -29,10 +29,10 @@ C  SYNOPSIS
 C  SOURCE
 C
       IMPLICIT NONE
-      INTEGER PT, NPOINTS, LN, NDEL
+      INTEGER PT, LNPOINTS, LN, NDEL
       DOUBLE PRECISION DCARG, MP, FACF, FACR
-      PARAMETER ( NPOINTS = 7 )
-      DOUBLE PRECISION XIS(NPOINTS), POINTS(0:1, 2, NPOINTS)
+      PARAMETER ( LNPOINTS = 7 )
+      DOUBLE PRECISION XIS(LNPOINTS), POINTS(0:1, 2, LNPOINTS)
       DOUBLE COMPLEX CFFD, CFFM, CFFU
 *     Proton mass:
       PARAMETER (MP = 0.938272d0 )
@@ -78,7 +78,7 @@ C
         END IF
         PAR(11) = (2.0d0/3.0d0) - PAR(21)
 
-      DO 10 PT = 1, NPOINTS
+      DO 10 PT = 1, LNPOINTS
         XI = XIS(PT)
 
 *     Looping over two table rows
@@ -105,21 +105,21 @@ C
       RR2 = 1.0d0
       RF2 = 1.0d0
       CALL INIT
-      CALL EVOLC(1)
+      CALL EVOLC(1,1)
       CALL CFFF 
       CFFM = CFF(P)
 
       RR2 = 1.0d0 / FACR
       RF2 = 1.0d0 / FACF
       CALL INIT
-      CALL EVOLC(1)
+      CALL EVOLC(1,1)
       CALL CFFF 
       CFFD = CFF(P)
 
       RR2 = FACR
       RF2 = FACF
       CALL INIT
-      CALL EVOLC(1)
+      CALL EVOLC(1,1)
       CALL CFFF 
       CFFU = CFF(P)
       
@@ -136,7 +136,7 @@ C
 
       DO 30 LN = 1, 2
          WRITE (UNIT=10,FMT=999) ( POINTS(0,LN,PT),
-     &  POINTS(1,LN,PT) , PT=1,NPOINTS )
+     &  POINTS(1,LN,PT) , PT=1,LNPOINTS )
  30   CONTINUE
 
 999   FORMAT (1X, 5(F4.1, ' [', F4.1, ']', 2X))

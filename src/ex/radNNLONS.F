@@ -23,11 +23,11 @@ C                            radNNLONS) with 4 sets of point coordinates
 C                            (\xi, \delta K) or (\xi, \delta\varphi),
 C                            corresponding to 4 lines on a graph
 C  IDENTIFIERS
-C          NPOINTS -- number of points on each line
+C          LNPOINTS -- number of points on each line
 C       LOGXISTART -- log(\xi) where line begins
 C         LOGXIEND -- log(\xi) where line ends
-C              XIS -- array(NPOINTS), values of XI
-C           POINTS -- array(0:3, 4, NPOINTS), holds results for
+C              XIS -- array(LNPOINTS), values of XI
+C           POINTS -- array(0:3, 4, LNPOINTS), holds results for
 C                 four panels (Fig 7, in order  a, b, c and d) and
 C                 4 K_{\lambda,arg} lines depicted on these panels
 C                 Order is:  1.  NNLO, CSBAR, HARD 
@@ -42,14 +42,14 @@ C      READPAR, INIT, CFFF, DCARG
 C  SOURCE
 C
       IMPLICIT NONE
-      INTEGER PT, NPOINTS, LN, NDEL
+      INTEGER PT, LNPOINTS, LN, NDEL
       DOUBLE PRECISION XISTART, XIEND, XISTEP, MP
       DOUBLE PRECISION DCARG
-      PARAMETER ( NPOINTS = 60 )
-      DOUBLE PRECISION POINTS(0:3, 4, NPOINTS)
-      DOUBLE PRECISION XIS(NPOINTS)
+      PARAMETER ( LNPOINTS = 60 )
+      DOUBLE PRECISION POINTS(0:3, 4, LNPOINTS)
+      DOUBLE PRECISION XIS(LNPOINTS)
       PARAMETER ( XISTART = 0.01d0, XIEND = 0.5d0,
-     &       XISTEP = (XIEND - XISTART) / (NPOINTS - 1) )
+     &       XISTEP = (XIEND - XISTART) / (LNPOINTS - 1) )
 *     Proton mass:
       PARAMETER (MP = 0.938272d0 )
 
@@ -90,7 +90,7 @@ C
       QS(1) = Q2
 
       XI = XISTART
-      DO 20 PT = 1, NPOINTS
+      DO 20 PT = 1, LNPOINTS
       XIS(PT) = XI
 
 *     Looping over four lines for each panel
@@ -116,15 +116,22 @@ C
 *     Calculating two CFFs needed for present line and point ...
 
       CALL INIT
-      CALL EVOLC(1)
+      CALL EVOLC(1,1)
       CALL CFFF 
       P = P - 1
       CALL INIT
-      CALL EVOLC(1)
+      CALL EVOLC(1,1)
       CALL CFFF 
       P = P + 1
 
 *     ... and saving them to array
+
+*     IF ((XI .LE. 1.1d-2) .AND. (Q2 .GE. 5.) .AND.
+*    & ((LN .EQ. 2) .OR. (LN .EQ. 4))) THEN
+*         WRITE(*,*) CFF
+*         WRITE(*,*) (ABS(CFF(P)) / ABS(CFF(P-1)) -
+*    &        1.0d0) * 100.0d0
+*     END IF
 
       POINTS(NDEL, LN, PT) = (ABS(CFF(P)) / ABS(CFF(P-1)) -
      &        1.0d0) * 100.0d0
@@ -137,7 +144,7 @@ C
 *     Printing all the results from arrays to files
 
       DO 40 LN = 1, 4
-      DO 30 PT = 1, NPOINTS
+      DO 30 PT = 1, LNPOINTS
          WRITE (UNIT=10+NDEL,FMT=998) XIS(PT), POINTS(NDEL,LN,PT)
          WRITE (UNIT=12+NDEL,FMT=998) XIS(PT), POINTS(2+NDEL,LN,PT)
  30   CONTINUE

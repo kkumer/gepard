@@ -50,8 +50,8 @@ C
       PAR(27) = 0.0d0
 
 *   turn off third PW
-      PAR(32) = 0.0d0
-      PAR(42) = 0.0d0
+      PAR(37) = 0.0d0
+      PAR(47) = 0.0d0
 
 *   turn off GPD E
       PAR(18) = 0.0d0

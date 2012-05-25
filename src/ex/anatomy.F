@@ -16,11 +16,11 @@ C  OUTPUT
 C        EVOL.dat  --  file with 2 sets of point coordinates
 C                      corresponding to 2 lines on a graph
 C  IDENTIFIERS
-C          NPOINTS -- number of points on each line
+C          LNPOINTS -- number of points on each line
 C       LOGXISTART -- log(\xi) where line begins
 C         LOGXIEND -- log(\xi) where line ends
-C              XIS -- array(NPOINTS), values of XI
-C            PREDS -- array(6, NPOINTS), holds results for
+C              XIS -- array(LNPOINTS), values of XI
+C            PREDS -- array(6, LNPOINTS), holds results for
 C                     each prediction calculated
 C                 Order is:  1.  TOTAL predicition (NLO with NLO ND evol.)
 C                            2.  LO prediction
@@ -39,15 +39,14 @@ C
       PROGRAM ANATOMY
 
       IMPLICIT NONE
-      INTEGER PT, NPOINTS, LN, NDEL
+      INTEGER PT, LNPOINTS, LN, NDEL
       DOUBLE PRECISION LOGXI, LOGXISTART, LOGXIEND, LOGXISTEP
-      PARAMETER ( NPOINTS = 40 )
-      DOUBLE COMPLEX PREDS(6, NPOINTS), TOT
-      DOUBLE PRECISION XIS(NPOINTS), MODUL, PHASE, Q2EXP, MP, Q02IN
+      PARAMETER ( LNPOINTS = 40 )
+      DOUBLE COMPLEX PREDS(6, LNPOINTS), TOT
+      DOUBLE PRECISION XIS(LNPOINTS), MODUL, PHASE, Q2EXP, MP, Q02IN
       DOUBLE PRECISION DCARG
-      CHARACTER SUBANSATZ*4
       PARAMETER ( LOGXISTART = -5.0d0, LOGXIEND = -0.30103d0,
-     &       LOGXISTEP = (LOGXIEND - LOGXISTART) / (NPOINTS - 1)  )
+     &       LOGXISTEP = (LOGXIEND - LOGXISTART) / (LNPOINTS - 1)  )
       PARAMETER (MP = 0.938272d0 )
 #include "../header.F"
 
@@ -94,7 +93,7 @@ C
 *   Looping over points (XI's) on each line
 
       LOGXI = LOGXISTART
-      DO 20 PT = 1, NPOINTS
+      DO 20 PT = 1, LNPOINTS
       XI = 10**LOGXI
       XIS(PT) = XI
 
@@ -130,7 +129,7 @@ C
   
       CALL INIT
       QS(1) = Q2
-      CALL EVOLC(1)
+      CALL EVOLC(1,1)
       CALL CFFF 
 
 *   ... and saving it to arrray
@@ -144,7 +143,7 @@ C
 *     Calculating plot points from results in PREDS and printing to files
 
       DO 40 LN = 1, 3
-      DO 30 PT = 1, NPOINTS
+      DO 30 PT = 1, LNPOINTS
         TOT = PREDS(1, PT)
         IF (LN .EQ. 1) THEN
           MODUL = ABS( PREDS(4,PT) ) / ABS( TOT )
