@@ -43,7 +43,7 @@ def test_DISNLO():
     t.m.g.parint.p = 1
     t.m.g.newcall = 1
     t.m.g.init()
-    assert_almost_equal(pt.xi*m.ImH(pt)/np.pi, 0.902814587)
+    assert_almost_equal(pt.xi*m.ImH(pt)/np.pi, 0.9028145873)
 
 test_DISNLO.gepardsuite = 1
 
@@ -61,6 +61,6 @@ def test_DISNNLO():
     t.m.g.parint.p = 2
     t.m.g.newcall = 1
     t.m.g.init()
-    assert_almost_equal(pt.xi*m.ImH(pt)/np.pi, 0.906821207)
+    assert_almost_equal(pt.xi*m.ImH(pt)/np.pi, 0.9068212068)
 
 test_DISNNLO.gepardsuite = 1
