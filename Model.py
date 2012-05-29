@@ -976,7 +976,8 @@ class ComptonGepard(ComptonFormFactors):
                  44 : 'M02D',
                  45 : 'DELM2D',
                  46 : 'PD'})
-        elif ansatz not in ['FIT', 'FITEXP', 'EPH', 'EPHEXP', 'EFL', 'EFLEXP']:
+        elif ansatz not in ['FIT', 'FITEXP', 'EPH', 'EPHEXP', 'EFL', 
+                'EFLEXP', 'HOUCHE']:
             raise ValueError, "Invalid ansatz: %s\n" % ansatz
         g.parchr.ansatz = array([c for c in ansatz + (6-len(ansatz))*' ']) # array(6)
         if ansatz == 'FITEXP':
