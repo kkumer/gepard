@@ -204,14 +204,14 @@ htmlnocss:
 
 .PHONY: rmfig
 rmfig:
-	-rm -f Tests/*dat
-	-rm -f ex/*dat
+	-rm -f Tests/*.dat
+	-rm -f ex/*.dat
 
 .PHONY: clean
 clean:
 	$(MAKE) -C src clean
 	$(MAKE) -C doc/tex clean
 	-rm -rf doc/html/*
-	-rm -f fits/*.{mnt,out,ps,eps,out}
-	-rm -f Tests/*{dat,out,eps}
-	-rm -f ex/*{dat,eps}
+	-rm -f fits/*.mnt fits/*.out fits/*.ps fits/*.eps fits/*.out
+	-rm -f Tests/*.dat Tests/*.out Tests/*.eps
+	-rm -f ex/*.dat ex/*.eps
