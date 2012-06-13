@@ -23,7 +23,7 @@ from constants import Mp, Mp2
 
 #from IPython.Debugger import Tracer; debug_here = Tracer()
 _lg = logging.getLogger('p.%s' % __name__)
-_lg.setLevel('logging.INFO')
+_lg.setLevel('INFO')
 _lg.info('Loading module %s' % __name__)
 
 
@@ -40,7 +40,7 @@ def loaddata(datadir='data', approach=False):
     """
     data = {}
     for file in os.listdir(datadir):
-        _lg.info('Loading datafile %s' % file)
+        _lg.debug('Loading datafile %s' % file)
         if os.path.splitext(file)[1] == ".dat":
             dataset = Data.DataSet(datafile=os.path.join(datadir, file))
             if approach and dataset.process == 'ep2epgamma':

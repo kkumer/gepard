@@ -4,7 +4,7 @@ of some specific datasets and CFFs.
 
 """
 
-from IPython.Debugger import Tracer; debug_here = Tracer()
+#from IPython.Debugger import Tracer; debug_here = Tracer()
 
 import sys, os, math, copy, string, commands
 import numpy as np
@@ -243,17 +243,17 @@ def HERMES09BCA(path=None, fmt='png', **kwargs):
         fig.show()
     return fig
 
-def HERMES10(path=None, fmt='png', **kwargs):
-    """Plot HERMES PRELIMINARY 06/07 BCA and BSA data with fit lines."""
+def HERMES12(path=None, fmt='png', **kwargs):
+    """Plot HERMES combined BCA and BSA data with fit lines."""
 
-    title = 'HERMES-10-PRELIMINARY'
+    title = 'HERMES-12'
     fig = plt.figure()
     fig.canvas.set_window_title(title)
     fig.suptitle(title)
     xaxes = ['tm', 'xB', 'Q2']
     ylims = [(-0.05, 0.3), (-0.15, 0.15), (-0.45, 0.05)]
     # we have 3x18=54 points to be separated in nine panels six points each:
-    for y, id, shift in zip(range(3), [57, 57, 58], [18, 0, 0]):
+    for y, id, shift in zip(range(3), [67, 67, 68], [18, 0, 0]):
         for x in range(3):
             npanel = 3*y + x + 1  # 1, 2, ..., 9
             ax = fig.add_subplot(3,3,npanel)
@@ -283,18 +283,18 @@ def HERMES10(path=None, fmt='png', **kwargs):
         fig.show()
     return fig
 
-def HERMES10BCA(path=None, fmt='png', **kwargs):
-    """Plot HERMES PRELIMINARY 06/07 BCA data with fit lines."""
+def HERMES12BCA(path=None, fmt='png', **kwargs):
+    """Plot HERMES combined BCA data with fit lines."""
 
     #ids = [2, 4, 5]
-    title = 'HERMES-10-BCA-PRELIMINARY'
+    title = 'HERMES-12-BCA'
     fig = plt.figure()
     fig.canvas.set_window_title(title)
     fig.suptitle(title)
     xaxes = ['tm', 'xB', 'Q2']
     ylims = [(-0.15, 0.15), (-0.05, 0.3), (-0.15, 0.15)]
     # we have 3x18=54 points to be separated in nine panels six points each:
-    for y, id, shift in zip(range(3), [57, 57, 57], [0, 18, 36]):
+    for y, id, shift in zip(range(3), [67, 67, 67], [0, 18, 36]):
         for x in range(3):
             npanel = 3*y + x + 1  # 1, 2, ..., 9
             ax = fig.add_subplot(3,3,npanel)
@@ -323,18 +323,18 @@ def HERMES10BCA(path=None, fmt='png', **kwargs):
         fig.show()
     return fig
 
-def HERMES10BSA(path=None, fmt='png', **kwargs):
-    """Plot HERMES PRELIMINARY 06/07 BSA data with fit lines."""
+def HERMES12BSA(path=None, fmt='png', **kwargs):
+    """Plot HERMES combined BSA data with fit lines."""
 
     #ids = [2, 4, 5]
-    title = 'HERMES 10 BSA PRELIMINARY'
+    title = 'HERMES-12-BSA'
     fig = plt.figure()
     fig.canvas.set_window_title(title)
     fig.suptitle(title)
     xaxes = ['tm', 'xB', 'Q2']
     ylims = [(-0.45, 0.1), (-0.25, 0.25), (-0.15, 0.15)]
     # we have 3x18=54 points to be separated in nine panels six points each:
-    for y, id, shift in zip(range(3), [58, 59, 58], [0, 0, 18]):
+    for y, id, shift in zip(range(3), [68, 69, 68], [0, 0, 18]):
         for x in range(3):
             npanel = 3*y + x + 1  # 1, 2, ..., 9
             ax = fig.add_subplot(3,3,npanel)
