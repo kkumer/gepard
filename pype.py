@@ -19,23 +19,23 @@ from math import sqrt
 from dispersion import *
 from quadrature import rthtquadrature
 
-class HFilter(logging.Filter):
+#class HFilter(logging.Filter):
 
-    def __init__(self, treestring):
-        self.tree = treestring.split('.')
-        logging.Filter.__init__(self)
+#    def __init__(self, treestring):
+#        self.tree = treestring.split('.')
+#        logging.Filter.__init__(self)
 
-    def filter(self, rec):
-        head = rec.name.split('.')[:len(self.tree)]
-        if head != self.tree: 
-            return 0
-        #sys.stderr.write(' --- HFilter hit by %s (%s)\n' % (rec.name, rec.levelname))
-        return 1
+#    def filter(self, rec):
+#        head = rec.name.split('.')[:len(self.tree)]
+#        if head != self.tree: 
+#            return 0
+#        #sys.stderr.write(' --- HFilter hit by %s (%s)\n' % (rec.name, rec.levelname))
+#        return 1
 
-_lg = logging.getLogger('p')
+#_lg = logging.getLogger('p')
 
-hfil = HFilter('p')
-logging._handlerList[0].addFilter(hfil)
+#hfil = HFilter('p')
+#logging._handlerList[0].addFilter(hfil)
 
 #lg = logging.Logger('A')
 #lg.addHandler(logging.StreamHandler())
@@ -48,68 +48,93 @@ logging._handlerList[0].addFilter(hfil)
 
 data = utils.loaddata('/home/kkumer/pype/data/ep2epgamma', approach=Approach.BMK)  
 data.update(utils.loaddata('/home/kkumer/pype/data/gammastarp2gammap', approach=Approach.BMK))
-data.update(utils.loaddata('/home/kkumer/pype/data/gammastarp2gammap/EIC', approach=Approach.BMK))
-data.update(utils.loaddata('/home/kkumer/pype/data/ep2epgamma/EIC', approach=Approach.BMK))
+#data.update(utils.loaddata('/home/kkumer/pype/data/gammastarp2gammap/EIC', approach=Approach.BMK))
+#data.update(utils.loaddata('/home/kkumer/pype/data/ep2epgamma/EIC', approach=Approach.BMK))
 db = shelve.open('/home/kkumer/pype/theories.db')
 #dell = shelve.open('/home/kkumer/pype/dellB.db')
 
 ## [2] Choose subset of datapoints for fitting
 
-#testpoints = data[31][12:14] + data[8][1:3] + data[30][2:4]  # test set
-GLOpoints = data[31][12:] + data[8] + data[29]  # DM's GLO set
-#GLO1points = data[31][12:] + data[8] + data[29] + data[30]  # DM's GLO1 set
-##HERMESpoints = data[31][12:] +  data[29]
-##BSApoints = data[8] + data[29]
-##HAD17 = utils.select(data[33], criteria=['Q2 == 1.5', 't == -0.17'])
-##HA17 = utils.select(data[34], criteria=['t == -0.17'])
-##HA28 = utils.select(data[34], criteria=['t == -0.28'])
-##HA33 = utils.select(data[34], criteria=['t == -0.33'])
+####  --  Unpolarized target --
+#
+## H1 and ZEUS
+#
 DVCSpoints = data[36] + data[37] + data[38] + data[39] + \
   data[40] + data[41] + data[42] + data[43] + data[44] + \
   data[45]
-#ALTGLOpoints = data[5] + data[25] + data[32][18:]  # KK's CLAS BSA
-##ALTGLO1points = data[5] + data[25] + data[32] + HAD17 + HA17
-##ALTGLO2points = data[5] + data[25] + data[32][18:] + HAD17[::2] + HA17[::2]
-##ALTGLO3points = data[5] + data[25] + data[32][18:] + data[30] + HA17
-#ALTGLO4points = data[25] + data[32][18:]
-ALTGLO5points = data[5] + data[8] + data[32][18:]   # DM's CLAS BSA
-#Hpoints = data[5] + data[32][18:]
-##BSDw2Cpoints = utils.select(data[26], criteria=['Q2 == 2.3'])
-##BSDw2CDpoints = utils.select(data[50], criteria=['Q2 == 2.3'])
-BSDwpoints = utils.select(data[50], criteria=['FTn == -1'])
-BSSwpoints = utils.select(data[51], criteria=['FTn>=0', 'FTn <= 1'])
-#BSDwDMpoints = utils.select(data[55], criteria=['FTn == -1'])
-#BSSwDMpoints = utils.select(data[56], criteria=['FTn>=0', 'FTn <= 1'])
-TSA1points = utils.select(data[52], criteria=['FTn == -1'])  # HERMES A_UL
-#DMpoints = data[5] + data[32][18:] + data[8] + data[30]
-#DMTSApoints = data[5] + data[32][18:] + TSA1points + data[8] + data[30]
-TSApoints = TSA1points + data[54]  # HERMES+CLAS  A_UL
-BTSApoints = utils.select(data[53], criteria=['FTn==0'])   # HERMES A_LL
-LPpoints = TSApoints + BTSApoints  # longitudinal target
-AUTIpoints = utils.select(data[66], criteria=['FTn==1'])
-AUTDVCSpoints = data[65]
-TPpoints = AUTIpoints + AUTDVCSpoints
-#UNPpoints = ALTGLOpoints + BSSwpoints + BSDwpoints
-UNP5points = ALTGLO5points + BSSwpoints + BSDwpoints
 #H1ZEUSpoints = DVCSpoints + data[48]
 #H1ZEUSindependent = data[45] + data[39] + data[36] + data[46]
 H1ZEUSindependentNEW = data[45] + data[39] + data[63] + data[46]
 H1ZEUS = H1ZEUSindependentNEW + utils.select(data[47], criteria=['Q2 >= 4.0'])
-EICX = data[2001]
-for n in range(2002,2024):
-    EICX = EICX + data[n]
-EICTSA = data[2102]
-for n in range(2103,2110) + range(2111,2118) + range(2119,2125):
-    EICTSA = EICTSA + data[n]
+#
+## HERMES 
+#
+ALUIpoints = utils.select(data[68], criteria=['FTn == -1'])  # HERMES
+BCA0points = utils.select(data[67], criteria=['FTn == 0'])  # HERMES
+BCA1points = utils.select(data[67], criteria=['FTn == 1'])  # HERMES
+ALUIpts = ALUIpoints[:6]
+BCApts = BCA0points[:6] + BCA1points[:6]
+
+#
+## CLAS
+#
+BSACLAS_KKpoints = data[25]
+BSACLAS_DMpoints = data[8]
+CLASpts = utils.select(data[8], criteria=['Q2 >= 2.0'])
+#
+# Hall A
+#
+BSDwpoints = utils.select(data[50], criteria=['FTn == -1'])
+BSSwpoints = utils.select(data[51], criteria=['FTn>=0', 'FTn <= 1'])
+HApts = BSDwpoints[::2] + BSSwpoints[::2]
+#
+# EIC mock
+#
+#EICX = data[2001]
+#for n in range(2002,2024):
+#    EICX = EICX + data[n]
+#EICTSA = data[2102]
+#for n in range(2103,2110) + range(2111,2118) + range(2119,2125):
+#    EICTSA = EICTSA + data[n]
 #EICmockkk = data[1002]
-GLO12 = H1ZEUS + UNP5points + LPpoints + TPpoints
+
+
+####  --  Longitudinally polarized target --
+#
+TSA1points = utils.select(data[52], criteria=['FTn == -1'])  # HERMES A_UL
+TSApoints = TSA1points + data[54]  # HERMES+CLAS  A_UL
+BTSApoints = utils.select(data[53], criteria=['FTn==0'])   # HERMES A_LL
+LPpoints = TSApoints + BTSApoints  # total longitudinal target
+AULpts = TSA1points[:4] + data[54]
+ALLpts = BTSApoints[:4]
+
+####  --  Transversally polarized target --
+#
+AUTIpoints = utils.select(data[66], criteria=['FTn==1'])  # HERMES A_UT_I
+AUTDVCSpoints = data[65]  # HERMES A_UT_DVCS
+TPpoints = AUTIpoints + AUTDVCSpoints  # total transversal target
+AUTIpts = AUTIpoints[:4]
+
+# Global combinations
+#
+GLOpoints = data[31][12:] + data[8] + data[29]  # DM's GLO set
+#ALTGLOpoints = data[5] + data[25] + data[32][18:]  # KK's CLAS BSA
+ALTGLO5points = data[5] + data[8] + data[32][18:]   # DM's CLAS BSA
+#UNPpoints = ALTGLOpoints + BSSwpoints + BSDwpoints
+UNP5points = ALTGLO5points + BSSwpoints + BSDwpoints
+#
+GLOall = H1ZEUS[::3] + ALUIpts + BCApts + CLASpts + HApts + AULpts + ALLpts + AUTIpts
+# Excluding LP
+GLOnoL = H1ZEUS[::3] + ALUIpts + BCApts + CLASpts + HApts + AUTIpts
+# Excluding problematic Hall A BSS:
+GLOnoBSS = H1ZEUS[::3] + ALUIpts + BCApts + CLASpts + BSDwpoints[::2] + AULpts + ALLpts + AUTIpts
 
 
 ## [3] Create a theory
 
 # Gepard only - NPB08
 #m = Model.Gepard(ansatz='FIT')
-#m.parameters.update(NPB08NNLO)
+#m.parameters.update(NPB09NNLO)
 #th = Approach.BMK(m)
 #th.name = 'NPB08_NNLO'
 
@@ -130,15 +155,22 @@ tDR1 = Approach.hotfixedBMK(mDRonly1)
 tDR1.name = 'KM09b'
 tDR1.m.parameters.update(DMepsGLO1)
 
+mGepard = Model.ComptonGepard(cutq2=0.5)
+mDRPPsea = Model.ComptonModelDRPPsea()
+m = Model.HybridDipole(mGepard, mDRPPsea)
+th = Approach.BM10(m)
+th.name = 'KM10'
+g = th.m.g
+th.m.parameters.update(KM12noL)
 
 # Hybrid KM10a
-mGepard = Model.ComptonGepard(cutq2=0.5)
-mDRsea = Model.ComptonModelDRsea()
-m = Model.HybridDipole(mGepard, mDRsea)
-th = Approach.hotfixedBMK(m)
-th.name = 'KM10a'
-g = th.m.g
-th.m.parameters.update(KM10a)  # ALTGLO
+#mGepard = Model.ComptonGepard(cutq2=0.5)
+#mDRsea = Model.ComptonModelDRsea()
+#m = Model.HybridDipole(mGepard, mDRsea)
+#th = Approach.hotfixedBMK(m)
+#th.name = 'KM10a'
+#g = th.m.g
+#th.m.parameters.update(KM10a)  # ALTGLO
 
 # Hybrid KM10b
 #mGepard = Model.ComptonGepard()
@@ -159,9 +191,18 @@ th.m.parameters.update(KM10a)  # ALTGLO
 #g = m.g
 #th.m.parameters.update(KM10a) 
 
+# Even newer hybrid model
+#mGepard = Model.ComptonGepard()
+#mDRPPsea = Model.ComptonModelDRPPsea()
+#m = Model.HybridKelly(mGepard, mDRPPsea)
+#th = Approach.BM10(m)
+#th.name = 'new'
+#g = th.m.g
+#th.m.parameters.update(KM10a) 
+
 
 ## [4] Do the fit
-#th.model.fix_parameters('ALL')
+th.model.fix_parameters('ALL')
 #th.model.release_parameters(
 #   'ALPS', 'M02S', 'SECS', 'THIS', 'ALPG', 'M02G', 'SECG', 'THIG')
 #th.model.release_parameters(
@@ -173,12 +214,12 @@ th.m.parameters.update(KM10a)  # ALTGLO
 #    'M02S', 'M02G', 'SECS', 'SECG')
 #th.model.release_parameters(
 #   'rv', 'Mv', 'bv', 'C', 'MC', 'trv', 'tbv')
-#th.model.release_parameters('M02S', 'SECS', 'SECG', 'THIS', 'THIG', 
-#   'rv', 'bv', 'Mv', 'C', 'MC', 'trv', 'tbv', 'tMv')
-#f = Fitter.FitterMinuit(DVCSpoints+GLOpoints, th)
+th.model.release_parameters('M02S', 'SECS', 'SECG', 'THIS', 'THIG', 
+   'rv', 'bv', 'Mv', 'C', 'MC', 'trv', 'tbv', 'tMv', 'rpi', 'Mpi')
+f = Fitter.FitterMinuit(GLOnoL + TSA1points, th)
 
-#f.minuit.tol = 80
-#f.minuit.printMode = 1
+f.minuit.tol = 80
+f.minuit.printMode = 2
 #f.minuit.maxcalls = 100
 
 #f.fit()
@@ -201,8 +242,8 @@ GLO12 = H1ZEUS + UNP5points + LPpoints + TPpoints
 def pc(th):
     #exps = ['UNP5points', 'ALTGLO5', 'CLAS', 'CLASDM', 'BSDw', 'BSSw', 'TSA1', 'BTSA', 'TPpoints']
     #ptssets = [UNP5points, ALTGLO5points, data[25], data[8], BSDwpoints, BSSwpoints, TSA1points, BTSApoints, TPpoints]
-    exps = ['H1ZEUS', 'UNP5points', 'ALTGLO5', 'CLASDM', 'BSDw', 'BSSw', 'TSA_H', 'TSA_C', 'BTSA', 'TPpoints']
-    ptssets = [H1ZEUS, UNP5points, ALTGLO5points, data[8], BSDwpoints, BSSwpoints, TSA1points, data[54], BTSApoints, TPpoints]
+    exps = ['H1ZEUS', 'ALUIpts', 'BCApts', 'CLASpts', 'BSDwpoints', 'BSSwpoints', 'AULpts', 'ALLpts', 'AUTIpts' ]
+    ptssets = [H1ZEUS, ALUIpts, BCApts, CLASpts, BSDwpoints, BSSwpoints, AULpts, ALLpts, AUTIpts ]
     for name, pts in zip(exps,ptssets):
         print '%10s: chi/npts = %6.2f/%d' % (name, th.chisq(pts)[0], len(pts))
         #cutpts = utils.select(pts, criteria=['Q2>=1.6'])
@@ -266,7 +307,7 @@ def ptcol(th, Q=-1, pol=0, Ee=20, Ep=250, xB=0.001998, Q2=4., t=-0.1,
     th.prepare(ptc)
     return ptc
 
-ptc = ptcol(th, Q=1, pol=0, Ee=5, Ep=100, phi=0.1, Q2=4.4, xB=8.2e-3, t=-0.25)
+#ptc = ptcol(th, Q=1, pol=0, Ee=5, Ep=100, phi=0.1, Q2=4.4, xB=8.2e-3, t=-0.25)
 
 def ccals(th, pt):
     cals = ['DVCSunp', 'INTunp', 'INTunpV', 'INTunpA']
@@ -303,18 +344,18 @@ def der(th, pars, pts, f=False,  h=0.05):
         ders = np.array([_derpt(th, par, pt, f, h) for pt in pts])
         print '%4s  |  %5.2f' % (par, ders.mean())
 
-pti = data[66][13]
-ptd = data[65][0]
+#pti = data[66][13]
+#ptd = data[65][0]
 
 
-def rth(m, pt, tht):
-    """Calculate <r(tht)> for model m."""
-    norm = rthtquadrature(lambda r: m.gpdHQbpolpol(pt, r, tht), 0.0, 2.5)
-    aux = rthtquadrature(lambda r: r*m.gpdHQbpolpol(pt, r, tht), 0.0, 2.5)
-    return aux/norm
+#def rth(m, pt, tht):
+#    """Calculate <r(tht)> for model m."""
+#    norm = rthtquadrature(lambda r: m.gpdHQbpolpol(pt, r, tht), 0.0, 2.5)
+#    aux = rthtquadrature(lambda r: r*m.gpdHQbpolpol(pt, r, tht), 0.0, 2.5)
+#    return aux/norm
 
-def bsq(m, pt):
-    """Calculate <b^2> for model m."""
-    norm = rthtquadrature(lambda b: b*m.gpdHQbIntg(pt, b), 0.0, 2.5)
-    aux = rthtquadrature(lambda b: b**3*m.gpdHQbIntg(pt, b), 0.0, 2.5)
-    return aux/norm
+#def bsq(m, pt):
+#    """Calculate <b^2> for model m."""
+#    norm = rthtquadrature(lambda b: b*m.gpdHQbIntg(pt, b), 0.0, 2.5)
+#    aux = rthtquadrature(lambda b: b**3*m.gpdHQbIntg(pt, b), 0.0, 2.5)
+#    return aux/norm

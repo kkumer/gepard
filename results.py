@@ -2140,3 +2140,115 @@ NPB08NNLO = {
  'SKEWS': 0.0,
  'THIG': 0.0,
  'THIS': 0.0}
+
+### 'GLO w/out BSS 81/45 p=0.0007'
+ #  Mv =    0.828 +- 0.235      H1ZEUS: chi/npts =  29.94/35
+ #  rv =    1.153 +- 0.157     ALUIpts: chi/npts =  13.79/6
+ #  bv =    0.400 +- 0.004      BCApts: chi/npts =   6.86/12
+ #   C =    0.768 +- 2.154     CLASpts: chi/npts =   5.22/4
+ #  MC =    0.491 +- 0.360  BSDwpoints: chi/npts =  44.40/12
+ # tMv =    3.283 +- 3.829  BSSwpoints: chi/npts = 465.56/8
+ # trv =    0.650 +- 0.144      AULpts: chi/npts =   7.44/10
+ # tbv =    0.400 +- 0.006      ALLpts: chi/npts =  11.06/4
+ #M02S =    0.465 +- 0.047     AUTIpts: chi/npts =   3.23/4
+ #SECS =    0.288 +- 0.046
+ #THIS =   -0.132 +- 0.014
+ #SECG =   -2.525 +- 0.315
+ #THIG =    0.833 +- 0.143
+
+KM12noBSS = {'tMv': 3.2830495794500516, 'rS': 1.0, 'limit_tbv':
+        (0.40000000000000002, 5.0), 'rpi': 3.5355742996824659, 'fix_Mv': False,
+'fix_Mpi': True, 'alv': 0.42999999999999999, 'fix_bv': False, 'Mpi':
+0.72673907227274226, 'Nv': 1.3500000000000001, 'fix_trv': False, 'limit_C':
+(-10.0, 10.0), 'rv': 1.153012349637625, 'fix_tNv': True, 'fix_MC': False,
+'Nsea': 0.0, 'fix_MS': True, 'limit_trv': (0.0, 8.0), 'limit_rv': (0.0, 8.0),
+'alS': 1.1299999999999999, 'fix_bS': True, 'alpS': 0.14999999999999999,
+'limit_Mpi': (0.40000000000000002, 4.0), 'C': 0.76804987321244766, 'tNv':
+0.59999999999999998, 'limit_Mv': (0.40000000000000002, 4.0), 'limit_tMv':
+(0.40000000000000002, 4.0), 'limit_bS': (0.40000000000000002, 5.0), 'fix_alpv':
+True, 'tbv': 0.4000461297465579, 'fix_alv': True, 'limit_rpi': (-8, 8.0), 'bv':
+0.40008300823386755, 'Mv': 0.82823212553714387, 'fix_rS': True, 'fix_Nv': True,
+'fix_tbv': False, 'fix_rpi': True, 'alpv': 0.84999999999999998, 'MC':
+0.49116476145618343, 'fix_Nsea': True, 'fix_alpS': True, 'fix_rv': False,
+'limit_bv': (0.40000000000000002, 5.0), 'limit_MC': (0.40000000000000002, 4.0),
+'fix_alS': True, 'MS': 0.70699999999999996, 'bS': 2.0, 'fix_C': False,
+'fix_tMv': False, 'trv': 0.64954705652468325, 'EAL0G': 1.1000000000000001,
+'KAPS': 0.0, 'fix_ALPG': True, 'EDELM2S': 0.0, 'EPS': 2.0, 'EAL0S': 1.0,
+'KAPG': 0.0, 'fix_ETHIG': True, 'EPG': 2.0, 'EDELM2G': 0.0, 'SECG':
+-2.5250068586741179, 'EKAPG': 0.0, 'ESKEWG': 0.0, 'fix_KAPG': True, 'M02S':
+0.46530829487142711, 'NG': 0.5, 'fix_KAPS': True, 'SECS': 0.28798902503233614,
+'EKAPS': 0.0, 'NS': 0.15203911208796006, 'fix_PG': True, 'ALPS':
+0.14999999999999999, 'fix_EM02G': True, 'fix_DELM2S': True, 'SKEWG': 0.0,
+'fix_EM02S': True, 'SKEWS': 0.0, 'fix_THIS': False, 'fix_ESKEWS': True,
+'fix_ETHIS': True, 'fix_NG': True, 'THIS': -0.13188078841841708, 'fix_EDELM2S':
+True, 'fix_NS': True, 'fix_THIG': False, 'fix_DELB': True, 'THIG':
+0.833468211523963, 'fix_EDELM2G': True, 'fix_EPG': True, 'fix_ALPS': True,
+'ETHIG': 0.0, 'ESECS': 0.0, 'fix_EAL0G': True, 'fix_SECG': False, 'ETHIS': 0.0,
+'ESECG': 0.0, 'fix_EPS': True, 'fix_EAL0S': True, 'fix_SECS': False, 'PS': 2.0,
+'EALPG': 0.14999999999999999, 'EM02S': 1.0, 'fix_AL0S': True, 'fix_EALPG':
+True, 'fix_M02G': True, 'EALPS': 0.14999999999999999, 'ESKEWS': 0.0, 'EM02G':
+0.69999999999999996, 'PG': 2.0, 'fix_EALPS': True, 'limit_M02G':
+(0.29999999999999999, 1.5), 'fix_M02S': False, 'fix_DELM2G': True, 'fix_AL0G':
+True, 'AL0S': 1.1575060246398083, 'DELB': 0.0, 'fix_ESECS': True, 'fix_PS':
+True, 'limit_EM02S': (0.10000000000000001, 1.5), 'fix_ESECG': True, 'AL0G':
+1.2473167010704711, 'limit_EM02G': (0.10000000000000001, 1.5), 'limit_M02S':
+(0.29999999999999999, 1.5), 'M02G': 0.69999999999999996, 'fix_SKEWG': True,
+'DELM2S': 0.0, 'fix_ESKEWG': True, 'ALPG': 0.14999999999999999, 'fix_SKEWS':
+True, 'DELM2G': 0.0}
+
+
+#GLOnoL (without longitudinal target data)
+#P(chi-square, d.o.f) = P(50.30, 35) = 0.0453
+#   Mv =    0.917 +- 0.869      H1ZEUS: chi/npts =  29.88/35
+#   rv =    0.456 +- 0.159     ALUIpts: chi/npts =   4.64/6
+#   bv =    0.401 +- 2.063      BCApts: chi/npts =  12.46/12
+#    C =   10.000 +- 0.065     CLASpts: chi/npts =   2.38/4
+#   MC =    0.787 +- 0.124  BSDwpoints: chi/npts =  12.21/12
+#  tMv =    1.027 +- 0.136  BSSwpoints: chi/npts =  57.05/8
+#  trv =    4.680 +- 0.209      AULpts: chi/npts = 262.31/10
+#  tbv =    0.403 +- 0.031      ALLpts: chi/npts =  21.08/4
+# M02S =    0.451 +- 0.026     AUTIpts: chi/npts =   6.21/4
+# SECS =    0.288 +- 0.008
+# THIS =   -0.127 +- 0.002
+# SECG =   -2.741 +- 0.062
+# THIG =    0.911 +- 0.028
+
+KM12noL =  {'tMv': 1.0272335149111647, 'rS': 1.0, 'limit_tbv':
+        (0.40000000000000002, 5.0), 'rpi': 3.5355742996824659, 'fix_Mv': False,
+'fix_Mpi': True, 'alv': 0.42999999999999999, 'fix_bv': False, 'Mpi':
+0.72673907227274226, 'Nv': 1.3500000000000001, 'fix_trv': False, 'limit_C':
+(-10.0, 10.0), 'rv': 0.45597081069713674, 'fix_tNv': True, 'fix_MC': False,
+'Nsea': 0.0, 'fix_MS': True, 'limit_trv': (0.0, 8.0), 'limit_rv': (0.0, 8.0),
+'alS': 1.1299999999999999, 'fix_bS': True, 'alpS': 0.14999999999999999,
+'limit_Mpi': (0.40000000000000002, 4.0), 'C': 9.9995952854255918, 'tNv':
+0.59999999999999998, 'limit_Mv': (0.40000000000000002, 4.0), 'limit_tMv':
+(0.40000000000000002, 4.0), 'limit_bS': (0.40000000000000002, 5.0), 'fix_alpv':
+True, 'tbv': 0.40264332011381532, 'fix_alv': True, 'limit_rpi': (-8, 8.0),
+'bv': 0.40146788811997625, 'Mv': 0.91716294504773721, 'fix_rS': True, 'fix_Nv':
+True, 'fix_tbv': False, 'fix_rpi': True, 'alpv': 0.84999999999999998, 'MC':
+0.78744954155169866, 'fix_Nsea': True, 'fix_alpS': True, 'fix_rv': False,
+'limit_bv': (0.40000000000000002, 5.0), 'limit_MC': (0.40000000000000002, 4.0),
+'fix_alS': True, 'MS': 0.70699999999999996, 'bS': 2.0, 'fix_C': False,
+'fix_tMv': False, 'trv': 4.6802497283849522, 'EAL0G': 1.1000000000000001,
+'KAPS': 0.0, 'fix_ALPG': True, 'EDELM2S': 0.0, 'EPS': 2.0, 'EAL0S': 1.0,
+'KAPG': 0.0, 'fix_ETHIG': True, 'EPG': 2.0, 'EDELM2G': 0.0, 'SECG':
+-2.7412133234390517, 'EKAPG': 0.0, 'ESKEWG': 0.0, 'fix_KAPG': True, 'M02S':
+0.45125328495775913, 'NG': 0.5, 'fix_KAPS': True, 'SECS': 0.28799602313473516,
+'EKAPS': 0.0, 'NS': 0.15203911208796006, 'fix_PG': True, 'ALPS':
+0.14999999999999999, 'fix_EM02G': True, 'fix_DELM2S': True, 'SKEWG': 0.0,
+'fix_EM02S': True, 'SKEWS': 0.0, 'fix_THIS': False, 'fix_ESKEWS': True,
+'fix_ETHIS': True, 'fix_NG': True, 'THIS': -0.12682665569302967, 'fix_EDELM2S':
+True, 'fix_NS': True, 'fix_THIG': False, 'fix_DELB': True, 'THIG':
+0.91094683740896631, 'fix_EDELM2G': True, 'fix_EPG': True, 'fix_ALPS': True,
+'ETHIG': 0.0, 'ESECS': 0.0, 'fix_EAL0G': True, 'fix_SECG': False, 'ETHIS': 0.0,
+'ESECG': 0.0, 'fix_EPS': True, 'fix_EAL0S': True, 'fix_SECS': False, 'PS': 2.0,
+'EALPG': 0.14999999999999999, 'EM02S': 1.0, 'fix_AL0S': True, 'fix_EALPG':
+True, 'fix_M02G': True, 'EALPS': 0.14999999999999999, 'ESKEWS': 0.0, 'EM02G':
+0.69999999999999996, 'PG': 2.0, 'fix_EALPS': True, 'limit_M02G':
+(0.29999999999999999, 1.5), 'fix_M02S': False, 'fix_DELM2G': True, 'fix_AL0G':
+True, 'AL0S': 1.1575060246398083, 'DELB': 0.0, 'fix_ESECS': True, 'fix_PS':
+True, 'limit_EM02S': (0.10000000000000001, 1.5), 'fix_ESECG': True, 'AL0G':
+1.2473167010704711, 'limit_EM02G': (0.10000000000000001, 1.5), 'limit_M02S':
+(0.29999999999999999, 1.5), 'M02G': 0.69999999999999996, 'fix_SKEWG': True,
+'DELM2S': 0.0, 'fix_ESKEWG': True, 'ALPG': 0.14999999999999999, 'fix_SKEWS':
+True, 'DELM2G': 0.0}
