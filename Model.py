@@ -142,8 +142,8 @@ class Model(object):
             val = self.parameters[p]
             err = sqrt(tolerance2)*sqrt(self.covariance[p,p])
             if pvalues:
-                pval = 2*(1.-scipy.stats.t.cdf(val/err, ndof))
-                print '%5s = %8.3f +- %5.3f  (p = %.1g)' % (p, val, err, pval)
+                pval = 2*(1.-scipy.stats.t.cdf(abs(val/err), ndof))
+                print '%5s = %8.3f +- %5.3f  (p = %.3g)' % (p, val, err, pval)
             else:
                 print '%5s = %8.3f +- %5.3f' % (p, val, err)
 
