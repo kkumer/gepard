@@ -129,6 +129,31 @@ GLOnoL = H1ZEUS[::3] + ALUIpts + BCApts + CLASpts + HApts + AUTIpts
 # Excluding problematic Hall A BSS:
 GLOnoBSS = H1ZEUS[::3] + ALUIpts + BCApts + CLASpts + BSDwpoints[::2] + AULpts + ALLpts + AUTIpts
 
+unppts = [ALUIpts, BCApts[6:], CLASpts, BSSwpoints[::-2]]
+polpts = [TSA1points[:4], data[54], BTSApoints[:4], AUTIpoints[:4], AUTDVCSpoints[:4]]
+
+# Local bins, 4 bins per dimension
+# obsolete unpolarized target data, Morgan will provide update
+A = utils.select(data[68], criteria=['FTn == -1'])  
+# Faking 4 bins by dropping some points:
+L4_ALUI = A[:1]+A[2:4]+A[5:7]+A[8:10]+A[11:13]+A[14:16]+A[17:]
+L4_AC_0 = utils.select(data[31], criteria=['FTn==0'])  
+L4_AC_1 = utils.select(data[31], criteria=['FTn==1'])  
+# polarized target data
+L4_AUL = utils.select(data[52], criteria=['FTn == -1'])
+L4_ALL_0 = utils.select(data[53], criteria=['FTn==0'])
+L4_ALL_1 = utils.select(data[53], criteria=['FTn==1'])
+L4_AUTI_1 = utils.select(data[66], criteria=['FTn==1'])
+L4_AUTI_0 = utils.select(data[66], criteria=['FTn==0'])
+L4_AUTI_m1 = utils.select(data[66], criteria=['FTn==-1'])
+L4_AUTDVCS = data[65]
+
+bins = zip(L4_ALU, L4_AC_0, L4_AC_1, L4_AUL, L4_ALL_0, L4_AUTI_1)
+bins = zip(L4_ALU, L4_AC_0, L4_AC_1, L4_AUL, L4_ALL_0, 
+        L4_ALL_1, L4_AUTI_1, L4_AUTI_0, L4_AUTI_m1, L4_AUTDVCS)
+
+
+
 
 ## [3] Create a theory
 
@@ -155,13 +180,18 @@ tDR1 = Approach.hotfixedBMK(mDRonly1)
 tDR1.name = 'KM09b'
 tDR1.m.parameters.update(DMepsGLO1)
 
-mGepard = Model.ComptonGepard(cutq2=0.5)
-mDRPPsea = Model.ComptonModelDRPPsea()
-m = Model.HybridDipole(mGepard, mDRPPsea)
+#mGepard = Model.ComptonGepard(cutq2=0.5)
+#mDRPPsea = Model.ComptonModelDRPPsea()
+#m = Model.HybridDipole(mGepard, mDRPPsea)
+#th = Approach.BM10(m)
+#th.name = 'KM12new'
+#g = th.m.g
+#th.m.parameters.update(GLOnoBSSandBSS)
+#th.m.covariance = GLOnoBSSandBSScov
+
+m = Model.ModelLocal()
 th = Approach.BM10(m)
-th.name = 'KM10'
-g = th.m.g
-th.m.parameters.update(KM12noL)
+th.name = 'local'
 
 # Hybrid KM10a
 #mGepard = Model.ComptonGepard(cutq2=0.5)
@@ -196,7 +226,7 @@ th.m.parameters.update(KM12noL)
 #mDRPPsea = Model.ComptonModelDRPPsea()
 #m = Model.HybridKelly(mGepard, mDRPPsea)
 #th = Approach.BM10(m)
-#th.name = 'new'
+#th.name = 'KM12new'
 #g = th.m.g
 #th.m.parameters.update(KM10a) 
 
@@ -214,13 +244,19 @@ th.model.fix_parameters('ALL')
 #    'M02S', 'M02G', 'SECS', 'SECG')
 #th.model.release_parameters(
 #   'rv', 'Mv', 'bv', 'C', 'MC', 'trv', 'tbv')
-th.model.release_parameters('M02S', 'SECS', 'SECG', 'THIS', 'THIG', 
-   'rv', 'bv', 'Mv', 'C', 'MC', 'trv', 'tbv', 'tMv', 'rpi', 'Mpi')
-f = Fitter.FitterMinuit(GLOnoL + TSA1points, th)
+#th.model.release_parameters('M02S', 'SECS', 'SECG', 'THIS', 'THIG', 
+#   'rv', 'bv', 'Mv', 'C', 'MC', 'trv', 'tbv', 'tMv', 'rpi', 'Mpi')
+#f = Fitter.FitterMinuit(GLOnoL + TSA1points, th)
 
-f.minuit.tol = 80
+#th.model.release_parameters('pImH', 'pReH', 'pImE', 'pReE', 'pImHt', 'pReHt')
+nbin = 2
+th.model.release_parameters('pImH', 'pReH')
+th.name = th.name + 'bin %s' % nbin
+f = Fitter.FitterMinuit(bins[nbin-1], th)
+#f.minuit.tol = 80
 f.minuit.printMode = 2
 #f.minuit.maxcalls = 100
+
 
 #f.fit()
 #fl = open('aux.par')
@@ -346,6 +382,34 @@ def der(th, pars, pts, f=False,  h=0.05):
 
 #pti = data[66][13]
 #ptd = data[65][0]
+
+ptH1ZEUS = H1ZEUS[8]
+ptHallA = BSSwpoints[::-2][-1]
+ptHERMES = TSA1points[1]
+ptCLAS = data[54][1]
+
+def CFFatpt(th, cffs=['ImH', 'ReH', 'ImE', 'ReE', 'ImHt', 'ReHt', 'ImEt', 'xReEt']):
+    pts = [ptH1ZEUS, ptHallA, ptCLAS, ptHERMES]
+    ptss = ['H1ZEUS', 'HallA', 'CLAS', 'HERMES']
+    tmpl = '%5s | ' + len(pts)*' % 6.2f '
+    print ('%5s | ' + len(pts)*' % 6s ') % tuple([''] + ptss)
+    print '------+' + 33*'-'
+    for kin in ['xB', 'Q2', 'tm']:
+        vals = [getattr(pt, kin) for pt in pts]
+        print tmpl % tuple([kin] + vals)
+    print '------+' + 33*'-'
+    for cff in cffs:
+        if cff != 'xReEt':
+            vals = []
+            for pt in pts:
+                if hasattr(th.m, 'g'):
+                    th.m.g.newcall = 1
+                vals.append(getattr(th.m, cff)(pt))
+        else:
+            vals = [pt.xi*th.m.ReEt(pt) for pt in pts]
+        print tmpl % tuple([cff]+vals)
+    print '------+' + 33*'-'
+
 
 
 #def rth(m, pt, tht):

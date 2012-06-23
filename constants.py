@@ -59,3 +59,20 @@ toTeX = {'tm' : '$-t$',  'xB' : '$x_{\\rm B}$', 'Q2' : '$Q^{2}$',
      "ImEt" : '$\\mathfrak{Im}\\tilde{\\mathcal{E}}(\\xi, t)$',
      "ReEt" : '$\\mathfrak{Re}\\tilde{\\mathcal{E}}(\\xi, t)$',
      }
+
+# Dictionary that maps observable tuples to their LaTeX representation
+OBStoTeX = {
+        ('BCA', 0) : '$A_{\\rm C}^{\\cos 0\\phi}$',
+        ('BCA', 1) : '$A_{\\rm C}^{\\cos \\phi}$',
+        ('BSA', -1) : '$A_{\\rm LU}^{\\sin \\phi}$',
+        ('ALUI', -1) : '$A_{\\rm LU,I}^{\\sin \\phi}$',
+        ('ALUI', -2) : '$A_{\\rm LU,I}^{\\sin 2\\phi}$',
+        ('ALUDVCS', -1) : '$A_{\\rm LU,DVCS}^{\\sin \\phi}$',
+        ('TSA', -1) : '$A_{\\rm UL}^{\\sin \\phi}$',
+        ('BTSA', 0) : '$A_{\\rm LL}^{\\cos 0 \\phi}$',
+        ('BTSA', 1) : '$A_{\\rm LL}^{\\cos  \\phi}$',
+        ('AUTI', 1) : '$A_{\\rm UT,I}^{\\sin(\\phi-\\phi_S) \\cos \\phi}$',
+        ('AUTI', 0) : '$A_{\\rm UT,I}^{\\sin(\\phi-\\phi_S)}$',
+        ('AUTI', -1) : '$A_{\\rm UT,I}^{\\cos(\\phi-\\phi_S) \\sin \\phi}$',
+        ('AUTDVCS', 0) : '$A_{\\rm UT,DVCS}^{\\sin(\\phi-\\phi_S)}$'
+        }

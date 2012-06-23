@@ -11,6 +11,7 @@ import pickle, sys, logging
 
 from numpy import log, pi, imag, real, sqrt, cos, sin
 from numpy import ndarray, array
+import scipy.stats
 from scipy.special import j0, j1
 
 from quadrature import PVquadrature, bquadrature, rthtquadrature
@@ -130,7 +131,7 @@ class Model(object):
         # fitting parameters (not fixed)
         return [p for p in self.parameter_names if self.parameters['fix_'+p] == False]
 
-    def print_parameters_errors(self):
+    def print_parameters_errors(self, pvalues=False, ndof=0):
         """Print fitting parameters and their errors.
 
         Model must have covariance defined.
@@ -138,8 +139,13 @@ class Model(object):
 
         """
         for p in self.free_parameters():
-            print '%5s = %8.3f +- %5.3f' % (p, self.parameters[p],
-                    sqrt(tolerance2)*sqrt(self.covariance[p,p]))
+            val = self.parameters[p]
+            err = sqrt(tolerance2)*sqrt(self.covariance[p,p])
+            if pvalues:
+                pval = 2*(1.-scipy.stats.t.cdf(val/err, ndof))
+                print '%5s = %8.3f +- %5.3f  (p = %.1g)' % (p, val, err, pval)
+            else:
+                print '%5s = %8.3f +- %5.3f' % (p, val, err)
 
     def print_covariance(self, colors=True, correlations=False):
         """Pretty-print covariance matrix
@@ -1373,6 +1379,29 @@ class ComptonHybrid(ComptonFormFactors):
     def ReEt(self, pt):
         return  self.DR.ReEt(pt)
 
+class ComptonLocal(ComptonFormFactors):
+    """For local fitting of CFFs which are themselves fit paramters."""
+
+    def __init__(self, **kwargs):
+        self.parameters = {
+            'pImH' :  0.0,                                 
+            'pReH' :  0.0,                                 
+            'pImE' :  0.0,                                 
+            'pReE' :  0.0,                                 
+           'pImHt' :  0.0,                                 
+           'pReHt' :  0.0,                                 
+           'pImEt' :  0.0,                                 
+           'pReEt' :  0.0}
+        self.parameter_names = ['pImH', 'pReH', 'pImE', 'pReE',
+           'pImHt', 'pReHt', 'pImEt', 'pReEt']
+
+        # now do whatever else is necessary
+        ComptonFormFactors.__init__(self, **kwargs)
+
+    # Each of 8 CFFs just returns value of pCFF parameter
+    for name in ComptonFormFactors.allCFFs:
+        exec('def %s(self, pt): return self.parameters["p%s"]' % (name, name))
+
 ##  --- Complete models built from the above components ---
 
 class ModelDR(ComptonModelDR, ElasticDipole):
@@ -1400,3 +1429,6 @@ class ModelDRPP(ComptonModelDRPP, ElasticDipole):
 
 class HybridKelly(ComptonHybrid, ElasticKelly):
     """As Hybrid, but with Kelly elasticd FFs."""
+
+class ModelLocal(ComptonLocal, ElasticKelly):
+    """Model for local fitting of CFFs themselves."""

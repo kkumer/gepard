@@ -19,7 +19,7 @@ import pylab as plt
 
 
 import Data, Approach, utils
-from constants import toTeX, Mp2, Mp
+from constants import toTeX, Mp2, Mp, OBStoTeX
 from results import *
 
 # load experimental data
@@ -67,6 +67,7 @@ def _axpoints(ax, pts, xaxis, **kwargs):
     xaxis -- 'Q2', 't', 'xB', ...
 
     """
+    kwargs.pop('justbars', False)  # Kludge
     pts = [Approach.BMK.from_conventions(pt.copy()) for pt in pts]
     xvals = [getattr(pt, xaxis) for pt in pts]
     yvals = [pt.val for pt in pts]
@@ -84,6 +85,7 @@ def _axline(ax, fun, points, xaxis, **kwargs):
     for pts in points:
         xvals = [getattr(pt, xaxis) for pt in pts]
         yvals = [fun(pt) for pt in pts]
+        kwargs.pop('justbars', False)  # Kludge
         if kwargs.pop('xF', False):  # do we want  xF(x) plotted?
             xis = np.array([pt.xi for pt in pts])
             yvals = xis*np.array(yvals)
@@ -107,12 +109,20 @@ def _axband(ax, fun, pts, xaxis, **kwargs):
         # we have symmetric error
         res = [(m, err, err) for m, err in res]
     up, down = np.array([(m+errp, m-errm) for m,errp,errm in res]).transpose()
-    x = plt.concatenate( (xvals, xvals[::-1]) )
-    y = plt.concatenate( (up, down[::-1]) )
-    if kwargs.pop('xF', False):  # do we want  xF(x) plotted?
-        xis = np.array([pt.xi for pt in pts+pts[::-1]])
-        y = xis*y
-    ax.fill(x, y, alpha=0.5, **kwargs)
+    if kwargs.pop('justbars', False):  # do we want just errorbars for theory?
+        res = zip(up, down)
+        #FIXME: symmetric error assumed
+        yvals, yerrs = np.array([((up+down)/2, (up-down)/2) for up,down in res]).transpose()
+        xvals = [x+0.1 for x in xvals]
+        ax.errorbar(xvals, yvals, yerrs, marker='d', color='red', linestyle='None', 
+                elinewidth=3)
+    else:
+        x = plt.concatenate( (xvals, xvals[::-1]) )
+        y = plt.concatenate( (up, down[::-1]) )
+        if kwargs.pop('xF', False):  # do we want  xF(x) plotted?
+            xis = np.array([pt.xi for pt in pts+pts[::-1]])
+            y = xis*y
+        ax.fill(x, y, alpha=0.5, **kwargs)
 
 
 def panel(ax, points=None, lines=None, bands=None, xaxis=None, xs=None, 
@@ -146,8 +156,8 @@ def panel(ax, points=None, lines=None, bands=None, xaxis=None, xs=None,
         if not xaxis: xaxis = points[-1].xaxes[-1]
         if isinstance(points[0], Data.DataPoint): points = [points]
 
-        pointshapes = ['o', 's', '^', 'd']  # first circles, then squares ...
-        pointcolors = ['blue', 'black', 'purple', 'green']  # circles are blue, squares are black, ...
+        pointshapes = ['o', 's', '^', 'd', 'o', 's', '^', 'd']  # first circles, then squares ...
+        pointcolors = ['blue', 'black', 'purple', 'green', 'red', 'brown', 'blue', 'black']
         setn = 0
         for pts in points:
             _axpoints(ax, pts, xaxis, linestyle='None', elinewidth=1, 
@@ -2616,6 +2626,43 @@ def beff(m, pars1, pars2, path=None, fmt='png', **kwargs):
     ax.set_xlim(1e-4, 1e-2)
     ax.set_ylim(0, 7)
     fig.subplots_adjust(bottom=0.1)
+    if path:
+        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+    else:
+        fig.canvas.draw()
+        fig.show()
+    return fig
+
+def binplot(path=None, fmt='png', **kwargs):
+    """Plot local fit of a single kinematic bin."""
+    title = kwargs.pop('title', 'N/A')
+    fig = plt.figure()
+    fig.canvas.set_window_title(title)
+    fig.suptitle(title)
+    ax = fig.add_subplot(1, 1, 1)
+    n = 1
+    pts = kwargs['points']
+    for pt in pts:
+        pt.npt = n
+        n += 1
+    panel(ax, xaxis='npt', **kwargs)
+    ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
+    ax.set_xticks(range(1,n))
+    ax.set_xticklabels([OBStoTeX[(pt.y1name, int(pt.FTn))] for pt in pts])
+    for pt, label in zip(pts, ax.get_xticklabels()):
+        if (pt.y1name == 'BTSA' and int(pt.FTn) == 1):
+            label.set_fontsize(12)
+        elif (pt.y1name == 'AUTI' and int(pt.FTn) == 0):
+            label.set_fontsize(12)
+        elif (pt.y1name == 'AUTI' and int(pt.FTn) == -1):
+            label.set_fontsize(12)
+        else:
+            label.set_fontsize(16)
+    for label in ax.get_xticklabels()[6:]:
+            label.set_rotation(60)
+    #xtickNames = plt.setp(ax)
+    #plt.setp(xtickNames, rotation=45)
+    fig.subplots_adjust(bottom=0.2)
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:

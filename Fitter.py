@@ -77,11 +77,13 @@ def fcn(%s):
 
     def fit(self):
         self.minuit.migrad()
-        print "ncalls = ", self.minuit.ncalls
+        print "ncalls = \n", self.minuit.ncalls
         self.theory.print_chisq(self.fitpoints)
-        self.theory.model.print_parameters()
         # Set/update covariance matrix of model:
         self.theory.model.covariance = self.minuit.covariance
+        print ""
+        self.theory.model.print_parameters_errors(pvalues=True, 
+                ndof=len(self.fitpoints)-utils.npars(self.theory.model))
 
     def fix_parameters(self, *args):
         """fix_parameters('p1', 'p2', ...)."""
