@@ -31,3 +31,4 @@ def test_GPDzero():
     assert_almost_equal(m.gpdHzeroG(pt0), 6.9642, 4)
     assert_almost_equal(m.gpdEzeroQ(pt0)/1000., 3.09861, 5)
     assert_almost_equal(m.gpdEzeroG(pt0)*100, 7.56646, 5)
+

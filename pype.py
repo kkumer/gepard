@@ -8,7 +8,7 @@ import shelve, copy, sys, logging
 import numpy as np
 import scipy.stats
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 
 import Model, Approach, Fitter, Data, utils, plots
 from constants import Mp, Mp2
@@ -62,7 +62,7 @@ db = shelve.open('/home/kkumer/pype/theories.db')
 DVCSpoints = data[36] + data[37] + data[38] + data[39] + \
   data[40] + data[41] + data[42] + data[43] + data[44] + \
   data[45]
-#H1ZEUSpoints = DVCSpoints + data[48]
+H1ZEUSpoints = DVCSpoints + data[48]
 #H1ZEUSindependent = data[45] + data[39] + data[36] + data[46]
 H1ZEUSindependentNEW = data[45] + data[39] + data[63] + data[46]
 H1ZEUS = H1ZEUSindependentNEW + utils.select(data[47], criteria=['Q2 >= 4.0'])
@@ -124,115 +124,36 @@ ALTGLO5points = data[5] + data[8] + data[32][18:]   # DM's CLAS BSA
 UNP5points = ALTGLO5points + BSSwpoints + BSDwpoints
 #
 GLOall = H1ZEUS[::3] + ALUIpts + BCApts + CLASpts + HApts + AULpts + ALLpts + AUTIpts
+GLOfull = (H1ZEUS + ALUIpts + BCApts + BSACLAS_DMpoints + BSSwpoints + BSDwpoints
+            + LPpoints + TPpoints)
 # Excluding LP
 GLOnoL = H1ZEUS[::3] + ALUIpts + BCApts + CLASpts + HApts + AUTIpts
 # Excluding problematic Hall A BSS:
 GLOnoBSS = H1ZEUS[::3] + ALUIpts + BCApts + CLASpts + BSDwpoints[::2] + AULpts + ALLpts + AUTIpts
-
+#               12         6         12        4           6              4+6      4         4
+GLOnoBSS2 = H1ZEUS + ALUIpts + BCApts + CLASpts + BSDwpoints + AULpts + ALLpts + AUTIpts
 unppts = [ALUIpts, BCApts[6:], CLASpts, BSSwpoints[::-2]]
 polpts = [TSA1points[:4], data[54], BTSApoints[:4], AUTIpoints[:4], AUTDVCSpoints[:4]]
 
-# Local bins, 4 bins per dimension
-# obsolete unpolarized target data, Morgan will provide update
-A = utils.select(data[68], criteria=['FTn == -1'])  
-# Faking 4 bins by dropping some points:
-L4_ALUI = A[:1]+A[2:4]+A[5:7]+A[8:10]+A[11:13]+A[14:16]+A[17:]
-L4_AC_0 = utils.select(data[31], criteria=['FTn==0'])  
-L4_AC_1 = utils.select(data[31], criteria=['FTn==1'])  
-# polarized target data
-L4_AUL = utils.select(data[52], criteria=['FTn == -1'])
-L4_ALL_0 = utils.select(data[53], criteria=['FTn==0'])
-L4_ALL_1 = utils.select(data[53], criteria=['FTn==1'])
-L4_AUTI_1 = utils.select(data[66], criteria=['FTn==1'])
-L4_AUTI_0 = utils.select(data[66], criteria=['FTn==0'])
-L4_AUTI_m1 = utils.select(data[66], criteria=['FTn==-1'])
-L4_AUTDVCS = data[65]
-
-bins = zip(L4_ALU, L4_AC_0, L4_AC_1, L4_AUL, L4_ALL_0, L4_AUTI_1)
-bins = zip(L4_ALU, L4_AC_0, L4_AC_1, L4_AUL, L4_ALL_0, 
-        L4_ALL_1, L4_AUTI_1, L4_AUTI_0, L4_AUTI_m1, L4_AUTDVCS)
-
-
-
 
 ## [3] Create a theory
-
-# Gepard only - NPB08
-#m = Model.Gepard(ansatz='FIT')
-#m.parameters.update(NPB09NNLO)
-#th = Approach.BMK(m)
-#th.name = 'NPB08_NNLO'
-
-# Gepard only - EIC fit
-#m = Model.Gepard(ansatz='EFLEXP')
-#m.parameters.update(EIC12C)
-#m.covariance = EIC12Ccov
-#th = Approach.BMK(m)
-#th.name = 'EIC_fit'
-
-# DR
-mDRonly = Model.ModelDR()
-tDR = Approach.hotfixedBMK(mDRonly)
-tDR.name = 'KM09a'
-tDR.m.parameters.update(DMepsGLO)
-mDRonly1 = Model.ModelDR()
-tDR1 = Approach.hotfixedBMK(mDRonly1)
-tDR1.name = 'KM09b'
-tDR1.m.parameters.update(DMepsGLO1)
 
 #mGepard = Model.ComptonGepard(cutq2=0.5)
 #mDRPPsea = Model.ComptonModelDRPPsea()
 #m = Model.HybridDipole(mGepard, mDRPPsea)
 #th = Approach.BM10(m)
-#th.name = 'KM12new'
+#th.name = 'new'
 #g = th.m.g
-#th.m.parameters.update(GLOnoBSSandBSS)
-#th.m.covariance = GLOnoBSSandBSScov
+#th.m.parameters.update(KM12a)
 
-m = Model.ModelLocal()
-th = Approach.BM10(m)
-th.name = 'local'
-
-# Hybrid KM10a
-#mGepard = Model.ComptonGepard(cutq2=0.5)
-#mDRsea = Model.ComptonModelDRsea()
-#m = Model.HybridDipole(mGepard, mDRsea)
-#th = Approach.hotfixedBMK(m)
-#th.name = 'KM10a'
-#g = th.m.g
-#th.m.parameters.update(KM10a)  # ALTGLO
-
-# Hybrid KM10b
-#mGepard = Model.ComptonGepard()
-#mDRPPsea = Model.ComptonModelDRPPsea()
-#m = Model.HybridKelly(mGepard, mDRPPsea)
-#thKM10b = Approach.BM10(m)
-#thKM10b.name = 'KM10b'
-#g = thKM10b.m.g
-#thKM10b.m.parameters.update(KM10b)  # DM email only!
-#th = thKM10b
-
-# New Hybrid KM12
-#mGepard = Model.ComptonGepard(ansatz='EFL', speed=2)
-#mDRsea = Model.ComptonModelDRsea()
-#m = Model.HybridDipole(mGepard, mDRsea)
+#m = Model.ModelLocal()
 #th = Approach.BM10(m)
-#th.name = 'hy12'
-#g = m.g
-#th.m.parameters.update(KM10a) 
+#th.name = 'local'
 
-# Even newer hybrid model
-#mGepard = Model.ComptonGepard()
-#mDRPPsea = Model.ComptonModelDRPPsea()
-#m = Model.HybridKelly(mGepard, mDRPPsea)
-#th = Approach.BM10(m)
-#th.name = 'KM12new'
-#g = th.m.g
-#th.m.parameters.update(KM10a) 
 
 
 ## [4] Do the fit
-th.model.fix_parameters('ALL')
+#th.model.fix_parameters('ALL')
 #th.model.release_parameters(
 #   'ALPS', 'M02S', 'SECS', 'THIS', 'ALPG', 'M02G', 'SECG', 'THIG')
 #th.model.release_parameters(
@@ -246,15 +167,15 @@ th.model.fix_parameters('ALL')
 #   'rv', 'Mv', 'bv', 'C', 'MC', 'trv', 'tbv')
 #th.model.release_parameters('M02S', 'SECS', 'SECG', 'THIS', 'THIG', 
 #   'rv', 'bv', 'Mv', 'C', 'MC', 'trv', 'tbv', 'tMv', 'rpi', 'Mpi')
-#f = Fitter.FitterMinuit(GLOnoL + TSA1points, th)
+#f = Fitter.FitterMinuit(GLOnoBSS2+BSSwpoints, th)
 
 #th.model.release_parameters('pImH', 'pReH', 'pImE', 'pReE', 'pImHt', 'pReHt')
-nbin = 2
-th.model.release_parameters('pImH', 'pReH')
-th.name = th.name + 'bin %s' % nbin
-f = Fitter.FitterMinuit(bins[nbin-1], th)
+#nbin = 3
+#th.model.release_parameters('pImH', 'pReE')
+#th.name = th.name + 'bin %s' % nbin
+#f = Fitter.FitterMinuit(bins[nbin-1], th)
 #f.minuit.tol = 80
-f.minuit.printMode = 2
+#f.minuit.printMode = 2
 #f.minuit.maxcalls = 100
 
 

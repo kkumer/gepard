@@ -19,7 +19,9 @@ from utils import flatten, hubDict, stringcolor
 from constants import tolerance2, GeVfm, Mp
 import dispersion as DR
 
-import pygepard as g
+import pygepard as g1
+import pygepard2 as g2
+import pygepard3 as g3
 import optModel
 
 _lg = logging.getLogger('p.%s' % __name__)
@@ -845,8 +847,19 @@ class ComptonGepard(ComptonFormFactors):
     cutq2 - Q2 at which evolution is frozen (default = 0 GeV^2)
     
     """
+
+    # To have different Gepard models available we have to
+    # use separate modules - otherwise things clash
+    gepardPool = [g1, g2, g3]  #  modules to choose from
+
     def __init__(self, cutq2=0.0, ansatz='FIT', speed=1, q02=4.0, **kwargs):
+        _lg.debug('Creating %s.\n' % str(self))
         # initial values of parameters and limits on their values
+        self.cutq2 = cutq2
+        self.ansatz = ansatz
+        self.speed = speed
+        self.q02 = q02
+        self.kwargs = kwargs
         self.parameters = {
         #  GPD H
                'NS' : 0.15,
@@ -946,27 +959,6 @@ class ComptonGepard(ComptonFormFactors):
         self.allGPDs = ['gpdHtrajQ', 'gpdHtrajG', 'gpdEtrajQ', 'gpdEtrajG',
                         'gpdHzeroQ', 'gpdHzeroG', 'gpdEzeroQ', 'gpdEzeroG',
                         'gpdHQb', 'gpdHQbpol', 'gpdHGb']
-        # this was in Gepard's GEPARD.INI, which is not needed now
-        # but look at it for documentation of what parameters below are
-        g.parint.speed = speed
-        g.parint.acc = 3
-        g.parint.p = 0
-        g.parint.nf = 4
-        g.parint.czero = 1
-
-        g.astrong.mu02 = 2.5
-        g.astrong.asp = array([0.0606, 0.0518, 0.0488])
-
-        g.parflt.q02 = q02
-        g.parflt.rf2 = 1.0
-        g.parflt.rr2 = 1.0
-
-        g.mbcont.c = 0.35
-        g.mbcont.phi = 1.57079632
-        g.mbcont.cnd = -0.25
-        g.mbcont.phind = 1.57
-
-        g.parchr.scheme = array([c for c in 'CSBAR'])  # array(5)
 
         if ansatz == 'NSFIT' or ansatz == 'FITBP':
             self.parameters_index.update({
@@ -985,37 +977,82 @@ class ComptonGepard(ComptonFormFactors):
         elif ansatz not in ['FIT', 'FITEXP', 'EPH', 'EPHEXP', 'EFL', 
                 'EFLEXP', 'HOUCHE']:
             raise ValueError, "Invalid ansatz: %s\n" % ansatz
-        g.parchr.ansatz = array([c for c in ansatz + (6-len(ansatz))*' ']) # array(6)
+        
         if ansatz == 'FITEXP':
-            g.parchr.ansatz = array([c for c in 'FITEXP']) # array(6)
             self.parameters['ALPS'] = 0.0   # like in smallx.nb
             self.parameters['ALPG'] = 0.0
             self.parameters['M02G'] = 1./4.63 # from J/Psi production
             self.parameters['limit_M02S'] = (0.0, 1.5)
             self.parameters['limit_M02G'] = (0.0, 1.5)
 
-        # following two items usually came from driver file
-        g.parchr.process = array([c for c in 'DVCS  '])  # array(6)
-        g.parchr.fftype = array([c for c in 'SINGLET   ']) # array(10)
-
-        g.init()
-        # Cutting-off evolution  at Q2 = cutq2
-        # Evaluate evolved C at this scale now.
-        self.cutq2 = cutq2
-        g.nqs.nqs = 1
-        g.qs.qs[0] = self.cutq2
-        g.kinematics.q2 = self.cutq2
-        g.evolc(1, 1)
-        g.evolc(2, 1)
-        g.evolc(3, 1)
-        self.qdict = {self.cutq2 : 1}
-
-        g.newcall = 1
-        # number of points on MB contour
-        g.npts = 2**g.parint.acc * 12 / g.parint.speed
-        self.g = g
+        self._gepardinit(cutq2, ansatz, speed, q02, **kwargs)   # gepard init
         # now do whatever else is necessary
         ComptonFormFactors.__init__(self, **kwargs)
+
+    def _gepardinit(self, cutq2=0.0, ansatz='FIT', speed=1, q02=4.0, **kwargs):
+        """Initializate gepard part of model."""
+        self.g = ComptonGepard.gepardPool[-1]
+        # this was in Gepard's GEPARD.INI, which is not needed now
+        # but look at it for documentation of what parameters below are
+        self.g.parint.speed = speed
+        self.g.parint.acc = 3
+        self.g.parint.p = 0
+        self.g.parint.nf = 4
+        self.g.parint.czero = 1
+
+        self.g.astrong.mu02 = 2.5
+        self.g.astrong.asp = array([0.0606, 0.0518, 0.0488])
+
+        self.g.parflt.q02 = q02
+        self.g.parflt.rf2 = 1.0
+        self.g.parflt.rr2 = 1.0
+
+        self.g.mbcont.c = 0.35
+        self.g.mbcont.phi = 1.57079632
+        self.g.mbcont.cnd = -0.25
+        self.g.mbcont.phind = 1.57
+
+        self.g.parchr.scheme = array([c for c in 'CSBAR'])  # array(5)
+
+        self.g.parchr.ansatz = array([c for c in ansatz + (6-len(ansatz))*' ']) # array(6)
+        if ansatz == 'FITEXP':
+            self.g.parchr.ansatz = array([c for c in 'FITEXP']) # array(6)
+
+        # following two items usually came from driver file
+        self.g.parchr.process = array([c for c in 'DVCS  '])  # array(6)
+        self.g.parchr.fftype = array([c for c in 'SINGLET   ']) # array(10)
+
+        self.g.init()
+        # Cutting-off evolution  at Q2 = cutq2
+        # Evaluate evolved C at this scale now.
+        self.g.nqs.nqs = 1
+        self.g.qs.qs[0] = self.cutq2
+        self.g.kinematics.q2 = self.cutq2
+        self.g.evolc(1, 1)
+        self.g.evolc(2, 1)
+        self.g.evolc(3, 1)
+        self.qdict = {self.cutq2 : 1}  # have to reset this 
+
+        self.g.newcall = 1
+        # number of points on MB contour
+        self.g.npts = 2**self.g.parint.acc * 12 / self.g.parint.speed
+        # now do whatever else is necessary
+
+    def __getstate__(self):
+        # We have to remove unpicklable gepard module object
+        _lg.debug('Shelving [ComptonGepard] %s.\n' % str(self))
+        del self.g
+        return self.__dict__
+
+    def __setstate__(self, dict):
+        _lg.debug('Unshelving %s.' % str(self))
+        self.__dict__ = dict
+        # We now have to reconstruct gepard module object
+        self._gepardinit(self.cutq2, self.ansatz, self.speed, self.q02, **self.kwargs)
+
+    def return_gepard(self):
+        _lg.debug('Returning gepard module to pool.')
+        ComptonGepard.gepardPool.append(self.g)
 
     def _evolve(self, pt):
         """Calculate evolution operator."""
@@ -1039,62 +1076,62 @@ class ComptonGepard(ComptonFormFactors):
     def _GepardCFFs(self, pt):
         """Call gepard routine that calculates CFFs."""
         for i in self.parameters_index:
-            g.par.par[i-1] = self.parameters[self.parameters_index[i]]
+            self.g.par.par[i-1] = self.parameters[self.parameters_index[i]]
 
-        g.kinematics.q2 = pt.Q2
-        g.kinematics.xi = pt.xi
-        g.kinematics.del2 = pt.t
+        self.g.kinematics.q2 = pt.Q2
+        self.g.kinematics.xi = pt.xi
+        self.g.kinematics.del2 = pt.t
 
         if not self.qdict.has_key(pt.Q2):
             self._evolve(pt)
 
-        g.mt.nmts = 1
-        g.mt.mtind = 0 
-        g.mts.mts[0] = - pt.t
+        self.g.mt.nmts = 1
+        self.g.mt.mtind = 0 
+        self.g.mts.mts[0] = - pt.t
 
-        g.cfff()
-        g.newcall = 0
+        self.g.cfff()
+        self.g.newcall = 0
 
     def gpdHtrajQ(self, pt):
         """GPD H^q on xi=x trajectory.
         FIXME: After this, calling self.ImH is broken!!
         """
-        g.parchr.process = array([c for c in 'DVCSTQ'])  # array(6)
-        g.init()
+        self.g.parchr.process = array([c for c in 'DVCSTQ'])  # array(6)
+        self.g.init()
         # Need to reset stored evolC(Q2) which are now likely invalid
-        g.nqs.nqs = 0
+        self.g.nqs.nqs = 0
         self.qdict={}
-        g.newcall = 1
+        self.g.newcall = 1
         return self.ImH(pt)/pi
 
     def gpdHtrajG(self, pt):
         """GPD H^g on xi=x trajectory."""
-        g.parchr.process = array([c for c in 'DVCSTG'])  # array(6)
-        g.init()
+        self.g.parchr.process = array([c for c in 'DVCSTG'])  # array(6)
+        self.g.init()
         # Need to reset stored evolC(Q2) which are now likely invalid
-        g.nqs.nqs = 0
+        self.g.nqs.nqs = 0
         self.qdict={}
-        g.newcall = 1
+        self.g.newcall = 1
         return pt.xi*self.ImH(pt)/pi
 
     def gpdEtrajQ(self, pt):
         """GPD E on xi=x trajectory."""
-        g.parchr.process = array([c for c in 'DVCSTQ'])  # array(6)
-        g.init()
+        self.g.parchr.process = array([c for c in 'DVCSTQ'])  # array(6)
+        self.g.init()
         # Need to reset stored evolC(Q2) which are now likely invalid
-        g.nqs.nqs = 0
+        self.g.nqs.nqs = 0
         self.qdict={}
-        g.newcall = 1
+        self.g.newcall = 1
         return self.ImE(pt)/pi
 
     def gpdEtrajG(self, pt):
         """GPD H^g on xi=x trajectory."""
-        g.parchr.process = array([c for c in 'DVCSTG'])  # array(6)
-        g.init()
+        self.g.parchr.process = array([c for c in 'DVCSTG'])  # array(6)
+        self.g.init()
         # Need to reset stored evolC(Q2) which are now likely invalid
-        g.nqs.nqs = 0
+        self.g.nqs.nqs = 0
         self.qdict={}
-        g.newcall = 1
+        self.g.newcall = 1
         return pt.xi*self.ImE(pt)/pi
 
     def gpdHzeroQ(self, pt, ts=None):
@@ -1109,23 +1146,23 @@ class ComptonGepard(ComptonFormFactors):
         zerosub = {'SECS': 0, 'SECG': 0, 'ESECS' : 0, 'ESECG' : 0,
                    'THIS': 0, 'THIG': 0, 'ETHIS' : 0, 'ETHIG' : 0}
         self.parameters.update(zerosub)
-        g.parchr.process = array([c for c in 'DVCSZQ'])  # array(6)
-        g.init()
+        self.g.parchr.process = array([c for c in 'DVCSZQ'])  # array(6)
+        self.g.init()
         # Need to reset stored evolC(Q2) which are now likely invalid
-        g.nqs.nqs = 0
+        self.g.nqs.nqs = 0
         self.qdict={}
         if isinstance(ts, ndarray):
             tmem = pt.t
             res = []
             for t in ts:
                 pt.t = t
-                g.newcall = 1
+                self.g.newcall = 1
                 res.append(self.ImH(pt))
             self.parameters.update(memsub)
             pt.t = tmem
             return array(res)/pi
         else:
-            g.newcall = 1
+            self.g.newcall = 1
             res = self.ImH(pt)
             self.parameters.update(memsub)
             return res/pi
@@ -1139,23 +1176,23 @@ class ComptonGepard(ComptonFormFactors):
         zerosub = {'SECS': 0, 'SECG': 0, 'ESECS' : 0, 'ESECG' : 0,
                    'THIS': 0, 'THIG': 0, 'ETHIS' : 0, 'ETHIG' : 0}
         self.parameters.update(zerosub)
-        g.parchr.process = array([c for c in 'DVCSZG'])  # array(6)
-        g.init()
+        self.g.parchr.process = array([c for c in 'DVCSZG'])  # array(6)
+        self.g.init()
         # Need to reset stored evolC(Q2) which are now likely invalid
-        g.nqs.nqs = 0
+        self.g.nqs.nqs = 0
         self.qdict={}
         if isinstance(ts, ndarray):
             tmem = pt.t
             res = []
             for t in ts:
                 pt.t = t
-                g.newcall = 1
+                self.g.newcall = 1
                 res.append(self.ImH(pt))
             self.parameters.update(memsub)
             pt.t = tmem
             return pt.xi*array(res)/pi
         else:
-            g.newcall = 1
+            self.g.newcall = 1
             res = self.ImH(pt)
             self.parameters.update(memsub)
             return pt.xi*res/pi
@@ -1169,23 +1206,23 @@ class ComptonGepard(ComptonFormFactors):
         zerosub = {'SECS': 0, 'SECG': 0, 'ESECS' : 0, 'ESECG' : 0,
                    'THIS': 0, 'THIG': 0, 'ETHIS' : 0, 'ETHIG' : 0}
         self.parameters.update(zerosub)
-        g.parchr.process = array([c for c in 'DVCSZQ'])  # array(6)
-        g.init()
+        self.g.parchr.process = array([c for c in 'DVCSZQ'])  # array(6)
+        self.g.init()
         # Need to reset stored evolC(Q2) which are now likely invalid
-        g.nqs.nqs = 0
+        self.g.nqs.nqs = 0
         self.qdict={}
         if isinstance(ts, ndarray):
             tmem = pt.t
             res = []
             for t in ts:
                 pt.t = t
-                g.newcall = 1
+                self.g.newcall = 1
                 res.append(self.ImE(pt))
             self.parameters.update(memsub)
             pt.t = tmem
             return array(res)/pi
         else:
-            g.newcall = 1
+            self.g.newcall = 1
             res = self.ImE(pt)
             self.parameters.update(memsub)
             return res/pi
@@ -1199,23 +1236,23 @@ class ComptonGepard(ComptonFormFactors):
         zerosub = {'SECS': 0, 'SECG': 0, 'ESECS' : 0, 'ESECG' : 0,
                    'THIS': 0, 'THIG': 0, 'ETHIS' : 0, 'ETHIG' : 0}
         self.parameters.update(zerosub)
-        g.parchr.process = array([c for c in 'DVCSZG'])  # array(6)
-        g.init()
+        self.g.parchr.process = array([c for c in 'DVCSZG'])  # array(6)
+        self.g.init()
         # Need to reset stored evolC(Q2) which are now likely invalid
-        g.nqs.nqs = 0
+        self.g.nqs.nqs = 0
         self.qdict={}
         if isinstance(ts, ndarray):
             tmem = pt.t
             res = []
             for t in ts:
                 pt.t = t
-                g.newcall = 1
+                self.g.newcall = 1
                 res.append(self.ImE(pt))
             self.parameters.update(memsub)
             pt.t = tmem
             return pt.xi*array(res)/pi
         else:
-            g.newcall = 1
+            self.g.newcall = 1
             res = self.ImE(pt)
             self.parameters.update(memsub)
             return pt.xi*res/pi
@@ -1295,10 +1332,10 @@ class ComptonGepard(ComptonFormFactors):
         """slope of  CFFH."""
         tmem = pt.t
         pt.t = -0.7
-        g.newcall = 1
+        self.g.newcall = 1
         up = self.ImH(pt)
         pt.t = -0.1
-        g.newcall = 1
+        self.g.newcall = 1
         down = self.ImH(pt)
         pt.t = tmem
         return - 2 * log(up/down)/0.7
@@ -1308,25 +1345,25 @@ class ComptonGepard(ComptonFormFactors):
         """Imaginary part of CFF H."""
         if self.g.newcall:
             self._GepardCFFs(pt)
-        return imag(g.cff.cff[g.parint.p])
+        return imag(self.g.cff.cff[self.g.parint.p])
 
     def ReH(self, pt):
         """Real part of CFF H."""
         if self.g.newcall:
             self._GepardCFFs(pt)
-        return real(g.cff.cff[g.parint.p])
+        return real(self.g.cff.cff[self.g.parint.p])
 
     def ImE(self, pt):
         """Imaginary part of CFF E."""
         if self.g.newcall:
             self._GepardCFFs(pt)
-        return imag(g.cff.cffe[g.parint.p])
+        return imag(self.g.cff.cffe[self.g.parint.p])
 
     def ReE(self, pt):
         """Real part of CFF E."""
         if self.g.newcall:
             self._GepardCFFs(pt)
-        return real(g.cff.cffe[g.parint.p])
+        return real(self.g.cff.cffe[self.g.parint.p])
 
 
 class ComptonHybrid(ComptonFormFactors):
@@ -1342,9 +1379,22 @@ class ComptonHybrid(ComptonFormFactors):
         self.parameters = hubDict(self.DR.parameters, self.Gepard.parameters)
         self.parameter_names = self.DR.parameter_names + self.Gepard.parameter_names
 
-        self.g = g
+        self.g = self.Gepard.g
         # now do whatever else is necessary
         ComptonFormFactors.__init__(self, **kwargs)
+
+    def __getstate__(self):
+        # We have to remove unpicklable gepard module object
+        _lg.debug('Shelving [ComptonHybrid] %s.\n' % str(self))
+        del self.g
+        return self.__dict__
+
+    def __setstate__(self, dict):
+        self.__dict__ = dict
+        self.g = self.Gepard.g
+
+    def close(self):
+        self.Gepard.close()
 
     def is_within_model_kinematics(self, pt):
         # relaxing xBmin and removing Q2max

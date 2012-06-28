@@ -70,3 +70,4 @@ def test_gepardfitDVCSNLO():
 test_gepardfitDVCSNLO.long = 1
 test_gepardfitDVCSNLO.gepardsuite = 1
 #test_gepardfitDVCSNLO.newfeature = 1
+
