@@ -153,7 +153,7 @@ endif
 #  
 # Location and links to pgplot libs (if you have them. 
 # If not, compile fit and gepard.exe with NOPGPLOT=1'.)
-export PGPLOTLIBS = -L$(HOME)/local/lib/pgplot -lpgplot
+export PGPLOTLIBS = -L/usr/lib -lpgplot
 # If you have pgplot libs, but without /XSERVE driver, comment 
 # out the next three lines (should be automatic on Windows)
 ifndef WINDIR
@@ -176,7 +176,7 @@ export EXTARGETS = auxsi auxns anatomyNS anatomy radNLONS radNLO evolutNS evolut
                    radNNLONS radNNLO scalesNS scales scalesNNLO
 export FITTARGETS = fitres fitres2 fitpdfs slope contours
 export MMATARGETS = gepard.exe int2f1.exe dvem.exe
-export PYTARGETS = pygepard.so
+export PYTARGETS = pygepard.so pygepard2.so pygepard3.so
 
 .PHONY: $(TESTTARGETS) $(EXTARGETS) $(FITTARGETS) $(MMATARGETS) $(PYTARGETS)
 DOCTARGETS = pdf html htmlnocss
