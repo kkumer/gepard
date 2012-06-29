@@ -57,7 +57,7 @@ def test_gepardfitDVCSexp():
     f = Fitter.FitterMinuit(reducedpoints, tGepard)
     f.fit()
     chisq = tGepard.chisq(reducedpoints)[0]
-    assert_almost_equal(chisq, 97.93273, 1)
+    assert_almost_equal(chisq/100, 97.93273/100, 1)
     assert_almost_equal(tGepard.model.parameters['M02S'], 0.16058, 2)
     assert_almost_equal(tGepard.model.parameters['SECS'], -0.18120, 2)
     assert_almost_equal(tGepard.model.parameters['SECG'], -0.86294, 2)

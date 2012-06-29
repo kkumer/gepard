@@ -101,7 +101,7 @@ def test_gepardfitDVCSsumso3():
     f = Fitter.FitterMinuit(DVCSpoints, tGepard)
     f.fit()
     chisq = tGepard.chisq(DVCSpoints)[0]
-    assert_almost_equal(chisq, 101.094, 1)
+    assert_almost_equal(chisq/100, 101.094/100, 3)
     tGepard.model.fix_parameters('ALL')
 
 test_gepardfitDVCSsumso3.long = 1
@@ -140,10 +140,20 @@ def test_gepardfitDVCSnlso3():
     f = Fitter.FitterMinuit(DVCSpoints, tGepard)
     f.fit()
     chisq = tGepard.chisq(DVCSpoints)[0]
-    assert_almost_equal(chisq/1000, 95.9/1000, 3)
-    assert_almost_equal(tGepard.model.parameters['M02S'], 0.4782082809, 4)
-    assert_almost_equal(tGepard.model.parameters['SECS'], -0.15134045438, 4)
-    assert_almost_equal(tGepard.model.parameters['SECG'], -0.811942207227, 4)
+    assert_almost_equal(chisq/1000, 95.92/1000, 2)
+    assert_almost_equal(tGepard.model.parameters['M02S'], 0.47839, 2)
+    assert_almost_equal(tGepard.model.parameters['SECS'], -0.15152, 2)
+    assert_almost_equal(tGepard.model.parameters['SECG'], -0.81216, 2)
+    ## smallx-final.nb :
+    #  chisq = 95.9195
+    # {14, "M02S", 0.47839137795878817, 0.1, 0., 0.}, 
+    # {17, "SECS", -0.1515200895554755, 0.02, 0., 0.}, 
+    # {27, "SECG", -0.8121701222093677
+    # fit dvcs dvcs dvcs :
+    #  FCN=   95.91791   FROM MIGRAD    STATUS=CONVERGED    186 CALLS      188 TOTAL
+    #  14    M02S       0.47839 
+    #  17    SECS      -0.15152 
+    #  27    SECG      -0.81216 
     tGepard.model.fix_parameters('ALL')
 
 test_gepardfitDVCSnlso3.long = 1
@@ -252,7 +262,7 @@ def test_hybridfitDVCS():
     f = Fitter.FitterMinuit(DVCSpoints, t)
     f.fit()
     chisq = t.chisq(DVCSpoints)[0]
-    assert_almost_equal(chisq, 101.094, 1)
+    assert_almost_equal(chisq/100, 101.094/100, 3)
     tGepard.model.fix_parameters('ALL')
 
 test_hybridfitDVCS.long = 1
