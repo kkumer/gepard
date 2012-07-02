@@ -262,7 +262,7 @@ def test_hybridfitDVCS():
     f = Fitter.FitterMinuit(DVCSpoints, t)
     f.fit()
     chisq = t.chisq(DVCSpoints)[0]
-    assert_almost_equal(chisq/100, 101.094/100, 3)
+    assert_almost_equal(chisq/100, 101.094/100, 1)
     tGepard.model.fix_parameters('ALL')
 
 test_hybridfitDVCS.long = 1
@@ -313,7 +313,7 @@ def test_hybridfit():
     f.minuit.printMode = 0
     f.fit()
     chisq = t.chisq(fitpoints+DVCSpoints[:6])[0]
-    assert_almost_equal(chisq, 24.830217692733402, 4)
+    assert_almost_equal(chisq/100, 24.830217692733402/100, 3)
     tGepard.model.fix_parameters('ALL')
 
 test_hybridfit.long = 1

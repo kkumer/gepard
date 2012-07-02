@@ -1,3 +1,6 @@
+ - Long gepard test are agreeing only wih 1-2 siginficant digits.
+   This is not good enough.
+
  - after calling gpdF.... stuff everything is broken because
    g...process is changed and gepard must be completely reinitialized
 
