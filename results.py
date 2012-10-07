@@ -1186,6 +1186,20 @@ EIC12generic = {"NS" : 0.152, "AL0S" : 1.1575, "ALPS" : 0.05, "M02S" : 0.2, "DEL
 'fix_EM02G' : False, 'fix_ESECG' : False}
 
 
+#######   For EIC paper  ##########
+
+AFKM12 = {"NS" : 0.152, "AL0S" : 1.158, "ALPS" : 0.10, "M02S" : 0.179, "DELM2S" : 0., 
+"PS" : 2., "SECS" : 0.5142, "THIS" : -0.2106, "SKEWS" : 0., "AL0G" : 1.2473, 
+"ALPG" : 0.10, "M02G" : 0.25, "DELM2G" : 0., "PG" : 2., "SECG" : -4.587, "THIG" : 1.7607, 
+"SKEWG" : 0., "KAPS" : 1.5, "EAL0S" : 1.158, "EALPS" : 0.02, "EM02S" : 0.179,
+"EDELM2S" : 0., "EPS" : 2., "ESECS" : 0.5235, "ETHIS" : -0.2194, "ESKEWS" : 0., 
+"EAL0G" : 1.247, "EALPG" : 0.05, "EM02G" : 0.25, "EDELM2G" : 0., "EPG" : 2., 
+"ESECG" : -4.6366, "ETHIG" : 1.8638, "ESKEWG" : 0.,
+'fix_ALPS' : False, 'fix_M02S' : False, 'fix_SECS' : False, 'fix_THIS' : False, 'fix_KAPS' : False,
+'fix_ALPG' : False, 'fix_M02G' : False, 'fix_SECG' : False, 'fix_THIG' : False, 'fix_EAL0S' : False,
+'fix_EALPS' : False, 'fix_EM02S': False, 'fix_ESECS' : False, 'fix_ETHIS' : False, 'fix_EAL0G' : False, 
+'fix_EM02G' : False, 'fix_ESECG' : False}
+
 #######    DM12  ##########
 
 #  P(chi-square, d.o.f) = P(1887.05, 1687) = 0.0004

@@ -1442,8 +1442,8 @@ class ComptonLocal(ComptonFormFactors):
            'pReHt' :  0.0,                                 
            'pImEt' :  0.0,                                 
            'pReEt' :  0.0}
-        self.parameter_names = ['pImH', 'pReH', 'pImE', 'pReE',
-           'pImHt', 'pReHt', 'pImEt', 'pReEt']
+        self.parameter_names = ['pImH', 'pReH', 'pImHt', 'pReHt', 'pImE', 'pReE',
+           'pImEt', 'pReEt']
 
         # now do whatever else is necessary
         ComptonFormFactors.__init__(self, **kwargs)
@@ -1482,3 +1482,11 @@ class HybridKelly(ComptonHybrid, ElasticKelly):
 
 class ModelLocal(ComptonLocal, ElasticKelly):
     """Model for local fitting of CFFs themselves."""
+
+    def ImEt(self, pt):
+        #To get sensible numbers for parameter.
+        return 2./pt.xB * self.parameters['pImEt']
+
+    def ReEt(self, pt):
+        #To get sensible numbers for parameter.
+        return 2./pt.xB * self.parameters['pReEt']

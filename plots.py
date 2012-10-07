@@ -1130,10 +1130,12 @@ def EICspinALU(th, path=None, fmt='png'):
     pt.in1particle = 'e'
     pt.in1charge = -1
     pt.in1energy = 5.
+    #pt.in1energy = 20.
     pt.in1polarizationvector = 'L'
     pt.in1polarization = 1
     pt.in2particle = 'p'
     pt.in2energy = 100.
+    #pt.in2energy = 250.
     pt.s = 2 * pt.in1energy * (pt.in2energy + math.sqrt(
         pt.in2energy**2 - Mp2)) + Mp2
     pt.xB = 3.2e-3
@@ -1251,9 +1253,11 @@ def EICspinAUT(th, path=None, fmt='png'):
     pt.in1particle = 'e'
     pt.in1charge = -1
     pt.in1energy = 5.
+    #pt.in1energy = 20.
     pt.in1polarization = 0.0
     pt.in2particle = 'p'
     pt.in2energy = 100.
+    #pt.in2energy = 250.
     pt.in2polarizationvector = 'T'
     pt.in2polarization = 1
     pt.s = 2 * pt.in1energy * (pt.in2energy + math.sqrt(
@@ -1376,14 +1380,17 @@ def EICspinAUL(th, path=None, fmt='png'):
     pt.in1particle = 'e'
     pt.in1charge = -1
     pt.in1energy = 5.
+    #pt.in1energy = 20.
     pt.in1polarization = 0.0
     pt.in2particle = 'p'
     pt.in2energy = 100.
+    #pt.in2energy = 250.
     pt.in2polarizationvector = 'L'
     pt.in2polarization = 1
     pt.s = 2 * pt.in1energy * (pt.in2energy + math.sqrt(
         pt.in2energy**2 - Mp2)) + Mp2
     pt.xB = 1.3e-2
+    #pt.xB = 8.155e-3
     pt.t = -0.25
     pt.Q2 = 4.4
     pt.units = {'phi' : 'radian'}
@@ -1498,12 +1505,15 @@ def EICcharge(th, path=None, fmt='png'):
     pt.in1particle = 'e'
     pt.in1charge = 1
     pt.in1energy = 5.
+    #pt.in1energy = 20.
     pt.in1polarization = 0
     pt.in2particle = 'p'
     pt.in2energy = 100.
+    #pt.in2energy = 250.
     pt.s = 2 * pt.in1energy * (pt.in2energy + math.sqrt(
         pt.in2energy**2 - Mp2)) + Mp2
     pt.xB = 5.1e-3
+    #pt.xB = 5.1e-4
     pt.t = -0.25
     pt.Q2 = 4.4
     pt.units = {'phi' : 'radian'}

@@ -135,16 +135,39 @@ GLOnoBSS2 = H1ZEUS + ALUIpts + BCApts + CLASpts + BSDwpoints + AULpts + ALLpts +
 unppts = [ALUIpts, BCApts[6:], CLASpts, BSSwpoints[::-2]]
 polpts = [TSA1points[:4], data[54], BTSApoints[:4], AUTIpoints[:4], AUTDVCSpoints[:4]]
 
+# Local 4-bin fits
+# Updated data by Morgan and DM
+L4_ALUI = utils.select(data[71], criteria=['FTn == -1'])
+L4_AC_0 = utils.select(data[70], criteria=['FTn == 0'])
+L4_AC_1 = utils.select(data[70], criteria=['FTn == 1'])
+# polarized target data
+L4_AUL = utils.select(data[52], criteria=['FTn == -1'])
+L4_ALL_0 = utils.select(data[53], criteria=['FTn==0'])
+L4_ALL_1 = utils.select(data[53], criteria=['FTn==1'])
+L4_AUTI_1 = utils.select(data[66], criteria=['FTn==1'])
+L4_AUTI_0 = utils.select(data[66], criteria=['FTn==0'])
+L4_AUTI_m1 = utils.select(data[66], criteria=['FTn==-1'])
+L4_AUTDVCS = data[65]
+
+#bins = zip(L4_ALUI, L4_AC_0, L4_AC_1, L4_AUL, L4_ALL_0, L4_AUTI_1)
+bins = zip(L4_ALUI, L4_AC_0, L4_AC_1, L4_AUL, L4_ALL_0, 
+        L4_ALL_1, L4_AUTI_1, L4_AUTI_0, L4_AUTI_m1, L4_AUTDVCS)
+bins = zip(L4_ALUI, L4_AC_0, L4_AC_1, L4_AUL, L4_ALL_0, 
+        L4_ALL_1, L4_AUTI_1, L4_AUTI_0, L4_AUTI_m1)
+bins = zip(L4_ALUI, L4_AUL, L4_AUTI_1, L4_AUTI_m1)
+#bins = zip(L4_ALUI, L4_AC_0, L4_AC_1, L4_AUL, L4_ALL_0, L4_ALL_1)
 
 ## [3] Create a theory
 
-#mGepard = Model.ComptonGepard(cutq2=0.5)
-#mDRPPsea = Model.ComptonModelDRPPsea()
-#m = Model.HybridDipole(mGepard, mDRPPsea)
-#th = Approach.BM10(m)
-#th.name = 'new'
-#g = th.m.g
-#th.m.parameters.update(KM12a)
+mGepard = Model.ComptonGepard(cutq2=0.5, ansatz='FITEXP')
+mDRPPsea = Model.ComptonModelDRPPsea()
+m = Model.HybridKelly(mGepard, mDRPPsea)
+th = Approach.BM10(m)
+th.name = 'AFKM12'
+g = th.m.g
+th.m.parameters.update(AFKM12)
+
+thKM10 = db['KM10']
 
 #m = Model.ModelLocal()
 #th = Approach.BM10(m)
@@ -170,8 +193,8 @@ polpts = [TSA1points[:4], data[54], BTSApoints[:4], AUTIpoints[:4], AUTDVCSpoint
 #f = Fitter.FitterMinuit(GLOnoBSS2+BSSwpoints, th)
 
 #th.model.release_parameters('pImH', 'pReH', 'pImE', 'pReE', 'pImHt', 'pReHt')
-#nbin = 3
-#th.model.release_parameters('pImH', 'pReE')
+#nbin = 1
+#th.model.release_parameters('pImH', 'pImHt', 'pImE', 'pImEt')
 #th.name = th.name + 'bin %s' % nbin
 #f = Fitter.FitterMinuit(bins[nbin-1], th)
 #f.minuit.tol = 80
