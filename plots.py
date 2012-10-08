@@ -1367,6 +1367,85 @@ def EICspinAUT(th, path=None, fmt='png'):
         fig.show()
     return fig
 
+def EICspinAUTphi(th, path=None, fmt='png'):
+    """Plot EIC TTSA.  """
+    title = ''
+    fig = plt.figure()
+    fig.canvas.set_window_title(title)
+    fig.suptitle(title)
+    fig.subplots_adjust(bottom=0.1, top=1., right=0.9, wspace=0.)
+    pt = Data.DummyPoint()
+    pt.exptype = 'collider'
+    pt.in1particle = 'e'
+    pt.in1charge = -1
+    pt.in1energy = 20.
+    pt.in1polarization = 0.0
+    pt.in2particle = 'p'
+    pt.in2energy = 250.
+    pt.in2polarizationvector = 'T'
+    pt.in2polarization = 1
+    pt.s = 2 * pt.in1energy * (pt.in2energy + math.sqrt(
+        pt.in2energy**2 - Mp2)) + Mp2
+    kins = [(14., 8.2e-4), (14., 1.3e-3), (14., 5.1e-3),
+            (7.8, 5.1e-4), (7.8, 8.2e-4), (7.8, 5.1e-3),
+            (4.4, 3.2e-4), (4.4, 8.2e-4), (4.4, 5.1e-3)]
+    pt.varphi = -np.pi/2
+    pt.units = {'phi' : 'radian'}
+    linestyles = ['b-', 'g-.', 'r--',]
+    dasheslengths = [(None, None), (20,5,5,5), (20,5)]
+    pn = 1
+    for kin in kins:
+        if hasattr(pt, 'W'): del pt.W
+        pt.Q2, pt.xB = kin
+        if hasattr(pt, 'tm'): del pt.tm
+        pt.t = -0.25
+        ax = fig.add_subplot(3,3,pn)
+        ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
+        phi = np.linspace(0., 2*np.pi, 50)
+        utils.fill_kinematics(pt)
+        #labels = [r'$\sigma^{\uparrow}$ ' + t.name for t in lines]
+        th.__class__.to_conventions(pt)
+        th.__class__.prepare(pt)
+        ln = 0
+        for kappa in [1.5, 0., -1.5]:
+            th.m.parameters['KAPS'] = kappa
+            # Must go to BKM explicitely here
+            line = th.TSA(pt, vars={'phi':np.pi-phi})
+            ax.plot(phi, line, linestyles[ln], dashes=dasheslengths[ln], linewidth=2, 
+                    label='$\\kappa^{\\rm sea} = %.1f$' % kappa) 
+            ln +=1
+        ax.set_xlim(0.0, 2*np.pi)
+        ax.set_ylim(-0.9, 0.9)
+        # axes labels
+        if pn > 6:
+            ax.set_xlabel('$\\phi\\quad {\\rm [rad]}$', fontsize=20)
+        if (pn % 3) == 1:
+            ax.set_ylabel('$A_{\\rm UT}^{\\sin(\\phi - \\phi_S)}$', fontsize=20)
+        #ax.text(1, 0.35, "$t = %s \\,{\\rm GeV}^2$" % pt.t, fontsize=14)
+        ax.set_xticks([0, np.pi/2, np.pi, 3*np.pi/2])
+        ax.set_xticklabels(['$0$', '$\\pi/2$', '$\\pi$', '$3 \\pi/2$'])
+        # Legend
+        if pn == 1:
+            leg = ax.legend(loc='upper center', handlelength=4.0, fancybox=True)
+            frame  = leg.get_frame()
+            frame.set_facecolor('0.90')    # set the frame face color to light gray
+            for t in leg.get_texts():
+                t.set_fontsize(12)    # the legend text fontsize
+            for l in leg.get_lines():
+                l.set_linewidth(2.0)  # the legend line width
+        #
+        #ax.text(0.1, -0.17, "$E_e = %d \\,{\\rm GeV}$" % pt.in1energy, fontsize=14)
+        #ax.text(0.1, -0.26, "$E_p = %d \\,{\\rm GeV}$" % pt.in2energy, fontsize=14)
+        ax.text(0.1, -0.55, "$x_B = %s$" % pt.xB, fontsize=14)
+        ax.text(0.1, -0.75, "$Q^2 = %s \\,{\\rm GeV}^2$" % pt.Q2, fontsize=14)
+        pn += 1
+    if path:
+        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+    else:
+        fig.canvas.draw()
+        fig.show()
+    return fig
+
 def EICspinAUL(th, path=None, fmt='png'):
     """Plot EIC LTSA.  """
     title = ''

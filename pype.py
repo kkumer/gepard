@@ -159,9 +159,7 @@ bins = zip(L4_ALUI, L4_AUL, L4_AUTI_1, L4_AUTI_m1)
 
 ## [3] Create a theory
 
-mGepard = Model.ComptonGepard(cutq2=0.5, ansatz='FITEXP')
-mDRPPsea = Model.ComptonModelDRPPsea()
-m = Model.HybridKelly(mGepard, mDRPPsea)
+m = Model.Gepard(ansatz='EFLEXP')
 th = Approach.BM10(m)
 th.name = 'AFKM12'
 g = th.m.g
