@@ -30,12 +30,12 @@ _lg = logging.getLogger('p.%s' % __name__)
 class Model(object):
     """Base class for all models."""
 
-    def __init__(self, optimization=False):
+    def __init__(self, **kwargs):
         """ 
         optimization -- use C/Fortran extensions or some such
         
         """
-        self.optimization = optimization
+        self.optimization = kwargs.pop('optimization', False)
         # Intially all parameters are fixed and should be released by user
         exec('fixed = {' + ", ".join(map(lambda x: "'fix_%s': %s" % x, 
                     zip(self.parameter_names, len(self.parameter_names)*['True']))) + '}')
@@ -297,6 +297,7 @@ class ComptonFormFactors(Model):
     allCFFeffs = ['ImHeff', 'ReHeff', 'ImEeff', 'ReEeff', 
                      'ImHteff', 'ReHteff', 'ImEteff', 'ReEteff']
     allGPDs = []
+
 
     def CFFvalues(self, pt):
         """Print values of CFFs. Pastable into Mathematica."""
@@ -990,8 +991,25 @@ class ComptonGepard(ComptonFormFactors):
         ComptonFormFactors.__init__(self, **kwargs)
 
     def _gepardinit(self, cutq2=0.0, ansatz='FIT', speed=1, q02=4.0, **kwargs):
-        """Initializate gepard part of model."""
-        self.g = ComptonGepard.gepardPool[-1]
+        """Initialize gepard part of model."""
+        emptyPoolMessage = 'Pool of gepard modules is empty. No new \
+gepard models can be created. Restart everything!\n'
+        if kwargs.pop('newgepard', False):
+            # Consume one gepard module from the gepardPool
+            try:
+                self.g = ComptonGepard.gepardPool.pop()
+                _lg.debug('Consumed one gepard module from the gepardPool. Leaving %i.\n' 
+                    % (len(ComptonGepard.gepardPool),))
+            except IndexError:
+                sys.stderr.write(emptyPoolMessage)
+                return -1
+        else:
+            # Just use the last gepard module, but leave it in the gepardPool
+            try:
+                self.g = ComptonGepard.gepardPool[-1]
+            except IndexError:
+                sys.stderr.write(emptyPoolMessage)
+                return -1
         # this was in Gepard's GEPARD.INI, which is not needed now
         # but look at it for documentation of what parameters below are
         self.g.parint.speed = speed

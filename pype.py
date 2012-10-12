@@ -159,13 +159,13 @@ bins = zip(L4_ALUI, L4_AUL, L4_AUTI_1, L4_AUTI_m1)
 
 ## [3] Create a theory
 
-m = Model.Gepard(ansatz='EFLEXP')
-th = Approach.BM10(m)
-th.name = 'AFKM12'
-g = th.m.g
-th.m.parameters.update(AFKM12)
 
+thAFKM12 = db['AFKM12']
+th = thAFKM12
+Model.ComptonGepard.gepardPool.pop()
 thKM10 = db['KM10']
+Model.ComptonGepard.gepardPool.pop()
+theories = [thAFKM12, thKM10]
 
 #m = Model.ModelLocal()
 #th = Approach.BM10(m)
@@ -286,6 +286,8 @@ def ptcol(th, Q=-1, pol=0, Ee=20, Ep=250, xB=0.001998, Q2=4., t=-0.1,
     return ptc
 
 #ptc = ptcol(th, Q=1, pol=0, Ee=5, Ep=100, phi=0.1, Q2=4.4, xB=8.2e-3, t=-0.25)
+ptI = ptcol(th, Q=1, pol=0, Ee=5, Ep=100, phi=np.pi, Q2=4.4, xB=5.1e-3, t=-0.25)
+ptII = ptcol(th, Q=1, pol=0, Ee=20, Ep=250, phi=np.pi, Q2=4.4, xB=5.1e-4, t=-0.25)
 
 def ccals(th, pt):
     cals = ['DVCSunp', 'INTunp', 'INTunpV', 'INTunpA']
