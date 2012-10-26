@@ -551,6 +551,7 @@ class ComptonModelDRPP(ComptonModelDR):
         return self.parameters['rpi'] * 2.16444 / (0.0196 - pt.t) / (1. 
             - pt.t/self.parameters['Mpi']**2)**2 / pt.xi
 
+
 class ComptonModelDRsea(ComptonDispersionRelations):
     """DR Model intended for combining with Gepard sea. NS->Nsea"""
 
@@ -643,6 +644,7 @@ class ComptonModelDRsea(ComptonDispersionRelations):
         return (2.2390424 * (1. - (1.7*(0.0196 - pt.t))/(1. 
             - pt.t/2.)**2))/((0.0196 - pt.t)*pt.xi)
 
+
 class ComptonModelDRPPsea(ComptonModelDRsea):
     """As DRPP but with NS->Nsea. For combining with Gepard sea"""
 
@@ -683,6 +685,7 @@ class ComptonModelDRPPsea(ComptonModelDRsea):
         """Instead of disp. rel. use pole formula"""
         return self.parameters['rpi'] * 2.16444 / (0.0196 - pt.t) / (1. 
             - pt.t/self.parameters['Mpi']**2)**2 / pt.xi
+
 
 class ComptonNeuralNets(Model):
     """Neural network CFFs"""
@@ -1447,6 +1450,7 @@ class ComptonHybrid(ComptonFormFactors):
     def ReEt(self, pt):
         return  self.DR.ReEt(pt)
 
+
 class ComptonLocal(ComptonFormFactors):
     """For local fitting of CFFs which are themselves fit paramters."""
 
@@ -1503,8 +1507,8 @@ class ModelLocal(ComptonLocal, ElasticKelly):
 
     def ImEt(self, pt):
         #To get sensible numbers for parameter.
-        return 2./pt.xB * self.parameters['pImEt']
+        return (2.-pt.xB)/pt.xB * self.parameters['pImEt']
 
     def ReEt(self, pt):
         #To get sensible numbers for parameter.
-        return 2./pt.xB * self.parameters['pReEt']
+        return (2.-pt.xB)/pt.xB * self.parameters['pReEt']

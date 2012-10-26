@@ -152,24 +152,32 @@ L4_AUTDVCS = data[65]
 #bins = zip(L4_ALUI, L4_AC_0, L4_AC_1, L4_AUL, L4_ALL_0, L4_AUTI_1)
 bins = zip(L4_ALUI, L4_AC_0, L4_AC_1, L4_AUL, L4_ALL_0, 
         L4_ALL_1, L4_AUTI_1, L4_AUTI_0, L4_AUTI_m1, L4_AUTDVCS)
-bins = zip(L4_ALUI, L4_AC_0, L4_AC_1, L4_AUL, L4_ALL_0, 
-        L4_ALL_1, L4_AUTI_1, L4_AUTI_0, L4_AUTI_m1)
-bins = zip(L4_ALUI, L4_AUL, L4_AUTI_1, L4_AUTI_m1)
+#bins = zip(L4_ALUI, L4_AC_0, L4_AC_1, L4_AUL, L4_ALL_0, 
+#        L4_ALL_1, L4_AUTI_1, L4_AUTI_0, L4_AUTI_m1)
+#bins = zip(L4_ALUI, L4_AUL, L4_AUTI_1, L4_AUTI_m1)
 #bins = zip(L4_ALUI, L4_AC_0, L4_AC_1, L4_AUL, L4_ALL_0, L4_ALL_1)
 
 ## [3] Create a theory
 
 
-thAFKM12 = db['AFKM12']
-th = thAFKM12
-Model.ComptonGepard.gepardPool.pop()
-thKM10 = db['KM10']
-Model.ComptonGepard.gepardPool.pop()
-theories = [thAFKM12, thKM10]
+#thAFKM12 = db['AFKM12']
+#th = thAFKM12
+#Model.ComptonGepard.gepardPool.pop()
+#thKM10 = db['KM10']
+#Model.ComptonGepard.gepardPool.pop()
+#theories = [thAFKM12, thKM10]
 
-#m = Model.ModelLocal()
-#th = Approach.BM10(m)
-#th.name = 'local'
+m = Model.ModelLocal()
+th = Approach.BM10(m)
+th.name = 'DMlocal'
+th.m.parameters.update({'pImE': -50.02097709090083,
+ 'pImEt': -94.04223960082038,
+ 'pImH': 26.90785517414438,
+ 'pImHt': -4.4912953169971015,
+ 'pReE': -172.74446204986222,
+ 'pReEt': 16.30482089309816,
+ 'pReH': 2.0973238402092345,
+ 'pReHt': 2.03359772383489})
 
 
 
