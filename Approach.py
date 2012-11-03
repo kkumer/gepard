@@ -310,7 +310,7 @@ class BMK(Approach):
         # This doesn't touches pt
         # C2. phi_{BKM} -> (pi - phi_{Trento})
         if pt.has_key('frame') and pt.frame == 'Trento' and pt.has_key('FTn'):
-            if pt.FTn == 1 or pt.FTn == 3 or pt.FTn = -2:
+            if pt.FTn == 1 or pt.FTn == 3 or pt.FTn == -2:
                 val = - val
         if pt.has_key('frame') and pt.frame == 'Trento' and pt.has_key('varFTn'):
             if pt.FTn == 1 or pt.FTn == -1:
