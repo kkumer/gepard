@@ -67,7 +67,7 @@ def _axpoints(ax, pts, xaxis, **kwargs):
     xaxis -- 'Q2', 't', 'xB', ...
 
     """
-    kwargs.pop('justbars', False)  # Kludge
+    kwargs.pop('justbars', False)  # Kludge, FIXME
     pts = [Approach.BMK.from_conventions(pt.copy()) for pt in pts]
     xvals = [getattr(pt, xaxis) for pt in pts]
     yvals = [pt.val for pt in pts]
@@ -83,7 +83,12 @@ def _axline(ax, fun, points, xaxis, **kwargs):
 
     """
     for pts in points:
-        xvals = [getattr(pt, xaxis) for pt in pts]
+        if pts[0].has_key('phi') and pts[0].frame == 'Trento':
+            # go back to degrees
+            oldpts = [Approach.BMK.from_conventions(pt.copy()) for pt in pts]
+            xvals = [getattr(pt, xaxis) for pt in oldpts]
+        else:
+            xvals = [getattr(pt, xaxis) for pt in pts]
         yvals = [fun(pt) for pt in pts]
         kwargs.pop('justbars', False)  # Kludge
         if kwargs.pop('xF', False):  # do we want  xF(x) plotted?
@@ -103,12 +108,18 @@ def _axband(ax, fun, pts, xaxis, **kwargs):
     if not (isinstance(pts[0], Data.DataPoint) or isinstance(pts[0], Data.DummyPoint)):
         raise ValueError, "%s is not single dataset" % str(pts)
 
-    xvals = [getattr(pt, xaxis) for pt in pts]
+    if pts[0].has_key('phi') and pts[0].frame == 'Trento':
+        # go back to degrees
+        oldpts = [Approach.BMK.from_conventions(pt.copy()) for pt in pts]
+        xvals = [getattr(pt, xaxis) for pt in oldpts]
+    else:
+        xvals = [getattr(pt, xaxis) for pt in pts]
     res = [fun(pt) for pt in pts]
     if len(res[0]) == 2:
         # we have symmetric error
         res = [(m, err, err) for m, err in res]
     up, down = np.array([(m+errp, m-errm) for m,errp,errm in res]).transpose()
+
     if kwargs.pop('justbars', False):  # do we want just errorbars for theory?
         res = zip(up, down)
         #FIXME: symmetric error assumed
@@ -213,7 +224,10 @@ def panel(ax, points=None, lines=None, bands=None, xaxis=None, xs=None,
         xvals = []; yvals = []
         for pts in points:
             for pt in pts:
-                xvals.append(getattr(pt, xaxis))
+                if xaxis == 'phi' and pt.frame == 'Trento':
+                    xvals.append((np.pi - pt.phi)/np.pi * 180.)
+                else:
+                    xvals.append(getattr(pt, xaxis))
                 yvals.append(pt.val)
         labx = min(0, min(xvals)) + (max(xvals) - min(0, min(xvals))) * 0.35
         laby = min(0, min(yvals)) + (max(yvals) - min(0, min(yvals))) * 0.02
@@ -653,8 +667,8 @@ def HallAphi(path=None, fmt='png', **kwargs):
     for id in ids:
         ax = fig.add_subplot(2,3,npanel)
         panel(ax, points=subsets[id], xaxis='phi', kinlabels=['Q2', 't'], **kwargs)
-        ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(2.))
-        ax.set_xlabel('$\\phi\\; {\\rm [rad]}$', fontsize=16)
+        #ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(2.))
+        ax.set_xlabel('$\\phi\\; {\\rm [deg]}$', fontsize=16)
         if not(npanel==1 or npanel==4):
             # Leave labels only on leftmost panels
             ax.set_ylabel('')
@@ -666,6 +680,10 @@ def HallAphi(path=None, fmt='png', **kwargs):
             ax.set_ylabel('$d^4\\sigma$', fontsize=18)
             #ax.set_ylabel('$d^4\\sigma/(dQ^2\\! dx_{\\rm B}dt d\\phi)\\quad  \
             #        [{\\rm nb/GeV}^4]$', fontsize=18)
+        if npanel < 4:
+            ax.set_ylim(-0.03, 0.03)
+        else:
+            ax.set_ylim(0, 0.12)
         npanel += 1
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)

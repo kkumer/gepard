@@ -290,10 +290,6 @@ class BMK(Approach):
 
     def from_conventions(pt):
         """Transform stuff from Approach's conventions into original data's."""
-        # This method is never used presently!!
-        # C1. azimutal angle phi back to degrees
-        if pt.has_key('phi') and pt.units['phi'][:3]=='deg':
-            pt.phi = pt.phi / pi * 180.
         # C2. phi_{BKM} -> (pi - phi_{Trento})
         if pt.has_key('frame') and pt.frame == 'Trento':
             if pt.has_key('phi'):
@@ -301,7 +297,15 @@ class BMK(Approach):
             elif pt.has_key('FTn'):
                 if pt.FTn == 1 or pt.FTn == 3:
                     pt.val = - pt.val
-            pt.newframe = 'BMK'
+            if pt.has_key('varphi'):
+                pt.varphi = pt.varphi + pi
+            elif pt.has_key('varFTn'):
+                if pt.varFTn == 1 or pt.varFTn == -1:
+                    pt.val = - pt.val
+            pt.newframe = 'Trento'
+        # C1. azimutal angle phi back to degrees
+        if pt.has_key('phi') and pt.units['phi'][:3]=='deg':
+            pt.phi = pt.phi / pi * 180.
         return pt
     from_conventions = staticmethod(from_conventions)
 
