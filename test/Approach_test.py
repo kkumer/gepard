@@ -152,7 +152,7 @@ def test_BTSA():
     assert_almost_equal(tBM10.BTSA(ptb), 0.25592806446362842)
 
 def test_TTSA():
-    """Calculate transversal TSA in BMK Approach."""
+    """Calculate transversal TSA in BMK Approach and frame."""
     assert_almost_equal(t.TSA(pttrans), 0.080468284490077271)
 
 def test_BSSw():
@@ -164,12 +164,12 @@ def test_BSDw():
     assert_almost_equal(t.BSDw(ptwd)*1e3, 8.91853141911449)
 
 def test_AUTI():
-    """Calculate transversal TSA - INT part - in BMK Approach."""
+    """Calculate transversal TSA - INT part - in BMK Approach and frame."""
     assert_almost_equal(t.AUTI(pttrans), 0.075300023640416394)
 
 def test_AUTDVCS():
-    """Calculate transversal TSA - DVCS part - in BMK Approach."""
+    """Calculate transversal TSA - DVCS part - in BMK Approach and frame."""
     pttrans.varFTn = -1
-    assert_almost_equal(th.AUTDVCS(pttrans)*1e3, 1.5171462298928092)
+    assert_almost_equal(th.AUTDVCS(pttrans)*1e3, -1.5171462298928092)
 
 

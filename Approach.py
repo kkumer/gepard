@@ -276,8 +276,15 @@ class BMK(Approach):
             if pt.has_key('phi'):
                 pt.phi = pi - pt.phi
             elif pt.has_key('FTn'):
-                if pt.FTn == 1 or pt.FTn == 3:
+                if pt.FTn == 1 or pt.FTn == 3 or pt.FTn == -2:
                     pt.val = - pt.val
+            if pt.has_key('varphi'):
+                pt.varphi = pt.varphi - pi
+            elif pt.has_key('varFTn'):
+                if pt.varFTn == 1 or pt.varFTn == -1:
+                    pt.val = - pt.val
+                else:
+                    raise ValueError('varFTn = %d not allowed. Only +/-1!' % pt.varFTn)
             pt.newframe = 'BMK'
     to_conventions = staticmethod(to_conventions)
 
@@ -303,7 +310,10 @@ class BMK(Approach):
         # This doesn't touches pt
         # C2. phi_{BKM} -> (pi - phi_{Trento})
         if pt.has_key('frame') and pt.frame == 'Trento' and pt.has_key('FTn'):
-            if pt.FTn == 1 or pt.FTn == 3:
+            if pt.FTn == 1 or pt.FTn == 3 or pt.FTn = -2:
+                val = - val
+        if pt.has_key('frame') and pt.frame == 'Trento' and pt.has_key('varFTn'):
+            if pt.FTn == 1 or pt.FTn == -1:
                 val = - val
         return val
     orig_conventions = staticmethod(orig_conventions)
@@ -739,8 +749,12 @@ class BMK(Approach):
             # We directly take cos(varphi) or sin(varphi) terms depending if
             # varFTn is specified
                 if hasattr(pt, 'varFTn'):
-                    # FIXME: should deal with Trento/BKM differences
-                    kin.varphi = (pt.varFTn-1)*pi/4.  # 0 for cos, -pi/2 for sin
+                    # FIXME: should deal properly with Trento/BKM differences
+                    # Also, this gives result in Trento convention now,
+                    # and is completely O.K. for Trento asymmetries
+                    #kin.varphi = (3*pt.varFTn+1)*pi/4.  # pi for cos, -pi/2 for sin
+                    # And this is for BMK
+                    kin.varphi = (1-pt.varFTn)*pi/4.  # 0 for cos, pi/2 for sin
                 aux += kin.in2polarization*(
                         self.TBH2TP(kin) + self.TINTTP(kin) + self.TDVCS2TP(kin))
             else:

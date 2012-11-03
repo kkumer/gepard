@@ -179,6 +179,36 @@ th.m.parameters.update({'pImE': -50.02097709090083,
  'pReH': 2.0973238402092345,
  'pReHt': 2.03359772383489})
 
+def predictBin(th, k=0, orig_conventions=True):
+    for pt in bins[k]:
+        pred = th.predict(pt, orig_conventions=orig_conventions)
+        if pt.has_key('FTn'):
+            if pt.FTn == 1:
+                sphi = '\cos\phi'
+            elif pt.FTn == -1:
+                sphi = '\sin\phi'
+            elif pt.FTn == 0:
+                sphi = '\cos 0\phi'
+            else:
+                sys.stderr.write('Wrong FTn')
+        else:
+            sphi = ''
+        if pt.has_key('varFTn'):
+            if pt.varFTn == 1:
+                svarphi = '\cos\\varphi'
+            elif pt.varFTn == -1:
+                svarphi = '\sin\\varphi'
+            elif pt.varFTn == 0:
+                svarphi = '\cos 0\\varphi'
+            else:
+                sys.stderr.write('Wrong varFTn')
+        else:
+            svarphi = ''
+        obsname = pt.yaxis +'_'+svarphi+'_'+sphi
+        #print '%32s =  % .4f  (% .3f +- %.3f)' % (obsname, pred, pt.val, pt.err)
+        print '%32s =  % .4f' % (obsname, pred)
+
+
 
 
 ## [4] Do the fit
