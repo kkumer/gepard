@@ -323,7 +323,7 @@ def ptcol(th, Q=-1, pol=0, Ee=20, Ep=250, xB=0.001998, Q2=4., t=-0.1,
     th.prepare(ptc)
     return ptc
 
-#ptc = ptcol(th, Q=1, pol=0, Ee=5, Ep=100, phi=0.1, Q2=4.4, xB=8.2e-3, t=-0.25)
+ptc = ptcol(th, Q=1, pol=1, Ee=5, Ep=100, phi=0.1, Q2=4.4, xB=8.2e-3, t=-0.25)
 ptI = ptcol(th, Q=1, pol=0, Ee=5, Ep=100, phi=np.pi, Q2=4.4, xB=5.1e-3, t=-0.25)
 ptII = ptcol(th, Q=1, pol=0, Ee=20, Ep=250, phi=np.pi, Q2=4.4, xB=5.1e-4, t=-0.25)
 

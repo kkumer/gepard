@@ -709,7 +709,7 @@ class BMK(Approach):
             ptempty = Data.DummyPoint()
             kin = utils.fill_kinematics(ptempty, old=pt)
             BMK.prepare(kin)
-            ## Nothing seems to be gained by following approach:
+            ## Nothing seems to be gained by the following approach:
             #kin = dict((i, getattr(pt, i)) for i in 
             #        ['xB', 'Q2', 'W', 's', 't', 'mt', 'phi', 'in1charge',
             #            'in1polarization', 'in2particle'])

@@ -82,6 +82,36 @@ def theory(id):
         g = th.m.g
         th.m.parameters.update(KM10b)  # DM email only!
         return th
+    elif id == 6:
+        # Hybrid fit 
+        # P(chi-square, d.o.f) = P(124.12, 80) = 0.0012
+# 
+# GLOnoBSS2 = H1ZEUS + ALUIpts + BCApts + CLASpts + BSDwpoints + AULpts + ALLpts + AUTIpts
+# + BSSwpoints
+# 
+#    Mv =    0.951 +- 0.282  (p = 0.00114)          H1ZEUS: chi/npts =  28.57/35
+#    rv =    1.121 +- 0.099  (p = 0)               ALUIpts: chi/npts =  12.47/6
+#    bv =    0.400 +- 0.000  (p = 0)                BCApts: chi/npts =   9.35/12
+#     C =    1.003 +- 0.565  (p = 0.0794)          CLASpts: chi/npts =   5.14/4
+#    MC =    2.080 +- 3.754  (p = 0.581)        BSDwpoints: chi/npts =  12.74/12
+#   tMv =    3.523 +- 13.175  (p = 0.79)        BSSwpoints: chi/npts =  18.80/8
+#   trv =    1.302 +- 0.206  (p = 1.38e-08)         AULpts: chi/npts =  19.66/10
+#   tbv =    0.400 +- 0.001  (p = 0)                ALLpts: chi/npts =  13.77/4
+#   rpi =    3.837 +- 0.141  (p = 0)               AUTIpts: chi/npts =   3.61/4
+#   Mpi =    4.000 +- 0.036  (p = 0)
+#  M02S =    0.462 +- 0.032  (p = 0)
+#  SECS =    0.313 +- 0.039  (p = 8.67e-12)
+#  THIS =   -0.138 +- 0.012  (p = 0)
+#  SECG =   -2.771 +- 0.228  (p = 0)
+#  THIG =    0.945 +- 0.107  (p = 2.03e-13)
+        mGepard = Model.ComptonGepard(cutq2=0.5)
+        mDRPPsea = Model.ComptonModelDRPPsea()
+        m = Model.HybridKelly(mGepard, mDRPPsea)
+        th = Approach.BM10(m)
+        th.name = 'KMM12'
+        g = th.m.g
+        th.m.parameters.update(KM12a)
+        return th
     else:
         sys.stdout.write('Unknown model: %d\n' % id)
         sys.exit(1)
@@ -93,7 +123,7 @@ def tmin(xB, Q2):
     return (-Q2 * ( 2. * (1.-xB)*(1. - sqrt(1.+eps2)) + eps2 ) / (
             4. * xB * (1.-xB) + eps2 ))
 
-def XSunp(id, Q, lam, Ee, Ep, xB, Q2, t, phi):
+def XSall(id, Q, lam, Ee, Ep, xB, Q2, t, phi):
     """ Return cross section of scattering on unpolarized proton
 
     Here phi is assumed to be in Trento conventions.
@@ -132,7 +162,17 @@ def XSunp(id, Q, lam, Ee, Ep, xB, Q2, t, phi):
         sys.stdout.flush()
         sys.exit(1)
     else:
-        return th.Xunp(pt0)
+        xstot = [th.Xunp(pt0), 0, 0, 0]
+        if id > 5:
+            pt0.in2polarizationvector = 'L'
+            pt0.in2polarization = 1
+            xstot[3] = th.XLP(pt0)
+            pt0.in2polarizationvector = 'T'
+            pt0.varphi = 0
+            xstot[1] = th.XLP(pt0)
+            pt0.varphi = pi/2
+            xstot[2] = th.XLP(pt0)
+        return xstot
 
 if __name__ == '__main__':
     usage = """
@@ -140,7 +180,22 @@ if __name__ == '__main__':
   xs.exe  ModelID  Charge  Polarization  Ee  Ep  xB  Q2  t  phi
 
 returns cross section (in nb) for scattering of lepton of energy Ee 
-on unpolarized proton of energy Ep. Charge=-1 is for electron. 
+on proton of energy Ep. Charge=-1 is for electron. Polarization=+1
+is for lepton polarization along the beam.
+Output is
+
+    phi xs_unp  xs_TP+  xs_TP-  xs_LP
+
+where total cross section is
+
+    xs_unp + sin(theta_S) cos(phi-phi_S) xs_TP+
+           + sin(theta_S) sin(phi-phi_S) xs_TP-
+           + cos(theta_S) xs_LP
+
+and theta_S and phi_S are proton polarization polar and
+azimuthal angles, while phi is angle between lepton
+and reaction planes (both in BMK convention.
+FIXME: go to Trento!!!!!!).
 
 ModelID is one of  
    0 debug, always returns 42, 
@@ -149,8 +204,10 @@ ModelID is one of
    3 KM10  - preliminary hybrid fit with LO sea evolution, from Trento presentation,
    4 KM10a - preliminary hybrid fit with LO sea evolution, without Hall A data
    5 KM10b - preliminary hybrid fit with LO sea evolution, with Hall A data
+   6 KMM12 - hybrid global fit to unpolarized and polarized DVCS data
+where models 1-5 are for unpolarized target only.
 
-xB Q2 t phi  -- usual kinematics (phi is in Trento convention)
+xB Q2 t -- usual kinematics
 
 For convenience, if last argument (phi=n) is larger than 2pi, you get grid 
 of n equidistant points with phi=0..2pi.
@@ -170,8 +227,12 @@ Example:
         sys.stdout.write(usage)
         sys.exit(1)
     if args[-1] <= 2*3.141592:
-        res = apply(XSunp, args)
-        sys.stdout.write("%.14f\n" % res)
+        lst = apply(XSall, args)
+        lst.insert(0, args[-1])
+        if args[0] > 5:
+            sys.stdout.write("%.3f  %.14f  % .14f  % .14f  % .14f\n" % tuple(lst))
+        else:
+            sys.stdout.write("%.3f  %.14f\n" % tuple(lst[:2]))
     else:
         # we want phi-grid
         res = []
@@ -179,5 +240,10 @@ Example:
         for k in range(npts):
             phi = 2*pi*k / (npts-1)
             args[-1] = phi
-            sys.stdout.write("%.3f  %.14f\n" % (phi, apply(XSunp, args)))
+            lst = apply(XSall, args)
+            lst.insert(0, phi)
+            if args[0] > 5:
+                sys.stdout.write("%.3f  %.14f  % .14f  % .14f  % .14f\n" % tuple(lst))
+            else:
+                sys.stdout.write("%.3f  %.14f\n" % tuple(lst[:2]))
     sys.stdout.flush()
