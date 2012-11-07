@@ -48,8 +48,13 @@ obsnames = ['ALUI', 'AC0', 'AC1', 'AUL', 'ALL0', 'ALL1',
 
 def Hptval(pt):
     """pt.val in HERMES conventions"""
+    # cos-varphi and sin-varphi harmonics change sign
+    if pt.has_key('varFTn'):
+        val = -pt.val
+    else:
+        val = pt.val
     # All cos-phi (positive FTn) harmonics change sign
-    return np.sign(0.2-pt.FTn)*pt.val
+    return np.sign(0.2-pt.FTn)*val
 
 def printset(filename, set, nbin=4):
     f = open(filename+'-tm.dat', 'w')
@@ -161,4 +166,3 @@ for prefix in ['', 'Ht-', 'KM12a-']:
 
     print '%sTOTAL chisq = %f' % (prefix, totchi)
 
-# closing all files

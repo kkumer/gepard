@@ -278,6 +278,7 @@ class BMK(Approach):
             elif pt.has_key('FTn'):
                 if pt.FTn == 1 or pt.FTn == 3 or pt.FTn == -2:
                     pt.val = - pt.val
+        # C3. varphi_{Trento} -> (varphi_{BKM} + pi)
             if pt.has_key('varphi'):
                 pt.varphi = pt.varphi - pi
             elif pt.has_key('varFTn'):
@@ -297,6 +298,7 @@ class BMK(Approach):
             elif pt.has_key('FTn'):
                 if pt.FTn == 1 or pt.FTn == 3:
                     pt.val = - pt.val
+        # C3. varphi_{Trento} -> (varphi_{BKM} + pi)
             if pt.has_key('varphi'):
                 pt.varphi = pt.varphi + pi
             elif pt.has_key('varFTn'):
