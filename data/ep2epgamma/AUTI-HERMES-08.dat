@@ -31,7 +31,7 @@ out3particle = gamma
 
 
 ### Observable
-# A^{sin(varphi)}_{UT,DVCS} 
+# A^{sin,cos(varphi)}_{UT,I} 
 
 y1name = AUTI
 y1namelong = Charge Difference Transverse Target Spin Asymmetry

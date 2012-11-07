@@ -317,7 +317,7 @@ class BMK(Approach):
             if pt.FTn == 1 or pt.FTn == 3 or pt.FTn == -2:
                 val = - val
         if pt.has_key('frame') and pt.frame == 'Trento' and pt.has_key('varFTn'):
-            if pt.FTn == 1 or pt.FTn == -1:
+            if pt.varFTn == 1 or pt.varFTn == -1:
                 val = - val
         return val
     orig_conventions = staticmethod(orig_conventions)

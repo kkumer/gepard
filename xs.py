@@ -126,7 +126,8 @@ def tmin(xB, Q2):
 def XSall(id, Q, lam, Ee, Ep, xB, Q2, t, phi):
     """ Return cross section of scattering on unpolarized proton
 
-    Here phi is assumed to be in Trento conventions.
+    Here phi is assumed to be in Trento conventions, and results
+    are also in Trento convention.
     """
 
 #    sys.stderr.write('called grid(%i, %i, %i, %.1f, %.1f, 
@@ -166,12 +167,12 @@ def XSall(id, Q, lam, Ee, Ep, xB, Q2, t, phi):
         if id > 5:
             pt0.in2polarizationvector = 'L'
             pt0.in2polarization = 1
-            xstot[3] = th.XLP(pt0)
+            xstot[3] = - th.XLP(pt0)  # minus to go to Trento
             pt0.in2polarizationvector = 'T'
             pt0.varphi = 0
-            xstot[1] = th.XLP(pt0)
+            xstot[1] =  - th.XTP(pt0)
             pt0.varphi = pi/2
-            xstot[2] = th.XLP(pt0)
+            xstot[2] = - th.XTP(pt0)
         return xstot
 
 if __name__ == '__main__':
@@ -179,23 +180,21 @@ if __name__ == '__main__':
 
   xs.exe  ModelID  Charge  Polarization  Ee  Ep  xB  Q2  t  phi
 
-returns cross section (in nb) for scattering of lepton of energy Ee 
-on proton of energy Ep. Charge=-1 is for electron. Polarization=+1
-is for lepton polarization along the beam.
-Output is
+returns cross section (in nb) for scattering of lepton of energy Ee on proton 
+of energy Ep. xB, Q2 and t is usual kinematics. Charge=-1 is for electron. 
+Polarization=+1 is for lepton polarization along the beam.  Output is:
 
-    phi xs_unp  xs_TP+  xs_TP-  xs_LP
+    phi xs_unp  xs_TPcos  xs_TPsin  xs_LP
 
 where total cross section is
 
-    xs_unp + sin(theta_S) cos(phi-phi_S) xs_TP+
-           + sin(theta_S) sin(phi-phi_S) xs_TP-
-           + cos(theta_S) xs_LP
+ xs = xs_unp + sin(theta_S) cos(phi-phi_S) xs_TPcos
+             + sin(theta_S) sin(phi-phi_S) xs_TPsin
+             + cos(theta_S) xs_LP
 
 and theta_S and phi_S are proton polarization polar and
 azimuthal angles, while phi is angle between lepton
-and reaction planes (both in BMK convention.
-FIXME: go to Trento!!!!!!).
+and reaction planes. All in Trento conventions.
 
 ModelID is one of  
    0 debug, always returns 42, 
@@ -206,9 +205,6 @@ ModelID is one of
    5 KM10b - preliminary hybrid fit with LO sea evolution, with Hall A data
    6 KMM12 - hybrid global fit to unpolarized and polarized DVCS data
 where models 1-5 are for unpolarized target only.
-
-xB Q2 t -- usual kinematics
-
 For convenience, if last argument (phi=n) is larger than 2pi, you get grid 
 of n equidistant points with phi=0..2pi.
 
