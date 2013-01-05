@@ -942,6 +942,44 @@ class BMK(Approach):
         """Calculate beam-target spin asymmetry or its harmonics."""
         return self._phiharmonic(self._BTSA, pt, **kwargs)
 
+    def _CBTSA(self, pt, chargepar=-1, **kwargs):
+        """Calculate charge-beam spin-target spin asymmetry (CBTSA).
+        
+        According to 1106.2990 Eq. (18)(chargepar=1) and (19)(chargepar=-1)
+
+        """
+        T_args = kwargs.copy()
+        T_args.update({'flip':'in2polarization'})
+        B_args = kwargs.copy()
+        B_args.update({'flip':'in1polarization'})
+        BT_args = kwargs.copy()
+        BT_args.update({'flip':['in1polarization', 'in2polarization']})
+        C_args = kwargs.copy()
+        C_args.update({'flip':'in1charge'})
+        CT_args = kwargs.copy()
+        CT_args.update({'flip':['in1charge', 'in2polarization']})
+        CB_args = kwargs.copy()
+        CB_args.update({'flip':['in1charge', 'in1polarization']})
+        CBT_args = kwargs.copy()
+        CBT_args.update({'flip':['in1charge' ,'in1polarization', 'in2polarization']})
+        o =  self.XS(pt, **kwargs)
+        t =  self.XS(pt, **T_args)
+        b =  self.XS(pt, **B_args)
+        bt =  self.XS(pt, **BT_args)
+        c =  self.XS(pt, **C_args)
+        ct =  self.XS(pt, **CT_args)
+        cb =  self.XS(pt, **CB_args)
+        cbt =  self.XS(pt, **CBT_args)
+        return ((o-t-b+bt) + chargepar*(c-ct-cb+cbt)) / (o+t+b+bt+c+ct+cb+cbt)
+
+    def ALTI(self, pt, **kwargs):
+        """Calculate {A_LT,I} as defined by HERMES 1106.2990 Eq. (19) or its harmonics."""
+        return self._phiharmonic(self._CBTSA, pt, **kwargs)
+
+    def ALTBHDVCS(self, pt, **kwargs):
+        """Calculate {A_LT,BHDVCS} as defined by HERMES 1106.2990 Eq. (18) or its harmonics."""
+        return self._phiharmonic(self._CBTSA, pt, chargepar=+1, **kwargs)
+
     def BSD(self, pt, **kwargs):
         """Calculate 4-fold helicity-dependent cross section measured by HALL A """
 

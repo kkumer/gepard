@@ -148,14 +148,15 @@ L4_AUTI_1 = utils.select(data[66], criteria=['FTn==1'])
 L4_AUTI_0 = utils.select(data[66], criteria=['FTn==0'])
 L4_AUTI_m1 = utils.select(data[66], criteria=['FTn==-1'])
 L4_AUTDVCS = data[65]
+# For ALT last point is overall
+L4_ALTI_1 = utils.select(data[74], criteria=['FTn==1'])[:-1]
+L4_ALTI_0 = utils.select(data[74], criteria=['FTn==0'])[:-1]
+L4_ALTI_m1 = utils.select(data[74], criteria=['FTn==-1'])[:-1]
+L4_ALTBHDVCS_0 = utils.select(data[73], criteria=['FTn==0'])[:-1]
 
-#bins = zip(L4_ALUI, L4_AC_0, L4_AC_1, L4_AUL, L4_ALL_0, L4_AUTI_1)
 bins = zip(L4_ALUI, L4_AC_0, L4_AC_1, L4_AUL, L4_ALL_0, 
-        L4_ALL_1, L4_AUTI_1, L4_AUTI_0, L4_AUTI_m1, L4_AUTDVCS)
-#bins = zip(L4_ALUI, L4_AC_0, L4_AC_1, L4_AUL, L4_ALL_0, 
-#        L4_ALL_1, L4_AUTI_1, L4_AUTI_0, L4_AUTI_m1)
-#bins = zip(L4_ALUI, L4_AUL, L4_AUTI_1, L4_AUTI_m1)
-#bins = zip(L4_ALUI, L4_AC_0, L4_AC_1, L4_AUL, L4_ALL_0, L4_ALL_1)
+        L4_ALL_1, L4_AUTI_1, L4_AUTI_0, L4_AUTI_m1, L4_AUTDVCS,
+        L4_ALTI_m1, L4_ALTI_0, L4_ALTI_1, L4_ALTBHDVCS_0)
 
 ## [3] Create a theory
 
@@ -179,8 +180,29 @@ th.m.parameters.update({'pImE': -50.02097709090083,
  'pReH': 2.0973238402092345,
  'pReHt': 2.03359772383489})
 
-def predictBin(th, k=0, orig_conventions=True):
+dmkins = [
+{'tm':0.031,'xB':0.079,'Q2':1.982},
+{'tm':0.094,'xB':0.103,'Q2':2.531},
+{'tm':0.201,'xB':0.11,'Q2':2.883},
+{'tm':0.408,'xB':0.123,'Q2':3.587},
+{'tm':0.096,'xB':0.054,'Q2':1.437},
+{'tm':0.099,'xB':0.084,'Q2':2.115},
+{'tm':0.123,'xB':0.121,'Q2':3.108},
+{'tm':0.188,'xB':0.198,'Q2':4.934},
+{'tm':0.085,'xB':0.056,'Q2':1.236},
+{'tm':0.098,'xB':0.079,'Q2':1.862},
+{'tm':0.123,'xB':0.108,'Q2':2.829},
+{'tm':0.178,'xB':0.17,'Q2':4.865},
+{'tm':0.118,'xB':0.097,'Q2':2.51}]
+
+
+def predictBin(th, k=0, orig_conventions=True, fixedkin=False):
     for pt in bins[k]:
+        if fixedkin:
+            del pt.t, pt.tm, pt.xB, pt.Q2, pt.W
+            pt.__dict__.update(dmkins[k])
+            utils.fill_kinematics(pt)   
+            th.prepare(pt)
         pred = th.predict(pt, orig_conventions=orig_conventions)
         if pt.has_key('FTn'):
             if pt.FTn == 1:
@@ -392,7 +414,10 @@ def CFFatpt(th, cffs=['ImH', 'ReH', 'ImE', 'ReE', 'ImHt', 'ReHt', 'ImEt', 'xReEt
         print tmpl % tuple([cff]+vals)
     print '------+' + 33*'-'
 
-
+def DMN(th, pt):
+    prefac = pt.xB**2 * (1+pt.eps2)**2 * pt.t * th.anintP1P2(pt)  
+    prefac = prefac / (2*np.pi*pt.Q2)
+    return th.cBH0unp(pt) / ( th.cBH0unp(pt) + prefac*th.cDVCS0unp(pt) )
 
 #def rth(m, pt, tht):
 #    """Calculate <r(tht)> for model m."""
