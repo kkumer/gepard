@@ -39,12 +39,29 @@ L4_AUTI_1 = utils.select(data[66], criteria=['FTn==1'])
 L4_AUTI_0 = utils.select(data[66], criteria=['FTn==0'])
 L4_AUTI_m1 = utils.select(data[66], criteria=['FTn==-1'])
 L4_AUTDVCS = data[65]
+# For ALT last point is overall
+L4_ALTI_1 = utils.select(data[74], criteria=['FTn==1'])[:-1]
+L4_ALTI_0 = utils.select(data[74], criteria=['FTn==0'])[:-1]
+L4_ALTI_m1 = utils.select(data[74], criteria=['FTn==-1'])[:-1]
+L4_ALTBHDVCS_0 = utils.select(data[73], criteria=['FTn==0'])[:-1]
 
 bins = zip(L4_ALUI, L4_AC_0, L4_AC_1, L4_AUL, L4_ALL_0, 
         L4_ALL_1, L4_AUTI_1, L4_AUTI_0, L4_AUTI_m1, L4_AUTDVCS)
 
+# Full 14 obs
+bins = zip(L4_ALUI, L4_AC_0, L4_AC_1, L4_AUL, L4_ALL_0, 
+        L4_ALL_1, L4_AUTI_1, L4_AUTI_0, L4_AUTI_m1, L4_AUTDVCS,
+        L4_ALTI_m1, L4_ALTI_0, L4_ALTI_1, L4_ALTBHDVCS_0)
 obsnames = ['ALUI', 'AC0', 'AC1', 'AUL', 'ALL0', 'ALL1', 
-        'AUTI1', 'AUTI0', 'AUTIm1', 'AUTDVCS']
+        'AUTI1', 'AUTI0', 'AUTIm1', 'AUTDVCS',
+        'ALTIm1', 'ALTI0', 'ALTI1', 'ALTBHDVCS']
+
+# 8 obs given by INT term
+bins = zip(L4_ALUI, L4_AC_1, L4_AUL, L4_ALL_1, 
+           L4_AUTI_1, L4_AUTI_m1, L4_ALTI_1, L4_ALTI_m1)
+obsnames = ['ALUI', 'AC1', 'AUL',  'ALL1', 
+            'AUTI1',  'AUTIm1', 'ALTIm1', 'ALTI1']
+
 
 def Hptval(pt):
     """pt.val in HERMES conventions"""
@@ -86,13 +103,19 @@ printset('fits/HERMES-AUTI0', L4_AUTI_0)
 printset('fits/HERMES-AUTIm1', L4_AUTI_m1)
 printset('fits/HERMES-AUTDVCS', L4_AUTDVCS)
 
+printset('fits/HERMES-ALTI1', L4_ALTI_1)
+printset('fits/HERMES-ALTI0', L4_ALTI_0)
+printset('fits/HERMES-ALTIm1', L4_ALTI_m1)
+printset('fits/HERMES-ALTBHDVCS', L4_ALTBHDVCS_0)
+
 
 tmshifts = [0.02, 0.03, 0]
 xBshifts = [0.01, 0.015, 0]
 Q2shifts = [0.2, 0.3, 0]
 shifts = zip(tmshifts, xBshifts, Q2shifts)
 ## [3] Iterate over all models:
-for prefix in ['', 'Ht-', 'KM12a-']:
+#for prefix in ['', 'Ht-', 'KM12a-']:
+for prefix in ['AllEight-']:
     sys.stdout.write('\n Doing %smodel.' % (prefix,))
     fls = []
     for obs in  obsnames:
@@ -124,6 +147,18 @@ for prefix in ['', 'Ht-', 'KM12a-']:
             th = Approach.BM10(m)
             th.model.fix_parameters('ALL')
             th.model.release_parameters('pImH', 'pReH', 'pImHt')
+            f = Fitter.FitterMinuit(pts, th)
+            f.minuit.printMode = 0
+            f.fit()
+            tmshift, xBshift, Q2shift = shifts[1]
+        elif prefix == 'AllEight-':
+            # -- Fitting to ImH and ReH
+            m = Model.ModelLocal()
+            m.parameters['pImH'] = 10. 
+            th = Approach.BM10(m)
+            th.model.fix_parameters('ALL')
+            th.model.release_parameters('pImH', 'pReH', 'pImE', 'pReE', 
+                    'pImHt', 'pReHt', 'pImEt', 'pReEt')
             f = Fitter.FitterMinuit(pts, th)
             f.minuit.printMode = 0
             f.fit()
