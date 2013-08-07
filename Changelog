@@ -1,4 +1,9 @@
-2010-06-25 
+2013-08-07 
+
+Version 0.9.6 2013-08-07 
+	- ADD: DVEM coefficient functions (just starting, DVEM not usable yet)
+	- ADD: GPD E
+	- FIX: All test for "big" NPB paper (2008) fixed
 
 Version 0.9.5 2010-06-25 
 
