@@ -854,7 +854,8 @@ class ComptonGepard(ComptonFormFactors):
 
     # To have different Gepard models available we have to
     # use separate modules - otherwise things clash
-    gepardPool = [g1, g2, g3]  #  modules to choose from
+    #gepardPool = [g1, g2, g3]  #  modules to choose from
+    gepardPool = [g1]  #  modules to choose from
 
     def __init__(self, cutq2=0.0, ansatz='FIT', speed=1, q02=4.0, **kwargs):
         _lg.debug('Creating %s.\n' % str(self))
@@ -1094,8 +1095,8 @@ gepard models can be created. Restart everything!\n'
             self.g.evolc(2, nqs)
             self.g.evolc(3, nqs)
 
-    def _GepardCFFs(self, pt):
-        """Call gepard routine that calculates CFFs."""
+    def _GepardFFs(self, pt, FF='cfff'):
+        """Call gepard routine that calculates CFFs or TFFs."""
         for i in self.parameters_index:
             self.g.par.par[i-1] = self.parameters[self.parameters_index[i]]
 
@@ -1110,8 +1111,9 @@ gepard models can be created. Restart everything!\n'
         self.g.mt.mtind = 0 
         self.g.mts.mts[0] = - pt.t
 
-        self.g.cfff()
+        getattr(self.g, FF)()
         self.g.newcall = 0
+
 
     def gpdHtrajQ(self, pt):
         """GPD H^q on xi=x trajectory.
@@ -1365,25 +1367,37 @@ gepard models can be created. Restart everything!\n'
     def ImH(self, pt):
         """Imaginary part of CFF H."""
         if self.g.newcall:
-            self._GepardCFFs(pt)
+            self._GepardFFs(pt)
         return imag(self.g.cff.cff[self.g.parint.p])
 
     def ReH(self, pt):
         """Real part of CFF H."""
         if self.g.newcall:
-            self._GepardCFFs(pt)
+            self._GepardFFs(pt)
         return real(self.g.cff.cff[self.g.parint.p])
+
+    def ImHrho(self, pt):
+        """Imaginary part of TFF H_rho."""
+        if self.g.newcall:
+            self._GepardFFs(pt, 'tfff')
+        return imag(self.g.tff.tffh[self.g.parint.p])
+
+    def ReHrho(self, pt):
+        """Real part of TFF H_rho."""
+        if self.g.newcall:
+            self._GepardFFs(pt, 'tfff')
+        return real(self.g.tff.tffh[self.g.parint.p])
 
     def ImE(self, pt):
         """Imaginary part of CFF E."""
         if self.g.newcall:
-            self._GepardCFFs(pt)
+            self._GepardFFs(pt)
         return imag(self.g.cff.cffe[self.g.parint.p])
 
     def ReE(self, pt):
         """Real part of CFF E."""
         if self.g.newcall:
-            self._GepardCFFs(pt)
+            self._GepardFFs(pt)
         return real(self.g.cff.cffe[self.g.parint.p])
 
 

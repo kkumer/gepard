@@ -124,7 +124,18 @@ class DataPoint(DummyPoint):
         if self.has_key('y1error'):  # we are given total error already
             self.err = gridline[int(self.y1error.split('column')[1])-1]
         else:  # we have to add stat and syst in quadrature
-            self.stat = gridline[int(self.y1errorstatistic.split('column')[1])-1]
+            # 1. statistical error
+            if self.has_key('y1errorstatisticc'):
+                self.stat = gridline[int(self.y1errorstatistic.split('column')[1])-1]
+            elif self.has_key('y1errorstatisticplus'): 
+                # we have stat+ and stat-. Taking the larger one as a systematic error.
+                # TODO: This should be, of course, treated in a assymetric way
+                self.statplus = gridline[int(self.y1errorstatisticplus.split('column')[1])-1]
+                self.statminus = gridline[int(self.y1errorstatisticminus.split('column')[1])-1]
+                self.stat = max(self.statplus, -self.statminus)
+            else:  # stat error not given, assumed zero
+                self.stat = 0.
+            # 2. systematic error
             if self.has_key('y1errorsystematic'):
                 self.syst = gridline[int(self.y1errorsystematic.split('column')[1])-1]
                 self.err = math.sqrt( self.stat**2 + self.syst**2 )
@@ -134,9 +145,10 @@ class DataPoint(DummyPoint):
                 self.systplus = gridline[int(self.y1errorsystematicplus.split('column')[1])-1]
                 self.systminus = gridline[int(self.y1errorsystematicminus.split('column')[1])-1]
                 self.syst = max(self.systplus, -self.systminus)
-                self.err = math.sqrt( self.stat**2 + self.syst**2 )
             else:  # syst error not given, assumed zero
-                self.err = self.stat
+                self.syst = 0.
+            # adding syst and stat in quadrature
+            self.err = math.sqrt( self.stat**2 + self.syst**2 )
         # 2e. calculate standard kinematical variables
         utils.fill_kinematics(self)
         # 2f. polarizations

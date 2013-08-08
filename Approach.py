@@ -1172,6 +1172,16 @@ class BMK(Approach):
                 0, 2.0*pi) / pi
         return b1/b0
 
+##  DVMP
+
+    def Xrhot(self, pt):
+        """Partial DVrhoP cross section w.r.t. Mandelstam t."""
+
+        self.m.g.newcall = 1
+        res = 112175.5 * pt.xB**2 * ( 
+                self.m.ImHrho(pt)**2 + self.m.ReHrho(pt)**2) / pt.Q2**2
+        return res
+
 
 
 class hotfixedBMK(BMK):
