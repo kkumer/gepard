@@ -163,7 +163,6 @@ C
       END IF
 
 
-      IF ( FFTYPE(:7) .EQ. 'SINGLET' ) THEN
 
 *   -----------  SINGLET  ------------------
               
@@ -272,7 +271,6 @@ C
  30   CONTINUE
 
 
-      ELSE
 *  -------------  NON - SINGLET  ----------------
 
 *   2.bNS Anomalous dimensions matrices: LO, NLO, and NNLO
@@ -318,7 +316,6 @@ C
  50     CONTINUE
       END IF
 
-      END IF
 
 100   CONTINUE
 

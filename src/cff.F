@@ -12,7 +12,7 @@ C     CFFF  --   Compton form factor \mathcal{H}
 C  DESCRIPTION
 C    calculates singlet Compton form factor H by numerical Mellin-Barnes 
 C    integration according to formula Eq. (58) from [Kumericki:2007sa]
-C      NB!! - only one of three CFF(0:2) array elements, CFF(P)
+C      NB!! - only one of three CFF(0:2) array elements, CFF(P),
 C             is changed by single call to CFFF!
 C  SYNOPSIS
 
@@ -78,7 +78,7 @@ C
 *        FIXME: Following line could be wrong parameter no. It's ther
 *               just to avoid compiler warning ... NONSING is maybe
 *               broken!
-        FPWE = CGRIDNS(QIND,K)*PAR(18)*MBGPD(K,3)        
+        FPWE = CGRIDNS(QIND,K)*PAR(17)*MBGPD(K,3)        
       ELSE
 *       --- singlet case ---
 *            --- CFF H ---

@@ -40,7 +40,7 @@ diff lett/FIG2A-LETT.dat FIG2A.dat
 Or, better, diff -> vimdiff
 
 
-Fourth test (broken presently)
+Fourth test 
 -----------
 run executable ./houches and resulting files show relative difference with
 respect to evolution of Les Houches benchmark gluon PDF, as evaluated

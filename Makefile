@@ -12,7 +12,7 @@
 # 	auxns    -  comparing MSBAR and CSBAR schemes
 # 	auxtest  -  tests DVCS \mathcal{H} calculation
 #
-# 	houches  -  comparison to Les Houches DIS benchmark (broken)
+# 	houches  -  comparison to Les Houches DIS benchmark 
 # 	accuracy -  Analysis of accuracy and SPEED of DVCS calculation
 #
 # For compiling 'fit' and 'gepard.exe' without PGPLOT (no plotting) do
@@ -101,7 +101,7 @@ endif
 # -- 2. MathLink related things
 #
 # Put your version of Mathematica here and it's root dir (final slash needed!)
-export MMAVERSION=8.0
+export MMAVERSION=7.0
 export MMAROOT = /usr/local/Wolfram/Mathematica/
 # export MMAROOT = /cygdrive/c/Program\ Files/Wolfram\ Research/Mathematica/
 #export MMAROOT = /psi/math-

@@ -630,15 +630,6 @@ C  SYNOPSIS
       DOUBLE COMPLEX CGRIDDIS(QINDMAX, NPTSMAX, 2)
 C     ***
 
-C     ****v* header.F/HGRID
-C  DESCRIPTION
-C       HGRID(MTIND, K, flavour) -- values of GPD H
-C               obsoleted by MBGPD, should be changed to MBGPD in code
-C  MEMBER OF
-C    HGRID(block) 
-C  SYNOPSIS
-      DOUBLE COMPLEX HGRID(0:MTINDMAX, NPTSMAX, 2)
-C     ***
 
 C     ****v* header.F/MBGPD
 C  DESCRIPTION
@@ -931,14 +922,6 @@ C  DESCRIPTION
 C     "Evolved" DIS F2 Wilson coefficients
 C  SYNOPSIS
       COMMON / CGRIDDIS /  CGRIDDIS
-C     ***
-
-C     ****c* header.F/HGRID(block)
-C  DESCRIPTION
-C      Values of GPDs on MB contour for all needed -t (in principle)
-C      Maybe obsoleted by MBGPD
-C  SYNOPSIS
-      COMMON / HGRID    /  HGRID
 C     ***
 
 C     ****c* header.F/MBGPD(block)
