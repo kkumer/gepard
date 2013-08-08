@@ -66,6 +66,13 @@ C
       WRITE (*,*) "Expect LO: 13.919751 + 189.278946 I "
       WRITE (*,*) CFF(0) / CHARGEFAC
       WRITE (*,*) 
+      
+*     DVMP transition FF
+      CALL TFFF 
+      WRITE (*,*) 
+      WRITE (*,*) "Expect LO H_rho: ??? "
+      WRITE (*,*) TFFH(0)
+      WRITE (*,*) 
 
 *     2. Point "B"
       WRITE (*,*) " --- Point B  (CSBAR) ----- "

@@ -33,7 +33,7 @@ $(ADACFODIR)/%.o: adacf/%.f
 FOBJS = Finit.o Fbeta.o Fspecial.o Fdcomplex.o Fastrong.o Flambda.o\
 Fprojectors.o Frnnlo.o Ferfunc.o Fevol.o Fcdvcs.o Fmsbar.o \
 Fdvcs.o Ff2.o Freadpar.o Ferror.o Fgauss.o Fnd.o Fbigcns.o Fintegra.o Fxspace.o\
-Finitc.o Fevolc.o Fgetmbgpd.o Fhj.o Fej.o Fsplice.o Fcff.o Fderiv.o Fbca.o
+Finitc.o Fevolc.o Fgetmbgpd.o Fhj.o Fej.o Fsplice.o Fcff.o Ftff.o Fderiv.o Fbca.o
 _FOBJS = $(patsubst %,$(FODIR)/%,$(FOBJS))
 
 # Fortran object files needed for DVEM
@@ -85,7 +85,7 @@ FPREPDIR = Fprep
 FPREPS = init.f beta.f special.f dcomplex.f astrong.f lambda.f\
 projectors.f rnnlo.f erfunc.f evol.f cdvcs.f msbar.f \
 dvcs.f f2.f error.f gauss.f nd.f bigcns.f integra.f\
-initc.f evolc.f getmbgpd.f hj.f ej.f splice.f cff.f 
+initc.f evolc.f getmbgpd.f hj.f ej.f splice.f cff.f tff.f 
 _FPREPS = $(patsubst %,$(FPREPDIR)/%,$(FPREPS))
 
 $(FPREPDIR)/%.f: %.F  header.F
