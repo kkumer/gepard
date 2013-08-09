@@ -125,7 +125,7 @@ class DataPoint(DummyPoint):
             self.err = gridline[int(self.y1error.split('column')[1])-1]
         else:  # we have to add stat and syst in quadrature
             # 1. statistical error
-            if self.has_key('y1errorstatisticc'):
+            if self.has_key('y1errorstatistic'):
                 self.stat = gridline[int(self.y1errorstatistic.split('column')[1])-1]
             elif self.has_key('y1errorstatisticplus'): 
                 # we have stat+ and stat-. Taking the larger one as a systematic error.
