@@ -242,7 +242,7 @@ C
 *       (Option 3) CFF or F2 in CSBAR scheme
           CALL CDVCSF(SEC, K, BIGCTMP)
       ELSE IF (SCHEME(:3) .EQ. 'MSB') THEN
-*       (Option 4) CFF or F2 in MSBAR/MSBDI/MSBLO schemes
+*       (Option 4) CFF or TFF or F2 in MSBAR/MSBDI/MSBLO schemes
           CALL MSBARF(SEC, K, BIGCTMP)
       ELSE
 *       (Option 5) This should never happen
@@ -263,7 +263,7 @@ C
 *          -- GPDs at eta=0 trajectory --
           BIGC(SEC, K, ORD, L) = BIGCTMP(ORD, L)
         ELSE
-*          -- CFFs or GPDs at eta=x trajectory --
+*          -- CFFs or TFFs or GPDs at eta=x trajectory --
           BIGC(SEC, K, ORD, L) = BIGCTMP(ORD, L) * 2.0d0**(J+1.d0)
      &           * EXP(CLNGAMMA(2.5d0 + J) - CLNGAMMA(3.0d0 + J))
      &           / 0.886226925452758014d0
@@ -308,7 +308,8 @@ C
 *     2^(J+1) Gamma(5/2+J) / Gamma(3/2) / Gamma(3+J)
 *     BTW,  Gamma(3/2) = 0.88622...
 
-      IF ( PROCESS(:4) .EQ. 'DVCS' ) THEN
+      IF (( PROCESS(:4) .EQ. 'DVCS' ) .OR. (
+     ^  PROCESS(:4) .EQ. 'DVMP' )) THEN
         DO 50 ORD = 0, P
           BIGCNS(K, ORD) = BIGCNS(K, ORD) * 2.0d0**(J+1.d0) 
      &          *  EXP(CLNGAMMA(2.5d0 + J) - CLNGAMMA(3.0d0 + J))

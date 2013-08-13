@@ -39,17 +39,29 @@ C
 
       LRF2 = LOG(RF2)
 
-      BIGCTMP(0, 1) = (1.0d0,0.0d0)
-      BIGCTMP(0, 2) = (0.0d0,0.0d0)
+      IF ( PROCESS(:4) .EQ. 'DVMP' ) THEN
 
-      BIGCTMP(1, 1) =  CF * (2.0d0 * HS1(J+1)**2 - (9.0d0/2.0d0)
+        BIGCTMP(0, 1) = (1.0d0,0.0d0)
+        BIGCTMP(0, 2) = (1.0d0,0.0d0)
+c   --- switching off LO gluons for debugging
+c       BIGCTMP(0, 2) = (0.0d0,0.0d0)
+
+      ELSE
+*     --- DVCS or DIS ---
+
+        BIGCTMP(0, 1) = (1.0d0,0.0d0)
+        BIGCTMP(0, 2) = (0.0d0,0.0d0)
+
+        BIGCTMP(1, 1) =  CF * (2.0d0 * HS1(J+1)**2 - (9.0d0/2.0d0)
      &      + (5.0d0 - 4.0d0 * HS1(J+1)) / (2.0d0 * (J+1) * (J+2))
      &   + 1.0d0 / ( (J+1)**2 * (J+2)**2 ) ) - 
      &   GAM(SEC,K,0,1,1)*LRF2/ 2.0d0
 
-      BIGCTMP(1, 2) =  - NF * ( (4.0d0 + 3.0d0 * J + J*J) * (HS1(J)
+        BIGCTMP(1, 2) =  - NF * ( (4.0d0 + 3.0d0 * J + J*J) * (HS1(J)
      &      + HS1(J+2)) + 2.0d0 + 3.0d0 * J + J*J ) / ((J+1) * (J+2)
      &      * (J+3)) - GAM(SEC,K,0,1,2)*LRF2/ 2.0d0
+
+      END IF
 
       RETURN
       END

@@ -30,8 +30,9 @@ C  SOURCE
 C
 
       INTEGER K
+      DOUBLE COMPLEX J
       DOUBLE PRECISION R, ASQ02, ASMUR2, ASMUF2
-      DOUBLE COMPLEX CEVNS, CEV(2)
+      DOUBLE COMPLEX CEVNS, CEV(2), CEVDIS(2)
       DOUBLE COMPLEX EVOLNSA(0:2)
       DOUBLE COMPLEX EVOLA(0:2,2,2)
 #include "header.F"
@@ -48,11 +49,8 @@ C
 
       DO 123 K = 1, NPTS
 
-*        Evolution operators and partial wave depending on whether we do
-*        non-singlet or singlet case. This is specified by using
-*        process name that starts 'NS...'.
 
-      IF ( FFTYPE(:7) .EQ. 'NONSING' ) THEN
+**    1. non-singlet
 
         CALL EVOLNSF (K, R, EVOLNSA)
 
@@ -76,13 +74,11 @@ C
 
         CGRIDNS(QIND, K) = CEVNS
 
-      ELSE
-*     singlet case
+*     2. singlet case
 
        CALL EVOLF (SEC, K, R, EVOLA)
 
-       IF ( PROCESS(:4) .EQ. 'DVCS' ) THEN
-*      --- DVCS ---
+*       2.1  --- DVCS ---
 
         CEV(1) = ( BIGC(SEC,K,0,1) * EVOLA(0,1,1) + 
      &             BIGC(SEC,K,0,2) * EVOLA(0,2,1) ) * CZERO
@@ -122,41 +118,46 @@ C
 
         ENDIF
 
-        CGRID(SEC, QIND, K, 1) = CEV(1)
-        CGRID(SEC, QIND, K, 2) = CEV(2)
+        IF (PROCESS(:4) .EQ. 'DVMP') THEN
+          J = N(SEC, K) - 1
+          CGRID(SEC, QIND, K, 1) = CEV(1) / NF
+          CGRID(SEC, QIND, K, 2) = CEV(2) * 2.d0/CF/(J+3.d0)
+        ELSE
+          CGRID(SEC, QIND, K, 1) = CEV(1)
+          CGRID(SEC, QIND, K, 2) = CEV(2)
+        END IF
 
-       ELSE
-*      --- DIS ---
+*        2.2 -- DIS ---
 
-        CEV(1) = ( BIGCF2(K,0,1) * EVOLA(0,1,1) + 
+        CEVDIS(1) = ( BIGCF2(K,0,1) * EVOLA(0,1,1) + 
      &             BIGCF2(K,0,2) * EVOLA(0,2,1) ) * CZERO
-        CEV(2) = ( BIGCF2(K,0,1) * EVOLA(0,1,2) + 
+        CEVDIS(2) = ( BIGCF2(K,0,1) * EVOLA(0,1,2) + 
      &             BIGCF2(K,0,2) * EVOLA(0,2,2) ) * CZERO
 
         IF (P .GE. 1) THEN
 
-          CEV(1) = CEV(1) + ASMUR2 * ( BIGCF2(K,1,1) * EVOLA(0,1,1) + 
-     &                                 BIGCF2(K,1,2) * EVOLA(0,2,1) )
+          CEVDIS(1) = CEVDIS(1) + ASMUR2 * ( BIGCF2(K,1,1) * 
+     &                  EVOLA(0,1,1) +  BIGCF2(K,1,2) * EVOLA(0,2,1) )
      &                    + ASMUF2 * ( BIGCF2(K,0,1) * EVOLA(1,1,1) + 
      &                                 BIGCF2(K,0,2) * EVOLA(1,2,1) )
 
-          CEV(2) = CEV(2) + ASMUR2 * ( BIGCF2(K,1,1) * EVOLA(0,1,2) + 
-     &                                 BIGCF2(K,1,2) * EVOLA(0,2,2) )
+          CEVDIS(2) = CEVDIS(2) + ASMUR2 * ( BIGCF2(K,1,1) * 
+     &                 EVOLA(0,1,2) +  BIGCF2(K,1,2) * EVOLA(0,2,2) )
      &                    + ASMUF2 * ( BIGCF2(K,0,1) * EVOLA(1,1,2) + 
      &                                 BIGCF2(K,0,2) * EVOLA(1,2,2) )
 
 
           IF (P .GE. 2) THEN
 
-          CEV(1) = CEV(1) + ASMUR2**2 * ( BIGCF2(K,2,1) * EVOLA(0,1,1) +
-     &                                    BIGCF2(K,2,2) * EVOLA(0,2,1) )
+          CEVDIS(1) = CEVDIS(1) + ASMUR2**2 * ( BIGCF2(K,2,1) * 
+     &                    EVOLA(0,1,1) + BIGCF2(K,2,2) * EVOLA(0,2,1) )
      &        + ASMUR2 * ASMUF2 * ( BIGCF2(K,1,1) * EVOLA(1,1,1) + 
      &                              BIGCF2(K,1,2) * EVOLA(1,2,1) )
      &                  + ASMUF2**2 * ( BIGCF2(K,0,1) * EVOLA(2,1,1) + 
      &                                    BIGCF2(K,0,2) * EVOLA(2,2,1) )
 
-          CEV(2) = CEV(2) + ASMUR2**2 * ( BIGCF2(K,2,1) * EVOLA(0,1,2) +
-     &                                    BIGCF2(K,2,2) * EVOLA(0,2,2) )
+          CEVDIS(2) = CEVDIS(2) + ASMUR2**2 * ( BIGCF2(K,2,1) * 
+     &                    EVOLA(0,1,2) + BIGCF2(K,2,2) * EVOLA(0,2,2) )
      &        + ASMUR2 * ASMUF2 * ( BIGCF2(K,1,1) * EVOLA(1,1,2) + 
      &                              BIGCF2(K,1,2) * EVOLA(1,2,2) )
      &                  + ASMUF2**2 * ( BIGCF2(K,0,1) * EVOLA(2,1,2) + 
@@ -166,13 +167,9 @@ C
 
         ENDIF
 
-        CGRIDDIS(QIND, K, 1) = CEV(1)
-        CGRIDDIS(QIND, K, 2) = CEV(2)
+        CGRIDDIS(QIND, K, 1) = CEVDIS(1)
+        CGRIDDIS(QIND, K, 2) = CEVDIS(2)
 
-       ENDIF
-
-
-      END IF
 
  123  CONTINUE
 

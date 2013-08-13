@@ -173,7 +173,7 @@ endif
 # targets
 export TESTTARGETS = radcorr scaledep test auxtest houches accuracy
 export EXTARGETS = auxsi auxns anatomyNS anatomy radNLONS radNLO evolutNS evolut radQ \
-                   radNNLONS radNNLO scalesNS scales scalesNNLO
+                   radNNLONS radNNLO scalesNS scales scalesNNLO rho
 export FITTARGETS = fitres fitres2 fitpdfs slope contours
 export MMATARGETS = gepard.exe int2f1.exe dvem.exe
 export PYTARGETS = pygepard.so pygepard2.so pygepard3.so

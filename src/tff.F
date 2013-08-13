@@ -51,6 +51,7 @@ C
       IMEFNS = 0.d0
 
       CALL LOOKUPQ(QIND)
+
 *   Getting GPD values on MB contour ...
 
       CALL GETMBGPD
@@ -71,12 +72,14 @@ C
         EFNS  = CGRIDNS(QIND,K)*MBGPD(K,1)
         
 *           --- ading 2nd SO(3) partial wave ---
-C       EFSIG = EFSIG + PAR(17) * CGRID(2,QIND,K,1) * MBGPD(K,1)
-C       EFG   = EFG   + PAR(27) * CGRID(2,QIND,K,2) * MBGPD(K,2)
+
+        EFSIG = EFSIG + PAR(17) * CGRID(2,QIND,K,1) * MBGPD(K,1)
+        EFG   = EFG   + PAR(27) * CGRID(2,QIND,K,2) * MBGPD(K,2)
 
 *           --- ading 3nd SO(3) partial wave ---
-C       EFSIG = EFSIG + PAR(37) * CGRID(3,QIND,K,1) * MBGPD(K,1)
-C       EFG   = EFG   + PAR(47) * CGRID(3,QIND,K,2) * MBGPD(K,2)
+
+        EFSIG = EFSIG + PAR(37) * CGRID(3,QIND,K,1) * MBGPD(K,1)
+        EFG   = EFG   + PAR(47) * CGRID(3,QIND,K,2) * MBGPD(K,2)
 
 
         REEFSIG = REEFSIG + WG(K)*IMAGPART(CFACRE * EFSIG)
@@ -92,16 +95,21 @@ C       EFG   = EFG   + PAR(47) * CGRID(3,QIND,K,2) * MBGPD(K,2)
       
 *     Building up complex TFFs with right prefactors
 
-      TFFHS     =  DBLCMPLX(REEFSIG, IMEFSIG) / NF 
-     &    + DBLCMPLX(REEFG, IMEFG) * 2.d0/CF/(J+3.d0)
+      TFFHS     =  DBLCMPLX(REEFSIG, IMEFSIG) 
+     &    + DBLCMPLX(REEFG, IMEFG)
+
 
       TFFHNS    =  DBLCMPLX(REEFNS, IMEFNS)
 
 *     Combining with charge and CG factors for rho-meson production
 *     (using model as in Dieter&Mantas paper)
 
+*  correct?
+C     TFFH(P) = 3.0d0 * CF * FRHO * ASTRONG / NC / sqrt(Q2)
+C    & * ( TFFHS + 3*TFFHNS/20.d0 ) / SQRT(2.0d0)
+*  singlet-only 
       TFFH(P) = 3.0d0 * CF * FRHO * ASTRONG / NC / sqrt(Q2)
-     & * ( TFFHS + 3*TFFHNS/20.d0 ) / SQRT(2.0d0)
+     & * ( TFFHS ) / SQRT(2.0d0)
 
 
       RETURN
