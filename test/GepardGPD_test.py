@@ -25,6 +25,8 @@ def test_GPDtraj():
     assert_almost_equal(m.gpdEtrajQ(pt0)/1000., 1.98069, 5)
     assert_almost_equal(m.gpdEtrajG(pt0)*100, 3.58365, 5)
 
+test_GPDtraj.gepardsuite = 1
+
 def test_GPDzero():
     """Calculate GPDs on trajectory xi=0"""
     assert_almost_equal(m.gpdHzeroQ(pt0)/1000., 1.83647, 5)
@@ -32,3 +34,4 @@ def test_GPDzero():
     assert_almost_equal(m.gpdEzeroQ(pt0)/1000., 3.09861, 5)
     assert_almost_equal(m.gpdEzeroG(pt0)*100, 7.56646, 5)
 
+test_GPDzero.gepardsuite = 1

@@ -2195,6 +2195,73 @@ def GPDt(path=None, fmt='png', **kwargs):
         fig.show()
     return fig
 
+def skewness(path=None, fmt='png', **kwargs):
+    """Makes plots of skewness ratios as function of xi
+
+    """
+    title = 'skewness ratios'
+    fig = plt.figure()
+    fig.canvas.set_window_title(title)
+    # Define abscissas
+    logxvals = np.logspace(-4.0, -1.5, 10)
+    # Plot panels
+    kp = 1
+    for obs in ['gpdHskewQ', 'gpdHskewG']:
+        # all-x logarithmic
+        ax = fig.add_subplot(2, 2, kp)
+        ax.set_xscale('log')  # x-axis to be logarithmic
+        panel(ax, xaxis='xi', xs=logxvals, kins={
+                'yaxis':obs, 't':0., 'Q2':4.}, **kwargs)
+        ax.axhspan(-0.0005, 0.0005, facecolor='g', alpha=0.6)  # horizontal bar
+        #ax.xaxis.set_major_formatter(matplotlib.ticker.FormatStrFormatter('%s'))
+        ax.set_xlabel(toTeX['xixB'], fontsize=18)
+        if kp == 1:
+            ax.set_ylabel('r_sea', fontsize=20)
+            ax.text(0.001, 0.3, "$Q^2 = 4\\, {\\rm GeV}^2$",# transform=ax.transAxes, 
+                    fontsize=15)
+        if kp == 2:
+            ax.set_ylabel('r_G', fontsize=20)
+        #apply(ax.set_ylim, ylims[cff])
+        ax.set_xlim(0.0001, 0.05)
+        ax.set_ylim(-0.2, 1.3)
+        #ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.02))  # tickmarks
+        for label in ax.get_xticklabels() + ax.get_yticklabels():
+            label.set_fontsize(14)
+        kp += 1
+    # Define abscissas
+    Q2vals = np.linspace(3, 40, 40)
+    # Plot panels
+    for obs in ['gpdHskewQ', 'gpdHskewG']:
+        # all-x logarithmic
+        ax = fig.add_subplot(2, 2, kp)
+        panel(ax, xaxis='Q2', xs=Q2vals, kins={
+                'yaxis':obs, 't':0., 'xi':0.001}, **kwargs)
+        ax.axhspan(-0.0005, 0.0005, facecolor='g', alpha=0.6)  # horizontal bar
+        ax.xaxis.set_major_formatter(matplotlib.ticker.FormatStrFormatter('%s'))
+        ax.set_xlabel(toTeX['Q2'], fontsize=18)
+        if kp == 3:
+            ax.set_ylabel('r_sea', fontsize=20)
+            ax.text(20, 0.4, "$\\xi = 0.001$",# transform=ax.transAxes, 
+                    fontsize=15)
+        if kp == 4:
+            ax.set_ylabel('r_G', fontsize=20)
+        #apply(ax.set_ylim, ylims[cff])
+        ax.set_xlim(3, 40)
+        ax.set_ylim(-0.2, 1.3)
+        #ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(5.))  # tickmarks
+        for label in ax.get_xticklabels() + ax.get_yticklabels():
+            label.set_fontsize(14)
+        kp += 1
+    fig.subplots_adjust(bottom=0.1, wspace=0.2, hspace=0.2)
+    if path:
+        #fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+        fig.set_size_inches((14, 16))
+        mkpdf(path)
+    else:
+        fig.canvas.draw()
+        fig.show()
+    return fig
+
 
 def jbod(path=None, fmt='png', **kwargs):
     """Plot "just a bunch of data" with lines

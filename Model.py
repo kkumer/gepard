@@ -857,7 +857,7 @@ class ComptonGepard(ComptonFormFactors):
     #gepardPool = [g1, g2, g3]  #  modules to choose from
     gepardPool = [g1]  #  modules to choose from
 
-    def __init__(self, cutq2=0.0, ansatz='FIT', speed=1, q02=4.0, **kwargs):
+    def __init__(self, cutq2=0.0, ansatz='FIT', process='DVCS', speed=1, q02=4.0, **kwargs):
         _lg.debug('Creating %s.\n' % str(self))
         # initial values of parameters and limits on their values
         self.cutq2 = cutq2
@@ -963,6 +963,7 @@ class ComptonGepard(ComptonFormFactors):
 
         self.allGPDs = ['gpdHtrajQ', 'gpdHtrajG', 'gpdEtrajQ', 'gpdEtrajG',
                         'gpdHzeroQ', 'gpdHzeroG', 'gpdEzeroQ', 'gpdEzeroG',
+                        'gpdHskewQ', 'gpdHskewG',
                         'gpdHQb', 'gpdHQbpol', 'gpdHGb']
 
         if ansatz == 'NSFIT' or ansatz == 'FITBP':
@@ -990,11 +991,11 @@ class ComptonGepard(ComptonFormFactors):
             self.parameters['limit_M02S'] = (0.0, 1.5)
             self.parameters['limit_M02G'] = (0.0, 1.5)
 
-        self._gepardinit(cutq2, ansatz, speed, q02, **kwargs)   # gepard init
+        self._gepardinit(cutq2, ansatz, process, speed, q02, **kwargs)   # gepard init
         # now do whatever else is necessary
         ComptonFormFactors.__init__(self, **kwargs)
 
-    def _gepardinit(self, cutq2=0.0, ansatz='FIT', speed=1, q02=4.0, **kwargs):
+    def _gepardinit(self, cutq2=0.0, ansatz='FIT', process='DVCS', speed=1, q02=4.0, **kwargs):
         """Initialize gepard part of model."""
         emptyPoolMessage = 'Pool of gepard modules is empty. No new \
 gepard models can be created. Restart everything!\n'
@@ -1034,14 +1035,17 @@ gepard models can be created. Restart everything!\n'
         self.g.mbcont.cnd = -0.25
         self.g.mbcont.phind = 1.57
 
-        self.g.parchr.scheme = array([c for c in 'CSBAR'])  # array(5)
+        if process == 'DVMP':
+            self.g.parchr.scheme = array([c for c in 'MSBAR'])  # array(5)
+        else:
+            self.g.parchr.scheme = array([c for c in 'CSBAR'])  # array(5)
 
         self.g.parchr.ansatz = array([c for c in ansatz + (6-len(ansatz))*' ']) # array(6)
         if ansatz == 'FITEXP':
             self.g.parchr.ansatz = array([c for c in 'FITEXP']) # array(6)
 
         # following two items usually came from driver file
-        self.g.parchr.process = array([c for c in 'DVCS  '])  # array(6)
+        self.g.parchr.process = array([c for c in process + (6-len(process))*' ']) # array(6)
         self.g.parchr.fftype = array([c for c in 'SINGLET   ']) # array(10)
 
         self.g.init()
@@ -1279,6 +1283,16 @@ gepard models can be created. Restart everything!\n'
             res = self.ImE(pt)
             self.parameters.update(memsub)
             return pt.xi*res/pi
+
+    def gpdHskewQ(self, pt):
+        """Skewneess of GPD H_Q"""
+        return self.gpdHtrajQ(pt)/self.gpdHzeroQ(pt)
+
+    def gpdHskewG(self, pt):
+        """Skewneess of GPD H_G"""
+        return self.gpdHtrajG(pt)/self.gpdHzeroG(pt)
+
+
 
     def gpdHQb(self, pt):
         """GPD H^sea in b space in fm^-2."""
