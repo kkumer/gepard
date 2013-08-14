@@ -44,3 +44,17 @@ def test_gepardXrhot():
 
 test_gepardXrhot.gepardsuite = 1
 
+def test_c1():
+    """Calculate NLO DVMP coef. functions"""
+    t.m.g.init()
+    t.m.g.newcall = 1
+    aux = t.m.g.cdvemf((0.5+1.j), 2)
+    # comparing to DM's DVEM-c1_forKreso.nb
+    # quark part
+    assert_almost_equal(aux[0]/100, (30.3836+9.2856j)/100, 3)
+    # "pure singlet" part
+    assert_almost_equal(aux[1]/100, (-0.496221+3.85004j)/100, 3)
+    # gluon part
+    assert_almost_equal(aux[2]/100, (35.2725+34.0699j)/100, 2)
+
+test_c1.gepardsuite = 1

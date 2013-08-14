@@ -1029,6 +1029,8 @@ gepard models can be created. Restart everything!\n'
         self.g.parflt.q02 = q02
         self.g.parflt.rf2 = 1.0
         self.g.parflt.rr2 = 1.0
+        self.g.parflt.rdaf2 = 1.0
+        self.g.parflt.rgpdf2 = 1.0
 
         self.g.mbcont.c = 0.35
         self.g.mbcont.phi = 1.57079632
