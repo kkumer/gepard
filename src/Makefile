@@ -33,7 +33,8 @@ $(ADACFODIR)/%.o: adacf/%.f
 FOBJS = Finit.o Fbeta.o Fspecial.o Fdcomplex.o Fastrong.o Flambda.o\
 Fprojectors.o Frnnlo.o Ferfunc.o Fevol.o Fcdvcs.o Fmsbar.o \
 Fdvcs.o Ff2.o Freadpar.o Ferror.o Fgauss.o Fnd.o Fbigcns.o Fintegra.o Fxspace.o\
-Finitc.o Fevolc.o Fgetmbgpd.o Fhj.o Fej.o Fsplice.o Fcff.o Ftff.o Fderiv.o Fbca.o
+Finitc.o Fevolc.o Fgetmbgpd.o Fhj.o Fej.o Fsplice.o Fcff.o Ftff.o Fderiv.o Fbca.o\
+Fhyp2F1.o Fint2F1.o Fcdvem.o 
 _FOBJS = $(patsubst %,$(FODIR)/%,$(FOBJS))
 
 # Fortran object files needed for DVEM

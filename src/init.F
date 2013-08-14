@@ -270,6 +270,16 @@ C
         END IF
  30   CONTINUE
 
+*         -- TTFs, additional pre-factor:
+*          BIGC = T_jk from Eq. (3.61c) in big DVMP draft
+      IF ( PROCESS(:4) .EQ. 'DVMP' ) THEN
+        DO 40 ORD = 0, P
+          BIGC(SEC, K, ORD, 1) = BIGC(SEC, K, ORD, 1) * 3.d0
+          BIGC(SEC, K, ORD, 2) = (
+     &       BIGC(SEC, K, ORD, 2) * 2.d0/CF/(J+3.d0) * 3.d0 )
+ 40     CONTINUE
+      END IF
+
 
 *  -------------  NON - SINGLET  ----------------
 

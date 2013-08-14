@@ -105,10 +105,10 @@ C
 *     (using model as in Dieter&Mantas paper)
 
 *  correct?
-C     TFFH(P) = 3.0d0 * CF * FRHO * ASTRONG / NC / sqrt(Q2)
+C     TFFH(P) = CF * FRHO * ASTRONG / NC / sqrt(Q2)
 C    & * ( TFFHS + 3*TFFHNS/20.d0 ) / SQRT(2.0d0)
 *  singlet-only 
-      TFFH(P) = 3.0d0 * CF * FRHO * ASTRONG / NC / sqrt(Q2)
+      TFFH(P) = CF * FRHO * ASTRONG / NC / sqrt(Q2)
      & * ( TFFHS ) / SQRT(2.0d0)
 
 

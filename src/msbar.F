@@ -18,7 +18,7 @@ C  SYNOPSIS
 
       IMPLICIT NONE
       INTEGER  SEC, K
-      DOUBLE COMPLEX BIGCTMP(0:2,2)
+      DOUBLE COMPLEX BIGCTMP(0:2,2), MCU(3)
 
 C  INPUTS
 C           K -- conformal moment index
@@ -41,10 +41,16 @@ C
 
       IF ( PROCESS(:4) .EQ. 'DVMP' ) THEN
 
-        BIGCTMP(0, 1) = (1.0d0,0.0d0)
+        BIGCTMP(0, 1) = (1.0d0,0.0d0)/NF
         BIGCTMP(0, 2) = (1.0d0,0.0d0)
-c   --- switching off LO gluons for debugging
-c       BIGCTMP(0, 2) = (0.0d0,0.0d0)
+
+        IF (P .GE. 1) THEN
+
+*         FIXME: Approximate with asymptotic DA only: K=0
+          CALL CDVEMF (J, 0, MCU)
+          BIGCTMP(1, 1) = MCU(1)/NF + MCU(2)
+          BIGCTMP(1, 2) = MCU(3)
+        END IF
 
       ELSE
 *     --- DVCS or DIS ---

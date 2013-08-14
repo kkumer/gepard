@@ -78,7 +78,7 @@ C
 
        CALL EVOLF (SEC, K, R, EVOLA)
 
-*       2.1  --- DVCS ---
+*       2.1  --- DVCS  or DVMP ---
 
         CEV(1) = ( BIGC(SEC,K,0,1) * EVOLA(0,1,1) + 
      &             BIGC(SEC,K,0,2) * EVOLA(0,2,1) ) * CZERO
@@ -118,14 +118,8 @@ C
 
         ENDIF
 
-        IF (PROCESS(:4) .EQ. 'DVMP') THEN
-          J = N(SEC, K) - 1
-          CGRID(SEC, QIND, K, 1) = CEV(1) / NF
-          CGRID(SEC, QIND, K, 2) = CEV(2) * 2.d0/CF/(J+3.d0)
-        ELSE
-          CGRID(SEC, QIND, K, 1) = CEV(1)
-          CGRID(SEC, QIND, K, 2) = CEV(2)
-        END IF
+        CGRID(SEC, QIND, K, 1) = CEV(1)
+        CGRID(SEC, QIND, K, 2) = CEV(2)
 
 *        2.2 -- DIS ---
 
