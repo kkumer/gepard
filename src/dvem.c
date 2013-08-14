@@ -146,7 +146,7 @@ void cdvemf_(struct dblcomplex *j, struct dblcomplex *k, struct dblcomplex (*mcu
 
 void cdvem(void) {
 
-        int xint, dttype;
+        int xint, dttype, nf;
         double xreal, xi, xr;
         double rgpdf2, rdaf2, rr2;
         struct dblcomplex j, k, z;
@@ -209,6 +209,24 @@ void cdvem(void) {
                         return;
         }
 
+/* getting input nf via MathLink.  */
+
+        dttype=MLGetType(stdlink); 
+        switch (MLGetType(stdlink)) {
+                case MLTKINT:   /* Mma sent integer number*/
+                        MLGetInteger(stdlink, &xint);
+                        nf=xint;
+                        break;
+                case MLTKREAL:  /* Mma sent real number */
+                        MLGetReal(stdlink, &xreal);
+                        nf = (int) xreal ;
+                        break;
+                default:  /* Return an error */
+                        MLPutSymbol(stdlink, "errnan");
+                        return;
+        }
+
+
 /* getting input rgpdf2 via MathLink.  */
 
         dttype=MLGetType(stdlink); 
@@ -265,6 +283,8 @@ void cdvem(void) {
         parflt_.rgpdf2 = rgpdf2;
         parflt_.rdaf2 = rdaf2;
         parflt_.rr2 = rr2;
+
+        parint_.nf = nf;
 
 /* calling FORTRAN subroutine  */
         cdvemf_(&j, &k, &mcu);

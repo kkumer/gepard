@@ -14,8 +14,8 @@
 :Evaluate: errnan := Message[cdvem::nan]
 :Begin:
 :Function:      cdvem
-:Pattern:       cdvem[j_?NumericQ, k_?NumericQ, rgpdf2_?NumericQ, rdaf2_?NumericQ, rr2_?NumericQ]
-:Arguments:     {j, k, rgpdf2, rdaf2, rr2}
+:Pattern:       cdvem[j_?NumericQ, k_?NumericQ, nf_?NumericQ, rgpdf2_?NumericQ, rdaf2_?NumericQ, rr2_?NumericQ]
+:Arguments:     {j, k, nf, rgpdf2, rdaf2, rr2}
 :ArgumentTypes: {Manual}
 :ReturnType:    Manual
 :End:
