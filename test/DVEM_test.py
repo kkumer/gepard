@@ -24,9 +24,9 @@ def test_gepardTFFs():
     t.m.g.init()
     t.m.g.newcall = 1
     aux = t.m.ReHrho(pt)
-    assert_almost_equal(aux/100, 276.163/100, 2)
+    assert_almost_equal(aux/100, 285.15512/100, 2)
     aux = t.m.ImHrho(pt)
-    assert_almost_equal(aux/100, 495.104/100, 2)
+    assert_almost_equal(aux/100, 511.39622404/100, 2)
 
 test_gepardTFFs.gepardsuite = 1
 
@@ -40,7 +40,7 @@ def test_gepardXrhot():
     t.m.g.init()
     t.m.g.newcall = 1
     aux = t.Xrhot(pt)
-    assert_almost_equal(aux/1000., 1137.124/1000., 2)
+    assert_almost_equal(aux/1000., 1212.62165/1000., 2)
 
 test_gepardXrhot.gepardsuite = 1
 
