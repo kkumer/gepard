@@ -13,6 +13,7 @@ C     CDVEMF  --  "big C" NLO Wilson coefficient for DVEM
 C  DESCRIPTION
 C    calculates (unnormalized) Wilson coefficients for DVEM
 C    i.e. they are normalized w.r.t. LO C=1.
+C    Presently parities are fixed (to vector production case)
 C    OUTPUT MCU(K) K=1,2,3 for quark, pure singlet quark and gluon contrib
 C  SYNOPSIS
 
@@ -47,7 +48,6 @@ C     J = N(1, K) - 1
 
       PJ = 1
       PK = 2
-      NF = 3
       CALL BETAF
 
       LRGPDF2 = LOG(RGPDF2)
@@ -207,9 +207,11 @@ C   ... gluon part
 *     PRINT *, ' NGNORM = ',  NGNORM
 *     PRINT *, ' unnorm G = ',  MCG1F
 
-      MCU(1) = MCQ
-      MCU(2) = (MCBMUFQ1F+MCBAQ1F+MCBBQ1F)
-      MCU(3) = MCG1F
+*   dividing all by 2 to get to (alphas/2pi) expansion
+      MCU(1) = MCQ / 2.d0
+*   dividing pure singlet by 2/CF for agreement with DM. FIXME: CHECK!!
+      MCU(2) = (MCBMUFQ1F+MCBAQ1F+MCBBQ1F)/ 2.d0 * (2.d0/CF)
+      MCU(3) = MCG1F / 2.d0
 
 *     MC(1) = NQNORM * MCU(1)
 *     MC(2) = NQBNORM * MCU(2)

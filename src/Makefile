@@ -85,7 +85,8 @@ FPREPDIR = Fprep
 FPREPS = init.f beta.f special.f dcomplex.f astrong.f lambda.f\
 projectors.f rnnlo.f erfunc.f evol.f cdvcs.f msbar.f \
 dvcs.f f2.f error.f gauss.f nd.f bigcns.f integra.f\
-initc.f evolc.f getmbgpd.f hj.f ej.f splice.f cff.f tff.f 
+initc.f evolc.f getmbgpd.f hj.f ej.f splice.f cff.f\
+tff.f cdvem.f int2F1.f 
 _FPREPS = $(patsubst %,$(FPREPDIR)/%,$(FPREPS))
 
 $(FPREPDIR)/%.f: %.F  header.F
@@ -120,7 +121,7 @@ dvem.exe: $(ADACFODIR)/Harmonic.o $(_FDVEMOBJS) $(_MMADVEMOBJS)
 # pygepard target
 
 pygepard.so: $(_FPREPS)
-	f2py  -c -m pygepard $^ adacf/*f -lgomp
+	f2py  -c -m pygepard $^ adacf/*f hyp2F1.f90 -lgomp
 	mv pygepard.so ../fits/
 
 pygepard2.so: $(_FPREPS)
