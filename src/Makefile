@@ -126,11 +126,11 @@ pygepard.so: $(_FPREPS)
 	mv pygepard.so ../fits/
 
 pygepard2.so: $(_FPREPS)
-	f2py  -c -m pygepard2 $^ adacf/*f -lgomp
+	f2py  -c -m pygepard2 $^ adacf/*f hyp2F1.f90 -lgomp
 	mv pygepard2.so ../fits/
 	
 pygepard3.so: $(_FPREPS)
-	f2py  -c -m pygepard3 $^ adacf/*f -lgomp
+	f2py  -c -m pygepard3 $^ adacf/*f hyp2F1.f90 -lgomp
 	mv pygepard3.so ../fits/
 
 # targets for examples

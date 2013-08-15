@@ -209,7 +209,7 @@ C   ... gluon part
 
 *   dividing all by 2 to get to (alphas/2pi) expansion
       MCU(1) = MCQ / 2.d0
-*   dividing pure singlet by 2/CF for agreement with DM. FIXME: CHECK!!
+*   dividing pure singlet by 2/CF for agreement with DM
       MCU(2) = (MCBMUFQ1F+MCBAQ1F+MCBBQ1F)/ 2.d0 * (2.d0/CF)
       MCU(3) = MCG1F / 2.d0
 

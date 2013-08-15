@@ -18,7 +18,7 @@ C  SYNOPSIS
 
       IMPLICIT NONE
       INTEGER  SEC, K
-      DOUBLE COMPLEX BIGCTMP(0:2,2), MCU(3)
+      DOUBLE COMPLEX BIGCTMP(0:2,2), MCU(3), KMOM
 
 C  INPUTS
 C           K -- conformal moment index
@@ -47,7 +47,8 @@ C
         IF (P .GE. 1) THEN
 
 *         FIXME: Approximate with asymptotic DA only: K=0
-          CALL CDVEMF (J, 0, MCU)
+          KMOM = (0.0d0, 0.0d0)
+          CALL CDVEMF (J, KMOM, MCU)
           BIGCTMP(1, 1) = MCU(1)/NF + MCU(2)
           BIGCTMP(1, 2) = MCU(3)
         END IF

@@ -34,6 +34,7 @@ C
 
       CALL READPAR
 *   modifications of GEPARD.INI
+      SPEED = 3
       NF = 4
       Q02 = 4.0
       ASP(0) = 0.0606
@@ -46,6 +47,11 @@ C
       ANSATZ = 'FIT'
       SCHEME = 'MSBAR'
       PROCESS  = 'DVMP'
+
+
+      RGPDF2 = 1.d0
+      RDAF2 = 1.d0
+      RR2 = 1.d0
 
 *   GPD ansatz KM10b
 
@@ -86,11 +92,11 @@ c     PAR(47) = 0
 
 
 
-      P = 0
       DEL2 = -0.025d0
-      CALL INIT
 
       WRITE (*, *) " ---  Test 1: TFF (no evolution) ---- "
+      P = 0
+      CALL INIT
       W2 = 75.0d0**2
       Q2 = 4.0d0
       NQS = 1
@@ -104,8 +110,27 @@ c     PAR(47) = 0
       CAUX = TFFH(0)
       WRITE (*, *) CAUX
 
+      P = 1
+      CALL INIT
+
+      WRITE (*, *) " ---  Test 2: NLO TFF (no evolution) ---- "
+      W2 = 75.0d0**2
+      Q2 = 4.0d0
+      NQS = 1
+      QS(1) = Q2
+      CALL EVOLC(1,1)
+      CALL EVOLC(2,1)
+      CALL EVOLC(3,1)
+      XI = Q2 / ( 2.0d0 * W2 + Q2)
+      MTIND = 0
+      CALL TFFF
+      CAUX = TFFH(1)
+      WRITE (*, *) CAUX
+
       WRITE (*, *)
-      WRITE (*, *) " ---  Test 2: dsigma_rho_L / dt ---- "
+      WRITE (*, *) " ---  Test 3: dsigma_rho_L / dt ---- "
+      P = 0
+      CALL INIT
       DO 10 K=1,5
         Q2 = Q2EXP(K)
         NQS = 1
@@ -119,6 +144,24 @@ c     PAR(47) = 0
      &       *  ABS(TFFH(P))**2 / Q2**2
 c     WRITE (*,*) TFFH(P)
 10    WRITE (*, 999) Q2EXP(K), XS, XSEXP(K)
+
+      WRITE (*, *)
+      WRITE (*, *) " ---  Test 4: NLO dsigma_rho_L / dt ---- "
+      P = 1
+      CALL INIT
+      DO 20 K=1,5
+        Q2 = Q2EXP(K)
+        NQS = 1
+        QS(1) = Q2
+        CALL EVOLC(1,1)
+        CALL EVOLC(2,1)
+        CALL EVOLC(3,1)
+        XI = Q2 / ( 2.0d0 * W2 + Q2)
+        CALL TFFF
+        XS = 112175.5 * (2.d0*XI)**2 
+     &       *  ABS(TFFH(P))**2 / Q2**2
+c     WRITE (*,*) TFFH(P)
+20    WRITE (*, 999) Q2EXP(K), XS, XSEXP(K)
 
 999   FORMAT (1X,'Q2 = ', F4.1, 5X, 'XS = ', F6.1, 5X, 'vs. ', F6.1)
       STOP
