@@ -255,10 +255,6 @@ C
         DEL2 = 0.0d0
         CALL INIT
         CALL GETMBGPD
-        DO 68  K = 1, NPTS
-          HGRID(0, K, 1) = MBGPD(K, 1) 
-          HGRID(0, K, 2) = MBGPD(K, 2)
- 68     CONTINUE
         
 *     Looping over Q2
         LSTART = 2.d0

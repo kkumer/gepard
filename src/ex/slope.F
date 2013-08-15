@@ -18,9 +18,9 @@ C                            slope) with 4 sets of point coordinates
 C                            corresponding to 4 lines on a graph
 C                         (Alekhin's PDFs come in another file)
 C  IDENTIFIERS
-C          NPOINTS -- number of points on each line
-C              XS  -- array(NPOINTS), values of x-coordinates 
-C           POINTS -- array(2, 6, NPOINTS), holds results for
+C          NPLOTPOINTS -- number of points on each line
+C              XS  -- array(NPLOTPOINTS), values of x-coordinates 
+C           POINTS -- array(2, 6, NPLOTPOINTS), holds results for
 C                 two panels (Fig 14 a, b),and 6 lines are:
 C                  low-band CS NLO, hi-band CS NLO,
 C                  LO, MS-bar NLO, CS-bar NLO, and NNLO
@@ -36,17 +36,17 @@ C  SYNOPSIS
 C  SOURCE
 C
       IMPLICIT NONE
-      INTEGER PT, NPOINTS, LN, NEVALS
+      INTEGER PT, NPLOTPOINTS, LN, NEVALS
       DOUBLE PRECISION BH(2)
       DOUBLE PRECISION LOGXI, LOGXISTART, LOGXIEND, LOGXISTEP, MP
       DOUBLE PRECISION LNHXQ, LNHXG, T, H, DRV, ERR
       EXTERNAL LNHXQ, LNHXG
       PARAMETER ( NEVALS = 5, H = 0.41d0 )
-      PARAMETER ( NPOINTS = 20 )
-      DOUBLE PRECISION POINTS(0:1, 6, NPOINTS)
-      DOUBLE PRECISION XIS(NPOINTS)
+      PARAMETER ( NPLOTPOINTS = 20 )
+      DOUBLE PRECISION POINTS(0:1, 6, NPLOTPOINTS)
+      DOUBLE PRECISION XIS(NPLOTPOINTS)
       PARAMETER ( LOGXISTART = -4.0d0, LOGXIEND = -2.0d0,
-     &       LOGXISTEP = (LOGXIEND - LOGXISTART) / (NPOINTS - 1) )
+     &       LOGXISTEP = (LOGXIEND - LOGXISTART) / (NPLOTPOINTS - 1) )
 *     Proton mass:
       PARAMETER (MP = 0.938272d0 )
 
@@ -81,7 +81,7 @@ C
      & that program'
 
       LOGXI = LOGXISTART
-      DO 20 PT = 1, NPOINTS
+      DO 20 PT = 1, NPLOTPOINTS
       XI = 10**LOGXI
       XIS(PT) = XI
 
@@ -160,11 +160,11 @@ C
 
 *     First the error band
 
-      DO 25 PT = 1, NPOINTS
+      DO 25 PT = 1, NPLOTPOINTS
          WRITE (UNIT=10,FMT=998) XIS(PT), POINTS(0,1,PT)
          WRITE (UNIT=11,FMT=998) XIS(PT), POINTS(1,1,PT)
  25   CONTINUE
-      DO 26 PT = NPOINTS, 1, -1
+      DO 26 PT = NPLOTPOINTS, 1, -1
          WRITE (UNIT=10,FMT=998) XIS(PT), POINTS(0,2,PT)
          WRITE (UNIT=11,FMT=998) XIS(PT), POINTS(1,2,PT)
  26   CONTINUE
@@ -173,7 +173,7 @@ C
       WRITE (UNIT=11, FMT=999)
 
       DO 40 LN = 3, 6
-      DO 30 PT = 1, NPOINTS
+      DO 30 PT = 1, NPLOTPOINTS
          WRITE (UNIT=10,FMT=998) XIS(PT), POINTS(0,LN,PT)
          WRITE (UNIT=11,FMT=998) XIS(PT), POINTS(1,LN,PT)
  30   CONTINUE

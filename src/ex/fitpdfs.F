@@ -22,9 +22,9 @@ C                            fitpdfs) with 4 sets of point coordinates
 C                            corresponding to 4 lines on a graph
 C                         (Alekhin's PDFs come in another file)
 C  IDENTIFIERS
-C          NPOINTS -- number of points on each line
-C              XS  -- array(NPOINTS), values of x-coordinates 
-C           POINTS -- array(2, 4, NPOINTS), holds results for
+C          NPLOTPOINTS -- number of points on each line
+C              XS  -- array(NPLOTPOINTS), values of x-coordinates 
+C           POINTS -- array(2, 4, NPLOTPOINTS), holds results for
 C                 two panels (Fig 14 a, b),and 4 lines are:
 C                    LO, MS-bar NLO, CS-bar NLO, and NNLO
 C
@@ -35,14 +35,14 @@ C      READPAR, INIT, XSPACE
 C  SOURCE
 C
       IMPLICIT NONE
-      INTEGER PT, NPOINTS, LN
+      INTEGER PT, NPLOTPOINTS, LN
       DOUBLE PRECISION HX(2)
       DOUBLE PRECISION LOGXI, LOGXISTART, LOGXIEND, LOGXISTEP, MP
-      PARAMETER ( NPOINTS = 20 )
-      DOUBLE PRECISION POINTS(0:1, 4, NPOINTS)
-      DOUBLE PRECISION XIS(NPOINTS)
+      PARAMETER ( NPLOTPOINTS = 20 )
+      DOUBLE PRECISION POINTS(0:1, 4, NPLOTPOINTS)
+      DOUBLE PRECISION XIS(NPLOTPOINTS)
       PARAMETER ( LOGXISTART = -4.0d0, LOGXIEND = -2.0d0,
-     &       LOGXISTEP = (LOGXIEND - LOGXISTART) / (NPOINTS - 1) )
+     &       LOGXISTEP = (LOGXIEND - LOGXISTART) / (NPLOTPOINTS - 1) )
 *     Proton mass:
       PARAMETER (MP = 0.938272d0 )
 
@@ -77,7 +77,7 @@ C
      & that program'
 
       LOGXI = LOGXISTART
-      DO 20 PT = 1, NPOINTS
+      DO 20 PT = 1, NPLOTPOINTS
       XI = 10**LOGXI
       XIS(PT) = XI
 
@@ -135,7 +135,7 @@ C
 *     Printing all the results from arrays to files
 
       DO 40 LN = 1, 4
-      DO 30 PT = 1, NPOINTS
+      DO 30 PT = 1, NPLOTPOINTS
          WRITE (UNIT=10,FMT=998) XIS(PT), POINTS(0,LN,PT)
          WRITE (UNIT=11,FMT=998) XIS(PT), POINTS(1,LN,PT)
  30   CONTINUE

@@ -22,9 +22,9 @@ C       fitres[0-3].dat  --  4 files (one for each panel of Figure
 C                            fitres) with 1-3 sets of point coordinates
 C                            corresponding to 1-3 lines on a graph
 C  IDENTIFIERS
-C          NPOINTS -- number of points on each line
-C              XS  -- array(NPOINTS), values of x-coordinates (-tt, Q2, W)
-C           POINTS -- array(4, 3, NPOINTS), holds results for
+C          NPLOTPOINTS -- number of points on each line
+C              XS  -- array(NPLOTPOINTS), values of x-coordinates (-tt, Q2, W)
+C           POINTS -- array(4, 3, NPLOTPOINTS), holds results for
 C                     four panels (Fig ?, in order  a, b, c, d)
 C
 C                P -- approximation order N^{P}LO P=0,1,2
@@ -34,10 +34,10 @@ C      READPAR, INIT, CFFF, DCARG
 C  SOURCE
 C
       IMPLICIT NONE
-      INTEGER PT, NPOINTS, LN, PANEL, K
+      INTEGER PT, NPLOTPOINTS, LN, PANEL, K
       DOUBLE PRECISION MT, MP, LSTART, LEND, LSTEP
-      PARAMETER ( NPOINTS = 40 )
-      DOUBLE PRECISION POINTS(0:3, 4, NPOINTS)
+      PARAMETER ( NPLOTPOINTS = 40 )
+      DOUBLE PRECISION POINTS(0:3, 4, NPLOTPOINTS)
       DOUBLE PRECISION W, PARSIGMA, SIGMA
       CHARACTER FNAME*30
 *     Proton mass:
@@ -153,9 +153,9 @@ C
 *     Looping over MT
         LSTART = 0.05
         LEND = 0.9
-        LSTEP = (LEND - LSTART) / (NPOINTS - 1)
+        LSTEP = (LEND - LSTART) / (NPLOTPOINTS - 1)
 
-        DO 10 PT = 1, NPOINTS
+        DO 10 PT = 1, NPLOTPOINTS
 
           MT = LSTART + (PT - 1) * LSTEP
           MTIND = NMTS + NMTSEXP + 1
@@ -184,9 +184,9 @@ C
 *     Looping over Q2
         LSTART = 3.0d0
         LEND = 90.0d0
-        LSTEP = (LEND - LSTART) / (NPOINTS - 1)
+        LSTEP = (LEND - LSTART) / (NPLOTPOINTS - 1)
 
-        DO 40 PT = 1, NPOINTS
+        DO 40 PT = 1, NPLOTPOINTS
 
           Q2 = LSTART + (PT - 1) * LSTEP
           XI = Q2 / ( 2.0d0 * W**2 + Q2)
@@ -221,9 +221,9 @@ C
 *     Looping over W
         LSTART = 30.d0
         LEND = 140.d0
-        LSTEP = (LEND - LSTART) / (NPOINTS - 1)
+        LSTEP = (LEND - LSTART) / (NPLOTPOINTS - 1)
 
-        DO 60 PT = 1, NPOINTS
+        DO 60 PT = 1, NPLOTPOINTS
 
           W = LSTART + (PT - 1) * LSTEP
           XI = Q2 / ( 2.0d0 * W**2 + Q2)
@@ -256,17 +256,13 @@ C
         DEL2 = 0.0d0
         CALL INIT
         CALL GETMBGPD
-        DO 68  K = 1, NPTS
-          HGRID(0, K, 1) = MBGPD(K, 1) 
-          HGRID(0, K, 2) = MBGPD(K, 2)
- 68     CONTINUE
         
 *     Looping over Q2
         LSTART = 2.d0
         LEND = 95.d0
-        LSTEP = (LEND - LSTART) / (NPOINTS - 1)
+        LSTEP = (LEND - LSTART) / (NPLOTPOINTS - 1)
 
-        DO 80 PT = 1, NPOINTS
+        DO 80 PT = 1, NPLOTPOINTS
 
           Q2 = LSTART + (PT - 1) * LSTEP
           QSDIS(1) = Q2
