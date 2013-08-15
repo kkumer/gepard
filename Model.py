@@ -854,14 +854,15 @@ class ComptonGepard(ComptonFormFactors):
 
     # To have different Gepard models available we have to
     # use separate modules - otherwise things clash
-    #gepardPool = [g1, g2, g3]  #  modules to choose from
-    gepardPool = [g1]  #  modules to choose from
+    gepardPool = [g1, g2, g3]  #  modules to choose from
+    #gepardPool = [g1]  #  modules to choose from
 
-    def __init__(self, cutq2=0.0, ansatz='FIT', process='DVCS', speed=1, q02=4.0, **kwargs):
+    def __init__(self, cutq2=0.0, ansatz='FIT', process='DVCS', p=0, speed=1, q02=4.0, **kwargs):
         _lg.debug('Creating %s.\n' % str(self))
         # initial values of parameters and limits on their values
         self.cutq2 = cutq2
         self.ansatz = ansatz
+        self.p = p
         self.speed = speed
         self.q02 = q02
         self.kwargs = kwargs
@@ -991,11 +992,11 @@ class ComptonGepard(ComptonFormFactors):
             self.parameters['limit_M02S'] = (0.0, 1.5)
             self.parameters['limit_M02G'] = (0.0, 1.5)
 
-        self._gepardinit(cutq2, ansatz, process, speed, q02, **kwargs)   # gepard init
+        self._gepardinit(cutq2, ansatz, process, p, speed, q02, **kwargs)   # gepard init
         # now do whatever else is necessary
         ComptonFormFactors.__init__(self, **kwargs)
 
-    def _gepardinit(self, cutq2=0.0, ansatz='FIT', process='DVCS', speed=1, q02=4.0, **kwargs):
+    def _gepardinit(self, cutq2=0.0, ansatz='FIT', process='DVCS', p=0, speed=1, q02=4.0, **kwargs):
         """Initialize gepard part of model."""
         emptyPoolMessage = 'Pool of gepard modules is empty. No new \
 gepard models can be created. Restart everything!\n'
@@ -1019,7 +1020,7 @@ gepard models can be created. Restart everything!\n'
         # but look at it for documentation of what parameters below are
         self.g.parint.speed = speed
         self.g.parint.acc = 3
-        self.g.parint.p = 0
+        self.g.parint.p = p
         self.g.parint.nf = 4
         self.g.parint.czero = 1
 

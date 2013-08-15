@@ -6,16 +6,34 @@ import numpy as np
 import utils, Model, Approach, Data, Fitter
 
 from constants import Mp, Mp2
-from results import KM10b
+from results import KM10b, dvmppars
 
-m = Model.ComptonGepard(process='DVMP')
+# KM10b model
+m = Model.ComptonGepard(process='DVMP', p=0)
 t = Approach.BMK(m)
 t.m.parameters.update(KM10b)
 
-pt = Data.DummyPoint()
+# generic LO model from big DVMP draft
+mlo = Model.ComptonGepard(process='DVMP', p=0)
+tlo = Approach.BMK(mlo)
+tlo.m.parameters.update(dvmppars)
+
 
 def test_gepardTFFs():
-    """Calculate LO DVMP TFFs for rho production."""
+    """Calculate LO DVMP TFFs for rho production at input scale."""
+    xB = 1e-4
+    pt = Data.DummyPoint(init = {'Q2':4., 't':0, 'xi':xB/2., 'xB':xB})
+    utils.fill_kinematics(pt)
+    re, im =  (tlo.m.ReHrho(pt), tlo.m.ImHrho(pt))
+    # following agrees with DM to best than percent
+    assert_almost_equal(re/1e4, 4766.8993/1e4, 3)
+    assert_almost_equal(im/1e4, 12395.53/1e4, 3)
+
+test_gepardTFFs.gepardsuite = 1
+
+def test_gepardTFFsEvol():
+    """Calculate LO DVMP TFFs for rho production + evolution."""
+    pt = Data.DummyPoint()
     pt.W = 75.
     pt.Q2 = 6.6
     pt.t = -0.025
@@ -28,10 +46,11 @@ def test_gepardTFFs():
     aux = t.m.ImHrho(pt)
     assert_almost_equal(aux/100, 511.39622404/100, 2)
 
-test_gepardTFFs.gepardsuite = 1
+test_gepardTFFsEvol.gepardsuite = 1
 
 def test_gepardXrhot():
     """Calculate LO DVMP cross section d sigma / dt"""
+    pt = Data.DummyPoint()
     pt.W = 75.
     pt.Q2 = 6.6
     pt.t = -0.025
@@ -44,17 +63,3 @@ def test_gepardXrhot():
 
 test_gepardXrhot.gepardsuite = 1
 
-def test_c1():
-    """Calculate NLO DVMP coef. functions"""
-    t.m.g.init()
-    t.m.g.newcall = 1
-    aux = t.m.g.cdvemf((0.5+1.j), 2)
-    # comparing to DM's DVEM-c1_forKreso.nb
-    # quark part
-    assert_almost_equal(aux[0]/100, (30.3836+9.2856j)/100, 3)
-    # "pure singlet" part
-    assert_almost_equal(aux[1]/100, (-0.496221+3.85004j)/100, 3)
-    # gluon part
-    assert_almost_equal(aux[2]/100, (35.2725+34.0699j)/100, 2)
-
-test_c1.gepardsuite = 1
