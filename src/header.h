@@ -122,13 +122,10 @@ struct{
 
 /*
  **     - Values on the whole contour 
- *      DOUBLE COMPLEX HGRID(0:MTINDMAX, NPTSMAX, 2)
- *      COMMON / HGRID    /  HGRID
+ *      DOUBLE COMPLEX MBGPD(NPTSMAX, 2)    ??? (check)
+ *      COMMON / MBGPD    /  MBGPD          ???
  */
 
-struct{
-        struct dblcomplex hgrid[NGPDSMAX][NPTSMAX][MTINDMAX+1];
-} hgrid_;
 
 struct{
         struct dblcomplex mbgpd[NGPDSMAX][NPTSMAX];

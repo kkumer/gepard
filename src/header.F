@@ -459,9 +459,13 @@ C     ***
       DOUBLE COMPLEX TWOPII
       PARAMETER ( TWOPII = (0.0d0, 6.2831 853071 795865 D0) )
 
+*     - Meson decay constants
+      DOUBLE PRECISION FRHO, FOMEGA, FPHI
+      PARAMETER (FRHO = 0.209, FOMEGA = 0.195, FPHI = 0.221)
+
 *     - QCD beta function
-      INTEGER NFMIN, NFMAX
-      PARAMETER (NFMIN = 3, NFMAX = 6)
+      INTEGER NFMIN, NFMAX, NC
+      PARAMETER (NFMIN = 3, NFMAX = 6, NC = 3)
       DOUBLE PRECISION BETA0, BETA1, BETA2, BETA3
 
 *     - Mellin-Barnes integration contour points
@@ -630,15 +634,6 @@ C  SYNOPSIS
       DOUBLE COMPLEX CGRIDDIS(QINDMAX, NPTSMAX, 2)
 C     ***
 
-C     ****v* header.F/HGRID
-C  DESCRIPTION
-C       HGRID(MTIND, K, flavour) -- values of GPD H
-C               obsoleted by MBGPD, should be changed to MBGPD in code
-C  MEMBER OF
-C    HGRID(block) 
-C  SYNOPSIS
-      DOUBLE COMPLEX HGRID(0:MTINDMAX, NPTSMAX, 2)
-C     ***
 
 C     ****v* header.F/MBGPD
 C  DESCRIPTION
@@ -676,10 +671,20 @@ C     ****v* header.F/CFFE
 C  DESCRIPTION
 C      CFFE(P)  --  DVCS Compton form factor \mathcal{E}
 C  MEMBER OF
-C    CFFE(block) 
+C    CFF(block) 
 C  SYNOPSIS
       DOUBLE COMPLEX CFFE(0:2)
 C     ***
+
+C     ****v* header.F/TFFH
+C  DESCRIPTION
+C      TFFH(P)  --  DVMP transiton form factor  \mathcal{H}_M
+C  MEMBER OF
+C    TFF(block)
+C  SYNOPSIS
+      DOUBLE COMPLEX TFFH(0:2)
+C     ***
+        
         
 C     ****v* header.F/CHISQ
 C  DESCRIPTION
@@ -933,14 +938,6 @@ C  SYNOPSIS
       COMMON / CGRIDDIS /  CGRIDDIS
 C     ***
 
-C     ****c* header.F/HGRID(block)
-C  DESCRIPTION
-C      Values of GPDs on MB contour for all needed -t (in principle)
-C      Maybe obsoleted by MBGPD
-C  SYNOPSIS
-      COMMON / HGRID    /  HGRID
-C     ***
-
 C     ****c* header.F/MBGPD(block)
 C  DESCRIPTION
 C     Values of GPDs on MB contour
@@ -952,9 +949,16 @@ C     ***
 
 C     ****c* header.F/CFF(block)
 C  DESCRIPTION
-C     Compton form factor \mathcal{H}
+C     Compton form factor \mathcal{H}, \mathcal{E}
 C  SYNOPSIS
       COMMON / CFF      /  CFF, CFFE
+C     ***
+
+C     ****c* header.F/TFF(block)
+C  DESCRIPTION
+C     DVMP transition form factors \mathcal{H}_M
+C  SYNOPSIS
+      COMMON / TFF      /  TFFH
 C     ***
 
 C     ****c* header.F/F2(block)

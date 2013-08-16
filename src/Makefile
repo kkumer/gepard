@@ -33,7 +33,8 @@ $(ADACFODIR)/%.o: adacf/%.f
 FOBJS = Finit.o Fbeta.o Fspecial.o Fdcomplex.o Fastrong.o Flambda.o\
 Fprojectors.o Frnnlo.o Ferfunc.o Fevol.o Fcdvcs.o Fmsbar.o \
 Fdvcs.o Ff2.o Freadpar.o Ferror.o Fgauss.o Fnd.o Fbigcns.o Fintegra.o Fxspace.o\
-Finitc.o Fevolc.o Fgetmbgpd.o Fhj.o Fej.o Fsplice.o Fcff.o Fderiv.o Fbca.o
+Finitc.o Fevolc.o Fgetmbgpd.o Fhj.o Fej.o Fsplice.o Fcff.o Ftff.o Fderiv.o Fbca.o\
+Fhyp2F1.o Fint2F1.o Fcdvem.o 
 _FOBJS = $(patsubst %,$(FODIR)/%,$(FOBJS))
 
 # Fortran object files needed for DVEM
@@ -85,7 +86,8 @@ FPREPDIR = Fprep
 FPREPS = init.f beta.f special.f dcomplex.f astrong.f lambda.f\
 projectors.f rnnlo.f erfunc.f evol.f cdvcs.f msbar.f \
 dvcs.f f2.f error.f gauss.f nd.f bigcns.f integra.f\
-initc.f evolc.f getmbgpd.f hj.f ej.f splice.f cff.f 
+initc.f evolc.f getmbgpd.f hj.f ej.f splice.f cff.f\
+tff.f cdvem.f int2F1.f 
 _FPREPS = $(patsubst %,$(FPREPDIR)/%,$(FPREPS))
 
 $(FPREPDIR)/%.f: %.F  header.F
@@ -111,25 +113,19 @@ gepard.exe: CPPFLAGS += -DMMA  $(USEPGPLOT)
 gepard.exe: $(ALLOBJS) $(FODIR)/Ffcn.o $(_MMAOBJS)  $(FODIR)/Fmninterface.o
 	$(FC) -o ../fits/$@/$(SYS)/$@ $^ $(FFLAGS) $(CERNLIBS) -L$(MLLIBDIR) -l$(MLLIB) $(ALLPGPLOTLIBS) $(MLEXTRA)
 
-int2f1.exe: $(FODIR)/Fhyp2F1.o $(FODIR)/Fgauss.o $(FODIR)/Fintegra.o  \
-             $(FODIR)/Fint2F1F.o $(_MMADVEMOBJS)
+int2f1.exe dvem.exe: $(ADACFODIR)/Harmonic.o $(_FDVEMOBJS) $(_MMADVEMOBJS)
 	$(FC) -o ../fits/$@/$(SYS)/$@ $^ $(FFLAGS)  -L$(MLLIBDIR) -l$(MLLIB)  $(MLEXTRA)
 
-dvem.exe: $(ADACFODIR)/Harmonic.o $(_FDVEMOBJS) $(_MMADVEMOBJS)
-	$(FC) -o ../fits/$@/$(SYS)/$@ $^ $(FFLAGS)  -L$(MLLIBDIR) -l$(MLLIB)  $(MLEXTRA)
-# pygepard target
-
+# pygepard targets
+#
 pygepard.so: $(_FPREPS)
-	f2py  -c -m pygepard $^ adacf/*f -lgomp
+	f2py  -c -m pygepard $^ adacf/*f hyp2F1.f90 -lgomp
 	mv pygepard.so ../fits/
 
-pygepard2.so: $(_FPREPS)
-	f2py  -c -m pygepard2 $^ adacf/*f -lgomp
-	mv pygepard2.so ../fits/
-	
-pygepard3.so: $(_FPREPS)
-	f2py  -c -m pygepard3 $^ adacf/*f -lgomp
-	mv pygepard3.so ../fits/
+pygepard%.so: $(_FPREPS)
+	f2py  -c -m pygepard$* $^ adacf/*f hyp2F1.f90 -lgomp
+	mv pygepard$*.so ../fits/
+
 
 # targets for examples
 #
@@ -151,4 +147,5 @@ clean:
 	-rm -f $(patsubst %,../ex/%.exe,$(EXTARGETS))
 	-rm -f ../fits/gepard.exe/$(SYS)/gepard.exe
 	-rm -f ../fits/dvem.exe/$(SYS)/dvem.exe
+	-rm -f ../fits/int2f1.exe/$(SYS)/int2f1.exe
 	-rm -f hyp_2f1_module.mod

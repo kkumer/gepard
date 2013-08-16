@@ -12,10 +12,10 @@ C        CONTOURS  --  Ploting parton density contours resulting from fitted GPD
 C  DESCRIPTION
 C  OUTPUT
 C  IDENTIFIERS
-C          NPOINTS -- number of points on each line
-C             DDS  -- array(NPOINTS), values of Delta-coordinates 
-C              XS  -- array(NPOINTS), values of x-coordinates 
-C           POINTS -- array(2, NPOINTS, NPOINTS), holds results
+C          LNPOINTS -- number of points on each line
+C             DDS  -- array(LNPOINTS), values of Delta-coordinates 
+C              XS  -- array(LNPOINTS), values of x-coordinates 
+C           POINTS -- array(2, LNPOINTS, LNPOINTS), holds results
 C                P -- approximation order N^{P}LO P=0,1,2
 C
 C  CHILDREN
@@ -26,17 +26,17 @@ C
       PROGRAM CONTOURS
 
       IMPLICIT NONE
-      INTEGER PTD, PTX, NPOINTS, LN
+      INTEGER PTD, PTX, LNPOINTS, LN
       DOUBLE PRECISION HX(2)
       DOUBLE PRECISION DD, DDSTART, DDEND, DDSTEP, MP, T
       DOUBLE PRECISION X, LOGX, LOGXSTART, LOGXEND, LOGXSTEP
-      PARAMETER ( NPOINTS = 50 )
-      DOUBLE PRECISION POINTS(2, NPOINTS, NPOINTS)
-      DOUBLE PRECISION DDS(NPOINTS), XS(NPOINTS)
+      PARAMETER ( LNPOINTS = 50 )
+      DOUBLE PRECISION POINTS(2, LNPOINTS, LNPOINTS)
+      DOUBLE PRECISION DDS(LNPOINTS), XS(LNPOINTS)
       PARAMETER ( DDSTART = 0.0d0, DDEND = 5.0d0,
-     &       DDSTEP = (DDEND - DDSTART) / (NPOINTS - 1) )
+     &       DDSTEP = (DDEND - DDSTART) / (LNPOINTS - 1) )
       PARAMETER ( LOGXSTART = -5.0d0, LOGXEND = -0.30103d0,
-     &       LOGXSTEP = (LOGXEND - LOGXSTART) / (NPOINTS - 1) )
+     &       LOGXSTEP = (LOGXEND - LOGXSTART) / (LNPOINTS - 1) )
 *     Proton mass:
       PARAMETER (MP = 0.938272d0 )
 
@@ -103,9 +103,9 @@ C          PAR(24) =  1.39
 
 
       DD = DDSTART
-      DO 20 PTD = 1, NPOINTS
+      DO 20 PTD = 1, LNPOINTS
         LOGX = LOGXSTART
-        DO 10 PTX = 1, NPOINTS
+        DO 10 PTX = 1, LNPOINTS
           DDS(PTD) = DD
           X = 10**LOGX
           XS(PTX) = X
@@ -126,8 +126,8 @@ C          PAR(24) =  1.39
 
 *     Printing all the results from arrays to files
 
-      DO 40 PTD = 1, NPOINTS
-      DO 30 PTX = 1, NPOINTS
+      DO 40 PTD = 1, LNPOINTS
+      DO 30 PTX = 1, LNPOINTS
          WRITE (UNIT=11,FMT=998) DDS(PTD), XS(PTX), POINTS(1,PTD,PTX)
          WRITE (UNIT=12,FMT=998) DDS(PTD), XS(PTX), POINTS(2,PTD,PTX)
  30   CONTINUE

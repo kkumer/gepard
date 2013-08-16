@@ -534,11 +534,6 @@ void F2Internal(double xbj, double q2, double q02, int speed, int p,
         else                    /* FIT or other Fortran */
           getmbgpd_();
 
-        for (i = 0; i < contour_.npts; i++){
-                hgrid_.hgrid[0][i][0] = mbgpd_.mbgpd[0][i];
-                hgrid_.hgrid[1][i][0] = mbgpd_.mbgpd[1][i];
-        }
-
 
         f2f_();
 

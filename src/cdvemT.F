@@ -47,7 +47,6 @@ C     J = N(1, K) - 1
 
       PJ = 1
       PK = 2
-      NF = 3
       CALL BETAF
 
       LRGPDF2 = LOG(RGPDF2)

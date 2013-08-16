@@ -98,10 +98,6 @@ C
         CALL GETMBGPD
       END IF
 #endif
-      DO 11  K = 1, NPTS
-        HGRID(0, K, 1) = MBGPD(K, 1) 
-        HGRID(0, K, 2) = MBGPD(K, 2)
- 11   CONTINUE
 
       ICOL = 0
       IPANEL = 0

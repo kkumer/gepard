@@ -25,11 +25,11 @@ C                            evolut) with 4 sets of point coordinates
 C                            (\xi, \Delta K) or (\xi, \Delta\varphi),
 C                            corresponding to 4 lines on a graph
 C  IDENTIFIERS
-C          NPOINTS -- number of points on each line
+C      NPLOTPOINTS -- number of points on each line
 C       LOGXISTART -- log(\xi) where line begins
 C         LOGXIEND -- log(\xi) where line ends
-C              XIS -- array(NPOINTS), values of XI
-C           POINTS -- array(0:3, 6, NPOINTS), holds results for
+C              XIS -- array(NPLOTPOINTS), values of XI
+C           POINTS -- array(0:3, 6, NPLOTPOINTS), holds results for
 C                 four panels (Fig 7, in order  a, b, c and d) and
 C                 6 K_{\lambda,arg} lines depicted on these panels
 C                 Order is:  1.   LO,        HARD 
@@ -46,15 +46,15 @@ C      READPAR, INIT, CFFF, DCARG
 C  SOURCE
 C
       IMPLICIT NONE
-      INTEGER PT, NPOINTS, LN, NDEL
+      INTEGER PT, NPLOTPOINTS, LN, NDEL
       DOUBLE PRECISION LOGXI, LOGXISTART, LOGXIEND, LOGXISTEP, MP
       DOUBLE PRECISION DCARG, Q2MEM
       DOUBLE COMPLEX CFFQ, CFF0
-      PARAMETER ( NPOINTS = 40 )
-      DOUBLE PRECISION POINTS(0:3, 6, NPOINTS)
-      DOUBLE PRECISION XIS(NPOINTS)
+      PARAMETER ( NPLOTPOINTS = 40 )
+      DOUBLE PRECISION POINTS(0:3, 6, NPLOTPOINTS)
+      DOUBLE PRECISION XIS(NPLOTPOINTS)
       PARAMETER ( LOGXISTART = -5.0d0, LOGXIEND = -0.30103d0,
-     &       LOGXISTEP = (LOGXIEND - LOGXISTART) / (NPOINTS - 1) )
+     &       LOGXISTEP = (LOGXIEND - LOGXISTART) / (NPLOTPOINTS - 1) )
 *     Proton mass:
       PARAMETER (MP = 0.938272d0 )
 
@@ -93,7 +93,7 @@ C
 
 
       LOGXI = LOGXISTART
-      DO 20 PT = 1, NPOINTS
+      DO 20 PT = 1, NPLOTPOINTS
       XI = 10**LOGXI
       XIS(PT) = XI
 
@@ -156,7 +156,7 @@ C
 *     Printing all the results from arrays to files
 
       DO 40 LN = 1, 6
-      DO 30 PT = 1, NPOINTS
+      DO 30 PT = 1, NPLOTPOINTS
          WRITE (UNIT=10+NDEL,FMT=998) XIS(PT), POINTS(NDEL,LN,PT)
          WRITE (UNIT=12+NDEL,FMT=998) XIS(PT), POINTS(2+NDEL,LN,PT)
  30   CONTINUE
