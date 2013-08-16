@@ -29,7 +29,6 @@ C
       DOUBLE PRECISION AS
       DOUBLE PRECISION LHXGLO(21), LHXGNLO(21)
       DOUBLE PRECISION LHXGNNLO(21), XIA(21)
-      DOUBLE COMPLEX FCM(2)
 #include "header.F"
 
       PROCESS = 'DIS'
@@ -199,9 +198,8 @@ C
         QIND = 1
         DO 30 K = 1, NPTS
         J = N(1,K) - 1
-        FCM(1) = MBGPD(K, 1)
-        FCM(2) = MBGPD(K, 2)
-        FPW = CGRID(1,QIND,K,1) * FCM(1) + CGRID(1,QIND,K,2) * FCM(2)
+        FPW = CGRID(1,QIND,K,1) * GPDH(K, 1) + 
+     &        CGRID(1,QIND,K,2) * GPDH(K, 2)
         F2IMAG = IMAGPART(EPH * (1.0d0/XI)**(J-C) * FPW )
 *       WRITE (*,*) CGRID(1,QIND, K, 1)
         RES = RES + WG(K)*F2IMAG
@@ -227,9 +225,8 @@ C
         QIND = 1
         DO 40 K = 1, NPTS
         J = N(1,K) - 1
-        FCM(1) = MBGPD(K, 1)
-        FCM(2) = MBGPD(K, 2)
-        FPW = CGRID(1,QIND,K,1) * FCM(1) + CGRID(1,QIND,K,2) * FCM(2)
+        FPW = CGRID(1,QIND,K,1) * GPDH(K, 1) + 
+     &        CGRID(1,QIND,K,2) * GPDH(K, 2)
         F2IMAG = IMAGPART(EPH * (1.0d0/XI)**(J-C) * FPW )
         RES = RES + WG(K)*F2IMAG
  40     CONTINUE

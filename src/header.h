@@ -13,7 +13,7 @@
 #define NPTSMAX  768
 #define MTINDMAX 100
 #define NPWMAX     3
-#define NGPDSMAX   4
+#define NGPDSMAX   5
 
 struct dblcomplex {
         double dr;
@@ -120,15 +120,19 @@ struct{
         struct dblcomplex n[NPTSMAX][NPWMAX];
 } npoints_;
 
+
 /*
  **     - Values on the whole contour 
- *      DOUBLE COMPLEX MBGPD(NPTSMAX, 2)    ??? (check)
- *      COMMON / MBGPD    /  MBGPD          ???
+ *     DOUBLE COMPLEX GPDH(NPTSMAX, 5)
+ *     DOUBLE COMPLEX GPDE(NPTSMAX, 5)
+ *
+ *     COMMON / MBGPD    /  GPDH, GPDE
+ *      
  */
 
 
 struct{
-        struct dblcomplex mbgpd[NGPDSMAX][NPTSMAX];
+        struct dblcomplex gpdh[NGPDSMAX][NPTSMAX], gpde[NGPDSMAX][NPTSMAX];
 } mbgpd_;
 
 

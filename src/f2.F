@@ -30,7 +30,7 @@ C
       IMPLICIT NONE
       INTEGER K, QIND
       DOUBLE PRECISION RES, F2IMAG
-      DOUBLE COMPLEX EPH, FPW, J, FCM(2)
+      DOUBLE COMPLEX EPH, FPW, J
 #include "header.F"
 
 
@@ -44,9 +44,8 @@ C
 
       DO 123 K = 1, NPTS
       J = N(1, K) - 1
-      FCM(1) = MBGPD(K, 1)
-      FCM(2) = MBGPD(K, 2)
-      FPW = CGRIDDIS(QIND,K,1) * FCM(1) + CGRIDDIS(QIND,K,2) * FCM(2)
+      FPW = CGRIDDIS(QIND,K,1) * GPDH(K,1) + 
+     &      CGRIDDIS(QIND,K,2) * GPDH(K,2)
       F2IMAG = IMAGPART( EPH / XI**J * FPW )
       RES = RES + WG(K)*F2IMAG
  123  CONTINUE

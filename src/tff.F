@@ -67,19 +67,20 @@ C
 
 *       --- flavour components ---
 
-        EFSIG = CGRID(1,QIND,K,1)*MBGPD(K,1)
-        EFG   = CGRID(1,QIND,K,2)*MBGPD(K,2)
-        EFNS  = CGRIDNS(QIND,K)*MBGPD(K,1)
+        EFSIG = CGRID(1,QIND,K,1)*GPDH(K,1)
+        EFG   = CGRID(1,QIND,K,2)*GPDH(K,2)
+c       FIXME: 1 --> 3 or so
+        EFNS  = CGRIDNS(QIND,K)*GPDH(K,1)
         
 *           --- ading 2nd SO(3) partial wave ---
 
-        EFSIG = EFSIG + PAR(17) * CGRID(2,QIND,K,1) * MBGPD(K,1)
-        EFG   = EFG   + PAR(27) * CGRID(2,QIND,K,2) * MBGPD(K,2)
+        EFSIG = EFSIG + PAR(17) * CGRID(2,QIND,K,1) * GPDH(K,1)
+        EFG   = EFG   + PAR(27) * CGRID(2,QIND,K,2) * GPDH(K,2)
 
 *           --- ading 3nd SO(3) partial wave ---
 
-        EFSIG = EFSIG + PAR(37) * CGRID(3,QIND,K,1) * MBGPD(K,1)
-        EFG   = EFG   + PAR(47) * CGRID(3,QIND,K,2) * MBGPD(K,2)
+        EFSIG = EFSIG + PAR(37) * CGRID(3,QIND,K,1) * GPDH(K,1)
+        EFG   = EFG   + PAR(47) * CGRID(3,QIND,K,2) * GPDH(K,2)
 
 
         REEFSIG = REEFSIG + WG(K)*IMAGPART(CFACRE * EFSIG)

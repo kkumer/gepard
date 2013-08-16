@@ -600,14 +600,14 @@ void getmbgpdmma_(void)
                       MLGetReal(stdlink, &xi);
                     xc.dr = xr;
                     xc.di = xi;
-                    mbgpd_.mbgpd[0][i] = xc;
+                    mbgpd_.gpdh[0][i] = xc;
                     /* gluon GPD */
                     MLGetFunction(stdlink, &fname, &nargs); /* fname = Complex */
                       MLGetReal(stdlink, &xr);
                       MLGetReal(stdlink, &xi);
                     xc.dr = xr;
                     xc.di = xi;
-                    mbgpd_.mbgpd[1][i] = xc;
+                    mbgpd_.gpdh[1][i] = xc;
             }
         MLEndPacket(stdlink);
 

@@ -635,18 +635,31 @@ C  SYNOPSIS
 C     ***
 
 
-C     ****v* header.F/MBGPD
+C     ****v* header.F/GPDH
 C  DESCRIPTION
-C      MBGPD(K, index)  --  values of GPDs H and E
+C      GPDH(K, index)  --  values of conformal moments of GPD H
 C          index: 1  H_S
 C          index: 2  H_G
-C          index: 3  E_S
-C          index: 4  E_G
+C          index: 3  H_NS
+C          index: 4  H_NS 
+C          index: 5  H_NS ..
+C      where NS = u, d, s  or (3), (8), (15), or whatever ...
 C  MEMBER OF
 C    MBGPD(block) 
 C  SYNOPSIS
-      DOUBLE COMPLEX MBGPD(NPTSMAX, 4)
+      DOUBLE COMPLEX GPDH(NPTSMAX, 5)
 C     ***
+
+C     ****v* header.F/GPDE
+C  DESCRIPTION
+C      GPDE(K, index)  --  values of conformal moments of GPD E
+C          index: [see GPDH]
+C  MEMBER OF
+C    MBGPD(block) 
+C  SYNOPSIS
+      DOUBLE COMPLEX GPDE(NPTSMAX, 5)
+C     ***
+
 
 *     - Final observables
 C     ****v* header.F/F2
@@ -942,7 +955,7 @@ C     ****c* header.F/MBGPD(block)
 C  DESCRIPTION
 C     Values of GPDs on MB contour
 C  SYNOPSIS
-      COMMON / MBGPD    /  MBGPD
+      COMMON / MBGPD    /  GPDH, GPDE
 C     ***
 
 *     ---- Final observables

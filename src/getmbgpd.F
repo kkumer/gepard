@@ -16,7 +16,7 @@ C  SYNOPSIS
 C  PARENTS
 C    FCN, CFFF, XSPACE
 C  CHILDREN
-C    HJ
+C    HJ, EJ
 C  SOURCE
 C
       IMPLICIT NONE
@@ -29,18 +29,15 @@ c$OMP parallel do PRIVATE(J, FCM)
       DO 30  K = 1, NPTS
         J = N(1, K) - 1
         CALL HJ(J, FCM)
-        MBGPD(K, 1) = FCM(1)
-        MBGPD(K, 2) = FCM(2)
+        GPDH(K, 1) = FCM(1)
+        GPDH(K, 2) = FCM(2)
         IF ( (ANSATZ .EQ. 'EFL') .OR. (ANSATZ .EQ. 'EFLEXP') ) THEN
-*           we model E independently
+*           we model E independently, so call EJ to overwrite FCM
+*           otherwise, we use E \propto H 
             CALL EJ(J, FCM)
-            MBGPD(K, 3) = FCM(1)
-            MBGPD(K, 4) = FCM(2)
-        ELSE
-*           use E \propto H
-            MBGPD(K, 3) = FCM(1)
-            MBGPD(K, 4) = FCM(2)
         END IF
+        GPDE(K, 1) = FCM(1)
+        GPDE(K, 2) = FCM(2)
  30   CONTINUE
 c$OMP end parallel do
 
