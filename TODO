@@ -6,8 +6,6 @@ Computing:
 -  In fitting parameters should be non-squared quantities
 -  use autoconf and friends
 -  Automatize putting Alekhin's PDFs into fitpdfs
--  We don't need both HGRID and MBGPD, it seems. (Or HGRID memorises
-   PDFs during fitting, so it's needed?)
 -  deriv.f should be copyright-cleared
 -  PAR(18) and (28) hardwired in CompileMoments[]
 -  Using GOTO statements in fcn.F should be avoided
@@ -57,3 +55,5 @@ DONE:
 +  Charge factor treatment should be improved
 +  Improve compilation on gfortran and ifort (-Wall, ...)
 +  MSBND -> MSBAR, MSBAR -> MSBDI
++  We don't need both HGRID and MBGPD, it seems. (Or HGRID memorises
+   PDFs during fitting, so it's needed?) [HGRID removed]
