@@ -17,12 +17,14 @@ C    Presently parities are fixed (to vector production case)
 C    OUTPUT MCU(K) K=1,2,3 for quark, pure singlet quark and gluon contrib
 C  SYNOPSIS
 
-      SUBROUTINE CDVEMF (J, K, MCU)
+      SUBROUTINE CDVEMF (SGNTR, J, K, MCU)
 
+!f2py integer intent(in) :: SGNTR
 !f2py complex(8) intent(in) :: J, K
 !f2py complex(8) intent(out) :: MCU
 
       IMPLICIT NONE
+      INTEGER SGNTR
       DOUBLE COMPLEX MCU(3), MCQ, J, K, JAUX, CLNGAMMA
 *     DOUBLE COMPLEX NQNORM, NQBNORM, NGNORM
       INTEGER PJ, PK, PJAUX, TWO
@@ -46,7 +48,7 @@ C
 
 C     J = N(1, K) - 1
 
-      PJ = 1
+      PJ = (1+SGNTR)/2
       PK = 2
       CALL BETAF
 

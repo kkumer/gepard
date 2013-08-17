@@ -48,7 +48,7 @@ C
 
 *         FIXME: Approximate with asymptotic DA only: K=0
           KMOM = (0.0d0, 0.0d0)
-          CALL CDVEMF (J, KMOM, MCU)
+          CALL CDVEMF (1, J, KMOM, MCU)
           BIGCTMP(1, 1) = MCU(1)/NF + MCU(2)
           BIGCTMP(1, 2) = MCU(3)
         END IF

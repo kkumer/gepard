@@ -9,13 +9,13 @@
 :ReturnType:    Manual
 :End:
 
-:Evaluate: cdvem::usage = "cdvem[j, k, rgpdf2, rdaf2, rr2] returns three (unnormalized) DVEM Wilson coefficients C_jk: quark, pure singlet quark and gluon. rgpdf2, rdaf2 and rr2 are ratios of Q2 and squares of GPD factorization, DA factorization and renormalization scales squared, respectively"
+:Evaluate: cdvem::usage = "cdvem[sgntr, j, k, nf, rgpdf2, rdaf2, rr2] returns three (unnormalized) DVEM Wilson coefficients C_jk: quark, pure singlet quark and gluon. rgpdf2, rdaf2 and rr2 are ratios of Q2 and squares of GPD factorization, DA factorization and renormalization scales squared, respectively. sgntr is signature"
 :Evaluate: cdvem::nan = "Error - Argument not in correct numerical form."
 :Evaluate: errnan := Message[cdvem::nan]
 :Begin:
 :Function:      cdvem
-:Pattern:       cdvem[j_?NumericQ, k_?NumericQ, nf_?NumericQ, rgpdf2_?NumericQ, rdaf2_?NumericQ, rr2_?NumericQ]
-:Arguments:     {j, k, nf, rgpdf2, rdaf2, rr2}
+:Pattern:       cdvem[sgntr_?IntegerQ, j_?NumericQ, k_?NumericQ, nf_?NumericQ, rgpdf2_?NumericQ, rdaf2_?NumericQ, rr2_?NumericQ]
+:Arguments:     {sgntr, j, k, nf, rgpdf2, rdaf2, rr2}
 :ArgumentTypes: {Manual}
 :ReturnType:    Manual
 :End:
