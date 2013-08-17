@@ -1,14 +1,7 @@
 
-# Testing gepard MSBAR NLO code
+# Testing gepard MSBAR NLO code - singlet case
 
-# Numbers below are produced by gepard's redNLONS
-# When ratios of absolute values are taken 
-#        (NLO/LO - 1)*100 = -16.0881222
-# they correspond to thick green dashed line
-# of panel 2 of Fig. 7 in NPB 08
-# (leftmost point, also visible in
-# radNLONS1.dat, at
-# the start of 2nd and 4th block of numbers.
+# Numbers below are produced by gepard's ex/evolut
 
 
 import shutil, copy, math
@@ -19,16 +12,14 @@ import utils, Model, Approach, Data, Fitter
 
 from constants import Mp, Mp2
 
-m = Model.ComptonGepard(process='DVCS', ansatz='NSFIT', q02=2.5)
+m = Model.ComptonGepard(process='DVCS', ansatz='FITBP', q02=2.5)
 t = Approach.hotfixedBMK(m)
-
 # Setting gepard to values as in radNLONS.F
 # (Fig. 7 of NPB08)
-
 t.m.g.parint.nf = 4
 t.m.g.astrong.asp = np.array([0.05, 0.05, 0.05])
-t.m.g.parchr.fftype = np.array([c for c in 'NONSINGLET']) # array(10)
-t.m.g.parchr.scheme = np.array([c for c in 'MSBDI']) # array(10)
+t.m.g.parchr.fftype = np.array([c for c in 'SINGLET   ']) # array(10)
+t.m.g.parchr.scheme = np.array([c for c in 'MSBAR']) # array(?)
 t.m.g.mbcont.phi = 1.9
 
 # Seting model parameters to be as in test.F
@@ -63,17 +54,19 @@ setpar(45, MassP**2)
 setpar(46, 1.0)
 
 #  'hard' ansatz
-setpar(11, 4./15.)
+setpar(21, 0.4)
+setpar(22, 1.1 + 0.05)
+setpar(11, 2./3. - 0.4)
 
 pt = Data.DummyPoint()
+pt.Q2 = 25.
+pt.t = -0.25
+pt.xi = 1.e-5
+pt.xB = 2*pt.xi/(1.+pt.xi)
 
 
-def test_radMSBARLONS():
-    """Non-singlet LO CFF H"""
-    pt.Q2 = 2.5
-    pt.t = -1.
-    pt.xi = 0.01
-    pt.xB = 2*pt.xi/(1.+pt.xi)
+def test_radMSBARLO():
+    """Singlet LO CFF H evolved"""
     #FIXME: how to avoid this:
     try:
         del t.m.qdict[pt.Q2]
@@ -82,19 +75,15 @@ def test_radMSBARLONS():
     t.m.g.parint.p = 0
     t.m.g.newcall = 1
     t.m.g.init()
-    assert_almost_equal(m.ReH(pt), -1.6620214256774486)
-    assert_almost_equal(m.ImH(pt), -12.604465892107740)
+    assert_almost_equal(m.ReH(pt)/1e5, 251460.03959908773/1e5)
+    assert_almost_equal(m.ImH(pt)/1e5, 1015357.1865059549/1e5)
 
 
-test_radMSBARLONS.gepardsuite = 1
+test_radMSBARLO.gepardsuite = 1
 
 
-def test_radMSBARNLONS():
-    """Non-singlet NLO MSBAR CFF H"""
-    pt.Q2 = 2.5
-    pt.t = -1.
-    pt.xi = 0.01
-    pt.xB = 2*pt.xi/(1.+pt.xi)
+def test_radMSBARNLO():
+    """Singlet NLO MSBAR CFF H evolved"""
     #FIXME: how to avoid this:
     try:
         del t.m.qdict[pt.Q2]
@@ -103,15 +92,7 @@ def test_radMSBARNLONS():
     t.m.g.parint.p = 1
     t.m.g.newcall = 1
     t.m.g.init()
-    assert_almost_equal(m.ReH(pt), -1.2740328118218003)
-    assert_almost_equal(m.ImH(pt), -10.591847869828122)
+    assert_almost_equal(m.ReH(pt)/1e5, 142867.21556625995/1e5)
+    assert_almost_equal(m.ImH(pt)/1e5, 653095.26655367797/1e5)
 
-test_radMSBARNLONS.gepardsuite = 1
-
-## relo = -1.6620214256774486
-## imlo = -12.604465892107740
-## renlo =  -1.2740328118218003
-## imnlo = -10.591847869828122
-## print (sqrt(renlo**2+imnlo**2)/sqrt(relo**2+imlo**2) - 1)*100
-## -16.08812221458558
-
+test_radMSBARNLO.gepardsuite = 1
