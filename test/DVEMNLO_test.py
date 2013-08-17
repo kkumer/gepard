@@ -12,12 +12,14 @@ from results import KM10b,dvmppars
 def test_c1():
     """Calculate NLO DVMP coef. functions"""
 	# KM10b model
+	# For speed, we can stay with p=0 because this
+	# doesn't influence c1 coefficients
     m = Model.ComptonGepard(process='DVMP', p=0)
     t = Approach.BMK(m)
     t.m.parameters.update(KM10b)
     t.m.g.init()
     t.m.g.newcall = 1
-    aux = t.m.g.cdvemf((0.5+1.j), 2)
+    aux = t.m.g.cdvemf(1, (0.5+1.j), 2)
     # comparing to DM's DVEM-c1_forKreso.nb
     # quark part
     assert_almost_equal(aux[0]/100, (30.3836+9.2856j)/100, 3)

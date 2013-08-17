@@ -1,5 +1,5 @@
 # Three tests below, LO, NLO and NNLO, correspond to
-# left-most points of panel 2 of Fig. 12 in NPB 08
+# left-most points, x=0.01, of panel 2 of Fig. 12 in NPB 08
 # paper. Their ratios are plotted there, for xi=0.01, as
 #
 # (NLO/LO - 1)*100 = -9.627907  (thin blue dashed line)
@@ -7,8 +7,8 @@
 # (NNLO/NLO - 1)*100 = -1.575703 (thin red solid line)
 #
 # Actually, plot starts for somewhat larger xi, but
-# numbers can be seen in radNNLONS1.dat, at
-# the start of 2nd and 4th block of numbers.
+# numbers above can be seen in radNNLONS1.dat, at
+# the start of 4th and 2nd block of numbers, respectively.
 
 import shutil, copy, math
 from nose.tools import *
@@ -119,4 +119,16 @@ def test_radNNLONS():
     assert_almost_equal(m.ImH(pt), 3.0344836334101961)
 
 test_radNNLONS.gepardsuite = 1
+
+## relo = -3.3434664508535783
+## imlo = 3.274603763172275
+## renlo = -2.8809502819615411
+## imnlo = 3.096381114053143
+## rennlo = -2.8495779492285682
+## imnnlo = 3.0344836334101961
+## print (sqrt(renlo**2+imnlo**2)/sqrt(relo**2+imlo**2) - 1)*100
+## print (sqrt(rennlo**2+imnnlo**2)/sqrt(renlo**2+imnlo**2) - 1)*100
+## 
+## -9.62790688897865
+## -1.57570328069094
 

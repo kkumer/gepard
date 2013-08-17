@@ -1,14 +1,13 @@
 # Three tests below, LO, NLO and NNLO, correspond to
-# xi=1e-4?? points of panel 2 of Fig. 13 in NPB 08
+# leftmost, xi=1e-5, points of panel 1 of Fig. 13 in NPB 08
 # paper. Their ratios are plotted there, as
 #
-# (NLO/LO - 1)*100 = -9.627907  (thin blue dashed line)
+# (NLO/LO - 1)*100 = -50.201434  (thick blue dashed line)
 #
-# (NNLO/NLO - 1)*100 = -1.575703 (thin red solid line)
+# (NNLO/NLO - 1)*100 = -1.7617628 (thick red solid line)
 #
-# Actually, plot starts for somewhat larger xi, but
-# numbers can be seen in radNNLONS1.dat, at
-# the start of 2nd and 4th block of numbers. ???
+# Numbers above can be seen in radNNLO0.dat, at
+# the start of 3rd and 1sr block of numbers, respectively.
 
 import shutil, copy, math
 from nose.tools import *
@@ -135,4 +134,16 @@ def test_radNNLO():
 
 test_radNNLO.gepardsuite = 1
 test_radNNLO.newfeature = 0
+
+## relo = 39544.823112887607
+## imlo = 402367.23596533033
+## renlo = 5747.0424614455933
+## imnlo = 201256.45352582674
+## rennlo = 13475.876522596294
+## imnnlo =  197331.78427187083
+## print (sqrt(renlo**2+imnlo**2)/sqrt(relo**2+imlo**2) - 1)*100
+## print (sqrt(rennlo**2+imnnlo**2)/sqrt(renlo**2+imnlo**2) - 1)*100
+## 
+## -50.20143439912961
+## -1.761762799149148
 
