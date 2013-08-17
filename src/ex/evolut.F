@@ -130,7 +130,7 @@ C
 
       CALL INIT
       QS(1) = Q2
-      CALL EVOLC(1)
+      CALL EVOLC(1,1)
       CALL CFFF 
       CFFQ = CFF(P)
       Q2MEM = Q2
@@ -138,7 +138,7 @@ C
       Q2 = Q02
       CALL INIT
       QS(1) = Q2
-      CALL EVOLC(1)
+      CALL EVOLC(1,1)
       CALL CFFF 
       CFF0 = CFF(P)
       Q2 = Q2MEM
