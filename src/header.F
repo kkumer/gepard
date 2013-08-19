@@ -572,6 +572,16 @@ C  SYNOPSIS
       DOUBLE COMPLEX BIGC(NPWMAX,NPTSMAX,0:2,2)
 C     ***
 
+C     ****v* header.F/WC
+C  DESCRIPTION
+C     WC(PID, SEC, K, P, L) -- all Wilson coefficients
+C  MEMBER OF
+C     WC(block)
+C  SYNOPSIS
+      DOUBLE COMPLEX WC(-4:3,NPWMAX,NPTSMAX,0:2,4)
+C     ***
+
+
 C     ****v* header.F/BIGCF2
 C  DESCRIPTION
 C     BIGCF2(K,P,flavour) -- "Big C" DIS F2 singlet Wilson coefficient  
@@ -582,22 +592,31 @@ C  SYNOPSIS
 C     ***
 
 
-C     ****v* header.F/GAMNS
+C     ****v* header.F/GAMNSP
 C  DESCRIPTION
-C      GAMNS(K,P) -- non-singlet DIS anomalous dimensions 
+C      GAMNSP(SEC, K, P) -- non-singlet DIS anomalous dimensions  \gamma^+
 C  MEMBER OF
-C     GAMNS(block)
+C     GAM(block)
 C  SYNOPSIS
-      DOUBLE COMPLEX GAMNS(NPTSMAX,0:2)
+      DOUBLE COMPLEX GAMNSP(NPWMAX,NPTSMAX,0:2)
+C     ***
+
+C     ****v* header.F/GAMNSM
+C  DESCRIPTION
+C      GAMNSM(SEC, K, P) -- non-singlet DIS anomalous dimensions  \gamma^-
+C  MEMBER OF
+C     GAM(block)
+C  SYNOPSIS
+      DOUBLE COMPLEX GAMNSM(NPWMAX,NPTSMAX,0:2)
 C     ***
 
 C     ****v* header.F/GAM
 C  DESCRIPTION
-C      GAM(SEC,K,P,flavour_i,flavour_j) -- non-singlet DIS anomalous dimensions 
+C      GAM(SEC,K,P,flavour_i,flavour_j) -- singlet DIS anomalous dimensions 
 C  MEMBER OF
-C     GAMNS(block)
+C     GAM(block)
 C  SYNOPSIS
-      DOUBLE COMPLEX GAM(3,NPTSMAX,0:2,2,2)
+      DOUBLE COMPLEX GAM(NPWMAX,NPTSMAX,0:2,2,2)
 C     ***
 
 C     ****v* header.F/CGRIDNS
@@ -632,6 +651,17 @@ C  MEMBER OF
 C    CGRIDDIS(block)
 C  SYNOPSIS
       DOUBLE COMPLEX CGRIDDIS(QINDMAX, NPTSMAX, 2)
+C     ***
+
+C     ****v* header.F/WCE
+C  DESCRIPTION
+C      WCE(PID, SEC, QIND, K, L) -- "Evolved"  Wilson
+C      coefficients for all processes i.e. multiplied by evolution operator for
+C      evolution from Q02 to QS(QIND)
+C  MEMBER OF
+C    WCE(block)
+C  SYNOPSIS
+      DOUBLE COMPLEX WCE(-4:3, NPWMAX, QINDMAX, NPTSMAX, 4)
 C     ***
 
 
@@ -909,18 +939,18 @@ C  SYNOPSIS
       COMMON / BIGC     /  BIGC
 C     ***
 
-C     ****c* header.F/GAMNS(block)
+C     ****c* header.F/WC(block)
 C  DESCRIPTION
-C     Nonsinglet DIS anomalous dimensions 
+C     All Wilson coefficients
 C  SYNOPSIS
-      COMMON / GAMNS    /  GAMNS
+      COMMON / WC       /  WC
 C     ***
 
 C     ****c* header.F/GAM(block)
 C  DESCRIPTION
-C     Singlet DIS anomalous dimensions 
+C     DIS anomalous dimensions 
 C  SYNOPSIS
-      COMMON / GAM      /  GAM
+      COMMON / GAM      /  GAM, GAMNSP, GAMNSM
 C     ***
 
 C     ****c* header.F/BIGCF2(block)
@@ -943,6 +973,14 @@ C     "Evolved" singlet DVCS Wilson coefficients
 C  SYNOPSIS
       COMMON / CGRID    /  CGRID
 C     ***
+
+C     ****c* header.F/WCE(block)
+C  DESCRIPTION
+C     "Evolved" Wilson coefficients
+C  SYNOPSIS
+      COMMON / WCE      /  WCE
+C     ***
+
 
 C     ****c* header.F/CGRIDDIS(block)
 C  DESCRIPTION

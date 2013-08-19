@@ -27,7 +27,7 @@ C
 
 
       IMPLICIT NONE
-      INTEGER K, QIND
+      INTEGER K, QIND, PIDK
       DOUBLE COMPLEX EPH, J, CFAC, FPWH, FPWE
       DOUBLE PRECISION RESREALH, RESIMAGH
       DOUBLE PRECISION FREALH, FIMAGH
@@ -44,6 +44,7 @@ C
       RESREALE = 0.0d0
       RESIMAGE = 0.0d0
 
+      PIDK = 1
 
       XIMEM = XI
 *     -- when calculating just GPDs at eta=0 --
@@ -74,22 +75,22 @@ C
       CFAC = EPH / XI**(J+1.d0)
 
       IF ( FFTYPE(:7) .EQ. 'NONSING' ) THEN
-        FPWH = CGRIDNS(QIND,K)*GPDH(K,1)        
+        FPWH = WCE(PIDK,1,QIND,K,3)*GPDH(K,3)        
 *        FIXME: Following line could be wrong parameter no. It's ther
 *               just to avoid compiler warning ... NONSING is maybe
 *               broken!
-        FPWE = CGRIDNS(QIND,K)*PAR(17)*GPDE(K,1)        
+        FPWE = WCE(PIDK,1,QIND,K,3)*PAR(17)*GPDE(K,3)        
       ELSE
 *       --- singlet case ---
 *            --- CFF H ---
-        FPWH = CGRID(1,QIND,K,1)*GPDH(K,1) + 
-     &         CGRID(1,QIND,K,2)*GPDH(K,2)
+        FPWH = WCE(PIDK,1,QIND,K,1)*GPDH(K,1) + 
+     &         WCE(PIDK,1,QIND,K,2)*GPDH(K,2)
         FPWH = FPWH +  
-     &              PAR(17) * CGRID(2,QIND,K,1) * GPDH(K,1) + 
-     &              PAR(27) * CGRID(2,QIND,K,2) * GPDH(K,2)
+     &              PAR(17) * WCE(PIDK,2,QIND,K,1) * GPDH(K,1) + 
+     &              PAR(27) * WCE(PIDK,2,QIND,K,2) * GPDH(K,2)
         FPWH = FPWH +  
-     &              PAR(37) * CGRID(3,QIND,K,1) * GPDH(K,1) + 
-     &              PAR(47) * CGRID(3,QIND,K,2) * GPDH(K,2)
+     &              PAR(37) * WCE(PIDK,3,QIND,K,1) * GPDH(K,1) + 
+     &              PAR(47) * WCE(PIDK,3,QIND,K,2) * GPDH(K,2)
 *            --- CFF E ---
         IF (.NOT. ( (ANSATZ .EQ. 'EFL') .OR. (ANSATZ .EQ. 'EFLEXP')
      &           )) THEN
@@ -105,14 +106,14 @@ C
           PAR(28) = - PAR(18)*PAR(11) / (0.6d0 - PAR(11))
         END IF
 
-        FPWE = CGRID(1,QIND,K,1)*PAR(18)*GPDE(K,1) 
-     &       + CGRID(1,QIND,K,2)*PAR(28)*GPDE(K,2)
+        FPWE = WCE(PIDK,1,QIND,K,1)*PAR(18)*GPDE(K,1) 
+     &       + WCE(PIDK,1,QIND,K,2)*PAR(28)*GPDE(K,2)
         FPWE = FPWE +  
-     &            PAR(18) * PAR(117) * CGRID(2,QIND,K,1) * GPDE(K,1) + 
-     &            PAR(28) * PAR(127) * CGRID(2,QIND,K,2) * GPDE(K,2)
+     &          PAR(18) * PAR(117) * WCE(PIDK,2,QIND,K,1) * GPDE(K,1) + 
+     &          PAR(28) * PAR(127) * WCE(PIDK,2,QIND,K,2) * GPDE(K,2)
         FPWE = FPWE +  
-     &            PAR(18) * PAR(137) * CGRID(3,QIND,K,1) * GPDE(K,1) + 
-     &            PAR(28) * PAR(147) * CGRID(3,QIND,K,2) * GPDE(K,2)
+     &          PAR(18) * PAR(137) * WCE(PIDK,3,QIND,K,1) * GPDE(K,1) + 
+     &          PAR(28) * PAR(147) * WCE(PIDK,3,QIND,K,2) * GPDE(K,2)
       END IF
 
       IF (ANSATZ(:1) .EQ. 'E') THEN

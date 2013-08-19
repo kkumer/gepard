@@ -12,14 +12,15 @@ C  DESCRIPTION
 C    calculates non-singlet evolution operator
 C  SYNOPSIS
 
-      SUBROUTINE EVOLNSF (K, R, EVOLNSA)
+      SUBROUTINE EVOLNSF (SEC, K, R, EVOLNSA)
 
       IMPLICIT NONE
-      INTEGER K
+      INTEGER SEC, K
       DOUBLE PRECISION R
       DOUBLE COMPLEX EVOLNSA(0:2)
 
 C  INPUTS
+C         SEC -- SO(3) partial wave
 C           K -- Mellin-Barnes integration point index
 C           R -- ratio of astrong(mu)/astrong(mu0)
 C  OUTPUT
@@ -40,7 +41,7 @@ C
 #include "header.F"
 
 
-      CALL RNNLONSF (K, R1, R2)
+      CALL RNNLONSF (SEC, K, R1, R2)
 
       
       AUX(0) = (1.0d0, 0.0d0)
@@ -58,7 +59,7 @@ C
       ENDIF
 
       DO 10 ORD = 0, P
- 10   EVOLNSA(ORD) = AUX(ORD) * R**( - GAMNS(K,0) / BETA0(NF) )
+ 10   EVOLNSA(ORD) = AUX(ORD) * R**( - GAMNSP(SEC,K,0) / BETA0(NF) )
 
 *   Adding MSBAR non-diagonal NLO evolution (time consuming)
       IF ( (P .EQ. 1) .AND. (SCHEME .EQ. 'MSBAR') ) THEN

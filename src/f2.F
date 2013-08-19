@@ -44,8 +44,8 @@ C
 
       DO 123 K = 1, NPTS
       J = N(1, K) - 1
-      FPW = CGRIDDIS(QIND,K,1) * GPDH(K,1) + 
-     &      CGRIDDIS(QIND,K,2) * GPDH(K,2)
+      FPW = WCE(0,1,QIND,K,1) * GPDH(K,1) + 
+     &      WCE(0,1,QIND,K,2) * GPDH(K,2)
       F2IMAG = IMAGPART( EPH / XI**J * FPW )
       RES = RES + WG(K)*F2IMAG
  123  CONTINUE

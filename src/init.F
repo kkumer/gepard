@@ -26,10 +26,10 @@ C
 
       IMPLICIT NONE
       INTEGER NINTGMAX, K
-      INTEGER L, ORD, SEC
+      INTEGER L, ORD, SEC, PIDK
       INTEGER EFFACC, NBNDMAX
       DOUBLE PRECISION NFD
-      DOUBLE COMPLEX J, Z, EPH
+      DOUBLE COMPLEX J, Z, EPH, FSHU
       DOUBLE COMPLEX HS1, HS2, HS3, HS4
       DOUBLE COMPLEX CF2, CFL
       DOUBLE COMPLEX BIGCTMP(0:2,2)
@@ -161,10 +161,6 @@ C
             S4 = HS4(Z)
         END IF
       END IF
-
-
-
-*   -----------  SINGLET  ------------------
               
 *   2.b Anomalous dimensions matrices: LO, NLO, and NNLO
 
@@ -172,28 +168,36 @@ C
       CALL WgammaVQG0F(NFD, Z, GAM(SEC, K, 0, 1, 2))
       CALL WgammaVGQ0F(NFD, Z, GAM(SEC, K, 0, 2, 1))
       CALL WgammaVGG0F(NFD, Z, GAM(SEC, K, 0, 2, 2))
+      CALL WgammaVNSP0F(NFD, Z, GAMNSP(SEC, K, 0))
+c     CALL WgammaVNSM0F(NFD, Z, GAMNSM(SEC, K, 0))
 
       IF (P .GE. 1) THEN
         CALL WgammaVQQ1F(NFD, Z, GAM(SEC, K, 1, 1, 1))
         CALL WgammaVQG1F(NFD, Z, GAM(SEC, K, 1, 1, 2))
         CALL WgammaVGQ1F(NFD, Z, GAM(SEC, K, 1, 2, 1))
         CALL WgammaVGG1F(NFD, Z, GAM(SEC, K, 1, 2, 2))
+        CALL WgammaVNSP1F(NFD, Z, GAMNSP(SEC, K, 1))
+c       CALL WgammaVNSM1F(NFD, Z, GAMNSM(SEC, K, 1))
 
         IF (P .GE. 2) THEN
           CALL WgammaVQQ2F(NFD, Z, GAM(SEC, K, 2, 1, 1))
           CALL WgammaVQG2F(NFD, Z, GAM(SEC, K, 2, 1, 2))
           CALL WgammaVGQ2F(NFD, Z, GAM(SEC, K, 2, 2, 1))
           CALL WgammaVGG2F(NFD, Z, GAM(SEC, K, 2, 2, 2))
+          CALL WgammaVNSP2F(NFD, Z, GAMNSP(SEC, K, 2))
+c         CALL WgammaVNSM2F(NFD, Z, GAMNSM(SEC, K, 2))
         END IF
       END IF
 
 
-*   2.c DIS Wilson coefficients ("small" c)
+
+*   2.c DIS Wilson coefficients: LO, NLO, and NNLO
 
       CDIS1(K, 0, 1) = (1.0d0, 0.0d0)
       CDIS1(K, 0, 2) = (0.0d0, 0.0d0)
       CDIS2(K, 0, 1) = (1.0d0, 0.0d0)
       CDIS2(K, 0, 2) = (0.0d0, 0.0d0)
+      CDISNS1(K, 0) = (1.0d0, 0.0d0)
 
       IF (P .GE. 1) THEN
         CALL WcVF2Q1F(NFD, Z, CF2)
@@ -204,6 +208,9 @@ C
         CALL WcVFLG1F(NFD, Z, CFL)
         CDIS1(K, 1, 2) = CF2 -  CFL
         CDIS2(K, 1, 2) = CF2
+        CALL WcVF2NSP1F(NFD, Z, CF2)
+        CALL WcVFLNSP1F(NFD, Z, CFL)
+        CDISNS1(K, 1) = CF2 -  CFL
 
         IF (P .GE. 2) THEN
           CALL WcVF2Q2F(NFD, Z, CF2)
@@ -212,120 +219,83 @@ C
           CALL WcVF2G2F(NFD, Z, CF2)
           CALL WcVFLG2F(NFD, Z, CFL)
           CDIS1(K, 2, 2) = CF2 -  CFL
-        END IF
-      END IF
-
-*   3. "Big C' Wilson coefficients
-
-      IF ( PROCESS(6:6) .EQ. 'Q' ) THEN
-*       (Option 1) Just evolution of quark GPD
-        BIGCTMP(0, 1) = (1.0d0, 0.0d0)
-        BIGCTMP(0, 2) = (0.0d0, 0.0d0)
-        DO 15 L = 1, 2
-        DO 15 ORD = 1, 2
- 15     BIGCTMP(ORD, L) = (0.0d0, 0.0d0)
-      ELSE IF ( PROCESS(6:6) .EQ. 'G' ) THEN
-*       (Option 2) Just evolution of gluon GPD or PDF (houches)
-        BIGCTMP(0, 1) = (0.0d0, 0.0d0)
-*  Gluons need special treatment here and for DVCS additional factor of xi later
-        IF ( PROCESS .EQ. 'DVCSTG' ) THEN
-*         GPD(x, eta=x,t)                                              
-          BIGCTMP(0, 2) = 2.0d0 / (3.0d0 + J)
-        ELSE
-*         PDF(x) and GPD(x, eta=0,t)                                              
-          BIGCTMP(0, 2) = (1.0d0,0.0d0)
-        END IF
-        DO 20 L = 1, 2
-        DO 20 ORD = 1, 2
- 20     BIGCTMP(ORD, L) = (0.0d0, 0.0d0)
-      ELSE IF (SCHEME .EQ. 'CSBAR') THEN
-*       (Option 3) CFF or F2 in CSBAR scheme
-          CALL CDVCSF(SEC, K, BIGCTMP)
-      ELSE IF (SCHEME(:3) .EQ. 'MSB') THEN
-*       (Option 4) CFF or TFF or F2 in MSBAR/MSBDI/MSBLO schemes
-          CALL MSBARF(SEC, K, BIGCTMP)
-      ELSE
-*       (Option 5) This should never happen
-          STOP
-      END IF
-
-*     Writing this to BIGC or BIGCF2 common blocks.
-*     "Big C" Wilson coefficients of DVCS (in BIGC) have to be multiplied by
-*     2^(J+1) Gamma(5/2+J) / Gamma(3/2) / Gamma(3+J)
-*     BTW,  Gamma(3/2) = 0.88622...
-
-      DO 30 L = 1,2
-      DO 30 ORD = 0, P
-        IF ( PROCESS(:3) .EQ. 'DIS' ) THEN
-*          -- F2 or PDFs --
-          BIGCF2(K, ORD, L) = BIGCTMP(ORD, L)
-        ELSE IF ( PROCESS(5:5) .EQ. 'Z' ) THEN
-*          -- GPDs at eta=0 trajectory --
-          BIGC(SEC, K, ORD, L) = BIGCTMP(ORD, L)
-        ELSE
-*          -- CFFs or TFFs or GPDs at eta=x trajectory --
-          BIGC(SEC, K, ORD, L) = BIGCTMP(ORD, L) * 2.0d0**(J+1.d0)
-     &           * EXP(CLNGAMMA(2.5d0 + J) - CLNGAMMA(3.0d0 + J))
-     &           / 0.886226925452758014d0
-        END IF
- 30   CONTINUE
-
-*         -- TTFs, additional pre-factor:
-*          BIGC = T_jk from Eq. (3.61c) in big DVMP draft
-      IF ( PROCESS(:4) .EQ. 'DVMP' ) THEN
-        DO 40 ORD = 0, P
-          BIGC(SEC, K, ORD, 1) = BIGC(SEC, K, ORD, 1) * 3.d0
-          BIGC(SEC, K, ORD, 2) = (
-     &       BIGC(SEC, K, ORD, 2) * 2.d0/CF/(J+3.d0) * 3.d0 )
- 40     CONTINUE
-      END IF
-
-
-*  -------------  NON - SINGLET  ----------------
-
-*   2.bNS Anomalous dimensions matrices: LO, NLO, and NNLO
-
-      CALL WgammaVNSP0F(NFD, Z, GAMNS(K, 0))
-      IF (P .GE. 1) THEN
-        CALL WgammaVNSP1F(NFD, Z, GAMNS(K, 1))
-        IF (P .GE. 2) THEN
-          CALL WgammaVNSP2F(NFD, Z, GAMNS(K, 2))
-        END IF
-      END IF
-
-*   2.cNS DIS Wilson coefficients ("small" c)
-
-      CDISNS1(K, 0) = (1.0d0, 0.0d0)
-      IF (P .GE. 1) THEN
-        CALL WcVF2NSP1F(NFD, Z, CF2)
-        CALL WcVFLNSP1F(NFD, Z, CFL)
-        CDISNS1(K, 1) = CF2 -  CFL
-        IF (P .GE. 2) THEN
           CALL WcVF2NSP2F(NFD, Z, CF2)
           CALL WcVFLNSP2F(NFD, Z, CFL)
           CDISNS1(K, 2) = CF2 -  CFL
         END IF
       END IF
 
-*   3.NS "Big C' Wilson coefficients
-
-*     non-singlet DIS is not implemented yet, so here we call
-*     BIGCNSF which directly writes to BIGCNS common block
-
-      CALL BIGCNSF(K)
-
-*     "Big C" Wilson coefficients of DVCS (in BIGC) have to be multiplied by
+*   2.d  "Shuvaev" factor
 *     2^(J+1) Gamma(5/2+J) / Gamma(3/2) / Gamma(3+J)
-*     BTW,  Gamma(3/2) = 0.88622...
+      FSHU = 2.0d0**(J+1.d0)
+     &        * EXP(CLNGAMMA(2.5d0 + J) - CLNGAMMA(3.0d0 + J))
+     &        / 0.886226925452758014d0
 
-      IF (( PROCESS(:4) .EQ. 'DVCS' ) .OR. (
-     ^  PROCESS(:4) .EQ. 'DVMP' )) THEN
-        DO 50 ORD = 0, P
-          BIGCNS(K, ORD) = BIGCNS(K, ORD) * 2.0d0**(J+1.d0) 
-     &          *  EXP(CLNGAMMA(2.5d0 + J) - CLNGAMMA(3.0d0 + J))
-     &          / 0.886226925452758014d0
+
+*   3. Wilson coefficients for all needs
+
+*  --- first initialize everything to zero ...
+
+        DO 20 L = 1, 2
+        DO 20 ORD = 1, 2
+        BIGCTMP(ORD, L) = (0.0d0, 0.0d0)
+        DO 20 PIDK = -4, 2
+        WC(PIDK, SEC, K, ORD, L) = (0.0d0, 0.0d0)
+ 20     CONTINUE
+
+*  --- ... then change what needs to be changed
+
+*     PID = -1: Quark PDF or GPD at eta=0 
+        WC(-1, SEC, K, 0, 1) = (1.0d0, 0.0d0)
+        WC(-1, SEC, K, 0, 3) = (1.0d0, 0.0d0)
+        WC(-1, SEC, K, 0, 4) = (1.0d0, 0.0d0)
+
+*     PID = -2: Gluon PDF or GPD at eta=0 
+        WC(-2, SEC, K, 0, 2) = (1.0d0, 0.0d0)
+
+*     PID = -3: Quark GPD at eta=x 
+        WC(-3, SEC, K, 0, 1) = (1.0d0, 0.0d0) * FSHU
+        WC(-3, SEC, K, 0, 3) = (1.0d0, 0.0d0) * FSHU
+        WC(-3, SEC, K, 0, 4) = (1.0d0, 0.0d0) * FSHU
+
+*     PID = -4: Gluon GPD at eta=x 
+        WC(-4, SEC, K, 0, 2) = FSHU * 2.0d0 / (3.0d0 + J)
+
+*       Load  ===CSBAR scheme=== coefs into BIGCTMP
+          CALL CDVCSF(SEC, K, BIGCTMP)
+
+*     PID = 0: DIS F2 
+*       here only SEC=1 case makes sense
+        IF (SEC .EQ. 1) THEN
+          DO 30 L = 1,2
+          DO 30 ORD = 0, P
+ 30         WC(0, SEC, K, ORD, L) = BIGCTMP(ORD, L) 
+        END IF
+
+*     PID = 1: DVCS (CSBAR)
+          DO 40 L = 1,4
+          DO 40 ORD = 0, P
+ 40         WC(1, SEC, K, ORD, L) = BIGCTMP(ORD, L) * FSHU
+
+*       Load ===MSBAR scheme=== coefs into BIGCTMP
+          CALL MSBARF(SEC, K, BIGCTMP)
+
+          DO 50 L = 1,4
+          DO 50 ORD = 0, P
+*     PID = 2: DVCS (MSBAR)
+            WC(2, SEC, K, ORD, L) = BIGCTMP(ORD, L) * FSHU
+
+*     PID = 3: DVMP (MSBAR)
+*            WC = T_jk from Eq. (3.61c) in big DVMP draft
+            IF (L .EQ. 2) THEN
+*             --- gluons get additional factor
+              WC(3, SEC, K, ORD, L) = ( BIGCTMP(ORD, L) * FSHU * 3.d0
+     &                  * 2.d0/CF/(J+3.d0) * 3.d0 )
+            ELSE
+*             --- quarks, singlet and non-singlet
+              WC(3, SEC, K, ORD, L) = BIGCTMP(ORD, L) * FSHU * 3.d0
+            END IF
  50     CONTINUE
-      END IF
 
 
 100   CONTINUE
