@@ -1057,9 +1057,9 @@ gepard models can be created. Restart everything!\n'
         self.g.nqs.nqs = 1
         self.g.qs.qs[0] = self.cutq2
         self.g.kinematics.q2 = self.cutq2
-        self.g.evolc(1, 1, 1)
-        self.g.evolc(1, 2, 1)
-        self.g.evolc(1, 3, 1)
+        self.g.evolc(1, 1)
+        self.g.evolc(2, 1)
+        self.g.evolc(3, 1)
         self.qdict = {self.cutq2 : 1}  # have to reset this 
 
         self.g.newcall = 1
@@ -1098,9 +1098,9 @@ gepard models can be created. Restart everything!\n'
                 self.g.cgrid.cgrid[0,nqs-1,k,1] = self.g.cgrid.cgrid[0,0,k,1]
                 self.g.cgrid.cgrid[1,nqs-1,k,1] = self.g.cgrid.cgrid[1,0,k,1]
         else:
-            self.g.evolc(1, 1, nqs)
-            self.g.evolc(1, 2, nqs)
-            self.g.evolc(1, 3, nqs)
+            self.g.evolc(1, nqs)
+            self.g.evolc(2, nqs)
+            self.g.evolc(3, nqs)
 
     def _GepardFFs(self, pt, FF='cfff'):
         """Call gepard routine that calculates CFFs or TFFs."""
