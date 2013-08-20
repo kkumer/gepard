@@ -1040,8 +1040,10 @@ gepard models can be created. Restart everything!\n'
 
         if process == 'DVMP':
             self.g.parchr.scheme = array([c for c in 'MSBAR'])  # array(5)
+            self.g.parint.pid = 3
         else:
             self.g.parchr.scheme = array([c for c in 'CSBAR'])  # array(5)
+            self.g.parint.pid = 1
 
         self.g.parchr.ansatz = array([c for c in ansatz + (6-len(ansatz))*' ']) # array(6)
         if ansatz == 'FITEXP':
@@ -1132,6 +1134,7 @@ gepard models can be created. Restart everything!\n'
         self.g.nqs.nqs = 0
         self.qdict={}
         self.g.newcall = 1
+        self.g.parint.pid = -3
         return self.ImH(pt)/pi
 
     def gpdHtrajG(self, pt):
@@ -1142,6 +1145,7 @@ gepard models can be created. Restart everything!\n'
         self.g.nqs.nqs = 0
         self.qdict={}
         self.g.newcall = 1
+        self.g.parint.pid = -4
         return pt.xi*self.ImH(pt)/pi
 
     def gpdEtrajQ(self, pt):
@@ -1152,6 +1156,7 @@ gepard models can be created. Restart everything!\n'
         self.g.nqs.nqs = 0
         self.qdict={}
         self.g.newcall = 1
+        self.g.parint.pid = -3
         return self.ImE(pt)/pi
 
     def gpdEtrajG(self, pt):
@@ -1162,6 +1167,7 @@ gepard models can be created. Restart everything!\n'
         self.g.nqs.nqs = 0
         self.qdict={}
         self.g.newcall = 1
+        self.g.parint.pid = -4
         return pt.xi*self.ImE(pt)/pi
 
     def gpdHzeroQ(self, pt, ts=None):
@@ -1180,6 +1186,7 @@ gepard models can be created. Restart everything!\n'
         self.g.init()
         # Need to reset stored evolC(Q2) which are now likely invalid
         self.g.nqs.nqs = 0
+        self.g.parint.pid = -1
         self.qdict={}
         if isinstance(ts, ndarray):
             tmem = pt.t
@@ -1210,6 +1217,7 @@ gepard models can be created. Restart everything!\n'
         self.g.init()
         # Need to reset stored evolC(Q2) which are now likely invalid
         self.g.nqs.nqs = 0
+        self.g.parint.pid = -2
         self.qdict={}
         if isinstance(ts, ndarray):
             tmem = pt.t
@@ -1240,6 +1248,7 @@ gepard models can be created. Restart everything!\n'
         self.g.init()
         # Need to reset stored evolC(Q2) which are now likely invalid
         self.g.nqs.nqs = 0
+        self.g.parint.pid = -1
         self.qdict={}
         if isinstance(ts, ndarray):
             tmem = pt.t
@@ -1270,6 +1279,7 @@ gepard models can be created. Restart everything!\n'
         self.g.init()
         # Need to reset stored evolC(Q2) which are now likely invalid
         self.g.nqs.nqs = 0
+        self.g.parint.pid = -2
         self.qdict={}
         if isinstance(ts, ndarray):
             tmem = pt.t

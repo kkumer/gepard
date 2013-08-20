@@ -112,7 +112,6 @@ def test_radNLO():
     assert_almost_equal(m.ImH(pt), 201256.45352582674)
 
 test_radNLO.gepardsuite = 1
-test_radNLO.newfeature = 0
 
 def test_radNNLO():
     """Singlet NNLO CFF H"""
@@ -133,7 +132,6 @@ def test_radNNLO():
     assert_almost_equal(m.ImH(pt), 197331.78427187083)
 
 test_radNNLO.gepardsuite = 1
-test_radNNLO.newfeature = 0
 
 ## relo = 39544.823112887607
 ## imlo = 402367.23596533033

@@ -32,6 +32,7 @@ t.m.g.astrong.asp = np.array([0.05, 0.05, 0.05])
 t.m.g.parchr.fftype = np.array([c for c in 'NONSINGLET']) # array(10)
 t.m.g.parchr.scheme = np.array([c for c in 'MSBDI']) # array(10)
 t.m.g.mbcont.phi = 1.9
+t.m.g.parint.pid = 2
 
 # Seting model parameters to be as in test.F
 def setpar(i, val):
@@ -141,7 +142,7 @@ test_radMSBARLONSevol.gepardsuite = 1
 
 
 def test_radMSBARNLONSevol():
-    """Non-singlet NLO MSBAR CFF H at input scale"""
+    """Non-singlet NLO MSBAR CFF H evolved"""
     pt.Q2 = 10.
     pt.t = -0.25
     pt.xi = 0.01

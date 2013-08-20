@@ -20,6 +20,7 @@ t.m.g.astrong.mu02 = 2.0
 t.m.g.mbcont.phi = 1.9
 t.m.g.parchr.fftype = np.array([c for c in 'SINGLET   ']) # array(10)
 t.m.g.parchr.process = np.array([c for c in 'DVCSZG'])  # array(6)
+t.m.g.parint.pid = -2
 
 # Seting model parameters to be as in test.F
 
