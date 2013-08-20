@@ -19,7 +19,7 @@ C  SOURCE
 C
 
 
-      PROGRAM TEST
+      PROGRAM RHO
 
       IMPLICIT NONE
       INTEGER K
@@ -47,6 +47,7 @@ C
       ANSATZ = 'FIT'
       SCHEME = 'MSBAR'
       PROCESS  = 'DVMP'
+      PID = 3
 
 
       RGPDF2 = 1.d0

@@ -28,7 +28,7 @@ C
 
 
       IMPLICIT NONE
-      INTEGER K, QIND
+      INTEGER K, QIND, PIDK
       DOUBLE COMPLEX EPH, J, CFACRE, CFACIM
       DOUBLE COMPLEX EFSIG, EFG, EFNS
       DOUBLE COMPLEX TFFHS, TFFHNS
@@ -41,6 +41,8 @@ C
       CALL AS2PF (ASMUR2, Q2/RR2, ASP(P), MU02)
       ASTRONG = 2.d0 * PI * ASMUR2
 
+*     DVMP process ID = 3
+      PIDK = 3
       EPH = EXP ( DBLCMPLX(0.0d0, PHI) )
 
       REEFSIG = 0.d0
@@ -67,20 +69,20 @@ C
 
 *       --- flavour components ---
 
-        EFSIG = CGRID(1,QIND,K,1)*GPDH(K,1)
-        EFG   = CGRID(1,QIND,K,2)*GPDH(K,2)
+        EFSIG = WCE(PIDK,1,QIND,K,1)*GPDH(K,1)
+        EFG   = WCE(PIDK,1,QIND,K,2)*GPDH(K,2)
 c       FIXME: 1 --> 3 or so
-        EFNS  = CGRIDNS(QIND,K)*GPDH(K,1)
+        EFNS  = WCE(PIDK,1,QIND,K,3)*GPDH(K,1)
         
 *           --- ading 2nd SO(3) partial wave ---
 
-        EFSIG = EFSIG + PAR(17) * CGRID(2,QIND,K,1) * GPDH(K,1)
-        EFG   = EFG   + PAR(27) * CGRID(2,QIND,K,2) * GPDH(K,2)
+        EFSIG = EFSIG + PAR(17) * WCE(PIDK,2,QIND,K,1) * GPDH(K,1)
+        EFG   = EFG   + PAR(27) * WCE(PIDK,2,QIND,K,2) * GPDH(K,2)
 
 *           --- ading 3nd SO(3) partial wave ---
 
-        EFSIG = EFSIG + PAR(37) * CGRID(3,QIND,K,1) * GPDH(K,1)
-        EFG   = EFG   + PAR(47) * CGRID(3,QIND,K,2) * GPDH(K,2)
+        EFSIG = EFSIG + PAR(37) * WCE(PIDK,3,QIND,K,1) * GPDH(K,1)
+        EFG   = EFG   + PAR(47) * WCE(PIDK,3,QIND,K,2) * GPDH(K,2)
 
 
         REEFSIG = REEFSIG + WG(K)*IMAGPART(CFACRE * EFSIG)

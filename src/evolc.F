@@ -9,19 +9,18 @@ C     ****s* evolc.F/EVOLC
 C  NAME
 C     EVOLC  --  "evolved" Wilson coefficients
 C  DESCRIPTION
-C      Calculates "evolved" Wilson coefficients  for both singlet and
-C      nonsinglet DVCS and DIS, which means that Wilson coefficients are
+C      Calculates "evolved" Wilson coefficients
+C      which means that Wilson coefficients are
 C      multiplied by evolution operator.
 C   
 C  SYNOPSIS
 
-      SUBROUTINE EVOLC (PID, SEC, QIND )
+      SUBROUTINE EVOLC (SEC, QIND)
 
       IMPLICIT NONE
-      INTEGER PID, SEC, QIND
+      INTEGER SEC, QIND
 
 C  INPUTS
-C        PID  -- process ID
 C        SEC  -- SO(3) PW index
 C        QIND -- index of actual Q2 value in QS or QSDIS array
 C  PARENTS
@@ -46,7 +45,6 @@ C
       CALL AS2PF (ASQ02, Q02, ASP(P), MU02)
 
       R = ASMUF2/ASQ02
-
 
       DO 123 K = 1, NPTS
 

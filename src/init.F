@@ -32,7 +32,7 @@ C
       DOUBLE COMPLEX J, Z, EPH, FSHU
       DOUBLE COMPLEX HS1, HS2, HS3, HS4
       DOUBLE COMPLEX CF2, CFL
-      DOUBLE COMPLEX BIGCTMP(0:2,2)
+      DOUBLE COMPLEX WCTMP(0:2,4)
       DOUBLE COMPLEX CLNGAMMA
       PARAMETER ( NINTGMAX = 12 )
       DOUBLE PRECISION DOWN(NINTGMAX+1)
@@ -238,8 +238,8 @@ c         CALL WgammaVNSM2F(NFD, Z, GAMNSM(SEC, K, 2))
 
         DO 20 L = 1, 2
         DO 20 ORD = 1, 2
-        BIGCTMP(ORD, L) = (0.0d0, 0.0d0)
-        DO 20 PIDK = -4, 2
+        WCTMP(ORD, L) = (0.0d0, 0.0d0)
+        DO 20 PIDK = -4, PIDMAX
         WC(PIDK, SEC, K, ORD, L) = (0.0d0, 0.0d0)
  20     CONTINUE
 
@@ -261,41 +261,49 @@ c         CALL WgammaVNSM2F(NFD, Z, GAMNSM(SEC, K, 2))
 *     PID = -4: Gluon GPD at eta=x 
         WC(-4, SEC, K, 0, 2) = FSHU * 2.0d0 / (3.0d0 + J)
 
-*       Load  ===CSBAR scheme=== coefs into BIGCTMP
-          CALL CDVCSF(SEC, K, BIGCTMP)
 
 *     PID = 0: DIS F2 
 *       here only SEC=1 case makes sense
         IF (SEC .EQ. 1) THEN
+        CALL WCCSBAR(0, SEC, K, WCTMP)
           DO 30 L = 1,2
           DO 30 ORD = 0, P
- 30         WC(0, SEC, K, ORD, L) = BIGCTMP(ORD, L) 
+ 30         WC(0, SEC, K, ORD, L) = WCTMP(ORD, L) 
         END IF
 
 *     PID = 1: DVCS (CSBAR)
-          DO 40 L = 1,4
-          DO 40 ORD = 0, P
- 40         WC(1, SEC, K, ORD, L) = BIGCTMP(ORD, L) * FSHU
+        CALL WCCSBAR(1, SEC, K, WCTMP)
+c       IF ((K .EQ. 1) .AND. (SEC .EQ. 1)) THEN
+c         WRITE (*, *) "CSBAR = ", WCTMP(0, 4)
+c       END IF
+        DO 40 L = 1,4
+        DO 40 ORD = 0, P
+ 40       WC(1, SEC, K, ORD, L) = WCTMP(ORD, L) * FSHU
 
-*       Load ===MSBAR scheme=== coefs into BIGCTMP
-          CALL MSBARF(SEC, K, BIGCTMP)
-
-          DO 50 L = 1,4
-          DO 50 ORD = 0, P
 *     PID = 2: DVCS (MSBAR)
-            WC(2, SEC, K, ORD, L) = BIGCTMP(ORD, L) * FSHU
+        CALL WCMSBAR(SEC, K, WCTMP)
+c       IF ((K .EQ. 1) .AND. (SEC .EQ. 1)) THEN
+c         WRITE (*, *) "MSBAR = ", WCTMP(0, 4), FSHU
+c       END IF
+        DO 50 L = 1,4
+        DO 50 ORD = 0, P
+ 50       WC(2, SEC, K, ORD, L) = WCTMP(ORD, L) * FSHU
 
 *     PID = 3: DVMP (MSBAR)
-*            WC = T_jk from Eq. (3.61c) in big DVMP draft
-            IF (L .EQ. 2) THEN
-*             --- gluons get additional factor
-              WC(3, SEC, K, ORD, L) = ( BIGCTMP(ORD, L) * FSHU * 3.d0
-     &                  * 2.d0/CF/(J+3.d0) * 3.d0 )
-            ELSE
-*             --- quarks, singlet and non-singlet
-              WC(3, SEC, K, ORD, L) = BIGCTMP(ORD, L) * FSHU * 3.d0
-            END IF
- 50     CONTINUE
+        CALL WCDVMP(SEC, K, WCTMP)
+*       WC = T_jk from Eq. (3.61c) in big DVMP draft
+
+        DO 60 L = 1,4
+        DO 60 ORD = 0, P
+        IF (L .EQ. 2) THEN
+*         --- gluons get additional factor
+          WC(3, SEC, K, ORD, L) = ( WCTMP(ORD, L) * FSHU * 3.d0
+     &                * 2.d0/CF/(J+3.d0) )
+        ELSE
+*         --- quarks, singlet and non-singlet
+          WC(3, SEC, K, ORD, L) = WCTMP(ORD, L) * FSHU * 3.d0
+        END IF
+ 60     CONTINUE
 
 
 100   CONTINUE

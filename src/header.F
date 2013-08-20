@@ -79,6 +79,24 @@ C  SYNOPSIS
       INTEGER CZERO
 C     ***
       
+C     ****v* header.F/PID
+C  DESCRIPTION
+C       PID -- process ID. with possible values:
+C               0 = DIS F2
+C               1 = DVCS (CSBAR)
+C               2 = DVCS (MSBAR)
+C               3 = DVMP (FIXME: just rho presently)
+C              -1 = quark GPD at eta = 0
+C              -2 = gluon GPD at eta = 0
+C              -3 = quark GPD at eta = x
+C              -4 = gluon GPD at eta = x
+C  MEMBER OF
+C     PARINT
+C  SYNOPSIS
+      INTEGER PID
+C     ***
+      
+
 
 C     ****v* header.F/MU02
 C  DESCRIPTION
@@ -578,7 +596,9 @@ C     WC(PID, SEC, K, P, L) -- all Wilson coefficients
 C  MEMBER OF
 C     WC(block)
 C  SYNOPSIS
-      DOUBLE COMPLEX WC(-4:3,NPWMAX,NPTSMAX,0:2,4)
+      INTEGER PIDMAX
+      PARAMETER (PIDMAX = 3)
+      DOUBLE COMPLEX WC(-4:PIDMAX,NPWMAX,NPTSMAX,0:2,4)
 C     ***
 
 
@@ -661,7 +681,7 @@ C      evolution from Q02 to QS(QIND)
 C  MEMBER OF
 C    WCE(block)
 C  SYNOPSIS
-      DOUBLE COMPLEX WCE(-4:3, NPWMAX, QINDMAX, NPTSMAX, 4)
+      DOUBLE COMPLEX WCE(-4:PIDMAX, NPWMAX, QINDMAX, NPTSMAX, 4)
 C     ***
 
 
@@ -769,7 +789,7 @@ C     ****c* header.F/PARINT
 C  DESCRIPTION
 C     Integer parameters
 C  SYNOPSIS
-      COMMON / PARINT /  SPEED, ACC, P, NF, CZERO
+      COMMON / PARINT /  SPEED, ACC, P, NF, CZERO, PID
 C     ***
 
 C     ****c* header.F/ASTRONG

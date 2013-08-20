@@ -63,6 +63,7 @@ C
 
       P = 0
       PROCESS = 'DIS'
+      PID = 0
       DEL2 = 0.0d0
       CALL INIT
       CALL GETMBGPD
@@ -74,13 +75,14 @@ C
       Q2 = 1.d0
       NQSDIS = 1
       QSDIS(1) = Q2
-      CALL EVOLC(0,1,1)
+      CALL EVOLC(1,1)
       WRITE (*, *) " 0.65783876286 is correct result"
       CALL F2F
       WRITE (*, *) F2(0)
 
       P = 1
       PROCESS = 'DVCS'
+      PID = 1
       CALL INIT
 
       WRITE (*, *) " ---  Test 2: LO partial sigma, no evolution ---- "
@@ -89,7 +91,7 @@ C
       Q2 = 1.0d0
       NQS = 1
       QS(1) = Q2
-      CALL EVOLC(1,1,1)
+      CALL EVOLC(1,1)
       XI = Q2 / ( 2.0d0 * W2 + Q2)
       WRITE (*, *) " 5608.4194288225 is result from gepard_devel.nb"
       MTIND = 0
@@ -103,7 +105,7 @@ C
       Q2 = 3.0d0
       NQS = 2
       QS(2) = Q2
-      CALL EVOLC(1,1,2)
+      CALL EVOLC(1,2)
       XI = Q2 / ( 2.0d0 * W2 + Q2)
       WRITE (*, *) " 329.68332610735 is t=0 result from gepard_devel.nb"
       MTIND = 0
@@ -134,7 +136,7 @@ C
       Q2 = 4.0D0
       NQS = 3
       QS(3) = Q2
-      CALL EVOLC(1,1,3)
+      CALL EVOLC(1,3)
       XI = 1.0D-6
       WRITE (*, *) " 99.8381042 is old gepard result"
       AUX = SIGMA ()

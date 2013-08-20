@@ -1,35 +1,34 @@
-C     ****h* gepard/cdvcs.F
+C     ****h* gepard/wccsbar.F
 C  FILE DESCRIPTION
-C    calculation of singlet  Wilson coefficients for DVCS in CSbar scheme
-C    and DIS (where MSbar=CSbar)
+C    calculation of Wilson coefficients for DVCS in CSbar scheme
+C    and for DIS (where MSbar=CSbar)
 C
 C    $Id$
 C     *******
 
 
-C     ****s* cdvcs.F/CDVCSF
+C     ****s* wccsbar.F/WCCSBAR
 C  NAME
-C     CDVCSF  --   singlet Wilson coefficients  "big C"
+C     WCCSBAR  --   singlet Wilson coefficients  "big C"
 C  DESCRIPTION
 C    calculates Wilson coefficients for DVCS 
 C    according to  formulas from [Kumericki:2007sa]
 C       (101b-c) - CSbar;   (127,129) - MSbar
-C    Also used for DIS where
-C    CSbar=MSbar, and for special 'EVOLQ' and 'EVOLG'
-C    schemes used for evolution of GPDs/PDFs without
-C    multiplying with Wilson coefficients..
+C    Also used for DIS where CSbar=MSbar, 
 C  SYNOPSIS
 
-      SUBROUTINE CDVCSF (SEC, K, BIGCTMP )
+      SUBROUTINE WCCSBAR (PIDK, SEC, K, WCTMP )
 
       IMPLICIT NONE
-      INTEGER  K, SEC
-      DOUBLE COMPLEX BIGCTMP(0:2,2)
+      INTEGER  PIDK, SEC, K
+      DOUBLE COMPLEX WCTMP(0:2, 4)
 
 C  INPUTS
+C        PIDK -- process ID (0 for DIS, 1 for DVCS)
+C         SEC -- SO(3) PW index
 C           K -- conformal moment index
 C  OUTPUT
-C       BIGCTMP(P, flavour) --  "big  C^{(P)}"
+C       WCTMP(P, flavour) --  "big  C^{(P)}"
 C  PARENTS
 C      INIT
 C  CHILDREN
@@ -51,17 +50,20 @@ C
       LRR2 = LOG(RR2)
 
 
-      IF ( PROCESS(:4) .EQ. 'DVCS' ) THEN
+      IF ( PIDK .EQ. 1 ) THEN
+*       DVCS (CSBAR)
         SHIFT1 = HS1(J + 1.5d0) - HS1(J + 2.0d0) + 2.0d0 * LOG(2.0d0)
      &        - LRF2
         SHIFT2 = SHIFT1*SHIFT1 - HS2(J + 1.5d0) + HS2(J + 2.0d0)
       ELSE
+*       DIS
         SHIFT1 =  - LRF2
         SHIFT2 = SHIFT1*SHIFT1
       END IF
 
 *     auxilliary W-coeffs "small C" at given point K
-      IF ( PROCESS(:4) .EQ. 'DVCS' ) THEN
+
+      IF ( PIDK .EQ. 1 ) THEN
         DO 30 L = 1, 2
           C0(L) = CDIS1(K, 0, L) 
           C1(L) = CDIS1(K, 1, L) 
@@ -76,24 +78,32 @@ C
       END IF
 
       CALL VECMAT(C0, 0, SEC, K, VM00)
-      IF (P .GE. 2) THEN
       CALL VECMAT(C0, 1, SEC, K, VM01)
       CALL VECMAT(C1, 0, SEC, K, VM10)
       CALL VECMAT(VM00, 0, SEC, K, VM000)
-      END IF
 
 
-      BIGCTMP(0, 1) = (1.0d0,0.0d0)
-      BIGCTMP(0, 2) = (0.0d0,0.0d0)
+*     --- LO ---
+      WCTMP(0, 1) = (1.0d0, 0.0d0)
+      WCTMP(0, 2) = (0.0d0, 0.0d0)
+      WCTMP(0, 3) = (1.0d0, 0.0d0)
+      WCTMP(0, 4) = (1.0d0, 0.0d0)
 
+*     --- NLO and NNLO ---
       DO 50 L = 1, 2
-      BIGCTMP(1, L) = C1(L) + 0.5d0 * SHIFT1 * VM00(L)
-      IF (P .GE. 2) THEN
-      BIGCTMP(2, L) = C2(L) + 0.5d0 * SHIFT1 * (VM01(L) + VM10(L)) +
-     &      0.125d0 * SHIFT2 * VM000(L) + 0.5d0 * BETA0(NF) * (
-     &      BIGCTMP(1, L) * LRR2 + 0.25d0 * VM00(L) * LRF2**2 )
-      END IF
+        WCTMP(1, L) = C1(L) + 0.5d0 * SHIFT1 * VM00(L)
+        WCTMP(2, L) = C2(L) + 0.5d0 * SHIFT1 * (VM01(L) + VM10(L)) +
+     &        0.125d0 * SHIFT2 * VM000(L) + 0.5d0 * BETA0(NF) * (
+     &        WCTMP(1, L) * LRR2 + 0.25d0 * VM00(L) * LRF2**2 )
  50   CONTINUE
+*     TODO: implement NS- i.e. NSM
+      WCTMP(1, 3) = CDISNS1(K, 1) + 0.5d0 * SHIFT1 * CDISNS1(K, 0) *
+     &                GAMNSP(SEC,K, 0)
+      WCTMP(2, 3) = CDISNS1(K, 2) + 0.5d0 * SHIFT1 * (CDISNS1(K, 0)
+     &       * GAMNSP(SEC,K, 1) + CDISNS1(K, 1) * GAMNSP(SEC,K, 0)) +
+     &      0.125d0 * SHIFT2 * CDISNS1(K, 0) * GAMNSP(SEC,K, 0)**2 + 
+     &      0.5d0 * BETA0(NF) * ( WCTMP(1, 3) * LRR2 + 0.25d0 * 
+     &        CDISNS1(K, 0) * GAMNSP(SEC,K, 0) * LRF2**2 )
 
 
       RETURN
@@ -101,7 +111,7 @@ C
 C     *******
 
 
-C     ****s* cdvcs.F/VECMAT
+C     ****s* wccsbar.F/VECMAT
 C  NAME
 C     VECMAT  --   multiplies row vector with anomalous matrix
 C  SYNOPSIS
@@ -115,11 +125,12 @@ C  SYNOPSIS
 C  INPUTS
 C         VEC(flavour) -- row vector
 C                  ORD -- order of perturbation expansion i.e. P
+C                  SEC -- SO(3) PW
 C                    K -- conformal moment index
 C  OUTPUT
 C          VM(flavour) -- resulting vector VM = VEC . GAMMA^(ORD)_J(K)
 C  PARENTS
-C     CDVCSF
+C     WCCSBAR
 C  SOURCE
 C
 

@@ -31,10 +31,10 @@ $(ADACFODIR)/%.o: adacf/%.f
 
 # Fortran object files
 FOBJS = Finit.o Fbeta.o Fspecial.o Fdcomplex.o Fastrong.o Flambda.o\
-Fprojectors.o Frnnlo.o Ferfunc.o Fevol.o Fcdvcs.o Fmsbar.o \
-Fdvcs.o Ff2.o Freadpar.o Ferror.o Fgauss.o Fnd.o Fbigcns.o Fintegra.o Fxspace.o\
+Fprojectors.o Frnnlo.o Ferfunc.o Fevol.o Fwccsbar.o Fwcmsbar.o \
+Fdvcs.o Ff2.o Freadpar.o Ferror.o Fgauss.o Fnd.o Fintegra.o Fxspace.o\
 Finitc.o Fevolc.o Fgetmbgpd.o Fhj.o Fej.o Fsplice.o Fcff.o Ftff.o Fderiv.o Fbca.o\
-Fhyp2F1.o Fint2F1.o Fcdvem.o 
+Fhyp2F1.o Fint2F1.o Fwcdvmp.o Fcdvem.o 
 _FOBJS = $(patsubst %,$(FODIR)/%,$(FOBJS))
 
 # Fortran object files needed for DVEM
@@ -84,10 +84,10 @@ $(EXFODIR)/%.o: $(EXDIR)/%.F header.F
 # Fortran prep files (needed for f2py which ignores preprocessing)
 FPREPDIR = Fprep
 FPREPS = init.f beta.f special.f dcomplex.f astrong.f lambda.f\
-projectors.f rnnlo.f erfunc.f evol.f cdvcs.f msbar.f \
-dvcs.f f2.f error.f gauss.f nd.f bigcns.f integra.f\
+projectors.f rnnlo.f erfunc.f evol.f wccsbar.f wcmsbar.f \
+dvcs.f f2.f error.f gauss.f nd.f integra.f\
 initc.f evolc.f getmbgpd.f hj.f ej.f splice.f cff.f\
-tff.f cdvem.f int2F1.f 
+tff.f wcdvmp.f cdvem.f int2F1.f 
 _FPREPS = $(patsubst %,$(FPREPDIR)/%,$(FPREPS))
 
 $(FPREPDIR)/%.f: %.F  header.F
