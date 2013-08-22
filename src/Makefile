@@ -15,7 +15,7 @@ ifndef NOPGPLOT
 endif
 
 # "adacf" package Fortran object files
-ADACFOBJS = Harmonic.o Mellin.o WgammaVNSP0F.o WgammaVNSP1F.o\
+ADACFOBJS = Harmonic.o WgammaVNSP0F.o WgammaVNSP1F.o\
 WgammaVNSP2F.o WgammaVQQ0F.o WgammaVQQ1F.o WgammaVQQ2F.o WgammaVQG0F.o\
 WgammaVQG1F.o WgammaVQG2F.o WgammaVGQ0F.o WgammaVGQ1F.o WgammaVGQ2F.o\
 WgammaVGG0F.o WgammaVGG1F.o WgammaVGG2F.o WcVF2NSP0F.o WcVF2NSP1F.o\
@@ -34,19 +34,17 @@ FOBJS = Finit.o Fbeta.o Fspecial.o Fdcomplex.o Fastrong.o Flambda.o\
 Fprojectors.o Frnnlo.o Ferfunc.o Fevol.o Fwccsbar.o Fwcmsbar.o \
 Fdvcs.o Ff2.o Freadpar.o Ferror.o Fgauss.o Fnd.o Fintegra.o Fxspace.o\
 Finitc.o Fevolc.o Fgetmbgpd.o Fhj.o Fej.o Fsplice.o Fcff.o Ftff.o Fderiv.o Fbca.o\
-Fhyp2F1.o Fint2F1.o Fwcdvmp.o Fcdvem.o 
+Fwcdvmp.o Fc1dvmp.o
 _FOBJS = $(patsubst %,$(FODIR)/%,$(FOBJS))
 
 # Fortran object files needed for DVEM
-FDVEMOBJS = Fhyp2F1.o Fgauss.o Fintegra.o Fint2F1.o Fbeta.o Fspecial.o Fcdvem.o 
+FDVEMOBJS = Fgauss.o Fintegra.o Fbeta.o Fspecial.o Fc1dvmp.o
 _FDVEMOBJS = $(patsubst %,$(FODIR)/%,$(FDVEMOBJS))
 
 # rule for compiling Fortran .F  files
 # (prefix "F" in "F%.o" is used to avoid possible future clashes with
 #  C-wrappers with the same name)
-$(FODIR)/Fhyp2F1.o: hyp2F1.f90
-	$(FC) -c -o $@ $< $(FFLAGS) $(CPPFLAGS)
-
+#
 $(FODIR)/F%.o: %.F  header.F
 	$(FC) -c -o $@ $< $(FFLAGS) $(CPPFLAGS)
 
@@ -64,9 +62,6 @@ export ALLOBJS = $(_OBJS) $(_ADACFOBJS) $(_FOBJS)
 # Mathlink C object files
 MMAOBJS = fit.tm.o fit.o 
 _MMAOBJS = $(patsubst %,$(MMAODIR)/%,$(MMAOBJS))
-
-MMADVEMOBJS = dvem.tm.o dvem.o 
-_MMADVEMOBJS = $(patsubst %,$(MMAODIR)/%,$(MMADVEMOBJS))
 
 # rules for compiling MathLink C files
 $(MMAODIR)/%.tm.c: %.tm
@@ -87,7 +82,7 @@ FPREPS = init.f beta.f special.f dcomplex.f astrong.f lambda.f\
 projectors.f rnnlo.f erfunc.f evol.f wccsbar.f wcmsbar.f \
 dvcs.f f2.f error.f gauss.f nd.f integra.f\
 initc.f evolc.f getmbgpd.f hj.f ej.f splice.f cff.f\
-tff.f wcdvmp.f cdvem.f int2F1.f 
+tff.f wcdvmp.f c1dvmp.f
 _FPREPS = $(patsubst %,$(FPREPDIR)/%,$(FPREPS))
 
 $(FPREPDIR)/%.f: %.F  header.F
@@ -113,17 +108,15 @@ gepard.exe: CPPFLAGS += -DMMA  $(USEPGPLOT)
 gepard.exe: $(ALLOBJS) $(FODIR)/Ffcn.o $(_MMAOBJS)  $(FODIR)/Fmninterface.o
 	$(FC) -o ../fits/$@/$(SYS)/$@ $^ $(FFLAGS) $(CERNLIBS) -L$(MLLIBDIR) -l$(MLLIB) $(ALLPGPLOTLIBS) $(MLEXTRA)
 
-int2f1.exe dvem.exe: $(ADACFODIR)/Harmonic.o $(_FDVEMOBJS) $(_MMADVEMOBJS)
-	$(FC) -o ../fits/$@/$(SYS)/$@ $^ $(FFLAGS)  -L$(MLLIBDIR) -l$(MLLIB)  $(MLEXTRA)
 
 # pygepard targets
 #
 pygepard.so: $(_FPREPS)
-	f2py  -c -m pygepard $^ adacf/*f hyp2F1.f90 -lgomp
+	f2py  -c -m pygepard $^ adacf/*f -lgomp
 	mv pygepard.so ../fits/
 
 pygepard%.so: $(_FPREPS)
-	f2py  -c -m pygepard$* $^ adacf/*f hyp2F1.f90 -lgomp
+	f2py  -c -m pygepard$* $^ adacf/*f -lgomp
 	mv pygepard$*.so ../fits/
 
 
@@ -147,5 +140,3 @@ clean:
 	-rm -f $(patsubst %,../ex/%.exe,$(EXTARGETS))
 	-rm -f ../fits/gepard.exe/$(SYS)/gepard.exe
 	-rm -f ../fits/dvem.exe/$(SYS)/dvem.exe
-	-rm -f ../fits/int2f1.exe/$(SYS)/int2f1.exe
-	-rm -f hyp_2f1_module.mod

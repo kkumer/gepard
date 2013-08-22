@@ -21,13 +21,14 @@ C  SYNOPSIS
       DOUBLE COMPLEX WCTMP(0:2,4), MCU(3), KMOM
 
 C  INPUTS
+C         SEC -- SO(3) PW
 C           K -- conformal moment index
 C  OUTPUT
 C       WCTMP(P, flavour) -- Wilson coefficients
 C  PARENTS
 C      INIT
 C  CHILDREN
-C      HS1
+C      C1DVMP
 C  SOURCE
 C
 
@@ -51,10 +52,7 @@ c     WRITE (*,*)  "BEGIN doing WCDVMP SEC, K = ", SEC, K
 *     FIXME: Approximate with asymptotic DA only: K=0
       KMOM = (0.0d0, 0.0d0)
       IF (P .GE. 1) THEN
-        CALL CDVEMF (1, J, KMOM, MCU)
-*       MCU(1) = (1.,0.)
-*       MCU(2) = (1.,0.)
-*       MCU(3) = (1.,0.)
+        CALL C1DVMP (1, J, KMOM, MCU)
         WCTMP(1, 1) = MCU(1)/NF + MCU(2)
         WCTMP(1, 2) = MCU(3)
 *       FIXME: Check NS+ and implement NS-
