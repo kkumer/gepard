@@ -8,9 +8,9 @@
        DOUBLE COMPLEX PSI, DPSI
        DOUBLE PRECISION NF, CF, CA, TF
        DOUBLE PRECISION EMC, ZETA2, ZETA3, ZETA4, LOG2
-       PARAMETER ( EMC  = 0.57721 56649D0, ZETA2 = 1.64493 40668D0,
-     ,            ZETA3 = 1.20205 69032D0, ZETA4 = 1.08232 32337D0,
-     ,            LOG2 = 0.69314 71806D0 )
+       PARAMETER ( EMC  = 0.5772156649D0, ZETA2 = 1.6449340668D0,
+     ,            ZETA3 = 1.2020569032D0, ZETA4 = 1.0823232337D0,
+     ,            LOG2 = 0.6931471806D0 )
        PARAMETER ( CF=4./3.d0, CA=3.d0, TF=0.5d0 )
 *
 *      ... Harmonic sum initialization ...
