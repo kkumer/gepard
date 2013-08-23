@@ -48,6 +48,7 @@ from quadrature import rthtquadrature
 
 data = utils.loaddata('/home/kkumer/pype/data/ep2epgamma', approach=Approach.BMK)  
 data.update(utils.loaddata('/home/kkumer/pype/data/gammastarp2gammap', approach=Approach.BMK))
+data.update(utils.loaddata('/home/kkumer/pype/data/gammastarp2Mp', approach=Approach.BMK))
 #data.update(utils.loaddata('/home/kkumer/pype/data/gammastarp2gammap/EIC', approach=Approach.BMK))
 #data.update(utils.loaddata('/home/kkumer/pype/data/ep2epgamma/EIC', approach=Approach.BMK))
 db = shelve.open('/home/kkumer/pype/theories.db')
@@ -97,6 +98,11 @@ HApts = BSDwpoints[::2] + BSSwpoints[::2]
 #for n in range(2103,2110) + range(2111,2118) + range(2119,2125):
 #    EICTSA = EICTSA + data[n]
 #EICmockkk = data[1002]
+#
+# H1 DVMP points
+#
+DVMPpoints = utils.select(data[76], criteria=['Q2 >= 4.0'])
+tdepDVMPpoints = utils.select(data[75], criteria=['Q2 >= 4.0'])
 
 
 ####  --  Longitudinally polarized target --

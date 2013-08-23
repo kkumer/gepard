@@ -813,6 +813,16 @@ class BMK(Approach):
             (W2 + pt.Q2) * (2.0 * W2 + pt.Q2)**2 )
         return res
 
+    def _XrhotApprox(self, pt):
+        """Partial DVrhoP cross section w.r.t. Mandelstam t.
+         Approx. formula for small xB."""
+
+        self.m.g.newcall = 1
+        res = 112175.5 * pt.xB**2 * ( 
+                self.m.ImHrho(pt)**2 + self.m.ReHrho(pt)**2) / pt.Q2**2
+        return res
+
+
     def _XDVCStEx(self, pt):
         """Partial DVCS cross section w.r.t. Mandelstam t."""
 
@@ -827,39 +837,44 @@ class BMK(Approach):
         return res
 
     _XDVCSt = _XDVCStEx
+    _Xrhot = _XrhotApprox
 
-    def _XDVCSt4int(self, t, pt):
-        """Same as _XDVCSt but with additional variable t 
+    def _Xt4int(self, t, pt):
+        """Same as _XDVCSt/_Xrhot but with additional variable t 
         to facilitate integration over it.
         
         """
         aux = []
         for t_single in t:
             pt.t = t_single
-            res = self._XDVCSt(pt)
+            if hasattr(pt, 'process') and pt.process == 'gammastarp2Mp':
+            	res = self._Xrhot(pt)
+	    else:
+            	res = self._XDVCSt(pt)
             del pt.t
             #if debug == 2: print "t = %s  =>  dsig/dt = %s" % (t_single, res)
             aux.append(res)
         return array(aux)
 
+##  DVMP
+
+
     def X(self, pt):
-        """Total DVCS cross section.
-
-        FIXME: should be universal total xs and should look into 'process'
-
-        """
-        # if pt.process = 'gammastarp2gammap':
-        #debug_here()
+        """Total DVCS or DVMP cross section. """
         if pt.has_key('t') or pt.has_key('tm'):
             # partial XS w.r.t momentum transfer t
-            return self._XDVCSt(pt)
+            if hasattr(pt, 'process') and pt.process == 'gammastarp2Mp':
+		return self._Xrhot(pt)
+	    else:
+		return self._XDVCSt(pt)
+
         else:
             # total XS
             if pt.has_key('tmmax'):
                 tmmax = pt.tmmax
             else:
                 tmmax = 1.  # default -t cuttoff in GeV^2
-            res = quadrature.tquadrature(lambda t: self._XDVCSt4int(t, pt), -tmmax, 0)
+            res = quadrature.tquadrature(lambda t: self._Xt4int(t, pt), -tmmax, 0)
             return res
 
 
@@ -1171,16 +1186,6 @@ class BMK(Approach):
         b1 = quadrature.Hquadrature(lambda phi: self.BSS(pt, vars={'phi':phi}, weighted=True) * cos(phi), 
                 0, 2.0*pi) / pi
         return b1/b0
-
-##  DVMP
-
-    def Xrhot(self, pt):
-        """Partial DVrhoP cross section w.r.t. Mandelstam t."""
-
-        self.m.g.newcall = 1
-        res = 112175.5 * pt.xB**2 * ( 
-                self.m.ImHrho(pt)**2 + self.m.ReHrho(pt)**2) / pt.Q2**2
-        return res
 
 
 

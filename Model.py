@@ -1079,7 +1079,8 @@ gepard models can be created. Restart everything!\n'
         _lg.debug('Unshelving %s.' % str(self))
         self.__dict__ = dict
         # We now have to reconstruct gepard module object
-        self._gepardinit(self.cutq2, self.ansatz, self.speed, self.q02, **self.kwargs)
+        self._gepardinit(cutqq2=self.cutq2, ansatz=self.ansatz, speed=self.speed, 
+                q02=self.q02, **self.kwargs)
 
     def return_gepard(self):
         _lg.debug('Returning gepard module to pool.')
