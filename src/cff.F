@@ -21,13 +21,13 @@ C  SYNOPSIS
 C  PARENTS
 C    PARSIGMA, cffHInternal, cffEInternal
 C  CHILDREN
-C    GETMBGPD, GETMBGPDMMA, LOOKUPQ, DCTAN
+C    GETMBGPD, GETMBGPDMMA, GETQIND, DCTAN
 C  SOURCE
 C
 
 
       IMPLICIT NONE
-      INTEGER K, QIND
+      INTEGER K, QIND, GETQIND
       DOUBLE COMPLEX EPH, J, CFAC, FPWH, FPWE
       DOUBLE PRECISION RESREALH, RESIMAGH
       DOUBLE PRECISION FREALH, FIMAGH
@@ -49,7 +49,7 @@ C
       IF (( PROCESS(5:5) .EQ. 'Z' ) .OR. (PID .EQ. -1)
      &      .OR. (PID .EQ. -2)) XI = 0
 
-      CALL LOOKUPQ(QIND)
+      QIND = GETQIND()
       CALL GETMBGPD
 
       XI = XIMEM
@@ -124,6 +124,36 @@ C
  123  CONTINUE
       
 *     Multiplying with charge factor
+
+      IF ( FFTYPE(:7) .EQ. 'SINGLET' ) THEN
+        IF (NF .EQ. 3) THEN
+           CHARGEFAC =  2.0D0 / 9.0D0
+        ELSE IF (NF .EQ. 4) THEN
+           CHARGEFAC =  5.0D0 / 18.0D0
+        ELSE
+           CALL ERROR ('GeParD', ' INIT',
+     & 'NF is not integer equal to 3 or 4!                          ',
+     & 5, 3)
+        END IF
+      ELSE
+*         -- NONSINGLET --
+        IF (NF .EQ. 3) THEN
+           CHARGEFAC =  1.0D0 / 9.0D0
+        ELSE IF (NF .EQ. 4) THEN
+           CHARGEFAC =  1.0D0 / 6.0D0
+        ELSE
+           CALL ERROR ('GeParD', ' INIT',
+     & 'NF is not integer equal to 3 or 4!                          ',
+     & 5, 3)
+        END IF
+      END IF
+
+*         -- when calculating just GPDs --
+
+      IF ( ( PROCESS(5:5) .EQ. 'Z' ) .OR. 
+     &     ( PROCESS(5:5) .EQ. 'T' ) ) THEN
+        CHARGEFAC = 1.0d0
+      END IF
 
       CFF(P) = CHARGEFAC * DBLCMPLX(RESREALH, RESIMAGH)
       CFFE(P) = CHARGEFAC * DBLCMPLX(RESREALE, RESIMAGE) 

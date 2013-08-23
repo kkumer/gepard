@@ -100,11 +100,6 @@ c     PAR(47) = 0
       CALL INIT
       W2 = 75.0d0**2
       Q2 = 4.0d0
-      NQS = 1
-      QS(1) = Q2
-      CALL EVOLC(1,1)
-      CALL EVOLC(2,1)
-      CALL EVOLC(3,1)
       XI = Q2 / ( 2.0d0 * W2 + Q2)
       MTIND = 0
       CALL TFFF
@@ -117,11 +112,6 @@ c     PAR(47) = 0
       WRITE (*, *) " ---  Test 2: NLO TFF (no evolution) ---- "
       W2 = 75.0d0**2
       Q2 = 4.0d0
-      NQS = 1
-      QS(1) = Q2
-      CALL EVOLC(1,1)
-      CALL EVOLC(2,1)
-      CALL EVOLC(3,1)
       XI = Q2 / ( 2.0d0 * W2 + Q2)
       MTIND = 0
       CALL TFFF
@@ -134,11 +124,6 @@ c     PAR(47) = 0
       CALL INIT
       DO 10 K=1,5
         Q2 = Q2EXP(K)
-        NQS = 1
-        QS(1) = Q2
-        CALL EVOLC(1,1)
-        CALL EVOLC(2,1)
-        CALL EVOLC(3,1)
         XI = Q2 / ( 2.0d0 * W2 + Q2)
         CALL TFFF
         XS = 112175.5 * (2.d0*XI)**2 
@@ -152,11 +137,6 @@ c     WRITE (*,*) TFFH(P)
       CALL INIT
       DO 20 K=1,5
         Q2 = Q2EXP(K)
-        NQS = 1
-        QS(1) = Q2
-        CALL EVOLC(1,1)
-        CALL EVOLC(2,1)
-        CALL EVOLC(3,1)
         XI = Q2 / ( 2.0d0 * W2 + Q2)
         CALL TFFF
         XS = 112175.5 * (2.d0*XI)**2 

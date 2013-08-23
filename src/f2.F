@@ -23,18 +23,18 @@ C  SYNOPSIS
 C  PARENTS
 C     PROCDATA
 C  CHILDREN
-C     LOOKUPQ
+C     GETQIND
 C  SOURCE
 C
 
       IMPLICIT NONE
-      INTEGER K, QIND
+      INTEGER K, QIND, GETQIND
       DOUBLE PRECISION RES, F2IMAG
       DOUBLE COMPLEX EPH, FPW, J
 #include "header.F"
 
 
-      CALL LOOKUPQ(QIND)
+      QIND = GETQIND()
 
 *     Fixing forward kinematics:
       MTIND = 0
@@ -49,6 +49,14 @@ C
       F2IMAG = IMAGPART( EPH / XI**J * FPW )
       RES = RES + WG(K)*F2IMAG
  123  CONTINUE
+
+      IF (NF .EQ. 3) THEN
+         CHARGEFAC =  2.0D0 / 9.0D0
+      ELSE IF (NF .EQ. 4) THEN
+         CHARGEFAC =  5.0D0 / 18.0D0
+      ELSE
+         STOP
+      END IF
 
       F2(P) = RES * CHARGEFAC / PI
 

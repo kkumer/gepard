@@ -23,13 +23,13 @@ C  SYNOPSIS
 C  PARENTS
 C    PARSIGMA, tffHInternal, tffEInternal
 C  CHILDREN
-C    GETMBGPD, LOOKUPQ, DCTAN
+C    GETMBGPD, GETQIND, DCTAN
 C  SOURCE
 C
 
 
       IMPLICIT NONE
-      INTEGER K, L, QIND, PIDK, SEC, NPWS
+      INTEGER K, L, QIND, GETQIND, SEC, NPWS
       DOUBLE COMPLEX HRHO(4), CH(4)
       DOUBLE COMPLEX EPH, J, CFACRE, CFACIM
       DOUBLE COMPLEX EFSIG, EFG, EFNS
@@ -44,10 +44,10 @@ C
       ASTRONG = 2.d0 * PI * ASMUR2
 
 *     DVMP process ID = 3
-      PIDK = 3
+      PID = 3
       EPH = EXP ( DBLCMPLX(0.0d0, PHI) )
 
-      CALL LOOKUPQ(QIND)
+      QIND = GETQIND()
 
 *   Getting GPD values on MB contour ...
 
@@ -78,6 +78,7 @@ C
 
 *       (SIG, G, NSP, NSM) = FROT * (sea, G, uval, dval)
 c       FIXME: neglecting valence components atm
+c       FIXME: Valid only for NF = 4 ?!
         HRHO(1) = GPDH(K,1) / SQRT2
         HRHO(2) = GPDH(K,2) / SQRT2
         HRHO(3) = GPDH(K,1) / SQRT2  * (3.d0/20.d0)
@@ -91,7 +92,7 @@ c       FIXME: with NS(-), following loop has to go to 4
  10     CONTINUE
 *         --- building evolved Wilson coef. summed over SO(3) partial waves ---
           DO 20 SEC = 1, NPWS
-            CH(L) = CH(L) + PWPAR(SEC, L)*WCE(PIDK,SEC,QIND,K,L)
+            CH(L) = CH(L) + PWPAR(SEC, L)*WCE(PID,SEC,QIND,K,L)
  20       CONTINUE
 *         --- multiplying with GPD, to finalize that part of MB integrand
           CH(L) = CH(L) * HRHO(L)

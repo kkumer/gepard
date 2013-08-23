@@ -68,6 +68,12 @@ C
         MTS(NMTS+K) = MTSEXP(K)
   5   CONTINUE
 
+*  (Re-)initialization of NQS array, carrying number of
+*  Q2 values for which WCE has been calculated already
+
+      DO 6 K = -4, PIDMAX
+        NQS(K) = 0
+  6   CONTINUE
 
 
 *  Initialization of N array, carrying all needed j values on MB contour
@@ -99,37 +105,6 @@ C
 
 *   ----  Initialization of common blocks ----
 
-*   0. Initialization of charge factor
-
-      IF ( FFTYPE(:7) .EQ. 'SINGLET' ) THEN
-        IF (NF .EQ. 3) THEN
-           CHARGEFAC =  2.0D0 / 9.0D0
-        ELSE IF (NF .EQ. 4) THEN
-           CHARGEFAC =  5.0D0 / 18.0D0
-        ELSE
-           CALL ERROR ('GeParD', ' INIT',
-     & 'NF is not integer equal to 3 or 4!                          ',
-     & 5, 3)
-        END IF
-      ELSE
-*         -- NONSINGLET --
-        IF (NF .EQ. 3) THEN
-           CHARGEFAC =  1.0D0 / 9.0D0
-        ELSE IF (NF .EQ. 4) THEN
-           CHARGEFAC =  1.0D0 / 6.0D0
-        ELSE
-           CALL ERROR ('GeParD', ' INIT',
-     & 'NF is not integer equal to 3 or 4!                          ',
-     & 5, 3)
-        END IF
-      END IF
-
-*         -- when calculating just GPDs --
-
-      IF ( ( PROCESS(5:5) .EQ. 'Z' ) .OR. 
-     &     ( PROCESS(5:5) .EQ. 'T' ) ) THEN
-        CHARGEFAC = 1.0d0
-      END IF
 
 *   1. Initialization of QCD beta function coefficients
 
@@ -245,24 +220,24 @@ c         CALL WgammaVNSM2F(NFD, Z, GAMNSM(SEC, K, 2))
 
 *  --- ... then change what needs to be changed
 
-*     PID = -1: Quark PDF or GPD at eta=0 
+*     PIDK = -1: Quark PDF or GPD at eta=0 
         WC(-1, SEC, K, 0, 1) = (1.0d0, 0.0d0)
         WC(-1, SEC, K, 0, 3) = (1.0d0, 0.0d0)
         WC(-1, SEC, K, 0, 4) = (1.0d0, 0.0d0)
 
-*     PID = -2: Gluon PDF or GPD at eta=0 
+*     PIDK = -2: Gluon PDF or GPD at eta=0 
         WC(-2, SEC, K, 0, 2) = (1.0d0, 0.0d0)
 
-*     PID = -3: Quark GPD at eta=x 
+*     PIDK = -3: Quark GPD at eta=x 
         WC(-3, SEC, K, 0, 1) = (1.0d0, 0.0d0) * FSHU
         WC(-3, SEC, K, 0, 3) = (1.0d0, 0.0d0) * FSHU
         WC(-3, SEC, K, 0, 4) = (1.0d0, 0.0d0) * FSHU
 
-*     PID = -4: Gluon GPD at eta=x 
+*     PIDK = -4: Gluon GPD at eta=x 
         WC(-4, SEC, K, 0, 2) = FSHU * 2.0d0 / (3.0d0 + J)
 
 
-*     PID = 0: DIS F2 
+*     PIDK = 0: DIS F2 
 *       here only SEC=1 case makes sense
         IF (SEC .EQ. 1) THEN
         CALL WCCSBAR(0, SEC, K, WCTMP)
@@ -271,7 +246,7 @@ c         CALL WgammaVNSM2F(NFD, Z, GAMNSM(SEC, K, 2))
  30         WC(0, SEC, K, ORD, L) = WCTMP(ORD, L) 
         END IF
 
-*     PID = 1: DVCS (CSBAR)
+*     PIDK = 1: DVCS (CSBAR)
         CALL WCCSBAR(1, SEC, K, WCTMP)
 c       IF ((K .EQ. 1) .AND. (SEC .EQ. 1)) THEN
 c         WRITE (*, *) "CSBAR = ", WCTMP(0, 4)
@@ -280,7 +255,7 @@ c       END IF
         DO 40 ORD = 0, P
  40       WC(1, SEC, K, ORD, L) = WCTMP(ORD, L) * FSHU
 
-*     PID = 2: DVCS (MSBAR)
+*     PIDK = 2: DVCS (MSBAR)
         CALL WCMSBAR(SEC, K, WCTMP)
 c       IF ((K .EQ. 1) .AND. (SEC .EQ. 1)) THEN
 c         WRITE (*, *) "MSBAR = ", WCTMP(0, 4), FSHU
@@ -289,7 +264,7 @@ c       END IF
         DO 50 ORD = 0, P
  50       WC(2, SEC, K, ORD, L) = WCTMP(ORD, L) * FSHU
 
-*     PID = 3: DVMP (MSBAR)
+*     PIDK = 3: DVMP (MSBAR)
         CALL WCDVMP(SEC, K, WCTMP)
 *       WC = T_jk from Eq. (3.61c) in big DVMP draft
 

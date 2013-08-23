@@ -5,6 +5,58 @@ C
 C    $Id$
 C     *******
 
+
+C     ****f* evolc.F/GETQIND
+C  NAME
+C     GETQIND  --  return QIND for evolved Wilson coefs.
+C  DESCRIPTION
+C     It returns the QIND index where WCE array
+C     will have the evolution corresponding to present Q2
+C     and PID.
+C     If Q2 is unseen yet, precalculate WCE first
+C     for present PID.
+C   
+C  SYNOPSIS
+
+      INTEGER FUNCTION GETQIND()
+
+      IMPLICIT NONE
+*     INTEGER PIDK
+
+C  INPUT
+C         PIDK -- process index
+C  OUTPUT
+C     GETQIND -- index of actual Q2 value in QS(PID, QIND) array
+C  PARENTS
+C      CFFF, TFFF
+C  CHILDREN
+C      EVOLC
+C  SOURCE
+C
+
+      INTEGER K, SEC
+#include "header.F"
+
+      GETQIND = 0
+      DO 200 K = 1, NQS(PID)
+           IF ( QS(PID, K) .EQ. Q2 ) GETQIND = K
+ 200  CONTINUE
+
+c     --- If Q2 not found, calculate WCE for this Q2
+      IF (GETQIND .EQ. 0) THEN
+        NQS(PID) = NQS(PID) + 1
+        QS(PID, NQS(PID)) = Q2
+        DO 210 SEC = 1, NPWMAX
+ 210      CALL EVOLC(SEC, NQS(PID))
+        GETQIND = NQS(PID)
+      END IF
+
+      RETURN
+      END
+C     *****
+
+
+
 C     ****s* evolc.F/EVOLC
 C  NAME
 C     EVOLC  --  "evolved" Wilson coefficients
@@ -128,3 +180,4 @@ C
       RETURN
       END
 C     *****
+      
