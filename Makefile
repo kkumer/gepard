@@ -4,7 +4,7 @@
 # 	test     -  tests both DVCS and DIS routines
 # 	fit      -  fitting GPD ansatz to DVCS and DIS data
 # 	gepard.exe - Mathematica interface
-#   pygepard.so - python interface
+#       pygepard - python interface
 # 	html     -  HTML documentation
 # 	pdf      -  LaTeX -> PDF documentation
 # 	radcorr  -  program for producing Fig. 1 in hep-ph/0605237
@@ -176,7 +176,7 @@ export EXTARGETS = auxsi auxns anatomyNS anatomy radNLONS radNLO evolutNS evolut
                    radNNLONS radNNLO scalesNS scales scalesNNLO rho
 export FITTARGETS = fitres fitres2 fitpdfs slope contours
 export MMATARGETS = gepard.exe int2f1.exe dvem.exe
-export PYTARGETS = pygepard.so pygepard2.so pygepard3.so
+export PYTARGETS = pygepard pygepards
 
 .PHONY: $(TESTTARGETS) $(EXTARGETS) $(FITTARGETS) $(MMATARGETS) $(PYTARGETS)
 DOCTARGETS = pdf html htmlnocss
