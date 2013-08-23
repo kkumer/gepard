@@ -1056,13 +1056,14 @@ gepard models can be created. Restart everything!\n'
         self.g.init()
         # Cutting-off evolution  at Q2 = cutq2
         # Evaluate evolved C at this scale now.
-        self.g.nqs.nqs = 1
-        self.g.qs.qs[0] = self.cutq2
-        self.g.kinematics.q2 = self.cutq2
-        self.g.evolc(1, 1)
-        self.g.evolc(2, 1)
-        self.g.evolc(3, 1)
-        self.qdict = {self.cutq2 : 1}  # have to reset this 
+        # FIXME: check that this works 
+        for pid in range(-4,4):
+            self.g.nqs.nqs[pid] = 1
+            self.g.qs.qs[pid, 0] = self.cutq2
+            self.g.kinematics.q2 = self.cutq2
+            self.g.evolc(1, 1)
+            self.g.evolc(2, 1)
+            self.g.evolc(3, 1)
 
         self.g.newcall = 1
         # number of points on MB contour
@@ -1086,24 +1087,6 @@ gepard models can be created. Restart everything!\n'
         _lg.debug('Returning gepard module to pool.')
         ComptonGepard.gepardPool.append(self.g)
 
-    def _evolve(self, pt):
-        """Calculate evolution operator."""
-        self.g.nqs.nqs += 1
-        nqs = int(self.g.nqs.nqs)
-        self.g.qs.qs[nqs-1] = pt.Q2
-        self.qdict[pt.Q2] = nqs
-        if pt.Q2 < self.cutq2:
-            # just copy the evolved C from Q2=cutq2
-            for k in range(self.g.npts):
-                # both partial waves; for quarks and gluons:
-                self.g.cgrid.cgrid[0,nqs-1,k,0] = self.g.cgrid.cgrid[0,0,k,0]
-                self.g.cgrid.cgrid[1,nqs-1,k,0] = self.g.cgrid.cgrid[1,0,k,0]
-                self.g.cgrid.cgrid[0,nqs-1,k,1] = self.g.cgrid.cgrid[0,0,k,1]
-                self.g.cgrid.cgrid[1,nqs-1,k,1] = self.g.cgrid.cgrid[1,0,k,1]
-        else:
-            self.g.evolc(1, nqs)
-            self.g.evolc(2, nqs)
-            self.g.evolc(3, nqs)
 
     def _GepardFFs(self, pt, FF='cfff'):
         """Call gepard routine that calculates CFFs or TFFs."""
@@ -1113,9 +1096,6 @@ gepard models can be created. Restart everything!\n'
         self.g.kinematics.q2 = pt.Q2
         self.g.kinematics.xi = pt.xi
         self.g.kinematics.del2 = pt.t
-
-        if not self.qdict.has_key(pt.Q2):
-            self._evolve(pt)
 
         self.g.mt.nmts = 1
         self.g.mt.mtind = 0 
@@ -1131,44 +1111,32 @@ gepard models can be created. Restart everything!\n'
         """
         self.g.parchr.process = array([c for c in 'DVCSTQ'])  # array(6)
         self.g.init()
-        # Need to reset stored evolC(Q2) which are now likely invalid
-        self.g.nqs.nqs = 0
-        self.qdict={}
-        self.g.newcall = 1
         self.g.parint.pid = -3
+        self.g.newcall = 1
         return self.ImH(pt)/pi
 
     def gpdHtrajG(self, pt):
         """GPD H^g on xi=x trajectory."""
         self.g.parchr.process = array([c for c in 'DVCSTG'])  # array(6)
         self.g.init()
-        # Need to reset stored evolC(Q2) which are now likely invalid
-        self.g.nqs.nqs = 0
-        self.qdict={}
-        self.g.newcall = 1
         self.g.parint.pid = -4
+        self.g.newcall = 1
         return pt.xi*self.ImH(pt)/pi
 
     def gpdEtrajQ(self, pt):
         """GPD E on xi=x trajectory."""
         self.g.parchr.process = array([c for c in 'DVCSTQ'])  # array(6)
         self.g.init()
-        # Need to reset stored evolC(Q2) which are now likely invalid
-        self.g.nqs.nqs = 0
-        self.qdict={}
-        self.g.newcall = 1
         self.g.parint.pid = -3
+        self.g.newcall = 1
         return self.ImE(pt)/pi
 
     def gpdEtrajG(self, pt):
         """GPD H^g on xi=x trajectory."""
         self.g.parchr.process = array([c for c in 'DVCSTG'])  # array(6)
         self.g.init()
-        # Need to reset stored evolC(Q2) which are now likely invalid
-        self.g.nqs.nqs = 0
-        self.qdict={}
-        self.g.newcall = 1
         self.g.parint.pid = -4
+        self.g.newcall = 1
         return pt.xi*self.ImE(pt)/pi
 
     def gpdHzeroQ(self, pt, ts=None):
@@ -1185,10 +1153,7 @@ gepard models can be created. Restart everything!\n'
         self.parameters.update(zerosub)
         self.g.parchr.process = array([c for c in 'DVCSZQ'])  # array(6)
         self.g.init()
-        # Need to reset stored evolC(Q2) which are now likely invalid
-        self.g.nqs.nqs = 0
         self.g.parint.pid = -1
-        self.qdict={}
         if isinstance(ts, ndarray):
             tmem = pt.t
             res = []
@@ -1216,10 +1181,7 @@ gepard models can be created. Restart everything!\n'
         self.parameters.update(zerosub)
         self.g.parchr.process = array([c for c in 'DVCSZG'])  # array(6)
         self.g.init()
-        # Need to reset stored evolC(Q2) which are now likely invalid
-        self.g.nqs.nqs = 0
         self.g.parint.pid = -2
-        self.qdict={}
         if isinstance(ts, ndarray):
             tmem = pt.t
             res = []
@@ -1247,10 +1209,7 @@ gepard models can be created. Restart everything!\n'
         self.parameters.update(zerosub)
         self.g.parchr.process = array([c for c in 'DVCSZQ'])  # array(6)
         self.g.init()
-        # Need to reset stored evolC(Q2) which are now likely invalid
-        self.g.nqs.nqs = 0
         self.g.parint.pid = -1
-        self.qdict={}
         if isinstance(ts, ndarray):
             tmem = pt.t
             res = []
@@ -1278,10 +1237,7 @@ gepard models can be created. Restart everything!\n'
         self.parameters.update(zerosub)
         self.g.parchr.process = array([c for c in 'DVCSZG'])  # array(6)
         self.g.init()
-        # Need to reset stored evolC(Q2) which are now likely invalid
-        self.g.nqs.nqs = 0
         self.g.parint.pid = -2
-        self.qdict={}
         if isinstance(ts, ndarray):
             tmem = pt.t
             res = []
