@@ -19,7 +19,7 @@ def test_c1():
     t.m.parameters.update(KM10b)
     t.m.g.init()
     t.m.g.newcall = 1
-    aux = t.m.g.cdvemf(1, (0.5+1.j), 2)
+    aux = t.m.g.c1dvmp(1, (0.5+1.j), 2)
     # comparing to DM's DVEM-c1_forKreso.nb
     # quark part
     assert_almost_equal(aux[0]/100, (30.3836+9.2856j)/100, 3)
@@ -40,7 +40,7 @@ def test_gepardTFFsNLO():
     pt = Data.DummyPoint(init = {'Q2':4., 't':0, 'xi':xB/2., 'xB':xB})
     utils.fill_kinematics(pt)
     re, im =  (tnlo.m.ReHrho(pt), tnlo.m.ImHrho(pt))
-    # following agrees with DM to best than percent
+    # following agrees with DM to better than percent
     assert_almost_equal(re/1e4,  5328.3678/1e4, 3)
     assert_almost_equal(im/1e4, 22676.063/1e4, 3)
 
