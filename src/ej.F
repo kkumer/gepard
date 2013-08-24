@@ -125,7 +125,8 @@ C
      &           CLNGAMMA(DBLCMPLX(7.0d0 + ALPT(1), 0.0d0))   )
           CORR(2) = EXP(   CLNGAMMA(DBLCMPLX(7.0d0 + PAR(22), 0.0d0)) -
      &           CLNGAMMA(DBLCMPLX(7.0d0 + ALPT(2), 0.0d0))   )
-        IF ( PROCESS .EQ. 'DIS' ) THEN 
+        IF ( PID .EQ. 0 ) THEN 
+*         ---  DIS  ---
           FCM(1) = PAR(11) * POCHHAMMER(DBLCMPLX(2.0d0 - PAR(12),0.0d0) 
      &              , 8) / POCHHAMMER(1.0d0 - PAR(12)
      &          + J , 8) * (1.0d0 - PAR(12) + J) / (1.0d0 + JMA(1))

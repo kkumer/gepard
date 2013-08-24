@@ -31,7 +31,6 @@ C
       DOUBLE PRECISION LHXGNNLO(21), XIA(21)
 #include "header.F"
 
-      PROCESS = 'DIS'
       FFTYPE = 'SINGLET'
 
 *  Values of Bjorken x
@@ -154,6 +153,7 @@ C
 *   all orders, thus effectively putting F_2 -> Q_s^2 x g(x)
 
       PROCESS = 'DVCSZG'
+      PID = -2
       
 
 *   Parameters of Les Houches benchmark

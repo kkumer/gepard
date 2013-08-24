@@ -43,7 +43,7 @@ C
       CALL AS2PF (ASMUR2, Q2/RR2, ASP(P), MU02)
       ASTRONG = 2.d0 * PI * ASMUR2
 
-*     DVMP process ID = 3
+*     DVrhoP process ID = 3
       PID = 3
       EPH = EXP ( DBLCMPLX(0.0d0, PHI) )
 

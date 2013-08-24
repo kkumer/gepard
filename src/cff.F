@@ -151,7 +151,7 @@ C
 *         -- when calculating just GPDs --
 
       IF ( ( PROCESS(5:5) .EQ. 'Z' ) .OR. 
-     &     ( PROCESS(5:5) .EQ. 'T' ) ) THEN
+     &     ( PROCESS(5:5) .EQ. 'T' ) .OR. (PID .LE. -1) ) THEN
         CHARGEFAC = 1.0d0
       END IF
 

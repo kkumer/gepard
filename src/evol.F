@@ -62,7 +62,7 @@ C
  10   EVOLNSA(ORD) = AUX(ORD) * R**( - GAMNSP(SEC,K,0) / BETA0(NF) )
 
 *   Adding MSBAR non-diagonal NLO evolution (time consuming)
-      IF ( (P .EQ. 1) .AND. (SCHEME .EQ. 'MSBAR') ) THEN
+      IF ( (P .EQ. 1) .AND. (PID .GE. 2) ) THEN
         CALL NDINTF(1, K, R, NDINT, 0, 0)
         EVOLNSA(1) = EVOLNSA(1) + NDINT
       ENDIF
@@ -154,7 +154,7 @@ C
  40   CONTINUE
 
 *   Adding MSBAR non-diagonal NLO evolution (time consuming)
-      IF ( (P .EQ. 1) .AND. (SCHEME .EQ. 'MSBAR') ) THEN
+      IF ( (P .EQ. 1) .AND. (PID .GE. 2) ) THEN
         DO 50 I = 1, 2
         DO 50 J = 1, 2
           CALL NDINTF(SEC, K, R, NDINT, I, J)

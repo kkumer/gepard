@@ -62,7 +62,6 @@ C
 
 
       P = 0
-      PROCESS = 'DIS'
       PID = 0
       DEL2 = 0.0d0
       CALL INIT
@@ -78,7 +77,6 @@ C
       WRITE (*, *) F2(0)
 
       P = 1
-      PROCESS = 'DVCS'
       PID = 1
       CALL INIT
 
