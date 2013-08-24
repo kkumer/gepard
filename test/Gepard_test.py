@@ -48,6 +48,7 @@ def test_gepardXDVCSt():
     pt.xi = pt.Q2 / ( 2.0 * pt.W * pt.W + pt.Q2)
     pt.xB = 2*pt.xi/(1.+pt.xi)
     t.m.g.parint.p = 0
+    t.m.g.parint.pid = 1  # CSBAR
     t.m.g.init()
     aux = t.X(pt)
     assert_almost_equal(aux, 5608.42804256, 2)
@@ -86,6 +87,7 @@ def test_hybrid():
     pt.xi = pt.Q2 / ( 2.0 * pt.W * pt.W + pt.Q2)
     pt.xB = 2*pt.xi/(1.+pt.xi)
     tBoth.m.g.parint.p = 0
+    tBoth.m.g.parint.pid = 1
     tBoth.m.g.init()
     aux = tBoth.X(pt)/1.e4
     assert_almost_equal(aux, 0.56084280, 3)
@@ -105,6 +107,7 @@ def test_hybridopt():
     pt.xi = pt.Q2 / ( 2.0 * pt.W * pt.W + pt.Q2)
     pt.xB = 2*pt.xi/(1.+pt.xi)
     tBoth.m.g.parint.p = 0
+    tBoth.m.g.parint.pid = 1
     tBoth.m.g.init()
     aux = tBoth.X(pt)/1.e4
     assert_almost_equal(aux, 0.56075998541187819, 3)

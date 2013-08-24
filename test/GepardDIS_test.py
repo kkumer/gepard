@@ -19,7 +19,6 @@ t.m.g.astrong.asp = np.array([asp0, asp0, asp0])
 t.m.g.astrong.mu02 = 2.0
 t.m.g.mbcont.phi = 1.9
 t.m.g.parchr.fftype = np.array([c for c in 'SINGLET   ']) # array(10)
-t.m.g.parchr.process = np.array([c for c in 'DVCSZG'])  # array(6)
 t.m.g.parint.pid = -2
 
 # Seting model parameters to be as in test.F
@@ -36,11 +35,6 @@ def test_DISNLO():
     pt.t = 0
     pt.xi = xi
     pt.xB = 2*pt.xi/(1.+pt.xi)
-    #FIXME: how to avoid this:
-    try:
-        del t.m.qdict[pt.Q2]
-    except:
-        pass
     t.m.g.parint.p = 1
     t.m.g.newcall = 1
     t.m.g.init()
@@ -54,11 +48,6 @@ def test_DISNNLO():
     pt.t = 0
     pt.xi = xi
     pt.xB = 2*pt.xi/(1.+pt.xi)
-    #FIXME: how to avoid this:
-    try:
-        del t.m.qdict[pt.Q2]
-    except:
-        pass
     t.m.g.parint.p = 2
     t.m.g.newcall = 1
     t.m.g.init()

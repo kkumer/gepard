@@ -25,6 +25,7 @@ t = Approach.hotfixedBMK(m)
 # (Fig. 12 of NPB08)
 
 t.m.g.parint.nf = 4
+t.m.g.parint.pid = 1  # CSBAR
 t.m.g.astrong.asp = np.array([0.05, 0.05, 0.05])
 t.m.g.parchr.fftype = np.array([c for c in 'NONSINGLET']) # array(10)
 t.m.g.mbcont.phi = 1.9

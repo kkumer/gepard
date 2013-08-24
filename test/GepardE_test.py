@@ -11,6 +11,7 @@ from math import exp
 
 m = Model.ComptonGepard(ansatz='EPH')
 t = Approach.hotfixedBMK(m)
+t.m.g.parint.pid = 1  # CSBAR
 
 # 11 : 'NS',        112 : 'EAL0S',
 # 12 : 'AL0S',      113 : 'EALPS',

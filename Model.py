@@ -857,7 +857,7 @@ class ComptonGepard(ComptonFormFactors):
     #gepardPool = [g1, g2, g3]  #  modules to choose from
     gepardPool = [g1]  #  modules to choose from
 
-    def __init__(self, cutq2=0.0, ansatz='FIT', process='DVCS', p=0, speed=1, q02=4.0, **kwargs):
+    def __init__(self, cutq2=0.0, ansatz='FIT', p=0, speed=1, q02=4.0, **kwargs):
         _lg.debug('Creating %s.\n' % str(self))
         # initial values of parameters and limits on their values
         self.cutq2 = cutq2
@@ -992,11 +992,11 @@ class ComptonGepard(ComptonFormFactors):
             self.parameters['limit_M02S'] = (0.0, 1.5)
             self.parameters['limit_M02G'] = (0.0, 1.5)
 
-        self._gepardinit(cutq2, ansatz, process, p, speed, q02, **kwargs)   # gepard init
+        self._gepardinit(cutq2, ansatz, p, speed, q02, **kwargs)   # gepard init
         # now do whatever else is necessary
         ComptonFormFactors.__init__(self, **kwargs)
 
-    def _gepardinit(self, cutq2=0.0, ansatz='FIT', process='DVCS', p=0, speed=1, q02=4.0, **kwargs):
+    def _gepardinit(self, cutq2=0.0, ansatz='FIT', p=0, speed=1, q02=4.0, **kwargs):
         """Initialize gepard part of model."""
         emptyPoolMessage = 'Pool of gepard modules is empty. No new \
 gepard models can be created. Restart everything!\n'
@@ -1038,20 +1038,7 @@ gepard models can be created. Restart everything!\n'
         self.g.mbcont.cnd = -0.25
         self.g.mbcont.phind = 1.57
 
-        if process == 'DVMP':
-            self.g.parchr.scheme = array([c for c in 'MSBAR'])  # array(5)
-            self.g.parint.pid = 3
-        else:
-            self.g.parchr.scheme = array([c for c in 'CSBAR'])  # array(5)
-            self.g.parint.pid = 1
-
         self.g.parchr.ansatz = array([c for c in ansatz + (6-len(ansatz))*' ']) # array(6)
-        if ansatz == 'FITEXP':
-            self.g.parchr.ansatz = array([c for c in 'FITEXP']) # array(6)
-
-        # following two items usually came from driver file
-        self.g.parchr.process = array([c for c in process + (6-len(process))*' ']) # array(6)
-        self.g.parchr.fftype = array([c for c in 'SINGLET   ']) # array(10)
 
         self.g.init()
         # Cutting-off evolution  at Q2 = cutq2
@@ -1109,7 +1096,6 @@ gepard models can be created. Restart everything!\n'
         """GPD H^q on xi=x trajectory.
         FIXME: After this, calling self.ImH is broken!!
         """
-        self.g.parchr.process = array([c for c in 'DVCSTQ'])  # array(6)
         self.g.init()
         self.g.parint.pid = -3
         self.g.newcall = 1
@@ -1117,7 +1103,6 @@ gepard models can be created. Restart everything!\n'
 
     def gpdHtrajG(self, pt):
         """GPD H^g on xi=x trajectory."""
-        self.g.parchr.process = array([c for c in 'DVCSTG'])  # array(6)
         self.g.init()
         self.g.parint.pid = -4
         self.g.newcall = 1
@@ -1125,7 +1110,6 @@ gepard models can be created. Restart everything!\n'
 
     def gpdEtrajQ(self, pt):
         """GPD E on xi=x trajectory."""
-        self.g.parchr.process = array([c for c in 'DVCSTQ'])  # array(6)
         self.g.init()
         self.g.parint.pid = -3
         self.g.newcall = 1
@@ -1133,7 +1117,6 @@ gepard models can be created. Restart everything!\n'
 
     def gpdEtrajG(self, pt):
         """GPD H^g on xi=x trajectory."""
-        self.g.parchr.process = array([c for c in 'DVCSTG'])  # array(6)
         self.g.init()
         self.g.parint.pid = -4
         self.g.newcall = 1
@@ -1151,7 +1134,6 @@ gepard models can be created. Restart everything!\n'
         zerosub = {'SECS': 0, 'SECG': 0, 'ESECS' : 0, 'ESECG' : 0,
                    'THIS': 0, 'THIG': 0, 'ETHIS' : 0, 'ETHIG' : 0}
         self.parameters.update(zerosub)
-        self.g.parchr.process = array([c for c in 'DVCSZQ'])  # array(6)
         self.g.init()
         self.g.parint.pid = -1
         if isinstance(ts, ndarray):
@@ -1179,7 +1161,6 @@ gepard models can be created. Restart everything!\n'
         zerosub = {'SECS': 0, 'SECG': 0, 'ESECS' : 0, 'ESECG' : 0,
                    'THIS': 0, 'THIG': 0, 'ETHIS' : 0, 'ETHIG' : 0}
         self.parameters.update(zerosub)
-        self.g.parchr.process = array([c for c in 'DVCSZG'])  # array(6)
         self.g.init()
         self.g.parint.pid = -2
         if isinstance(ts, ndarray):
@@ -1207,7 +1188,6 @@ gepard models can be created. Restart everything!\n'
         zerosub = {'SECS': 0, 'SECG': 0, 'ESECS' : 0, 'ESECG' : 0,
                    'THIS': 0, 'THIG': 0, 'ETHIS' : 0, 'ETHIG' : 0}
         self.parameters.update(zerosub)
-        self.g.parchr.process = array([c for c in 'DVCSZQ'])  # array(6)
         self.g.init()
         self.g.parint.pid = -1
         if isinstance(ts, ndarray):
@@ -1235,7 +1215,6 @@ gepard models can be created. Restart everything!\n'
         zerosub = {'SECS': 0, 'SECG': 0, 'ESECS' : 0, 'ESECG' : 0,
                    'THIS': 0, 'THIG': 0, 'ETHIS' : 0, 'ETHIG' : 0}
         self.parameters.update(zerosub)
-        self.g.parchr.process = array([c for c in 'DVCSZG'])  # array(6)
         self.g.init()
         self.g.parint.pid = -2
         if isinstance(ts, ndarray):

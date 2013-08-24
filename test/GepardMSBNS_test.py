@@ -23,16 +23,16 @@ import utils, Model, Approach, Data, Fitter
 
 from constants import Mp, Mp2
 
-m = Model.ComptonGepard(process='DVCS', ansatz='NSFIT', q02=2.5)
+m = Model.ComptonGepard(ansatz='NSFIT', q02=2.5)
 t = Approach.hotfixedBMK(m)
 # Setting gepard to values as in radNLONS.F
 # (Fig. 7 of NPB08)
 t.m.g.parint.nf = 4
+t.m.g.parint.pid = 2   #MSBAA
 t.m.g.astrong.asp = np.array([0.05, 0.05, 0.05])
 t.m.g.parchr.fftype = np.array([c for c in 'NONSINGLET']) # array(10)
-t.m.g.parchr.scheme = np.array([c for c in 'MSBDI']) # array(10)
+#t.m.g.parchr.scheme = np.array([c for c in 'MSBDI']) # array(10)
 t.m.g.mbcont.phi = 1.9
-t.m.g.parint.pid = 2
 
 # Seting model parameters to be as in test.F
 def setpar(i, val):
@@ -77,11 +77,6 @@ def test_radMSBARLONS():
     pt.t = -1.
     pt.xi = 0.01
     pt.xB = 2*pt.xi/(1.+pt.xi)
-    #FIXME: how to avoid this:
-    try:
-        del t.m.qdict[pt.Q2]
-    except:
-        pass
     t.m.g.parint.p = 0
     t.m.g.newcall = 1
     t.m.g.init()
@@ -99,11 +94,6 @@ def test_radMSBARNLONS():
     pt.t = -1.
     pt.xi = 0.01
     pt.xB = 2*pt.xi/(1.+pt.xi)
-    #FIXME: how to avoid this:
-    try:
-        del t.m.qdict[pt.Q2]
-    except:
-        pass
     t.m.g.parint.p = 1
     t.m.g.newcall = 1
     t.m.g.init()
@@ -126,11 +116,6 @@ def test_radMSBARLONSevol():
     pt.t = -0.25
     pt.xi = 0.01
     pt.xB = 2*pt.xi/(1.+pt.xi)
-    #FIXME: how to avoid this:
-    try:
-        del t.m.qdict[pt.Q2]
-    except:
-        pass
     t.m.g.parint.p = 0
     t.m.g.newcall = 1
     t.m.g.init()
@@ -147,11 +132,6 @@ def test_radMSBARNLONSevol():
     pt.t = -0.25
     pt.xi = 0.01
     pt.xB = 2*pt.xi/(1.+pt.xi)
-    #FIXME: how to avoid this:
-    try:
-        del t.m.qdict[pt.Q2]
-    except:
-        pass
     t.m.g.parint.p = 1
     t.m.g.newcall = 1
     t.m.g.init()

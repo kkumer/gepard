@@ -9,12 +9,12 @@ from constants import Mp, Mp2
 from results import KM10b, dvmppars
 
 # KM10b model
-m = Model.ComptonGepard(process='DVMP', p=0)
+m = Model.ComptonGepard(p=0)
 t = Approach.BMK(m)
 t.m.parameters.update(KM10b)
 
 # generic LO model from big DVMP draft
-mlo = Model.ComptonGepard(process='DVMP', p=0)
+mlo = Model.ComptonGepard(p=0)
 tlo = Approach.BMK(mlo)
 tlo.m.parameters.update(dvmppars)
 

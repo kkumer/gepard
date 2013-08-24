@@ -60,7 +60,7 @@ def test_gepardfitDVCSNLO():
     mGepard.g.parint.p = 1
     mGepard.g.parchr.scheme = np.array([c for c in 'MSBAR'])
     mGepard.g.init()
-    tGepard.model.release_parameters('M02S','SECS','SECG')
+    tGepard.model.release_parameters('M03S','SECS','SECG')
     f = Fitter.FitterMinuit(DVCSpoints, tGepard)
     f.fit()
     chisq = tGepard.chisq(DVCSpoints)[0]

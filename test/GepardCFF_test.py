@@ -12,6 +12,8 @@ m = Model.ComptonGepard()
 m.parameters.update(hy1)
 t = Approach.hotfixedBMK(m)
 
+t.m.g.parint.pid = 1 # CSBAR
+
 # Seting model parameters to be as in test.F
 def setpar(i, val):
     t.m.parameters[t.m.parameters_index[i]] = val
