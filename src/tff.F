@@ -43,8 +43,6 @@ C
       CALL AS2PF (ASMUR2, Q2/RR2, ASP(P), MU02)
       ASTRONG = 2.d0 * PI * ASMUR2
 
-*     DVrhoP process ID = 3
-      PID = 3
       EPH = EXP ( DBLCMPLX(0.0d0, PHI) )
 
       QIND = GETQIND()
@@ -78,7 +76,8 @@ C
 
 *       (SIG, G, NSP, NSM) = FROT * (sea, G, uval, dval)
 c       FIXME: neglecting valence components atm
-c       FIXME: Valid only for NF = 4 ?!
+c       FIXME: Valid only for NF = 4 !
+c       FIXME: THis is for rho-production !
         HRHO(1) = GPDH(K,1) / SQRT2
         HRHO(2) = GPDH(K,2) / SQRT2
         HRHO(3) = GPDH(K,1) / SQRT2  * (3.d0/20.d0)

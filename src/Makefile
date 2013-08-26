@@ -116,7 +116,7 @@ pygepard: pygepard.so
 pygepards: pygepard.so pygepard2.so pygepard3.so
 
 pygepard.so: $(_FPREPS)
-	f2py --fcompiler=gnu95 -c -m pygepard $^ adacf/*f -lgomp
+	f2py --fcompiler=gnu95 --debug  -c -m pygepard $^ adacf/*f -lgomp
 	mv pygepard.so ../fits/
 
 pygepard%.so: $(_FPREPS)

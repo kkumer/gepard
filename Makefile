@@ -171,7 +171,7 @@ endif
 
 
 # targets
-export TESTTARGETS = radcorr scaledep test auxtest houches accuracy
+export TESTTARGETS = radcorr scaledep test testb auxtest houches accuracy
 export EXTARGETS = auxsi auxns anatomyNS anatomy radNLONS radNLO evolutNS evolut radQ \
                    radNNLONS radNNLO scalesNS scales scalesNNLO rho
 export FITTARGETS = fitres fitres2 fitpdfs slope contours
