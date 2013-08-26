@@ -10,7 +10,7 @@ editor = DM
 ### Experiment
 
 collaboration = H1
-process = gammastarp2gammarho0
+process = gammastarp2rho0p
 exptype = collider
 year = 2005
 reference = arXiv:0910.5831

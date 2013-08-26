@@ -740,7 +740,9 @@ class BMK(Approach):
             wgh = 1
 
         # Gepard may need resetting
-        if self.model.__dict__.has_key('g'): self.m.g.newcall = 1
+        if self.model.__dict__.has_key('g'): 
+	    self.m.g.newcall = 1
+	    self.m.g.parint.pid = 1
 
         # Finally, we build up the cross-section
         # 1. unpolarized target part
@@ -805,6 +807,7 @@ class BMK(Approach):
          Approx. formula used in NPB10 paper."""
 
         W2 = pt.W * pt.W
+        self.m.g.parint.pid = 1
         self.m.g.newcall = 1
         # Simplified formula used also in Fortran gepard code
         res = 260.5633976788416 * W2 * ( 
@@ -817,6 +820,7 @@ class BMK(Approach):
         """Partial DVrhoP cross section w.r.t. Mandelstam t.
          Approx. formula for small xB."""
 
+        self.m.g.parint.pid = 3
         self.m.g.newcall = 1
         res = 112175.5 * pt.xB**2 * ( 
                 self.m.ImHrho(pt)**2 + self.m.ReHrho(pt)**2) / pt.Q2**2
@@ -827,6 +831,7 @@ class BMK(Approach):
         """Partial DVCS cross section w.r.t. Mandelstam t."""
 
         eps2 = 4. * pt.xB**2 * Mp2 / pt.Q2
+        self.m.g.parint.pid = 1
         self.m.g.newcall = 1
         ImH, ReH, ImE, ReE = self.m.ImH(pt), self.m.ReH(pt), self.m.ImE(pt), self.m.ReE(pt)
         res = 65.14079453579676 * ( pt.xB**2 / pt.Q2**2 / (1-pt.xB) / (2-pt.xB)**2 /
@@ -847,7 +852,7 @@ class BMK(Approach):
         aux = []
         for t_single in t:
             pt.t = t_single
-            if hasattr(pt, 'process') and pt.process == 'gammastarp2Mp':
+            if hasattr(pt, 'process') and pt.process == 'gammastarp2rho0p':
             	res = self._Xrhot(pt)
 	    else:
             	res = self._XDVCSt(pt)
@@ -856,14 +861,12 @@ class BMK(Approach):
             aux.append(res)
         return array(aux)
 
-##  DVMP
-
 
     def X(self, pt):
         """Total DVCS or DVMP cross section. """
         if pt.has_key('t') or pt.has_key('tm'):
             # partial XS w.r.t momentum transfer t
-            if hasattr(pt, 'process') and pt.process == 'gammastarp2Mp':
+            if hasattr(pt, 'process') and pt.process == 'gammastarp2rho0p':
 		return self._Xrhot(pt)
 	    else:
 		return self._XDVCSt(pt)

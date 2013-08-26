@@ -14,11 +14,12 @@ def test_c1():
 	# KM10b model
 	# For speed, we can stay with p=0 because this
 	# doesn't influence c1 coefficients
-    m = Model.ComptonGepard(process='DVMP', p=0)
+    m = Model.ComptonGepard(p=0)
     t = Approach.BMK(m)
     t.m.parameters.update(KM10b)
     t.m.g.init()
     t.m.g.newcall = 1
+    t.m.g.parint.pid = 3
     aux = t.m.g.c1dvmp(1, (0.5+1.j), 2)
     # comparing to DM's DVEM-c1_forKreso.nb
     # quark part
@@ -33,11 +34,12 @@ test_c1.gepardsuite = 1
 def test_gepardTFFsNLO():
     """Calculate NLO DVMP TFFs for rho production at input scale."""
 	# NLO model
-    mnlo = Model.ComptonGepard(process='DVMP', p=1, speed=1)
+    mnlo = Model.ComptonGepard(p=1, speed=1)
     tnlo = Approach.BMK(mnlo)
     tnlo.m.parameters.update(dvmppars)
+    tnlo.m.g.parint.pid = 3
     xB = 1e-4
-    pt = Data.DummyPoint(init = {'Q2':4., 't':0, 'xi':xB/2., 'xB':xB})
+    pt = Data.DummyPoint(init = {'Q2':4., 't':0, 'xi':xB/(2.-xB), 'xB':xB})
     utils.fill_kinematics(pt)
     re, im =  (tnlo.m.ReHrho(pt), tnlo.m.ImHrho(pt))
     # following agrees with DM to better than percent

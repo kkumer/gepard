@@ -25,6 +25,7 @@ from results import *
 # load experimental data
 data = utils.loaddata('/home/kkumer/pype/data/ep2epgamma', approach=Approach.BMK) 
 data.update(utils.loaddata('/home/kkumer/pype/data/gammastarp2gammap', approach=Approach.BMK)) 
+data.update(utils.loaddata('/home/kkumer/pyper/data/gammastarp2Mp', approach=Approach.BMK)) 
 
 ###  subplots_adjust options and their meanings:
  # left  = 0.125  # the left side of the subplots of the figure
@@ -746,6 +747,56 @@ def H1ZEUS(path=None, fmt='png', **kwargs):
         else: # npanel==4
             ax.text(30, 3, '${\\rm ZEUS}\\, (idem)$', fontsize=16)
             #ax.set_xlim(0, 80)
+    if path:
+        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+    else:
+        fig.canvas.draw()
+        fig.show()
+    return fig
+
+def DVMP(path=None, fmt='png', **kwargs):
+    """Makes plot of H1 DVMP data with fit lines"""
+
+    subsets = {}
+    subsets[1] = [data[76]]
+    subsets[2] = [] 
+    subsets[3] = []
+    subsets[4] = [] 
+    xs = ['Q2', 't', 'W', 'Q2']
+    title = 'H1 DVMP'
+    fig = plt.figure()
+    fig.canvas.set_window_title(title)
+    fig.suptitle(title)
+    fig.subplots_adjust(bottom=0.1, hspace=0.3)
+    for npanel in range(1,2):
+        ax = fig.add_subplot(2,2,npanel)
+        ax.set_yscale('log')  # y-axis to be logarithmic
+        panel(ax, points=subsets[npanel], xaxis=xs[npanel-1], **kwargs)
+        #if npanel < 3:
+        #    ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.2))
+        # y labels
+        if npanel==1:
+            ax.set_ylabel('$\\sigma_L\\quad [{\\rm nb}]$', fontsize=18)
+        elif npanel==3:
+            ax.set_ylabel('$d\\sigma/dt\\quad [{\\rm nb/GeV}^2]$', fontsize=18)
+        else: # npanel 4
+            ax.set_ylabel('')
+        # x labels
+        if npanel==1 or npanel==2:
+            ax.set_xlabel('$Q^2\\quad [{\\rm GeV}^2]$', fontsize=18)
+        #elif npanel==3:
+        #    ax.set_xlabel('$W\\quad [{\\rm GeV}]$', fontsize=18)
+        #else: # npanel 4
+        #    ax.set_xlabel('$t\\quad [{\\rm GeV}^2]$', fontsize=18)
+        if npanel==1:
+            ax.text(15, 100, '${\\rm W = 75}\\, {\\rm GeV}$', fontsize=12)
+        #if npanel==2:
+        #    ax.text(-0.3, 6, '${\\rm ZEUS}$', fontsize=16)
+        #if npanel==3:
+        #    ax.text(50, 5, '${\\rm H1}\\, (idem):$', fontsize=16)
+        #else: # npanel==4
+        #    ax.text(30, 3, '${\\rm ZEUS}\\, (idem)$', fontsize=16)
+        #    #ax.set_xlim(0, 80)
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:

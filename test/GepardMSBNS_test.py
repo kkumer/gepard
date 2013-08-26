@@ -28,7 +28,7 @@ t = Approach.hotfixedBMK(m)
 # Setting gepard to values as in radNLONS.F
 # (Fig. 7 of NPB08)
 t.m.g.parint.nf = 4
-t.m.g.parint.pid = 2   #MSBAA
+t.m.g.parint.pid = 2   # MSBAR
 t.m.g.astrong.asp = np.array([0.05, 0.05, 0.05])
 t.m.g.parchr.fftype = np.array([c for c in 'NONSINGLET']) # array(10)
 #t.m.g.parchr.scheme = np.array([c for c in 'MSBDI']) # array(10)
@@ -135,7 +135,8 @@ def test_radMSBARNLONSevol():
     t.m.g.parint.p = 1
     t.m.g.newcall = 1
     t.m.g.init()
-    assert_almost_equal(m.ReH(pt), -8.2438442701262247)
-    assert_almost_equal(m.ImH(pt), -22.887858499802647)
+    assert_almost_equal(m.ReH(pt), -8.2659180201153966, 6)
+    assert_almost_equal(m.ImH(pt), -22.865361242094782, 6)
+
 
 test_radMSBARNLONSevol.gepardsuite = 1

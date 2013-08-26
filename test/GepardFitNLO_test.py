@@ -58,7 +58,7 @@ def test_gepardfitDVCSNLO():
     setpar(37,  0.)
     setpar(47,  0.)
     mGepard.g.parint.p = 1
-    mGepard.g.parchr.scheme = np.array([c for c in 'MSBAR'])
+    mGepard.g.parint.pid = 2 # FIXME: this is useless here?
     mGepard.g.init()
     tGepard.model.release_parameters('M02S','SECS','SECG')
     f = Fitter.FitterMinuit(DVCSpoints, tGepard)

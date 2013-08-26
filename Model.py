@@ -127,6 +127,15 @@ class Model(object):
             s += row
         print s
 
+    def print_parameters_fortran(self, output=sys.stdout):
+        """Print model parameters in Fortran form
+        
+        """
+        for ind in self.parameters_index:
+            name = self.parameters_index[ind]
+            value = self.parameters[name]
+            output.write('      PAR(%i) = %-g\n' % (ind, value))
+
     def free_parameters(self):
         """Return just free (non-fixed) parameters."""
 
@@ -857,11 +866,12 @@ class ComptonGepard(ComptonFormFactors):
     #gepardPool = [g1, g2, g3]  #  modules to choose from
     gepardPool = [g1]  #  modules to choose from
 
-    def __init__(self, cutq2=0.0, ansatz='FIT', p=0, speed=1, q02=4.0, **kwargs):
+    def __init__(self, cutq2=0.0, ansatz='FIT', fftype='SINGLET', p=0, speed=1, q02=4.0, **kwargs):
         _lg.debug('Creating %s.\n' % str(self))
         # initial values of parameters and limits on their values
         self.cutq2 = cutq2
         self.ansatz = ansatz
+        self.fftype = fftype
         self.p = p
         self.speed = speed
         self.q02 = q02
@@ -992,11 +1002,11 @@ class ComptonGepard(ComptonFormFactors):
             self.parameters['limit_M02S'] = (0.0, 1.5)
             self.parameters['limit_M02G'] = (0.0, 1.5)
 
-        self._gepardinit(cutq2, ansatz, p, speed, q02, **kwargs)   # gepard init
+        self._gepardinit(cutq2, ansatz, fftype, p, speed, q02, **kwargs)   # gepard init
         # now do whatever else is necessary
         ComptonFormFactors.__init__(self, **kwargs)
 
-    def _gepardinit(self, cutq2=0.0, ansatz='FIT', p=0, speed=1, q02=4.0, **kwargs):
+    def _gepardinit(self, cutq2=0.0, ansatz='FIT', fftype='SINGLET', p=0, speed=1, q02=4.0, **kwargs):
         """Initialize gepard part of model."""
         emptyPoolMessage = 'Pool of gepard modules is empty. No new \
 gepard models can be created. Restart everything!\n'
@@ -1039,6 +1049,7 @@ gepard models can be created. Restart everything!\n'
         self.g.mbcont.phind = 1.57
 
         self.g.parchr.ansatz = array([c for c in ansatz + (6-len(ansatz))*' ']) # array(6)
+        self.g.parchr.fftype = array([c for c in fftype + (10-len(fftype))*' ']) # array(11)
 
         self.g.init()
         # Cutting-off evolution  at Q2 = cutq2
