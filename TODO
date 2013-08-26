@@ -1,4 +1,4 @@
-2008-09-12 
+2013-08-25 
 
 Computing:
 -  Go to www.hepforge.org?
@@ -16,6 +16,7 @@ Computing:
    (not necessarily, this is not such performance hit as I thought)
 -  Check Lanczos algorithm for gamma for negative real part of argument
 -  Paralellize MSBAR and maybe all gpdH....[] functions
+-  Remove PROCESS, FFTYPE and SCHEME and do everything with PID
 
 
 Checks:

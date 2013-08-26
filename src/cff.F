@@ -46,8 +46,7 @@ C
 
       XIMEM = XI
 *     -- when calculating just GPDs at eta=0 --
-      IF (( PROCESS(5:5) .EQ. 'Z' ) .OR. (PID .EQ. -1)
-     &      .OR. (PID .EQ. -2)) XI = 0
+      IF ((PID .EQ. -1) .OR. (PID .EQ. -2)) XI = 0
 
       QIND = GETQIND()
       CALL GETMBGPD
@@ -150,10 +149,7 @@ C
 
 *         -- when calculating just GPDs --
 
-      IF ( ( PROCESS(5:5) .EQ. 'Z' ) .OR. 
-     &     ( PROCESS(5:5) .EQ. 'T' ) .OR. (PID .LE. -1) ) THEN
-        CHARGEFAC = 1.0d0
-      END IF
+      IF (PID .LE. -1) CHARGEFAC = 1.0d0
 
       CFF(P) = CHARGEFAC * DBLCMPLX(RESREALH, RESIMAGH)
       CFFE(P) = CHARGEFAC * DBLCMPLX(RESREALE, RESIMAGE) 

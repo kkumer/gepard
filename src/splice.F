@@ -34,7 +34,7 @@ C
 #include "header.F"
 C     DOUBLE COMPLEX CLNGAMMA
 
-      IF ( PROCESS .EQ. 'DIS' ) THEN 
+      IF ( PID .EQ. 0 ) THEN 
                 FCM(1)=(PAR(11)*(2-PAR(12))*(3-PAR(12))*(4
      &  -PAR(12))*(5-PAR(12))*(6-PAR(12))*(7-PAR(1
      &  2))*(8-PAR(12))*(9-PAR(12))*(1/(1-DEL2/(PA

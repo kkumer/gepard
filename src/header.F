@@ -219,15 +219,6 @@ C  SYNOPSIS
       DOUBLE PRECISION PHIND
 C     ***
 
-C     ****v* header.F/SCHEME
-C  DESCRIPTION
-C      SCHEME -- renormalization scheme: CSBAR, MSBAR, MSBDI,
-C                EVOLQ, EVOLG, ZEROQ, ZEROG, TRAJQ, TRAJG
-C  MEMBER OF
-C     PARCHR
-C  SYNOPSIS
-      CHARACTER SCHEME*5
-C     ***
 
 C     ****v* header.F/ANSATZ
 C  DESCRIPTION
@@ -236,15 +227,6 @@ C  MEMBER OF
 C     PARCHR
 C  SYNOPSIS
       CHARACTER ANSATZ*6
-C     ***
-
-C     ****v* header.F/PROCESS
-C  DESCRIPTION
-C      PROCESS -- process (DVCS or DIS)
-C  MEMBER OF
-C     PARCHR
-C  SYNOPSIS
-      CHARACTER PROCESS*6
 C     ***
 
 C     ****v* header.F/FFTYPE
@@ -765,7 +747,7 @@ C     ****c* header.F/PARCHR
 C  DESCRIPTION
 C     String parameters
 C  SYNOPSIS
-      COMMON / PARCHR /  SCHEME, ANSATZ, PROCESS, FFTYPE
+      COMMON / PARCHR /  ANSATZ, FFTYPE
 C     ***
 
 C     ****c* header.F/FILENAMES

@@ -45,18 +45,8 @@ C
 
       
       AUX(0) = (1.0d0, 0.0d0)
-
-      IF (SCHEME(4:5) .EQ. 'LO') THEN 
-*       Just LO evolution ...
-        AUX(1) = (0.0d0, 0.0d0)
-        AUX(2) = (0.0d0, 0.0d0)
-      ELSE
-*       ... or normal (N)NLO one (diagonal part)
-        AUX(1) = - ( 1.0d0 - 1.0d0 / R ) * R1
-        IF (P .GE. 2) THEN
-          AUX(2) = 0.5d0 * ( AUX(1)**2 - (1.0d0 - 1.0d0 / R**2) * R2 )
-        END IF
-      ENDIF
+      AUX(1) = - ( 1.0d0 - 1.0d0 / R ) * R1
+      AUX(2) = 0.5d0 * ( AUX(1)**2 - (1.0d0 - 1.0d0 / R**2) * R2 )
 
       DO 10 ORD = 0, P
  10   EVOLNSA(ORD) = AUX(ORD) * R**( - GAMNSP(SEC,K,0) / BETA0(NF) )
@@ -144,11 +134,6 @@ C
       END IF
  30   CONTINUE
       DO 35 ORD = 0, P
-        IF (SCHEME(4:5) .EQ. 'LO') THEN 
-*         Just LO evolution ...
-          IJAUX(1) = (0.0d0, 0.0d0)
-          IJAUX(2) = (0.0d0, 0.0d0)
-        ENDIF
  35   EVOLA(ORD,I,J) = EVOLA(ORD,I,J) 
      &                 + IJAUX(ORD) * R**( -LAM(B) / BETA0(NF) )
  40   CONTINUE

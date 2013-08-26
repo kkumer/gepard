@@ -82,7 +82,7 @@ C
       PARAMETER ( NEVALS = 5, H = 0.41d0 )
 #include "header.F"
 
-      PROCESS = 'DVCS'
+      PID = 1
       XI = X
 
       T = 0.0d0

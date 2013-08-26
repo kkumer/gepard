@@ -32,10 +32,12 @@ C
 #include "header.F"
       DOUBLE COMPLEX CLNGAMMA
 
-      IF ( PROCESS .EQ. 'DIS' ) THEN 
+      IF ( PID .EQ. 0 ) THEN 
+C       --- DIS ----
         <* PDFQsplice *> 
         <* PDFGsplice *> 
       ELSE  
+C       --- DVCS ----
         <* GPDQsplice *> 
         <* GPDGsplice *> 
       ENDIF
