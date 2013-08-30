@@ -61,10 +61,12 @@ C
       PAR(29) = 0.0d0
 
 
-      P = 0
-      PID = 0
-      DEL2 = 0.0d0
+      P = 1
       CALL INIT
+
+      P = 0
+
+      DEL2 = 0.0d0
       CALL GETMBGPD
       WRITE (*, *) "For values of test parameters see src/test.F"
       WRITE (*, *) 
@@ -76,12 +78,8 @@ C
       CALL F2F
       WRITE (*, *) F2(0)
 
-      P = 1
-      PID = 1
-      CALL INIT
 
       WRITE (*, *) " ---  Test 2: LO partial sigma, no evolution ---- "
-      P = 0
       W2 = 82.0d0**2
       Q2 = 1.0d0
       XI = Q2 / ( 2.0d0 * W2 + Q2)

@@ -29,6 +29,8 @@ C
       IMPLICIT NONE
 #include "header.F"
 
+      PID = 1
+
 *     Scales and kinematics
 
       W2 = (Q2 - XI * Q2) / (2.0d0 * XI)

@@ -74,9 +74,9 @@ C  SYNOPSIS
 
 C  INPUTS
 C        SEC  -- SO(3) PW index
-C        QIND -- index of actual Q2 value in QS or QSDIS array
+C        QIND -- index of actual Q2 value in QS array
 C  PARENTS
-C      INITC
+C      GETQIND
 C  CHILDREN
 C      AS2PF, EVOLNSF, EVOLF
 C  SOURCE
@@ -130,8 +130,6 @@ C
 *     2. singlet case
 
        CALL EVOLF (SEC, K, R, EVOLA)
-
-*       2.1  --- DVCS  or DVMP ---
 
         CEV(1) = ( WC(PID,SEC,K,0,1) * EVOLA(0,1,1) + 
      &             WC(PID,SEC,K,0,2) * EVOLA(0,2,1) ) * CZERO

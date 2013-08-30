@@ -219,6 +219,14 @@ C  SYNOPSIS
       DOUBLE PRECISION PHIND
 C     ***
 
+C     ****v* header.F/SCHEME
+C  DESCRIPTION
+C      SCHEME -- DVCS renormalization scheme: CSBAR, MSBAR
+C  MEMBER OF
+C     PARCHR
+C  SYNOPSIS
+      CHARACTER SCHEME*5
+C     ***
 
 C     ****v* header.F/ANSATZ
 C  DESCRIPTION
@@ -747,7 +755,7 @@ C     ****c* header.F/PARCHR
 C  DESCRIPTION
 C     String parameters
 C  SYNOPSIS
-      COMMON / PARCHR /  ANSATZ, FFTYPE
+      COMMON / PARCHR /  SCHEME, ANSATZ, FFTYPE
 C     ***
 
 C     ****c* header.F/FILENAMES

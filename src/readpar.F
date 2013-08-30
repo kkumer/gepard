@@ -42,6 +42,7 @@ C
       READ (61, *) PHI
       READ (61, *) CND
       READ (61, *) PHIND
+      READ (61, *) SCHEME
       READ (61, *) ANSATZ
       CLOSE (61)
 

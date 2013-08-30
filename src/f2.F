@@ -34,6 +34,7 @@ C
 #include "header.F"
 
 
+      PID = 0
       QIND = GETQIND()
 
 *     Fixing forward kinematics:

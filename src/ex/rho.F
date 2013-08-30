@@ -45,9 +45,7 @@ C
       CND = -0.25
       PHIND = 1.57
       ANSATZ = 'FIT'
-      SCHEME = 'MSBAR'
-      PROCESS  = 'DVMP'
-      PID = 3
+      PID = 2
 
 
       RGPDF2 = 1.d0

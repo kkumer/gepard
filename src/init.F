@@ -246,25 +246,17 @@ c         CALL WgammaVNSM2F(NFD, Z, GAMNSM(SEC, K, 2))
  30         WC(0, SEC, K, ORD, L) = WCTMP(ORD, L) 
         END IF
 
-*     PIDK = 1: DVCS (CSBAR)
-        CALL WCCSBAR(1, SEC, K, WCTMP)
-c       IF ((K .EQ. 1) .AND. (SEC .EQ. 1)) THEN
-c         WRITE (*, *) "CSBAR = ", WCTMP(0, 4)
-c       END IF
+*     PIDK = 1: DVCS 
+        IF (SCHEME .EQ. 'CSBAR') THEN
+          CALL WCCSBAR(1, SEC, K, WCTMP)
+        ELSE
+          CALL WCMSBAR(SEC, K, WCTMP)
+        END IF
         DO 40 L = 1,4
         DO 40 ORD = 0, P
  40       WC(1, SEC, K, ORD, L) = WCTMP(ORD, L) * FSHU
 
-*     PIDK = 2: DVCS (MSBAR)
-        CALL WCMSBAR(SEC, K, WCTMP)
-c       IF ((K .EQ. 1) .AND. (SEC .EQ. 1)) THEN
-c         WRITE (*, *) "MSBAR = ", WCTMP(0, 4), FSHU
-c       END IF
-        DO 50 L = 1,4
-        DO 50 ORD = 0, P
- 50       WC(2, SEC, K, ORD, L) = WCTMP(ORD, L) * FSHU
-
-*     PIDK = 3: DVMP (MSBAR)
+*     PIDK = 2: DVMP
         CALL WCDVMP(SEC, K, WCTMP)
 *       WC = T_jk from Eq. (3.61c) in big DVMP draft
 
@@ -272,11 +264,11 @@ c       END IF
         DO 60 ORD = 0, P
         IF (L .EQ. 2) THEN
 *         --- gluons get additional factor
-          WC(3, SEC, K, ORD, L) = ( WCTMP(ORD, L) * FSHU * 3.d0
+          WC(2, SEC, K, ORD, L) = ( WCTMP(ORD, L) * FSHU * 3.d0
      &                * 2.d0/CF/(J+3.d0) )
         ELSE
 *         --- quarks, singlet and non-singlet
-          WC(3, SEC, K, ORD, L) = WCTMP(ORD, L) * FSHU * 3.d0
+          WC(2, SEC, K, ORD, L) = WCTMP(ORD, L) * FSHU * 3.d0
         END IF
  60     CONTINUE
 
