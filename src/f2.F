@@ -36,6 +36,7 @@ C
 
       PID = 0
       QIND = GETQIND()
+      CALL GETMBGPD
 
 *     Fixing forward kinematics:
       MTIND = 0

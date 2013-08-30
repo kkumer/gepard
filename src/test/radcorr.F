@@ -54,7 +54,7 @@ C
      &       LOGXISTEP = (LOGXIEND - LOGXISTART) / (NNPOINTS - 1)  )
 #include "header.F"
 
-      PROCESS = 'DVCS'
+      PID = 1
       FFTYPE = 'SINGLET'
 
       CALL READPAR
@@ -74,9 +74,6 @@ C
 
       Q02 = 2.5d0
       Q2 = 2.5d0
-      NQS = 1
-      QS(1) = Q2
-
 
 *     Looping over two different walues of \Delta^2
 
@@ -118,10 +115,9 @@ C
 
 *     Calculating two CFFs needed for present line and point ...
 
-      CALL EVOLC(1,1)
       CALL CFFF 
       P = P - 1
-      CALL EVOLC(1,1)
+      CALL INIT
       CALL CFFF 
 
 *     ... and saving them to array

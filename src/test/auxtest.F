@@ -26,7 +26,7 @@ C
       IMPLICIT NONE
 #include "header.F"
 
-      PROCESS = 'DVCS'
+      PID = 1
       FFTYPE = 'SINGLET'
 
       CALL READPAR
@@ -35,67 +35,50 @@ C
       Q02 = 2.5d0
       Q2 = 2.5d0
 
-      NQS = 1
-      QS(1) = Q2
-
 
 *     1. Point "A"
       WRITE (*,*) " --- Point A  (MSBAR) ----- "
 
       XI = 0.01
+      DEL2 = -0.5
       ANSATZ = 'HARD'
-      P = 1
       SCHEME = 'MSBDI'
 
-      CALL INIT
-*      DEL2 = -0.5 which is 3rd "experimental" t
-      MTIND = NMTS + 3
-      DEL2 = -MTS(MTIND)
 
-      CALL GETMBGPD
-
-      CALL EVOLC(1,1)
-      CALL CFFF 
-      P = P - 1
-      CALL EVOLC(1,1)
-      CALL CFFF 
 
       WRITE (*,*) "Expect NLO: 0.248594238 + 102.323245 I"
+      P = 1
+      CALL INIT
+      CALL CFFF 
       WRITE (*,*) CFF(1) / CHARGEFAC
       WRITE (*,*) 
+      P = 0
+      CALL INIT
+      CALL CFFF 
       WRITE (*,*) "Expect LO: 13.919751 + 189.278946 I "
       WRITE (*,*) CFF(0) / CHARGEFAC
       WRITE (*,*) 
       
-*     DVMP transition FF
-      CALL TFFF 
-      WRITE (*,*) 
-      WRITE (*,*) "Expect LO H_rho: ??? "
-      WRITE (*,*) TFFH(0)
-      WRITE (*,*) 
 
 *     2. Point "B"
       WRITE (*,*) " --- Point B  (CSBAR) ----- "
 
       XI = 0.00001
+      DEL2 = 0.0d0
       ANSATZ = 'HARD'
-      P = 1
       SCHEME = 'CSBAR'
 
-      CALL INIT
-      MTIND = 0
-      DEL2 = -MTS(MTIND)
 
-      CALL GETMBGPD
-      CALL EVOLC(1,1)
-      CALL CFFF 
-      P = P - 1
-      CALL EVOLC(1,1)
-      CALL CFFF 
 
       WRITE (*,*) "Expect NLO: -25716.505846 + 1134612.30 I"
+      P = 1
+      CALL INIT
+      CALL CFFF 
       WRITE (*,*) CFF(1) / CHARGEFAC
       WRITE (*,*) 
+      P = 0
+      CALL INIT
+      CALL CFFF 
       WRITE (*,*) "Expect LO: 399725.2294640 + 2520521.6 I "
       WRITE (*,*) CFF(0) / CHARGEFAC
       WRITE (*,*) 

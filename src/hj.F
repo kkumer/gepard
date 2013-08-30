@@ -154,11 +154,6 @@ C
      &          (1.0d0 - (SIN(PI*ALPT(2)) -
      &           SIN(J*PI))/SIN(PI*JMA(2)) ) * CORR(2) )
         ENDIF
-      ELSE IF (ANSATZ .EQ. 'SPLICE') THEN
-              CALL SPLICE(J, FCM)
-*           Killing E contribution
-            PAR(18) = 0.0d0
-            PAR(28) = 0.0d0
 *  ## ansatz used for "big paper"  hep-ph/0703179 
       ELSE IF (ANSATZ .EQ. 'FITBP') THEN
             HU = PAR(31) * POCHHAMMER(DBLCMPLX(1.0d0 - PAR(32), 0.0d0) 

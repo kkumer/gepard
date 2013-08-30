@@ -27,7 +27,7 @@ C
       IMPLICIT NONE
       DOUBLE PRECISION AUX
       DOUBLE PRECISION PARSIGMA, SIGMA
-#include "header.F"
+#include "../header.F"
 
       FFTYPE  = 'SINGLET'
 
@@ -67,7 +67,6 @@ C
       P = 0
 
       DEL2 = 0.0d0
-      CALL GETMBGPD
       WRITE (*, *) "For values of test parameters see src/test.F"
       WRITE (*, *) 
 

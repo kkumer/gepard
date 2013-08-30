@@ -1,6 +1,7 @@
 # Makefile for gepard Fortran and C sources
 
 # Subdirectories for storing example source files
+TESTDIR = test
 EXDIR = ex
 
 # Directories for storing object files
@@ -8,11 +9,9 @@ ADACFODIR = adacf/obj
 FODIR = Fobj
 ODIR = obj
 MMAODIR = Mobj
+TESTFODIR = test/obj
 EXFODIR = ex/obj
 
-ifndef NOPGPLOT
-  USEPGPLOT := -DPGPLOT
-endif
 
 # "adacf" package Fortran object files
 ADACFOBJS = Harmonic.o WgammaVNSP0F.o WgammaVNSP1F.o\
@@ -32,14 +31,11 @@ $(ADACFODIR)/%.o: adacf/%.f
 # Fortran object files
 FOBJS = Finit.o Fbeta.o Fspecial.o Fdcomplex.o Fastrong.o Flambda.o\
 Fprojectors.o Frnnlo.o Ferfunc.o Fevol.o Fwccsbar.o Fwcmsbar.o \
-Fdvcs.o Ff2.o Freadpar.o Ferror.o Fgauss.o Fnd.o Fintegra.o Fxspace.o\
-Fevolc.o Fgetmbgpd.o Fhj.o Fej.o Fsplice.o Fcff.o Ftff.o Fderiv.o\
+Fdvcs.o Ff2.o Ferror.o Fgauss.o Fnd.o Fintegra.o Freadpar.o\
+Fevolc.o Fgetmbgpd.o Fhj.o Fej.o Fcff.o Ftff.o Fderiv.o\
 Fwcdvmp.o Fc1dvmp.o
 _FOBJS = $(patsubst %,$(FODIR)/%,$(FOBJS))
 
-# Fortran object files needed for DVEM
-FDVEMOBJS = Fgauss.o Fintegra.o Fbeta.o Fspecial.o Fc1dvmp.o
-_FDVEMOBJS = $(patsubst %,$(FODIR)/%,$(FDVEMOBJS))
 
 # rule for compiling Fortran .F  files
 # (prefix "F" in "F%.o" is used to avoid possible future clashes with
@@ -48,16 +44,12 @@ _FDVEMOBJS = $(patsubst %,$(FODIR)/%,$(FDVEMOBJS))
 $(FODIR)/F%.o: %.F  header.F
 	$(FC) -c -o $@ $< $(FFLAGS) $(CPPFLAGS)
 
-# C object files
-OBJS = flushout.o
-_OBJS = $(patsubst %,$(ODIR)/%,$(OBJS))
-
 # rule for compiling C files
 $(ODIR)/%.o: %.c
 	$(CC) -c -o $@ $< $(CFLAGS) $(INCS)
 
 # All object files together
-export ALLOBJS = $(_OBJS) $(_ADACFOBJS) $(_FOBJS)
+export ALLOBJS = $(_ADACFOBJS) $(_FOBJS)
 
 # Mathlink C object files
 MMAOBJS = fit.tm.o fit.o 
@@ -71,6 +63,9 @@ $(MMAODIR)/%.tm.o: $(MMAODIR)/%.tm.c $(MMAODIR)/%.o
 $(MMAODIR)/%.o: %.c  header.h
 	$(CC) -c -o $@ $< -I$(MLINCDIR) $(CFLAGS)
 
+# rule for compiling test Fortran programs
+$(TESTFODIR)/%.o: $(TESTDIR)/%.F header.F
+	$(FC) -c -o $@ $< $(FFLAGS)
 
 # rule for compiling example Fortran programs
 $(EXFODIR)/%.o: $(EXDIR)/%.F header.F
@@ -80,7 +75,7 @@ $(EXFODIR)/%.o: $(EXDIR)/%.F header.F
 FPREPDIR = Fprep
 FPREPS = init.f beta.f special.f dcomplex.f astrong.f lambda.f\
 projectors.f rnnlo.f erfunc.f evol.f wccsbar.f wcmsbar.f \
-dvcs.f f2.f error.f gauss.f nd.f integra.f\
+dvcs.f f2.f error.f gauss.f nd.f integra.f readpar.f\
 evolc.f getmbgpd.f hj.f ej.f splice.f cff.f\
 tff.f wcdvmp.f c1dvmp.f
 _FPREPS = $(patsubst %,$(FPREPDIR)/%,$(FPREPS))
@@ -88,25 +83,20 @@ _FPREPS = $(patsubst %,$(FPREPDIR)/%,$(FPREPS))
 $(FPREPDIR)/%.f: %.F  header.F
 	$(FC) -E $<  > $@
 
-# test and fit targets
 
-$(TESTTARGETS): %: $(ALLOBJS) $(FODIR)/F%.o
-	$(FC) -o ../Tests/$@ $^ $(FFLAGS)
-
-# main fit target  (a variant withouth PGPLOT)
-fit: CPPFLAGS += $(USEPGPLOT)
+# main fit target
 fit: $(ALLOBJS) $(FODIR)/Ffcn.o $(FODIR)/Ffit.o
-	$(FC) -o ../fits/$@ $^ $(FFLAGS) $(CERNLIBS) $(ALLPGPLOTLIBS)
+	$(FC) -o ../fits/$@ $^ $(FFLAGS) $(CERNLIBS)
 
 # targets for processing/presenting GPDs resulting from fit
 $(FITTARGETS): %: $(ALLOBJS) $(EXFODIR)/%.o
-	$(FC) -o ../fits/$@ $^ $(FFLAGS) $(ALLPGPLOTLIBS)
+	$(FC) -o ../fits/$@ $^ $(FFLAGS)
 
 # mma targets
 
-gepard.exe: CPPFLAGS += -DMMA  $(USEPGPLOT)
+gepard.exe: CPPFLAGS += -DMMA
 gepard.exe: $(ALLOBJS) $(FODIR)/Ffcn.o $(_MMAOBJS)  $(FODIR)/Fmninterface.o
-	$(FC) -o ../fits/$@/$(SYS)/$@ $^ $(FFLAGS) $(CERNLIBS) -L$(MLLIBDIR) -l$(MLLIB) $(ALLPGPLOTLIBS) $(MLEXTRA)
+	$(FC) -o ../fits/$@/$(SYS)/$@ $^ $(FFLAGS) $(CERNLIBS) -L$(MLLIBDIR) -l$(MLLIB) $(MLEXTRA)
 
 
 # pygepard targets
@@ -129,18 +119,21 @@ pygepard%.so: $(_FPREPS)
 $(EXTARGETS): %: $(ALLOBJS) $(EXFODIR)/%.o
 	$(FC) -o ../ex/$@ $^ $(FFLAGS)
 
+$(TESTTARGETS): %: $(ALLOBJS) $(TESTFODIR)/%.o
+	$(FC) -o ../test/$@ $^ $(FFLAGS)
+
 
 .PHONY: clean
 clean:
 	-rm -f $(ADACFODIR)/*.o $(FODIR)/F*.o $(ODIR)/*.o $(EXFODIR)/*.o $(MMAODIR)/*
 	-rm -f *.s
 	-rm -f $(FPREPDIR)/*.f
-	-rm -f $(patsubst %,../Tests/%,$(TESTTARGETS))
-	-rm -f $(patsubst %,../Tests/%.exe,$(TESTTARGETS))
+	-rm -f $(patsubst %,../test/%,$(TESTTARGETS))
+	-rm -f $(patsubst %,../test/%.exe,$(TESTTARGETS))
 	-rm -f $(patsubst %,../fits/%,$(FITTARGETS))
 	-rm -f $(patsubst %,../fits/%.exe,$(FITTARGETS))
 	-rm -f ../fits/fit ../fits/fit.exe  ../fits/pygepard.so
 	-rm -f $(patsubst %,../ex/%,$(EXTARGETS))
 	-rm -f $(patsubst %,../ex/%.exe,$(EXTARGETS))
-	-rm -f ../fits/gepard.exe/$(SYS)/gepard.exe
-	-rm -f ../fits/dvem.exe/$(SYS)/dvem.exe
+	-rm -f ../ifaces/gepard.exe/$(SYS)/gepard.exe
+	-rm -f ../ifaces/pygepar*.so

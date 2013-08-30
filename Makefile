@@ -175,7 +175,7 @@ export TESTTARGETS = radcorr scaledep test auxtest houches accuracy
 export EXTARGETS = auxsi auxns anatomyNS anatomy radNLONS radNLO evolutNS evolut radQ \
                    radNNLONS radNNLO scalesNS scales scalesNNLO rho
 export FITTARGETS = fitres fitres2 fitpdfs slope contours
-export MMATARGETS = gepard.exe int2f1.exe dvem.exe
+export MMATARGETS = gepard.exe
 export PYTARGETS = pygepard pygepards
 
 .PHONY: $(TESTTARGETS) $(EXTARGETS) $(FITTARGETS) $(MMATARGETS) $(PYTARGETS)
@@ -204,7 +204,7 @@ htmlnocss:
 
 .PHONY: rmfig
 rmfig:
-	-rm -f Tests/*.dat
+	-rm -f test/*.dat
 	-rm -f ex/*.dat
 
 .PHONY: clean
@@ -213,5 +213,5 @@ clean:
 	$(MAKE) -C doc/tex clean
 	-rm -rf doc/html/*
 	-rm -f fits/*.mnt fits/*.out fits/*.ps fits/*.eps fits/*.out
-	-rm -f Tests/*.dat Tests/*.out Tests/*.eps
+	-rm -f test/*.dat test/*.out test/*.eps
 	-rm -f ex/*.dat ex/*.eps
