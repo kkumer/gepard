@@ -8,18 +8,20 @@ editor = DM
 ## y: SIG(C=T) IN NB
 
 ### Experiment
+# data taken 1996-2000
 
 collaboration = H1
 process = gammastarp2rho0p
 exptype = collider
-year = 2005
+year = 2010
 reference = arXiv:0910.5831
 reference2 = Table 21
 reference3 = JHEP05 (2010) 032
 
 ### Scattering Process
 
-sqrtsenergy = 310
+sqrtsenergy = 320
+s = 102400.  # 320**2
 
 in1particle = gammastar
 in2particle = p
@@ -31,7 +33,7 @@ out2particle = p
 ### Observable 
 
 y1name = X
-y1namelong = differential cross section XL + XT for fixed W=75 GeV
+y1namelong = differential cross section XL + XT
 y1unit = nb
 y1value = column3
 y1errorstatisticplus = column4

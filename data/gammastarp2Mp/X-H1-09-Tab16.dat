@@ -13,15 +13,16 @@ editor = DM
 collaboration = H1
 process = gammastarp2gammaphi
 exptype = collider
-year = 2005
+year = 2010
 reference = arXiv:0910.5831
-reference2 = Table 17
+reference2 = Table 16
 reference3 = JHEP05 (2010) 032
 
 ### Scattering Process
 
-sqrtsenergy = 310.
+sqrtsenergy = 320. # Why?
 sqrtsenergyunit = GeV
+s = 102400.  # 320**2
 
 in1particle = gammastar
 in2particle = p
@@ -74,5 +75,5 @@ table =
 32.15  0.371 0.076 -0.076 0.04 -0.042
 
 ## Q2 dependence of the gamma^star p cross section for elastic phi meson 
-## production for W =75 GeV. The overall normalisation uncertainty of 3.9% is 
+## production for W =75 GeV. The overall normalisation uncertainty of 4.7% is 
 ## not included in the systematic errors.
