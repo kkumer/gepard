@@ -18,18 +18,17 @@ import utils, Model, Approach, Data, Fitter
 
 from constants import Mp, Mp2
 
-m = Model.ComptonGepard(ansatz='NSFIT', q02=2.5)
+m = Model.ComptonGepard(ansatz='NSFIT', scheme='CSBAR', q02=2.5)
 t = Approach.hotfixedBMK(m)
 
 # Setting gepard to values as in radNNLONS.F
 # (Fig. 12 of NPB08)
 
 t.m.g.parint.nf = 4
-t.m.g.parint.pid = 1  # CSBAR
+t.m.g.parint.pid = 1
 t.m.g.astrong.asp = np.array([0.05, 0.05, 0.05])
 t.m.g.parchr.fftype = np.array([c for c in 'NONSINGLET']) # array(10)
 t.m.g.mbcont.phi = 1.9
-#t.m.g.parchr.fftype = np.array([c for c in 'SINGLET   ']) # array(10)
 
 # Seting model parameters to be as in test.F
 def setpar(i, val):

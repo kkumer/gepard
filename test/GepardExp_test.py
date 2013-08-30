@@ -7,13 +7,13 @@ import numpy as np
 import Model, Approach, Fitter, Data
 
 # Gepard only
-mGepard = Model.ComptonGepard(ansatz='FITEXP')
+mGepard = Model.ComptonGepard(ansatz='FITEXP', scheme='CSBAR')
 tGepard = Approach.hotfixedBMK(mGepard)
 
 # Setting gepard to test values
 tGepard.m.g.parint.p = 1
 tGepard.m.g.parint.nf = 3
-tGepard.m.g.parint.pid = 1 # CSBAR
+tGepard.m.g.parint.pid = 1
 tGepard.m.g.astrong.asp = np.array([0.05, 0.05, 0.05])
 tGepard.m.g.parflt.q02 = 1.0
 #tGepard.m.g.parchr.ansatz = np.array([c for c in 'TEST  ']) # array(6)

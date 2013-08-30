@@ -820,7 +820,7 @@ class BMK(Approach):
         """Partial DVrhoP cross section w.r.t. Mandelstam t.
          Approx. formula for small xB."""
 
-        self.m.g.parint.pid = 3
+        self.m.g.parint.pid = 2
         self.m.g.newcall = 1
         res = 112175.5 * pt.xB**2 * ( 
                 self.m.ImHrho(pt)**2 + self.m.ReHrho(pt)**2) / pt.Q2**2

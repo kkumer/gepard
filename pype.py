@@ -9,6 +9,7 @@ import numpy as np
 import scipy.stats
 
 logging.basicConfig(level=logging.INFO)
+#logging.basicConfig(level=logging.DEBUG)
 
 import Model, Approach, Fitter, Data, utils, plots
 from constants import Mp, Mp2
@@ -56,10 +57,14 @@ __builtin__.H109WdepXL = H109WdepXL
 
 ## [3] Create a theory
 
-#db = shelve.open('/home/kkumer/pype/theories.db')
+db = shelve.open('/home/kkumer/pype/theories.db')
 
 #thLO = db['dvmp']
 #thLO.name = 'LO'
+#Model.ComptonGepard.gepardPool.pop()
+thNLO = db['dvmpnlo']
+Model.ComptonGepard.gepardPool.pop()
+thNLO.name = 'NLO'
 #th = thAFKM12
 #Model.ComptonGepard.gepardPool.pop()
 #thKM10 = db['KM10']
@@ -67,6 +72,7 @@ __builtin__.H109WdepXL = H109WdepXL
 #theories = [thAFKM12, thKM10]
 
 m = Model.ComptonGepard(p=1)
+Model.ComptonGepard.gepardPool.pop()
 th = Approach.BMK(m)
 #th.m.parameters.update(KMM12) #  LO
 th.m.parameters.update(nloNLOMSParameters)
@@ -87,7 +93,7 @@ prefac = (4./3.) * 0.209 * astrong / 3 / sqrt(ptc.Q2)
 ## [4] Do the fit
 th.model.fix_parameters('ALL')
 #th.model.release_parameters(
-#   'ALPS', 'M02S', 'SECS', 'THIS', 'ALPG', 'M02G', 'SECG', 'THIG')
+#   'ALPS', 'M03S', 'SECS', 'THIS', 'ALPG', 'M02G', 'SECG', 'THIG')
 #th.model.release_parameters(
 #   'EAL0S', 'EALPS', 'EM02S', 'ESECS', 'ETHIS', 'KAPS',
 #   'EAL1G', 'EM02G',  'ESECG')

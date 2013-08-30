@@ -863,16 +863,17 @@ class ComptonGepard(ComptonFormFactors):
 
     # To have different Gepard models available we have to
     # use separate modules - otherwise things clash
-    #gepardPool = [g1, g2, g3]  #  modules to choose from
-    gepardPool = [g1]  #  modules to choose from
+    gepardPool = [g1, g2, g3]  #  modules to choose from
+    #gepardPool = [g1]  #  modules to choose from
 
-    def __init__(self, cutq2=0.0, ansatz='FIT', fftype='SINGLET', p=0, speed=1, q02=4.0, **kwargs):
+    def __init__(self, cutq2=0.0, ansatz='FIT', fftype='SINGLET', p=0, scheme='MSBAR', speed=1, q02=4.0, **kwargs):
         _lg.debug('Creating %s.\n' % str(self))
         # initial values of parameters and limits on their values
         self.cutq2 = cutq2
         self.ansatz = ansatz
         self.fftype = fftype
         self.p = p
+        self.scheme = scheme
         self.speed = speed
         self.q02 = q02
         self.kwargs = kwargs
@@ -992,7 +993,7 @@ class ComptonGepard(ComptonFormFactors):
                  45 : 'DELM2D',
                  46 : 'PD'})
         elif ansatz not in ['FIT', 'FITEXP', 'EPH', 'EPHEXP', 'EFL', 
-                'EFLEXP', 'HOUCHE']:
+                'EFLEXP', 'HOUCHE', 'TEST']:
             raise ValueError, "Invalid ansatz: %s\n" % ansatz
         
         if ansatz == 'FITEXP':
@@ -1002,20 +1003,21 @@ class ComptonGepard(ComptonFormFactors):
             self.parameters['limit_M02S'] = (0.0, 1.5)
             self.parameters['limit_M02G'] = (0.0, 1.5)
 
-        self._gepardinit(cutq2, ansatz, fftype, p, speed, q02, **kwargs)   # gepard init
+        self._gepardinit(cutq2, ansatz, fftype, p, scheme, speed, q02, **kwargs)   # gepard init
         # now do whatever else is necessary
         ComptonFormFactors.__init__(self, **kwargs)
 
-    def _gepardinit(self, cutq2=0.0, ansatz='FIT', fftype='SINGLET', p=0, speed=1, q02=4.0, **kwargs):
+    def _gepardinit(self, cutq2=0.0, ansatz='FIT', fftype='SINGLET', p=0, scheme='MSBAR', speed=1, q02=4.0, **kwargs):
         """Initialize gepard part of model."""
-        emptyPoolMessage = 'Pool of gepard modules is empty. No new \
-gepard models can be created. Restart everything!\n'
+        emptyPoolMessage = '''
+        Pool of gepard modules is empty. 
+        No new gepard models can be created. Restart everything!\n'''
         if kwargs.pop('newgepard', False):
             # Consume one gepard module from the gepardPool
             try:
                 self.g = ComptonGepard.gepardPool.pop()
-                _lg.debug('Consumed one gepard module from the gepardPool. Leaving %i.\n' 
-                    % (len(ComptonGepard.gepardPool),))
+                _lg.debug('Consumed %s from the gepardPool. Leaving %i.\n' 
+                    % (self.g.__file__, len(ComptonGepard.gepardPool)))
             except IndexError:
                 sys.stderr.write(emptyPoolMessage)
                 return -1
@@ -1023,6 +1025,8 @@ gepard models can be created. Restart everything!\n'
             # Just use the last gepard module, but leave it in the gepardPool
             try:
                 self.g = ComptonGepard.gepardPool[-1]
+                _lg.debug('Using %s from gepardPool, and leaving it there. Their number is %i.\n' 
+                    % (self.g.__file__, len(ComptonGepard.gepardPool)))
             except IndexError:
                 sys.stderr.write(emptyPoolMessage)
                 return -1
@@ -1050,6 +1054,7 @@ gepard models can be created. Restart everything!\n'
 
         self.g.parchr.ansatz = array([c for c in ansatz + (6-len(ansatz))*' ']) # array(6)
         self.g.parchr.fftype = array([c for c in fftype + (10-len(fftype))*' ']) # array(11)
+        self.g.parchr.scheme = array([c for c in scheme + (5-len(scheme))*' ']) # array(5)
 
         self.g.init()
         # Cutting-off evolution  at Q2 = cutq2
@@ -1078,11 +1083,23 @@ gepard models can be created. Restart everything!\n'
         _lg.debug('Unshelving %s.' % str(self))
         self.__dict__ = dict
         # We now have to reconstruct gepard module object
-        self._gepardinit(cutqq2=self.cutq2, ansatz=self.ansatz, speed=self.speed, 
-                q02=self.q02, **self.kwargs)
+        self._gepardinit(cutqq2=self.cutq2, ansatz=self.ansatz, fftype=self.fftype,
+                p=self.p, scheme=self.scheme, speed=self.speed, q02=self.q02, **self.kwargs)
+        # FIXME: Next is for compatibility with old models saved in database.
+        #        Should upgrade database and remoe this:
+        #self._gepardinit(cutqq2=self.cutq2, ansatz=self.ansatz, speed=self.speed, 
+        #        q02=self.q02, **self.kwargs)
+        #if hasattr(self, 'p'):
+        #    self.g.parint.p = self.p
+        #if hasattr(self, 'scheme'):
+        #    self.g.parchr.scheme = self.scheme
+        #if hasattr(self, 'fftype'):
+        #    self.g.parchr.fftype = array([c for c in 
+        #        self.fftype + (10-len(self.fftype))*' ']) # array(10)
+
 
     def return_gepard(self):
-        _lg.debug('Returning gepard module to pool.')
+        _lg.debug('Returning %s to GepardPool.' % (self.g.__file__,))
         ComptonGepard.gepardPool.append(self.g)
 
 
@@ -1104,31 +1121,25 @@ gepard models can be created. Restart everything!\n'
 
 
     def gpdHtrajQ(self, pt):
-        """GPD H^q on xi=x trajectory.
-        FIXME: After this, calling self.ImH is broken!!
-        """
-        self.g.init()
+        """GPD H^q on xi=x trajectory.  """
         self.g.parint.pid = -3
         self.g.newcall = 1
         return self.ImH(pt)/pi
 
     def gpdHtrajG(self, pt):
         """GPD H^g on xi=x trajectory."""
-        self.g.init()
         self.g.parint.pid = -4
         self.g.newcall = 1
         return pt.xi*self.ImH(pt)/pi
 
     def gpdEtrajQ(self, pt):
         """GPD E on xi=x trajectory."""
-        self.g.init()
         self.g.parint.pid = -3
         self.g.newcall = 1
         return self.ImE(pt)/pi
 
     def gpdEtrajG(self, pt):
         """GPD H^g on xi=x trajectory."""
-        self.g.init()
         self.g.parint.pid = -4
         self.g.newcall = 1
         return pt.xi*self.ImE(pt)/pi
@@ -1145,7 +1156,6 @@ gepard models can be created. Restart everything!\n'
         zerosub = {'SECS': 0, 'SECG': 0, 'ESECS' : 0, 'ESECG' : 0,
                    'THIS': 0, 'THIG': 0, 'ETHIS' : 0, 'ETHIG' : 0}
         self.parameters.update(zerosub)
-        self.g.init()
         self.g.parint.pid = -1
         if isinstance(ts, ndarray):
             tmem = pt.t
@@ -1172,7 +1182,6 @@ gepard models can be created. Restart everything!\n'
         zerosub = {'SECS': 0, 'SECG': 0, 'ESECS' : 0, 'ESECG' : 0,
                    'THIS': 0, 'THIG': 0, 'ETHIS' : 0, 'ETHIG' : 0}
         self.parameters.update(zerosub)
-        self.g.init()
         self.g.parint.pid = -2
         if isinstance(ts, ndarray):
             tmem = pt.t
@@ -1199,7 +1208,6 @@ gepard models can be created. Restart everything!\n'
         zerosub = {'SECS': 0, 'SECG': 0, 'ESECS' : 0, 'ESECG' : 0,
                    'THIS': 0, 'THIG': 0, 'ETHIS' : 0, 'ETHIG' : 0}
         self.parameters.update(zerosub)
-        self.g.init()
         self.g.parint.pid = -1
         if isinstance(ts, ndarray):
             tmem = pt.t
@@ -1226,7 +1234,6 @@ gepard models can be created. Restart everything!\n'
         zerosub = {'SECS': 0, 'SECG': 0, 'ESECS' : 0, 'ESECG' : 0,
                    'THIS': 0, 'THIG': 0, 'ETHIS' : 0, 'ETHIG' : 0}
         self.parameters.update(zerosub)
-        self.g.init()
         self.g.parint.pid = -2
         if isinstance(ts, ndarray):
             tmem = pt.t

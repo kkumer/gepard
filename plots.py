@@ -2286,8 +2286,8 @@ def skewness(path=None, fmt='png', **kwargs):
         for label in ax.get_xticklabels() + ax.get_yticklabels():
             label.set_fontsize(14)
         kp += 1
-    # Define abscissas
-    Q2vals = np.linspace(3, 40, 40)
+    # Define abscissas. Q2 can be expensive at NLO MSBAR
+    Q2vals = np.linspace(3, 40, 4)
     # Plot panels
     for obs in ['gpdHskewQ', 'gpdHskewG']:
         # all-x logarithmic

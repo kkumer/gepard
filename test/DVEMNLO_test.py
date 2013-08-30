@@ -19,7 +19,7 @@ def test_c1():
     t.m.parameters.update(KM10b)
     t.m.g.init()
     t.m.g.newcall = 1
-    t.m.g.parint.pid = 3
+    t.m.g.parint.pid = 2
     aux = t.m.g.c1dvmp(1, (0.5+1.j), 2)
     # comparing to DM's DVEM-c1_forKreso.nb
     # quark part
@@ -37,7 +37,7 @@ def test_gepardTFFsNLO():
     mnlo = Model.ComptonGepard(p=1, speed=1)
     tnlo = Approach.BMK(mnlo)
     tnlo.m.parameters.update(dvmppars)
-    tnlo.m.g.parint.pid = 3
+    tnlo.m.g.parint.pid = 2
     xB = 1e-4
     pt = Data.DummyPoint(init = {'Q2':4., 't':0, 'xi':xB/(2.-xB), 'xB':xB})
     utils.fill_kinematics(pt)

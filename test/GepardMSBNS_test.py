@@ -28,7 +28,7 @@ t = Approach.hotfixedBMK(m)
 # Setting gepard to values as in radNLONS.F
 # (Fig. 7 of NPB08)
 t.m.g.parint.nf = 4
-t.m.g.parint.pid = 2   # MSBAR
+t.m.g.parint.pid = 1
 t.m.g.astrong.asp = np.array([0.05, 0.05, 0.05])
 t.m.g.parchr.fftype = np.array([c for c in 'NONSINGLET']) # array(10)
 #t.m.g.parchr.scheme = np.array([c for c in 'MSBDI']) # array(10)

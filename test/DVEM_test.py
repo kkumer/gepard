@@ -12,13 +12,13 @@ from results import KM10b, dvmppars
 m = Model.ComptonGepard(p=0)
 t = Approach.BMK(m)
 t.m.parameters.update(KM10b)
-t.m.g.parint.pid = 3
+t.m.g.parint.pid = 2
 
 # generic LO model from big DVMP draft
 mlo = Model.ComptonGepard(p=0)
 tlo = Approach.BMK(mlo)
 tlo.m.parameters.update(dvmppars)
-tlo.m.g.parint.pid = 3
+tlo.m.g.parint.pid = 2
 
 
 def test_gepardTFFs():

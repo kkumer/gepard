@@ -10,7 +10,7 @@ data = utils.loaddata('data/ep2epgamma', approach=Approach.hotfixedBMK)
 data.update(utils.loaddata('data/gammastarp2gammap', approach=Approach.hotfixedBMK))
 
 # Gepard only
-mGepard = Model.ComptonGepard()
+mGepard = Model.ComptonGepard(scheme='MSBAR')
 tGepard = Approach.hotfixedBMK(mGepard)
 # removing some limits for compatibility with old Gepard
 del mGepard.parameters['limit_M02S']
@@ -58,7 +58,6 @@ def test_gepardfitDVCSNLO():
     setpar(37,  0.)
     setpar(47,  0.)
     mGepard.g.parint.p = 1
-    mGepard.g.parint.pid = 2 # FIXME: this is useless here?
     mGepard.g.init()
     tGepard.model.release_parameters('M02S','SECS','SECG')
     f = Fitter.FitterMinuit(DVCSpoints, tGepard)

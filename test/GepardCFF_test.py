@@ -8,11 +8,11 @@ from results import hy1
 
 data = utils.loaddata('data/ep2epgamma', approach=Approach.hotfixedBMK)  
 
-m = Model.ComptonGepard()
+m = Model.ComptonGepard(scheme='CSBAR')
 m.parameters.update(hy1)
 t = Approach.hotfixedBMK(m)
 
-t.m.g.parint.pid = 1 # CSBAR
+t.m.g.parint.pid = 1
 
 # Seting model parameters to be as in test.F
 def setpar(i, val):
