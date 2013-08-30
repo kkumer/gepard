@@ -1424,7 +1424,7 @@ class ComptonHybrid(ComptonFormFactors):
     def ReE(self, pt):
         return  self.Gepard.ReE(pt) + self.DR.ReE(pt)
 
-    # tildes are not provided by Gepard
+    # FIXME: tildes are not provided by Gepard
 
     def ImHt(self, pt, xi=0):
         return  self.DR.ImHt(pt, xi)
@@ -1438,6 +1438,13 @@ class ComptonHybrid(ComptonFormFactors):
     def ReEt(self, pt):
         return  self.DR.ReEt(pt)
 
+    # FIXME: rho production TFFs are not provided by DR
+
+    def ImHrho(self, pt):
+        return  self.Gepard.ImHrho(pt)
+
+    def ReHrho(self, pt):
+        return  self.Gepard.ReHrho(pt)
 
 class ComptonLocal(ComptonFormFactors):
     """For local fitting of CFFs which are themselves fit paramters."""

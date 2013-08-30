@@ -841,6 +841,7 @@ class BMK(Approach):
                 - (2-pt.xB)**2 *pt.t/4/Mp2*(ImE**2+ReE**2) ) )
         return res
 
+    #_XDVCSt = _XDVCStApprox
     _XDVCSt = _XDVCStEx
     _Xrhot = _XrhotApprox
 

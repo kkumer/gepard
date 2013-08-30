@@ -759,16 +759,19 @@ def DVMP(path=None, fmt='png', **kwargs):
 
     subsets = {}
     subsets[1] = [data[76]]
-    subsets[2] = [] 
+    subsets[2] = [utils.select(H109WdepXL, criteria=['Q2 == 6.6']),
+            utils.select(H109WdepXL, criteria=['Q2 == 11.9']), 
+            utils.select(H109WdepXL, criteria=['Q2 == 19.5']), 
+            utils.select(H109WdepXL, criteria=['Q2 == 35.6'])]
     subsets[3] = []
     subsets[4] = [] 
-    xs = ['Q2', 't', 'W', 'Q2']
+    xs = ['Q2', 'W', 't', 'Q2']
     title = 'H1 DVMP'
     fig = plt.figure()
     fig.canvas.set_window_title(title)
     fig.suptitle(title)
     fig.subplots_adjust(bottom=0.1, hspace=0.3)
-    for npanel in range(1,2):
+    for npanel in range(1,3):
         ax = fig.add_subplot(2,2,npanel)
         ax.set_yscale('log')  # y-axis to be logarithmic
         panel(ax, points=subsets[npanel], xaxis=xs[npanel-1], **kwargs)
@@ -782,21 +785,23 @@ def DVMP(path=None, fmt='png', **kwargs):
         else: # npanel 4
             ax.set_ylabel('')
         # x labels
-        if npanel==1 or npanel==2:
+        if npanel==1:
             ax.set_xlabel('$Q^2\\quad [{\\rm GeV}^2]$', fontsize=18)
-        #elif npanel==3:
-        #    ax.set_xlabel('$W\\quad [{\\rm GeV}]$', fontsize=18)
+        elif npanel==2:
+            ax.set_xlabel('$W\\quad [{\\rm GeV}]$', fontsize=18)
         #else: # npanel 4
         #    ax.set_xlabel('$t\\quad [{\\rm GeV}^2]$', fontsize=18)
         if npanel==1:
-            ax.text(15, 100, '${\\rm W = 75}\\, {\\rm GeV}$', fontsize=12)
-        #if npanel==2:
-        #    ax.text(-0.3, 6, '${\\rm ZEUS}$', fontsize=16)
+            ax.text(15, 100, '${\\rm W = 75}\\, {\\rm GeV}$', fontsize=16)
+            ax.legend(loc='upper right', borderaxespad=0.).draw_frame(0)
+        if npanel==2:
+            ax.text(60, 300, '$Q^2 = 6.6,\\, 11.9,\\, 19.5,\\, 35.6\\, {\\rm GeV}^2$', fontsize=16)
         #if npanel==3:
         #    ax.text(50, 5, '${\\rm H1}\\, (idem):$', fontsize=16)
         #else: # npanel==4
         #    ax.text(30, 3, '${\\rm ZEUS}\\, (idem)$', fontsize=16)
         #    #ax.set_xlim(0, 80)
+        ax.set_ylim(0.3, 1.e3)
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
@@ -2267,14 +2272,16 @@ def skewness(path=None, fmt='png', **kwargs):
         #ax.xaxis.set_major_formatter(matplotlib.ticker.FormatStrFormatter('%s'))
         ax.set_xlabel(toTeX['xixB'], fontsize=18)
         if kp == 1:
-            ax.set_ylabel('r_sea', fontsize=20)
+            ax.set_ylabel('$r^{\\rm sea}$', fontsize=20)
             ax.text(0.001, 0.3, "$Q^2 = 4\\, {\\rm GeV}^2$",# transform=ax.transAxes, 
                     fontsize=15)
         if kp == 2:
-            ax.set_ylabel('r_G', fontsize=20)
+            ax.set_ylabel('$r^{\\rm G}$', fontsize=20)
+            ax.legend(loc='upper right',
+                    borderaxespad=0.).draw_frame(0)
         #apply(ax.set_ylim, ylims[cff])
         ax.set_xlim(0.0001, 0.05)
-        ax.set_ylim(-0.2, 1.3)
+        ax.set_ylim(-0.2, 3.0)
         #ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.02))  # tickmarks
         for label in ax.get_xticklabels() + ax.get_yticklabels():
             label.set_fontsize(14)
@@ -2291,14 +2298,14 @@ def skewness(path=None, fmt='png', **kwargs):
         ax.xaxis.set_major_formatter(matplotlib.ticker.FormatStrFormatter('%s'))
         ax.set_xlabel(toTeX['Q2'], fontsize=18)
         if kp == 3:
-            ax.set_ylabel('r_sea', fontsize=20)
+            ax.set_ylabel('$r^{\\rm sea}$', fontsize=20)
             ax.text(20, 0.4, "$\\xi = 0.001$",# transform=ax.transAxes, 
                     fontsize=15)
         if kp == 4:
-            ax.set_ylabel('r_G', fontsize=20)
+            ax.set_ylabel('$r^{\\rm G}$', fontsize=20)
         #apply(ax.set_ylim, ylims[cff])
         ax.set_xlim(3, 40)
-        ax.set_ylim(-0.2, 1.3)
+        ax.set_ylim(-0.2, 3.0)
         #ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(5.))  # tickmarks
         for label in ax.get_xticklabels() + ax.get_yticklabels():
             label.set_fontsize(14)

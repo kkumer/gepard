@@ -149,6 +149,11 @@ class DataPoint(DummyPoint):
                 self.syst = 0.
             # adding syst and stat in quadrature
             self.err = math.sqrt( self.stat**2 + self.syst**2 )
+			# 3. normalization error
+			# FIXME: We treat it as point-to-point uncorrelated, so add it in quadrature
+            if self.has_key('y1errornormalization'):
+                self.normerr = self.y1errornormalization * self.val
+                self.err = math.sqrt( self.err**2 + self.normerr**2 )
         # 2e. calculate standard kinematical variables
         utils.fill_kinematics(self)
         # 2f. polarizations

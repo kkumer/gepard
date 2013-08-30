@@ -1,0 +1,120 @@
+# Abbreviations for various collections of data
+import utils, Approach
+
+data = utils.loaddata('data/gammastarp2gammap', approach=Approach.BMK)  
+data.update(utils.loaddata('data/ep2epgamma', approach=Approach.BMK))
+data.update(utils.loaddata('data/gammastarp2Mp', approach=Approach.BMK))
+#data.update(utils.loaddata('/home/kkumer/pype/data/gammastarp2gammap/EIC', approach=Approach.BMK))
+#data.update(utils.loaddata('/home/kkumer/pype/data/ep2epgamma/EIC', approach=Approach.BMK))
+
+
+## [2] Choose subset of datapoints for fitting
+
+####  --  Unpolarized target --
+#
+## H1 and ZEUS
+#
+DVCSpoints = data[36] + data[37] + data[38] + data[39] + \
+  data[40] + data[41] + data[42] + data[43] + data[44] + \
+  data[45]
+H1ZEUSpoints = DVCSpoints + data[48]
+H1ZEUSindependent = data[45] + data[39] + data[36] + data[46]
+H1ZEUSindependentNEW = data[45] + data[39] + data[63] + data[46]
+H1ZEUS = H1ZEUSindependentNEW + utils.select(data[47], criteria=['Q2 >= 4.0'])
+#
+## HERMES 
+#
+ALUIpoints = utils.select(data[68], criteria=['FTn == -1'])  # HERMES
+BCA0points = utils.select(data[67], criteria=['FTn == 0'])  # HERMES
+BCA1points = utils.select(data[67], criteria=['FTn == 1'])  # HERMES
+ALUIpts = ALUIpoints[:6]
+BCApts = BCA0points[:6] + BCA1points[:6]
+
+#
+## CLAS
+#
+BSACLAS_KKpoints = data[25]
+BSACLAS_DMpoints = data[8]
+CLASpts = utils.select(data[8], criteria=['Q2 >= 2.0'])
+#
+# Hall A
+#
+BSDwpoints = utils.select(data[50], criteria=['FTn == -1'])
+BSSwpoints = utils.select(data[51], criteria=['FTn>=0', 'FTn <= 1'])
+HApts = BSDwpoints[::2] + BSSwpoints[::2]
+#
+# EIC mock
+#
+#EICX = data[2001]
+#for n in range(2002,2024):
+#    EICX = EICX + data[n]
+#EICTSA = data[2102]
+#for n in range(2103,2110) + range(2111,2118) + range(2119,2125):
+#    EICTSA = EICTSA + data[n]
+#EICmockkk = data[1002]
+#
+# H1 DVMP points
+#
+H109XL = utils.select(data[76], criteria=['Q2 >= 4.0'])
+H109tdep = utils.select(data[75], criteria=['Q2 >= 4.0'])
+
+
+####  --  Longitudinally polarized target --
+#
+TSA1points = utils.select(data[52], criteria=['FTn == -1'])  # HERMES A_UL
+TSApoints = TSA1points + data[54]  # HERMES+CLAS  A_UL
+BTSApoints = utils.select(data[53], criteria=['FTn==0'])   # HERMES A_LL
+LPpoints = TSApoints + BTSApoints  # total longitudinal target
+AULpts = TSA1points[:4] + data[54]
+ALLpts = BTSApoints[:4]
+
+####  --  Transversally polarized target --
+#
+AUTIpoints = utils.select(data[66], criteria=['FTn==1'])  # HERMES A_UT_I
+AUTDVCSpoints = data[65]  # HERMES A_UT_DVCS
+TPpoints = AUTIpoints + AUTDVCSpoints  # total transversal target
+AUTIpts = AUTIpoints[:4]
+
+# Global combinations
+#
+GLOpoints = data[31][12:] + data[8] + data[29]  # DM's GLO set
+#ALTGLOpoints = data[5] + data[25] + data[32][18:]  # KK's CLAS BSA
+ALTGLO5points = data[5] + data[8] + data[32][18:]   # DM's CLAS BSA
+#UNPpoints = ALTGLOpoints + BSSwpoints + BSDwpoints
+UNP5points = ALTGLO5points + BSSwpoints + BSDwpoints
+#
+GLOall = H1ZEUS[::3] + ALUIpts + BCApts + CLASpts + HApts + AULpts + ALLpts + AUTIpts
+GLOfull = (H1ZEUS + ALUIpts + BCApts + BSACLAS_DMpoints + BSSwpoints + BSDwpoints
+            + LPpoints + TPpoints)
+# Excluding LP
+GLOnoL = H1ZEUS[::3] + ALUIpts + BCApts + CLASpts + HApts + AUTIpts
+# Excluding problematic Hall A BSS:
+GLOnoBSS = H1ZEUS[::3] + ALUIpts + BCApts + CLASpts + BSDwpoints[::2] + AULpts + ALLpts + AUTIpts
+#               12         6         12        4           6              4+6      4         4
+GLOnoBSS2 = H1ZEUS + ALUIpts + BCApts + CLASpts + BSDwpoints + AULpts + ALLpts + AUTIpts
+unppts = [ALUIpts, BCApts[6:], CLASpts, BSSwpoints[::-2]]
+polpts = [TSA1points[:4], data[54], BTSApoints[:4], AUTIpoints[:4], AUTDVCSpoints[:4]]
+
+# Local 4-bin fits
+# Updated data by Morgan and DM
+L4_ALUI = utils.select(data[71], criteria=['FTn == -1'])
+L4_AC_0 = utils.select(data[70], criteria=['FTn == 0'])
+L4_AC_1 = utils.select(data[70], criteria=['FTn == 1'])
+# polarized target data
+L4_AUL = utils.select(data[52], criteria=['FTn == -1'])
+L4_ALL_0 = utils.select(data[53], criteria=['FTn==0'])
+L4_ALL_1 = utils.select(data[53], criteria=['FTn==1'])
+L4_AUTI_1 = utils.select(data[66], criteria=['FTn==1'])
+L4_AUTI_0 = utils.select(data[66], criteria=['FTn==0'])
+L4_AUTI_m1 = utils.select(data[66], criteria=['FTn==-1'])
+L4_AUTDVCS = data[65]
+# For ALT last point is overall
+L4_ALTI_1 = utils.select(data[74], criteria=['FTn==1'])[:-1]
+L4_ALTI_0 = utils.select(data[74], criteria=['FTn==0'])[:-1]
+L4_ALTI_m1 = utils.select(data[74], criteria=['FTn==-1'])[:-1]
+L4_ALTBHDVCS_0 = utils.select(data[73], criteria=['FTn==0'])[:-1]
+
+bins = zip(L4_ALUI, L4_AC_0, L4_AC_1, L4_AUL, L4_ALL_0, 
+        L4_ALL_1, L4_AUTI_1, L4_AUTI_0, L4_AUTI_m1, L4_AUTDVCS,
+        L4_ALTI_m1, L4_ALTI_0, L4_ALTI_1, L4_ALTBHDVCS_0)
+
