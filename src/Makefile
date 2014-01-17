@@ -76,7 +76,7 @@ FPREPDIR = Fprep
 FPREPS = init.f beta.f special.f dcomplex.f astrong.f lambda.f\
 projectors.f rnnlo.f erfunc.f evol.f wccsbar.f wcmsbar.f \
 dvcs.f f2.f error.f gauss.f nd.f integra.f readpar.f\
-evolc.f getmbgpd.f hj.f ej.f splice.f cff.f\
+evolc.f getmbgpd.f hj.f ej.f cff.f\
 tff.f wcdvmp.f c1dvmp.f
 _FPREPS = $(patsubst %,$(FPREPDIR)/%,$(FPREPS))
 
