@@ -65,7 +65,7 @@ C
      &       LOGXISTEP = (LOGXIEND - LOGXISTART) / (NNPOINTS - 1)  )
 #include "header.F"
 
-      PROCESS = 'DVCS'
+      PID = 1
       FFTYPE = 'SINGLET'
 
       CALL READPAR
@@ -82,9 +82,6 @@ C
 *     Scales 
 
       QVAR2 = 4.0d0
-
-      NQS = 1
-
 
       SCHEME = 'CSBAR'
       P = 2
@@ -120,7 +117,6 @@ C
             ANSATZ = 'SOFT'
       END IF
 
-      CALL INIT
       MTIND = 0
       IF (NDEL .EQ. 1) MTIND = NMTS + 3
       DEL2 = -MTS(MTIND)
@@ -128,15 +124,19 @@ C
 *     Calculating derivatives of CFFs needed for present line and point ...
 *     ... and saving them to array (note that P changes value)
 
+      CALL INIT
       CALL DERIV(LOGABSH, QVAR2, H, NEVALS, DRVU, ERR)
       P = P - 1
+      CALL INIT
       CALL DERIV(LOGABSH, QVAR2, H, NEVALS, DRVD, ERR)
       POINTS(1, LN, PT) = DRVU / DRVD
 
 *     Returning P to the correct value 
       P = P + 1
+      CALL INIT
       CALL DERIV(ARGH, QVAR2, H, NEVALS, DRVU, ERR)
       P = P - 1
+      CALL INIT
       CALL DERIV(ARGH, QVAR2, H, NEVALS, DRVD, ERR)
       POINTS(2, LN, PT) = DRVU / DRVD
 
@@ -181,8 +181,6 @@ C
 #include "header.F"
 
       Q2 = QQ2
-      QS(1) = Q2
-      CALL EVOLC(1,1)
 
       CALL CFFF 
 
@@ -212,8 +210,6 @@ C
 #include "header.F"
 
       Q2 = QQ2
-      QS(1) = Q2
-      CALL EVOLC(1,1)
 
       CALL CFFF 
 

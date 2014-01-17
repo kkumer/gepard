@@ -17,6 +17,8 @@ Computing:
 -  Check Lanczos algorithm for gamma for negative real part of argument
 -  Paralellize MSBAR and maybe all gpdH....[] functions
 -  Remove PROCESS, FFTYPE and SCHEME and do everything with PID
+-  Remove fitting, SIGMA, PARSIGMA (CFF is highest Fortran
+   level, what about F2?), but note that SIGMA is used by ’accuracy’
 
 
 Checks:
