@@ -2,6 +2,8 @@ This directory holds available experimental data
 
 ep2epgamma/ - relevant experimental data for e p --> e p gamma
 gammastarp2gammap/ - data for \gamma^* p --> \gamma p  i.e. DVCS
+gammastarp2Mp/ - data for \gamma^* p --> meson p  i.e. DVMP
+DIS/  - data for DIS  
 old/ - old data files
 
 Note:
@@ -17,3 +19,10 @@ file. Thus,
    maybe with putting some comment into them
 
 This makes it much easier to reproduce old results.
+
+Some informal conventions:
+
+- ids beyond ID=1000 are for mock/fake data 
+- ids beyond ID=500 are for derived data (derived from
+  actual data using some contestable theoretical procedure)
+- ID=200+ are for DIS data
