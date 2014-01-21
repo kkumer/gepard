@@ -8,6 +8,7 @@ import utils, Model, Approach, Fitter
 
 data = utils.loaddata('data/ep2epgamma', approach=Approach.hotfixedBMK)  
 data.update(utils.loaddata('data/gammastarp2gammap', approach=Approach.hotfixedBMK))
+data.update(utils.loaddata('data/DIS', approach=Approach.BMK))
 
 # Gepard only
 mGepard = Model.ComptonGepard()
@@ -28,11 +29,17 @@ topt = Approach.hotfixedBMK(mopt)
 def setpar(i, val):
     mGepard.parameters[mGepard.parameters_index[i]] = val
 
+# DISpoints = all data from gepard's dis.dat
+DISpoints = data[201] + data[202] + data[203] + data[204] + \
+            data[205] + data[206] + data[207] + data[208] + \
+            data[209] + data[210] + data[211] + data[212]
+
 # DVCSpoints = all data from gepard's dvcs.dat
 # model parameters from DIS fit should be fixed
 DVCSpoints = data[36] + data[37] + data[38] + data[39] + \
   data[40] + data[41] + data[42] + data[43] + data[44] + \
   data[45]
+
 
 # testing data set for fits
 fitpoints = data[31][12:14] + data[8][1:3] + data[30][2:4]
@@ -271,13 +278,15 @@ test_hybridfitDVCS.extendedtesting = 1
 def test_gepardfitDIS():
     """Test fitting to H1 DIS via gepard"""
     # DISpoints = all data from gepard's dis.dat
-    t.model.release_parameters('NS', 'AL0S', 'AL0G')
-    f = Fitter.FitterMinuit(DISpoints, t)
+    tGepard.model.fix_parameters('ALL')
+    tGepard.model.release_parameters('NS', 'AL0S', 'AL0G')
+    f = Fitter.FitterMinuit(DISpoints, tGepard)
     f.fit()
-    chisq = t.chisq(fitpoints)[0]
-    assert_almost_equal(chisq, 49.7312, 5)
+    chisq = tGepard.chisq(f.fitpoints)[0]
+    assert_almost_equal(chisq/100, 49.7312/100, 5)
 
-test_gepardfitDIS.newfeature = 1
+test_gepardfitDIS.long = 1
+test_gepardfitDIS.gepardsuite = 1
 
 def test_hybridfit():
     """Test fitting to large- and small-x data

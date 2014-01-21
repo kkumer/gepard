@@ -4,11 +4,16 @@ import utils, Approach
 data = utils.loaddata('data/gammastarp2gammap', approach=Approach.BMK)  
 data.update(utils.loaddata('data/ep2epgamma', approach=Approach.BMK))
 data.update(utils.loaddata('data/gammastarp2Mp', approach=Approach.BMK))
+data.update(utils.loaddata('data/DIS', approach=Approach.BMK))
 #data.update(utils.loaddata('/home/kkumer/pype/data/gammastarp2gammap/EIC', approach=Approach.BMK))
 #data.update(utils.loaddata('/home/kkumer/pype/data/ep2epgamma/EIC', approach=Approach.BMK))
 
 
 ## [2] Choose subset of datapoints for fitting
+
+DISpoints = data[201] + data[202] + data[203] + data[204] + \
+            data[205] + data[206] + data[207] + data[208] + \
+            data[209] + data[210] + data[211] + data[212]
 
 ####  --  Unpolarized target --
 #

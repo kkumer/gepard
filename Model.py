@@ -863,8 +863,8 @@ class ComptonGepard(ComptonFormFactors):
 
     # To have different Gepard models available we have to
     # use separate modules - otherwise things clash
-    gepardPool = [g1, g2, g3]  #  modules to choose from
-    #gepardPool = [g1]  #  modules to choose from
+    #gepardPool = [g1, g2, g3]  #  modules to choose from
+    gepardPool = [g1]  #  modules to choose from
 
     def __init__(self, cutq2=0.0, ansatz='FIT', fftype='SINGLET', p=0, scheme='MSBAR', speed=1, q02=4.0, **kwargs):
         _lg.debug('Creating %s.\n' % str(self))
@@ -1118,6 +1118,19 @@ class ComptonGepard(ComptonFormFactors):
 
         getattr(self.g, FF)()
         self.g.newcall = 0
+
+    def DISF2(self, pt):
+        """Call gepard routine that calculates DIS F2."""
+        for i in self.parameters_index:
+            self.g.par.par[i-1] = self.parameters[self.parameters_index[i]]
+        self.g.parint.pid = 0
+        self.g.kinematics.q2 = pt.Q2
+        # Note a hack in Fortran gepard where for F2 calculation
+        # XI should actually be xB, and not xB/2 !
+        self.g.kinematics.xi = 2*pt.xi/(1.+pt.xi)
+        self.g.kinematics.del2 = 0
+        self.g.f2f()
+        return self.g.f2.f2[self.g.parint.p]
 
 
     def gpdHtrajQ(self, pt):

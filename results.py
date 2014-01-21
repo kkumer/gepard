@@ -2757,4 +2757,39 @@ nloNLOMSParameters = {
      "KAPG": 0.,
      "SKEWG": 0.}
  
+# from smallx-final.nb
+
+StartParameters = {
+ "NS": 0.15, "AL0S": 1.0, "ALPS": 0.15, "M02S": 1.0, "DELM2S": 0.0, "PS": 2.0,
+ "SECS": 0.0, "KAPS": 0.0, "SKEWS": 0.0,
+ "AL0G": 1.1, "ALPG": 0.15, "M02G": 0.7, "DELM2G": 0.0, "PG": 2.0,
+ "SECG": 0.0, "KAPG": 0.0, "SKEWG": 0.0}
+
+
+
+sumLOParameters = {
+     "NS": 0.15203911208796006, "AL0S": 1.1575060246398083, 
+     "ALPS": 0.15, "M02S": 0.41768649210641556, "DELM2S": 0., "PS": 2., 
+     "SECS": 0., "KAPS": 0., "SKEWS": -10.502775850357269, 
+     "AL0G": 1.247316701070471, "ALPG": 0.15, "M02G": 0.7, 
+     "DELM2G": 0., "PG": 2., "SECG": 0., 
+     "KAPG": 0., "SKEWG": -31.889948002702166}
+
+LODISParameters = {
+     "NS": 0.15203911208796006, "AL0S": 1.1575060246398083, 
+     "ALPS": 0.15, "M02S": 1., "DELM2S": 0., "PS": 2., "SECS": 0., "KAPS": 0., 
+     "SKEWS": 0., "AL0G": 1.247316701070471, "ALPG": 0.15, "M02G": 0.7, 
+     "DELM2G": 0., "PG": 2., "SECG": 0., "KAPG": 0., "SKEWG": 0.}
+ 
+NLODISParameters = {
+     "NS": 0.1678001855399918, "AL0S": 1.1283507054223731, "ALPS": 0.15, "M02S": 1., 
+     "DELM2S": 0., "PS": 2., "SECS": 0., "KAPS": 0., "SKEWS": 0., 
+     "AL0G": 1.0990016751643479, "ALPG": 0.15, "M02G": 0.7, "DELM2G": 0., "PG": 2., 
+     "SECG": 0., "KAPG": 0., "SKEWG": 0.}
+ 
+NNLODISParameters = {
+     "NS": 0.17163282857219522, "AL0S": 1.1251653484541477, "ALPS": 0.15, "M02S": 1., 
+     "DELM2S": 0., "PS": 2., "SECS": 0., "KAPS": 0., "SKEWS": 0., 
+     "AL0G": 1.1042244128306518, "ALPG": 0.15, "M02G": 0.7, "DELM2G": 0., "PG": 2., 
+     "SECG": 0., "KAPG": 0., "SKEWG": 0.}
 

@@ -802,6 +802,14 @@ class BMK(Approach):
         f =  self.XS(pt, **pol)
         return (o-f)/2.
 
+    def F2(self, pt):
+        """DIS F2 form factor."""
+
+        self.m.g.parint.pid = 0
+        self.m.g.newcall = 1
+        res = self.m.DISF2(pt)
+        return res
+
     def _XDVCStApprox(self, pt):
         """Partial DVCS cross section w.r.t. Mandelstam t.
          Approx. formula used in NPB10 paper."""
