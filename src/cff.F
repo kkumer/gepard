@@ -61,7 +61,13 @@ C
       CFAC = EPH / XI**(J+1.d0)
 
       IF ( FFTYPE(:7) .EQ. 'NONSING' ) THEN
-        FPWH = WCE(PID,1,QIND,K,3)*GPDH(K,1)        
+        IF (ANSATZ .EQ. 'NSHOUC') THEN
+*              NS(-)
+          FPWH = WCE(PID,1,QIND,K,4)*GPDH(K,1)        
+        ELSE
+*              NS(+)
+          FPWH = WCE(PID,1,QIND,K,3)*GPDH(K,1)        
+        END IF
 *        FIXME: Following line could be wrong parameter no. It's ther
 *               just to avoid compiler warning ... NONSING is maybe
 *               broken!

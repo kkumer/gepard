@@ -98,12 +98,12 @@ C
  50   CONTINUE
 *     TODO: implement NS- i.e. NSM
       WCTMP(1, 3) = CDISNS1(K, 1) + 0.5d0 * SHIFT1 * CDISNS1(K, 0) *
-     &                GAMNSP(SEC,K, 0)
+     &                GAMNS(SEC,K,0,0)
       WCTMP(2, 3) = CDISNS1(K, 2) + 0.5d0 * SHIFT1 * (CDISNS1(K, 0)
-     &       * GAMNSP(SEC,K, 1) + CDISNS1(K, 1) * GAMNSP(SEC,K, 0)) +
-     &      0.125d0 * SHIFT2 * CDISNS1(K, 0) * GAMNSP(SEC,K, 0)**2 + 
+     &       * GAMNS(SEC,K,1,0) + CDISNS1(K, 1) * GAMNS(SEC,K,0,0)) +
+     &      0.125d0 * SHIFT2 * CDISNS1(K, 0) * GAMNS(SEC,K,0,0)**2 + 
      &      0.5d0 * BETA0(NF) * ( WCTMP(1, 3) * LRR2 + 0.25d0 * 
-     &        CDISNS1(K, 0) * GAMNSP(SEC,K, 0) * LRF2**2 )
+     &        CDISNS1(K, 0) * GAMNS(SEC,K,0,0) * LRF2**2 )
 
 
       RETURN

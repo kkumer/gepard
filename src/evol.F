@@ -17,9 +17,11 @@ C  SYNOPSIS
       IMPLICIT NONE
       INTEGER SEC, K
       DOUBLE PRECISION R
-      DOUBLE COMPLEX EVOLNSA(0:2)
+      DOUBLE COMPLEX EVOLNSA(0:1, 0:2)
+      INTEGER PRTY
 
 C  INPUTS
+C        PRTY -- 0 for NS(+) and 1 for NS(-)
 C         SEC -- SO(3) partial wave
 C           K -- Mellin-Barnes integration point index
 C           R -- ratio of astrong(mu)/astrong(mu0)
@@ -41,28 +43,33 @@ C
 #include "header.F"
 
 
-      CALL RNNLONSF (SEC, K, R1, R2)
+      DO 8 PRTY = 0, 1
+
+        CALL RNNLONSF (PRTY, SEC, K, R1, R2)
 
       
-      AUX(0) = (1.0d0, 0.0d0)
-      AUX(1) = - ( 1.0d0 - 1.0d0 / R ) * R1
-      AUX(2) = 0.5d0 * ( AUX(1)**2 - (1.0d0 - 1.0d0 / R**2) * R2 )
+        AUX(0) = (1.0d0, 0.0d0)
+        AUX(1) = - ( 1.0d0 - 1.0d0 / R ) * R1
+        AUX(2) = 0.5d0 * ( AUX(1)**2 - (1.0d0 - 1.0d0 / R**2) * R2 )
 
-      DO 10 ORD = 0, P
- 10   EVOLNSA(ORD) = AUX(ORD) * R**( - GAMNSP(SEC,K,0) / BETA0(NF) )
+        DO  5 ORD = 0, P
+  5     EVOLNSA(PRTY,ORD) = AUX(ORD) * R**( 
+     &              - GAMNS(SEC,K,0,PRTY) / BETA0(NF) )
 
 *   Adding MSBAR non-diagonal NLO evolution (time consuming)
 *   Only for NLO, and only if proces is either DVMP, or
 *    if MSBAR scheme is explicitely specified.
-      IF ( (P .EQ. 1) .AND. (
+*   FIXME: Check if PRTY=1 i.e. NS(-) case is OK. Probably NOT!!
+        IF ( (P .EQ. 1) .AND. (
      &        (PID .EQ. 2) .OR.
      &        ((PID .EQ.  1) .AND. (SCHEME .EQ. 'MSBAR')) .OR.
      &        ((PID .LE. -3) .AND. (SCHEME .EQ. 'MSBAR')) 
      &                      ) ) THEN
         CALL NDINTF(SEC, K, R, NDINT, 0, 0)
-        EVOLNSA(1) = EVOLNSA(1) + NDINT
+        EVOLNSA(PRTY,1) = EVOLNSA(PRTY,1) + NDINT
       ENDIF
 
+  8   CONTINUE
 
       RETURN
       END

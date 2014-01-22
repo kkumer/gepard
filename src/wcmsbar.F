@@ -60,7 +60,7 @@ C
       WCTMP(1, 3) =  CF * (2.0d0 * HS1(J+1)**2 - (9.0d0/2.0d0)
      &    + (5.0d0 - 4.0d0 * HS1(J+1)) / (2.0d0 * (J+1) * (J+2))
      &    + 1.0d0 / ( (J+1)**2 * (J+2)**2 ) ) 
-     &    - GAMNSP(SEC,K,0)*LRF2/2.0d0
+     &    - GAMNS(SEC,K,0,0)*LRF2/2.0d0
 *     TODO: implement NS-
 
       RETURN

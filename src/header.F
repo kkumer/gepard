@@ -584,22 +584,14 @@ C  SYNOPSIS
 C     ***
 
 
-C     ****v* header.F/GAMNSP
+C     ****v* header.F/GAMNS
 C  DESCRIPTION
-C      GAMNSP(SEC, K, P) -- non-singlet DIS anomalous dimensions  \gamma^+
+C      GAMNS(SEC, K, P, 0) -- non-singlet DIS anomalous dimensions  \gamma^+
+C      GAMNS(SEC, K, P, 1) -- non-singlet DIS anomalous dimensions  \gamma^-
 C  MEMBER OF
 C     GAM(block)
 C  SYNOPSIS
-      DOUBLE COMPLEX GAMNSP(NPWMAX,NPTSMAX,0:2)
-C     ***
-
-C     ****v* header.F/GAMNSM
-C  DESCRIPTION
-C      GAMNSM(SEC, K, P) -- non-singlet DIS anomalous dimensions  \gamma^-
-C  MEMBER OF
-C     GAM(block)
-C  SYNOPSIS
-      DOUBLE COMPLEX GAMNSM(NPWMAX,NPTSMAX,0:2)
+      DOUBLE COMPLEX GAMNS(NPWMAX,NPTSMAX,0:2,0:1)
 C     ***
 
 C     ****v* header.F/GAM
@@ -908,7 +900,7 @@ C     ****c* header.F/GAM(block)
 C  DESCRIPTION
 C     DIS anomalous dimensions 
 C  SYNOPSIS
-      COMMON / GAM      /  GAM, GAMNSP, GAMNSM
+      COMMON / GAM      /  GAM, GAMNS
 C     ***
 
 C     ****c* header.F/BIGCF2(block)

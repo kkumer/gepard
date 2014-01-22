@@ -14,7 +14,7 @@ EXFODIR = ex/obj
 
 
 # "adacf" package Fortran object files
-ADACFOBJS = Harmonic.o WgammaVNSP0F.o WgammaVNSP1F.o\
+ADACFOBJS = Harmonic.o WgammaVNSP0F.o WgammaVNSP1F.o WgammaVNSM1F.o\
 WgammaVNSP2F.o WgammaVQQ0F.o WgammaVQQ1F.o WgammaVQQ2F.o WgammaVQG0F.o\
 WgammaVQG1F.o WgammaVQG2F.o WgammaVGQ0F.o WgammaVGQ1F.o WgammaVGQ2F.o\
 WgammaVGG0F.o WgammaVGG1F.o WgammaVGG2F.o WcVF2NSP0F.o WcVF2NSP1F.o\

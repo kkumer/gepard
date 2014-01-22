@@ -143,24 +143,24 @@ C
       CALL WgammaVQG0F(NFD, Z, GAM(SEC, K, 0, 1, 2))
       CALL WgammaVGQ0F(NFD, Z, GAM(SEC, K, 0, 2, 1))
       CALL WgammaVGG0F(NFD, Z, GAM(SEC, K, 0, 2, 2))
-      CALL WgammaVNSP0F(NFD, Z, GAMNSP(SEC, K, 0))
-c     CALL WgammaVNSM0F(NFD, Z, GAMNSM(SEC, K, 0))
+      CALL WgammaVNSP0F(NFD, Z, GAMNS(SEC, K, 0, 0))
+      CALL WgammaVNSP0F(NFD, Z, GAMNS(SEC, K, 0, 1))
 
       IF (P .GE. 1) THEN
         CALL WgammaVQQ1F(NFD, Z, GAM(SEC, K, 1, 1, 1))
         CALL WgammaVQG1F(NFD, Z, GAM(SEC, K, 1, 1, 2))
         CALL WgammaVGQ1F(NFD, Z, GAM(SEC, K, 1, 2, 1))
         CALL WgammaVGG1F(NFD, Z, GAM(SEC, K, 1, 2, 2))
-        CALL WgammaVNSP1F(NFD, Z, GAMNSP(SEC, K, 1))
-c       CALL WgammaVNSM1F(NFD, Z, GAMNSM(SEC, K, 1))
+        CALL WgammaVNSP1F(NFD, Z, GAMNS(SEC, K, 1, 0))
+        CALL WgammaVNSM1F(NFD, Z, GAMNS(SEC, K, 1, 1))
 
         IF (P .GE. 2) THEN
           CALL WgammaVQQ2F(NFD, Z, GAM(SEC, K, 2, 1, 1))
           CALL WgammaVQG2F(NFD, Z, GAM(SEC, K, 2, 1, 2))
           CALL WgammaVGQ2F(NFD, Z, GAM(SEC, K, 2, 2, 1))
           CALL WgammaVGG2F(NFD, Z, GAM(SEC, K, 2, 2, 2))
-          CALL WgammaVNSP2F(NFD, Z, GAMNSP(SEC, K, 2))
-c         CALL WgammaVNSM2F(NFD, Z, GAMNSM(SEC, K, 2))
+          CALL WgammaVNSP2F(NFD, Z, GAMNS(SEC, K, 2, 0))
+c         CALL WgammaVNSM2F(NFD, Z, GAMNS(SEC, K, 2, 1))
         END IF
       END IF
 

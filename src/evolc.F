@@ -84,8 +84,8 @@ C
 
       INTEGER K
       DOUBLE PRECISION R, ASQ02, ASMUR2, ASMUF2
-      DOUBLE COMPLEX CEVNS, CEV(2)
-      DOUBLE COMPLEX EVOLNSA(0:2)
+      DOUBLE COMPLEX CEVNSP, CEVNSM, CEV(2)
+      DOUBLE COMPLEX EVOLNSA(0:1,0:2)
       DOUBLE COMPLEX EVOLA(0:2,2,2)
 #include "header.F"
 
@@ -107,25 +107,35 @@ C
 
 *       CZERO puts astrong^0 term to zero for investigation of NLO effects
 
-        CEVNS = WC(PID, SEC, K, 0, 3) * EVOLNSA(0) * CZERO
+        CEVNSP = WC(PID, SEC, K, 0, 3) * EVOLNSA(0,0) * CZERO
+        CEVNSM = WC(PID, SEC, K, 0, 4) * EVOLNSA(0,0) * CZERO
 
         IF (P .GE. 1) THEN
 
-          CEVNS = CEVNS + ASMUR2 * WC(PID, SEC, K, 1, 3) * EVOLNSA(0) +
-     &                    ASMUF2 * WC(PID, SEC, K, 0, 3) * EVOLNSA(1) 
+         CEVNSP = CEVNSP + ASMUR2 * WC(PID, SEC, K, 1, 3) * EVOLNSA(0,0)
+     &                  + ASMUF2 * WC(PID, SEC, K, 0, 3) * EVOLNSA(0,1) 
+         CEVNSM = CEVNSM + ASMUR2 * WC(PID, SEC, K, 1, 4) * EVOLNSA(1,0)
+     &                  + ASMUF2 * WC(PID, SEC, K, 0, 4) * EVOLNSA(1,1) 
+*       FIXME: Wilson coef. might also have NS(-) part different from
+*       NS(+) at NLO !
 
           IF (P .GE. 2) THEN
 
-            CEVNS = CEVNS + ASMUR2**2 * WC(PID,SEC,K,2,3)*EVOLNSA(0) +
-     &          ASMUR2 * ASMUF2 * WC(PID,SEC,K,1,3) * EVOLNSA(1) + 
-     &                      ASMUF2**2 *  WC(PID,SEC,K,0,3) * EVOLNSA(2)
+          CEVNSP = CEVNSP + ASMUR2**2 * WC(PID,SEC,K,2,3)*EVOLNSA(0,0) +
+     &          ASMUR2 * ASMUF2 * WC(PID,SEC,K,1,3) * EVOLNSA(0,1) + 
+     &                    ASMUF2**2 *  WC(PID,SEC,K,0,3) * EVOLNSA(0,2)
+          CEVNSM = CEVNSM + ASMUR2**2 * WC(PID,SEC,K,2,4)*EVOLNSA(1,0) +
+     &          ASMUR2 * ASMUF2 * WC(PID,SEC,K,1,4) * EVOLNSA(1,1) + 
+     &                    ASMUF2**2 *  WC(PID,SEC,K,0,4) * EVOLNSA(1,2)
+*       FIXME: Implement NNLO NS(-) evolution
+*       FIXME: Wilson coef. might also have NS(-) part different from
+*       NS(+) at NLO and NNLO !
           END IF
 
         END IF
 
-        WCE(PID, SEC, QIND, K, 3) = CEVNS
-*       FIXME: following has yet to be done!
-        WCE(PID, SEC, QIND, K, 4) = 0.d0
+        WCE(PID, SEC, QIND, K, 3) = CEVNSP
+        WCE(PID, SEC, QIND, K, 4) = CEVNSM
 
 *     2. singlet case
 
