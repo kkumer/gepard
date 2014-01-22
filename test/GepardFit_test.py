@@ -114,6 +114,7 @@ def test_gepardfitDVCSsumso3():
 test_gepardfitDVCSsumso3.long = 1
 # It's not a 'new feature' - test passes but the test
 # from GepardFitNLO_test.py is more comprehensive
+#  (Actually test fails on 3rd digit)
 test_gepardfitDVCSsumso3.newfeature = 1
 
 def test_gepardfitDVCSnlso3():
@@ -284,6 +285,7 @@ def test_gepardfitDIS():
     f.fit()
     chisq = tGepard.chisq(f.fitpoints)[0]
     assert_almost_equal(chisq/100, 49.7312/100, 5)
+    tGepard.model.fix_parameters('ALL')
 
 test_gepardfitDIS.long = 1
 test_gepardfitDIS.gepardsuite = 1
