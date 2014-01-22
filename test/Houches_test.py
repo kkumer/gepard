@@ -7,18 +7,14 @@ import utils, Model, Approach, Data, Fitter
 
 from constants import Mp, Mp2
 
-m = Model.ComptonGepard(ansatz='HOUCHE', q02=2.0)
+m = Model.ComptonGepard(ansatz='HOUCHE', fftype='SINGLET', q02=2.0)
 t = Approach.hotfixedBMK(m)
-
-# Setting gepard to values as in radNNLONS.F
-# (Fig. 12 of NPB08)
 
 t.m.g.parint.nf = 4
 asp0 = 0.35 / 2./ np.pi
 t.m.g.astrong.asp = np.array([asp0, asp0, asp0])
 t.m.g.astrong.mu02 = 2.0
 t.m.g.mbcont.phi = 1.9
-t.m.g.parchr.fftype = np.array([c for c in 'SINGLET   ']) # array(10)
 t.m.g.parint.pid = -2
 
 # Seting model parameters to be as in test.F
@@ -29,7 +25,21 @@ pt = Data.DummyPoint()
 Q2 = 10000.
 xi = 0.1  # note that this is actually xB
 
-def test_DISLO():
+def test_PDFevolINIT():
+    """Les Houches gluon PDF at input scale"""
+    pt.Q2 = 2.0
+    pt.t = 0
+    pt.xi = xi
+    t.m.g.parint.p = 0
+    t.m.g.newcall = 1
+    t.m.g.init()
+    assert_almost_equal(m.gpdHzeroG(pt), 1.26375109, 6)
+
+test_PDFevolINIT.gepardsuite = 1
+test_PDFevolINIT.extendedtesting = 1
+
+
+def test_PDFevolLO():
     """Les Houches gluon PDF at LO"""
     pt.Q2 = Q2
     pt.t = 0
@@ -39,9 +49,9 @@ def test_DISLO():
     t.m.g.init()
     assert_almost_equal(m.gpdHzeroG(pt), 0.887657279, 6)
 
-test_DISLO.gepardsuite = 1
+test_PDFevolLO.gepardsuite = 1
 
-def test_DISNLO():
+def test_PDFevolNLO():
     """Les Houches gluon PDF at NLO"""
     pt.Q2 = Q2
     pt.t = 0
@@ -51,9 +61,9 @@ def test_DISNLO():
     t.m.g.init()
     assert_almost_equal(m.gpdHzeroG(pt), 0.9028145873)
 
-test_DISNLO.gepardsuite = 1
+test_PDFevolNLO.gepardsuite = 1
 
-def test_DISNNLO():
+def test_PDFevolNNLO():
     """Les Houches gluon PDF at NNLO"""
     pt.Q2 = Q2
     pt.t = 0
@@ -63,10 +73,10 @@ def test_DISNNLO():
     t.m.g.init()
     assert_almost_equal(m.gpdHzeroG(pt), 0.9068212068)
 
-test_DISNNLO.gepardsuite = 1
-test_DISNNLO.extendedtesting = 1
+test_PDFevolNNLO.gepardsuite = 1
+test_PDFevolNNLO.extendedtesting = 1
 
-def test_DISNNLO_Q10():
+def test_PDFevolNNLO_Q10():
     """Les Houches gluon PDF at NNLO. Short evolution."""
     pt.Q2 = 10.
     pt.t = 0
@@ -76,5 +86,6 @@ def test_DISNNLO_Q10():
     t.m.g.init()
     assert_almost_equal(m.gpdHzeroG(pt)/10, 1.26362026/10, 5)
 
-test_DISNNLO_Q10.gepardsuite = 1
-test_DISNNLO_Q10.extendedtesting = 1
+test_PDFevolNNLO_Q10.gepardsuite = 1
+test_PDFevolNNLO_Q10.extendedtesting = 1
+
