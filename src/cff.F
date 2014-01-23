@@ -61,7 +61,7 @@ C
       CFAC = EPH / XI**(J+1.d0)
 
       IF ( FFTYPE(:7) .EQ. 'NONSING' ) THEN
-        IF (ANSATZ .EQ. 'NSHOUC') THEN
+        IF (ANSATZ .EQ. 'NSMHOU') THEN
 *              NS(-)
           FPWH = WCE(PID,1,QIND,K,4)*GPDH(K,1)        
         ELSE

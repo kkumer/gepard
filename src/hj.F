@@ -220,11 +220,28 @@ C
 *           Killing E contribution
             PAR(18) = 0.0d0
             PAR(28) = 0.0d0
-      ELSE IF (ANSATZ .EQ. 'NSHOUC') THEN
-*           Just u_valence
+      ELSE IF (ANSATZ .EQ. 'NSMHOU') THEN
+*      (u_valence - d_valence), which is evolved by NS(-)
         FCM(1) =
      &      LHA(1)*LHBETAF(1) / POCHHAMMER(J-DBLCMPLX(LHLAM(1), 0.0D0),
      &        LHBETA(1)+1)
+     &  - LHA(2)*LHBETAF(2) / POCHHAMMER(J-DBLCMPLX(LHLAM(2), 0.0D0),
+     &        LHBETA(2)+1)
+      ELSE IF (ANSATZ .EQ. 'NSPHOU') THEN
+*      (u_valence + 2ubar) - (d_valence + 2dbar), which is evolved by NS(+)
+        FCM(1) =
+     &      LHA(1)*LHBETAF(1) / POCHHAMMER(J-DBLCMPLX(LHLAM(1), 0.0D0),
+     &        LHBETA(1)+1)
+     &  - LHA(2)*LHBETAF(2) / POCHHAMMER(J-DBLCMPLX(LHLAM(2), 0.0D0),
+     &        LHBETA(2)+1)
+     &  - LHA(3)*LHBETAF(3) / POCHHAMMER(J+1-DBLCMPLX(LHLAM(3), 0.0D0),
+     &        LHBETA(3)+1) * 2.D0
+        FCM(2) = 
+     &      LHA(4)*LHBETAF(4) / POCHHAMMER(J-DBLCMPLX(LHLAM(4), 0.0D0),
+     &        LHBETA(4)+1) 
+*           Killing E contribution
+            PAR(18) = 0.0d0
+            PAR(28) = 0.0d0
         FCM(2) =  0.0d0
 *           Killing E contribution
             PAR(18) = 0.0d0
