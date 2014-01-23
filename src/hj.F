@@ -224,6 +224,15 @@ C
 *           Killing E contribution
             PAR(18) = 0.0d0
             PAR(28) = 0.0d0
+      ELSE IF (ANSATZ .EQ. 'NSHOUC') THEN
+*           Just u_v
+        FCM(1) =
+     &      LHA(1)*LHBETAF(1) / POCHHAMMER(J-DBLCMPLX(LHLAM(1), 0.0D0),
+     &        LHBETA(1)+1)
+        FCM(2) = 0.0d0
+*           Killing E contribution
+            PAR(18) = 0.0d0
+            PAR(28) = 0.0d0
       END IF
 
       RETURN
