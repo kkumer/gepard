@@ -993,7 +993,7 @@ class ComptonGepard(ComptonFormFactors):
                  45 : 'DELM2D',
                  46 : 'PD'})
         elif ansatz not in ['FIT', 'FITEXP', 'EPH', 'EPHEXP', 'EFL', 
-                'EFLEXP', 'HOUCHE', 'NSHOUC', 'TEST']:
+                'EFLEXP', 'HOUCHE', 'NSPHOU', 'NSMHOU','TEST']:
             raise ValueError, "Invalid ansatz: %s\n" % ansatz
         
         if ansatz == 'FITEXP':
