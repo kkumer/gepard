@@ -26,7 +26,7 @@ Q2 = 10000.
 xi = 0.1  # note that this is actually xB
 
 def test_PDFevolINIT():
-    """Les Houches gluon PDF at input scale"""
+    """Les Houches singlet PDFs at input scale"""
     pt.Q2 = 2.0
     pt.t = 0
     pt.xi = xi
@@ -34,13 +34,14 @@ def test_PDFevolINIT():
     t.m.g.newcall = 1
     t.m.g.init()
     assert_almost_equal(m.gpdHzeroG(pt), 1.26375109, 6)
+    assert_almost_equal(pt.xi*m.gpdHzeroQ(pt), 1.50054746, 5)
 
 test_PDFevolINIT.gepardsuite = 1
-test_PDFevolINIT.extendedtesting = 1
+#test_PDFevolINIT.extendedtesting = 1
 
 
 def test_PDFevolLO():
-    """Les Houches gluon PDF at LO"""
+    """Les Houches singlet PDFs at LO"""
     pt.Q2 = Q2
     pt.t = 0
     pt.xi = xi
@@ -48,11 +49,12 @@ def test_PDFevolLO():
     t.m.g.newcall = 1
     t.m.g.init()
     assert_almost_equal(m.gpdHzeroG(pt), 0.887657279, 6)
+    assert_almost_equal(pt.xi*m.gpdHzeroQ(pt), 1.44097515, 5)
 
 test_PDFevolLO.gepardsuite = 1
 
 def test_PDFevolNLO():
-    """Les Houches gluon PDF at NLO"""
+    """Les Houches singlet PDFs at NLO"""
     pt.Q2 = Q2
     pt.t = 0
     pt.xi = xi
@@ -60,11 +62,12 @@ def test_PDFevolNLO():
     t.m.g.newcall = 1
     t.m.g.init()
     assert_almost_equal(m.gpdHzeroG(pt), 0.9028145873)
+    assert_almost_equal(pt.xi*m.gpdHzeroQ(pt), 1.39330569, 6)
 
 test_PDFevolNLO.gepardsuite = 1
 
 def test_PDFevolNNLO():
-    """Les Houches gluon PDF at NNLO"""
+    """Les Houches singlet PDFs at NNLO"""
     pt.Q2 = Q2
     pt.t = 0
     pt.xi = xi
@@ -72,9 +75,10 @@ def test_PDFevolNNLO():
     t.m.g.newcall = 1
     t.m.g.init()
     assert_almost_equal(m.gpdHzeroG(pt), 0.9068212068)
+    assert_almost_equal(pt.xi*m.gpdHzeroQ(pt), 1.38651001, 6)
 
 test_PDFevolNNLO.gepardsuite = 1
-test_PDFevolNNLO.extendedtesting = 1
+#test_PDFevolNNLO.extendedtesting = 1
 
 def test_PDFevolNNLO_Q10():
     """Les Houches gluon PDF at NNLO. Short evolution."""
