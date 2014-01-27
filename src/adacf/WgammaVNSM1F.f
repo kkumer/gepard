@@ -1,6 +1,11 @@
 *    
        SUBROUTINE WgammaVNSM1F (NF, n, res)
 *
+
+!f2py float(8) intent(in) :: NF
+!f2py complex(8) intent(in) :: n
+!f2py complex(8) intent(out) :: res
+
        IMPLICIT none
        DOUBLE COMPLEX n, res
        DOUBLE COMPLEX S1, S2, S3, S4

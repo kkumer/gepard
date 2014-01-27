@@ -20,6 +20,7 @@ Computing:
 -  Remove fitting, SIGMA, PARSIGMA (CFF is highest Fortran
    level, what about F2?), but note that SIGMA is used by ’accuracy’
 -  merge CFF, TFF and F2 into one function/file
+-  NF (float or integer?)
 
 
 Checks:
