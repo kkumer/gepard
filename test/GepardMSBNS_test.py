@@ -140,3 +140,4 @@ def test_radMSBARNLONSevol():
 
 
 test_radMSBARNLONSevol.gepardsuite = 1
+test_radMSBARNLONSevol.long = 1

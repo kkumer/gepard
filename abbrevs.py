@@ -15,6 +15,17 @@ DISpoints = data[201] + data[202] + data[203] + data[204] + \
             data[205] + data[206] + data[207] + data[208] + \
             data[209] + data[210] + data[211] + data[212]
 
+H1all = data[36] + data[37] + data[38] + data[39] + \
+  data[40] + data[41] + data[42] + data[43] + data[44] + \
+  data[60] + data[61] + data[62] + data[63] + data[64] + \
+  data[75] + data[76] + data[77] + data[78] + data[79] + data[80]
+ZEUSall = data[45] + data[46] + data[47] + data[48] + data[49]
+HERMESall = data[29] + data[31] + data[32] + data[52] + data[53] + \
+            data[57] + data[58] + data[59] + data[65] + data[66] + \
+            data[67] + data[68] + data[69] + data[70] + data[71] + \
+            data[72] + data[73] + data[74]
+CLASall = data[7] + data[54]
+HallAall = data[33] + data[34] + data[55] + data[56]
 ####  --  Unpolarized target --
 #
 ## H1 and ZEUS

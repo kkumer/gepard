@@ -62,9 +62,9 @@ db = shelve.open('/home/kkumer/pype/theories.db')
 #thLO = db['dvmp']
 #thLO.name = 'LO'
 #Model.ComptonGepard.gepardPool.pop()
-thNLO = db['dvmpnlo']
-Model.ComptonGepard.gepardPool.pop()
-thNLO.name = 'NLO'
+#thNLO = db['dvmpnlo']
+#Model.ComptonGepard.gepardPool.pop()
+#thNLO.name = 'NLO'
 #th = thAFKM12
 #Model.ComptonGepard.gepardPool.pop()
 #thKM10 = db['KM10']

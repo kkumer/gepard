@@ -87,3 +87,4 @@ def test_radMSBARNLOevol():
     assert_almost_equal(m.ImH(pt)/1e5, 653095.26655367797/1e5)
 
 test_radMSBARNLOevol.gepardsuite = 1
+test_radMSBARNLOevol.long = 1

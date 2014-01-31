@@ -1083,19 +1083,19 @@ class ComptonGepard(ComptonFormFactors):
         _lg.debug('Unshelving %s.' % str(self))
         self.__dict__ = dict
         # We now have to reconstruct gepard module object
-        self._gepardinit(cutqq2=self.cutq2, ansatz=self.ansatz, fftype=self.fftype,
-                p=self.p, scheme=self.scheme, speed=self.speed, q02=self.q02, **self.kwargs)
+        #self._gepardinit(cutqq2=self.cutq2, ansatz=self.ansatz, fftype=self.fftype,
+                #p=self.p, scheme=self.scheme, speed=self.speed, q02=self.q02, **self.kwargs)
         # FIXME: Next is for compatibility with old models saved in database.
         #        Should upgrade database and remoe this:
-        #self._gepardinit(cutqq2=self.cutq2, ansatz=self.ansatz, speed=self.speed, 
-        #        q02=self.q02, **self.kwargs)
-        #if hasattr(self, 'p'):
-        #    self.g.parint.p = self.p
-        #if hasattr(self, 'scheme'):
-        #    self.g.parchr.scheme = self.scheme
-        #if hasattr(self, 'fftype'):
-        #    self.g.parchr.fftype = array([c for c in 
-        #        self.fftype + (10-len(self.fftype))*' ']) # array(10)
+        self._gepardinit(cutqq2=self.cutq2, ansatz=self.ansatz, speed=self.speed, 
+                q02=self.q02, **self.kwargs)
+        if hasattr(self, 'p'):
+            self.g.parint.p = self.p
+        if hasattr(self, 'scheme'):
+            self.g.parchr.scheme = self.scheme
+        if hasattr(self, 'fftype'):
+            self.g.parchr.fftype = array([c for c in 
+                self.fftype + (10-len(self.fftype))*' ']) # array(10)
 
 
     def return_gepard(self):

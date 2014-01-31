@@ -16,8 +16,8 @@ m.g.parflt.q02 = 1.0
 nf = 4
 z = 0.1+2.3j  # testpoint
 
-def test_WgammaLO():
-    """Calculate anomalous dimensions up to NNLO."""
+def test_Wgamma():
+    """Calculate anomalous dimensions up to NLO."""
     m.g.parint.p = 1
     m.g.harmonic.s1 = m.g.hs1(z)
     m.g.harmonic.s2 = m.g.hs2(z)
@@ -29,6 +29,7 @@ def test_WgammaLO():
     qq2 = m.g.wgammavqq2f(nf, z)
     nsp1 = m.g.wgammavnsp1f(nf, z)
     nsm1 = m.g.wgammavnsm1f(nf, z)
+    # Comparison to adacf.nb
     assert_almost_equal(qq0, 4.0622581815675+7.2098651918316j)
     assert_almost_equal(gg0/100., (11.4686+16.4593j)/100., 5)
     assert_almost_equal(qq1/100., (22.6712+19.7996j)/100., 5)
