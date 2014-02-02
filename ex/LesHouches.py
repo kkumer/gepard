@@ -28,9 +28,8 @@ fftypes = ['SINGLET', 'SINGLET', 'NONSINGLET', 'NONSINGLET']
 flavlbl = ['gluon', 'singlet Q', 'C=1 NS Q', 'C=-1 NS Q']
 
 
-ss = np.loadtxt('ex/LesHouches-input.dat'); Q2 = 2.
-#ss = np.loadtxt('ex/LesHouches-1e2.dat'); Q2 = 1.e2
-#ss = np.loadtxt('ex/LesHouches.dat'); Q2 = 1.e4
+#ss = np.loadtxt('ex/LesHouches-input.dat'); Q2 = 2.
+ss = np.loadtxt('ex/LesHouches.dat'); Q2 = 1.e4
 ssr = ss.reshape((3,21,7))
 
 # ... which is formatted as:
@@ -42,7 +41,7 @@ xBs = [x for x,p in ssr[0,:,0:3:2]]
 def LesHouches(path=None, fmt='png'):
     """Make Gepard-Pegasus comparison plot."""
     title = 'GepVsPeg'
-    suptitle = 'GeParD vs. Pegausus @ %.0f GeV^2' % Q2
+    suptitle = 'GeParD vs. Pegasus @ %.0f GeV^2' % Q2
     fig = plt.figure()
     #fig.canvas.set_window_title(title)
     fig.suptitle(suptitle)
@@ -66,8 +65,9 @@ def LesHouches(path=None, fmt='png'):
         t.m.g.astrong.asp = np.array([asp0, asp0, asp0])
         t.m.g.astrong.mu02 = 2.0
         t.m.g.mbcont.phi = 1.9
-        #t.m.g.mbcont.c = 0.25
-        t.m.g.parint.pid = -2
+        # Pegasus values:
+        #t.m.g.mbcont.phi = 3./4.*np.pi
+        #t.m.g.mbcont.c = 0.9
         t.m.g.parint.acc = 4
         for ord in range(3):
             if ((flav >=2) and (ord == 2)): break
@@ -82,13 +82,17 @@ def LesHouches(path=None, fmt='png'):
                 else:
                     xF.append(pt.xi*m.gpdHzeroQ(pt))
             err = [abs((peg-gep)/peg) for peg,gep in zip(ssr[ord,:,6-flav], xF)]
-            if np.any([np.isnan(x) for x in err]):
+            # pruning nans
+            clean = np.array([(xB, err) for xB, err in zip(xBs,err) if not np.isnan(err)])
+            xs, ys = clean.transpose()
+            if np.any([np.isnan(x) for x in ys]): # never true
                 ax.plot([], [], color=colors[flav], linestyle=styles[ord],
                         linewidth=2, label='NAN: %s %s' % (lbl[ord], flavlbl[flav])) 
             else:
-                ax.plot(xBs, err, color=colors[flav], linestyle=styles[ord],
+                ax.plot(xs, ys, color=colors[flav], linestyle=styles[ord],
                              linewidth=2, label='%s %s' % (lbl[ord], flavlbl[flav])) 
-    ax.set_xlim(1.0e-7, 1.0)
+    #ax.set_xlim(1.0e-7, 1.0)
+    ax.set_xlim(1.0e-6, 0.5)
     #ax.text(0.2, 8., "$x_B = %s$" % xB, fontsize=14)
     #ax.set_ylabel('$\\Im\\! m \\mathcal{H}(x_{\\rm B}, t, Q^2=2\\,\
     #         {\\rm GeV}^2)/\\pi$', fontsize=10)

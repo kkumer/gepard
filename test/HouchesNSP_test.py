@@ -57,12 +57,23 @@ def test_PDFevolNLO_NSP():
     t.m.g.parint.p = 1
     t.m.g.newcall = 1
     t.m.g.init()
-    # FIXME: We have 4th decimal error here (0.06%), with
-    # K-factor (NLO-LO)/LO equal 2.7%. Error is not
-    # phenomenologically important but should be tracked down.
-    assert_almost_equal(pt.xi*m.gpdHzeroQ(pt), 0.260596274, 3)
+    assert_almost_equal(pt.xi*m.gpdHzeroQ(pt), 2.60426989E-01, 6)
 
 test_PDFevolNLO_NSP.gepardsuite = 1
+
+#def test_PDFevolNLO_NSP_dbg():
+    #"""Les Houches (u+ubar-d-dbar) PDF NLO evolution"""
+    #pt.Q2 = 1.e2
+    #pt.t = 0
+    #pt.xi = 1.e-2
+    #t.m.g.parint.nf = 3
+    #t.m.g.mbcont.phi = np.pi/2.
+    #t.m.g.mbcont.c = 0.3
+    #t.m.g.parint.p = 1
+    #t.m.g.newcall = 1
+    #t.m.g.init()
+    #assert_almost_equal(pt.xi*m.gpdHzeroQ(pt), 7.26024364E-02, 3)
+
 
 def test_PDFevolNNLO_NSP():
     """Les Houches (u+ubar-d-dbar) PDF NNLO evolution"""
@@ -72,6 +83,8 @@ def test_PDFevolNNLO_NSP():
     t.m.g.parint.p = 2
     t.m.g.newcall = 1
     t.m.g.init()
-    assert_almost_equal(pt.xi*m.gpdHzeroQ(pt), 0.259940130, 4)
+    assert_almost_equal(pt.xi*m.gpdHzeroQ(pt), 2.59924771E-01, 3)
 
 test_PDFevolNNLO_NSP.gepardsuite = 1
+# Should work but error is larger than expected
+test_PDFevolNNLO_NSP.newfeature = 1

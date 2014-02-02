@@ -50,7 +50,7 @@ def test_PDFevolLO_NSM():
 test_PDFevolLO_NSM.gepardsuite = 1
 
 def test_PDFevolNLO_NSM():
-    """Les Houches u_v PDF at NLO"""
+    """Les Houches (u_v-d_v) PDF at NLO"""
     pt.Q2 = Q2
     pt.t = 0
     pt.xi = xi
@@ -60,9 +60,24 @@ def test_PDFevolNLO_NSM():
     # FIXME: We have 4th decimal error here (0.06%), with
     # K-factor (NLO-LO)/LO equal 2.7%. Error is not
     # phenomenologically important but should be tracked down.
-    assert_almost_equal(pt.xi*m.gpdHzeroQ(pt), 0.280573314, 3)
+    assert_almost_equal(pt.xi*m.gpdHzeroQ(pt), 0.280377064, 6)
 
 test_PDFevolNLO_NSM.gepardsuite = 1
+
+#def test_PDFevolNLO_NSM_dbg():
+    #"""Les Houches (u_v-d_v) PDF at NLO, for debugging with Pegasus"""
+    #pt.Q2 = 1.e2
+    #pt.t = 0
+    #pt.xi = 1.e-2
+    #t.m.g.parint.nf = 3
+    ##t.m.g.mbcont.phi = np.pi/2.
+    ##t.m.g.mbcont.c = 0.3
+    #t.m.g.parint.p = 1
+    #t.m.g.newcall = 1
+    #t.m.g.init()
+    #assert_almost_equal(pt.xi*m.gpdHzeroQ(pt), 0.0815943813, 3)
+
+#test_PDFevolNLO_NSM_dbg.gepardsuite = 1
 
 def test_PDFevolNNLO_NSM():
     """Les Houches u_v PDF at NNLO (not implemented in gepard)"""
@@ -72,7 +87,7 @@ def test_PDFevolNNLO_NSM():
     t.m.g.parint.p = 2
     t.m.g.newcall = 1
     t.m.g.init()
-    assert_almost_equal(pt.xi*m.gpdHzeroQ(pt), 0.279985895, 4)
+    assert_almost_equal(pt.xi*m.gpdHzeroQ(pt), 0.279974155E-01, 7)
 
 test_PDFevolNNLO_NSM.gepardsuite = 1
 test_PDFevolNNLO_NSM.newfeature = 1
