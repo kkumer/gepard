@@ -50,7 +50,7 @@ C
       PARAMETER (MP = 0.938272d0 )
 #include "../header.F"
 
-      PROCESS = 'DVCS'
+      PID = 1
       FFTYPE = 'SINGLET'
 
       CALL READPAR
@@ -72,7 +72,6 @@ C
       Q02IN = 2.5d0
       Q2EXP = 10.0d0
       DEL2 =  -0.25d0
-      NQS = 1
 
 
 *     Looping over two different ansaetze
@@ -128,8 +127,6 @@ C
 *   Doing calculation ...
   
       CALL INIT
-      QS(1) = Q2
-      CALL EVOLC(1,1)
       CALL CFFF 
 
 *   ... and saving it to arrray

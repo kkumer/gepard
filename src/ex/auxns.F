@@ -45,7 +45,7 @@ C
 
 #include "../header.F"
 
-      PROCESS = 'DVCS'
+      PID = 1
       FFTYPE = 'NONSINGLET'
 
       CALL READPAR
@@ -60,7 +60,6 @@ C
       XI = 0.4d0
       DEL2 = -0.25d0
       SCHEME = 'CSBAR'
-      NQS = 1
 
 *   sea or not?
       PAR(11) = 0.0d0
@@ -73,15 +72,11 @@ C
       Q02 = Q2EXP
       P = 0
       CALL INIT
-      QS(1) = Q2
-      CALL EVOLC(1,1)
       CALL CFFF 
       WRITE (*,902) "LO (no evol)", CFF(0)
 
       Q02 = Q02IN
       CALL INIT
-      QS(1) = Q2
-      CALL EVOLC(1,1)
       CALL CFFF 
       WRITE (*,902) "LO (LO evol)", CFF(0)
 
@@ -89,47 +84,35 @@ C
       CZERO = CZ
       Q02 = Q2EXP
       CALL INIT
-      QS(1) = Q2
-      CALL EVOLC(1,1)
       CALL CFFF 
       WRITE (*,902) "MS NLO (no evol)", CFF(1)
 
       SCHEME = 'MSBLO'
       Q02 = Q02IN
       CALL INIT
-      QS(1) = Q2
-      CALL EVOLC(1,1)
       CALL CFFF 
       WRITE (*,902) "MS NLO (LO evol)", CFF(1)
       TMP = CFF(1)
 
       SCHEME = 'MSBDI'
       CALL INIT
-      QS(1) = Q2
-      CALL EVOLC(1,1)
       CALL CFFF 
       WRITE (*,902) "MS NLO (evol D)", CFF(1) - TMP
       TMP = CFF(1)
 
       SCHEME = 'MSBAR'
       CALL INIT
-      QS(1) = Q2
-      CALL EVOLC(1,1)
       CALL CFFF 
       WRITE (*,902) "MS NLO (evol ND)", CFF(1) - TMP
 
       SCHEME = 'CSBAR'
       Q02 = Q2EXP
       CALL INIT
-      QS(1) = Q2
-      CALL EVOLC(1,1)
       CALL CFFF 
       WRITE (*,902) "CS NLO (no evol)", CFF(1)
 
       Q02 = Q02IN
       CALL INIT
-      QS(1) = Q2
-      CALL EVOLC(1,1)
       CALL CFFF 
       WRITE (*,902) "CS NLO (evol)", CFF(1)
 

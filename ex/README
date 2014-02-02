@@ -14,7 +14,7 @@ make <target>
 
 where possible targets are: 
 
-aux(ns)     -  auxilliary programs calculating single point 
+auxsi(auxns) -  auxilliary programs calculating single point 
 scales(NS)  -  produce Tables 1 and 2 
 scalesNNLO  -  produces Table 3
 radNLO(NS)  -  radiative corr., NLO in both schemes (Figs 7 and 9)

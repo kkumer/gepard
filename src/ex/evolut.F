@@ -60,13 +60,12 @@ C
 
 #include "../header.F"
 
-      PROCESS = 'DVCS'
+      PID = 1
       FFTYPE = 'SINGLET'
 
       CALL READPAR
     
       DEL2 = -0.25d0
-      NQS = 1
 
 #include "ansatz.F"
       ANSATZ = 'FITBP'
@@ -129,16 +128,12 @@ C
 *     Calculating two CFFs needed for present line and point ...
 
       CALL INIT
-      QS(1) = Q2
-      CALL EVOLC(1,1)
       CALL CFFF 
       CFFQ = CFF(P)
       Q2MEM = Q2
 
       Q2 = Q02
       CALL INIT
-      QS(1) = Q2
-      CALL EVOLC(1,1)
       CALL CFFF 
       CFF0 = CFF(P)
       Q2 = Q2MEM

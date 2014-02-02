@@ -45,7 +45,7 @@ C
       CHARACTER SUBANSATZ*4
 #include "../header.F"
 
-      PROCESS = 'DVCS'
+      PID = 1
       FFTYPE = 'SINGLET'
 
       CALL READPAR
@@ -86,15 +86,11 @@ C
       Q2 = Q02
       P = 0
       CALL INIT
-      QS(1) = Q2
-      CALL EVOLC(1,1)
       CALL CFFF 
       WRITE (*,902) "LO (no evol)", CFF(0)
 
       Q2 = Q2EXP
       CALL INIT
-      QS(1) = Q2
-      CALL EVOLC(1,1)
       CALL CFFF 
       WRITE (*,902) "LO (LO evol)", CFF(0)
 
@@ -102,24 +98,18 @@ C
       CZERO = CZ
       Q2 = Q02
       CALL INIT
-      QS(1) = Q2
-      CALL EVOLC(1,1)
       CALL CFFF 
       WRITE (*,902) "MS NLO (no evol)", CFF(1)
 
       SCHEME = 'MSBLO'
       Q2 = Q2EXP
       CALL INIT
-      QS(1) = Q2
-      CALL EVOLC(1,1)
       CALL CFFF 
-      WRITE (*,902) "MS NLO (LO evol)", CFF(1)
+      WRITE (*,902) "MSNLO(LOevol)[?]", CFF(1)
       TMP = CFF(1)
 
       SCHEME = 'MSBDI'
       CALL INIT
-      QS(1) = Q2
-      CALL EVOLC(1,1)
       CALL CFFF 
 !     WRITE (*,902) "MS NLO (evol D)", CFF(1) - TMP
       WRITE (*,902) "MS NLO (evol D)", CFF(1)
@@ -127,8 +117,6 @@ C
 
       SCHEME = 'MSBAR'
       CALL INIT
-      QS(1) = Q2
-      CALL EVOLC(1,1)
       CALL CFFF 
 !     WRITE (*,902) "MS NLO (evol ND)", CFF(1) - TMP
       WRITE (*,902) "MS NLO (evol ND)", CFF(1)
@@ -136,25 +124,21 @@ C
       SCHEME = 'CSBAR'
       Q2 = Q02
       CALL INIT
-      QS(1) = Q2
-      CALL EVOLC(1,1)
       CALL CFFF 
       WRITE (*,902) "CS NLO (no evol)", CFF(1)
 
       Q2 = Q2EXP
       CALL INIT
-      QS(1) = Q2
-      CALL EVOLC(1,1)
       CALL CFFF 
       WRITE (*,902) "CS NLO (evol)", CFF(1)
 
- 10   CONTINUE
+!10   CONTINUE
 
  901  FORMAT (1X, /, 1X, 'ANSATZ = ', A, 4X, 'DELTA^2 = ', F5.2,
      &    4X,'XI = ', F8.5, /)
  902  FORMAT (1X, A16, ' H = ', F11.2, ' + ', F11.2, ' I')
  903  FORMAT (1X, 'evolution : ', F4.1, ' --> ', F5.1, ' GeV^2', /)
- 904  FORMAT (1X, 'CND = ', F6.3)
+!904  FORMAT (1X, 'CND = ', F6.3)
       STOP
       END
 C     ****
