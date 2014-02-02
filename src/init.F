@@ -35,6 +35,7 @@ C
       DOUBLE COMPLEX WCTMP(0:2,4)
       DOUBLE COMPLEX CLNGAMMA
       PARAMETER ( NINTGMAX = 12 )
+*     PARAMETER ( NINTGMAX = 17 )
       DOUBLE PRECISION DOWN(NINTGMAX+1)
 #include "header.F"
       PARAMETER (NBNDMAX = 1)
@@ -86,6 +87,12 @@ C
      & / 0.D0, 0.01D0, 0.08D0, 0.15D0, 0.3D0, 
      &         0.5D0, 1.0D0, 1.5D0, 2.0D0, 
      &         4.0D0, 6.0D0, 8.0D0, 10.0D0 /
+
+
+*  Same as Pegasus:
+*     DATA DOWN  / 0.D0,  0.1D0, 0.3D0, 0.6D0, 1.0D0, 1.6D0, 2.4D0,
+*    1             3.5D0, 5.0D0, 7.0D0, 10.D0, 14.D0, 19.D0, 25.D0,
+*    2             32.D0, 40.D0, 50.D0, 63.D0 /
 
 
 *   Gaussian abscissae and weights:
