@@ -19,7 +19,6 @@ t = Approach.hotfixedBMK(m)
 t.m.g.parint.nf = 4
 t.m.g.parint.pid = 1
 t.m.g.astrong.asp = np.array([0.05, 0.05, 0.05])
-t.m.g.parchr.fftype = np.array([c for c in 'SINGLET   ']) # array(10)
 #t.m.g.parchr.scheme = np.array([c for c in 'MSBAR']) # array(?)
 t.m.g.mbcont.phi = 1.9
 

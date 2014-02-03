@@ -7,7 +7,7 @@ import utils, Model, Approach, Data, Fitter
 
 from constants import Mp, Mp2
 
-m = Model.ComptonGepard(ansatz='HOUCHE', fftype='SINGLET', q02=2.0)
+m = Model.ComptonGepard(ansatz='HOUCHE', q02=2.0)
 t = Approach.hotfixedBMK(m)
 
 t.m.g.parint.nf = 4

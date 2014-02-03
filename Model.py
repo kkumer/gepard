@@ -866,12 +866,11 @@ class ComptonGepard(ComptonFormFactors):
     #gepardPool = [g1, g2, g3]  #  modules to choose from
     gepardPool = [g1]  #  modules to choose from
 
-    def __init__(self, cutq2=0.0, ansatz='FIT', fftype='SINGLET', p=0, scheme='MSBAR', speed=1, q02=4.0, **kwargs):
+    def __init__(self, cutq2=0.0, ansatz='FIT', p=0, scheme='MSBAR', speed=1, q02=4.0, **kwargs):
         _lg.debug('Creating %s.\n' % str(self))
         # initial values of parameters and limits on their values
         self.cutq2 = cutq2
         self.ansatz = ansatz
-        self.fftype = fftype
         self.p = p
         self.scheme = scheme
         self.speed = speed
@@ -1003,11 +1002,11 @@ class ComptonGepard(ComptonFormFactors):
             self.parameters['limit_M02S'] = (0.0, 1.5)
             self.parameters['limit_M02G'] = (0.0, 1.5)
 
-        self._gepardinit(cutq2, ansatz, fftype, p, scheme, speed, q02, **kwargs)   # gepard init
+        self._gepardinit(cutq2, ansatz, p, scheme, speed, q02, **kwargs)   # gepard init
         # now do whatever else is necessary
         ComptonFormFactors.__init__(self, **kwargs)
 
-    def _gepardinit(self, cutq2=0.0, ansatz='FIT', fftype='SINGLET', p=0, scheme='MSBAR', speed=1, q02=4.0, **kwargs):
+    def _gepardinit(self, cutq2=0.0, ansatz='FIT', p=0, scheme='MSBAR', speed=1, q02=4.0, **kwargs):
         """Initialize gepard part of model."""
         emptyPoolMessage = '''
         Pool of gepard modules is empty. 
@@ -1053,7 +1052,6 @@ class ComptonGepard(ComptonFormFactors):
         self.g.mbcont.phind = 1.57
 
         self.g.parchr.ansatz = array([c for c in ansatz + (6-len(ansatz))*' ']) # array(6)
-        self.g.parchr.fftype = array([c for c in fftype + (10-len(fftype))*' ']) # array(11)
         self.g.parchr.scheme = array([c for c in scheme + (5-len(scheme))*' ']) # array(5)
 
         self.g.init()
@@ -1083,7 +1081,7 @@ class ComptonGepard(ComptonFormFactors):
         _lg.debug('Unshelving %s.' % str(self))
         self.__dict__ = dict
         # We now have to reconstruct gepard module object
-        #self._gepardinit(cutqq2=self.cutq2, ansatz=self.ansatz, fftype=self.fftype,
+        #self._gepardinit(cutqq2=self.cutq2, ansatz=self.ansatz,
                 #p=self.p, scheme=self.scheme, speed=self.speed, q02=self.q02, **self.kwargs)
         # FIXME: Next is for compatibility with old models saved in database.
         #        Should upgrade database and remoe this:
@@ -1093,9 +1091,6 @@ class ComptonGepard(ComptonFormFactors):
             self.g.parint.p = self.p
         if hasattr(self, 'scheme'):
             self.g.parchr.scheme = self.scheme
-        if hasattr(self, 'fftype'):
-            self.g.parchr.fftype = array([c for c in 
-                self.fftype + (10-len(self.fftype))*' ']) # array(10)
 
 
     def return_gepard(self):
