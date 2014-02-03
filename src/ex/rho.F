@@ -30,7 +30,6 @@ C
       DATA Q2EXP / 3.3d0, 6.6d0, 11.5d0, 17.4d0, 33.d0 /
       DATA XSEXP / 2156.d0, 604.d0, 181.d0, 51.1d0, 6.5d0 /
 
-      FFTYPE  = 'SINGLET'
 
       CALL READPAR
 *   modifications of GEPARD.INI

@@ -46,7 +46,6 @@ C
 #include "../header.F"
 
       PID = 1
-      FFTYPE = 'SINGLET'
 
       CALL READPAR
 
@@ -60,7 +59,6 @@ C
       DEL2 = -0.25d0
       SCHEME = 'MSBDI'
       CZ = 1
-      NQS = 1
 
       SUBANSATZ = 'HARD'
 

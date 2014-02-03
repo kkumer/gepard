@@ -41,14 +41,12 @@ C
 
       DATA XIS / 1.0D-5, 1.0D-4, 1.0D-3, 0.01D0, 0.1D0, 0.25D0, 0.5D0 /
 
-      PROCESS = 'DVCS'
-      FFTYPE = 'SINGLET'
+      PID = 1
 
       CALL READPAR
       
 #include "ansatz.F"
       ANSATZ = 'FITBP'
-      NQS = 1
 
 *     File that will hold results
 
@@ -62,7 +60,6 @@ C
       Q02 = 4.0d0
       Q2 = 4.0d0
       DEL2 = -0.25d0
-      QS(1) = Q2
 
 *     Looping over two different ansaetze
 
@@ -105,21 +102,18 @@ C
       RR2 = 1.0d0
       RF2 = 1.0d0
       CALL INIT
-      CALL EVOLC(1,1)
       CALL CFFF 
       CFFM = CFF(P)
 
       RR2 = 1.0d0 / FACR
       RF2 = 1.0d0 / FACF
       CALL INIT
-      CALL EVOLC(1,1)
       CALL CFFF 
       CFFD = CFF(P)
 
       RR2 = FACR
       RF2 = FACF
       CALL INIT
-      CALL EVOLC(1,1)
       CALL CFFF 
       CFFU = CFF(P)
       

@@ -42,15 +42,12 @@ C
 
 #include "../header.F"
 
-      PROCESS = 'DVCS'
-      FFTYPE = 'SINGLET'
+      PROCESS = PID
 
       CALL READPAR
 
       ANSATZ = 'FIT'
       Q02    =    4.0d0
-      NQS = 1
-      NQSDIS = 1
     
 #include "ansatz.F"
 
@@ -142,8 +139,6 @@ C
         CALL PRINTDATA(10, FNAME)
 
         CALL INIT
-        QS(1) = Q2
-        CALL EVOLC(1,1)
         
 *     Looping over MT
         LSTART = 0.05
@@ -189,8 +184,6 @@ C
 
           Q2 = LSTART + (PT - 1) * LSTEP
           XI = Q2 / ( 2.0d0 * W**2 + Q2)
-          QS(1) = Q2
-          CALL EVOLC(1,1)
           WRITE (UNIT=11,FMT=998) Q2, SIGMA(), 0.0
 
  40     CONTINUE
@@ -214,8 +207,6 @@ C
         CALL PRINTDATA(12, FNAME)
 
         CALL INIT
-        QS(1) = Q2
-        CALL EVOLC(1,1)
         
 *     Looping over W
         LSTART = 30.d0
@@ -264,8 +255,6 @@ C
         DO 80 PT = 1, LNPOINTS
 
           Q2 = LSTART + (PT - 1) * LSTEP
-          QSDIS(1) = Q2
-          CALL EVOLC(1,1)
           CALL F2F
           WRITE (UNIT=13,FMT=998) Q2, F2(P), 0.0
 

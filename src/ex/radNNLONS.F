@@ -55,15 +55,13 @@ C
 
 #include "../header.F"
 
-      PROCESS = 'DVCS'
-      FFTYPE = 'NONSINGLET'
+      PID = 1
 
       CALL READPAR
     
 
 #include "ansatz.F"
       ANSATZ = 'NSFIT'
-      NQS = 1
 
 
 *     Files that will hold results
@@ -87,7 +85,6 @@ C
 
       Q2 = 2.5d0
       IF (NDEL .EQ. 1) Q2 = 10.0d0
-      QS(1) = Q2
 
       XI = XISTART
       DO 20 PT = 1, LNPOINTS
@@ -116,11 +113,9 @@ C
 *     Calculating two CFFs needed for present line and point ...
 
       CALL INIT
-      CALL EVOLC(1,1)
       CALL CFFF 
       P = P - 1
       CALL INIT
-      CALL EVOLC(1,1)
       CALL CFFF 
       P = P + 1
 

@@ -29,7 +29,6 @@ C
       DOUBLE PRECISION LHXGNNLO(21), XIA(21)
 #include "header.F"
 
-      FFTYPE = 'SINGLET'
 
 *  Values of Bjorken x
 

@@ -41,14 +41,12 @@ C
 
       DATA XIS / 0.05D0, 0.1D0, 0.25D0, 0.5D0 /
 
-      PROCESS = 'DVCS'
-      FFTYPE = 'NONSINGLET'
+      PID = 1
 
       CALL READPAR
     
 #include "ansatz.F"
       ANSATZ = 'NSFIT'
-      NQS = 1
 
 
 *     File that will hold results
@@ -116,24 +114,18 @@ C
       RR2 = 1.0d0
       RF2 = 1.0d0
       CALL INIT
-      QS(1) = Q2
-      CALL EVOLC(1,1)
       CALL CFFF 
       CFFM = CFF(P)
 
       RR2 = 1.0d0 / FACR
       RF2 = 1.0d0 / FACF
       CALL INIT
-      QS(1) = Q2
-      CALL EVOLC(1,1)
       CALL CFFF 
       CFFD = CFF(P)
 
       RR2 = FACR
       RF2 = FACF
       CALL INIT
-      QS(1) = Q2
-      CALL EVOLC(1,1)
       CALL CFFF 
       CFFU = CFF(P)
       

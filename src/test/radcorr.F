@@ -55,7 +55,6 @@ C
 #include "header.F"
 
       PID = 1
-      FFTYPE = 'SINGLET'
 
       CALL READPAR
 

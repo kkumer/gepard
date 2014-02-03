@@ -29,8 +29,6 @@ C
       DOUBLE PRECISION PARSIGMA, SIGMA
 #include "../header.F"
 
-      FFTYPE  = 'SINGLET'
-
       CALL READPAR
 
 *   GPD ansatz:

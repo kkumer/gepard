@@ -61,7 +61,6 @@ C
 #include "../header.F"
 
       PID = 1
-      FFTYPE = 'NONSINGLET'
 
       CALL READPAR
     

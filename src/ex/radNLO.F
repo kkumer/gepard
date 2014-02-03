@@ -57,8 +57,7 @@ C
 
 #include "../header.F"
 
-      PROCESS = 'DVCS'
-      FFTYPE = 'SINGLET'
+      PID = 1
 
       CALL READPAR
     
@@ -79,7 +78,6 @@ C
 
 *     Scales 
 
-      NQS = 1
       Q2 = 2.5d0
 
 *     Looping over two different walues of \Delta^2
@@ -121,14 +119,10 @@ C
 
       P = 1
       CALL INIT
-      QS(1) = Q2
-      CALL EVOLC(1,1)
       CALL CFFF 
 
       P = 0
       CALL INIT
-      QS(1) = Q2
-      CALL EVOLC(1,1)
       CALL CFFF 
 
 *     ... and saving them to array

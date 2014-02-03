@@ -57,8 +57,7 @@ C
 #include "../header.F"
 
       WRITE (*,*) 'Warning: This one is still broken!'
-      PROCESS = 'DVCS'
-      FFTYPE = 'SINGLET'
+      PID = 1
 
       CALL READPAR
     
@@ -72,7 +71,6 @@ C
 
       DEL2 = -0.25d0
       SCHEME = 'CSBAR'
-      NQS = 1
 
 
 *     Files that will hold results
@@ -111,7 +109,6 @@ C
 
         Q2 = Q2START + (PT - 1) * Q2STEP
         Q2S(PT) = Q2
-        QS(1) = Q2
         P = 2
         CALL INIT
 
@@ -126,7 +123,6 @@ C
 
           DO 10 P = 0, 2
 
-            CALL EVOLC(1,1)
             CALL CFFF 
 
 *         ... and saving them to array

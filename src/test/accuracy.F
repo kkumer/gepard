@@ -30,7 +30,6 @@ C
 
 
       PID = 1
-      FFTYPE = 'SINGLET'
       ANSATZ = 'FITNG'
 
       DATA XIA / 1.D-7,  5.D-7,  1.D-6,  5.D-6,  1.D-5,  5.D-5,

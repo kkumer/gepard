@@ -57,14 +57,12 @@ C
 
 #include "../header.F"
 
-      PROCESS = 'DVCS'
-      FFTYPE = 'NONSINGLET'
+      PID =1
 
       CALL READPAR
 
 #include "ansatz.F"
       ANSATZ = 'NSFIT'
-      NQS = 1
 
 *     Files that will hold results
 
@@ -116,14 +114,10 @@ C
 
       P = 1
       CALL INIT
-      QS(1) = Q2
-      CALL EVOLC(1,1)
       CALL CFFF 
       
       P = 0
       CALL INIT
-      QS(1) = Q2
-      CALL EVOLC(1,1)
       CALL CFFF 
 
 *     ... and saving them to array

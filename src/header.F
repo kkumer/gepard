@@ -237,15 +237,6 @@ C  SYNOPSIS
       CHARACTER ANSATZ*6
 C     ***
 
-C     ****v* header.F/FFTYPE
-C  DESCRIPTION
-C      FFTYPE -- form-factor type (SINGLET or NONSINGLET)
-C  MEMBER OF
-C     PARCHR
-C  SYNOPSIS
-      CHARACTER FFTYPE*10
-C     ***
-
 C     ****v* header.F/DATFILE
 C  DESCRIPTION
 C      DATFILE -- file with specification of datasets
@@ -747,7 +738,7 @@ C     ****c* header.F/PARCHR
 C  DESCRIPTION
 C     String parameters
 C  SYNOPSIS
-      COMMON / PARCHR /  SCHEME, ANSATZ, FFTYPE
+      COMMON / PARCHR /  SCHEME, ANSATZ
 C     ***
 
 C     ****c* header.F/FILENAMES
