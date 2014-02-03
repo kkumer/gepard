@@ -863,8 +863,8 @@ class ComptonGepard(ComptonFormFactors):
 
     # To have different Gepard models available we have to
     # use separate modules - otherwise things clash
-    #gepardPool = [g1, g2, g3]  #  modules to choose from
-    gepardPool = [g1]  #  modules to choose from
+    gepardPool = [g1, g2, g3]  #  modules to choose from
+    #gepardPool = [g1]  #  modules to choose from
 
     def __init__(self, cutq2=0.0, ansatz='FIT', p=0, scheme='MSBAR', speed=1, q02=4.0, **kwargs):
         _lg.debug('Creating %s.\n' % str(self))
@@ -1414,6 +1414,7 @@ class ComptonHybrid(ComptonFormFactors):
         return self.__dict__
 
     def __setstate__(self, dict):
+        _lg.debug('Unshelving %s.' % str(self))
         self.__dict__ = dict
         self.g = self.Gepard.g
 

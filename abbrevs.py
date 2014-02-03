@@ -94,7 +94,7 @@ AUTIpts = AUTIpoints[:4]
 # Global combinations
 #
 GLOpoints = data[31][12:] + data[8] + data[29]  # DM's GLO set
-#ALTGLOpoints = data[5] + data[25] + data[32][18:]  # KK's CLAS BSA
+ALTGLOpoints = data[5] + data[25] + data[32][18:]  # KK's CLAS BSA
 ALTGLO5points = data[5] + data[8] + data[32][18:]   # DM's CLAS BSA
 #UNPpoints = ALTGLOpoints + BSSwpoints + BSDwpoints
 UNP5points = ALTGLO5points + BSSwpoints + BSDwpoints
