@@ -21,6 +21,8 @@ Computing:
    level, what about F2?), but note that SIGMA is used by ’accuracy’
 -  merge CFF, TFF and F2 into one function/file
 -  NF (float or integer?)
+-  Maybe treat resummed GPD model differently and clean up hj.F
+   and cff.F by removing implied XI-dependence of GPD
 
 
 Checks:
