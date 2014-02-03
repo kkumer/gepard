@@ -28,14 +28,44 @@ C
 
       IMPLICIT NONE
       INTEGER K, QIND, GETQIND
-      DOUBLE COMPLEX EPH, J, CFAC, FPWH, FPWE
+      DOUBLE COMPLEX EPH, J, CFAC, FPWH, FPWHNS, FPWE
       DOUBLE PRECISION RESREALH, RESIMAGH
       DOUBLE PRECISION FREALH, FIMAGH
       DOUBLE PRECISION RESREALE, RESIMAGE
       DOUBLE PRECISION FREALE, FIMAGE
-      DOUBLE PRECISION XIMEM
+      DOUBLE PRECISION XIMEM, CHARGEFACNS
 #include "header.F"
       DOUBLE COMPLEX DCTAN
+
+*     Charge factor
+
+*         -- SINGLET --
+        IF (NF .EQ. 3) THEN
+           CHARGEFAC =  2.0D0 / 9.0D0
+        ELSE IF (NF .EQ. 4) THEN
+           CHARGEFAC =  5.0D0 / 18.0D0
+        ELSE
+           CALL ERROR ('GeParD', ' INIT',
+     & 'NF is not integer equal to 3 or 4!                          ',
+     & 5, 3)
+        END IF
+*         -- NONSINGLET --
+        IF (NF .EQ. 3) THEN
+           CHARGEFACNS =  1.0D0 / 9.0D0
+        ELSE IF (NF .EQ. 4) THEN
+           CHARGEFACNS =  1.0D0 / 6.0D0
+        ELSE
+           CALL ERROR ('GeParD', ' INIT',
+     & 'NF is not integer equal to 3 or 4!                          ',
+     & 5, 3)
+        END IF
+
+*         -- when calculating just GPDs --
+
+      IF (PID .LE. -1) THEN
+          CHARGEFAC = 1.0d0
+          CHARGEFACNS = 1.0d0
+      ENDIF
 
       EPH = EXP ( DBLCMPLX(0.0d0, PHI) )
 
@@ -60,19 +90,12 @@ C
       J = N(1,K) - 1
       CFAC = EPH / XI**(J+1.d0)
 
-      IF ( FFTYPE(:7) .EQ. 'NONSING' ) THEN
-        IF (ANSATZ .EQ. 'NSMHOU') THEN
-*              NS(-)
-          FPWH = WCE(PID,1,QIND,K,4)*GPDH(K,1)        
-        ELSE
-*              NS(+)
-          FPWH = WCE(PID,1,QIND,K,3)*GPDH(K,1)        
-        END IF
+        FPWHNS = WCE(PID,1,QIND,K,3)*GPDH(K,3) +
+     &                 WCE(PID,1,QIND,K,4)*GPDH(K,4) 
 *        FIXME: Following line could be wrong parameter no. It's ther
 *               just to avoid compiler warning ... NONSING is maybe
 *               broken!
-        FPWE = WCE(PID,1,QIND,K,3)*PAR(17)*GPDE(K,1)        
-      ELSE
+*       FPWE = WCE(PID,1,QIND,K,3)*PAR(17)*GPDE(K,1)        
 *       --- singlet case ---
 *            --- CFF H ---
         FPWH = WCE(PID,1,QIND,K,1)*GPDH(K,1) + 
@@ -106,13 +129,14 @@ C
         FPWE = FPWE +  
      &          PAR(18) * PAR(137) * WCE(PID,3,QIND,K,1) * GPDE(K,1) + 
      &          PAR(28) * PAR(147) * WCE(PID,3,QIND,K,2) * GPDE(K,2)
-      END IF
 
       IF (ANSATZ(:1) .EQ. 'E') THEN
 *     PAR(38)=Delta-B for CFF-E as proposed by Markus
         FPWE = FPWE * EXP(PAR(48)*DEL2)
       END IF
 
+      FPWH = CHARGEFACNS*FPWHNS + CHARGEFAC*FPWH
+      FPWE = CHARGEFAC*FPWE
       FREALH = IMAGPART(CFAC * DCTAN(PIHALF*J) * FPWH)
       FREALE = IMAGPART(CFAC * DCTAN(PIHALF*J) * FPWE)
 
@@ -128,37 +152,9 @@ C
 
  123  CONTINUE
       
-*     Multiplying with charge factor
 
-      IF ( FFTYPE(:7) .EQ. 'SINGLET' ) THEN
-        IF (NF .EQ. 3) THEN
-           CHARGEFAC =  2.0D0 / 9.0D0
-        ELSE IF (NF .EQ. 4) THEN
-           CHARGEFAC =  5.0D0 / 18.0D0
-        ELSE
-           CALL ERROR ('GeParD', ' INIT',
-     & 'NF is not integer equal to 3 or 4!                          ',
-     & 5, 3)
-        END IF
-      ELSE
-*         -- NONSINGLET --
-        IF (NF .EQ. 3) THEN
-           CHARGEFAC =  1.0D0 / 9.0D0
-        ELSE IF (NF .EQ. 4) THEN
-           CHARGEFAC =  1.0D0 / 6.0D0
-        ELSE
-           CALL ERROR ('GeParD', ' INIT',
-     & 'NF is not integer equal to 3 or 4!                          ',
-     & 5, 3)
-        END IF
-      END IF
-
-*         -- when calculating just GPDs --
-
-      IF (PID .LE. -1) CHARGEFAC = 1.0d0
-
-      CFF(P) = CHARGEFAC * DBLCMPLX(RESREALH, RESIMAGH)
-      CFFE(P) = CHARGEFAC * DBLCMPLX(RESREALE, RESIMAGE) 
+      CFF(P) = DBLCMPLX(RESREALH, RESIMAGH)
+      CFFE(P) = DBLCMPLX(RESREALE, RESIMAGE) 
 
       RETURN
       END

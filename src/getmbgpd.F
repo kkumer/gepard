@@ -22,7 +22,7 @@ C
       IMPLICIT NONE
       INTEGER K
 #include "header.F"
-      DOUBLE COMPLEX J, FCM(2)
+      DOUBLE COMPLEX J, FCM(4)
 
 
 c$OMP parallel do PRIVATE(J, FCM)
@@ -31,13 +31,17 @@ c$OMP parallel do PRIVATE(J, FCM)
         CALL HJ(J, FCM)
         GPDH(K, 1) = FCM(1)
         GPDH(K, 2) = FCM(2)
+        GPDH(K, 3) = FCM(3)
+        GPDH(K, 4) = FCM(4)
         IF ( (ANSATZ .EQ. 'EFL') .OR. (ANSATZ .EQ. 'EFLEXP') ) THEN
 *           we model E independently, so call EJ to overwrite FCM
-*           otherwise, we use E \propto H 
             CALL EJ(J, FCM)
         END IF
+*           otherwise, we use E \propto H 
         GPDE(K, 1) = FCM(1)
         GPDE(K, 2) = FCM(2)
+        GPDE(K, 3) = FCM(3)
+        GPDE(K, 4) = FCM(4)
  30   CONTINUE
 c$OMP end parallel do
 
