@@ -69,11 +69,6 @@ def test_radLONS():
     pt.t = -0.25
     pt.xi = 0.01
     pt.xB = 2*pt.xi/(1.+pt.xi)
-    #FIXME: how to avoid this:
-    try:
-        del t.m.qdict[pt.Q2]
-    except:
-        pass
     t.m.g.parint.p = 0
     t.m.g.newcall = 1
     t.m.g.init()
@@ -88,11 +83,6 @@ def test_radNLONS():
     pt.t = -0.25
     pt.xi = 0.01
     pt.xB = 2*pt.xi/(1.+pt.xi)
-    #FIXME: how to avoid this:
-    try:
-        del t.m.qdict[pt.Q2]
-    except:
-        pass
     t.m.g.parint.p = 1
     t.m.g.newcall = 1
     t.m.g.init()
@@ -107,10 +97,6 @@ def test_radNNLONS():
     pt.t = -0.25
     pt.xi = 0.01
     pt.xB = 2*pt.xi/(1.+pt.xi)
-    try:
-        del t.m.qdict[pt.Q2]
-    except:
-        pass
     t.m.g.parint.p = 2
     t.m.g.newcall = 1
     t.m.g.init()

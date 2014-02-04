@@ -1075,22 +1075,24 @@ class ComptonGepard(ComptonFormFactors):
         # We have to remove unpicklable gepard module object
         _lg.debug('Shelving [ComptonGepard] %s.\n' % str(self))
         del self.g
+        if self.kwargs.has_key('newgepard'):
+            _lg.warning("Model with newgepard atribute saved. It will consume one GepardPool module when restored.\n")
         return self.__dict__
 
     def __setstate__(self, dict):
         _lg.debug('Unshelving %s.' % str(self))
         self.__dict__ = dict
         # We now have to reconstruct gepard module object
-        #self._gepardinit(cutqq2=self.cutq2, ansatz=self.ansatz,
-                #p=self.p, scheme=self.scheme, speed=self.speed, q02=self.q02, **self.kwargs)
+        self._gepardinit(cutqq2=self.cutq2, ansatz=self.ansatz,
+                p=self.p, scheme=self.scheme, speed=self.speed, q02=self.q02, **self.kwargs)
         # FIXME: Next is for compatibility with old models saved in database.
         #        Should upgrade database and remoe this:
-        self._gepardinit(cutqq2=self.cutq2, ansatz=self.ansatz, speed=self.speed, 
-                q02=self.q02, **self.kwargs)
-        if hasattr(self, 'p'):
-            self.g.parint.p = self.p
-        if hasattr(self, 'scheme'):
-            self.g.parchr.scheme = self.scheme
+        #self._gepardinit(cutqq2=self.cutq2, ansatz=self.ansatz, speed=self.speed, 
+                #q02=self.q02, **self.kwargs)
+        #if hasattr(self, 'p'):
+            #self.g.parint.p = self.p
+        #if hasattr(self, 'scheme'):
+            #self.g.parchr.scheme = self.scheme
 
 
     def return_gepard(self):

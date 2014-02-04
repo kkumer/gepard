@@ -275,7 +275,7 @@ def listdb(db):
     print "%-8s--+--%s" % (8*'-', 60*'-')
     for key in db:
         print "%-8s  |  %s" % (key, db[key].description)
-    print "\n WARNING: gepard models are now likely broken. Reinitialize them!"
+    #print "\n WARNING: gepard models are now likely broken. Reinitialize them!"
 
 
 class hubDict(dict):
