@@ -271,10 +271,11 @@ def select(dataset, criteria=[], logic='AND'):
     return selected
 
 def listdb(db):
-    print "%-8s  |  %s" % ('name', 'description')
-    print "%-8s--+--%s" % (8*'-', 60*'-')
+    print "%-17s--+--%s" % (17*'-', 60*'-')
+    print "%-17s  |  %s" % ('name', 'description')
+    print "%-17s--+--%s" % (17*'-', 60*'-')
     for key in db:
-        print "%-8s  |  %s" % (key, db[key].description)
+        print "%-17s  |  %s" % (key, db[key].description)
     #print "\n WARNING: gepard models are now likely broken. Reinitialize them!"
 
 

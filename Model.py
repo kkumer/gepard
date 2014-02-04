@@ -1456,13 +1456,17 @@ class ComptonHybrid(ComptonFormFactors):
     def ReEt(self, pt):
         return  self.DR.ReEt(pt)
 
-    # FIXME: rho production TFFs are not provided by DR
+    # FIXME: rho production TFFs and DIS F2 are not provided by DR
 
     def ImHrho(self, pt):
         return  self.Gepard.ImHrho(pt)
 
     def ReHrho(self, pt):
         return  self.Gepard.ReHrho(pt)
+
+    def DISF2(self, pt):
+        return  self.Gepard.DISF2(pt)
+
 
 class ComptonLocal(ComptonFormFactors):
     """For local fitting of CFFs which are themselves fit paramters."""

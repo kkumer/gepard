@@ -25,7 +25,7 @@ from utils import listdb
 
 from abbrevs import *
 
-H1ZEUScut = utils.select(H1ZEUS, criteria=['Q2 >= 4.0'])
+H1ZEUScut = utils.select(H1ZEUS, criteria=['Q2 >= 2.0'])
 
 # transform total X data into XL=X/(eps+1/R) data
 def Rfun(Q2):
@@ -58,7 +58,7 @@ __builtin__.H109WdepXL = H109WdepXL
 ## [3] Create a theory
 
 db = shelve.open('/home/kkumer/pype/theories.db')
-thdvcs = db['KMN12nlo2']
+thdvcs = db['KMM12nlo2']
 Model.ComptonGepard.gepardPool.pop()
 
 #thLO = db['dvmp']
@@ -112,7 +112,7 @@ datcut = utils.select(H109XL+H109WdepXL+H1ZEUScut, criteria=['Q2 >= 2.0'])
 f = Fitter.FitterMinuit(datcut, th)
 f.minuit.tol = 80
 f.minuit.printMode = 1
-f.minuit.maxcalls = 1000
+f.minuit.maxcalls = 3000
 f.fit()
 
 
