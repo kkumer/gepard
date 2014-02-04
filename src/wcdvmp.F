@@ -18,7 +18,8 @@ C  SYNOPSIS
 
       IMPLICIT NONE
       INTEGER  SEC, K
-      DOUBLE COMPLEX WCTMP(0:2,4), MCU(3), KMOM
+      INTEGER KMOM
+      DOUBLE COMPLEX WCTMP(0:2,4), MCU(3)
 
 C  INPUTS
 C         SEC -- SO(3) PW
@@ -33,7 +34,7 @@ C  SOURCE
 C
 
       DOUBLE PRECISION LRF2
-      DOUBLE COMPLEX J, HS1
+      DOUBLE COMPLEX J
 #include "header.F"
 
 c     WRITE (*,*)  "BEGIN doing WCDVMP SEC, K = ", SEC, K
@@ -50,7 +51,7 @@ c     WRITE (*,*)  "BEGIN doing WCDVMP SEC, K = ", SEC, K
 
 
 *     FIXME: Approximate with asymptotic DA only: K=0
-      KMOM = (0.0d0, 0.0d0)
+      KMOM = 0
       IF (P .GE. 1) THEN
         CALL C1DVMP (1, J, KMOM, MCU)
         WCTMP(1, 1) = MCU(1)/NF + MCU(2)

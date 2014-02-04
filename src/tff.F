@@ -32,8 +32,6 @@ C
       INTEGER K, L, QIND, GETQIND, SEC, NPWS
       DOUBLE COMPLEX HRHO(4), CH(4)
       DOUBLE COMPLEX EPH, J, CFACRE, CFACIM
-      DOUBLE COMPLEX EFSIG, EFG, EFNS
-      DOUBLE COMPLEX TFFHS, TFFHNS
       DOUBLE PRECISION RE(4), IM(4)
 #include "header.F"
       DOUBLE PRECISION PWPAR(NPWMAX, 4)
@@ -88,7 +86,6 @@ c       FIXME: THis is for rho-production !
 c       FIXME: with NS(-), following loop has to go to 4
         DO 30 L = 1, 3
           CH(L) = (0.d0, 0.d0)
- 10     CONTINUE
 *         --- building evolved Wilson coef. summed over SO(3) partial waves ---
           DO 20 SEC = 1, NPWS
             CH(L) = CH(L) + PWPAR(SEC, L)*WCE(PID,SEC,QIND,K,L)
