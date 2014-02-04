@@ -18,8 +18,7 @@ C  SYNOPSIS
 
       IMPLICIT NONE
       INTEGER  SEC, K
-      INTEGER KMOM
-      DOUBLE COMPLEX WCTMP(0:2,4), MCU(3)
+      DOUBLE COMPLEX WCTMP(0:2,4), MCU(3), KMOM
 
 C  INPUTS
 C         SEC -- SO(3) PW
@@ -51,7 +50,7 @@ c     WRITE (*,*)  "BEGIN doing WCDVMP SEC, K = ", SEC, K
 
 
 *     FIXME: Approximate with asymptotic DA only: KMOM=0
-      KMOM = 0
+      KMOM = (0.0d0, 0.0d0)
       IF (P .GE. 1) THEN
         CALL C1DVMP (1, J, KMOM, MCU)
         WCTMP(1, 1) = MCU(1)/NF + MCU(2)
