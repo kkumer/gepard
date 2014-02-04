@@ -50,7 +50,7 @@ c     WRITE (*,*)  "BEGIN doing WCDVMP SEC, K = ", SEC, K
       WCTMP(0, 4) = (1.0d0,0.0d0)/NF
 
 
-*     FIXME: Approximate with asymptotic DA only: K=0
+*     FIXME: Approximate with asymptotic DA only: KMOM=0
       KMOM = 0
       IF (P .GE. 1) THEN
         CALL C1DVMP (1, J, KMOM, MCU)

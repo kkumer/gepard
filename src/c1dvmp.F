@@ -19,13 +19,12 @@ C  SYNOPSIS
       SUBROUTINE C1DVMP (SGNTR, J, K, MCU)
 
 !f2py integer intent(in) :: SGNTR
-!f2py complex(8) intent(in) :: J
-!f2py integer intent(in) :: K
+!f2py complex(8) intent(in) :: J, K
 !f2py complex(8) intent(out) :: MCU
 
       IMPLICIT NONE
-      INTEGER SGNTR, K
-      DOUBLE COMPLEX J, MCU(3)
+      INTEGER SGNTR
+      DOUBLE COMPLEX J, K, MCU(3)
 
 C  SOURCE
 C
@@ -38,7 +37,7 @@ C
       DOUBLE PRECISION LRGPDF2, LRDAF2, LRR2
       DOUBLE COMPLEX HS1, HS2, HS3, HSM1, HSM2, HSM3, HS1M2, SB3
       EXTERNAL HS1, HS2, HS3, HSM1, HSM2, HSM3, HS1M2, SB3
-      INTEGER PTY, L
+      INTEGER PTY, L, KINT
       EXTERNAL PTY
 #include "header.F"
 
@@ -49,6 +48,7 @@ C
       LRDAF2 = LOG(RDAF2)
       LRR2 = LOG(RR2)
 
+      KINT = INT(K)
 
 *  Spliced from Mathematica:
 
@@ -70,7 +70,7 @@ C
       SUMA = (0.d0, 0.d0)
       SUMB = (0.d0, 0.d0)
 
-      DO 10 L = 0, K
+      DO 10 L = 0, KINT
 
         LI = DBLCMPLX(L, 0)
 
@@ -86,9 +86,9 @@ C
 c     WRITE (*,*) 'SUMA = ', SUMA
 c     WRITE (*,*) 'SUMB = ', SUMB
 
-        DELc1aGJK=(-2.*PTY(K))/((1.+J)*(2.+J)*(1.+K)*(2.+K))+(0.5
+        DELc1aGJK=(-2.*PTY(KINT))/((1.+J)*(2.+J)*(1.+K)*(2.+K))+(0.5
      &  *(-1.+(1.+J)*(2.+J))*(-2.+(1.+K)*(2.+K)*(HS2(0.5*(1.+K))-
-     &  HS2(-0.5+0.5*(1.+K))))*PTY(K))/((1.+J)*(2.+J))+(1.+K)*(2.
+     &  HS2(-0.5+0.5*(1.+K))))*PTY(KINT))/((1.+J)*(2.+J))+(1.+K)*(2.
      &  +K)*(2.+0.5*(1.+K)*(2.+K))*((0.25*K*(2.+(1.+K)**2)*(HS2(0
      &  .5*(1.+J))-HS2(-0.5+0.5*(1.+J))+HS2(-0.5+0.5*K)-HS2(0.5*K
      &  )))/((0.5*(1.+J)-0.5*K)*(2.+J+K)*(3.+2.*K)*(4.+(1.+K)*(2.
@@ -97,9 +97,9 @@ c     WRITE (*,*) 'SUMB = ', SUMB
      &  *(3.+J+K))+(0.25*(3.+K)*(2.+(2.+K)**2)*(HS2(0.5*(1.+J))-H
      &  S2(-0.5+0.5*(1.+J))-HS2(0.5*(2.+K))+HS2(-0.5+0.5*(2.+K)))
      &  )/((0.5*(1.+J)+0.5*(-2.-K))*(4.+J+K)*(3.+2.*K)*(4.+(1.+K)
-     &  *(2.+K))))*PTY(K)+2.*(J-K)*(3.+J+K)*(-SUMA-ZETA3+HS3(1.+J
+     &  *(2.+K))))*PTY(KINT)+2.*(J-K)*(3.+J+K)*(-SUMA-ZETA3+HS3(1.+J
      &  )+(0.125*(1.+K)*(HS2(0.5*(1.+J))-HS2(-0.5+0.5*(1.+J))-HS2
-     &  (0.5*(1.+K))+HS2(-0.5+0.5*(1.+K)))*PTY(K))/((0.5*(1.+J)+0
+     &  (0.5*(1.+K))+HS2(-0.5+0.5*(1.+K)))*PTY(KINT))/((0.5*(1.+J)+0
      &  .5*(-1.-K))*(3.+J+K)))
 
         DELc1bGKJ=1/((1.+K)*(2.+K))+0.5*(-2.-(1.+K)**2-((1.+J)*(2
@@ -119,16 +119,16 @@ c     WRITE (*,*) 'SUMB = ', SUMB
         MCQ1CG=0.9565348003631189+DELc1aGJK-(2.*(1.+(1.+J)*(2.+J)
      &  )*(1.-SGNTR))/((1.+J)**2*(2.+J)**2)-DELc1bGKJ*SGNTR+(-(1/
      &  ((1.+K)*(2.+K)))+2.*HS1(1.+K))*(1.-SGNTR+0.5*(1.+J)*(2.+J
-     &  )*SGNTR*(-HS2(0.5*J)+HS2(0.5*(1.+J))))+(2.*SGNTR*PTY(K))/
+     &  )*SGNTR*(-HS2(0.5*J)+HS2(0.5*(1.+J))))+(2.*SGNTR*PTY(KINT))/
      &  ((1.+J)*(2.+J)*(1.+K)*(2.+K))-(2.*(1.+(1.+K)*(2.+K))*(1.+
-     &  PTY(K)))/((1.+K)**2*(2.+K)**2)+(-(1/((1.+J)*(2.+J)))+2.*H
-     &  S1(1.+J))*(1.+PTY(K)-0.5*(1.+K)*(2.+K)*(-HS2(0.5*K)+HS2(0
-     &  .5*(1.+K)))*PTY(K))+2.*(1.+J)*(2.+J)*((-0.5*(-1.+(1.+J)*(
+     &  PTY(KINT)))/((1.+K)**2*(2.+K)**2)+(-(1/((1.+J)*(2.+J)))+2.*H
+     &  S1(1.+J))*(1.+PTY(KINT)-0.5*(1.+K)*(2.+K)*(-HS2(0.5*K)+HS2(0
+     &  .5*(1.+K)))*PTY(KINT))+2.*(1.+J)*(2.+J)*((-0.5*(-1.+(1.+J)*(
      &  2.+J)))/((1.+J)**2*(2.+J)**2)+ZETA3-(0.5*SGNTR*(-HS2(0.5*
      &  J)+HS2(0.5*(1.+J))))/((1.+J)*(2.+J))-HS3(1.+J)-SGNTR*Sb3(
      &  ONE+J))+2.*(1.+K)*(2.+K)*((-0.5*(-1.+(1.+K)*(2.+K)))/((1.+
      &  K)**2*(2.+K)**2)+ZETA3-HS3(1.+K)+(0.5*(-HS2(0.5*K)+HS2(0.
-     &  5*(1.+K)))*PTY(K))/((1.+K)*(2.+K))+PTY(K)*Sb3(ONE+K))
+     &  5*(1.+K)))*PTY(KINT))/((1.+K)*(2.+K))+PTY(KINT)*Sb3(ONE+K))
 
 c     WRITE (*,*) 'DELc1aGJK = ', DELc1aGJK
 c     WRITE (*,*) 'DELc1bGKJ = ', DELc1bGKJ
