@@ -750,9 +750,11 @@ class ComptonNeuralNets(Model):
             return self.CFF
         elif name in ComptonFormFactors.allCFFs:
             # if asked for CFF which is not in output_layer, return 0
+            self.curname = name
             return self.zero
         elif name in ComptonFormFactors.allCFFeffs:
             # if asked for CFF which is not in output_layer, return 0
+            self.curname = name
             return self.zero
         elif name in ['endpointpower', 'optimization', 'useDR']:
             if self.__dict__.has_key(name):
@@ -763,8 +765,8 @@ class ComptonNeuralNets(Model):
             #syst.stderr.write('Possibly caught exception: AttErr: $s\n' % name)
             raise AttributeError, name
 
-    def zero(self, *args, **kwargs):
-        return 0
+    #def zero(self, *args, **kwargs):
+        #return 0
 
     def subtraction(self, pt):
         return 2.25  # temporary
@@ -842,6 +844,49 @@ class ComptonNeuralNets(Model):
                         res.append(all[self.parameters['nnet']])
                     except IndexError:
                         raise IndexError, str(self)+' has only '+str(len(self.nets))+' nets!'
+            # by default, we get mean value (FIXME:this should never occurr?)
+            else:
+                res.append(all.mean())
+        res = array(res)
+        if res.shape == (1,):
+            # returns number
+            return res[0]  
+        else:
+            # returns ndarray
+            return res.transpose()
+
+    def zero(self, pt, xi=0):
+        # FIXME: This function is HEAVILY sub-optimal and non-pythonic!
+        # FIXME: It is also essentially a  copy of CFF!!! (This was
+        #        copied in a hurry just to get right array shape.)
+        #_lg.debug('NN model CFF called as = %s\n' % self.curname)
+        if isinstance(xi, ndarray) and len(self.nets)>0:
+            # function was called with third argument that is xi nd array
+            # and we already have some nets so disp.int. can be calculated
+            x = xi
+        elif xi != 0:
+            # function was called with third argument that is xi number
+            x = array((xi,))
+        else:
+            # xi should be taken from pt object
+            if isinstance(pt.xi, ndarray):
+                x = pt.xi
+            else:
+                x = array((pt.xi,))
+        xBs = 2.*x/(1.+x)
+        res = []
+        for xB in xBs:
+            ar = []
+            for net in self.nets:
+                ar.append(0.)
+            all = array(ar).flatten()
+            if self.parameters.has_key('nnet'):
+                if self.parameters['nnet'] == 'ALL':
+                    res.append(all)
+                elif self.parameters['nnet'] == 'AVG':
+                    res.append(all.mean())
+                else: # we want particular net
+                    res.append(0)
             # by default, we get mean value (FIXME:this should never occurr?)
             else:
                 res.append(all.mean())

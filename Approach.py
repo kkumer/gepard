@@ -465,14 +465,14 @@ class BMK(Approach):
     def CCALDVCSTP(self, pt): 
         """ BKM Eq. (68) returns tuple (CTP+, Im(CTP-))"""
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
-        H = complex(self.m.ReH(pt), self.m.ImH(pt))
-        EE = complex(self.m.ReE(pt), self.m.ImE(pt))
-        tH = complex(self.m.ReHt(pt), self.m.ImHt(pt))
-        tE = complex(self.m.ReEt(pt), self.m.ImEt(pt))
-        HCC = complex(self.m.ReH(pt), -self.m.ImH(pt))
-        EECC = complex(self.m.ReE(pt), -self.m.ImE(pt))
-        tHCC = complex(self.m.ReHt(pt), -self.m.ImHt(pt))
-        tECC = complex(self.m.ReEt(pt), -self.m.ImEt(pt))
+        H = (self.m.ReH(pt)) + 1j * ( self.m.ImH(pt))
+        EE = (self.m.ReE(pt)) + 1j * ( self.m.ImE(pt))
+        tH = (self.m.ReHt(pt)) + 1j * ( self.m.ImHt(pt))
+        tE = (self.m.ReEt(pt)) + 1j * ( self.m.ImEt(pt))
+        HCC = (self.m.ReH(pt)) + 1j * ( -self.m.ImH(pt))
+        EECC = (self.m.ReE(pt)) + 1j * ( -self.m.ImE(pt))
+        tHCC = (self.m.ReHt(pt)) + 1j * ( -self.m.ImHt(pt))
+        tECC = (self.m.ReEt(pt)) + 1j * ( -self.m.ImEt(pt))
         resp = ( 2*xB*(H*tECC+tE*HCC) - 2*(2-xB)*(tH*EECC+tHCC*EE) +
                 xB**2*(EE*tECC+tE*EECC) ) / (2.-xB)**2
         resm = ((2-xB)*(H*EECC-EE*HCC) - xB*(tH*tECC-tE*tHCC))*2/(2.-xB)**2
@@ -1369,25 +1369,25 @@ class BM10ex(hotfixedBMK):
         """ BM10 (2.22), from DM's notebook """
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
         if leff:
-            H = complex(self.m.ReHeff(pt), self.m.ImHeff(pt))
-            EE = complex(self.m.ReEeff(pt), self.m.ImEeff(pt))
-            tH = complex(self.m.ReHteff(pt), self.m.ImHteff(pt))
-            tE = complex(self.m.ReEteff(pt), self.m.ImEteff(pt))
+            H = (self.m.ReHeff(pt)) + 1j * ( self.m.ImHeff(pt))
+            EE = (self.m.ReEeff(pt)) + 1j * ( self.m.ImEeff(pt))
+            tH = (self.m.ReHteff(pt)) + 1j * ( self.m.ImHteff(pt))
+            tE = (self.m.ReEteff(pt)) + 1j * ( self.m.ImEteff(pt))
         else:
-            H = complex(self.m.ReH(pt), self.m.ImH(pt))
-            EE = complex(self.m.ReE(pt), self.m.ImE(pt))
-            tH = complex(self.m.ReHt(pt), self.m.ImHt(pt))
-            tE = complex(self.m.ReEt(pt), self.m.ImEt(pt))
+            H = (self.m.ReH(pt)) + 1j * ( self.m.ImH(pt))
+            EE = (self.m.ReE(pt)) + 1j * ( self.m.ImE(pt))
+            tH = (self.m.ReHt(pt)) + 1j * ( self.m.ImHt(pt))
+            tE = (self.m.ReEt(pt)) + 1j * ( self.m.ImEt(pt))
         if reff:
-            HCC = complex(self.m.ReHeff(pt), -self.m.ImHeff(pt))
-            EECC = complex(self.m.ReEeff(pt), -self.m.ImEeff(pt))
-            tHCC = complex(self.m.ReHteff(pt), -self.m.ImHteff(pt))
-            tECC = complex(self.m.ReEteff(pt), -self.m.ImEteff(pt))
+            HCC = (self.m.ReHeff(pt)) + 1j * ( -self.m.ImHeff(pt))
+            EECC = (self.m.ReEeff(pt)) + 1j * ( -self.m.ImEeff(pt))
+            tHCC = (self.m.ReHteff(pt)) + 1j * ( -self.m.ImHteff(pt))
+            tECC = (self.m.ReEteff(pt)) + 1j * ( -self.m.ImEteff(pt))
         else:
-            HCC = complex(self.m.ReH(pt), -self.m.ImH(pt))
-            EECC = complex(self.m.ReE(pt), -self.m.ImE(pt))
-            tHCC = complex(self.m.ReHt(pt), -self.m.ImHt(pt))
-            tECC = complex(self.m.ReEt(pt), -self.m.ImEt(pt))
+            HCC = (self.m.ReH(pt)) + 1j * ( -self.m.ImH(pt))
+            EECC = (self.m.ReE(pt)) + 1j * ( -self.m.ImE(pt))
+            tHCC = (self.m.ReHt(pt)) + 1j * ( -self.m.ImHt(pt))
+            tECC = (self.m.ReEt(pt)) + 1j * ( -self.m.ImEt(pt))
         res = (Q2*(Q2 + t*xB)*(4*H*HCC*(1 - xB) - 
            ((EECC*H + EE*HCC)*(Q2 + t)**2*xB**2)/(Q2*(Q2 + t*xB)) - 
            (Q2*t*tE*tECC*xB**2)/(4*Mp2*(Q2 + t*xB)) - 
@@ -1405,25 +1405,25 @@ class BM10ex(hotfixedBMK):
         """ BM10 (2.23), from DM's notebook """
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
         if leff:
-            H = complex(self.m.ReHeff(pt), self.m.ImHeff(pt))
-            EE = complex(self.m.ReEeff(pt), self.m.ImEeff(pt))
-            tH = complex(self.m.ReHteff(pt), self.m.ImHteff(pt))
-            tE = complex(self.m.ReEteff(pt), self.m.ImEteff(pt))
+            H = (self.m.ReHeff(pt)) + 1j * ( self.m.ImHeff(pt))
+            EE = (self.m.ReEeff(pt)) + 1j * ( self.m.ImEeff(pt))
+            tH = (self.m.ReHteff(pt)) + 1j * ( self.m.ImHteff(pt))
+            tE = (self.m.ReEteff(pt)) + 1j * ( self.m.ImEteff(pt))
         else:
-            H = complex(self.m.ReH(pt), self.m.ImH(pt))
-            EE = complex(self.m.ReE(pt), self.m.ImE(pt))
-            tH = complex(self.m.ReHt(pt), self.m.ImHt(pt))
-            tE = complex(self.m.ReEt(pt), self.m.ImEt(pt))
+            H = (self.m.ReH(pt)) + 1j * ( self.m.ImH(pt))
+            EE = (self.m.ReE(pt)) + 1j * ( self.m.ImE(pt))
+            tH = (self.m.ReHt(pt)) + 1j * ( self.m.ImHt(pt))
+            tE = (self.m.ReEt(pt)) + 1j * ( self.m.ImEt(pt))
         if reff:
-            HCC = complex(self.m.ReHeff(pt), -self.m.ImHeff(pt))
-            EECC = complex(self.m.ReEeff(pt), -self.m.ImEeff(pt))
-            tHCC = complex(self.m.ReHteff(pt), -self.m.ImHteff(pt))
-            tECC = complex(self.m.ReEteff(pt), -self.m.ImEteff(pt))
+            HCC = (self.m.ReHeff(pt)) + 1j * ( -self.m.ImHeff(pt))
+            EECC = (self.m.ReEeff(pt)) + 1j * ( -self.m.ImEeff(pt))
+            tHCC = (self.m.ReHteff(pt)) + 1j * ( -self.m.ImHteff(pt))
+            tECC = (self.m.ReEteff(pt)) + 1j * ( -self.m.ImEteff(pt))
         else:
-            HCC = complex(self.m.ReH(pt), -self.m.ImH(pt))
-            EECC = complex(self.m.ReE(pt), -self.m.ImE(pt))
-            tHCC = complex(self.m.ReHt(pt), -self.m.ImHt(pt))
-            tECC = complex(self.m.ReEt(pt), -self.m.ImEt(pt))
+            HCC = (self.m.ReH(pt)) + 1j * ( -self.m.ImH(pt))
+            EECC = (self.m.ReE(pt)) + 1j * ( -self.m.ImE(pt))
+            tHCC = (self.m.ReHt(pt)) + 1j * ( -self.m.ImHt(pt))
+            tECC = (self.m.ReEt(pt)) + 1j * ( -self.m.ImEt(pt))
         res = (Q2*(Q2 + t*xB)*(4*H*HCC*(1 - xB) - 
            ((EECC*H + EE*HCC)*(Q2 + t)**2*xB**2)/(Q2*(Q2 + t*xB)) - 
            (Q2*t*tE*tECC*xB**2)/(4*Mp2*(Q2 + t*xB)) - 
@@ -1455,15 +1455,15 @@ class BM10ex(hotfixedBMK):
         """ BM10 Eq. (2.28) ... set im=1 for imag part, eff=1 for F_eff """
     
         if eff:
-            CFFH = complex(self.m.ReHeff(pt), self.m.ImHeff(pt))
-            CFFE = complex(self.m.ReEeff(pt), self.m.ImEeff(pt))
-            CFFHt = complex(self.m.ReHteff(pt), self.m.ImHteff(pt))
-            CFFEt = complex(self.m.ReEteff(pt), self.m.ImEteff(pt))
+            CFFH = (self.m.ReHeff(pt)) + 1j * ( self.m.ImHeff(pt))
+            CFFE = (self.m.ReEeff(pt)) + 1j * ( self.m.ImEeff(pt))
+            CFFHt = (self.m.ReHteff(pt)) + 1j * ( self.m.ImHteff(pt))
+            CFFEt = (self.m.ReEteff(pt)) + 1j * ( self.m.ImEteff(pt))
         else:
-            CFFH = complex(self.m.ReH(pt), self.m.ImH(pt))
-            CFFE = complex(self.m.ReE(pt), self.m.ImE(pt))
-            CFFHt = complex(self.m.ReHt(pt), self.m.ImHt(pt))
-            CFFEt = complex(self.m.ReEt(pt), self.m.ImEt(pt))
+            CFFH = (self.m.ReH(pt)) + 1j * ( self.m.ImH(pt))
+            CFFE = (self.m.ReE(pt)) + 1j * ( self.m.ImE(pt))
+            CFFHt = (self.m.ReHt(pt)) + 1j * ( self.m.ImHt(pt))
+            CFFEt = (self.m.ReEt(pt)) + 1j * ( self.m.ImEt(pt))
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
         res = ( 
     self.m.F1(t)*CFFH - (t/(4*Mp2))*self.m.F2(t)*CFFE + 
@@ -1478,15 +1478,15 @@ class BM10ex(hotfixedBMK):
         """ BM10 Eq. (2.29) ... set im=1 for imag part, eff=1 for F_eff """
     
         if eff:
-            CFFH = complex(self.m.ReHeff(pt), self.m.ImHeff(pt))
-            CFFE = complex(self.m.ReEeff(pt), self.m.ImEeff(pt))
-            CFFHt = complex(self.m.ReHteff(pt), self.m.ImHteff(pt))
-            CFFEt = complex(self.m.ReEteff(pt), self.m.ImEteff(pt))
+            CFFH = (self.m.ReHeff(pt)) + 1j * ( self.m.ImHeff(pt))
+            CFFE = (self.m.ReEeff(pt)) + 1j * ( self.m.ImEeff(pt))
+            CFFHt = (self.m.ReHteff(pt)) + 1j * ( self.m.ImHteff(pt))
+            CFFEt = (self.m.ReEteff(pt)) + 1j * ( self.m.ImEteff(pt))
         else:
-            CFFH = complex(self.m.ReH(pt), self.m.ImH(pt))
-            CFFE = complex(self.m.ReE(pt), self.m.ImE(pt))
-            CFFHt = complex(self.m.ReHt(pt), self.m.ImHt(pt))
-            CFFEt = complex(self.m.ReEt(pt), self.m.ImEt(pt))
+            CFFH = (self.m.ReH(pt)) + 1j * ( self.m.ImH(pt))
+            CFFE = (self.m.ReE(pt)) + 1j * ( self.m.ImE(pt))
+            CFFHt = (self.m.ReHt(pt)) + 1j * ( self.m.ImHt(pt))
+            CFFEt = (self.m.ReEt(pt)) + 1j * ( self.m.ImEt(pt))
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
         res = ( 
     (xB/((2 - xB) + (t*xB)/pt.Q2))*(self.m.F1(t) + self.m.F2(t))*
@@ -1502,15 +1502,15 @@ class BM10ex(hotfixedBMK):
         """ ... set im=1 for imag part, eff=1 for F_eff """
     
         if eff:
-            CFFH = complex(self.m.ReHeff(pt), self.m.ImHeff(pt))
-            CFFE = complex(self.m.ReEeff(pt), self.m.ImEeff(pt))
-            CFFHt = complex(self.m.ReHteff(pt), self.m.ImHteff(pt))
-            CFFEt = complex(self.m.ReEteff(pt), self.m.ImEteff(pt))
+            CFFH = (self.m.ReHeff(pt)) + 1j * ( self.m.ImHeff(pt))
+            CFFE = (self.m.ReEeff(pt)) + 1j * ( self.m.ImEeff(pt))
+            CFFHt = (self.m.ReHteff(pt)) + 1j * ( self.m.ImHteff(pt))
+            CFFEt = (self.m.ReEteff(pt)) + 1j * ( self.m.ImEteff(pt))
         else:
-            CFFH = complex(self.m.ReH(pt), self.m.ImH(pt))
-            CFFE = complex(self.m.ReE(pt), self.m.ImE(pt))
-            CFFHt = complex(self.m.ReHt(pt), self.m.ImHt(pt))
-            CFFEt = complex(self.m.ReEt(pt), self.m.ImEt(pt))
+            CFFH = (self.m.ReH(pt)) + 1j * ( self.m.ImH(pt))
+            CFFE = (self.m.ReE(pt)) + 1j * ( self.m.ImE(pt))
+            CFFHt = (self.m.ReHt(pt)) + 1j * ( self.m.ImHt(pt))
+            CFFEt = (self.m.ReEt(pt)) + 1j * ( self.m.ImEt(pt))
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
         res = ( 
     (xB/((2 - xB) + (t*xB)/pt.Q2))*(self.m.F1(t) + self.m.F2(t))*CFFHt
@@ -1525,15 +1525,15 @@ class BM10ex(hotfixedBMK):
         """ ... set im=1 for imag part, eff=1 for F_eff """
     
         if eff:
-            CFFH = complex(self.m.ReHeff(pt), self.m.ImHeff(pt))
-            CFFE = complex(self.m.ReEeff(pt), self.m.ImEeff(pt))
-            CFFHt = complex(self.m.ReHteff(pt), self.m.ImHteff(pt))
-            CFFEt = complex(self.m.ReEteff(pt), self.m.ImEteff(pt))
+            CFFH = (self.m.ReHeff(pt)) + 1j * ( self.m.ImHeff(pt))
+            CFFE = (self.m.ReEeff(pt)) + 1j * ( self.m.ImEeff(pt))
+            CFFHt = (self.m.ReHteff(pt)) + 1j * ( self.m.ImHteff(pt))
+            CFFEt = (self.m.ReEteff(pt)) + 1j * ( self.m.ImEteff(pt))
         else:
-            CFFH = complex(self.m.ReH(pt), self.m.ImH(pt))
-            CFFE = complex(self.m.ReE(pt), self.m.ImE(pt))
-            CFFHt = complex(self.m.ReHt(pt), self.m.ImHt(pt))
-            CFFEt = complex(self.m.ReEt(pt), self.m.ImEt(pt))
+            CFFH = (self.m.ReH(pt)) + 1j * ( self.m.ImH(pt))
+            CFFE = (self.m.ReE(pt)) + 1j * ( self.m.ImE(pt))
+            CFFHt = (self.m.ReHt(pt)) + 1j * ( self.m.ImHt(pt))
+            CFFEt = (self.m.ReEt(pt)) + 1j * ( self.m.ImEt(pt))
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
         res = ( 
     (xB/((2 - xB) + (t*xB)/pt.Q2))*(self.m.F1(t) + self.m.F2(t))*
@@ -1557,15 +1557,15 @@ class BM10ex(hotfixedBMK):
         """ ... set im=1 for imag part, eff=1 for F_eff """
     
         if eff:
-            CFFH = complex(self.m.ReHeff(pt), self.m.ImHeff(pt))
-            CFFE = complex(self.m.ReEeff(pt), self.m.ImEeff(pt))
-            CFFHt = complex(self.m.ReHteff(pt), self.m.ImHteff(pt))
-            CFFEt = complex(self.m.ReEteff(pt), self.m.ImEteff(pt))
+            CFFH = (self.m.ReHeff(pt)) + 1j * ( self.m.ImHeff(pt))
+            CFFE = (self.m.ReEeff(pt)) + 1j * ( self.m.ImEeff(pt))
+            CFFHt = (self.m.ReHteff(pt)) + 1j * ( self.m.ImHteff(pt))
+            CFFEt = (self.m.ReEteff(pt)) + 1j * ( self.m.ImEteff(pt))
         else:
-            CFFH = complex(self.m.ReH(pt), self.m.ImH(pt))
-            CFFE = complex(self.m.ReE(pt), self.m.ImE(pt))
-            CFFHt = complex(self.m.ReHt(pt), self.m.ImHt(pt))
-            CFFEt = complex(self.m.ReEt(pt), self.m.ImEt(pt))
+            CFFH = (self.m.ReH(pt)) + 1j * ( self.m.ImH(pt))
+            CFFE = (self.m.ReE(pt)) + 1j * ( self.m.ImE(pt))
+            CFFHt = (self.m.ReHt(pt)) + 1j * ( self.m.ImHt(pt))
+            CFFEt = (self.m.ReEt(pt)) + 1j * ( self.m.ImEt(pt))
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
         res = ( 
     (xB/((2 - xB) + (t*xB)/pt.Q2))*(self.m.F1(t) + self.m.F2(t))*
@@ -1582,15 +1582,15 @@ class BM10ex(hotfixedBMK):
         """ ... set im=1 for imag part, eff=1 for F_eff """
     
         if eff:
-            CFFH = complex(self.m.ReHeff(pt), self.m.ImHeff(pt))
-            CFFE = complex(self.m.ReEeff(pt), self.m.ImEeff(pt))
-            CFFHt = complex(self.m.ReHteff(pt), self.m.ImHteff(pt))
-            CFFEt = complex(self.m.ReEteff(pt), self.m.ImEteff(pt))
+            CFFH = (self.m.ReHeff(pt)) + 1j * ( self.m.ImHeff(pt))
+            CFFE = (self.m.ReEeff(pt)) + 1j * ( self.m.ImEeff(pt))
+            CFFHt = (self.m.ReHteff(pt)) + 1j * ( self.m.ImHteff(pt))
+            CFFEt = (self.m.ReEteff(pt)) + 1j * ( self.m.ImEteff(pt))
         else:
-            CFFH = complex(self.m.ReH(pt), self.m.ImH(pt))
-            CFFE = complex(self.m.ReE(pt), self.m.ImE(pt))
-            CFFHt = complex(self.m.ReHt(pt), self.m.ImHt(pt))
-            CFFEt = complex(self.m.ReEt(pt), self.m.ImEt(pt))
+            CFFH = (self.m.ReH(pt)) + 1j * ( self.m.ImH(pt))
+            CFFE = (self.m.ReE(pt)) + 1j * ( self.m.ImE(pt))
+            CFFHt = (self.m.ReHt(pt)) + 1j * ( self.m.ImHt(pt))
+            CFFEt = (self.m.ReEt(pt)) + 1j * ( self.m.ImEt(pt))
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
         res = ( 
     (xB/((2 - xB) + (t*xB)/pt.Q2))*(self.m.F1(t) + self.m.F2(t))*
@@ -3405,25 +3405,25 @@ class BM10(BM10ex):
 
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
         if leff:
-            H = complex(self.m.ReHeff(pt), self.m.ImHeff(pt))
-            EE = complex(self.m.ReEeff(pt), self.m.ImEeff(pt))
-            tH = complex(self.m.ReHteff(pt), self.m.ImHteff(pt))
-            tE = complex(self.m.ReEteff(pt), self.m.ImEteff(pt))
+            H = (self.m.ReHeff(pt)) + 1j * ( self.m.ImHeff(pt))
+            EE = (self.m.ReEeff(pt)) + 1j * ( self.m.ImEeff(pt))
+            tH = (self.m.ReHteff(pt)) + 1j * ( self.m.ImHteff(pt))
+            tE = (self.m.ReEteff(pt)) + 1j * ( self.m.ImEteff(pt))
         else:
-            H = complex(self.m.ReH(pt), self.m.ImH(pt))
-            EE = complex(self.m.ReE(pt), self.m.ImE(pt))
-            tH = complex(self.m.ReHt(pt), self.m.ImHt(pt))
-            tE = complex(self.m.ReEt(pt), self.m.ImEt(pt))
+            H = (self.m.ReH(pt)) + 1j * ( self.m.ImH(pt))
+            EE = (self.m.ReE(pt)) + 1j * ( self.m.ImE(pt))
+            tH = (self.m.ReHt(pt)) + 1j * ( self.m.ImHt(pt))
+            tE = (self.m.ReEt(pt)) + 1j * ( self.m.ImEt(pt))
         if reff:
-            HCC = complex(self.m.ReHeff(pt), -self.m.ImHeff(pt))
-            EECC = complex(self.m.ReEeff(pt), -self.m.ImEeff(pt))
-            tHCC = complex(self.m.ReHteff(pt), -self.m.ImHteff(pt))
-            tECC = complex(self.m.ReEteff(pt), -self.m.ImEteff(pt))
+            HCC = (self.m.ReHeff(pt)) + 1j * ( -self.m.ImHeff(pt))
+            EECC = (self.m.ReEeff(pt)) + 1j * ( -self.m.ImEeff(pt))
+            tHCC = (self.m.ReHteff(pt)) + 1j * ( -self.m.ImHteff(pt))
+            tECC = (self.m.ReEteff(pt)) + 1j * ( -self.m.ImEteff(pt))
         else:
-            HCC = complex(self.m.ReH(pt), -self.m.ImH(pt))
-            EECC = complex(self.m.ReE(pt), -self.m.ImE(pt))
-            tHCC = complex(self.m.ReHt(pt), -self.m.ImHt(pt))
-            tECC = complex(self.m.ReEt(pt), -self.m.ImEt(pt))
+            HCC = (self.m.ReH(pt)) + 1j * ( -self.m.ImH(pt))
+            EECC = (self.m.ReE(pt)) + 1j * ( -self.m.ImE(pt))
+            tHCC = (self.m.ReHt(pt)) + 1j * ( -self.m.ImHt(pt))
+            tECC = (self.m.ReEt(pt)) + 1j * ( -self.m.ImEt(pt))
         res = (4.*(1.-xB)*(H*HCC+tH*tHCC) 
                 - xB**2*(H*EECC+EE*HCC+tH*tECC+tE*tHCC)
                 - (xB**2+(2.-xB)**2*t/(4.*Mp2))*EE*EECC
@@ -3438,25 +3438,25 @@ class BM10(BM10ex):
 
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
         if leff:
-            H = complex(self.m.ReHeff(pt), self.m.ImHeff(pt))
-            EE = complex(self.m.ReEeff(pt), self.m.ImEeff(pt))
-            tH = complex(self.m.ReHteff(pt), self.m.ImHteff(pt))
-            tE = complex(self.m.ReEteff(pt), self.m.ImEteff(pt))
+            H = (self.m.ReHeff(pt)) + 1j * ( self.m.ImHeff(pt))
+            EE = (self.m.ReEeff(pt)) + 1j * ( self.m.ImEeff(pt))
+            tH = (self.m.ReHteff(pt)) + 1j * ( self.m.ImHteff(pt))
+            tE = (self.m.ReEteff(pt)) + 1j * ( self.m.ImEteff(pt))
         else:
-            H = complex(self.m.ReH(pt), self.m.ImH(pt))
-            EE = complex(self.m.ReE(pt), self.m.ImE(pt))
-            tH = complex(self.m.ReHt(pt), self.m.ImHt(pt))
-            tE = complex(self.m.ReEt(pt), self.m.ImEt(pt))
+            H = (self.m.ReH(pt)) + 1j * ( self.m.ImH(pt))
+            EE = (self.m.ReE(pt)) + 1j * ( self.m.ImE(pt))
+            tH = (self.m.ReHt(pt)) + 1j * ( self.m.ImHt(pt))
+            tE = (self.m.ReEt(pt)) + 1j * ( self.m.ImEt(pt))
         if reff:
-            HCC = complex(self.m.ReHeff(pt), -self.m.ImHeff(pt))
-            EECC = complex(self.m.ReEeff(pt), -self.m.ImEeff(pt))
-            tHCC = complex(self.m.ReHteff(pt), -self.m.ImHteff(pt))
-            tECC = complex(self.m.ReEteff(pt), -self.m.ImEteff(pt))
+            HCC = (self.m.ReHeff(pt)) + 1j * ( -self.m.ImHeff(pt))
+            EECC = (self.m.ReEeff(pt)) + 1j * ( -self.m.ImEeff(pt))
+            tHCC = (self.m.ReHteff(pt)) + 1j * ( -self.m.ImHteff(pt))
+            tECC = (self.m.ReEteff(pt)) + 1j * ( -self.m.ImEteff(pt))
         else:
-            HCC = complex(self.m.ReH(pt), -self.m.ImH(pt))
-            EECC = complex(self.m.ReE(pt), -self.m.ImE(pt))
-            tHCC = complex(self.m.ReHt(pt), -self.m.ImHt(pt))
-            tECC = complex(self.m.ReEt(pt), -self.m.ImEt(pt))
+            HCC = (self.m.ReH(pt)) + 1j * ( -self.m.ImH(pt))
+            EECC = (self.m.ReE(pt)) + 1j * ( -self.m.ImE(pt))
+            tHCC = (self.m.ReHt(pt)) + 1j * ( -self.m.ImHt(pt))
+            tECC = (self.m.ReEt(pt)) + 1j * ( -self.m.ImEt(pt))
         res = (4.*(1.-xB)*(H*tHCC+tH*HCC) 
                 - xB**2*(H*tECC+tE*HCC+tH*EECC+EE*tHCC)
                 - xB*(xB**2/2.+(2.-xB)*t/(4.*Mp2))*(EE*tECC+tE*EECC)
@@ -3470,15 +3470,15 @@ class BM10(BM10ex):
         """ BM10 Eq. (2.28) with 1/Q2 suppressed terms removed """
     
         if eff:
-            CFFH = complex(self.m.ReHeff(pt), self.m.ImHeff(pt))
-            CFFE = complex(self.m.ReEeff(pt), self.m.ImEeff(pt))
-            CFFHt = complex(self.m.ReHteff(pt), self.m.ImHteff(pt))
-            CFFEt = complex(self.m.ReEteff(pt), self.m.ImEteff(pt))
+            CFFH = (self.m.ReHeff(pt)) + 1j * ( self.m.ImHeff(pt))
+            CFFE = (self.m.ReEeff(pt)) + 1j * ( self.m.ImEeff(pt))
+            CFFHt = (self.m.ReHteff(pt)) + 1j * ( self.m.ImHteff(pt))
+            CFFEt = (self.m.ReEteff(pt)) + 1j * ( self.m.ImEteff(pt))
         else:
-            CFFH = complex(self.m.ReH(pt), self.m.ImH(pt))
-            CFFE = complex(self.m.ReE(pt), self.m.ImE(pt))
-            CFFHt = complex(self.m.ReHt(pt), self.m.ImHt(pt))
-            CFFEt = complex(self.m.ReEt(pt), self.m.ImEt(pt))
+            CFFH = (self.m.ReH(pt)) + 1j * ( self.m.ImH(pt))
+            CFFE = (self.m.ReE(pt)) + 1j * ( self.m.ImE(pt))
+            CFFHt = (self.m.ReHt(pt)) + 1j * ( self.m.ImHt(pt))
+            CFFEt = (self.m.ReEt(pt)) + 1j * ( self.m.ImEt(pt))
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
         res = ( 
             self.m.F1(t)*CFFH - (t/(4*Mp2))*self.m.F2(t)*CFFE + 
@@ -3493,15 +3493,15 @@ class BM10(BM10ex):
         """ BM10 Eq. (2.29) with 1/Q2 suppressed terms removed """
     
         if eff:
-            CFFH = complex(self.m.ReHeff(pt), self.m.ImHeff(pt))
-            CFFE = complex(self.m.ReEeff(pt), self.m.ImEeff(pt))
-            CFFHt = complex(self.m.ReHteff(pt), self.m.ImHteff(pt))
-            CFFEt = complex(self.m.ReEteff(pt), self.m.ImEteff(pt))
+            CFFH = (self.m.ReHeff(pt)) + 1j * ( self.m.ImHeff(pt))
+            CFFE = (self.m.ReEeff(pt)) + 1j * ( self.m.ImEeff(pt))
+            CFFHt = (self.m.ReHteff(pt)) + 1j * ( self.m.ImHteff(pt))
+            CFFEt = (self.m.ReEteff(pt)) + 1j * ( self.m.ImEteff(pt))
         else:
-            CFFH = complex(self.m.ReH(pt), self.m.ImH(pt))
-            CFFE = complex(self.m.ReE(pt), self.m.ImE(pt))
-            CFFHt = complex(self.m.ReHt(pt), self.m.ImHt(pt))
-            CFFEt = complex(self.m.ReEt(pt), self.m.ImEt(pt))
+            CFFH = (self.m.ReH(pt)) + 1j * ( self.m.ImH(pt))
+            CFFE = (self.m.ReE(pt)) + 1j * ( self.m.ImE(pt))
+            CFFHt = (self.m.ReHt(pt)) + 1j * ( self.m.ImHt(pt))
+            CFFEt = (self.m.ReEt(pt)) + 1j * ( self.m.ImEt(pt))
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
         res = ( 
         xB/(2 - xB)*(self.m.F1(t) + self.m.F2(t)) * (CFFH + CFFE)
@@ -3515,15 +3515,15 @@ class BM10(BM10ex):
         """ BM10 ... with 1/Q2 suppressed terms removed """
     
         if eff:
-            CFFH = complex(self.m.ReHeff(pt), self.m.ImHeff(pt))
-            CFFE = complex(self.m.ReEeff(pt), self.m.ImEeff(pt))
-            CFFHt = complex(self.m.ReHteff(pt), self.m.ImHteff(pt))
-            CFFEt = complex(self.m.ReEteff(pt), self.m.ImEteff(pt))
+            CFFH = (self.m.ReHeff(pt)) + 1j * ( self.m.ImHeff(pt))
+            CFFE = (self.m.ReEeff(pt)) + 1j * ( self.m.ImEeff(pt))
+            CFFHt = (self.m.ReHteff(pt)) + 1j * ( self.m.ImHteff(pt))
+            CFFEt = (self.m.ReEteff(pt)) + 1j * ( self.m.ImEteff(pt))
         else:
-            CFFH = complex(self.m.ReH(pt), self.m.ImH(pt))
-            CFFE = complex(self.m.ReE(pt), self.m.ImE(pt))
-            CFFHt = complex(self.m.ReHt(pt), self.m.ImHt(pt))
-            CFFEt = complex(self.m.ReEt(pt), self.m.ImEt(pt))
+            CFFH = (self.m.ReH(pt)) + 1j * ( self.m.ImH(pt))
+            CFFE = (self.m.ReE(pt)) + 1j * ( self.m.ImE(pt))
+            CFFHt = (self.m.ReHt(pt)) + 1j * ( self.m.ImHt(pt))
+            CFFEt = (self.m.ReEt(pt)) + 1j * ( self.m.ImEt(pt))
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
         res = ( 
     (xB/(2 - xB))*(self.m.F1(t) + self.m.F2(t))*CFFHt
@@ -3537,15 +3537,15 @@ class BM10(BM10ex):
         """ BM10 ... with 1/Q2 suppressed terms removed """
     
         if eff:
-            CFFH = complex(self.m.ReHeff(pt), self.m.ImHeff(pt))
-            CFFE = complex(self.m.ReEeff(pt), self.m.ImEeff(pt))
-            CFFHt = complex(self.m.ReHteff(pt), self.m.ImHteff(pt))
-            CFFEt = complex(self.m.ReEteff(pt), self.m.ImEteff(pt))
+            CFFH = (self.m.ReHeff(pt)) + 1j * ( self.m.ImHeff(pt))
+            CFFE = (self.m.ReEeff(pt)) + 1j * ( self.m.ImEeff(pt))
+            CFFHt = (self.m.ReHteff(pt)) + 1j * ( self.m.ImHteff(pt))
+            CFFEt = (self.m.ReEteff(pt)) + 1j * ( self.m.ImEteff(pt))
         else:
-            CFFH = complex(self.m.ReH(pt), self.m.ImH(pt))
-            CFFE = complex(self.m.ReE(pt), self.m.ImE(pt))
-            CFFHt = complex(self.m.ReHt(pt), self.m.ImHt(pt))
-            CFFEt = complex(self.m.ReEt(pt), self.m.ImEt(pt))
+            CFFH = (self.m.ReH(pt)) + 1j * ( self.m.ImH(pt))
+            CFFE = (self.m.ReE(pt)) + 1j * ( self.m.ImE(pt))
+            CFFHt = (self.m.ReHt(pt)) + 1j * ( self.m.ImHt(pt))
+            CFFEt = (self.m.ReEt(pt)) + 1j * ( self.m.ImEt(pt))
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
         res = ( 
           xB/(2 - xB)*(self.m.F1(t) + self.m.F2(t))*(CFFH + (xB/2)*CFFE) 
@@ -3562,15 +3562,15 @@ class BM10(BM10ex):
         """ BM10 ... with 1/Q2 suppressed terms removed """
     
         if eff:
-            CFFH = complex(self.m.ReHeff(pt), self.m.ImHeff(pt))
-            CFFE = complex(self.m.ReEeff(pt), self.m.ImEeff(pt))
-            CFFHt = complex(self.m.ReHteff(pt), self.m.ImHteff(pt))
-            CFFEt = complex(self.m.ReEteff(pt), self.m.ImEteff(pt))
+            CFFH = (self.m.ReHeff(pt)) + 1j * ( self.m.ImHeff(pt))
+            CFFE = (self.m.ReEeff(pt)) + 1j * ( self.m.ImEeff(pt))
+            CFFHt = (self.m.ReHteff(pt)) + 1j * ( self.m.ImHteff(pt))
+            CFFEt = (self.m.ReEteff(pt)) + 1j * ( self.m.ImEteff(pt))
         else:
-            CFFH = complex(self.m.ReH(pt), self.m.ImH(pt))
-            CFFE = complex(self.m.ReE(pt), self.m.ImE(pt))
-            CFFHt = complex(self.m.ReHt(pt), self.m.ImHt(pt))
-            CFFEt = complex(self.m.ReEt(pt), self.m.ImEt(pt))
+            CFFH = (self.m.ReH(pt)) + 1j * ( self.m.ImH(pt))
+            CFFE = (self.m.ReE(pt)) + 1j * ( self.m.ImE(pt))
+            CFFHt = (self.m.ReHt(pt)) + 1j * ( self.m.ImHt(pt))
+            CFFEt = (self.m.ReEt(pt)) + 1j * ( self.m.ImEt(pt))
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
         res = ( 
           xB/(2 - xB)*(self.m.F1(t) + self.m.F2(t))*(CFFH + (xB/2)*CFFE)
@@ -3584,15 +3584,15 @@ class BM10(BM10ex):
         """ BM10 ... with 1/Q2 suppressed terms removed """
     
         if eff:
-            CFFH = complex(self.m.ReHeff(pt), self.m.ImHeff(pt))
-            CFFE = complex(self.m.ReEeff(pt), self.m.ImEeff(pt))
-            CFFHt = complex(self.m.ReHteff(pt), self.m.ImHteff(pt))
-            CFFEt = complex(self.m.ReEteff(pt), self.m.ImEteff(pt))
+            CFFH = (self.m.ReHeff(pt)) + 1j * ( self.m.ImHeff(pt))
+            CFFE = (self.m.ReEeff(pt)) + 1j * ( self.m.ImEeff(pt))
+            CFFHt = (self.m.ReHteff(pt)) + 1j * ( self.m.ImHteff(pt))
+            CFFEt = (self.m.ReEteff(pt)) + 1j * ( self.m.ImEteff(pt))
         else:
-            CFFH = complex(self.m.ReH(pt), self.m.ImH(pt))
-            CFFE = complex(self.m.ReE(pt), self.m.ImE(pt))
-            CFFHt = complex(self.m.ReHt(pt), self.m.ImHt(pt))
-            CFFEt = complex(self.m.ReEt(pt), self.m.ImEt(pt))
+            CFFH = (self.m.ReH(pt)) + 1j * ( self.m.ImH(pt))
+            CFFE = (self.m.ReE(pt)) + 1j * ( self.m.ImE(pt))
+            CFFHt = (self.m.ReHt(pt)) + 1j * ( self.m.ImHt(pt))
+            CFFEt = (self.m.ReEt(pt)) + 1j * ( self.m.ImEt(pt))
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
         res = ( 
          xB/(2 - xB)*(self.m.F1(t) + self.m.F2(t))*(CFFHt + (xB/2)*CFFEt)
