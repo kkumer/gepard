@@ -38,6 +38,4 @@ f.minuit.printMode = 1
 f.minuit.maxcalls = 1000
 f.fit()
 
-th.print_chisq(f.fitpoints)
-m.print_parameters_errors()
 

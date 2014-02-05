@@ -899,6 +899,10 @@ class ComptonGepard(ComptonFormFactors):
              'KAPG' : 0.0,
             'SKEWG' : 0.0,
              'DELB' : 0.0,
+               'ND' : 1.0,    
+             'AL0D' : 0.5,
+             'ALPD' : 1.0,
+             'M02D' : 1.0,    'limit_M02D' : (0.1, 1.5),
         # GPD E
              'EAL0S' : 1.0,
              'EALPS' : 0.15,
@@ -941,6 +945,10 @@ class ComptonGepard(ComptonFormFactors):
              28 : 'KAPG',
              29 : 'SKEWG',
              37 : 'THIS',
+             41 : 'ND',  
+             42 : 'AL0D',
+             43 : 'ALPD',
+             44 : 'M02D',
              47 : 'THIG',
              48 : 'DELB',
             112 : 'EAL0S',
@@ -967,6 +975,7 @@ class ComptonGepard(ComptonFormFactors):
            'NG', 'AL0G', 'ALPG', 'M02G',
            'DELM2G', 'PG', 'SECG', 'THIG', 'KAPG', 'SKEWG',
            'DELB',
+           'ND', 'AL0D', 'ALPD', 'M02D',
            'EAL0S', 'EALPS', 'EM02S',
            'EDELM2S', 'EPS', 'ESECS', 'ETHIS', 'ESKEWS',
            'EAL0G', 'EALPG', 'EM02G',
@@ -991,7 +1000,7 @@ class ComptonGepard(ComptonFormFactors):
                  44 : 'M02D',
                  45 : 'DELM2D',
                  46 : 'PD'})
-        elif ansatz not in ['FIT', 'FITEXP', 'EPH', 'EPHEXP', 'EFL', 
+        elif ansatz not in ['FIT', 'FIT14', 'FITEXP', 'EPH', 'EPHEXP', 'EFL', 
                 'EFLEXP', 'HOUCHE', 'NSPHOU', 'NSMHOU','TEST']:
             raise ValueError, "Invalid ansatz: %s\n" % ansatz
         
