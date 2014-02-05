@@ -202,6 +202,35 @@ C
 *           Killing E contribution
             PAR(18) = 0.0d0
             PAR(28) = 0.0d0
+*  ## New ansatz 2014
+      ELSE IF (ANSATZ .EQ. 'FIT14') THEN
+            HD = PAR(41) * POCHHAMMER(DBLCMPLX(1.0d0 - PAR(42), 0.0d0) 
+     &              , 4) / POCHHAMMER(DBLCMPLX(1.0d0 - PAR(42), 0.0d0)
+     &          + J , 4) * (DBLCMPLX(1.0d0 - PAR(42), 0.0d0) + J) /
+     &           (DBLCMPLX(1.0d0 - PAR(42) - PAR(43)*DEL2, 0.0d0) + J) /
+     &           (1.0d0 - DEL2/PAR(44))
+* Two options, uncomment only one!
+*    1. Take sea normalization as free parameter
+            NORMS = PAR(11)
+*    2. Constrain sea normalization by momentum sum-rule (it has to
+*           be declared as fixed in MINUIT.CMD then).
+!            NORMS = 1.0d0 - PAR(21) - 2.0d0*(1.0d0-PAR(32))/(5.0d0 -
+!     &               PAR(32)) - (1.0d0-PAR(42))/(5.0d0-PAR(42))
+            HSEA = NORMS * POCHHAMMER(DBLCMPLX(2.0d0 - PAR(12), 0.0d0) 
+     &              , 8) / POCHHAMMER(DBLCMPLX(1.0d0 - PAR(12), 0.0d0)
+     &          + J , 8) * (DBLCMPLX(1.0d0 - PAR(12), 0.0d0) + J) /
+     &           (DBLCMPLX(1.0d0 - PAR(12) - PAR(13)*DEL2, 0.0d0) + J) /
+     &           (1.0d0 - DEL2/(PAR(14)+PAR(15)*J))**PAR(16)
+         FCM(1) = HSEA + 3.0d0*HD
+         FCM(2) = PAR(21) * POCHHAMMER(DBLCMPLX(2.0d0 - PAR(22), 0.0d0) 
+     &              , 6) / POCHHAMMER(DBLCMPLX(1.0d0 - PAR(22), 0.0d0)
+     &          + J , 6) * (DBLCMPLX(1.0d0 - PAR(22), 0.0d0) + J) /
+     &           (DBLCMPLX(1.0d0 - PAR(22) - PAR(23)*DEL2, 0.0d0) + J) /
+     &           (1.0d0 - DEL2/(PAR(24)+PAR(25)*J))**PAR(26)
+         FCM(3) = ZERO
+*           Killing E contribution
+            PAR(18) = 0.0d0
+            PAR(28) = 0.0d0
       ELSE IF (ANSATZ .EQ. 'NSFIT') THEN
           FCM(1) = ZERO
           FCM(2) = ZERO
