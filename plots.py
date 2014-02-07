@@ -271,7 +271,7 @@ def HERMES09BCA(path=None, fmt='png', **kwargs):
 def HERMES12(path=None, fmt='png', **kwargs):
     """Plot HERMES combined BCA and BSA data with fit lines."""
 
-    title = 'HERMES-12'
+    title = ''
     fig = plt.figure()
     fig.canvas.set_window_title(title)
     fig.suptitle(title)
@@ -494,7 +494,8 @@ def HERMES10LP(obs='TSA', path=None, fmt='png', **kwargs):
 def HERMES08TP(path=None, fmt='png', **kwargs):
     """Plot HERMES 08 TTSA data with fit lines."""
 
-    title = 'HERMES-08 TTSA'
+    #title = 'HERMES-08 TTSA'
+    title = ''
     fig = plt.figure()
     fig.canvas.set_window_title(title)
     fig.suptitle(title)
@@ -2055,13 +2056,15 @@ def CFF2(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
     nncolors = ['blue', 'green']  # cold computer colors
     linestyles = ['solid', 'dashed']
     # Define abscissas
-    logxvals = np.logspace(-3.0, -0.01, 40)
+    ximin = 0.01
+    ximax = 0.3
+    logxvals = np.logspace(np.log10(ximin), np.log10(ximax), 40)
     # ordinates 
     #ylims = {'ImH': (-4.3, 35), 'ReH': (-6.5, 8)}
-    ylims = {'ImH': (-4.3, 35), 'ReH': (-6, 8),
-             'ImE': (-40, 35), 'ReE': (-15, 30),
+    ylims = {'ImH': (-4.3, 35), 'ReH': (-4, 2),
+             'ImE': (-40, 35), 'ReE': (-25, 5),
              'ImEt': (-50, 100), 'ReEt': (-50, 100),
-             'ImHt': (-10, 20), 'ReHt': (-10, 20)}
+             'ImHt': (-8, 8), 'ReHt': (-10, 20)}
     # Plot panels
     ts = [-0.3, -0.12]
     for n in range(len(cffs)):
@@ -2100,7 +2103,7 @@ def CFF2(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
                 #ax.text(0.33, 0.95, "data region", transform=ax.transAxes, 
                 #        fontsize=14, fontweight='bold', va='top')
             apply(ax.set_ylim, ylims[cff])
-            ax.set_xlim(0.005, 1.0)
+            ax.set_xlim(ximin, ximax)
             #ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.02))  # tickmarks
             for label in ax.get_xticklabels() + ax.get_yticklabels():
                 label.set_fontsize(14)
