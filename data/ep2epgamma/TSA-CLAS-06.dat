@@ -2,6 +2,7 @@ id = 54
 editor = DM
 # Sept. 2010
 #taken from figure 6
+# Updated by KK according to CLAS database
 
 
 ### Experiment
@@ -39,7 +40,7 @@ y1namelong = Target Spin Asymmetry
 y1unit = 1
 y1value = column3
 y1error = column4
-# only total error is knonw
+# only total error is known
 
 
 
@@ -65,12 +66,15 @@ x4value = -1
 ### Data
 table =
 #  CLAS 2006 TSA
-# taken from figure 6
-# xB   -t       TSA      error
+# taken from 
+#  http://clas.sinp.msu.ru/cgi-bin/jlab/db.cgi?eid=92;search=on
+# xB   -t       TSA       error
 ############################################
-0.276   0.15   0.1829    0.0688876
-0.276   0.25   0.3453    0.0743825
-0.276   0.44   0.2338    0.0549493
-0.206   0.31   0.0730    0.0851714
-0.296   0.31   0.2326    0.0606452
-0.404   0.31   0.3826    0.0909343
+0.276   0.149   0.1837    0.0731
+0.276   0.247   0.3443    0.08198
+0.276   0.437   0.2387    0.0604
+0.2059  0.31    0.07326   0.0874
+0.2955  0.31    0.2409    0.0608
+0.4033  0.31    0.385     0.0912
+
+
