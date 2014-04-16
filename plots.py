@@ -10,12 +10,13 @@ import sys, os, math, copy, string, commands
 import numpy as np
 
 import matplotlib
+import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages # for PDF creation
 if os.sys.platform == 'win32':
     matplotlib.use('WxAgg')
 #else: #linux
 #    matplotlib.use('TkAgg')
-import pylab as plt
+#import pylab as plt
 
 
 import Data, Approach, utils
@@ -289,14 +290,14 @@ def HERMES12(path=None, fmt='png', **kwargs):
                 # Leave labels only on leftmost panels
                 ax.set_ylabel('')
             else:
-                ylabels = ['$BCA\\; \\cos \\phi$', '$BCA\\; \\cos 0\\phi$', '$ALUI\\; \\sin\\phi$']
-                ax.set_ylabel(ylabels[(npanel-1)/3], fontsize=18)
+                ylabels = ['$A_{C}^{\\cos \\phi}$', '$A_{C}^{\\cos 0\\phi}$', '$A_{LU,I}^{\\sin\\phi}$']
+                ax.set_ylabel(ylabels[(npanel-1)/3], fontsize=16)
             if npanel < 7:
                 # Leave labels only on lowest panels
                 ax.set_xlabel('')
             else:
                 xlabels = ['$-t\\; [{\\rm GeV}^2]$', '$x_B$', '$Q^2\\; [{\\rm GeV}^2]$']
-                ax.set_xlabel(xlabels[npanel-7], fontsize=18)
+                ax.set_xlabel(xlabels[npanel-7], fontsize=16)
 
             if (npanel % 3) == 2:
                 # Adjust x-axis on middle column
@@ -414,21 +415,21 @@ def HERMES09(path=None, fmt='png', **kwargs):
                 ax.set_yticklabels([])
             else:
                 ylabels = ['$A_{C}^{\\cos\\phi}$', '$A_{LU}^{\\sin\\phi}$']
-                ax.set_ylabel(ylabels[(npanel-1)/3], fontsize=20)
+                ax.set_ylabel(ylabels[(npanel-1)/3], fontsize=16)
             if npanel < 4:
                 # Leave labels only on lowest panels
                 ax.set_xlabel('')
                 ax.set_xticklabels([])
             else:
                 xlabels = ['$-t\\; [{\\rm GeV}^2]$', '$x_B$', '$Q^2\\; [{\\rm GeV}^2]$']
-                ax.set_xlabel(xlabels[npanel-7], fontsize=18)
+                ax.set_xlabel(xlabels[npanel-7], fontsize=16)
             if npanel == 3:
                 ax.legend(bbox_to_anchor=(0., 1.), loc='upper right',
                         borderaxespad=0.).draw_frame(0)
                 pass
         #ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.2))  # tickmarks
             for label in ax.get_xticklabels() + ax.get_yticklabels():
-                label.set_fontsize(14)
+                label.set_fontsize(10)
     fig.subplots_adjust(bottom=0.45, wspace=0.0, hspace=0.0)
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
@@ -451,17 +452,19 @@ def HERMES10LP(obs='TSA', path=None, fmt='png', **kwargs):
         id = 52
         harmonics = [-1, -2, -3]
         fun = 'sin'
+        lbl = 'A_{UL}'
     elif obs == 'BTSA':
         id = 53
         harmonics = [0, 1, 2]
         fun = 'cos'
+        lbl = 'A_{LL}'
     else:
         raise ValueError, 'Observable %s nonexistent.' % obs
     subsets = {}
     for k in range(3):
         subsets[k] = utils.select(data[id], criteria=['FTn == %i' % harmonics[k]])
     # we have 3x12=36 points to be separated in nine panels four points each:
-    for y in range(3):
+    for y in range(2):  # put this to 3 to plot also 3rd harmonic
         for x in range(3):
             npanel = 3*y + x + 1  # 1, 2, ..., 9
             ax = fig.add_subplot(3,3,npanel)
@@ -473,14 +476,14 @@ def HERMES10LP(obs='TSA', path=None, fmt='png', **kwargs):
                 # Leave labels only on leftmost panels
                 ax.set_ylabel('')
             else:
-                ylabels = ['$'+obs+'\\; \\'+fun+'(%i\\phi)$' % harmonics[k] for k in range(3)]
-                ax.set_ylabel(ylabels[(npanel-1)/3], fontsize=18)
+                ylabels = ['$'+lbl+'^{\\'+fun+'%i\\phi}$' % harmonics[k] for k in range(3)]
+                ax.set_ylabel(ylabels[(npanel-1)/3], fontsize=16)
             if npanel < 7:
                 # Leave labels only on lowest panels
                 ax.set_xlabel('')
             else:
                 xlabels = ['$-t\\; [{\\rm GeV}^2]$', '$x_B$', '$Q^2\\; [{\\rm GeV}^2]$']
-                ax.set_xlabel(xlabels[npanel-7], fontsize=18)
+                ax.set_xlabel(xlabels[npanel-7], fontsize=16)
             if (npanel % 3) == 2:
                 # Adjust x-axis on middle column
                 ax.set_xlim(0.04, 0.25)
@@ -518,14 +521,14 @@ def HERMES08TP(path=None, fmt='png', **kwargs):
             else:
                 ylabels = ['$A_{UT,I}^{\\sin(\\phi-\\phi_S)\\cos\\phi}$', 
                            '$A_{UT,DVCS}^{\\sin(\\phi-\\phi_S)}$']
-                ax.set_ylabel(ylabels[(npanel-1)/3], fontsize=20)
+                ax.set_ylabel(ylabels[(npanel-1)/3], fontsize=16)
             if npanel < 4:
                 # Leave labels only on lowest panels
                 ax.set_xlabel('')
                 ax.set_xticklabels([])
             else:
                 xlabels = ['$-t\\; [{\\rm GeV}^2]$', '$x_B$', '$Q^2\\; [{\\rm GeV}^2]$']
-                ax.set_xlabel(xlabels[npanel-7], fontsize=18)
+                ax.set_xlabel(xlabels[npanel-7], fontsize=16)
             if npanel == 3 and kwargs:
                 ax.legend(bbox_to_anchor=(0., 1.), loc='upper right',
                         borderaxespad=0.).draw_frame(0)
@@ -533,7 +536,7 @@ def HERMES08TP(path=None, fmt='png', **kwargs):
             ax.yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.2))  # tickmarks
             ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
             for label in ax.get_xticklabels() + ax.get_yticklabels():
-                label.set_fontsize(14)
+                label.set_fontsize(10)
     fig.subplots_adjust(bottom=0.35, wspace=0.0, hspace=0.0)
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
@@ -713,7 +716,7 @@ def H1ZEUS(path=None, fmt='png', **kwargs):
     fig = plt.figure()
     fig.canvas.set_window_title(title)
     fig.suptitle(title)
-    fig.subplots_adjust(bottom=0.1, hspace=0.3)
+    #fig.subplots_adjust(bottom=0.1, hspace=0.3)
     for npanel in range(1,5):
         ax = fig.add_subplot(2,2,npanel)
         ax.set_yscale('log')  # y-axis to be logarithmic

@@ -21,7 +21,7 @@ H1all = data[36] + data[37] + data[38] + data[39] + \
   data[75] + data[76] + data[77] + data[78] + data[79] + data[80]
 ZEUSall = data[45] + data[46] + data[47] + data[48] + data[49]
 HERMESall = data[29] + data[31] + data[32] + data[52] + data[53] + \
-            data[57] + data[58] + data[59] + data[65] + data[66] + \
+            data[65] + data[66] + \
             data[67] + data[68] + data[69] + data[70] + data[71] + \
             data[72] + data[73] + data[74]
 CLASall = data[7] + data[54]
@@ -86,10 +86,12 @@ ALLpts = BTSApoints[:4]
 
 ####  --  Transversally polarized target --
 #
-AUTIpoints = utils.select(data[66], criteria=['FTn==1'])  # HERMES A_UT_I
+AUTIpoints = utils.select(data[66], criteria=['FTn==1'])  # \sin\varphi\cos\phi
+AUTICSpoints = utils.select(data[66], criteria=['FTn==-1'])  # \cos\varphi\sin\phi
 AUTDVCSpoints = data[65]  # HERMES A_UT_DVCS
 TPpoints = AUTIpoints + AUTDVCSpoints  # total transversal target
 AUTIpts = AUTIpoints[:4]
+AUTICSpts = AUTICSpoints[:4]
 
 # Global combinations
 #

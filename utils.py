@@ -278,6 +278,42 @@ def listdb(db):
         print "%-17s  |  %s" % (key, db[key].description)
     #print "\n WARNING: gepard models are now likely broken. Reinitialize them!"
 
+def listdata(ids, data):
+    """List basic info about datasets specified by id numbers."""
+    if not isinstance(ids, list): ids = [ids]
+    for id in ids:
+        try:
+            dt = data[id]
+            ref = dt.reference.replace('arXiv:', '').replace('hep-ex', '').replace('nucl-ex', '').replace('from Morgan Murray, draft_90@hermes.desy.de, J. Burns and M. Murray', 'Morgan M.').replace('v1', '').replace('F. Ellinghaus, QCD02', 'Frank E.').replace('PRELIMINARY', 'prelim.').strip('[]/ ')
+            try:
+                ref2 = dt.reference2
+            except:
+                ref2 =  ''
+            print '[%2i] %8s %3i %9s %10s %s' % (dt.id, dt.collaboration, len(dt), dt.y1name, ref, ref2)
+        except KeyError:
+            pass
+
+def listchis(ths, Q2cut=2.):
+    """Compare chi-squares of theories for subsets of data."""
+    if not isinstance(ths, list): ths = [ths]
+    from abbrevs import H1ZEUS, ALUIpts, BCApts, CLASpts, BSDwpoints, BSSwpoints, AULpts, ALLpts, AUTIpts 
+    #exps = ['UNP5points', 'ALTGLO5', 'CLAS', 'CLASDM', 'BSDw', 'BSSw', 'TSA1', 'BTSA', 'TPpoints']
+    #ptssets = [UNP5points, ALTGLO5points, data[25], data[8], BSDwpoints, BSSwpoints, TSA1points, BTSApoints, TPpoints]
+    exps = ['H1ZEUS', 'ALUIpts', 'BCApts', 'CLASpts', 'BSDwpoints', 'BSSwpoints', 'AULpts', 'ALLpts', 'AUTIpts' ]
+    ptssets = [H1ZEUS, ALUIpts, BCApts, CLASpts, BSDwpoints, BSSwpoints, AULpts, ALLpts, AUTIpts ]
+    #exps = ['H1ZEUS DVCS', 'H1-09 XL', "H1-09 W-dep"]
+    #ptssets = [H1ZEUS, H109XL, H109WdepXL]
+    names = [th.name for th in ths]
+    sublines = ['------' for th in ths]
+    ftit = 15*' ' + len(names)*'{:8s}'
+    print ftit.format(*names)
+    print ftit.format(*sublines)
+    for name, pts in zip(exps,ptssets):
+        cutpts = select(pts, criteria=['Q2>=%f' % Q2cut])
+        chis = [th.chisq(cutpts)[0] for th in ths]
+        fstr = '{:10s}: ' + len(chis)*'{:8.2f}' + '   (np ={dof:3d})'
+        print fstr.format(name, *chis, dof=len(pts))
+
 
 class hubDict(dict):
     """Merges two dictionaries, but not actually but just by forwarding."""
