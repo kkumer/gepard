@@ -55,6 +55,6 @@ def test_KMM12():
     th = db['KMM12']
     pts = GLOnoBSS2 + BSSwpoints
     chisq = th.chisq(pts)[0]
-    assert_almost_equal(chisq, 124.11535912660511)
+    assert_almost_equal(chisq, 123.46439889570672)
 
 test_KMM12.long = 1
