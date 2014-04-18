@@ -23,7 +23,6 @@ from constants import Mp, Mp2
 
 #from IPython.Debugger import Tracer; debug_here = Tracer()
 _lg = logging.getLogger('p.%s' % __name__)
-_lg.setLevel('INFO')
 _lg.debug('Loading module %s' % __name__)
 
 

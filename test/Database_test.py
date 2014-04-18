@@ -41,7 +41,7 @@ def test_KM10a():
     th = db['KM10a']
     pts = DVCSpoints+data[48]+ALTGLOpoints
     chisq = th.chisq(pts)[0]
-    assert_almost_equal(chisq, 136.89562475279016)
+    assert_almost_equal(chisq, 132.14636420551949)
 
 #def test_KM10b():
     #"""Test model: KM10b"""

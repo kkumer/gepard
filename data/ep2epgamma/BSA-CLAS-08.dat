@@ -1,0 +1,90 @@
+id = 81
+editor = KK
+
+
+### Experiment
+
+collaboration = CLAS
+process = ep2epgamma
+exptype = fixed target
+year = 2008
+reference =  arXiv:0812.2950
+reference2 = Tables 3 and 4
+
+
+### Scattering Process
+
+frame = Trento
+
+in1particle = em
+in1energy = 4.8
+in1energyunit = GeV
+in1polarizationvector = L
+in1polarization = +1
+
+in2particle = p
+
+out1particle = em
+out2particle = p
+out3particle = gamma
+
+
+### Observable 
+# A_{LU}, BSA
+
+y1name = BSA
+y1namelong = Beam Spin Asymmetry - Amplitude of Azimuthal Angle Harmonic sin(n phi)
+y1unit = 1
+y1value = column5
+y1errorstatistic = column6
+y1errorsystematicplus = column7
+y1errorsystematicminus = column8
+
+
+### x-axes
+
+x1name = xB
+x1unit = 1
+x1value = column1
+
+x2name = Q2
+x2unit = GeV^2
+x2value = column2
+
+
+x3name = tm
+x3unit = GeV^2
+x3value = column3
+
+x4name = FTn
+x4unit = 1
+x4value = column4
+
+
+### Data
+#
+# xB    Q2     -t    FTn   A_LU   stat   syst+(8.2%)  syst-(8.7%)
+########################################################
+
+# Table 3 (Q2 bins)
+#
+0.17   1.22   0.23   -1   0.181  0.032   0.015        0.016
+0.17   1.22   0.23   -2   0.099  0.023   0.008        0.009
+
+0.20   1.51   0.26   -1   0.245  0.028   0.020        0.021
+0.20   1.51   0.26   -2  −0.040  0.021   0.003        0.003
+
+0.28   2.04   0.38   -1   0.192  0.044   0.016        0.017
+0.28   2.04   0.38   -2   0.010  0.030   0.001        0.001
+ 
+# Table 4 (-t bins)
+#
+0.23   1.69   0.19   -1   0.228  0.029   0.019        0.020
+0.23   1.69   0.19   -2  −0.034  0.024   0.003        0.003
+
+0.23   1.74   0.30   -1   0.147  0.055   0.012        0.013
+0.23   1.74   0.30   -2   0.033  0.037   0.003        0.003
+
+0.25   1.83   0.46   -1   0.260  0.062   0.021        0.023
+0.25   1.83   0.46   -2  −0.022  0.039   0.002        0.002
+

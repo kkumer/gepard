@@ -24,9 +24,9 @@ from constants import toTeX, Mp2, Mp, OBStoTeX
 from results import *
 
 # load experimental data
-data = utils.loaddata('/home/kkumer/pype/data/ep2epgamma', approach=Approach.BMK) 
-data.update(utils.loaddata('/home/kkumer/pype/data/gammastarp2gammap', approach=Approach.BMK)) 
-data.update(utils.loaddata('/home/kkumer/pyper/data/gammastarp2Mp', approach=Approach.BMK)) 
+data = utils.loaddata('data/ep2epgamma', approach=Approach.BMK) 
+data.update(utils.loaddata('data/gammastarp2gammap', approach=Approach.BMK)) 
+data.update(utils.loaddata('data/gammastarp2Mp', approach=Approach.BMK)) 
 
 ###  subplots_adjust options and their meanings:
  # left  = 0.125  # the left side of the subplots of the figure
@@ -231,8 +231,8 @@ def panel(ax, points=None, lines=None, bands=None, xaxis=None, xs=None,
                 else:
                     xvals.append(getattr(pt, xaxis))
                 yvals.append(pt.val)
-        labx = min(0, min(xvals)) + (max(xvals) - min(0, min(xvals))) * 0.35
-        laby = min(0, min(yvals)) + (max(yvals) - min(0, min(yvals))) * 0.02
+        labx = min(0, min(xvals)) + (max(xvals) - min(0, min(xvals))) * 0.15
+        laby = min(0, min(yvals)) + (max(yvals) - min(0, min(yvals))) * 0.04
         labtxt = ""
         for lab in kinlabels:
             try:
@@ -549,8 +549,10 @@ def CLAS(path=None, fmt='png', **kwargs):
     """Makes plot of CLAS BSA data with fit lines and bands"""
 
     dataset = data[25]
-    title = 'CLAS-07'
-    fig = plt.figure()
+    title = 'CLAS (Girod:2007aa)'
+    title = ''
+    fig, axs = plt.subplots(3, 3, sharey=True, sharex=True, figsize=[7,7])
+    axs = axs.reshape(9)
     fig.canvas.set_window_title(title)
     fig.suptitle(title)
     nmax = len(dataset) - 1
@@ -558,7 +560,7 @@ def CLAS(path=None, fmt='png', **kwargs):
     npt = 0
     panelpoints = []
     for npanel in [7, 8, 9, 4, 5, 6, 1, 2, 3]:
-        ax = fig.add_subplot(3,3,npanel)
+        ax = axs[npanel-1]
         panelpoints = []
         pt = dataset[npt]
         Q2 = pt.Q2
@@ -587,10 +589,37 @@ def CLAS(path=None, fmt='png', **kwargs):
         if (npanel % 3) != 1:
             # Leave labels only on leftmost panels
             ax.set_ylabel('')
+        else:
+            ax.set_ylabel('$A_{LU}^{\\sin\\phi}$', fontsize=16)
         if npanel < 7:
             ax.set_xlabel('')
         else:
-            ax.set_xlabel('$-t\\; [{\\rm GeV}^2]$', fontsize=18)
+            ax.set_xlabel('$-t\\; [{\\rm GeV}^2]$', fontsize=16)
+    if path:
+        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+    else:
+        fig.canvas.draw()
+        fig.show()
+    return fig
+
+def CLAS08(path=None, fmt='png', **kwargs):
+    """Makes plot of CLAS 2008 BSA data with fit lines and bands"""
+
+    title = 'CLAS (Gavalian:2008aa)'
+    title = ''
+    alldata = utils.select(data[81], criteria=['FTn == -1'])
+    datasets = [alldata[:3], alldata[-3:]]
+    xaxes = ['Q2', 'tm']
+    xlabels = ['$Q^2\\; [{\\rm GeV}^2]$', '$-t\\; [{\\rm GeV}^2]$']
+    fig, axs = plt.subplots(1, 2, sharey=True, figsize=[6,3])
+    fig.canvas.set_window_title(title)
+    fig.suptitle(title)
+    # Each different Q2 has its own panel
+    for np, ax in enumerate(axs):
+        panel(ax, points=datasets[np], xaxis=xaxes[np], **kwargs)
+        ax.set_xlabel(xlabels[np], fontsize=16)
+        ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.2))
+    axs[0].set_ylabel('$A_{LU}^{\\sin\\phi}$', fontsize=16)
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
@@ -629,8 +658,8 @@ def HallAFT(path=None, fmt='png', **kwargs):
     subsets[5] = utils.select(data[51], criteria=['FTn == 1'])
     #subsets[6] = utils.select(data[51], criteria=['FTn == 2'])
 
-    title = 'Hall-A'
-    fig = plt.figure()
+    title = ''
+    fig = plt.figure(figsize=[8,6])
     fig.canvas.set_window_title(title)
     fig.suptitle(title)
     Qs = ['1.5', '1.9', '2.3', '2.3', '2.3']
@@ -638,11 +667,11 @@ def HallAFT(path=None, fmt='png', **kwargs):
         ax = fig.add_subplot(2,3,npanel)
         panel(ax, points=subsets[npanel], xaxis='t', **kwargs)
         ax.set_ylabel('%s(FTn = %i)' % (subsets[npanel][0].y1name, 
-            subsets[npanel][0].FTn), fontsize=16)
-        if npanel<5:
-            ax.text(-0.31, 0.002, '$Q^2\\!= %s\\,{\\rm GeV}^2$' % Qs[npanel-1], fontsize=12)
+            subsets[npanel][0].FTn), fontsize=14)
+        if npanel != 4:
+            ax.text(-0.31, 0.017, '$Q^2\\!= %s\\,{\\rm GeV}^2$' % Qs[npanel-1], fontsize=12)
         else:
-            ax.text(-0.31, -0.008, '$Q^2\\!= %s\\,{\\rm GeV}^2$' % Qs[npanel-1], fontsize=12)
+            ax.text(-0.31, 0.065, '$Q^2\\!= %s\\,{\\rm GeV}^2$' % Qs[npanel-1], fontsize=12)
         ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))
     fig.subplots_adjust(wspace=0.7)
     if path:
@@ -663,11 +692,11 @@ def HallAphi(path=None, fmt='png', **kwargs):
     subsets[21] = utils.select(data[34], criteria=['t == -0.17'])
     subsets[23] = utils.select(data[34], criteria=['t == -0.28'])
     subsets[24] = utils.select(data[34], criteria=['t == -0.33'])
-    title = 'HALL-A-06'
-    fig = plt.figure()
+    title = ''
+    fig = plt.figure(figsize=[10,6])
     fig.canvas.set_window_title(title)
     fig.suptitle(title)
-    fig.subplots_adjust(wspace=0.2, right=0.95)
+    fig.subplots_adjust(wspace=0.2)
     npanel = 1
     for id in ids:
         ax = fig.add_subplot(2,3,npanel)

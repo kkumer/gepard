@@ -52,6 +52,7 @@ BCApts = BCA0points[:6] + BCA1points[:6]
 BSACLAS_KKpoints = data[25]
 BSACLAS_DMpoints = data[8]
 CLASpts = utils.select(data[8], criteria=['Q2 >= 2.0'])
+CLAS08pts = utils.select(data[81], criteria=['FTn == -1'])[-3:]
 #
 # Hall A
 #
