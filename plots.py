@@ -6,7 +6,7 @@ of some specific datasets and CFFs.
 
 #from IPython.Debugger import Tracer; debug_here = Tracer()
 
-import sys, os, math, copy, string, commands
+import sys, os, math, copy, string, commands, itertools
 import numpy as np
 
 import matplotlib
@@ -170,7 +170,7 @@ def panel(ax, points=None, lines=None, bands=None, xaxis=None, xs=None,
         if isinstance(points[0], Data.DataPoint): points = [points]
 
         pointshapes = ['o', 's', '^', 'd', 'o', 's', '^', 'd']  # first circles, then squares ...
-        pointcolors = ['blue', 'black', 'purple', 'green', 'red', 'brown', 'blue', 'black']
+        pointcolors = ['blue', 'red', 'green', 'red', 'brown', 'blue', 'black']
         setn = 0
         for pts in points:
             _axpoints(ax, pts, xaxis, linestyle='None', elinewidth=1, 
@@ -549,33 +549,67 @@ def CLAS(path=None, fmt='png', **kwargs):
     """Makes plot of CLAS BSA data with fit lines and bands"""
 
     dataset = utils.select(data[25], criteria=['Q2 > 1.57'])
-    dataset = data[25]
+    #dataset = data[25]
     title = ''
     title = 'CLAS (Girod:2007aa)'
     fig, axs = plt.subplots(2, 3, sharey=True, sharex=True, figsize=[7,5])
     axs = axs.reshape(6)
     fig.canvas.set_window_title(title)
     fig.suptitle(title)
-    nmax = len(dataset) - 1
     # Each different Q2 has its own panel
-    npt = 0
-    panelpoints = []
-    for npanel in [4, 5, 6, 1, 2, 3]:
-        ax = axs[npanel-1]
-        panelpoints = []
-        pt = dataset[npt]
-        Q2 = pt.Q2
-        while Q2 == pt.Q2:
-            panelpoints.append(pt)
-            npt += 1
-            if npt == nmax:
-                break
-            pt = dataset[npt]
+    panelorder =  [4, 5, 6, 1, 2, 3]
+    npanel = 0
+    for Q2, grp in itertools.groupby(dataset, lambda pt: pt.Q2):
+        np = panelorder[npanel]
+        ax = axs[np-1]
+        panelpoints = list(grp)
+        # now transform list into DataSet instance ...
+        panelset = Data.DataSet(panelpoints)
+        panelset.__dict__ = data[25].__dict__.copy()
+        # ... and plot
+        panel(ax, points=panelset, xaxis='tm', kinlabels=['Q2', 'xB'], **kwargs)
+        plt.xlim(0.0, 0.6)
+        plt.ylim(0.0, 0.4)
+        ax.yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))
+        if (np % 3) != 1:
+            # Leave labels only on leftmost panels
+            ax.set_ylabel('')
+        else:
+            ax.set_ylabel('$A_{LU}^{\\sin\\phi}$', fontsize=16)
+        if np < 4:
+            ax.set_xlabel('')
+        else:
+            ax.set_xlabel('$-t\\; [{\\rm GeV}^2]$', fontsize=16)
+        npanel += 1
+    if path:
+        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+    else:
+        fig.canvas.draw()
+        fig.show()
+    return fig
+
+def CLAS14(path=None, fmt='png', **kwargs):
+    """Makes plot of CLAS-14 BSA data with fit lines and bands"""
+
+    dataset = data[85]
+    title = ''
+    title = 'CLAS (prelim. 2014)'
+    fig, axs = plt.subplots(2, 2, sharey=True, sharex=True, figsize=[7,5])
+    axs = axs.reshape(4)
+    fig.canvas.set_window_title(title)
+    fig.suptitle(title)
+    # Each different Q2 has its own panel
+    panelorder = [3, 4, 1, 2]
+    npanel = 0
+    for Q2, grp in itertools.groupby(dataset, lambda pt: pt.Q2):
+        np = panelorder[npanel]
+        ax = axs[np-1]
+        panelpoints = list(grp)
         # now transform list into DataSet instance ...
         panelset = Data.DataSet(panelpoints)
         panelset.__dict__ = dataset.__dict__.copy()
         # ... and plot
-        if npanel == 4 or npanel == 4:
+        if np == 2:
             # fake doubling of points to get line visibility
             ptd = copy.deepcopy(panelset[0])
             ptd.tm = ptd.tm+0.02
@@ -583,25 +617,91 @@ def CLAS(path=None, fmt='png', **kwargs):
             panel(ax, points=panelset, xaxis='tm', kinlabels=['Q2', 'xB'], **kwargs)
         else:
             panel(ax, points=panelset, xaxis='tm', kinlabels=['Q2', 'xB'], **kwargs)
-
         plt.xlim(0.0, 0.6)
         plt.ylim(0.0, 0.4)
         ax.yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))
-        if (npanel % 3) != 1:
+        if (np % 2) != 1:
             # Leave labels only on leftmost panels
             ax.set_ylabel('')
         else:
             ax.set_ylabel('$A_{LU}^{\\sin\\phi}$', fontsize=16)
-        if npanel < 4:
+        if np > 2:
             ax.set_xlabel('')
         else:
             ax.set_xlabel('$-t\\; [{\\rm GeV}^2]$', fontsize=16)
+        npanel += 1
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
         fig.canvas.draw()
         fig.show()
     return fig
+
+def CLASJ(path=None, fmt='png', **kwargs):
+    """Makes plot of CLAS-14 BSA data with fit lines and bands.
+       Some CLAS-07 data points are also plotted.
+    """
+
+    # old data
+    aux = [(Q2, Data.DataSet(grp)) for Q2, grp in 
+            itertools.groupby(data[25], lambda pt: pt.Q2)]
+    old = []
+    for Q2, ds in aux:
+        ds.__dict__ = data[25].__dict__.copy()
+        old.append((Q2, ds))
+    # new data
+    dataset = data[85]
+    title = ''
+    title = 'CLAS (prelim. 2014)'
+    fig, axs = plt.subplots(2, 2, sharey=True, sharex=True, figsize=[7,5])
+    axs = axs.reshape(4)
+    fig.canvas.set_window_title(title)
+    fig.suptitle(title)
+    # Each different Q2 has its own panel
+    panelorder = [3, 4, 1, 2]
+    npanel = 0
+    for Q2, grp in itertools.groupby(dataset, lambda pt: pt.Q2):
+        np = panelorder[npanel]
+        ax = axs[np-1]
+        panelpoints = list(grp)
+        # now transform list into DataSet instance ...
+        panelset = Data.DataSet(panelpoints)
+        panelset.__dict__ = dataset.__dict__.copy()
+        # ... and plot
+        if np == 2:
+            # fake doubling of points to get line visibility
+            ptd = copy.deepcopy(panelset[0])
+            ptd.tm = ptd.tm+0.02
+            panelset.append(ptd)
+            panel(ax, points=panelset, xaxis='tm', kinlabels=['Q2', 'xB'], **kwargs)
+        else:
+            if np == 1:
+                panel(ax, points=[panelset, old[5][1]], xaxis='tm', kinlabels=['Q2', 'xB'], **kwargs)
+                ax.legend(loc='upper left', borderaxespad=0.).draw_frame(0)
+            elif np == 3:
+                panel(ax, points=[panelset, old[2][1]], xaxis='tm', kinlabels=['Q2', 'xB'], **kwargs)
+            else:
+                panel(ax, points=panelset, xaxis='tm', kinlabels=['Q2', 'xB'], **kwargs)
+        plt.xlim(0.0, 0.6)
+        plt.ylim(0.0, 0.4)
+        ax.yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))
+        if (np % 2) != 1:
+            # Leave labels only on leftmost panels
+            ax.set_ylabel('')
+        else:
+            ax.set_ylabel('$A_{LU}^{\\sin\\phi}$', fontsize=16)
+        if np > 2:
+            ax.set_xlabel('')
+        else:
+            ax.set_xlabel('$-t\\; [{\\rm GeV}^2]$', fontsize=16)
+        npanel += 1
+    if path:
+        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+    else:
+        fig.canvas.draw()
+        fig.show()
+    return fig
+
 
 def CLAS08(path=None, fmt='png', **kwargs):
     """Makes plot of CLAS 2008 BSA data with fit lines and bands"""
