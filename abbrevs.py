@@ -51,8 +51,9 @@ BCApts = BCA0points[:6] + BCA1points[:6]
 #
 BSACLAS_KKpoints = data[25]
 BSACLAS_DMpoints = data[8]
-CLASpts = utils.select(data[8], criteria=['Q2 >= 2.0'])
 CLAS08pts = utils.select(data[81], criteria=['FTn == -1'])[-3:]
+CLASpts = utils.select(data[8], criteria=['Q2 >= 1.5']) + CLAS08pts
+CLASKKpts = utils.select(data[25], criteria=['Q2 >= 1.5']) + CLAS08pts
 #
 # Hall A
 #
@@ -103,7 +104,11 @@ ALTGLO5points = data[5] + data[8] + data[32][18:]   # DM's CLAS BSA
 UNP5points = ALTGLO5points + BSSwpoints + BSDwpoints
 #
 GLOall = H1ZEUS[::3] + ALUIpts + BCApts + CLASpts + HApts + AULpts + ALLpts + AUTIpts
-GLOfull = (H1ZEUS + ALUIpts + BCApts + BSACLAS_DMpoints + BSSwpoints + BSDwpoints
+GLOfull = (H1ZEUS + ALUIpts + BCApts + CLASKKpts + BSSwpoints + BSDwpoints
+            + LPpoints + TPpoints)
+GLOfixfullKK = (ALUIpts + BCApts + CLASKKpts + BSSwpoints + BSDwpoints
+            + LPpoints + TPpoints)
+GLOfixfull = (ALUIpts + BCApts + CLASpts + BSSwpoints + BSDwpoints
             + LPpoints + TPpoints)
 # Excluding LP
 GLOnoL = H1ZEUS[::3] + ALUIpts + BCApts + CLASpts + HApts + AUTIpts

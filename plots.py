@@ -130,8 +130,8 @@ def _axband(ax, fun, pts, xaxis, **kwargs):
         ax.errorbar(xvals, yvals, yerrs, marker='d', color='red', linestyle='None', 
                 elinewidth=3)
     else:
-        x = plt.concatenate( (xvals, xvals[::-1]) )
-        y = plt.concatenate( (up, down[::-1]) )
+        x = np.concatenate( (xvals, xvals[::-1]) )
+        y = np.concatenate( (up, down[::-1]) )
         if kwargs.pop('xF', False):  # do we want  xF(x) plotted?
             xis = np.array([pt.xi for pt in pts+pts[::-1]])
             y = xis*y
@@ -548,18 +548,19 @@ def HERMES08TP(path=None, fmt='png', **kwargs):
 def CLAS(path=None, fmt='png', **kwargs):
     """Makes plot of CLAS BSA data with fit lines and bands"""
 
+    dataset = utils.select(data[25], criteria=['Q2 > 1.57'])
     dataset = data[25]
-    title = 'CLAS (Girod:2007aa)'
     title = ''
-    fig, axs = plt.subplots(3, 3, sharey=True, sharex=True, figsize=[7,7])
-    axs = axs.reshape(9)
+    title = 'CLAS (Girod:2007aa)'
+    fig, axs = plt.subplots(2, 3, sharey=True, sharex=True, figsize=[7,5])
+    axs = axs.reshape(6)
     fig.canvas.set_window_title(title)
     fig.suptitle(title)
     nmax = len(dataset) - 1
     # Each different Q2 has its own panel
     npt = 0
     panelpoints = []
-    for npanel in [7, 8, 9, 4, 5, 6, 1, 2, 3]:
+    for npanel in [4, 5, 6, 1, 2, 3]:
         ax = axs[npanel-1]
         panelpoints = []
         pt = dataset[npt]
@@ -574,7 +575,7 @@ def CLAS(path=None, fmt='png', **kwargs):
         panelset = Data.DataSet(panelpoints)
         panelset.__dict__ = dataset.__dict__.copy()
         # ... and plot
-        if npanel == 1 or npanel == 3:
+        if npanel == 4 or npanel == 4:
             # fake doubling of points to get line visibility
             ptd = copy.deepcopy(panelset[0])
             ptd.tm = ptd.tm+0.02
@@ -591,7 +592,7 @@ def CLAS(path=None, fmt='png', **kwargs):
             ax.set_ylabel('')
         else:
             ax.set_ylabel('$A_{LU}^{\\sin\\phi}$', fontsize=16)
-        if npanel < 7:
+        if npanel < 4:
             ax.set_xlabel('')
         else:
             ax.set_xlabel('$-t\\; [{\\rm GeV}^2]$', fontsize=16)
@@ -605,8 +606,8 @@ def CLAS(path=None, fmt='png', **kwargs):
 def CLAS08(path=None, fmt='png', **kwargs):
     """Makes plot of CLAS 2008 BSA data with fit lines and bands"""
 
-    title = 'CLAS (Gavalian:2008aa)'
     title = ''
+    title = 'CLAS (Gavalian:2008aa)'
     alldata = utils.select(data[81], criteria=['FTn == -1'])
     datasets = [alldata[:3], alldata[-3:]]
     xaxes = ['Q2', 'tm']
@@ -657,8 +658,10 @@ def HallAFT(path=None, fmt='png', **kwargs):
     subsets[4] = utils.select(data[51], criteria=['FTn == 0'])
     subsets[5] = utils.select(data[51], criteria=['FTn == 1'])
     #subsets[6] = utils.select(data[51], criteria=['FTn == 2'])
-
-    title = ''
+    ylabels = 3*['$d^{\,4}\\Sigma^{\,\\sin\\phi,w}$'] + \
+                ['$d^{\,4}\\sigma^{\,\\cos0\\phi,w}$'] + \
+                ['$d^{\,4}\\sigma^{\,\\cos\\phi,w}$']
+    title = 'MunozCamacho:2006hx'
     fig = plt.figure(figsize=[8,6])
     fig.canvas.set_window_title(title)
     fig.suptitle(title)
@@ -666,8 +669,7 @@ def HallAFT(path=None, fmt='png', **kwargs):
     for npanel in range(1,6):
         ax = fig.add_subplot(2,3,npanel)
         panel(ax, points=subsets[npanel], xaxis='t', **kwargs)
-        ax.set_ylabel('%s(FTn = %i)' % (subsets[npanel][0].y1name, 
-            subsets[npanel][0].FTn), fontsize=14)
+        ax.set_ylabel('%s' % ylabels[npanel-1], fontsize=16)
         if npanel != 4:
             ax.text(-0.31, 0.017, '$Q^2\\!= %s\\,{\\rm GeV}^2$' % Qs[npanel-1], fontsize=12)
         else:
@@ -707,11 +709,11 @@ def HallAphi(path=None, fmt='png', **kwargs):
             # Leave labels only on leftmost panels
             ax.set_ylabel('')
         elif npanel==1:
-            ax.set_ylabel('$d^4\\Sigma$', fontsize=18)
+            ax.set_ylabel('$d^{\,4}\\Sigma$', fontsize=18)
             #ax.set_ylabel('$d^4\\Sigma/(dQ^2\\! dx_{\\rm B}dt d\\phi)\\quad \
             #        [{\\rm nb/GeV}^4]$', fontsize=18)
         else: # panel 4
-            ax.set_ylabel('$d^4\\sigma$', fontsize=18)
+            ax.set_ylabel('$d^{\,4}\\sigma$', fontsize=18)
             #ax.set_ylabel('$d^4\\sigma/(dQ^2\\! dx_{\\rm B}dt d\\phi)\\quad  \
             #        [{\\rm nb/GeV}^4]$', fontsize=18)
         if npanel < 4:
@@ -2418,8 +2420,8 @@ def bspace(th, parsets=False, path=None, fmt='png', error=False, **kwargs):
         ys = np.array(ys)
         if error:
             yup, ydown = np.array([(m+err, m-err) for m,err in ys]).transpose()
-            x = plt.concatenate( (bvals, bvals[::-1]) )
-            y = pt.xi*plt.concatenate( (yup, ydown[::-1]) )
+            x = np.concatenate( (bvals, bvals[::-1]) )
+            y = pt.xi*np.concatenate( (yup, ydown[::-1]) )
             ax.fill(x, y, alpha=0.5, color=colors[k+1], **kwargs)
         else:
             ax.plot(bvals, pt.xi*ys, color=colors[k])
@@ -2444,8 +2446,8 @@ def bspace(th, parsets=False, path=None, fmt='png', error=False, **kwargs):
         ys = np.array(ys)
         if error:
             yup, ydown = np.array([(m+err, m-err) for m,err in ys]).transpose()
-            x = plt.concatenate( (bvals, bvals[::-1]) )
-            y = pt.xi*plt.concatenate( (yup, ydown[::-1]) )
+            x = np.concatenate( (bvals, bvals[::-1]) )
+            y = pt.xi*np.concatenate( (yup, ydown[::-1]) )
             ax.fill(x, y, alpha=0.5, color=colors[k+1], **kwargs)
         else:
             ax.plot(bvals, pt.xi*ys, color=colors[k])
@@ -2470,8 +2472,8 @@ def bspace(th, parsets=False, path=None, fmt='png', error=False, **kwargs):
         ys = np.array(ys)
         if error:
             yup, ydown = np.array([(m+err, m-err) for m,err in ys]).transpose()
-            x = plt.concatenate( (bvals, bvals[::-1]) )
-            y = plt.concatenate( (yup, ydown[::-1]) )
+            x = np.concatenate( (bvals, bvals[::-1]) )
+            y = np.concatenate( (yup, ydown[::-1]) )
             ax.fill(x, y, alpha=0.5, color=colors[k+1], **kwargs)
         else:
             ax.plot(bvals, ys, color=colors[k])
@@ -2572,8 +2574,8 @@ def markus(th, error=False, path=None, fmt='png', **kwargs):
     ys = np.array(ys)
     if error:
         yup, ydown = np.array([(m+err, m-err) for m,err in ys]).transpose()
-        x = plt.concatenate( (bxs, bxs[::-1]) )
-        y = pt.xi*plt.concatenate( (yup, ydown[::-1]) )
+        x = np.concatenate( (bxs, bxs[::-1]) )
+        y = pt.xi*np.concatenate( (yup, ydown[::-1]) )
         ax.fill(x, y, alpha=0.7, color='blue', **kwargs)
     else:
         ax.plot(bxs, pt.xi*ys, color='blue')
