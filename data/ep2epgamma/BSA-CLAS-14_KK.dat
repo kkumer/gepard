@@ -1,0 +1,81 @@
+id = 85
+editor = KK
+
+
+
+### Experiment
+
+collaboration = CLAS
+process = ep2epgamma
+exptype = fixed target
+year = 2014
+reference =  private communication
+reference2 = F.T. by K.K.
+
+
+### Scattering Process
+
+frame = Trento
+
+in1particle = em
+in1energy = 5.932
+in1energyunit = GeV
+in1polarizationvector = L
+in1polarization = +1
+
+in2particle = p
+
+out1particle = em
+out2particle = p
+out3particle = gamma
+
+
+### Observable 
+# A_{LU}
+
+
+y1name = BSA
+y1namelong = Beam Spin Asymmetry
+y1unit = 1
+y1value = column4
+y1error = column5 
+# only statistical error is given to us
+
+
+
+### x-axes
+
+x1name = Q2
+x1unit = GeV^2
+x1value = column2
+
+x2name = xB
+x2unit = 1
+x2value = column1
+
+x3name = tm
+x3unit = GeV^2
+x3value = column3
+
+
+x4name = FTn
+x4unit = 1
+x4value = -1
+
+### Data
+#
+#  CLAS 2014 BSA
+#
+# xB        Q2       -t      A_{LU}^sin(phi)  stat
+###########################################################
+#0.179933   1.5293    0.2302   0.212954   0.22969
+#0.179933   1.5293    0.4756   0.328404   0.277271
+0.254567   1.99003   0.1358   0.20908    0.0176601
+0.254567   1.99003   0.2278   0.231746   0.0215935
+0.254567   1.99003   0.4573   0.209011   0.028279
+0.2616     2.42253   0.1378   0.207688   0.0273049
+0.2616     2.42253   0.2286   0.188854   0.0308731
+0.2616     2.42253   0.4431   0.233816   0.0388891
+0.335167   2.62153   0.2401   0.23533    0.0258984
+0.335167   2.62153   0.4558   0.187548   0.0207458
+0.42875    3.2327    0.5068   0.203779   0.0392088
