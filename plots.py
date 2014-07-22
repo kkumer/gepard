@@ -597,15 +597,19 @@ def CLAS14(obs='BSA', path=None, fmt='png', **kwargs):
     if obs == 'BSA':
         dataset = data[85]
         lbl = '$A_{LU}^{\\sin\\phi}$'
-        ymax = 0.4
+        ymin, ymax = 0, 0.4
     elif obs == 'TSA':
-        dataset = data[86]
+        dataset = Data.DataSet(utils.select(data[86], criteria=['FTn == -1']))
         lbl = '$A_{UL}^{\\sin\\phi}$'
-        ymax = 0.4
+        ymin, ymax = 0, 0.4
+    elif obs == 'TSA2':
+        dataset = Data.DataSet(utils.select(data[86], criteria=['FTn == -2']))
+        lbl = '$A_{UL}^{\\sin2\\phi}$'
+        ymin, ymax = -0.1, 0.32
     elif obs == 'BTSA':
         dataset = data[87]
         lbl = '$A_{LL}^{\\cos0\\phi}$'
-        ymax = 0.8
+        ymin, ymax = 0, 0.8
     else:
         raise ValueError, 'Observable %s unavailable.' % obs
     fig, axs = plt.subplots(2, 2, sharey=True, sharex=True, figsize=[5,5])
@@ -632,8 +636,10 @@ def CLAS14(obs='BSA', path=None, fmt='png', **kwargs):
         else:
             panel(ax, points=panelset, xaxis='tm', kinlabels=['Q2', 'xB'], **kwargs)
         plt.xlim(0.0, 0.6)
-        plt.ylim(0.0, ymax)
+        plt.ylim(ymin, ymax)
         ax.yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))
+        if obs == 'TSA2':
+            ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
         if np == 2:
                 ax.legend(loc='upper left', borderaxespad=0.).draw_frame(0)
         if (np % 2) != 1:
@@ -838,6 +844,37 @@ def HallAphi(path=None, fmt='png', **kwargs):
         else:
             ax.set_ylim(0, 0.12)
         npanel += 1
+    if path:
+        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+    else:
+        fig.canvas.draw()
+        fig.show()
+    return fig
+
+def CLAS14phi(path=None, fmt='png', **kwargs):
+    """Makes example plot of CLAS 14 data phi-dependence with fit lines"""
+
+    subsets = {}
+    subsets[1] = utils.select(data[82],  criteria=['Q2 == 2.6655', 't == -0.4558'])
+    subsets[2] = utils.select(data[83],  criteria=['Q2 == 2.6655', 't == -0.4558'])
+    subsets[3] = utils.select(data[84],  criteria=['Q2 == 2.6655', 't == -0.4558'])
+    title = 'CLAS 2014 prelim. BSA, TSA and BTSA'
+    fig = plt.figure(figsize=[10,6])
+    fig.canvas.set_window_title(title)
+    fig.suptitle(title)
+    fig.subplots_adjust(wspace=0.2)
+    for np in range(1,4):
+        ax = fig.add_subplot(1,3,np)
+        panel(ax, points=subsets[np], xaxis='phi', kinlabels=['Q2', 't'], **kwargs)
+        #ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(2.))
+        ax.set_xlabel('$\\phi\\; {\\rm [deg]}$', fontsize=16)
+        ax.set_ylabel('{}'.format(subsets[np][0].y1name), fontsize=18)
+        if np == 1:
+            ax.legend(loc='upper left', borderaxespad=0.).draw_frame(0)
+        if np == 3:
+            ax.set_ylim(0.0, 0.8)
+        else:
+            ax.set_ylim(-0.4, 0.4)
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:

@@ -54,6 +54,9 @@ BSACLAS_DMpoints = data[8]
 CLAS08pts = utils.select(data[81], criteria=['FTn == -1'])[-3:]
 CLASpts = utils.select(data[8], criteria=['Q2 >= 1.5']) + CLAS08pts
 CLASKKpts = utils.select(data[25], criteria=['Q2 >= 1.5']) + CLAS08pts
+CLAS14BSApts = data[85]
+CLAS14TSApts = utils.select(data[86], criteria=['FTn == -1']) 
+CLAS14BTSApts = data[87]
 #
 # Hall A
 #

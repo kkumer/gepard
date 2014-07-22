@@ -295,13 +295,16 @@ def listdata(ids, data):
 def listchis(ths, Q2cut=2.):
     """Compare chi-squares of theories for subsets of data."""
     if not isinstance(ths, list): ths = [ths]
-    from abbrevs import H1ZEUS, ALUIpts, BCApts, CLASpts, BSDwpoints, BSSwpoints, AULpts, ALLpts, AUTIpts 
+    from abbrevs import H1ZEUS, ALUIpts, BCApts, CLASpts, BSDwpoints, BSSwpoints,\
+            AULpts, ALLpts, AUTIpts, CLAS14BSApts, CLAS14TSApts, CLAS14BTSApts, BSACLAS_KKpoints
     #exps = ['UNP5points', 'ALTGLO5', 'CLAS', 'CLASDM', 'BSDw', 'BSSw', 'TSA1', 'BTSA', 'TPpoints']
     #ptssets = [UNP5points, ALTGLO5points, data[25], data[8], BSDwpoints, BSSwpoints, TSA1points, BTSApoints, TPpoints]
     exps = ['H1ZEUS', 'ALUIpts', 'BCApts', 'CLASpts', 'BSDwpoints', 'BSSwpoints', 'AULpts', 'ALLpts', 'AUTIpts' ]
     ptssets = [H1ZEUS, ALUIpts, BCApts, CLASpts, BSDwpoints, BSSwpoints, AULpts, ALLpts, AUTIpts ]
     #exps = ['H1ZEUS DVCS', 'H1-09 XL', "H1-09 W-dep"]
     #ptssets = [H1ZEUS, H109XL, H109WdepXL]
+    exps = ['CLAS07 BSA', 'CLAS14 BSA', 'CLAS14 TSA', 'CLAS14 BTSA']
+    ptssets = [BSACLAS_KKpoints, CLAS14BSApts, CLAS14TSApts, CLAS14BTSApts]
     names = [th.name for th in ths]
     sublines = ['------' for th in ths]
     ftit = 15*' ' + len(names)*'{:8s}'

@@ -685,13 +685,13 @@ class BMK(Approach):
 ## Placeholder for original BMK longitudinally polarized target formulas
 
     def TBH2LP(self, pt):
-        raise ValueError('X_LP not implemented for BMK model! Use BM10')
+        raise ValueError('XLP not implemented for BMK model! Use BM10')
 
     def TDVCS2LP(self, pt):
-        raise ValueError('X_TP not implemented for BMK model! Use BM10')
+        raise ValueError('XTP not implemented for BMK model! Use BM10')
 
     def TINTLP(self, pt):
-        raise ValueError('X_TP not implemented for BMK model! Use BM10')
+        raise ValueError('XTP not implemented for BMK model! Use BM10')
 
 #####   Observables   ##
 
