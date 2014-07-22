@@ -174,6 +174,7 @@ def panel(ax, points=None, lines=None, bands=None, xaxis=None, xs=None,
         setn = 0
         for pts in points:
             _axpoints(ax, pts, xaxis, linestyle='None', elinewidth=1, 
+                    label = '{} {}'.format(pts[0].collaboration, pts[0].year),
                     marker=pointshapes[setn], color=pointcolors[setn], **kwargs)
             setn += 1
     else:
@@ -588,16 +589,29 @@ def CLAS(path=None, fmt='png', **kwargs):
         fig.show()
     return fig
 
-def CLAS14(path=None, fmt='png', **kwargs):
+def CLAS14(obs='BSA', path=None, fmt='png', **kwargs):
     """Makes plot of CLAS-14 BSA data with fit lines and bands"""
 
-    dataset = data[85]
     title = ''
     title = 'CLAS (prelim. 2014)'
-    fig, axs = plt.subplots(2, 2, sharey=True, sharex=True, figsize=[7,5])
+    if obs == 'BSA':
+        dataset = data[85]
+        lbl = '$A_{LU}^{\\sin\\phi}$'
+        ymax = 0.4
+    elif obs == 'TSA':
+        dataset = data[86]
+        lbl = '$A_{UL}^{\\sin\\phi}$'
+        ymax = 0.4
+    elif obs == 'BTSA':
+        dataset = data[87]
+        lbl = '$A_{LL}^{\\cos0\\phi}$'
+        ymax = 0.8
+    else:
+        raise ValueError, 'Observable %s unavailable.' % obs
+    fig, axs = plt.subplots(2, 2, sharey=True, sharex=True, figsize=[5,5])
     axs = axs.reshape(4)
     fig.canvas.set_window_title(title)
-    fig.suptitle(title)
+    fig.suptitle(title + ' -- ' +  obs)
     # Each different Q2 has its own panel
     panelorder = [3, 4, 1, 2]
     npanel = 0
@@ -618,14 +632,16 @@ def CLAS14(path=None, fmt='png', **kwargs):
         else:
             panel(ax, points=panelset, xaxis='tm', kinlabels=['Q2', 'xB'], **kwargs)
         plt.xlim(0.0, 0.6)
-        plt.ylim(0.0, 0.4)
+        plt.ylim(0.0, ymax)
         ax.yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))
+        if np == 2:
+                ax.legend(loc='upper left', borderaxespad=0.).draw_frame(0)
         if (np % 2) != 1:
             # Leave labels only on leftmost panels
             ax.set_ylabel('')
         else:
-            ax.set_ylabel('$A_{LU}^{\\sin\\phi}$', fontsize=16)
-        if np > 2:
+            ax.set_ylabel(lbl, fontsize=16)
+        if np < 3:
             ax.set_xlabel('')
         else:
             ax.set_xlabel('$-t\\; [{\\rm GeV}^2]$', fontsize=16)
@@ -677,7 +693,6 @@ def CLASJ(path=None, fmt='png', **kwargs):
         else:
             if np == 1:
                 panel(ax, points=[panelset, old[5][1]], xaxis='tm', kinlabels=['Q2', 'xB'], **kwargs)
-                ax.legend(loc='upper left', borderaxespad=0.).draw_frame(0)
             elif np == 3:
                 panel(ax, points=[panelset, old[2][1]], xaxis='tm', kinlabels=['Q2', 'xB'], **kwargs)
             else:
@@ -685,12 +700,14 @@ def CLASJ(path=None, fmt='png', **kwargs):
         plt.xlim(0.0, 0.6)
         plt.ylim(0.0, 0.4)
         ax.yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))
+        if np == 1:
+            ax.legend(loc='upper left', borderaxespad=0.).draw_frame(0)
         if (np % 2) != 1:
             # Leave labels only on leftmost panels
             ax.set_ylabel('')
         else:
             ax.set_ylabel('$A_{LU}^{\\sin\\phi}$', fontsize=16)
-        if np > 2:
+        if np < 3:
             ax.set_xlabel('')
         else:
             ax.set_xlabel('$-t\\; [{\\rm GeV}^2]$', fontsize=16)

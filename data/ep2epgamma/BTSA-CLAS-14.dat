@@ -24,6 +24,8 @@ in1polarizationvector = L
 in1polarization = +1
 
 in2particle = p
+in2polarizationvector = L
+in2polarization = +1
 
 out1particle = em
 out2particle = p
