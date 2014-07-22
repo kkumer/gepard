@@ -5,7 +5,7 @@ editor = KK
 
 ### Experiment
 
-collaboration = CLAS
+collaboration = CLAS_KK
 process = ep2epgamma
 exptype = fixed target
 year = 2014
