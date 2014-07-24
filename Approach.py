@@ -1114,7 +1114,7 @@ class BMK(Approach):
             return  self._BSA(pt, **kwargs) 
         else:
             raise ValueError('[%s] has neither azimuthal angle phi\
- nor harmonic FTn defined!' % pt)
+ nor harmonic FTn = -1 defined!' % pt)
         ### Exact but slower:
             #res = quadrature.Hquadrature(lambda phi: 
             #        self._BSA(pt, vars={'phi':phi}) * sin(phi), 0, 2*pi)
@@ -1127,6 +1127,9 @@ class BMK(Approach):
         elif pt.has_key('FTn') and pt.FTn == -1:
             res = quadrature.Hquadrature(lambda phi: 
                     self._BSA(pt, vars={'phi':phi}) * sin(phi), 0, 2*pi)
+        else:
+            raise ValueError('[%s] has neither azimuthal angle phi\
+ nor harmonic FTn == -1 defined!' % pt)
             return  res / pi
 
     def BSA(self, pt, **kwargs):
