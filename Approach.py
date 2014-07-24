@@ -1101,7 +1101,7 @@ class BMK(Approach):
         """Calculate beam spin asymmetry (BSA)."""
         return self.BSD(pt, **kwargs) / self.BSS(pt, **kwargs)
 
-    def BSA(self, pt, **kwargs):
+    def BSAold(self, pt, **kwargs):
         """Calculate beam spin asymmetry (BSA) or its harmonics."""
         if pt.has_key('phi'):
             return self._BSA(pt, **kwargs)
@@ -1119,6 +1119,20 @@ class BMK(Approach):
             #res = quadrature.Hquadrature(lambda phi: 
             #        self._BSA(pt, vars={'phi':phi}) * sin(phi), 0, 2*pi)
             #return  res / pi
+
+    def BSAexact(self, pt, **kwargs):
+        """Calculate beam spin asymmetry (BSA) or its harmonics."""
+        if pt.has_key('phi'):
+            return self._BSA(pt, **kwargs)
+        elif pt.has_key('FTn') and pt.FTn == -1:
+            res = quadrature.Hquadrature(lambda phi: 
+                    self._BSA(pt, vars={'phi':phi}) * sin(phi), 0, 2*pi)
+            return  res / pi
+
+    def BSA(self, pt, **kwargs):
+        """Calculate beam spin asymmetry (BSA) or its harmonics."""
+        res = self._phiharmonic(self._BSA, pt, **kwargs)
+        return  res
 
     def _BCA(self, pt, **kwargs):
         """Calculate beam charge asymmetry (BCA)."""
