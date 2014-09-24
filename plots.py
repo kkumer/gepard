@@ -598,7 +598,7 @@ def CLAS14(obs='BSA', path=None, fmt='png', **kwargs):
         dataset = data[85]
         lbl = '$A_{LU}^{\\sin\\phi}$'
         ymin, ymax = 0, 0.4
-    elif obs == 'TSA':
+    elif obs == 'TSA1':
         dataset = Data.DataSet(utils.select(data[86], criteria=['FTn == -1']))
         lbl = '$A_{UL}^{\\sin\\phi}$'
         ymin, ymax = 0, 0.4
@@ -606,10 +606,14 @@ def CLAS14(obs='BSA', path=None, fmt='png', **kwargs):
         dataset = Data.DataSet(utils.select(data[86], criteria=['FTn == -2']))
         lbl = '$A_{UL}^{\\sin2\\phi}$'
         ymin, ymax = -0.1, 0.32
-    elif obs == 'BTSA':
-        dataset = data[87]
+    elif obs == 'BTSA0':
+        dataset = Data.DataSet(utils.select(data[87], criteria=['FTn == 0']))
         lbl = '$A_{LL}^{\\cos0\\phi}$'
         ymin, ymax = 0, 0.8
+    elif obs == 'BTSA1':
+        dataset = Data.DataSet(utils.select(data[87], criteria=['FTn == 1']))
+        lbl = '$A_{LL}^{\\cos\\phi}$'
+        ymin, ymax = -0.3, 0.3
     else:
         raise ValueError, 'Observable %s unavailable.' % obs
     fig, axs = plt.subplots(2, 2, sharey=True, sharex=True, figsize=[5,5])
@@ -638,7 +642,7 @@ def CLAS14(obs='BSA', path=None, fmt='png', **kwargs):
         plt.xlim(0.0, 0.6)
         plt.ylim(ymin, ymax)
         ax.yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))
-        if obs == 'TSA2':
+        if obs == 'TSA2' or obs == 'BTSA1':
             ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
         if np == 2:
                 ax.legend(loc='upper left', borderaxespad=0.).draw_frame(0)
