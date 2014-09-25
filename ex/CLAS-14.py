@@ -19,7 +19,7 @@ import plots, utils, Approach
 from abbrevs import *
 
 
-UNCERT = True  # do we want uncertainties
+UNCERT = False  # do we want uncertainties
 # In[2]:
 
 # Example model

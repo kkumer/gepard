@@ -1132,10 +1132,12 @@ class BMK(Approach):
  nor harmonic FTn == -1 defined!' % pt)
             return  res / pi
 
-    def BSA(self, pt, **kwargs):
+    def BSAnew(self, pt, **kwargs):
         """Calculate beam spin asymmetry (BSA) or its harmonics."""
         res = self._phiharmonic(self._BSA, pt, **kwargs)
         return  res
+
+    BSA = BSAold
 
     def _BCA(self, pt, **kwargs):
         """Calculate beam charge asymmetry (BCA)."""

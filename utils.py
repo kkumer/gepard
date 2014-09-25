@@ -292,29 +292,46 @@ def listdata(ids, data):
         except KeyError:
             pass
 
-def listchis(ths, Q2cut=2.):
+def listchis(ths, Q2cut=2., nsets=0):
     """Compare chi-squares of theories for subsets of data."""
     if not isinstance(ths, list): ths = [ths]
     from abbrevs import H1ZEUS, ALUIpts, BCApts, CLASpts, BSDwpoints, BSSwpoints,\
-            AULpts, ALLpts, AUTIpts, CLAS14BSApts, CLAS14TSApts, CLAS14BTSApts, BSACLAS_KKpoints
-    #exps = ['UNP5points', 'ALTGLO5', 'CLAS', 'CLASDM', 'BSDw', 'BSSw', 'TSA1', 'BTSA', 'TPpoints']
-    #ptssets = [UNP5points, ALTGLO5points, data[25], data[8], BSDwpoints, BSSwpoints, TSA1points, BTSApoints, TPpoints]
-    exps = ['H1ZEUS', 'ALUIpts', 'BCApts', 'CLASpts', 'BSDwpoints', 'BSSwpoints', 'AULpts', 'ALLpts', 'AUTIpts' ]
-    ptssets = [H1ZEUS, ALUIpts, BCApts, CLASpts, BSDwpoints, BSSwpoints, AULpts, ALLpts, AUTIpts ]
-    #exps = ['H1ZEUS DVCS', 'H1-09 XL', "H1-09 W-dep"]
-    #ptssets = [H1ZEUS, H109XL, H109WdepXL]
-    exps = ['CLAS07 BSA', 'CLAS14 BSA', 'CLAS14 TSA', 'CLAS14 BTSA']
-    ptssets = [BSACLAS_KKpoints, CLAS14BSApts, CLAS14TSApts, CLAS14BTSApts]
-    names = [th.name for th in ths]
+            AULpts, ALLpts, AUTIpts, CLAS14BSApts, CLAS14TSApts, CLAS14BTSApts,\
+            BSACLAS_KKpoints, UNP5points, ALTGLO5points
+    #exps[0] = ['UNP5points', 'ALTGLO5', 'CLAS', 'CLASDM', 'BSDw', 'BSSw', 'TSA1', 'BTSA', 'TPpoints']
+    #ptssets[0] = [UNP5points, ALTGLO5points, data[25], data[8], BSDwpoints, BSSwpoints, TSA1points, BTSApoints, TPpoints]
+    sets = {}
+    sets[0] = [('H1ZEUS', 'X_DVCS', H1ZEUS), ('HERMES', 'ALUI', ALUIpts),
+            ('HERMES', 'BCA', BCApts), ('CLAS', 'BSA', CLASpts),
+            ('Hall A', 'BSDw', BSDwpoints), ('Hall A', 'BSSw', BSSwpoints),
+            ('HERMES', 'AUL', AULpts), ('HERMES', 'ALL', ALLpts),
+            ('HERMES', 'AUTI', AUTIpts)]
+    sets[1] = [('CLAS07_KK', 'BSA', BSACLAS_KKpoints),
+               ('CLAS14_KK', 'BSA', CLAS14BSApts),
+               ('CLAS14_KK', 'TSA', CLAS14TSApts), 
+               ('CLAS14_KK', 'BTSA', CLAS14BTSApts)]
+    #exps[2] = ['H1ZEUS DVCS', 'H1-09 XL', "H1-09 W-dep"]
+    #ptssets[2] = [H1ZEUS, H109XL, H109WdepXL]
+    #exps[3] = ['CLAS07 BSA', 'CLAS14 BSA', 'CLAS14 TSA', 'CLAS14 BTSA']
+    #ptssets[3] = [BSACLAS_KKpoints, CLAS14BSApts, CLAS14TSApts, CLAS14BTSApts]
+    names = [th.name[:8] for th in ths]
     sublines = ['------' for th in ths]
-    ftit = 15*' ' + len(names)*'{:8s}'
+    ftit = 21*' ' + len(names)*'{:^8s}'
+    fstr = '{:9s} {:7s}: ' + len(names)*'{:8.2f}' + '   (np ={dof:3d})'
     print ftit.format(*names)
     print ftit.format(*sublines)
-    for name, pts in zip(exps,ptssets):
+    total_chis = np.array([0. for th in ths])
+    total_npts = 0
+    for collab, obs, pts in sets[nsets]:
         cutpts = select(pts, criteria=['Q2>=%f' % Q2cut])
         chis = [th.chisq(cutpts)[0] for th in ths]
-        fstr = '{:10s}: ' + len(chis)*'{:8.2f}' + '   (np ={dof:3d})'
-        print fstr.format(name, *chis, dof=len(pts))
+        npts = len(pts)
+        print fstr.format(collab, obs, *chis, dof=npts)
+        total_chis += np.array(chis)
+        total_npts += npts
+    print ftit.format(*sublines)
+    print fstr.format('===', 'TOTAL', *total_chis.tolist(), dof=total_npts)
+
 
 
 class hubDict(dict):

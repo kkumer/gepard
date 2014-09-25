@@ -3,7 +3,7 @@
 
 """Give predictions for harmonics of CLAS 2014 data according to KMM12 model."""
 
-# Results sent to Silvia Niccolai produced with SVN version 283
+# Results sent to Silvia Niccolai produced with SVN version 289
 
 ## Introduction and Initialization
 
@@ -20,7 +20,7 @@ from abbrevs import *
 
 
 UNCERT = False  # do we want uncertainties
-# In[2]:
+NTPOINTS = 25
 
 # Example model
 db = shelve.open('/home/kkumer/pyper/theories.db')
@@ -76,8 +76,8 @@ def predictbinFT(cpts, error=False, ntms=25):
 
 
 allpredFT = {}
-for nb in range(len(binsFT)-3):
-    allpredFT[nb] = tuple([predictbinFT(bin[nb].pt.values, error=False) for bin in (binBSAFT, binTSAFT, binBTSAFT, binBTSAFT2)])
+for nb in range(len(binsFT)):
+    allpredFT[nb] = tuple([predictbinFT(bin[nb].pt.values, error=UNCERT, ntms=NTPOINTS) for bin in (binBSAFT, binTSAFT, binBTSAFT, binBTSAFT2)])
 
 
 
@@ -105,24 +105,27 @@ def plotbinFT(n, error=False):
                 ha='left', va='bottom', transform=ax.transAxes)
     axs[2].set_ylim(0, 1.0)
     axs[3].set_ylim(-0.4, 0.4)
-    fig.savefig('fig1')
+    fig.savefig('binFT-{}.png'.format(n))
 
 
 
-f = open('/home/kkumer/CLAS14FT-KMM12.dat', 'w')
+f = open('CLAS14FT-KMM12.dat', 'w')
 sstr = '# {:^4s}  ' + 2*'{:^6s}  '  + 8*'  {:^6s}' + '\n'
 sstr2 = '# {:^4s}  ' + 2*'{:^6s}  ' + 4*'  {:^6s}' + '\n'
 fstr = 3*'{:.4f}  ' + 8*'  {: .3f}' + '\n'
 fstr2 = 3*'{:.4f}  ' + 4*'  {: .3f}' + '\n'
 f.write('# 2014-07-24 Predictions of KMM12 model (arXiv:1301.1230 and arXiv:0904.0458)\n')
-f.write('#' + 76*'-' + '\n')
+f.write('#\n')
+f.write('# BSA and TSA are sin(phi), BTSA0 is cos(0phi) and BTSA1 is cos(phi) harmonic.')
+f.write('#\n')
+f.write('#' + 86*'-' + '\n')
 if UNCERT:
     f.write(sstr.format('Q2', 'xB', '-t', 'BSA', 'delBSA', 'TSA', 'delTSA', 'BTSA0', 'del0', 'BTSA1', 'del1'))
 else:
     f.write(sstr2.format('Q2', 'xB', '-t', 'BSA', 'TSA',  'BTSA0', 'BTSA1'))
-f.write('#' + 76*'-' + '\n')
+f.write('#' + 86*'-' + '\n')
 nb = 0
-for Q2, xB in binsFT[:1].values:
+for Q2, xB in binsFT[:].values:
     P = np.array(allpredFT[nb])
     for tm, BSA, TSA, BTSA, BTSA1 in zip(P[0,0], P[0,1], P[1,1], P[2,1], P[3,1]):
         if UNCERT:
@@ -134,7 +137,7 @@ for Q2, xB in binsFT[:1].values:
 f.close()
 
 
-for nb in range(len(binsFT)-3):
+for nb in range(len(binsFT)):
     plotbinFT(nb, error=UNCERT)
 
 
