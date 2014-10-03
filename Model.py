@@ -110,7 +110,7 @@ class Model(object):
                 try:
                     value2 =  model.parameters[name]
                 except KeyError:
-                    # compared model doesnt' have this parameter
+                    # compared model doesn't have this parameter
                     value2 = 0
                 app = '   %-5.3g' % value2
                 #app = ('   '+parform) % value2
@@ -303,17 +303,22 @@ class ComptonFormFactors(Model):
     """
 
     allCFFs = ['ImH', 'ReH', 'ImE', 'ReE', 'ImHt', 'ReHt', 'ImEt', 'ReEt']
+    allCFFsb = ['ImH', 'ReH', 'ImE', 'ReE', 'ImHt', 'ReHt', 'ImEt', 'ReEb']
     allCFFeffs = ['ImHeff', 'ReHeff', 'ImEeff', 'ReEeff', 
                      'ImHteff', 'ReHteff', 'ImEteff', 'ReEteff']
     allGPDs = []
 
 
-    def CFFvalues(self, pt):
-        """Print values of CFFs. Pastable into Mathematica."""
-        vals = map(lambda cff: str(getattr(self, cff)(pt)), ComptonFormFactors.allCFFs)
-        s = "{" + 8*"%s -> %s, "
-        s = s[:-2] + "}"
-        return s % flatten(tuple(zip(ComptonFormFactors.allCFFs, vals)))
+    def print_CFFs(self, pt, format=None):
+        """Print values of CFFs at given kinematic point."""
+        vals = map(lambda cff: getattr(self, cff)(pt), allCFFs)
+        if format == 'mma':
+            s = "{" + 8*"%s -> %f, "
+            s = s[:-2] + "}"
+        else:
+            s = 8*"%4s = %5.2f\n"
+        print s % flatten(tuple(zip(allCFFs, vals)))
+
 
     # Initial definition of all CFFs. All just return zero.
     for name in allCFFs:
@@ -321,6 +326,10 @@ class ComptonFormFactors(Model):
 
     for name in allCFFeffs:
         exec('def %s(self, pt): return 0.' % name)
+
+    # Define E-bar as xi*E-tilde
+    def ReEb(self, pt):
+        return (pt.xB/2.)*self.ReEt(pt)
 
     def is_within_model_kinematics(self, pt):
         return ( (1.5 <= pt.Q2 <= 5.) and 

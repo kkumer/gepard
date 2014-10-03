@@ -297,19 +297,37 @@ def listchis(ths, Q2cut=2., nsets=0):
     if not isinstance(ths, list): ths = [ths]
     from abbrevs import H1ZEUS, ALUIpts, BCApts, CLASpts, BSDwpoints, BSSwpoints,\
             AULpts, ALLpts, AUTIpts, CLAS14BSApts, CLAS14TSApts, CLAS14BTSApts,\
-            BSACLAS_KKpoints, UNP5points, ALTGLO5points
+            BSACLAS_KKpoints, UNP5points, ALTGLO5points, BSACLAS_DMpoints, CLASTSApts,\
+            AUTICSpts, CLASKKpts, AUTDVCSpts, H_AULpts, C_AULpts
     #exps[0] = ['UNP5points', 'ALTGLO5', 'CLAS', 'CLASDM', 'BSDw', 'BSSw', 'TSA1', 'BTSA', 'TPpoints']
     #ptssets[0] = [UNP5points, ALTGLO5points, data[25], data[8], BSDwpoints, BSSwpoints, TSA1points, BTSApoints, TPpoints]
     sets = {}
     sets[0] = [('H1ZEUS', 'X_DVCS', H1ZEUS), ('HERMES', 'ALUI', ALUIpts),
             ('HERMES', 'BCA', BCApts), ('CLAS', 'BSA', CLASpts),
             ('Hall A', 'BSDw', BSDwpoints), ('Hall A', 'BSSw', BSSwpoints),
-            ('HERMES', 'AUL', AULpts), ('HERMES', 'ALL', ALLpts),
+            ('HRM/CLS', 'AUL', AULpts), ('HERMES', 'ALL', ALLpts),
             ('HERMES', 'AUTI', AUTIpts)]
     sets[1] = [('CLAS07_KK', 'BSA', BSACLAS_KKpoints),
                ('CLAS14_KK', 'BSA', CLAS14BSApts),
                ('CLAS14_KK', 'TSA', CLAS14TSApts), 
                ('CLAS14_KK', 'BTSA', CLAS14BTSApts)]
+    sets[2] = [('CLAS07_DM', 'BSA', BSACLAS_DMpoints),
+               ('CLAS06', 'TSA', CLASTSApts),
+               ('CLAS14_KK', 'BSA', CLAS14BSApts),
+               ('CLAS14_KK', 'TSA', CLAS14TSApts), 
+               ('CLAS14_KK', 'BTSA', CLAS14BTSApts)]
+    sets[3] = [('CLAS0708', 'BSA', CLASKKpts),
+            ('CLAS', 'AUL', C_AULpts), 
+            ('CLAS14_KK', 'BSA', CLAS14BSApts),
+            ('CLAS14_KK', 'TSA', CLAS14TSApts), 
+            ('CLAS14_KK', 'BTSA', CLAS14BTSApts)]
+    sets[4] = [ ('HERMES', 'BCA', BCApts), 
+            ('HERMES', 'ALUI', ALUIpts),
+            ('HERMES', 'AUL', H_AULpts), 
+            ('HERMES', 'ALL', ALLpts),
+            ('HERMES', 'AUTI', AUTIpts),
+            ('HERMES', 'AUTICS', AUTICSpts),
+            ('HERMES', 'AUTDVCS', AUTDVCSpts)]
     #exps[2] = ['H1ZEUS DVCS', 'H1-09 XL', "H1-09 W-dep"]
     #ptssets[2] = [H1ZEUS, H109XL, H109WdepXL]
     #exps[3] = ['CLAS07 BSA', 'CLAS14 BSA', 'CLAS14 TSA', 'CLAS14 BTSA']
@@ -325,7 +343,7 @@ def listchis(ths, Q2cut=2., nsets=0):
     for collab, obs, pts in sets[nsets]:
         cutpts = select(pts, criteria=['Q2>=%f' % Q2cut])
         chis = [th.chisq(cutpts)[0] for th in ths]
-        npts = len(pts)
+        npts = len(cutpts)
         print fstr.format(collab, obs, *chis, dof=npts)
         total_chis += np.array(chis)
         total_npts += npts

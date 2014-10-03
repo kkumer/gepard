@@ -53,7 +53,9 @@ def test_KM10a():
 def test_KMM12():
     """Test model: KMM12"""
     th = db['KMM12']
-    pts = GLOnoBSS2 + BSSwpoints
+    AULptsOLD = TSA1points[:4] + data[54]  # data[54] are not independent
+    pts = H1ZEUS + ALUIpts + BCApts + CLASptsOLD + BSDwpoints\
+            + AULptsOLD + ALLpts + AUTIpts + BSSwpoints
     chisq = th.chisq(pts)[0]
     assert_almost_equal(chisq, 123.46439889570672)
 

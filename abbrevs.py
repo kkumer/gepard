@@ -51,6 +51,8 @@ BCApts = BCA0points[:6] + BCA1points[:6]
 #
 BSACLAS_KKpoints = data[25]
 BSACLAS_DMpoints = data[8]
+CLASTSApts = data[54][:3]
+# [-3:] means cut Q2>1.51 GeV^2
 CLAS08pts = utils.select(data[81], criteria=['FTn == -1'])[-3:]
 CLASptsOLD = utils.select(data[8], criteria=['Q2 >= 2.0'])
 CLASpts = utils.select(data[8], criteria=['Q2 >= 1.5']) + CLAS08pts
@@ -87,7 +89,9 @@ TSA1points = utils.select(data[52], criteria=['FTn == -1'])  # HERMES A_UL
 TSApoints = TSA1points + data[54]  # HERMES+CLAS  A_UL
 BTSApoints = utils.select(data[53], criteria=['FTn==0'])   # HERMES A_LL
 LPpoints = TSApoints + BTSApoints  # total longitudinal target
-AULpts = TSA1points[:4] + data[54]
+H_AULpts = TSA1points[:4]
+C_AULpts = data[54][:3]
+AULpts = H_AULpts + C_AULpts
 ALLpts = BTSApoints[:4]
 
 ####  --  Transversally polarized target --
@@ -98,6 +102,7 @@ AUTDVCSpoints = data[65]  # HERMES A_UT_DVCS
 TPpoints = AUTIpoints + AUTDVCSpoints  # total transversal target
 AUTIpts = AUTIpoints[:4]
 AUTICSpts = AUTICSpoints[:4]
+AUTDVCSpts = AUTDVCSpoints[:4]
 
 # Global combinations
 #
@@ -122,6 +127,17 @@ GLOnoBSS = H1ZEUS[::3] + ALUIpts + BCApts + CLASpts + BSDwpoints[::2] + AULpts +
 GLOnoBSS2 = H1ZEUS + ALUIpts + BCApts + CLASptsOLD + BSDwpoints + AULpts + ALLpts + AUTIpts
 unppts = [ALUIpts, BCApts[6:], CLASpts, BSSwpoints[::-2]]
 polpts = [TSA1points[:4], data[54], BTSApoints[:4], AUTIpoints[:4], AUTDVCSpoints[:4]]
+#
+# Independent sets according to target polarization:
+#
+HERMES_U = BCApts +  ALUIpts 
+HERMES_L = TSA1points[:4] + ALLpts
+HERMES_T = AUTIpts + AUTICSpts + AUTDVCSpts
+#
+CLAS_U = CLASKKpts + CLAS14BSApts
+CLAS_L = data[54][:3] + CLAS14TSApts + CLAS14BTSApts
+#
+
 
 # Local 4-bin fits
 # Updated data by Morgan and DM

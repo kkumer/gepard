@@ -2,9 +2,10 @@
 
 import copy
 
-from numpy import sin, cos, pi, sqrt, array, linspace, ndarray
+from numpy import sin, cos, pi, sqrt, array, linspace, ndarray, transpose
 from scipy.special import gammainc
 from scipy.stats import scoreatpercentile
+import pandas as pd
 
 import utils, quadrature, Data
 from constants import *
@@ -82,6 +83,19 @@ class Approach(object):
             print self.chisq(points, sigmas=True, **kwargs)
         print 'P(chi-square, d.o.f) = P(%1.2f, %2d) = %5.4f' % self.chisq(points, **kwargs)
 
+
+    def df_CFFs(self, pt, compare_with=[]):
+        """Return pandas dataframe of CFFs at given kinematic point."""
+        data = [map(lambda cff: getattr(self.m, cff)(pt), self.m.allCFFsb)]
+        names = [self.name]
+        for th in compare_with:
+            data.append(map(lambda cff: getattr(th.m, cff)(pt), th.m.allCFFsb))
+            names.append(th.name)
+        df = pd.DataFrame(transpose(data), 
+                index=self.m.allCFFsb, columns=names)
+        pd.options.display.float_format = '{: .2f}'.format
+        return df
+    
         
     def predict(self, pt, error=False, CL=False, **kwargs):
         """Give prediction for DataPoint pt.
