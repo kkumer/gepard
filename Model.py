@@ -456,6 +456,8 @@ class ComptonModelDR(ComptonDispersionRelations):
                'C' : 7.0,      'limit_C' : (-10., 10.),
               'MC' : 1.3,     'limit_MC' : (0.4, 2.),
              'tNv' : 0.0,                             
+             'tal' : 0.43,                             
+             'talp' : 0.85,                             
              'tMv' : 2.7,    'limit_tMv' : (0.4, 2.),
              'trv' : 6.0,    'limit_trv' : (0., 8.),
              'tbv' : 3.0,    'limit_tbv' : (0.4, 5.)   }
@@ -464,7 +466,8 @@ class ComptonModelDR(ComptonDispersionRelations):
         self.parameter_names = ['NS', 'alS', 'alpS', 'MS', 'rS', 'bS',
                                 'Nv', 'alv', 'alpv', 'Mv', 'rv', 'bv',
                                 'C', 'MC',
-                                'tNv', 'tMv', 'trv', 'tbv']
+                                'tNv', 'tal', 'talp',
+                                'tMv', 'trv', 'tbv']
 
         # now do whatever else is necessary
         ComptonFormFactors.__init__(self, **kwargs)
@@ -510,9 +513,13 @@ class ComptonModelDR(ComptonDispersionRelations):
         t = pt.t
         twox = 2.*x / (1.+x)
         onex = (1.-x) / (1.+x)
+        try:
+            regge = (-p['tal']-p['talp']*t)
+        except KeyError:
+            # Old models take Regge trajectory params from H:
+            regge = (-p['alv']-p['alpv']*t)
         val = ( (2.*4./9. + 1./9.) * p['tNv'] * p['trv'] * 
-            # Regge trajectory params taken from H:
-            twox**(-p['alv']-p['alpv']*t) *
+            twox**regge *
                  onex**p['tbv'] / (1. - onex*t/(p['tMv']**2))  )
         return pi * val / (1.+x)
 
@@ -549,6 +556,8 @@ class ComptonModelDRPP(ComptonModelDR):
                'C' : 7.0,      'limit_C' : (-10., 10.),
               'MC' : 1.3,     'limit_MC' : (0.4, 4.),
              'tNv' : 0.0,                             
+             'tal' : 0.43,                             
+             'talp' : 0.85,                             
              'tMv' : 2.7,    'limit_tMv' : (0.4, 4.),
              'trv' : 6.0,    'limit_trv' : (0., 8.),
              'tbv' : 3.0,    'limit_tbv' : (0.4, 5.),
@@ -559,7 +568,8 @@ class ComptonModelDRPP(ComptonModelDR):
         self.parameter_names = ['NS', 'alS', 'alpS', 'MS', 'rS', 'bS',
                                 'Nv', 'alv', 'alpv', 'Mv', 'rv', 'bv',
                                 'C', 'MC',
-                                'tNv', 'tMv', 'trv', 'tbv', 'rpi', 'Mpi']
+                                'tNv', 'tal', 'talp',
+                                'tMv', 'trv', 'tbv', 'rpi', 'Mpi']
 
         # now do whatever else is necessary
         ComptonFormFactors.__init__(self, **kwargs)
@@ -591,6 +601,8 @@ class ComptonModelDRsea(ComptonDispersionRelations):
                'C' : 7.0,      'limit_C' : (-10., 10.),
               'MC' : 1.3,     'limit_MC' : (0.4, 2.),
              'tNv' : 0.0,                             
+             'tal' : 0.43,                             
+             'talp' : 0.85,                             
              'tMv' : 2.7,    'limit_tMv' : (0.4, 2.),
              'trv' : 6.0,    'limit_trv' : (0., 8.),
              'tbv' : 3.0,    'limit_tbv' : (0.4, 5.)   }
@@ -599,7 +611,8 @@ class ComptonModelDRsea(ComptonDispersionRelations):
         self.parameter_names = ['Nsea', 'alS', 'alpS', 'MS', 'rS', 'bS',
                                 'Nv', 'alv', 'alpv', 'Mv', 'rv', 'bv',
                                 'C', 'MC',
-                                'tNv', 'tMv', 'trv', 'tbv']
+                                'tNv', 'tal', 'talp',
+                                'tMv', 'trv', 'tbv']
 
         # now do whatever else is necessary
         ComptonFormFactors.__init__(self, **kwargs)
@@ -684,6 +697,8 @@ class ComptonModelDRPPsea(ComptonModelDRsea):
                'C' : 7.0,      'limit_C' : (-10., 10.),
               'MC' : 1.3,     'limit_MC' : (0.4, 4.),
              'tNv' : 0.0,                             
+             'tal' : 0.43,                             
+             'talp' : 0.85,                             
              'tMv' : 2.7,    'limit_tMv' : (0.4, 4.),
              'trv' : 6.0,    'limit_trv' : (0., 8.),
              'tbv' : 3.0,    'limit_tbv' : (0.4, 5.),
@@ -694,7 +709,8 @@ class ComptonModelDRPPsea(ComptonModelDRsea):
         self.parameter_names = ['Nsea', 'alS', 'alpS', 'MS', 'rS', 'bS',
                                 'Nv', 'alv', 'alpv', 'Mv', 'rv', 'bv',
                                 'C', 'MC',
-                                'tNv', 'tMv', 'trv', 'tbv', 'rpi', 'Mpi']
+                                'tNv', 'tal', 'talp',
+                                'tMv', 'trv', 'tbv', 'rpi', 'Mpi']
 
         # now do whatever else is necessary
         ComptonFormFactors.__init__(self, **kwargs)
