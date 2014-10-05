@@ -7,7 +7,7 @@ import shelve
 #from utils import listdb
 from abbrevs import *
 
-db = shelve.open('/home/kkumer/pype/theories.db')
+db = shelve.open('theories.db')
 
 def test_KM09a():
     """Test model: KM09a"""

@@ -10,7 +10,7 @@ from results import *
 from utils import listdb
 from abbrevs import *
 
-db = shelve.open('/home/kkumer/pyper/theories.db')
+db = shelve.open('theories.db')
 
 #th = db['KMM12']
 #Model.ComptonGepard.gepardPool.pop()
