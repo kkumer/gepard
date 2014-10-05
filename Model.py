@@ -41,9 +41,9 @@ class Model(object):
                     zip(self.parameter_names, len(self.parameter_names)*['True']))) + '}')
         # FIXME: duplication of stuff: parameters and ndparameters!
         self.parameters.update(fixed)
-        # right-pad with zeros to the array of 20 elements needed by Fortran
+        # right-pad with zeros to the array of 50 elements 
         self.ndparameters = array([self.parameters[name] for name in self.parameter_names]+
-                [0. for k in range(20-len(self.parameter_names))])
+                [0. for k in range(50-len(self.parameter_names))])
         #self.res = array([0. for k in range(18)])
 
     def release_parameters(self, *args):

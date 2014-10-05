@@ -54,7 +54,7 @@ def fcn(%s):
     theory.model.parameters.update({%s})
     new = [%s]
     if theory.model.__dict__.has_key('Gepard'):
-        theory.model.ndparameters.put(range(theory.model.DR.ndparameters.size), new[:20])
+        theory.model.ndparameters.put(range(theory.model.DR.ndparameters.size), new[:50])
     else:
         theory.model.ndparameters.put(range(theory.model.ndparameters.size), new)
     chisq = 0.
