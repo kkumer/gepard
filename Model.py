@@ -658,9 +658,13 @@ class ComptonModelDRsea(ComptonDispersionRelations):
         t = pt.t
         twox = 2.*x / (1.+x)
         onex = (1.-x) / (1.+x)
+        try:
+            regge = (-p['tal']-p['talp']*t)
+        except KeyError:
+            # Old models take Regge trajectory params from H:
+            regge = (-p['alv']-p['alpv']*t)
         val = ( (2.*4./9. + 1./9.) * p['tNv'] * p['trv'] * 
-            # Regge trajectory params taken from H:
-            twox**(-p['alv']-p['alpv']*t) *
+            twox**regge *
                  onex**p['tbv'] / (1. - onex*t/(p['tMv']**2))  )
         return pi * val / (1.+x)
 
