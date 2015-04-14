@@ -39,7 +39,6 @@ y1name = BTSA
 y1namelong = Beam Spin Asymmetry
 y1unit = 1
 y1value = column5
-y1error = column6 
 y1errorstatistic = column6 
 y1errorsystematic = column7 
 
