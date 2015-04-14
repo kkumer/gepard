@@ -12,6 +12,9 @@ from abbrevs import *
 
 db = shelve.open('theories.db')
 
+m = Model.GK12()
+th = Approach.BM10(m)
+pt0 = DISpoints[0]
 #th = db['KMM12']
 #Model.ComptonGepard.gepardPool.pop()
 

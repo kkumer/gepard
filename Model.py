@@ -10,7 +10,7 @@ and parameter values can calculate observables.
 import pickle, sys, logging
 
 from numpy import log, pi, imag, real, sqrt, cos, sin
-from numpy import ndarray, array
+from numpy import ndarray, array, sum
 import scipy.stats
 from scipy.special import j0, j1
 
@@ -294,6 +294,79 @@ class ElasticKelly(ElasticFormFactors):
           (1 - 4.168632789020339*t + 1.9408278987597791*t**2 - 
           1.9100884849907935*t**3))/(1 - 0.2831951622975774*t)
  
+
+class GK12(Model):
+    """ Goloskokov-Kroll PDF model 
+
+        From [arXiv:1210.6975], Kroll:2012sm
+        Implementing also F2 for check
+
+    """
+
+    def __init__(self, **kwargs):
+        self.parameters = {}
+        self.parameter_names = []
+        self.allCFFs = []
+        self.allGPDs = []
+
+    def g(self, x, Q2):
+        """GK12 model for gluon PDF."""
+        Q02 = 4.
+        L = log(Q2/Q02)
+        cg = array([2.23+0.362*L, 5.43-7.00*L, -34.0+22.5*L, 40.6-21.6*L])
+        delg = (1.10+0.06*L-0.0027*L**2) - 1
+        ng = 2
+        xs = array([x**(j/2.) for j in range(4)])
+        return x**(-delg)*(1.-x)**(2*ng+1)*sum(cg*xs)
+
+    def s(self, x, Q2):
+        """GK12 model for strange PDF."""
+        Q02 = 4.
+        L = log(Q2/Q02)
+        cs = array([0.123+0.0003*L, -0.327-0.004*L, 0.692-0.068*L, -0.486+0.038*L])
+        delg = (1.10+0.06*L-0.0027*L**2) - 1
+        ng = 2
+        xs = array([x**(j/2.) for j in range(4)])
+        return x**(-delg)*(1.-x)**(2*ng+1)*sum(cs*xs)
+
+    def uval(self, x, Q2):
+        """GK12 model for u_val PDF."""
+        Q02 = 4.
+        L = log(Q2/Q02)
+        cuval = array([1.52+0.248*L, 2.88-0.940*L, -0.095*L, 0 ])
+        delval = 0.48 - 1
+        nval = 1
+        xs = array([x**(j/2.) for j in range(4)])
+        return x**(-delval)*(1.-x)**(2*nval+1)*sum(cuval*xs)
+
+    def dval(self, x, Q2):
+        """GK12 model for d_val PDF."""
+        Q02 = 4.
+        L = log(Q2/Q02)
+        cdval = array([0.76+0.248*L, 3.11-1.36*L, -3.99+1.15*L, 0])
+        delval = 0.48 - 1
+        nval = 1
+        xs = array([x**(j/2.) for j in range(4)])
+        return x**(-delval)*(1.-x)**(2*nval+1)*sum(cdval*xs)
+        
+    def udsea(self, x, Q2):
+        """GK12 model for u or d sea."""
+        kaps = 1.+0.68/(1.+0.52*log(Q2/4.))
+        return kaps * self.s(x,Q2)
+
+
+    def SIG(self, x, Q2):
+        """GK12 model for singlet quark."""
+        return self.uval(x, Q2) + self.dval(x,Q2) + 4*self.udsea(x,Q2) + 2*self.s(x,Q2)
+
+    def DISF2(self, pt):
+        """DIS F2 structure function in GK12 model."""
+        x = pt.xB
+        Q2 = pt.Q2
+        return ( (4./9.) * (self.uval(x, Q2) + 2*self.udsea(x,Q2)) 
+               + (1./9.) * (self.dval(x, Q2) + 2*self.udsea(x,Q2) 
+                                             + 2*self.s(x,Q2))  )
+
 
 class ComptonFormFactors(Model):
     """Twist-two, no-transversity set of 4 CFFs.

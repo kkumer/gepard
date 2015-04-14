@@ -819,8 +819,10 @@ class BMK(Approach):
     def F2(self, pt):
         """DIS F2 form factor."""
 
-        self.m.g.parint.pid = 0
-        self.m.g.newcall = 1
+        # Gepard may need resetting
+        if self.model.__dict__.has_key('g'): 
+            self.m.g.parint.pid = 0
+            self.m.g.newcall = 1
         res = self.m.DISF2(pt)
         return res
 
