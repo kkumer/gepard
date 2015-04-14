@@ -208,7 +208,7 @@ def panel(ax, points=None, lines=None, bands=None, xaxis=None, xs=None,
     if bands:
         if not isinstance(bands, list): bands = [bands]
         bandcolors = ['red', 'green', 'blue', 'purple']
-        hatches = ['//', '\\\\', '|', '.']
+        hatches = ['////', '\\\\', '|', '.']
         bandn = 0
         for band in bands:
             for pts in points:
@@ -218,7 +218,7 @@ def panel(ax, points=None, lines=None, bands=None, xaxis=None, xs=None,
                         #facecolor=bandcolors[bandn], # band  color
                         facecolor='none',
                         edgecolor=bandcolors[bandn], # band edge color
-                        linewidth=1,
+                        linewidth=2,
                         label=band.name, **kwargs)
             bandn += 1
 
@@ -656,6 +656,84 @@ def CLAS14(obs='BSA', path=None, fmt='png', **kwargs):
         else:
             ax.set_xlabel('$-t\\; [{\\rm GeV}^2]$', fontsize=16)
         npanel += 1
+    if path:
+        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+    else:
+        fig.canvas.draw()
+        fig.show()
+    return fig
+
+def CLAS15(obs='BSA', path=None, fmt='png', **kwargs):
+    """Makes plot of CLAS 2015 data with fit lines and bands"""
+
+    title = 'CLAS 2015 (Pisano:2015iqa)'
+    if obs == 'BSA':
+        dataset = data[94]
+        lbl = '$A_{LU}^{\\sin\\phi}$'
+        ymin, ymax = 0, 0.49
+        old = data[25]
+        oldpanels = [old[:1], old[3:6], old[6:9], old[11:14], None]
+    elif obs == 'TSA':
+        dataset = data[95]
+        lbl = '$A_{UL}^{\\sin\\phi}$'
+        ymin, ymax = 0, 0.49
+    elif obs == 'BTSA0':
+        dataset = Data.DataSet(utils.select(data[96], criteria=['FTn == 0']))
+        lbl = '$A_{LL}^{\\cos0\\phi}$'
+        ymin, ymax = 0, 0.85
+    elif obs == 'BTSA1':
+        dataset = Data.DataSet(utils.select(data[96], criteria=['FTn == 1']))
+        lbl = '$A_{LL}^{\\cos\\phi}$'
+        ymin, ymax = -0.35, 0.35
+    else:
+        raise ValueError, 'Observable %s unavailable.' % obs
+    fig, axs = plt.subplots(3, 2, sharey=True, sharex=True, figsize=[8,12])
+    axs = axs.reshape(6)
+    fig.canvas.set_window_title(title)
+    fig.suptitle(title + ' -- ' +  obs)
+    # 
+    panels = [ dataset[:1],
+               dataset[1:4],
+               dataset[4:7],
+               dataset[7:9],
+               dataset[9:]]
+    for np, panelset in enumerate(panels):
+        ax = axs[np]
+        if (np == 0) or (np == 4):
+            # fake doubling of points to get line visibility
+            ptd = copy.deepcopy(panelset[0])
+            ptd.tm = ptd.tm+0.02
+            panelset.append(ptd)
+            panel(ax, points=panelset, xaxis='tm', kinlabels=['Q2', 'xB'], **kwargs)
+        else:
+            if obs == 'BSA':
+                panel(ax, points=[panelset, oldpanels[np]], xaxis='tm', kinlabels=['Q2', 'xB'], **kwargs)
+            else:
+                panel(ax, points=panelset, xaxis='tm', kinlabels=['Q2', 'xB'], **kwargs)
+
+        #panel(ax, points=panelset, xaxis='tm', kinlabels=['Q2', 'xB'], **kwargs)
+        plt.xlim(0.0, 0.65)
+        ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))
+        ax.xaxis.set_minor_locator(matplotlib.ticker.MultipleLocator(0.02))
+        plt.ylim(ymin, ymax)
+        ax.yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))
+        ax.yaxis.set_minor_locator(matplotlib.ticker.MultipleLocator(0.02))
+        if obs == 'BTSA1':
+            ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
+        if np == 3:
+                # Create legend here, but draw it on last panel
+                handles, labels = ax.get_legend_handles_labels()
+        if (np % 2) == 1:
+            # Remove y-axis label from right panels
+            ax.set_ylabel('')
+        else:
+            ax.set_ylabel(lbl, fontsize=16)
+        if np < 3:
+            ax.set_xlabel('')
+        else:
+            ax.set_xlabel('$-t\\; [{\\rm GeV}^2]$', fontsize=16)
+    axs[5].legend(handles, labels, loc="center", borderaxespad=0.).draw_frame(0)
+    fig.subplots_adjust(wspace=0.0, hspace=0.0)
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
@@ -2253,10 +2331,10 @@ def CFF2(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
     logxvals = np.logspace(np.log10(ximin), np.log10(ximax), 40)
     # ordinates 
     #ylims = {'ImH': (-4.3, 35), 'ReH': (-6.5, 8)}
-    ylims = {'ImH': (-4.3, 35), 'ReH': (-4, 2),
+    ylims = {'ImH': (-4.3, 35), 'ReH': (-3.5, 2),
              'ImE': (-40, 35), 'ReE': (-25, 5),
              'ImEt': (-50, 100), 'ReEt': (-50, 100),
-             'ImHt': (-8, 8), 'ReHt': (-10, 20)}
+             'ImHt': (-6.9, 6.9), 'ReHt': (-10, 20)}
     # Plot panels
     ts = [-0.3, -0.12]
     for n in range(len(cffs)):
@@ -2278,10 +2356,10 @@ def CFF2(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
             if nt == 1:
                 # no y tick labels on right panels
                 ax.set_yticklabels([])
-            if n == 0:
+            if n < len(cffs)-1:
                 # no x tick labels on upper panels
                 ax.set_xticklabels([])
-            if n == 1:
+            if n == len(cffs)-1:
                 # x-label only on lower panels
                 ax.set_xlabel(toTeX['xixB'], fontsize=18)
             if n == 0 and nt == 0:
@@ -2299,7 +2377,7 @@ def CFF2(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
             #ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.02))  # tickmarks
             for label in ax.get_xticklabels() + ax.get_yticklabels():
                 label.set_fontsize(14)
-    fig.subplots_adjust(bottom=0.5, wspace=0.0, hspace=0.0)
+    fig.subplots_adjust(bottom=0.4, wspace=0.0, hspace=0.0)
     if path:
         #fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
         fig.set_size_inches((14, 16))

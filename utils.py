@@ -292,7 +292,7 @@ def listdata(ids, data):
         except KeyError:
             pass
 
-def listchis(ths, Q2cut=2., nsets=0):
+def listchis(ths, Q2cut=2., Q2max=1.e3, nsets=0):
     """Compare chi-squares of theories for subsets of data."""
     if not isinstance(ths, list): ths = [ths]
     from abbrevs import H1ZEUS, ALUIpts, BCApts, CLASpts, BSDwpoints, BSSwpoints,\
@@ -341,7 +341,7 @@ def listchis(ths, Q2cut=2., nsets=0):
     total_chis = np.array([0. for th in ths])
     total_npts = 0
     for collab, obs, pts in sets[nsets]:
-        cutpts = select(pts, criteria=['Q2>=%f' % Q2cut])
+        cutpts = select(pts, criteria=['Q2>=%f' % Q2cut, 'Q2<=%f' % Q2max])
         chis = [th.chisq(cutpts)[0] for th in ths]
         npts = len(cutpts)
         print fstr.format(collab, obs, *chis, dof=npts)

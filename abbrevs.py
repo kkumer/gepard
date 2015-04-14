@@ -92,6 +92,7 @@ LPpoints = TSApoints + BTSApoints  # total longitudinal target
 H_AULpts = TSA1points[:4]
 C_AULpts = data[54][:3]
 AULpts = H_AULpts + C_AULpts
+AULptsOLD = H_AULpts + data[54]  # CLAS points not independent
 ALLpts = BTSApoints[:4]
 
 ####  --  Transversally polarized target --
@@ -122,9 +123,9 @@ GLOfixfull = (ALUIpts + BCApts + CLASpts + BSSwpoints + BSDwpoints
 # Excluding LP
 GLOnoL = H1ZEUS[::3] + ALUIpts + BCApts + CLASpts + HApts + AUTIpts
 # Excluding problematic Hall A BSS:
-GLOnoBSS = H1ZEUS[::3] + ALUIpts + BCApts + CLASpts + BSDwpoints[::2] + AULpts + ALLpts + AUTIpts
+GLOnoBSS = H1ZEUS[::3] + ALUIpts + BCApts + CLASptsOLD + BSDwpoints[::2] + AULptsOLD + ALLpts + AUTIpts
 #               12         6         12        4           6              4+6      4         4
-GLOnoBSS2 = H1ZEUS + ALUIpts + BCApts + CLASptsOLD + BSDwpoints + AULpts + ALLpts + AUTIpts
+GLOnoBSS2 = H1ZEUS + ALUIpts + BCApts + CLASptsOLD + BSDwpoints + AULptsOLD + ALLpts + AUTIpts
 unppts = [ALUIpts, BCApts[6:], CLASpts, BSSwpoints[::-2]]
 polpts = [TSA1points[:4], data[54], BTSApoints[:4], AUTIpoints[:4], AUTDVCSpoints[:4]]
 #
