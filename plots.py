@@ -27,6 +27,7 @@ from results import *
 data = utils.loaddata('data/ep2epgamma', approach=Approach.BMK) 
 data.update(utils.loaddata('data/gammastarp2gammap', approach=Approach.BMK)) 
 data.update(utils.loaddata('data/gammastarp2Mp', approach=Approach.BMK)) 
+data.update(utils.loaddata('data/DIS', approach=Approach.BMK)) 
 
 ###  subplots_adjust options and their meanings:
  # left  = 0.125  # the left side of the subplots of the figure
@@ -733,6 +734,53 @@ def CLAS15(obs='BSA', path=None, fmt='png', **kwargs):
         else:
             ax.set_xlabel('$-t\\; [{\\rm GeV}^2]$', fontsize=16)
     axs[5].legend(handles, labels, loc="center", borderaxespad=0.).draw_frame(0)
+    fig.subplots_adjust(wspace=0.0, hspace=0.0)
+    if path:
+        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+    else:
+        fig.canvas.draw()
+        fig.show()
+    return fig
+
+def HERAF2(path=None, fmt='png', **kwargs):
+    """Makes plot of HERA F2 DIS data with fit lines and bands"""
+
+    #title = 'H1 hep-ex/9603004 (Aid:1996au)'
+    title = 'H1-F2'
+    dataset = data[208]
+    lbl = r'$F_{2}^{p}(x_{\rm B}, Q^2)$'
+    ymin, ymax = 0, 1.79
+    fig, axs = plt.subplots(2, 1, sharey=True, sharex=True, figsize=[8,12])
+    axs = axs.reshape(2)
+    fig.canvas.set_window_title(title)
+    #fig.suptitle(title + ' -- ' +  obs)
+    # 
+    panels = [ data[208],
+               data[202] ]
+    for np, panelset in enumerate(panels):
+        ax = axs[np]
+        panel(ax, points=panelset, xaxis='Q2', kinlabels=['xB'], **kwargs)
+        plt.xlim(0.0, 65)
+        #ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))
+        #ax.xaxis.set_minor_locator(matplotlib.ticker.MultipleLocator(0.02))
+        plt.ylim(ymin, ymax)
+        #ax.yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))
+        #ax.yaxis.set_minor_locator(matplotlib.ticker.MultipleLocator(0.02))
+        if np == 0:
+                # Take legend info on this panel
+                handles, labels = ax.get_legend_handles_labels()
+        if (np % 2) == 13: #1:
+            # Remove y-axis label from right panels
+            ax.set_ylabel('')
+        else:
+            ax.set_ylabel(lbl, fontsize=16)
+        if np < 0:
+            # Remove x-axis label from upper panels
+            ax.set_xlabel('')
+        else:
+            ax.set_xlabel(r'$Q^2\; [{\rm GeV}^2]$', fontsize=16)
+    # Draw legend on this panel
+    axs[0].legend(handles, labels, loc="upper right", borderaxespad=0.).draw_frame(0)
     fig.subplots_adjust(wspace=0.0, hspace=0.0)
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
