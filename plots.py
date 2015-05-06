@@ -747,7 +747,6 @@ def HERAF2(path=None, fmt='png', **kwargs):
 
     #title = 'H1 hep-ex/9603004 (Aid:1996au)'
     title = 'H1-F2'
-    dataset = data[208]
     lbl = r'$F_{2}^{p}(x_{\rm B}, Q^2)$'
     ymin, ymax = 0, 1.79
     fig, axs = plt.subplots(2, 1, sharey=True, sharex=True, figsize=[8,12])
@@ -1005,6 +1004,55 @@ def CLAS14phi(path=None, fmt='png', **kwargs):
             ax.set_ylim(0.0, 0.8)
         else:
             ax.set_ylim(-0.4, 0.4)
+    if path:
+        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+    else:
+        fig.canvas.draw()
+        fig.show()
+    return fig
+
+def CLAS15phi(path=None, fmt='png', **kwargs):
+    """Makes plot of CLAS 15 data phi-dependence with fit lines"""
+
+    title = 'CLAS-15-xs'
+    fig, axs = plt.subplots(2, 3, sharey='row', sharex=True, figsize=[8,12])
+    axs = axs.reshape(6)
+    fig.canvas.set_window_title(title)
+    panels = [
+       utils.select(data[98], criteria=['xB == 0.335', 'Q2 == 2.78', 't == -0.20']),
+       utils.select(data[98], criteria=['xB == 0.335', 'Q2 == 2.78', 't == -0.26']),
+       utils.select(data[98], criteria=['xB == 0.335', 'Q2 == 2.78', 't == -0.45']),
+       utils.select(data[97], criteria=['xB == 0.335', 'Q2 == 2.78', 't == -0.20']),
+       utils.select(data[97], criteria=['xB == 0.335', 'Q2 == 2.78', 't == -0.26']),
+       utils.select(data[97], criteria=['xB == 0.335', 'Q2 == 2.78', 't == -0.45'])
+               ]
+    for np, panelset in enumerate(panels):
+        ax = axs[np]
+        panel(ax, points=panelset, xaxis='phi', kinlabels=['xB', 'Q2', 't'], **kwargs)
+        #ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))
+        #ax.xaxis.set_minor_locator(matplotlib.ticker.MultipleLocator(0.02))
+        #ax.yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))
+        #ax.yaxis.set_minor_locator(matplotlib.ticker.MultipleLocator(0.02))
+        if np == 0:
+            # Take legend info on this panel
+            handles, labels = ax.get_legend_handles_labels()
+            # Draw legend on this panel
+            ax.legend(handles, labels, loc="upper right", borderaxespad=0.).draw_frame(0)
+            ax.set_ylabel('BSS', fontsize=16)
+        elif np == 3:
+            ax.set_ylabel('BSD', fontsize=16)
+        else:
+            ax.set_ylabel('')
+        if np < 3:
+            # Remove x-axis label from upper panels
+            ax.set_xlabel('')
+        else:
+            ax.set_xlabel(r'$\phi\; {\rm [deg]}$', fontsize=16)
+        if np < 3:
+            ax.set_ylim(-0.05, 0.3)
+        else:
+            ax.set_ylim(-0.1, 0.1)
+    fig.subplots_adjust(wspace=0.0, hspace=0.0)
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:

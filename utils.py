@@ -288,7 +288,7 @@ def listdata(ids, data):
                 ref2 = dt.reference2
             except:
                 ref2 =  ''
-            print '[%2i] %8s %3i %9s %10s %s' % (dt.id, dt.collaboration, len(dt), dt.y1name, ref, ref2)
+            print '[%3i] %8s %3i %9s %10s %s' % (dt.id, dt.collaboration, len(dt), dt.y1name, ref, ref2)
         except KeyError:
             pass
 
