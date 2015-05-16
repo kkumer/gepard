@@ -197,7 +197,7 @@ def panel(ax, points=None, lines=None, bands=None, xaxis=None, xs=None,
     if lines:
         if not isinstance(lines, list): lines = [lines]
         lineshapes = ['s', '^', 'd', 'h']  # first squares, then triangles, diamonds, hexagons
-        linecolors = ['black', 'blue', 'green', 'purple']  
+        linecolors = ['red', 'black', 'blue', 'green', 'purple']  
         linestyles = ['-', '--', '-.', ':']  # solid, dashed, dot-dashed, dotted
         linen = 0
         for line in lines:
@@ -668,7 +668,7 @@ def CLAS15(obs='BSA', path=None, fmt='png', **kwargs):
     """Makes plot of CLAS 2015 data with fit lines and bands"""
 
     title = 'CLAS 2015 (Pisano:2015iqa)'
-    if obs == 'BSA':
+    if obs[:3] == 'BSA':
         dataset = data[94]
         lbl = '$A_{LU}^{\\sin\\phi}$'
         ymin, ymax = 0, 0.49
@@ -691,7 +691,7 @@ def CLAS15(obs='BSA', path=None, fmt='png', **kwargs):
     fig, axs = plt.subplots(3, 2, sharey=True, sharex=True, figsize=[8,12])
     axs = axs.reshape(6)
     fig.canvas.set_window_title(title)
-    fig.suptitle(title + ' -- ' +  obs)
+    fig.suptitle(title + ' -- ' +  obs, fontsize=20)
     # 
     panels = [ dataset[:1],
                dataset[1:4],
@@ -707,7 +707,7 @@ def CLAS15(obs='BSA', path=None, fmt='png', **kwargs):
             panelset.append(ptd)
             panel(ax, points=panelset, xaxis='tm', kinlabels=['Q2', 'xB'], **kwargs)
         else:
-            if obs == 'BSA':
+            if obs == 'BSAOLD':
                 panel(ax, points=[panelset, oldpanels[np]], xaxis='tm', kinlabels=['Q2', 'xB'], **kwargs)
             else:
                 panel(ax, points=panelset, xaxis='tm', kinlabels=['Q2', 'xB'], **kwargs)
@@ -728,11 +728,11 @@ def CLAS15(obs='BSA', path=None, fmt='png', **kwargs):
             # Remove y-axis label from right panels
             ax.set_ylabel('')
         else:
-            ax.set_ylabel(lbl, fontsize=16)
+            ax.set_ylabel(lbl, fontsize=24)
         if np < 3:
             ax.set_xlabel('')
         else:
-            ax.set_xlabel('$-t\\; [{\\rm GeV}^2]$', fontsize=16)
+            ax.set_xlabel('$-t\\; [{\\rm GeV}^2]$', fontsize=20)
     axs[5].legend(handles, labels, loc="center", borderaxespad=0.).draw_frame(0)
     fig.subplots_adjust(wspace=0.0, hspace=0.0)
     if path:
@@ -920,7 +920,7 @@ def HallAFT(path=None, fmt='png', **kwargs):
     Qs = ['1.5', '1.9', '2.3', '2.3', '2.3']
     for npanel in range(1,6):
         ax = fig.add_subplot(2,3,npanel)
-        panel(ax, points=subsets[npanel], xaxis='t', **kwargs)
+        panel(ax, points=subsets[npanel], xaxis='tm', **kwargs)
         ax.set_ylabel('%s' % ylabels[npanel-1], fontsize=16)
         if npanel != 4:
             ax.text(-0.31, 0.017, '$Q^2\\!= %s\\,{\\rm GeV}^2$' % Qs[npanel-1], fontsize=12)
@@ -1015,7 +1015,7 @@ def CLAS15phi(path=None, fmt='png', **kwargs):
     """Makes plot of CLAS 15 data phi-dependence with fit lines"""
 
     title = 'CLAS-15-xs'
-    fig, axs = plt.subplots(2, 3, sharey='row', sharex=True, figsize=[8,12])
+    fig, axs = plt.subplots(2, 3, sharey='row', sharex=True, figsize=[14,8])
     axs = axs.reshape(6)
     fig.canvas.set_window_title(title)
     panels = [
@@ -1029,18 +1029,18 @@ def CLAS15phi(path=None, fmt='png', **kwargs):
     for np, panelset in enumerate(panels):
         ax = axs[np]
         panel(ax, points=panelset, xaxis='phi', kinlabels=['xB', 'Q2', 't'], **kwargs)
-        #ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))
-        #ax.xaxis.set_minor_locator(matplotlib.ticker.MultipleLocator(0.02))
+        ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(100))
+        ax.xaxis.set_minor_locator(matplotlib.ticker.MultipleLocator(50))
         #ax.yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))
         #ax.yaxis.set_minor_locator(matplotlib.ticker.MultipleLocator(0.02))
         if np == 0:
             # Take legend info on this panel
             handles, labels = ax.get_legend_handles_labels()
             # Draw legend on this panel
-            ax.legend(handles, labels, loc="upper right", borderaxespad=0.).draw_frame(0)
-            ax.set_ylabel('BSS', fontsize=16)
+            ax.legend(handles, labels, loc="upper center", borderaxespad=0.).draw_frame(0)
+            ax.set_ylabel(r'$d\sigma = d\sigma^{\leftarrow} + d\sigma^{\rightarrow}$', fontsize=20)
         elif np == 3:
-            ax.set_ylabel('BSD', fontsize=16)
+            ax.set_ylabel(r'$\Delta\sigma = d\sigma^{\leftarrow} - d\sigma^{\rightarrow}$', fontsize=20)
         else:
             ax.set_ylabel('')
         if np < 3:
@@ -1049,7 +1049,7 @@ def CLAS15phi(path=None, fmt='png', **kwargs):
         else:
             ax.set_xlabel(r'$\phi\; {\rm [deg]}$', fontsize=16)
         if np < 3:
-            ax.set_ylim(-0.05, 0.3)
+            ax.set_ylim(-0.03, 0.3)
         else:
             ax.set_ylim(-0.1, 0.1)
     fig.subplots_adjust(wspace=0.0, hspace=0.0)
@@ -1076,10 +1076,11 @@ def H1ZEUS(path=None, fmt='png', **kwargs):
     xs = ['t', 't', 'W', 'Q2']
     #title = 'H1 07 / ZEUS 08'
     title = ''
-    fig = plt.figure()
+    fig = plt.figure(figsize=[10,6])
     fig.canvas.set_window_title(title)
     fig.suptitle(title)
     #fig.subplots_adjust(bottom=0.1, hspace=0.3)
+    #fig.subplots_adjust(wspace=0.2)
     for npanel in range(1,5):
         ax = fig.add_subplot(2,2,npanel)
         ax.set_yscale('log')  # y-axis to be logarithmic
@@ -3067,3 +3068,32 @@ def binplot(path=None, fmt='png', **kwargs):
         fig.canvas.draw()
         fig.show()
     return fig
+
+def plotpts(bin1, bin2=None, replica=None, FT=False, errors=False, path=None, fmt='png'):
+    """Plot pandas points in bin with errorbars."""
+    fig, ax = plt.subplots(1,1, figsize=[6,6])
+    if FT:
+        if errors:
+            ax.errorbar(bin1.index.values, bin1.FTval.values, bin1.FTerr.values, linestyle='None')
+        else:
+            ax.plot(bin1.index.values, bin1.FTval.values)
+    else:
+        if errors:
+            ax.errorbar(bin1.phi.values, bin1.val.values, bin1.err.values, linestyle='None')
+        else:
+            ax.plot(bin1.phi.values, bin1.val.values, marker='o')
+    if isinstance(bin2, pd.DataFrame):
+        if errors:
+            ax.errorbar(bin2.phi.values, bin2.val.values, bin2.err.values, color='red', linestyle='None')
+        else:
+            ax.plot(bin2.phi.values, bin2.val.values, color='red', marker='s')
+    if isinstance(replica, np.ndarray):
+        ax.plot(bin1.phi.values, replica, marker='o', color='red', linestyle='None')
+    if path:
+        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+    else:
+        fig.canvas.draw()
+        fig.show()
+    return fig
+
+

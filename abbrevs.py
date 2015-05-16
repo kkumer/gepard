@@ -60,12 +60,18 @@ CLASKKpts = utils.select(data[25], criteria=['Q2 >= 1.5']) + CLAS08pts
 CLAS14BSApts = data[85]
 CLAS14TSApts = utils.select(data[86], criteria=['FTn == -1']) 
 CLAS14BTSApts = data[87]
+C_BSDwpts = data[101]
+C_BSSw0pts = data[102][:48]
+C_BSSw1pts = data[102][48:]
 #
 # Hall A
 #
 BSDwpoints = utils.select(data[50], criteria=['FTn == -1'])
 BSSwpoints = utils.select(data[51], criteria=['FTn>=0', 'FTn <= 1'])
 HApts = BSDwpoints[::2] + BSSwpoints[::2]
+H_BSDwpts = data[117]
+H_BSSw0pts = data[116][:10]
+H_BSSw1pts = data[116][10:]
 #
 # EIC mock
 #
@@ -126,6 +132,7 @@ GLOnoL = H1ZEUS[::3] + ALUIpts + BCApts + CLASpts + HApts + AUTIpts
 GLOnoBSS = H1ZEUS[::3] + ALUIpts + BCApts + CLASptsOLD + BSDwpoints[::2] + AULptsOLD + ALLpts + AUTIpts
 #               12         6         12        4           6              4+6      4         4
 GLOnoBSS2 = H1ZEUS + ALUIpts + BCApts + CLASptsOLD + BSDwpoints + AULptsOLD + ALLpts + AUTIpts
+GLO15 = H1ZEUS + ALUIpts + BCApts + CLASpts + AULpts + ALLpts + AUTIpts
 unppts = [ALUIpts, BCApts[6:], CLASpts, BSSwpoints[::-2]]
 polpts = [TSA1points[:4], data[54], BTSApoints[:4], AUTIpoints[:4], AUTDVCSpoints[:4]]
 #

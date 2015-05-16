@@ -4,6 +4,7 @@ import shelve, copy, sys, logging, __builtin__
 import numpy as np
 
 logging.basicConfig(level=logging.INFO)
+#logging.basicConfig(level=logging.DEBUG)
 
 import Model, Approach, Fitter, Data, utils, plots
 from results import *
@@ -12,11 +13,23 @@ from abbrevs import *
 
 db = shelve.open('theories.db')
 
-m = Model.GK12()
-th = Approach.BM10(m)
+th = db['KMM12']
+Model.ComptonGepard.gepardPool.pop()
+thb = db['KMM12']
+Model.ComptonGepard.gepardPool.pop()
+thb.m.parameters.update(KMM12b)
+thC = db['KM15prelimC']
+thC.name = 'KM15pC'
+Model.ComptonGepard.gepardPool.pop()
+
+#mGK = Model.GK12()
+#thGK = Approach.BM10(mGK)
+#thGK.name = 'GK12'
+
 pt0 = DISpoints[0]
-#th = db['KMM12']
-#Model.ComptonGepard.gepardPool.pop()
+pt0.Q2 = 4.
+pt0.xB = 1e-4
+pt0.xi = pt0.xB/(2.-pt0.xB)
 
 ## Gepard sea part
 #mGepard = Model.ComptonGepard(p=0, q02=4.0)
@@ -82,17 +95,19 @@ def gvsDR(th, pts, attr='ImH'):
             print '%4s %.1g = failed' % (pt.y1name, pt.xB)
 
 
-def pc(th, Q2cut=2.):
+def pc(th, Q2cut=2., wcut=False):
     #exps = ['UNP5points', 'ALTGLO5', 'CLAS', 'CLASDM', 'BSDw', 'BSSw', 'TSA1', 'BTSA', 'TPpoints']
     #ptssets = [UNP5points, ALTGLO5points, data[25], data[8], BSDwpoints, BSSwpoints, TSA1points, BTSApoints, TPpoints]
-    exps = ['H1ZEUS', 'ALUIpts', 'BCApts', 'CLASpts', 'BSDwpoints', 'BSSwpoints', 'AULpts', 'ALLpts', 'AUTIpts' ]
-    ptssets = [H1ZEUS, ALUIpts, BCApts, CLASpts, BSDwpoints, BSSwpoints, AULpts, ALLpts, AUTIpts ]
+    exps = ['H1ZEUS', 'ALUIpts', 'BCApts', 'CLASpts', 'BSDw06', 'BSSw06', 'AULpts', 'ALLpts', 'AUTIpts', 'BSDw_C', 'BSS0w_C', 'BSS1w_C', 'BSDw_HA', 'BSS0w_HA', 'BSS1w_HA' ]
+    ptssets = [H1ZEUS, ALUIpts, BCApts, CLASpts, BSDwpoints, BSSwpoints, AULpts, ALLpts, AUTIpts,
+            data[101], data[102][:48], data[102][48:], data[117], data[116][:10], data[116][10:] ]
     #exps = ['H1ZEUS DVCS', 'H1-09 XL', "H1-09 W-dep"]
     #ptssets = [H1ZEUS, H109XL, H109WdepXL]
     for name, pts in zip(exps,ptssets):
         print '%10s: chi/npts = %6.2f/%d' % (name, th.chisq(pts)[0], len(pts))
-        cutpts = utils.select(pts, criteria=['Q2>=%f' % Q2cut])
-        print '%10s: chi/npts = %6.2f/%d (cut)' % (name, th.chisq(cutpts)[0], len(cutpts))
+        if wcut:
+            cutpts = utils.select(pts, criteria=['Q2>=%f' % Q2cut])
+            print '%10s: chi/npts = %6.2f/%d (cut)' % (name, th.chisq(cutpts)[0], len(cutpts))
 
 def _derpt(th, p, pt, f=False, h=0.05):
     """Compute derivative of f w.r.t. model parameter p at point pt.
