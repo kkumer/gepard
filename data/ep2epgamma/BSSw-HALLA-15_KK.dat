@@ -1,0 +1,86 @@
+id = 116
+editor = KK
+
+# the y1 data are derived from the phi measurement
+# of HALL A data from the experiment (BSS-HALLA-15)
+
+### Experiment
+
+collaboration = HALLA
+process = ep2epgamma
+exptype = fixed target
+year = 2015
+reference =  arXiv:1504.05453
+reference2 = FT analysis with MC error propagation by KK
+
+
+### Scattering Process
+
+frame = BMK
+
+in1particle = em
+in1energy = 5.7572
+in1energyunit = GeV
+in1polarizationvector = L
+in1polarization = +1
+
+in2particle = p
+
+out1particle = e
+out2particle = p
+out3particle = gamma
+
+
+### Observable 
+y1long = Weighted beam spin sum
+y1name = BSSw
+y1unit = nb/GeV^4
+y1value = column5
+y1errorstatistic = column6
+y1errorsystematic = column7
+
+
+### x-axes
+
+x1name = xB
+x1unit = 1
+x1value = column2
+
+x2name = Q2
+x2unit = GeV^2
+x2value = column1
+
+
+x3name = tm
+x3unit = GeV^2
+x3value = column3
+
+x4name = FTn
+x4unit = 1
+x4value = column4
+
+
+### Data
+table=
+#   Q2     xB     tm  FTn    FTval    FTerr  avgsyst
+#################################################
+ 1.820  0.343  0.172    0  0.06887  0.00054  0.00044
+ 1.933  0.368  0.232    0  0.04226  0.00044  0.00032
+ 1.964  0.375  0.278    0  0.03442  0.00047  0.00024
+ 1.986  0.379  0.323    0  0.02796  0.00055  0.00052
+ 1.999  0.381  0.371    0  0.02461  0.00070  0.00054
+ 2.218  0.345  0.176    0  0.06247  0.00051  0.00073
+ 2.318  0.363  0.232    0  0.04136  0.00042  0.00032
+ 2.348  0.368  0.279    0  0.03171  0.00041  0.00034
+ 2.360  0.371  0.325    0  0.02602  0.00041  0.00037
+ 2.375  0.373  0.372    0  0.02040  0.00043  0.00040
+ 1.820  0.343  0.172    1   0.00389  0.00077  0.00044
+ 1.933  0.368  0.232    1   0.01021  0.00064  0.00032
+ 1.964  0.375  0.278    1   0.01308  0.00068  0.00024
+ 1.986  0.379  0.323    1   0.01263  0.00081  0.00052
+ 1.999  0.381  0.371    1   0.01294  0.00114  0.00054
+ 2.218  0.345  0.176    1  -0.00169  0.00071  0.00073
+ 2.318  0.363  0.232    1   0.00522  0.00058  0.00032
+ 2.348  0.368  0.279    1   0.00884  0.00059  0.00034
+ 2.360  0.371  0.325    1   0.00994  0.00062  0.00037
+ 2.375  0.373  0.372    1   0.00786  0.00066  0.00040
