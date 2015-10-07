@@ -1,0 +1,50 @@
+id = 30
+editor = KK
+
+process = ep2epgamma
+
+in1 = e
+in1energy = 5.75
+in1energyunit = GeV
+in1polarization = L
+
+in2 = p
+in2polarization = U
+
+out1 = e
+out2 = p
+out3 = gamma
+
+Q2 = 2.3
+xB = 0.36
+
+### Experiment
+
+collaboration = HALLA_DM
+exptype = fixed target
+year = 2006
+reference =  nucl-ex/0607029
+reference2 = DM's fit
+
+### Observable 
+
+y0 = b1ovb0
+y0long = Helicity Independent Cross Section - Ratio of First Two Cos Harmonics
+y0unit = nb/GeV^4
+
+
+### x-axes
+
+x0 = t
+x0unit = GeV^2
+
+frame = Trento
+
+### Data
+
+#   t      b1/b0          err
+############################################
+ -0.33   0.443787      0.0434513
+ -0.28   0.274752      0.0401836
+ -0.23   0.128205      0.0158519
+ -0.17  -0.0502283     0.0121852

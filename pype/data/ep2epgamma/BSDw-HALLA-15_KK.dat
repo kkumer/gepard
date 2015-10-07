@@ -1,0 +1,83 @@
+id = 117
+editor = KK
+
+# the y1 data are derived from the phi measurement
+# of HALL A data from the experiment (BSD-HALLA-15)
+
+
+### Experiment
+
+collaboration = HALLA
+process = ep2epgamma
+exptype = fixed target
+year = 2015
+reference =  arXiv:1504.05453
+reference2 = FT analysis with MC error propagation by KK
+
+
+### Scattering Process
+
+frame = BMK
+
+in1particle = em
+in1energy = 5.7572
+in1energyunit = GeV
+in1polarizationvector = L
+in1polarization = +1
+
+in2particle = p
+
+out1particle = e
+out2particle = p
+out3particle = gamma
+
+
+### Observable 
+
+y1name = BSDw
+y1long = Weighted beam spin difference
+y1unit = nb/GeV^4
+y1value = column4
+y1errorstatistic = column5
+y1errorsystematic = column6
+
+
+### x-axes
+
+x1name = xB
+x1unit = 1
+x1value = column2
+
+x2name = Q2
+x2unit = GeV^2
+x2value = column1
+
+
+x3name = tm
+x3unit = GeV^2
+x3value = column3
+
+x4name = FTn
+x4unit = 1
+x4value = -1
+
+
+### Data
+table=
+#   Q2     xB     tm    FTval    FTerr  avgsyst
+#################################################
+ 1.453  0.345  0.170  0.01670  0.00111  0.00143
+ 1.552  0.374  0.232  0.01084  0.00103  0.00173
+ 1.589  0.385  0.278  0.00729  0.00114  0.00218
+ 1.608  0.391  0.323  0.00778  0.00139  0.00195
+ 1.633  0.399  0.370  0.00845  0.00198  0.00246
+ 1.820  0.343  0.172  0.01560  0.00105  0.00154
+ 1.933  0.368  0.232  0.01096  0.00082  0.00074
+ 1.964  0.375  0.278  0.00891  0.00083  0.00106
+ 1.986  0.379  0.323  0.00648  0.00092  0.00171
+ 1.999  0.381  0.371  0.00451  0.00101  0.00147
+ 2.218  0.345  0.176  0.01458  0.00107  0.00182
+ 2.318  0.363  0.232  0.01098  0.00080  0.00094
+ 2.348  0.368  0.279  0.00935  0.00072  0.00084
+ 2.360  0.371  0.325  0.00806  0.00069  0.00068
+ 2.375  0.373  0.372  0.00550  0.00068  0.00062

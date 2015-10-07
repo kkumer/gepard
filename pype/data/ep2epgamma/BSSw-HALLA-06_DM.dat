@@ -1,0 +1,88 @@
+id = 56
+editor = DM
+# Sept. 2010
+# fit result to cos harmonics of BSS-HALLA-06 data
+
+
+### Experiment
+
+collaboration = HALLA
+process = ep2epgamma
+exptype = fixed target
+year = 2006
+reference =  nucl-ex/0607029
+reference2 = private tables
+
+
+### Scattering Process
+
+frame = BMK
+
+in1particle = e-
+in1energy = 5.75
+in1energyunit = GeV
+in1polarizationvector = L
+in1polarization = 1
+
+in2particle = p
+
+out1particle = e-
+out2particle = p
+out3particle = gamma
+
+
+### Observable 
+
+y1name = BSSw
+y1namelong = weighted Beam Helicity Independent Cross Section
+# or Beam spin sum
+y1unit = nb/GeV^4
+y1value = column5
+y1errorstatistic = column6
+# only statistic error was given
+# systematic one is considered to be small
+
+
+### x-axes
+
+x1name = xB
+x1unit = 1 
+x1value = column1
+
+x2name = t
+x2unit = GeV^2
+x2value = column2
+
+x3name = Q2
+x3unit = GeV^2
+x3value = column3
+
+x4name = FTn
+x4unit = 1
+x4value = column4
+
+
+### Data 
+table =
+#xB     t     Q2   FTn          BSS                   sta
+#######################################################################
+0.36  -0.17  2.3   0    0.06563526283634245     0.0004357341713453613
+0.36  -0.17  2.3   1   -0.0034733497152058994   0.0006167345183017228
+0.36  -0.17  2.3   2   -0.0009891644180413405   0.0006122235781629068
+0.36  -0.17  2.3   3    0.000281014794717425    0.0006169672539701615
+0.36  -0.17  2.3   4   -0.0018706835461944574   0.0006070033788157565
+0.36  -0.23  2.3   0    0.05051936831470547     0.0005203982588288106
+0.36  -0.23  2.3   1    0.0064024758738309455   0.0007440212190745504
+0.36  -0.23  2.3   2   -0.0010061332898539002   0.0007334143655034831
+0.36  -0.23  2.3   3   -0.00023728777690953105  0.0007341885738035038
+0.36  -0.23  2.3   4   -0.001246289102639914    0.0006897772558334249
+0.36  -0.28  2.3   0    0.04004504679568056     0.0008463211554802914
+0.36  -0.28  2.3   1    0.01092855495127239     0.001236557139518652
+0.36  -0.28  2.3   2   -0.0005635636605014971   0.001208571771109117
+0.36  -0.28  2.3   3    0.0002589729628073099   0.0012011002878601837
+0.36  -0.28  2.3   4    0.00015064778057538643  0.0010735231980538546
+0.36  -0.33  2.3   0    0.03342018991863765     0.000835044890791021
+0.36  -0.33  2.3   1    0.014326460402614049    0.001259322837113204
+0.36  -0.33  2.3   2    0.0023856815564647503   0.001189470745476265
+0.36  -0.33  2.3   3   -0.0006173378253767825   0.0011631742671190561
+0.36  -0.33  2.3   4    0.0005799965623906934   0.0009963615180476585

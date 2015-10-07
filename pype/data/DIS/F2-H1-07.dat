@@ -1,0 +1,55 @@
+id = 207
+editor = KK
+
+### Experiment
+
+collaboration = H1
+process = dis
+exptype = collider
+year = 1996
+reference = Nucl.Phys.B470(96)3
+
+### Scattering Process
+
+in1particle = gammastar
+in2particle = p
+
+### Observable 
+
+y1name = F2
+y1namelong = F2
+y1unit = 1
+y1value = column2
+y1errorstatistic = column3
+y1errorsystematic = column4
+
+
+### x-axes
+x1name = Q2
+x1unit = GeV^2
+x1value = column1
+
+x2name = xB
+x2unit = 1
+x2value = 0.0008
+
+
+table =
+### Data
+# Q2      F2     stat     syst
+######################################
+ 3.5     .712    .049    .126       
+ 5.0     .769    .037    .063       
+ 6.5     .848    .038    .076         
+ 8.5     .923    .031    .038         
+12.0    1.067    .015    .061     
+15.0    1.110    .018    .057     
+20.0    1.210    .022    .050          
+25.0    1.330    .028    .051     
+35.0    1.442    .038    .051      
+
+
+
+*     DIS7H1  [H1,  Nucl.Phys.B470(96)3]
+*       X = Q2,   Y = F2
+*       X_BJ = 0.00080

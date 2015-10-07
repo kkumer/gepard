@@ -1,0 +1,64 @@
+id = 8
+editor = KK
+
+process = ep2epgamma
+
+in1 = e
+in1energy = 5.77
+in1energyunit = GeV
+in1polarization = L
+
+in2 = p
+in2polarization = U
+
+out1 = e
+out2 = p
+out3 = gamma
+
+### Experiment
+
+collaboration = CLAS_DM
+exptype = fixed target
+year = 2007
+reference =  arXiv:0711.4805
+reference2 = F.T. by Dieter
+
+### Observable 
+# A_{LU}(90 degrees) = a
+
+y0 = ALUa
+y0long = Beam Spin Azimuthal Asymmetry at 90 degrees
+y0unit = 1
+
+frame = Trento
+
+### x-axes
+
+x0 = xB
+x0unit = 1
+
+x1 = t
+x1unit = GeV^2
+
+x2 = Q2
+x2unit = GeV^2
+
+
+### Data
+#
+#  CLAS 2007 BSA - FT by DM
+#
+# xB     t     Q2       a      err
+#####################################
+0.134  -0.28  1.17    0.164    0.018
+0.176  -0.28  1.37    0.277    0.032
+0.176  -0.13  1.37    0.249    0.024
+0.176  -0.14  1.56    0.208    0.023
+0.235  -0.15  1.65    0.274    0.036
+0.238  -0.14  1.89    0.231    0.046
+0.246  -0.14  2.16    0.202    0.036
+0.247  -0.28  1.69    0.298    0.055
+0.249  -0.28  1.95    0.28     0.029 
+0.252  -0.28  2.21    0.225    0.023
+0.345  -0.30  2.64    0.287    0.022
+0.348  -0.29  2.97    0.214    0.036
