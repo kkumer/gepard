@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 
 #from IPython.Debugger import Tracer; debug_here = Tracer()
 

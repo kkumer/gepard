@@ -5,13 +5,10 @@ import sys, logging
 
 import numpy as np
 
-#FIXME: this is needed only for FitterMinuit. It should
-# not raise exception on systems without pyminuit installed
-# after another Fitter is implemented, say NN
-try: # if you have ROOT you might want minuit2
-    from minuit2 import Minuit2 as Minuit
+try:
+    from iminuit import Minuit
 except:
-    from minuit import Minuit
+    pass
 
 
 _lg = logging.getLogger('p.%s' % __name__)
