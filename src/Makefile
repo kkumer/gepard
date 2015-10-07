@@ -107,11 +107,11 @@ pygepards: pygepard.so pygepard2.so pygepard3.so
 
 pygepard.so: $(_FPREPS)
 	f2py2 --fcompiler=gnu95  -c -m pygepard $^ adacf/*f -lgomp
-	mv pygepard.so ../ifaces/
+	mv pygepard.so ../pype/
 
 pygepard%.so: $(_FPREPS)
 	f2py2 --quiet --fcompiler=gnu95 -c -m pygepard$* $^ adacf/*f -lgomp
-	mv pygepard$*.so ../ifaces/
+	mv pygepard$*.so ../pype/
 
 
 # targets for examples
@@ -136,4 +136,4 @@ clean:
 	-rm -f $(patsubst %,../ex/%,$(EXTARGETS))
 	-rm -f $(patsubst %,../ex/%.exe,$(EXTARGETS))
 	-rm -f ../ifaces/gepard.exe/$(SYS)/gepard.exe
-	-rm -f ../ifaces/pygepar*.so
+	-rm -f ../pype/pygepar*.so

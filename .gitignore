@@ -1,0 +1,5 @@
+# Aux files
+**/*.o
+**/*.so
+**/*.pyc
+**/*prep/*.f
