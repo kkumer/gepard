@@ -6,16 +6,17 @@ of some specific datasets and CFFs.
 
 #from IPython.Debugger import Tracer; debug_here = Tracer()
 
-import sys, os, math, copy, string, commands
+import sys, os, math, copy, string, commands, itertools
 import numpy as np
 
 import matplotlib
+import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages # for PDF creation
 if os.sys.platform == 'win32':
     matplotlib.use('WxAgg')
 #else: #linux
 #    matplotlib.use('TkAgg')
-import pylab as plt
+#import pylab as plt
 
 
 import Data, Approach, utils
@@ -23,8 +24,10 @@ from constants import toTeX, Mp2, Mp, OBStoTeX
 from results import *
 
 # load experimental data
-data = utils.loaddata('/home/kkumer/pype/data/ep2epgamma', approach=Approach.BMK) 
-data.update(utils.loaddata('/home/kkumer/pype/data/gammastarp2gammap', approach=Approach.BMK)) 
+data = utils.loaddata('data/ep2epgamma', approach=Approach.BMK) 
+data.update(utils.loaddata('data/gammastarp2gammap', approach=Approach.BMK)) 
+data.update(utils.loaddata('data/gammastarp2Mp', approach=Approach.BMK)) 
+data.update(utils.loaddata('data/DIS', approach=Approach.BMK)) 
 
 ###  subplots_adjust options and their meanings:
  # left  = 0.125  # the left side of the subplots of the figure
@@ -128,8 +131,8 @@ def _axband(ax, fun, pts, xaxis, **kwargs):
         ax.errorbar(xvals, yvals, yerrs, marker='d', color='red', linestyle='None', 
                 elinewidth=3)
     else:
-        x = plt.concatenate( (xvals, xvals[::-1]) )
-        y = plt.concatenate( (up, down[::-1]) )
+        x = np.concatenate( (xvals, xvals[::-1]) )
+        y = np.concatenate( (up, down[::-1]) )
         if kwargs.pop('xF', False):  # do we want  xF(x) plotted?
             xis = np.array([pt.xi for pt in pts+pts[::-1]])
             y = xis*y
@@ -168,10 +171,11 @@ def panel(ax, points=None, lines=None, bands=None, xaxis=None, xs=None,
         if isinstance(points[0], Data.DataPoint): points = [points]
 
         pointshapes = ['o', 's', '^', 'd', 'o', 's', '^', 'd']  # first circles, then squares ...
-        pointcolors = ['blue', 'black', 'purple', 'green', 'red', 'brown', 'blue', 'black']
+        pointcolors = ['blue', 'red', 'green', 'red', 'brown', 'blue', 'black']
         setn = 0
         for pts in points:
             _axpoints(ax, pts, xaxis, linestyle='None', elinewidth=1, 
+                    label = '{} {}'.format(pts[0].collaboration, pts[0].year),
                     marker=pointshapes[setn], color=pointcolors[setn], **kwargs)
             setn += 1
     else:
@@ -193,7 +197,7 @@ def panel(ax, points=None, lines=None, bands=None, xaxis=None, xs=None,
     if lines:
         if not isinstance(lines, list): lines = [lines]
         lineshapes = ['s', '^', 'd', 'h']  # first squares, then triangles, diamonds, hexagons
-        linecolors = ['black', 'blue', 'green', 'purple']  
+        linecolors = ['red', 'black', 'blue', 'green', 'purple']  
         linestyles = ['-', '--', '-.', ':']  # solid, dashed, dot-dashed, dotted
         linen = 0
         for line in lines:
@@ -205,7 +209,7 @@ def panel(ax, points=None, lines=None, bands=None, xaxis=None, xs=None,
     if bands:
         if not isinstance(bands, list): bands = [bands]
         bandcolors = ['red', 'green', 'blue', 'purple']
-        hatches = ['//', '\\\\', '|', '.']
+        hatches = ['////', '\\\\', '|', '.']
         bandn = 0
         for band in bands:
             for pts in points:
@@ -215,7 +219,7 @@ def panel(ax, points=None, lines=None, bands=None, xaxis=None, xs=None,
                         #facecolor=bandcolors[bandn], # band  color
                         facecolor='none',
                         edgecolor=bandcolors[bandn], # band edge color
-                        linewidth=1,
+                        linewidth=2,
                         label=band.name, **kwargs)
             bandn += 1
 
@@ -229,8 +233,8 @@ def panel(ax, points=None, lines=None, bands=None, xaxis=None, xs=None,
                 else:
                     xvals.append(getattr(pt, xaxis))
                 yvals.append(pt.val)
-        labx = min(0, min(xvals)) + (max(xvals) - min(0, min(xvals))) * 0.35
-        laby = min(0, min(yvals)) + (max(yvals) - min(0, min(yvals))) * 0.02
+        labx = min(0, min(xvals)) + (max(xvals) - min(0, min(xvals))) * 0.15
+        laby = min(0, min(yvals)) + (max(yvals) - min(0, min(yvals))) * 0.04
         labtxt = ""
         for lab in kinlabels:
             try:
@@ -270,7 +274,7 @@ def HERMES09BCA(path=None, fmt='png', **kwargs):
 def HERMES12(path=None, fmt='png', **kwargs):
     """Plot HERMES combined BCA and BSA data with fit lines."""
 
-    title = 'HERMES-12'
+    title = ''
     fig = plt.figure()
     fig.canvas.set_window_title(title)
     fig.suptitle(title)
@@ -288,14 +292,14 @@ def HERMES12(path=None, fmt='png', **kwargs):
                 # Leave labels only on leftmost panels
                 ax.set_ylabel('')
             else:
-                ylabels = ['$BCA\\; \\cos \\phi$', '$BCA\\; \\cos 0\\phi$', '$ALUI\\; \\sin\\phi$']
-                ax.set_ylabel(ylabels[(npanel-1)/3], fontsize=18)
+                ylabels = ['$A_{C}^{\\cos \\phi}$', '$A_{C}^{\\cos 0\\phi}$', '$A_{LU,I}^{\\sin\\phi}$']
+                ax.set_ylabel(ylabels[(npanel-1)/3], fontsize=16)
             if npanel < 7:
                 # Leave labels only on lowest panels
                 ax.set_xlabel('')
             else:
                 xlabels = ['$-t\\; [{\\rm GeV}^2]$', '$x_B$', '$Q^2\\; [{\\rm GeV}^2]$']
-                ax.set_xlabel(xlabels[npanel-7], fontsize=18)
+                ax.set_xlabel(xlabels[npanel-7], fontsize=16)
 
             if (npanel % 3) == 2:
                 # Adjust x-axis on middle column
@@ -413,21 +417,21 @@ def HERMES09(path=None, fmt='png', **kwargs):
                 ax.set_yticklabels([])
             else:
                 ylabels = ['$A_{C}^{\\cos\\phi}$', '$A_{LU}^{\\sin\\phi}$']
-                ax.set_ylabel(ylabels[(npanel-1)/3], fontsize=20)
+                ax.set_ylabel(ylabels[(npanel-1)/3], fontsize=16)
             if npanel < 4:
                 # Leave labels only on lowest panels
                 ax.set_xlabel('')
                 ax.set_xticklabels([])
             else:
                 xlabels = ['$-t\\; [{\\rm GeV}^2]$', '$x_B$', '$Q^2\\; [{\\rm GeV}^2]$']
-                ax.set_xlabel(xlabels[npanel-7], fontsize=18)
+                ax.set_xlabel(xlabels[npanel-7], fontsize=16)
             if npanel == 3:
                 ax.legend(bbox_to_anchor=(0., 1.), loc='upper right',
                         borderaxespad=0.).draw_frame(0)
                 pass
         #ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.2))  # tickmarks
             for label in ax.get_xticklabels() + ax.get_yticklabels():
-                label.set_fontsize(14)
+                label.set_fontsize(10)
     fig.subplots_adjust(bottom=0.45, wspace=0.0, hspace=0.0)
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
@@ -450,17 +454,19 @@ def HERMES10LP(obs='TSA', path=None, fmt='png', **kwargs):
         id = 52
         harmonics = [-1, -2, -3]
         fun = 'sin'
+        lbl = 'A_{UL}'
     elif obs == 'BTSA':
         id = 53
         harmonics = [0, 1, 2]
         fun = 'cos'
+        lbl = 'A_{LL}'
     else:
         raise ValueError, 'Observable %s nonexistent.' % obs
     subsets = {}
     for k in range(3):
         subsets[k] = utils.select(data[id], criteria=['FTn == %i' % harmonics[k]])
     # we have 3x12=36 points to be separated in nine panels four points each:
-    for y in range(3):
+    for y in range(2):  # put this to 3 to plot also 3rd harmonic
         for x in range(3):
             npanel = 3*y + x + 1  # 1, 2, ..., 9
             ax = fig.add_subplot(3,3,npanel)
@@ -472,14 +478,14 @@ def HERMES10LP(obs='TSA', path=None, fmt='png', **kwargs):
                 # Leave labels only on leftmost panels
                 ax.set_ylabel('')
             else:
-                ylabels = ['$'+obs+'\\; \\'+fun+'(%i\\phi)$' % harmonics[k] for k in range(3)]
-                ax.set_ylabel(ylabels[(npanel-1)/3], fontsize=18)
+                ylabels = ['$'+lbl+'^{\\'+fun+'%i\\phi}$' % harmonics[k] for k in range(3)]
+                ax.set_ylabel(ylabels[(npanel-1)/3], fontsize=16)
             if npanel < 7:
                 # Leave labels only on lowest panels
                 ax.set_xlabel('')
             else:
                 xlabels = ['$-t\\; [{\\rm GeV}^2]$', '$x_B$', '$Q^2\\; [{\\rm GeV}^2]$']
-                ax.set_xlabel(xlabels[npanel-7], fontsize=18)
+                ax.set_xlabel(xlabels[npanel-7], fontsize=16)
             if (npanel % 3) == 2:
                 # Adjust x-axis on middle column
                 ax.set_xlim(0.04, 0.25)
@@ -493,7 +499,8 @@ def HERMES10LP(obs='TSA', path=None, fmt='png', **kwargs):
 def HERMES08TP(path=None, fmt='png', **kwargs):
     """Plot HERMES 08 TTSA data with fit lines."""
 
-    title = 'HERMES-08 TTSA'
+    #title = 'HERMES-08 TTSA'
+    title = ''
     fig = plt.figure()
     fig.canvas.set_window_title(title)
     fig.suptitle(title)
@@ -516,14 +523,14 @@ def HERMES08TP(path=None, fmt='png', **kwargs):
             else:
                 ylabels = ['$A_{UT,I}^{\\sin(\\phi-\\phi_S)\\cos\\phi}$', 
                            '$A_{UT,DVCS}^{\\sin(\\phi-\\phi_S)}$']
-                ax.set_ylabel(ylabels[(npanel-1)/3], fontsize=20)
+                ax.set_ylabel(ylabels[(npanel-1)/3], fontsize=16)
             if npanel < 4:
                 # Leave labels only on lowest panels
                 ax.set_xlabel('')
                 ax.set_xticklabels([])
             else:
                 xlabels = ['$-t\\; [{\\rm GeV}^2]$', '$x_B$', '$Q^2\\; [{\\rm GeV}^2]$']
-                ax.set_xlabel(xlabels[npanel-7], fontsize=18)
+                ax.set_xlabel(xlabels[npanel-7], fontsize=16)
             if npanel == 3 and kwargs:
                 ax.legend(bbox_to_anchor=(0., 1.), loc='upper right',
                         borderaxespad=0.).draw_frame(0)
@@ -531,7 +538,7 @@ def HERMES08TP(path=None, fmt='png', **kwargs):
             ax.yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.2))  # tickmarks
             ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
             for label in ax.get_xticklabels() + ax.get_yticklabels():
-                label.set_fontsize(14)
+                label.set_fontsize(10)
     fig.subplots_adjust(bottom=0.35, wspace=0.0, hspace=0.0)
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
@@ -543,31 +550,89 @@ def HERMES08TP(path=None, fmt='png', **kwargs):
 def CLAS(path=None, fmt='png', **kwargs):
     """Makes plot of CLAS BSA data with fit lines and bands"""
 
-    dataset = data[25]
-    title = 'CLAS-07'
-    fig = plt.figure()
+    dataset = utils.select(data[25], criteria=['Q2 > 1.57'])
+    #dataset = data[25]
+    title = ''
+    title = 'CLAS (Girod:2007aa)'
+    fig, axs = plt.subplots(2, 3, sharey=True, sharex=True, figsize=[7,5])
+    axs = axs.reshape(6)
     fig.canvas.set_window_title(title)
     fig.suptitle(title)
-    nmax = len(dataset) - 1
     # Each different Q2 has its own panel
-    npt = 0
-    panelpoints = []
-    for npanel in [7, 8, 9, 4, 5, 6, 1, 2, 3]:
-        ax = fig.add_subplot(3,3,npanel)
-        panelpoints = []
-        pt = dataset[npt]
-        Q2 = pt.Q2
-        while Q2 == pt.Q2:
-            panelpoints.append(pt)
-            npt += 1
-            if npt == nmax:
-                break
-            pt = dataset[npt]
+    panelorder =  [4, 5, 6, 1, 2, 3]
+    npanel = 0
+    for Q2, grp in itertools.groupby(dataset, lambda pt: pt.Q2):
+        np = panelorder[npanel]
+        ax = axs[np-1]
+        panelpoints = list(grp)
+        # now transform list into DataSet instance ...
+        panelset = Data.DataSet(panelpoints)
+        panelset.__dict__ = data[25].__dict__.copy()
+        # ... and plot
+        panel(ax, points=panelset, xaxis='tm', kinlabels=['Q2', 'xB'], **kwargs)
+        plt.xlim(0.0, 0.6)
+        plt.ylim(0.0, 0.4)
+        ax.yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))
+        if (np % 3) != 1:
+            # Leave labels only on leftmost panels
+            ax.set_ylabel('')
+        else:
+            ax.set_ylabel('$A_{LU}^{\\sin\\phi}$', fontsize=16)
+        if np < 4:
+            ax.set_xlabel('')
+        else:
+            ax.set_xlabel('$-t\\; [{\\rm GeV}^2]$', fontsize=16)
+        npanel += 1
+    if path:
+        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+    else:
+        fig.canvas.draw()
+        fig.show()
+    return fig
+
+def CLAS14(obs='BSA', path=None, fmt='png', **kwargs):
+    """Makes plot of CLAS-14 BSA data with fit lines and bands"""
+
+    title = ''
+    title = 'CLAS (prelim. 2014)'
+    if obs == 'BSA':
+        dataset = data[85]
+        lbl = '$A_{LU}^{\\sin\\phi}$'
+        ymin, ymax = 0, 0.4
+    elif obs == 'TSA1':
+        dataset = Data.DataSet(utils.select(data[86], criteria=['FTn == -1']))
+        lbl = '$A_{UL}^{\\sin\\phi}$'
+        ymin, ymax = 0, 0.4
+    elif obs == 'TSA2':
+        dataset = Data.DataSet(utils.select(data[86], criteria=['FTn == -2']))
+        lbl = '$A_{UL}^{\\sin2\\phi}$'
+        ymin, ymax = -0.1, 0.32
+    elif obs == 'BTSA0':
+        dataset = Data.DataSet(utils.select(data[87], criteria=['FTn == 0']))
+        lbl = '$A_{LL}^{\\cos0\\phi}$'
+        ymin, ymax = 0, 0.8
+    elif obs == 'BTSA1':
+        dataset = Data.DataSet(utils.select(data[87], criteria=['FTn == 1']))
+        lbl = '$A_{LL}^{\\cos\\phi}$'
+        ymin, ymax = -0.3, 0.3
+    else:
+        raise ValueError, 'Observable %s unavailable.' % obs
+    fig, axs = plt.subplots(2, 2, sharey=True, sharex=True, figsize=[5,5])
+    axs = axs.reshape(4)
+    fig.canvas.set_window_title(title)
+    fig.suptitle(title + ' -- ' +  obs)
+    # Each different Q2 has its own panel
+    panelorder = [3, 4, 1, 2]
+    npanel = 0
+    for Q2, grp in itertools.groupby(dataset, lambda pt: pt.Q2):
+        np = panelorder[npanel]
+        ax = axs[np-1]
+        panelpoints = list(grp)
         # now transform list into DataSet instance ...
         panelset = Data.DataSet(panelpoints)
         panelset.__dict__ = dataset.__dict__.copy()
         # ... and plot
-        if npanel == 1 or npanel == 3:
+        if np == 2:
             # fake doubling of points to get line visibility
             ptd = copy.deepcopy(panelset[0])
             ptd.tm = ptd.tm+0.02
@@ -575,17 +640,239 @@ def CLAS(path=None, fmt='png', **kwargs):
             panel(ax, points=panelset, xaxis='tm', kinlabels=['Q2', 'xB'], **kwargs)
         else:
             panel(ax, points=panelset, xaxis='tm', kinlabels=['Q2', 'xB'], **kwargs)
+        plt.xlim(0.0, 0.6)
+        plt.ylim(ymin, ymax)
+        ax.yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))
+        if obs == 'TSA2' or obs == 'BTSA1':
+            ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
+        if np == 2:
+                ax.legend(loc='upper left', borderaxespad=0.).draw_frame(0)
+        if (np % 2) != 1:
+            # Leave labels only on leftmost panels
+            ax.set_ylabel('')
+        else:
+            ax.set_ylabel(lbl, fontsize=16)
+        if np < 3:
+            ax.set_xlabel('')
+        else:
+            ax.set_xlabel('$-t\\; [{\\rm GeV}^2]$', fontsize=16)
+        npanel += 1
+    if path:
+        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+    else:
+        fig.canvas.draw()
+        fig.show()
+    return fig
 
+def CLAS15(obs='BSA', path=None, fmt='png', **kwargs):
+    """Makes plot of CLAS 2015 data with fit lines and bands"""
+
+    title = 'CLAS 2015 (Pisano:2015iqa)'
+    if obs[:3] == 'BSA':
+        dataset = data[94]
+        lbl = '$A_{LU}^{\\sin\\phi}$'
+        ymin, ymax = 0, 0.49
+        old = data[25]
+        oldpanels = [old[:1], old[3:6], old[6:9], old[11:14], None]
+    elif obs == 'TSA':
+        dataset = data[95]
+        lbl = '$A_{UL}^{\\sin\\phi}$'
+        ymin, ymax = 0, 0.49
+    elif obs == 'BTSA0':
+        dataset = Data.DataSet(utils.select(data[96], criteria=['FTn == 0']))
+        lbl = '$A_{LL}^{\\cos0\\phi}$'
+        ymin, ymax = 0, 0.85
+    elif obs == 'BTSA1':
+        dataset = Data.DataSet(utils.select(data[96], criteria=['FTn == 1']))
+        lbl = '$A_{LL}^{\\cos\\phi}$'
+        ymin, ymax = -0.35, 0.35
+    else:
+        raise ValueError, 'Observable %s unavailable.' % obs
+    fig, axs = plt.subplots(3, 2, sharey=True, sharex=True, figsize=[8,12])
+    axs = axs.reshape(6)
+    fig.canvas.set_window_title(title)
+    fig.suptitle(title + ' -- ' +  obs, fontsize=20)
+    # 
+    panels = [ dataset[:1],
+               dataset[1:4],
+               dataset[4:7],
+               dataset[7:9],
+               dataset[9:]]
+    for np, panelset in enumerate(panels):
+        ax = axs[np]
+        if (np == 0) or (np == 4):
+            # fake doubling of points to get line visibility
+            ptd = copy.deepcopy(panelset[0])
+            ptd.tm = ptd.tm+0.02
+            panelset.append(ptd)
+            panel(ax, points=panelset, xaxis='tm', kinlabels=['Q2', 'xB'], **kwargs)
+        else:
+            if obs == 'BSAOLD':
+                panel(ax, points=[panelset, oldpanels[np]], xaxis='tm', kinlabels=['Q2', 'xB'], **kwargs)
+            else:
+                panel(ax, points=panelset, xaxis='tm', kinlabels=['Q2', 'xB'], **kwargs)
+
+        #panel(ax, points=panelset, xaxis='tm', kinlabels=['Q2', 'xB'], **kwargs)
+        plt.xlim(0.0, 0.65)
+        ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))
+        ax.xaxis.set_minor_locator(matplotlib.ticker.MultipleLocator(0.02))
+        plt.ylim(ymin, ymax)
+        ax.yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))
+        ax.yaxis.set_minor_locator(matplotlib.ticker.MultipleLocator(0.02))
+        if obs == 'BTSA1':
+            ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
+        if np == 3:
+                # Create legend here, but draw it on last panel
+                handles, labels = ax.get_legend_handles_labels()
+        if (np % 2) == 1:
+            # Remove y-axis label from right panels
+            ax.set_ylabel('')
+        else:
+            ax.set_ylabel(lbl, fontsize=24)
+        if np < 3:
+            ax.set_xlabel('')
+        else:
+            ax.set_xlabel('$-t\\; [{\\rm GeV}^2]$', fontsize=20)
+    axs[5].legend(handles, labels, loc="center", borderaxespad=0.).draw_frame(0)
+    fig.subplots_adjust(wspace=0.0, hspace=0.0)
+    if path:
+        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+    else:
+        fig.canvas.draw()
+        fig.show()
+    return fig
+
+def HERAF2(path=None, fmt='png', **kwargs):
+    """Makes plot of HERA F2 DIS data with fit lines and bands"""
+
+    #title = 'H1 hep-ex/9603004 (Aid:1996au)'
+    title = 'H1-F2'
+    lbl = r'$F_{2}^{p}(x_{\rm B}, Q^2)$'
+    ymin, ymax = 0, 1.79
+    fig, axs = plt.subplots(2, 1, sharey=True, sharex=True, figsize=[8,12])
+    axs = axs.reshape(2)
+    fig.canvas.set_window_title(title)
+    #fig.suptitle(title + ' -- ' +  obs)
+    # 
+    panels = [ data[208],
+               data[202] ]
+    for np, panelset in enumerate(panels):
+        ax = axs[np]
+        panel(ax, points=panelset, xaxis='Q2', kinlabels=['xB'], **kwargs)
+        plt.xlim(0.0, 65)
+        #ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))
+        #ax.xaxis.set_minor_locator(matplotlib.ticker.MultipleLocator(0.02))
+        plt.ylim(ymin, ymax)
+        #ax.yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))
+        #ax.yaxis.set_minor_locator(matplotlib.ticker.MultipleLocator(0.02))
+        if np == 0:
+                # Take legend info on this panel
+                handles, labels = ax.get_legend_handles_labels()
+        if (np % 2) == 13: #1:
+            # Remove y-axis label from right panels
+            ax.set_ylabel('')
+        else:
+            ax.set_ylabel(lbl, fontsize=16)
+        if np < 0:
+            # Remove x-axis label from upper panels
+            ax.set_xlabel('')
+        else:
+            ax.set_xlabel(r'$Q^2\; [{\rm GeV}^2]$', fontsize=16)
+    # Draw legend on this panel
+    axs[0].legend(handles, labels, loc="upper right", borderaxespad=0.).draw_frame(0)
+    fig.subplots_adjust(wspace=0.0, hspace=0.0)
+    if path:
+        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+    else:
+        fig.canvas.draw()
+        fig.show()
+    return fig
+
+def CLASJ(path=None, fmt='png', **kwargs):
+    """Makes plot of CLAS-14 BSA data with fit lines and bands.
+       Some CLAS-07 data points are also plotted.
+    """
+
+    # old data
+    aux = [(Q2, Data.DataSet(grp)) for Q2, grp in 
+            itertools.groupby(data[25], lambda pt: pt.Q2)]
+    old = []
+    for Q2, ds in aux:
+        ds.__dict__ = data[25].__dict__.copy()
+        old.append((Q2, ds))
+    # new data
+    dataset = data[85]
+    title = ''
+    title = 'CLAS (prelim. 2014)'
+    fig, axs = plt.subplots(2, 2, sharey=True, sharex=True, figsize=[7,5])
+    axs = axs.reshape(4)
+    fig.canvas.set_window_title(title)
+    fig.suptitle(title)
+    # Each different Q2 has its own panel
+    panelorder = [3, 4, 1, 2]
+    npanel = 0
+    for Q2, grp in itertools.groupby(dataset, lambda pt: pt.Q2):
+        np = panelorder[npanel]
+        ax = axs[np-1]
+        panelpoints = list(grp)
+        # now transform list into DataSet instance ...
+        panelset = Data.DataSet(panelpoints)
+        panelset.__dict__ = dataset.__dict__.copy()
+        # ... and plot
+        if np == 2:
+            # fake doubling of points to get line visibility
+            ptd = copy.deepcopy(panelset[0])
+            ptd.tm = ptd.tm+0.02
+            panelset.append(ptd)
+            panel(ax, points=panelset, xaxis='tm', kinlabels=['Q2', 'xB'], **kwargs)
+        else:
+            if np == 1:
+                panel(ax, points=[panelset, old[5][1]], xaxis='tm', kinlabels=['Q2', 'xB'], **kwargs)
+            elif np == 3:
+                panel(ax, points=[panelset, old[2][1]], xaxis='tm', kinlabels=['Q2', 'xB'], **kwargs)
+            else:
+                panel(ax, points=panelset, xaxis='tm', kinlabels=['Q2', 'xB'], **kwargs)
         plt.xlim(0.0, 0.6)
         plt.ylim(0.0, 0.4)
         ax.yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))
-        if (npanel % 3) != 1:
+        if np == 1:
+            ax.legend(loc='upper left', borderaxespad=0.).draw_frame(0)
+        if (np % 2) != 1:
             # Leave labels only on leftmost panels
             ax.set_ylabel('')
-        if npanel < 7:
+        else:
+            ax.set_ylabel('$A_{LU}^{\\sin\\phi}$', fontsize=16)
+        if np < 3:
             ax.set_xlabel('')
         else:
-            ax.set_xlabel('$-t\\; [{\\rm GeV}^2]$', fontsize=18)
+            ax.set_xlabel('$-t\\; [{\\rm GeV}^2]$', fontsize=16)
+        npanel += 1
+    if path:
+        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+    else:
+        fig.canvas.draw()
+        fig.show()
+    return fig
+
+
+def CLAS08(path=None, fmt='png', **kwargs):
+    """Makes plot of CLAS 2008 BSA data with fit lines and bands"""
+
+    title = ''
+    title = 'CLAS (Gavalian:2008aa)'
+    alldata = utils.select(data[81], criteria=['FTn == -1'])
+    datasets = [alldata[:3], alldata[-3:]]
+    xaxes = ['Q2', 'tm']
+    xlabels = ['$Q^2\\; [{\\rm GeV}^2]$', '$-t\\; [{\\rm GeV}^2]$']
+    fig, axs = plt.subplots(1, 2, sharey=True, figsize=[6,3])
+    fig.canvas.set_window_title(title)
+    fig.suptitle(title)
+    # Each different Q2 has its own panel
+    for np, ax in enumerate(axs):
+        panel(ax, points=datasets[np], xaxis=xaxes[np], **kwargs)
+        ax.set_xlabel(xlabels[np], fontsize=16)
+        ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.2))
+    axs[0].set_ylabel('$A_{LU}^{\\sin\\phi}$', fontsize=16)
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
@@ -623,21 +910,22 @@ def HallAFT(path=None, fmt='png', **kwargs):
     subsets[4] = utils.select(data[51], criteria=['FTn == 0'])
     subsets[5] = utils.select(data[51], criteria=['FTn == 1'])
     #subsets[6] = utils.select(data[51], criteria=['FTn == 2'])
-
-    title = 'Hall-A'
-    fig = plt.figure()
+    ylabels = 3*['$d^{\,4}\\Sigma^{\,\\sin\\phi,w}$'] + \
+                ['$d^{\,4}\\sigma^{\,\\cos0\\phi,w}$'] + \
+                ['$d^{\,4}\\sigma^{\,\\cos\\phi,w}$']
+    title = 'MunozCamacho:2006hx'
+    fig = plt.figure(figsize=[8,6])
     fig.canvas.set_window_title(title)
     fig.suptitle(title)
     Qs = ['1.5', '1.9', '2.3', '2.3', '2.3']
     for npanel in range(1,6):
         ax = fig.add_subplot(2,3,npanel)
-        panel(ax, points=subsets[npanel], xaxis='t', **kwargs)
-        ax.set_ylabel('%s(FTn = %i)' % (subsets[npanel][0].y1name, 
-            subsets[npanel][0].FTn), fontsize=16)
-        if npanel<5:
-            ax.text(-0.31, 0.002, '$Q^2\\!= %s\\,{\\rm GeV}^2$' % Qs[npanel-1], fontsize=12)
+        panel(ax, points=subsets[npanel], xaxis='tm', **kwargs)
+        ax.set_ylabel('%s' % ylabels[npanel-1], fontsize=16)
+        if npanel != 4:
+            ax.text(-0.31, 0.017, '$Q^2\\!= %s\\,{\\rm GeV}^2$' % Qs[npanel-1], fontsize=12)
         else:
-            ax.text(-0.31, -0.008, '$Q^2\\!= %s\\,{\\rm GeV}^2$' % Qs[npanel-1], fontsize=12)
+            ax.text(-0.31, 0.065, '$Q^2\\!= %s\\,{\\rm GeV}^2$' % Qs[npanel-1], fontsize=12)
         ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))
     fig.subplots_adjust(wspace=0.7)
     if path:
@@ -658,11 +946,11 @@ def HallAphi(path=None, fmt='png', **kwargs):
     subsets[21] = utils.select(data[34], criteria=['t == -0.17'])
     subsets[23] = utils.select(data[34], criteria=['t == -0.28'])
     subsets[24] = utils.select(data[34], criteria=['t == -0.33'])
-    title = 'HALL-A-06'
-    fig = plt.figure()
+    title = ''
+    fig = plt.figure(figsize=[10,6])
     fig.canvas.set_window_title(title)
     fig.suptitle(title)
-    fig.subplots_adjust(wspace=0.2, right=0.95)
+    fig.subplots_adjust(wspace=0.2)
     npanel = 1
     for id in ids:
         ax = fig.add_subplot(2,3,npanel)
@@ -673,11 +961,11 @@ def HallAphi(path=None, fmt='png', **kwargs):
             # Leave labels only on leftmost panels
             ax.set_ylabel('')
         elif npanel==1:
-            ax.set_ylabel('$d^4\\Sigma$', fontsize=18)
+            ax.set_ylabel('$d^{\,4}\\Sigma$', fontsize=18)
             #ax.set_ylabel('$d^4\\Sigma/(dQ^2\\! dx_{\\rm B}dt d\\phi)\\quad \
             #        [{\\rm nb/GeV}^4]$', fontsize=18)
         else: # panel 4
-            ax.set_ylabel('$d^4\\sigma$', fontsize=18)
+            ax.set_ylabel('$d^{\,4}\\sigma$', fontsize=18)
             #ax.set_ylabel('$d^4\\sigma/(dQ^2\\! dx_{\\rm B}dt d\\phi)\\quad  \
             #        [{\\rm nb/GeV}^4]$', fontsize=18)
         if npanel < 4:
@@ -685,6 +973,86 @@ def HallAphi(path=None, fmt='png', **kwargs):
         else:
             ax.set_ylim(0, 0.12)
         npanel += 1
+    if path:
+        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+    else:
+        fig.canvas.draw()
+        fig.show()
+    return fig
+
+def CLAS14phi(path=None, fmt='png', **kwargs):
+    """Makes example plot of CLAS 14 data phi-dependence with fit lines"""
+
+    subsets = {}
+    subsets[1] = utils.select(data[82],  criteria=['Q2 == 2.6655', 't == -0.4558'])
+    subsets[2] = utils.select(data[83],  criteria=['Q2 == 2.6655', 't == -0.4558'])
+    subsets[3] = utils.select(data[84],  criteria=['Q2 == 2.6655', 't == -0.4558'])
+    title = 'CLAS 2014 prelim. BSA, TSA and BTSA'
+    fig = plt.figure(figsize=[10,6])
+    fig.canvas.set_window_title(title)
+    fig.suptitle(title)
+    fig.subplots_adjust(wspace=0.2)
+    for np in range(1,4):
+        ax = fig.add_subplot(1,3,np)
+        panel(ax, points=subsets[np], xaxis='phi', kinlabels=['Q2', 't'], **kwargs)
+        #ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(2.))
+        ax.set_xlabel('$\\phi\\; {\\rm [deg]}$', fontsize=16)
+        ax.set_ylabel('{}'.format(subsets[np][0].y1name), fontsize=18)
+        if np == 1:
+            ax.legend(loc='upper left', borderaxespad=0.).draw_frame(0)
+        if np == 3:
+            ax.set_ylim(0.0, 0.8)
+        else:
+            ax.set_ylim(-0.4, 0.4)
+    if path:
+        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+    else:
+        fig.canvas.draw()
+        fig.show()
+    return fig
+
+def CLAS15phi(path=None, fmt='png', **kwargs):
+    """Makes plot of CLAS 15 data phi-dependence with fit lines"""
+
+    title = 'CLAS-15-xs'
+    fig, axs = plt.subplots(2, 3, sharey='row', sharex=True, figsize=[14,8])
+    axs = axs.reshape(6)
+    fig.canvas.set_window_title(title)
+    panels = [
+       utils.select(data[98], criteria=['xB == 0.335', 'Q2 == 2.78', 't == -0.20']),
+       utils.select(data[98], criteria=['xB == 0.335', 'Q2 == 2.78', 't == -0.26']),
+       utils.select(data[98], criteria=['xB == 0.335', 'Q2 == 2.78', 't == -0.45']),
+       utils.select(data[97], criteria=['xB == 0.335', 'Q2 == 2.78', 't == -0.20']),
+       utils.select(data[97], criteria=['xB == 0.335', 'Q2 == 2.78', 't == -0.26']),
+       utils.select(data[97], criteria=['xB == 0.335', 'Q2 == 2.78', 't == -0.45'])
+               ]
+    for np, panelset in enumerate(panels):
+        ax = axs[np]
+        panel(ax, points=panelset, xaxis='phi', kinlabels=['xB', 'Q2', 't'], **kwargs)
+        ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(100))
+        ax.xaxis.set_minor_locator(matplotlib.ticker.MultipleLocator(50))
+        #ax.yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))
+        #ax.yaxis.set_minor_locator(matplotlib.ticker.MultipleLocator(0.02))
+        if np == 0:
+            # Take legend info on this panel
+            handles, labels = ax.get_legend_handles_labels()
+            # Draw legend on this panel
+            ax.legend(handles, labels, loc="upper center", borderaxespad=0.).draw_frame(0)
+            ax.set_ylabel(r'$d\sigma = d\sigma^{\leftarrow} + d\sigma^{\rightarrow}$', fontsize=20)
+        elif np == 3:
+            ax.set_ylabel(r'$\Delta\sigma = d\sigma^{\leftarrow} - d\sigma^{\rightarrow}$', fontsize=20)
+        else:
+            ax.set_ylabel('')
+        if np < 3:
+            # Remove x-axis label from upper panels
+            ax.set_xlabel('')
+        else:
+            ax.set_xlabel(r'$\phi\; {\rm [deg]}$', fontsize=16)
+        if np < 3:
+            ax.set_ylim(-0.03, 0.3)
+        else:
+            ax.set_ylim(-0.1, 0.1)
+    fig.subplots_adjust(wspace=0.0, hspace=0.0)
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
@@ -708,10 +1076,11 @@ def H1ZEUS(path=None, fmt='png', **kwargs):
     xs = ['t', 't', 'W', 'Q2']
     #title = 'H1 07 / ZEUS 08'
     title = ''
-    fig = plt.figure()
+    fig = plt.figure(figsize=[10,6])
     fig.canvas.set_window_title(title)
     fig.suptitle(title)
-    fig.subplots_adjust(bottom=0.1, hspace=0.3)
+    #fig.subplots_adjust(bottom=0.1, hspace=0.3)
+    #fig.subplots_adjust(wspace=0.2)
     for npanel in range(1,5):
         ax = fig.add_subplot(2,2,npanel)
         ax.set_yscale('log')  # y-axis to be logarithmic
@@ -746,6 +1115,61 @@ def H1ZEUS(path=None, fmt='png', **kwargs):
         else: # npanel==4
             ax.text(30, 3, '${\\rm ZEUS}\\, (idem)$', fontsize=16)
             #ax.set_xlim(0, 80)
+    if path:
+        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+    else:
+        fig.canvas.draw()
+        fig.show()
+    return fig
+
+def DVMP(path=None, fmt='png', **kwargs):
+    """Makes plot of H1 DVMP data with fit lines"""
+
+    subsets = {}
+    subsets[1] = [data[76]]
+    subsets[2] = [utils.select(H109WdepXL, criteria=['Q2 == 6.6']),
+            utils.select(H109WdepXL, criteria=['Q2 == 11.9']), 
+            utils.select(H109WdepXL, criteria=['Q2 == 19.5']), 
+            utils.select(H109WdepXL, criteria=['Q2 == 35.6'])]
+    subsets[3] = []
+    subsets[4] = [] 
+    xs = ['Q2', 'W', 't', 'Q2']
+    title = 'H1 DVMP'
+    fig = plt.figure()
+    fig.canvas.set_window_title(title)
+    fig.suptitle(title)
+    fig.subplots_adjust(bottom=0.1, hspace=0.3)
+    for npanel in range(1,3):
+        ax = fig.add_subplot(2,2,npanel)
+        ax.set_yscale('log')  # y-axis to be logarithmic
+        panel(ax, points=subsets[npanel], xaxis=xs[npanel-1], **kwargs)
+        #if npanel < 3:
+        #    ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.2))
+        # y labels
+        if npanel==1:
+            ax.set_ylabel('$\\sigma_L\\quad [{\\rm nb}]$', fontsize=18)
+        elif npanel==3:
+            ax.set_ylabel('$d\\sigma/dt\\quad [{\\rm nb/GeV}^2]$', fontsize=18)
+        else: # npanel 4
+            ax.set_ylabel('')
+        # x labels
+        if npanel==1:
+            ax.set_xlabel('$Q^2\\quad [{\\rm GeV}^2]$', fontsize=18)
+        elif npanel==2:
+            ax.set_xlabel('$W\\quad [{\\rm GeV}]$', fontsize=18)
+        #else: # npanel 4
+        #    ax.set_xlabel('$t\\quad [{\\rm GeV}^2]$', fontsize=18)
+        if npanel==1:
+            ax.text(15, 100, '${\\rm W = 75}\\, {\\rm GeV}$', fontsize=16)
+            ax.legend(loc='upper right', borderaxespad=0.).draw_frame(0)
+        if npanel==2:
+            ax.text(60, 300, '$Q^2 = 6.6,\\, 11.9,\\, 19.5,\\, 35.6\\, {\\rm GeV}^2$', fontsize=16)
+        #if npanel==3:
+        #    ax.text(50, 5, '${\\rm H1}\\, (idem):$', fontsize=16)
+        #else: # npanel==4
+        #    ax.text(30, 3, '${\\rm ZEUS}\\, (idem)$', fontsize=16)
+        #    #ax.set_xlim(0, 80)
+        ax.set_ylim(0.3, 1.e3)
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
@@ -1999,13 +2423,15 @@ def CFF2(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
     nncolors = ['blue', 'green']  # cold computer colors
     linestyles = ['solid', 'dashed']
     # Define abscissas
-    logxvals = np.logspace(-3.0, -0.01, 40)
+    ximin = 0.01
+    ximax = 0.3
+    logxvals = np.logspace(np.log10(ximin), np.log10(ximax), 40)
     # ordinates 
     #ylims = {'ImH': (-4.3, 35), 'ReH': (-6.5, 8)}
-    ylims = {'ImH': (-4.3, 35), 'ReH': (-6, 8),
-             'ImE': (-40, 35), 'ReE': (-15, 30),
+    ylims = {'ImH': (-4.3, 35), 'ReH': (-3.5, 2),
+             'ImE': (-40, 35), 'ReE': (-25, 5),
              'ImEt': (-50, 100), 'ReEt': (-50, 100),
-             'ImHt': (-10, 20), 'ReHt': (-10, 20)}
+             'ImHt': (-6.9, 6.9), 'ReHt': (-10, 20)}
     # Plot panels
     ts = [-0.3, -0.12]
     for n in range(len(cffs)):
@@ -2027,10 +2453,10 @@ def CFF2(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
             if nt == 1:
                 # no y tick labels on right panels
                 ax.set_yticklabels([])
-            if n == 0:
+            if n < len(cffs)-1:
                 # no x tick labels on upper panels
                 ax.set_xticklabels([])
-            if n == 1:
+            if n == len(cffs)-1:
                 # x-label only on lower panels
                 ax.set_xlabel(toTeX['xixB'], fontsize=18)
             if n == 0 and nt == 0:
@@ -2044,11 +2470,11 @@ def CFF2(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
                 #ax.text(0.33, 0.95, "data region", transform=ax.transAxes, 
                 #        fontsize=14, fontweight='bold', va='top')
             apply(ax.set_ylim, ylims[cff])
-            ax.set_xlim(0.005, 1.0)
+            ax.set_xlim(ximin, ximax)
             #ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.02))  # tickmarks
             for label in ax.get_xticklabels() + ax.get_yticklabels():
                 label.set_fontsize(14)
-    fig.subplots_adjust(bottom=0.5, wspace=0.0, hspace=0.0)
+    fig.subplots_adjust(bottom=0.4, wspace=0.0, hspace=0.0)
     if path:
         #fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
         fig.set_size_inches((14, 16))
@@ -2216,20 +2642,22 @@ def skewness(path=None, fmt='png', **kwargs):
         #ax.xaxis.set_major_formatter(matplotlib.ticker.FormatStrFormatter('%s'))
         ax.set_xlabel(toTeX['xixB'], fontsize=18)
         if kp == 1:
-            ax.set_ylabel('r_sea', fontsize=20)
+            ax.set_ylabel('$r^{\\rm sea}$', fontsize=20)
             ax.text(0.001, 0.3, "$Q^2 = 4\\, {\\rm GeV}^2$",# transform=ax.transAxes, 
                     fontsize=15)
         if kp == 2:
-            ax.set_ylabel('r_G', fontsize=20)
+            ax.set_ylabel('$r^{\\rm G}$', fontsize=20)
+            ax.legend(loc='upper right',
+                    borderaxespad=0.).draw_frame(0)
         #apply(ax.set_ylim, ylims[cff])
         ax.set_xlim(0.0001, 0.05)
-        ax.set_ylim(-0.2, 1.3)
+        ax.set_ylim(-0.2, 3.0)
         #ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.02))  # tickmarks
         for label in ax.get_xticklabels() + ax.get_yticklabels():
             label.set_fontsize(14)
         kp += 1
-    # Define abscissas
-    Q2vals = np.linspace(3, 40, 40)
+    # Define abscissas. Q2 can be expensive at NLO MSBAR
+    Q2vals = np.linspace(3, 40, 4)
     # Plot panels
     for obs in ['gpdHskewQ', 'gpdHskewG']:
         # all-x logarithmic
@@ -2240,14 +2668,14 @@ def skewness(path=None, fmt='png', **kwargs):
         ax.xaxis.set_major_formatter(matplotlib.ticker.FormatStrFormatter('%s'))
         ax.set_xlabel(toTeX['Q2'], fontsize=18)
         if kp == 3:
-            ax.set_ylabel('r_sea', fontsize=20)
+            ax.set_ylabel('$r^{\\rm sea}$', fontsize=20)
             ax.text(20, 0.4, "$\\xi = 0.001$",# transform=ax.transAxes, 
                     fontsize=15)
         if kp == 4:
-            ax.set_ylabel('r_G', fontsize=20)
+            ax.set_ylabel('$r^{\\rm G}$', fontsize=20)
         #apply(ax.set_ylim, ylims[cff])
         ax.set_xlim(3, 40)
-        ax.set_ylim(-0.2, 1.3)
+        ax.set_ylim(-0.2, 3.0)
         #ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(5.))  # tickmarks
         for label in ax.get_xticklabels() + ax.get_yticklabels():
             label.set_fontsize(14)
@@ -2325,8 +2753,8 @@ def bspace(th, parsets=False, path=None, fmt='png', error=False, **kwargs):
         ys = np.array(ys)
         if error:
             yup, ydown = np.array([(m+err, m-err) for m,err in ys]).transpose()
-            x = plt.concatenate( (bvals, bvals[::-1]) )
-            y = pt.xi*plt.concatenate( (yup, ydown[::-1]) )
+            x = np.concatenate( (bvals, bvals[::-1]) )
+            y = pt.xi*np.concatenate( (yup, ydown[::-1]) )
             ax.fill(x, y, alpha=0.5, color=colors[k+1], **kwargs)
         else:
             ax.plot(bvals, pt.xi*ys, color=colors[k])
@@ -2351,8 +2779,8 @@ def bspace(th, parsets=False, path=None, fmt='png', error=False, **kwargs):
         ys = np.array(ys)
         if error:
             yup, ydown = np.array([(m+err, m-err) for m,err in ys]).transpose()
-            x = plt.concatenate( (bvals, bvals[::-1]) )
-            y = pt.xi*plt.concatenate( (yup, ydown[::-1]) )
+            x = np.concatenate( (bvals, bvals[::-1]) )
+            y = pt.xi*np.concatenate( (yup, ydown[::-1]) )
             ax.fill(x, y, alpha=0.5, color=colors[k+1], **kwargs)
         else:
             ax.plot(bvals, pt.xi*ys, color=colors[k])
@@ -2377,8 +2805,8 @@ def bspace(th, parsets=False, path=None, fmt='png', error=False, **kwargs):
         ys = np.array(ys)
         if error:
             yup, ydown = np.array([(m+err, m-err) for m,err in ys]).transpose()
-            x = plt.concatenate( (bvals, bvals[::-1]) )
-            y = plt.concatenate( (yup, ydown[::-1]) )
+            x = np.concatenate( (bvals, bvals[::-1]) )
+            y = np.concatenate( (yup, ydown[::-1]) )
             ax.fill(x, y, alpha=0.5, color=colors[k+1], **kwargs)
         else:
             ax.plot(bvals, ys, color=colors[k])
@@ -2479,8 +2907,8 @@ def markus(th, error=False, path=None, fmt='png', **kwargs):
     ys = np.array(ys)
     if error:
         yup, ydown = np.array([(m+err, m-err) for m,err in ys]).transpose()
-        x = plt.concatenate( (bxs, bxs[::-1]) )
-        y = pt.xi*plt.concatenate( (yup, ydown[::-1]) )
+        x = np.concatenate( (bxs, bxs[::-1]) )
+        y = pt.xi*np.concatenate( (yup, ydown[::-1]) )
         ax.fill(x, y, alpha=0.7, color='blue', **kwargs)
     else:
         ax.plot(bxs, pt.xi*ys, color='blue')
@@ -2640,3 +3068,32 @@ def binplot(path=None, fmt='png', **kwargs):
         fig.canvas.draw()
         fig.show()
     return fig
+
+def plotpts(bin1, bin2=None, replica=None, FT=False, errors=False, path=None, fmt='png'):
+    """Plot pandas points in bin with errorbars."""
+    fig, ax = plt.subplots(1,1, figsize=[6,6])
+    if FT:
+        if errors:
+            ax.errorbar(bin1.index.values, bin1.FTval.values, bin1.FTerr.values, linestyle='None')
+        else:
+            ax.plot(bin1.index.values, bin1.FTval.values)
+    else:
+        if errors:
+            ax.errorbar(bin1.phi.values, bin1.val.values, bin1.err.values, linestyle='None')
+        else:
+            ax.plot(bin1.phi.values, bin1.val.values, marker='o')
+    if isinstance(bin2, pd.DataFrame):
+        if errors:
+            ax.errorbar(bin2.phi.values, bin2.val.values, bin2.err.values, color='red', linestyle='None')
+        else:
+            ax.plot(bin2.phi.values, bin2.val.values, color='red', marker='s')
+    if isinstance(replica, np.ndarray):
+        ax.plot(bin1.phi.values, replica, marker='o', color='red', linestyle='None')
+    if path:
+        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+    else:
+        fig.canvas.draw()
+        fig.show()
+    return fig
+
+

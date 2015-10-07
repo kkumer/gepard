@@ -17,17 +17,16 @@ import utils, Model, Approach, Data, Fitter
 
 from constants import Mp, Mp2
 
-m = Model.ComptonGepard(ansatz='FITBP', q02=2.5)
+m = Model.ComptonGepard(ansatz='FITBP', scheme='CSBAR',  q02=2.5)
 t = Approach.hotfixedBMK(m)
 
 # Setting gepard to values as in radNNLONS.F
 # (Fig. 12 of NPB08)
 
 t.m.g.parint.nf = 4
+t.m.g.parint.pid = 1
 t.m.g.astrong.asp = np.array([0.05, 0.05, 0.05])
 t.m.g.mbcont.phi = 1.9
-t.m.g.parchr.fftype = np.array([c for c in 'SINGLET   ']) # array(10)
-#t.m.g.parchr.fftype = np.array([c for c in 'NONSINGLET']) # array(10)
 
 # Seting model parameters to be as in test.F
 def setpar(i, val):
@@ -112,7 +111,6 @@ def test_radNLO():
     assert_almost_equal(m.ImH(pt), 201256.45352582674)
 
 test_radNLO.gepardsuite = 1
-test_radNLO.newfeature = 0
 
 def test_radNNLO():
     """Singlet NNLO CFF H"""
@@ -133,7 +131,6 @@ def test_radNNLO():
     assert_almost_equal(m.ImH(pt), 197331.78427187083)
 
 test_radNNLO.gepardsuite = 1
-test_radNNLO.newfeature = 0
 
 ## relo = 39544.823112887607
 ## imlo = 402367.23596533033

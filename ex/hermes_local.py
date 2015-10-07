@@ -106,7 +106,7 @@ for nextCFF in ['pReE']:
         #th.model.release_parameters('pImH', nextCFF)
         th.model.release_parameters('pImH', 'pReH', 'pImE', 'pReE', 'pImHt', 'pReHt', 'pImEt', 'pReEt')
         f = Fitter.FitterMinuit(bins[nbin], th)
-        #f.minuit.printMode = 2
+        #f.printMode = 2
         fl.write('\n')
         fl.write('-- Bin %2s: ' % (nbin+1,))
         sys.stdout.write('-- Bin %2s: \n' % (nbin+1,))

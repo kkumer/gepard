@@ -26,6 +26,7 @@ def test_basicNN():
                 (testNN.predict(pt) - pt.val)**2 / pt.err**2 )
     assert_almost_equal(chisq, 20.094357450964957)
 
+test_basicNN.long=1
 
 def test_fitNN():
     """Testing Neural Net fitting by FitterBrain."""

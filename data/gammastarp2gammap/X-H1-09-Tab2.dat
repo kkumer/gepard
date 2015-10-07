@@ -10,7 +10,8 @@ process = gammastarp2gammap
 exptype = collider
 year = 2009
 reference = arXiv:0907.5289 [hep-ex]
-reference2 = Table 3 [hepdata]
+reference2 = Table 2
+reference3 = Table 3 [hepdata]
 
 
 ### Scattering Process

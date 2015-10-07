@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 
 #from IPython.Debugger import Tracer; debug_here = Tracer()
 
@@ -110,7 +110,7 @@ def theory(id):
         th = Approach.BM10(m)
         th.name = 'KMM12'
         g = th.m.g
-        th.m.parameters.update(KM12a)
+        th.m.parameters.update(KMM12)
         return th
     else:
         sys.stdout.write('Unknown model: %d\n' % id)

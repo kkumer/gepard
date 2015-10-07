@@ -10,7 +10,7 @@ process = gammastarp2gammap
 exptype = collider
 year = 2005
 reference = hep-ex/0505061
-reference2 = Table 1
+reference2 = Table 3
 reference3 = Eur.Phys.J. C44 (2005) 1-11
 
 ### Scattering Process

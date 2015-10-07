@@ -127,7 +127,7 @@ for nbin in range(len(bins)):
     for cff in fitCFFs:
         th.model.release_parameters('p%s' % cff)
     f = Fitter.FitterMinuit(bins[nbin], th)
-    f.minuit.printMode = 0
+    f.printMode = 0
     fl.write('\n')
     fl.write('-- Bin %2s: ' % (nbin+1,))
     f.fit()

@@ -13,18 +13,23 @@ select -- selecting DataPoints according to criteria
 listdb --  listing the content of database of models
 hubDict -- merges two dicts, but not actually but by forwarding
 stringcolor -- coloring string for output, if possible
+FTF -- Fourier series fit
+FTFMC -- Fourier series fit with MC error propagation
+cvsets -- n-fold cross-validation sets
+FTanalyse -- Determine the number of harmonics present in bins according to 
+             n-fold cross-validation.
 """
 
 import os, re, string, fnmatch, itertools, logging
 import numpy as np
+import pandas as pd
 
 import Data, Approach
 from constants import Mp, Mp2
 
 #from IPython.Debugger import Tracer; debug_here = Tracer()
 _lg = logging.getLogger('p.%s' % __name__)
-_lg.setLevel('INFO')
-_lg.info('Loading module %s' % __name__)
+_lg.debug('Loading module %s' % __name__)
 
 
 class KinematicsError(Exception):
@@ -40,7 +45,7 @@ def loaddata(datadir='data', approach=False):
     """
     data = {}
     for file in os.listdir(datadir):
-        _lg.debug('Loading datafile %s' % file)
+        #_lg.debug('Loading datafile %s' % file)
         if os.path.splitext(file)[1] == ".dat":
             dataset = Data.DataSet(datafile=os.path.join(datadir, file))
             if approach and dataset.process == 'ep2epgamma':
@@ -271,10 +276,101 @@ def select(dataset, criteria=[], logic='AND'):
     return selected
 
 def listdb(db):
-    print "%-8s  |  %s" % ('name', 'description')
-    print "%-8s--+--%s" % (8*'-', 60*'-')
+    print "%-17s--+--%s" % (17*'-', 60*'-')
+    print "%-17s  |  %s" % ('name', 'description')
+    print "%-17s--+--%s" % (17*'-', 60*'-')
     for key in db:
-        print "%-8s  |  %s" % (key, db[key].description)
+        print "%-17s  |  %s" % (key, db[key].description)
+    #print "\n WARNING: gepard models are now likely broken. Reinitialize them!"
+
+def listdata(ids, data):
+    """List basic info about datasets specified by id numbers."""
+    if not isinstance(ids, list): ids = [ids]
+    for id in ids:
+        try:
+            dt = data[id]
+            ref = dt.reference.replace('arXiv:', '').replace('hep-ex', '').replace('nucl-ex', '').replace('from Morgan Murray, draft_90@hermes.desy.de, J. Burns and M. Murray', 'Morgan M.').replace('v1', '').replace('F. Ellinghaus, QCD02', 'Frank E.').replace('PRELIMINARY', 'prelim.').strip('[]/ ')
+            try:
+                ref2 = dt.reference2
+            except:
+                ref2 =  ''
+            print '[%3i] %8s %3i %9s %10s %s' % (dt.id, dt.collaboration, len(dt), dt.y1name, ref, ref2)
+        except KeyError:
+            pass
+
+def listchis(ths, Q2cut=2., Q2max=1.e3, nsets=0):
+    """Compare chi-squares of theories for subsets of data."""
+    if not isinstance(ths, list): ths = [ths]
+    from abbrevs import H1ZEUS, ALUIpts, BCApts, CLASpts, BSDwpoints, BSSwpoints,\
+            AULpts, ALLpts, AUTIpts, CLAS14BSApts, CLAS14TSApts, CLAS14BTSApts,\
+            BSACLAS_KKpoints, UNP5points, ALTGLO5points, BSACLAS_DMpoints, CLASTSApts,\
+            AUTICSpts, CLASKKpts, AUTDVCSpts, H_AULpts, C_AULpts,\
+            H_BSDwpts, H_BSSw0pts, H_BSSw1pts,\
+            C_BSDwpts, C_BSSw0pts, C_BSSw1pts
+    #exps[0] = ['UNP5points', 'ALTGLO5', 'CLAS', 'CLASDM', 'BSDw', 'BSSw', 'TSA1', 'BTSA', 'TPpoints']
+    #ptssets[0] = [UNP5points, ALTGLO5points, data[25], data[8], BSDwpoints, BSSwpoints, TSA1points, BTSApoints, TPpoints]
+    sets = {}
+    sets[0] = [('H1ZEUS', 'X_DVCS', H1ZEUS), ('HERMES', 'ALUI', ALUIpts),
+            ('HERMES', 'BCA', BCApts), ('CLAS', 'BSA', CLASpts),
+            ('Hall A', 'BSDw', BSDwpoints), ('Hall A', 'BSSw', BSSwpoints),
+            ('HRM/CLS', 'AUL', AULpts), ('HERMES', 'ALL', ALLpts),
+            ('HERMES', 'AUTI', AUTIpts)]
+    sets[1] = [('CLAS07_KK', 'BSA', BSACLAS_KKpoints),
+               ('CLAS14_KK', 'BSA', CLAS14BSApts),
+               ('CLAS14_KK', 'TSA', CLAS14TSApts), 
+               ('CLAS14_KK', 'BTSA', CLAS14BTSApts)]
+    sets[2] = [('CLAS07_DM', 'BSA', BSACLAS_DMpoints),
+               ('CLAS06', 'TSA', CLASTSApts),
+               ('CLAS14_KK', 'BSA', CLAS14BSApts),
+               ('CLAS14_KK', 'TSA', CLAS14TSApts), 
+               ('CLAS14_KK', 'BTSA', CLAS14BTSApts)]
+    sets[3] = [('CLAS0708', 'BSA', CLASKKpts),
+            ('CLAS', 'AUL', C_AULpts), 
+            ('CLAS14_KK', 'BSA', CLAS14BSApts),
+            ('CLAS14_KK', 'TSA', CLAS14TSApts), 
+            ('CLAS14_KK', 'BTSA', CLAS14BTSApts)]
+    sets[4] = [ ('HERMES', 'BCA', BCApts), 
+            ('HERMES', 'ALUI', ALUIpts),
+            ('HERMES', 'AUL', H_AULpts), 
+            ('HERMES', 'ALL', ALLpts),
+            ('HERMES', 'AUTI', AUTIpts),
+            ('HERMES', 'AUTICS', AUTICSpts),
+            ('HERMES', 'AUTDVCS', AUTDVCSpts)]
+    sets[5] = [('H1ZEUS', 'X_DVCS', H1ZEUS), ('HERMES', 'ALUI', ALUIpts),
+            ('HERMES', 'BCA', BCApts), ('CLAS', 'BSA', CLASpts),
+            ('HRM/CLS', 'AUL', AULpts), ('HERMES', 'ALL', ALLpts),
+            ('HERMES', 'AUTI', AUTIpts),
+            ('CLAS', 'BSDw_s1', C_BSDwpts), ('CLAS', 'BSSw_c0', C_BSSw0pts),
+            ('CLAS', 'BSSw_c1', C_BSSw1pts),
+            ('Hall A', 'BSDw_s1', H_BSDwpts), ('Hall A', 'BSSw_c0', H_BSSw0pts),
+            ('Hall A', 'BSSw_c1', H_BSSw1pts)
+            ]
+    #exps[2] = ['H1ZEUS DVCS', 'H1-09 XL', "H1-09 W-dep"]
+    #ptssets[2] = [H1ZEUS, H109XL, H109WdepXL]
+    #exps[3] = ['CLAS07 BSA', 'CLAS14 BSA', 'CLAS14 TSA', 'CLAS14 BTSA']
+    #ptssets[3] = [BSACLAS_KKpoints, CLAS14BSApts, CLAS14TSApts, CLAS14BTSApts]
+    names = [th.name[:10] for th in ths]
+    sublines = ['------' for th in ths]
+    ftit = 21*' ' + len(names)*'{:^10s}'
+    fstr = '{:9s} {:7s}: ' + len(names)*'{:10.2f}' + '   (np ={dof:3d})'
+    print ftit.format(*names)
+    print ftit.format(*sublines)
+    total_chis = np.array([0. for th in ths])
+    total_npts = 0
+    for collab, obs, pts in sets[nsets]:
+        cutpts = select(pts, criteria=['Q2>=%f' % Q2cut, 'Q2<=%f' % Q2max])
+        chis = [th.chisq(cutpts)[0] for th in ths]
+        total_chis += np.array(chis)
+        npts = len(cutpts)
+        total_npts += npts
+        # version with chis/npts printed:
+        chis = [chi/npts for chi in chis]
+        print fstr.format(collab, obs, *chis, dof=npts)
+    # version with chisq/npts:
+    total_chis = total_chis/total_npts
+    print ftit.format(*sublines)
+    print fstr.format('===', 'TOTAL', *total_chis.tolist(), dof=total_npts)
+
 
 
 class hubDict(dict):
@@ -353,3 +449,133 @@ def stringcolor(a, c, colors=False):
         return colored(a, c)
     else:
         return _fakecolor(a, c)
+
+def FTF(data, cosmax=None, sinmax=None, inverse=False):
+    """Fourier series fit to data (takes and returns pandas dataframe).
+    
+    cosmax, sinmax  - index of highest harmonics
+    inverse = True  - data values ARE harmonics, calculate function(phi)
+    
+    """
+    N = len(data)
+    # If length of series is not specified by the user, use maximal one
+    #   which makes this fit equal to DFT
+    if not cosmax and not (cosmax == 0):
+        cosmax = int((N-1)/2.)  # maximal cos harmonic
+    if not sinmax and not (sinmax == 0):
+        sinmax = cosmax + ((N-1) % 2)  # maximal sin harmonic
+    nharm = 1 + cosmax + sinmax  # number of harmonics
+    A = np.array([[np.cos(n*phi) for n in range(cosmax+1)] + [np.sin(n*phi) for n in range(1,sinmax+1)] for phi in data.phi.values])
+    B = data.val.values
+    if not inverse:
+        res = np.linalg.lstsq(A, B)
+        #print "Sum of residuals = {}".format(res[1])
+        z = np.zeros(N-len(res[0]), dtype=A.dtype)
+        vals = np.concatenate((res[0], z), axis=1)
+        df = pd.DataFrame({'phi': data.phi.values, 'val': vals})
+        #print "Number of harmonics = {}".format(nharm)
+    else:
+        res = np.dot(A, B[:nharm])
+        df = pd.DataFrame({'phi': data.phi.values, 'val': res})
+    return df
+
+
+def FTFMC(data, nsamples=100, cosmax=None, sinmax=None, inverse=False):
+    """Fourier series fit to data with MC error propagation (takes and returns pandas dataframe).
+    
+    cosmax, sinmax  - index of highest harmonics
+    inverse = True  - data values ARE harmonics, calculate function(phi)
+    
+    """
+    N = len(data)
+    # If length of series is not specified by the user, use maximal one
+    #   which makes this fit equal to DFT
+    if not cosmax and not (cosmax == 0):
+        cosmax = int((N-1)/2.)  # maximal cos harmonic
+    if not sinmax and not (sinmax == 0):
+        sinmax = cosmax + ((N-1) % 2)  # maximal sin harmonic
+    nharm = 1 + cosmax + sinmax  # number of harmonics
+    A = np.array([[np.cos(n*phi) for n in range(cosmax+1)] + [np.sin(n*phi) for n in range(1,sinmax+1)] for phi in data.phi.values])
+    B = np.transpose((np.ones((nsamples,N))*data.val.values + np.random.randn(nsamples,N)*data.err.values))  # replicas
+    if not inverse:
+        res = np.linalg.lstsq(A, B)
+        z = np.zeros((nsamples, N-len(res[0])), dtype=A.dtype)
+        vals = np.concatenate((res[0].T, z), axis=1)
+        df = pd.DataFrame({'phi': data.phi.values, 'val': vals.mean(axis=0), 'err': vals.std(axis=0)})
+        #print "Number of harmonics = {}".format(nharm)
+    else:
+        res = np.dot(A, B[:nharm])
+        df = pd.DataFrame({'phi': data.phi.values, 'val': res.mean(axis=1), 'err': res.std(axis=1)})
+    return df
+
+
+def cvsets(df_in, nfolds=3, shuffle=True):
+        """Return n-fold cross-validation sets [(train1, valid1), (train2, valid2), ...].
+        
+        Copies data.
+        
+        """
+        if shuffle:
+            df = df_in.reindex(np.random.permutation(df_in.index))
+        else:
+            df = df_in.copy()
+        # stolen from sklearn
+        n = len(df)
+        fold_sizes = (n // nfolds) * np.ones(nfolds, dtype=np.int)
+        fold_sizes[:n % nfolds] += 1
+        current = 0
+        chunks = []
+        for fold_size in fold_sizes:
+            start, stop = current, current + fold_size
+            #yield obj.idxs[start:stop]
+            chunks.append(df[start:stop])
+            current = stop
+        sets = []
+        # my ugly coding
+        for f in range(nfolds):
+            inds = range(nfolds)
+            k = inds.pop(f)
+            train = chunks[inds[0]]
+            for i in inds[1:]:
+                train = train.append(chunks[i])
+            sets.append([train, chunks[f]])
+        return sets
+
+
+def FTanalyse(bins, HMAX=2, NS=1000, nf=3, Nrep=1):
+    """Determine the number of harmonics present in bins according to n-fold cross-validation.
+
+       bins - dictionary with bins
+       HMAX - highest harmonic used in searches
+         NS - number of replicas for MC error propagation
+       Nrep - number of CV repetitions (probably wrong to make > 1)
+         nf - number of folds for cross-validation
+
+    """
+
+    mins = []
+    for nn in range(Nrep):
+        for k in bins:
+            df = bins[k]
+            err_min = 100
+            for CM in range(HMAX+1):
+                for SM in range(HMAX+1):
+                    errs = []
+                    for cvtrain, cvtest in cvsets(df, nfolds=nf):
+                        cvtest.reset_index(drop=True, inplace=True)
+                        dfo = FTFMC(cvtrain, nsamples=NS, cosmax=CM, sinmax=SM)[:len(cvtest)]
+                        dfo['phi'] = cvtest['phi']
+                        errs.append(((FTFMC(dfo, nsamples=NS, cosmax=CM, sinmax=SM, inverse=True)
+                          -cvtest)**2).val.values.sum())
+                    errs = np.array(errs)
+                    err = errs.mean() / (len(cvtest)-CM-SM-1)
+                    #print CM, SM, err
+                    if err <= err_min:
+                        err_min = err
+                        h_min = (CM, SM)
+            mins.append(h_min)
+    nc, ns = np.array(mins).mean(axis=0)
+    delc, dels = np.array(mins).std(axis=0)
+    print "Highest extractable cos harmonic = {:.3f} +- {:.3f}".format(nc, delc)
+    print "Highest extractable sin harmonic = {:.3f} +- {:.3f}\n".format(ns, dels)
+    return int(np.round(nc)), int(np.round(ns))

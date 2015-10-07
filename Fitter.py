@@ -1,18 +1,17 @@
 """Classes for fitting."""
 #from IPython.Debugger import Tracer; debug_here = Tracer()
 
-import sys, logging
+import sys, logging, warnings
 
 import numpy as np
 
-#FIXME: this is needed only for FitterMinuit. It should
-# not raise exception on systems without pyminuit installed
-# after another Fitter is implemented, say NN
-try: # if you have ROOT you might want minuit2
-    from minuit2 import Minuit2 as Minuit
+try:
+    from iminuit import Minuit, InitialParamWarning
 except:
-    from minuit import Minuit
+    pass
 
+# FIXME: maybe we should not switch this off so bluntly
+warnings.simplefilter('ignore', InitialParamWarning, append=False)
 
 _lg = logging.getLogger('p.%s' % __name__)
 #_lg.setLevel('logging.INFO')
@@ -40,6 +39,7 @@ class FitterMinuit(Fitter):
     def __init__(self, fitpoints, theory, **kwargs):
         self.fitpoints = fitpoints
         self.theory = theory
+        self.printMode = 0 # since iminuit doesn't have it
 
         # FIXME: ugly hack because Minuit counts the arguments of fcn so 'self'
         #        is not allowed
@@ -54,7 +54,7 @@ def fcn(%s):
     theory.model.parameters.update({%s})
     new = [%s]
     if theory.model.__dict__.has_key('Gepard'):
-        theory.model.ndparameters.put(range(theory.model.DR.ndparameters.size), new[:20])
+        theory.model.ndparameters.put(range(theory.model.DR.ndparameters.size), new[:50])
     else:
         theory.model.ndparameters.put(range(theory.model.ndparameters.size), new)
     chisq = 0.
@@ -77,12 +77,12 @@ def fcn(%s):
 
     def fit(self):
         self.minuit.migrad()
-        if self.minuit.printMode > 0:
+        if self.printMode > 0:
             print "ncalls = \n", self.minuit.ncalls
             self.theory.print_chisq(self.fitpoints)
         # Set/update covariance matrix of model:
         self.theory.model.covariance = self.minuit.covariance
-        if self.minuit.printMode > 0:
+        if self.printMode > 0:
             print ""
             self.theory.model.print_parameters_errors(pvalues=True, 
                     ndof=len(self.fitpoints)-utils.npars(self.theory.model))

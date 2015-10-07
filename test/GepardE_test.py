@@ -9,8 +9,9 @@ import numpy as np
 import utils, Model, Approach, Data
 from math import exp
 
-m = Model.ComptonGepard(ansatz='EPH')
+m = Model.ComptonGepard(ansatz='EPH', scheme='CSBAR')
 t = Approach.hotfixedBMK(m)
+t.m.g.parint.pid = 1
 
 # 11 : 'NS',        112 : 'EAL0S',
 # 12 : 'AL0S',      113 : 'EALPS',

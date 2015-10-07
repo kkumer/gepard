@@ -12,14 +12,14 @@ import utils, Model, Approach, Data, Fitter
 
 from constants import Mp, Mp2
 
-m = Model.ComptonGepard(process='DVCS', ansatz='FITBP', q02=2.5)
+m = Model.ComptonGepard(ansatz='FITBP', q02=2.5)
 t = Approach.hotfixedBMK(m)
 # Setting gepard to values as in radNLONS.F
 # (Fig. 7 of NPB08)
 t.m.g.parint.nf = 4
+t.m.g.parint.pid = 1
 t.m.g.astrong.asp = np.array([0.05, 0.05, 0.05])
-t.m.g.parchr.fftype = np.array([c for c in 'SINGLET   ']) # array(10)
-t.m.g.parchr.scheme = np.array([c for c in 'MSBAR']) # array(?)
+#t.m.g.parchr.scheme = np.array([c for c in 'MSBAR']) # array(?)
 t.m.g.mbcont.phi = 1.9
 
 # Seting model parameters to be as in test.F
@@ -65,13 +65,8 @@ pt.xi = 1.e-5
 pt.xB = 2*pt.xi/(1.+pt.xi)
 
 
-def test_radMSBARLO():
+def test_radMSBARLOevol():
     """Singlet LO CFF H evolved"""
-    #FIXME: how to avoid this:
-    try:
-        del t.m.qdict[pt.Q2]
-    except:
-        pass
     t.m.g.parint.p = 0
     t.m.g.newcall = 1
     t.m.g.init()
@@ -79,20 +74,16 @@ def test_radMSBARLO():
     assert_almost_equal(m.ImH(pt)/1e5, 1015357.1865059549/1e5)
 
 
-test_radMSBARLO.gepardsuite = 1
+test_radMSBARLOevol.gepardsuite = 1
 
 
-def test_radMSBARNLO():
+def test_radMSBARNLOevol():
     """Singlet NLO MSBAR CFF H evolved"""
-    #FIXME: how to avoid this:
-    try:
-        del t.m.qdict[pt.Q2]
-    except:
-        pass
     t.m.g.parint.p = 1
     t.m.g.newcall = 1
     t.m.g.init()
     assert_almost_equal(m.ReH(pt)/1e5, 142867.21556625995/1e5)
     assert_almost_equal(m.ImH(pt)/1e5, 653095.26655367797/1e5)
 
-test_radMSBARNLO.gepardsuite = 1
+test_radMSBARNLOevol.gepardsuite = 1
+test_radMSBARNLOevol.long = 1

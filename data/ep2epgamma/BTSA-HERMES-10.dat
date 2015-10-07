@@ -23,10 +23,10 @@ in1energy = 27.6
 in1energyunit = GeV
 in1polarizationvector = L
 in1polarization = +1
-in2polarizationvector = L
-in2polarization = +1
 
 in2particle = p
+in2polarizationvector = L
+in2polarization = +1
 
 out1particle = e+
 out2particle = p

@@ -2552,7 +2552,7 @@ True, 'DELM2G': 0.0}
 # CPU times: user 10358.86 s
 # Wall time: 2622.22 s
 
-KM12a = {'tMv': 3.5226287743963187, 'rS': 1.0, 'limit_tbv':
+KMM12 = {'tMv': 3.5226287743963187, 'rS': 1.0, 'limit_tbv':
 (0.40000000000000002, 5.0), 'rpi': 3.8374938533117451, 'fix_Mv': False,
 'fix_Mpi': False, 'alv': 0.42999999999999999, 'fix_bv': False, 'Mpi':
 3.999677971145172, 'Nv': 1.3500000000000001, 'fix_trv': False, 'limit_C':
@@ -2592,7 +2592,7 @@ True, 'limit_EM02S': (0.10000000000000001, 1.5), 'fix_ESECG': True, 'AL0G':
 'DELM2S': 0.0, 'fix_ESKEWG': True, 'ALPG': 0.14999999999999999, 'fix_SKEWS':
 True, 'DELM2G': 0.0} 
 
-KM12acov = {('MC', 'Mv'): -0.45030621597105341, ('trv', 'SECG'):
+KMM12cov = {('MC', 'Mv'): -0.45030621597105341, ('trv', 'SECG'):
 -0.00030672813728462489, ('C', 'tMv'): 0.09725954954962622, ('SECS', 'THIS'):
 -0.0004524745034635307, ('Mv', 'Mv'): 0.079353895568660432, ('SECG', 'MC'):
 -0.026881878150468587, ('M02S', 'bv'): 3.1542236080851275e-10, ('rpi', 'Mv'):
@@ -2736,9 +2736,204 @@ dvmppars = {
  'THIS': 0.089
 }
 
+nloNLOMSParameters = {
+     "NS": 0.1678001855399918,
+     "AL0S": 1.1283507054223731,
+     "ALPS": 0.15,
+     "M02S": 0.5903387154604478,
+     "DELM2S": 0.,
+     "PS": 2.,
+     "SECS": 0.04146596548203286,
+     "KAPS": 0.,
+     "SKEWS": 0.,
+     "AL0G": 1.0990016751643479,
+     "ALPG": 0.15,
+     "M02G": 0.7,
+     "DELM2G": 0.,
+     "PG": 2.,
+     "SECG": 0.02028213804881288,
+     'THIG': 0.,
+     'THIS': 0.,
+     "KAPG": 0.,
+     "SKEWG": 0.}
+ 
+# from smallx-final.nb
+
+StartParameters = {
+ "NS": 0.15, "AL0S": 1.0, "ALPS": 0.15, "M02S": 1.0, "DELM2S": 0.0, "PS": 2.0,
+ "SECS": 0.0, "KAPS": 0.0, "SKEWS": 0.0,
+ "AL0G": 1.1, "ALPG": 0.15, "M02G": 0.7, "DELM2G": 0.0, "PG": 2.0,
+ "SECG": 0.0, "KAPG": 0.0, "SKEWG": 0.0}
 
 
 
+sumLOParameters = {
+     "NS": 0.15203911208796006, "AL0S": 1.1575060246398083, 
+     "ALPS": 0.15, "M02S": 0.41768649210641556, "DELM2S": 0., "PS": 2., 
+     "SECS": 0., "KAPS": 0., "SKEWS": -10.502775850357269, 
+     "AL0G": 1.247316701070471, "ALPG": 0.15, "M02G": 0.7, 
+     "DELM2G": 0., "PG": 2., "SECG": 0., 
+     "KAPG": 0., "SKEWG": -31.889948002702166}
 
+LODISParameters = {
+     "NS": 0.15203911208796006, "AL0S": 1.1575060246398083, 
+     "ALPS": 0.15, "M02S": 1., "DELM2S": 0., "PS": 2., "SECS": 0., "KAPS": 0., 
+     "SKEWS": 0., "AL0G": 1.247316701070471, "ALPG": 0.15, "M02G": 0.7, 
+     "DELM2G": 0., "PG": 2., "SECG": 0., "KAPG": 0., "SKEWG": 0.}
+ 
+NLODISParameters = {
+     "NS": 0.1678001855399918, "AL0S": 1.1283507054223731, "ALPS": 0.15, "M02S": 1., 
+     "DELM2S": 0., "PS": 2., "SECS": 0., "KAPS": 0., "SKEWS": 0., 
+     "AL0G": 1.0990016751643479, "ALPG": 0.15, "M02G": 0.7, "DELM2G": 0., "PG": 2., 
+     "SECG": 0., "KAPG": 0., "SKEWG": 0.}
+ 
+NNLODISParameters = {
+     "NS": 0.17163282857219522, "AL0S": 1.1251653484541477, "ALPS": 0.15, "M02S": 1., 
+     "DELM2S": 0., "PS": 2., "SECS": 0., "KAPS": 0., "SKEWS": 0., 
+     "AL0G": 1.1042244128306518, "ALPG": 0.15, "M02G": 0.7, "DELM2G": 0., "PG": 2., 
+     "SECG": 0., "KAPG": 0., "SKEWG": 0.}
+
+
+# DM to {"ep2epgamma-BSA-CLAS-07_DM", "ep2epgamma-BSA-CLAS-14_KK",
+# "ep2epgamma-TSA-CLAS-06_DM",
+# Hold["ep2epgamma-TSA-CLAS-14_KK",  out -> {"row", Range[9]}],
+# "ep2epgamma-BTSA-CLAS-14_KK"}:
+KM14prelim2 = {"NS" : 0.152, "AL0S" : 1.1575, "ALPS" : 0.15, "M02S" : 0.4623,
+"DELM2S" : 0., "PS" : 2., "SECS" : 0.3126, "THIS" : -0.1383, "SKEWS" : 0.,
+"KAPS" : 0., "AL0G" : 1.2473, "ALPG" : 0.15, "M02G" : 0.7,
+"DELM2G" : 0., "PG" : 2., "SECG" : -2.7706, "THIG" : 0.9447, "SKEWG" : 0.,
+"KAPG" : 0., "rv" : 0.9183, "Mv" : 7.0436, "bv" :
+1.5619, "C" : 3.55, "MC" : 14.0617, "trv" : 0.7123, 'tNv' : 0.6,
+"tMv" : 71.3752, "tbv" : 0.0329, "rpi" : -0.1192,  "Mpi" : -1.7842}
+
+#'10p CLAS14pts+CLASKKpts chi=68.08/45'
+KM14prelim3 =  {'tMv': 3.9996031064812185, 'rS': 1.0, 'limit_tbv': (0.4, 5.0), 'rpi':
+-3.0858893984512514, 'fix_Mv': False, 'fix_Mpi': False, 'alv': 0.43,
+'fix_bv': False, 'Mpi': 0.40000640157904166, 'Nv': 1.35, 'fix_trv':
+False, 'limit_C': (-10.0, 10.0), 'rv': 1.3724369911814596, 'fix_tNv':
+True, 'fix_MC': False, 'Nsea': 0.0, 'fix_MS': True, 'limit_trv': (0.0,
+    8.0), 'limit_rv': (0.0, 8.0), 'alS': 1.13, 'fix_bS': True, 'alpS':
+0.15, 'limit_Mpi': (0.4, 4.0), 'C': 3.2724283907039293, 'tNv': 0.6,
+'limit_Mv': (0.4, 4.0), 'limit_tMv': (0.4, 4.0), 'limit_bS': (0.4,
+    5.0), 'fix_alpv': True, 'tbv': 0.4000000643505111, 'fix_alv': True,
+'limit_rpi': (-8, 8.0), 'bv': 2.3873100146028787, 'Mv':
+1.9193570137272777, 'fix_rS': True, 'fix_Nv': True, 'fix_tbv': False,
+'fix_rpi': False, 'alpv': 0.85, 'MC': 3.9970571477083845, 'fix_Nsea':
+True, 'fix_alpS': True, 'fix_rv': False, 'limit_bv': (0.4, 5.0),
+'limit_MC': (0.4, 4.0), 'fix_alS': True, 'MS': 0.707, 'bS': 2.0,
+'fix_C': False, 'fix_tMv': False, 'trv': 0.7751844206882592,
+'EAL0G': 1.1, 'KAPS': 0.0, 'fix_ALPG': True, 'EDELM2S': 0.0, 'EPS': 2.0,
+'EAL0S': 1.0, 'KAPG': 0.0, 'fix_ETHIG': True, 'EPG': 2.0,
+'EDELM2G': 0.0, 'SECG': -3.6690463094828325, 'EKAPG': 0.0,
+'ESKEWG': 0.0, 'fix_KAPG': True, 'ND': 1.0, 'M02S':
+0.4589156572100678, 'NG': 0.5, 'fix_KAPS': True, 'SECS':
+0.3063625097222349, 'EKAPS': 0.0, 'NS': 0.15203906032398054,
+'fix_PG': True, 'ALPS': 0.15, 'fix_EM02G': True, 'fix_DELM2S':
+True, 'SKEWG': 0.0, 'fix_EM02S': True, 'SKEWS': 0.0, 'fix_ALPD':
+True, 'fix_THIS': True, 'fix_ESKEWS': True, 'fix_ETHIS': True,
+'fix_ND': True, 'fix_NG': True, 'THIS': -0.1365057344264743,
+'fix_EDELM2S': True, 'fix_NS': True, 'fix_THIG': True, 'fix_DELB':
+True, 'THIG': 1.405958513189682, 'fix_EDELM2G': True, 'fix_EPG':
+True, 'fix_ALPS': True, 'ETHIG': 0.0, 'ESECS': 0.0, 'fix_EAL0G':
+True, 'fix_SECG': True, 'ETHIS': 0.0, 'ESECG': 0.0, 'fix_EPS':
+True, 'fix_EAL0S': True, 'fix_SECS': True, 'PS': 2.0, 'EALPG':
+0.15, 'M02D': 1.0, 'EM02S': 1.0, 'fix_AL0S': True, 'fix_EALPG':
+True, 'fix_M02D': True, 'fix_M02G': True, 'EALPS': 0.15, 'ESKEWS':
+0.0, 'EM02G': 0.7, 'PG': 2.0, 'fix_EALPS': True, 'limit_M02G':
+(0.3, 1.5), 'fix_M02S': True, 'fix_DELM2G': True, 'fix_AL0G': True,
+'fix_AL0D': True, 'AL0S': 1.1575156821191919, 'DELB': 0.0,
+'fix_ESECS': True, 'fix_PS': True, 'ALPD': 1.0, 'limit_EM02S':
+(0.1, 1.5), 'fix_ESECG': True, 'AL0G': 1.2473482995913796, 'AL0D':
+0.5, 'limit_EM02G': (0.1, 1.5), 'limit_M02S': (0.3, 1.5), 'M02G':
+0.7, 'fix_SKEWG': True, 'DELM2S': 0.0, 'fix_ESKEWG': True, 'ALPG':
+0.15, 'limit_M02D': (0.1, 1.5), 'fix_SKEWS': True, 'DELM2G': 0.0}
+
+# DM: 2014-10-03 
+#parameters to 1.17 fit to {"ep2epgamma-ALUI-HERMES-12",
+#"ep2epgamma-BCA-HERMES-12", "ep2epgamma-TSA-HERMES-10_DM",
+#"ep2epgamma-BTSA-HERMES-10",
+#"ep2epgamma-BSA-CLAS-07_KK", "ep2epgamma-BSA-CLAS-14_KK",
+#"ep2epgamma-TSA-CLAS-06", "ep2epgamma-TSA-CLAS-14_KK",
+#"ep2epgamma-BTSA-CLAS-14_KK"}
+KM14prelim4 = {"NS" : 0.152, "AL0S" : 1.1575, "ALPS" : 0.15, "M02S" : 0.4623,
+"DELM2S" : 0., "PS" : 2., "SECS" : 0.3126, "THIS" : -0.1383,                           
+"SKEWS" : 0., "KAPS" : 0., "AL0G" : 1.2473, "ALPG" : 0.15,  
+"M02G" : 0.7, "DELM2G" : 0., "PG" : 2., "SECG" : -2.7706,               
+"THIG" : 0.9447, "SKEWG" : 0., "KAPG" : 0., "rv" : 0.7465,
+"Mv" : 0.7432, "bv" : 0.0213, "C" : 1.7223, "MC" : 0.4368,                            
+"tal" : -1.0768, "talp" : 0., "trv" : 15.536, "tMv" : 49.5954,
+"tbv" : 4.8704, "rpi" : -3.3805, "Mpi" : 0.5, "rEv" : 0.,
+"MEv" : 1., "bEv" : 1., 'tNv' : 0.6}
+
+# DM 2015-05-06
+KMM12p = {'AL0G': 1.2473,
+ 'AL0S': 1.1575,
+ 'ALPG': 0.15,
+ 'ALPS': 0.15,
+ 'DELM2G': 0.0,
+ 'DELM2S': 0.0,
+ 'KAPG': 0.0,
+ 'KAPS': 0.0,
+ 'M02G': 0.7000000000000001,
+ 'M02S': 0.46230000000000004,
+ 'MC': 6.7416,
+ 'Mpi': 0.0126,
+ 'Mv': 0.7548,
+ 'NS': 0.152,
+ 'PG': 2.0,
+ 'PS': 2.0,
+ 'SECG': -2.7706,
+ 'SECS': 0.3126,
+ 'SKEWG': 0.0,
+ 'SKEWS': 0.0,
+ 'THIG': 0.9447000000000001,
+ 'THIS': -0.1383,
+ 'bv': 0.337,
+ 'C': -1.3962,
+ 'rpi': 3.3218,
+ 'rv': 1.3171000000000002,
+ 'tMv': 27.3551,
+ 'tbv': 3.331,'tNv' : 0.6, 
+ 'trv': 0.012100000000000001}
+
+KMM12b = {"NS" : 0.152, "AL0S" : 1.1575, "ALPS" : 0.15, 
+ "M02S" : 0.4466, "DELM2S" : 0., "PS" : 2., "SECS" : -0.4616, 
+ "THIS" : 0.0952, "SKEWS" : 0., "KAPS" : 0., "AL0G" : 1.2473, 
+ "ALPG" : 0.15, "M02G" : 0.7000000000000001, "DELM2G" : 0., 
+ "PG" : 2., "SECG" : -2.5356, "THIG" : 0.9664, "SKEWG" : 0., 
+ "KAPG" : 0., "rv" : 0.8586, "Mv" : 1.2687000000000002, 
+ "bv" : 0.4091, "C" : 2.5122, "MC" : 0.8669, "trv" : 0.9513, 'tNv' : 0.6, 
+ "tMv" : 1.6837, "tbv" : 1.0211000000000001, "rpi" : 3.2866, 
+ "Mpi" : 19.6189}
+
+KMM12pp = {'AL0G': 1.2473,
+ 'AL0S': 1.1575,
+ 'ALPG': 0.15,
+ 'ALPS': 0.15,
+ 'DELM2G': 0.0,
+ 'DELM2S': 0.0,
+ 'KAPG': 0.0,
+ 'KAPS': 0.0,
+ 'M02G': 0.7,
+ 'M02S': 0.4623,
+ 'MC': 20.2703,
+ 'Mpi': 0.0234,
+ 'Mv': 0.739,
+ 'NS': 0.152,
+ 'PG': 2.0,
+ 'PS': 2.0,
+ 'SECG': -2.7706,
+ 'SECS': 0.3126,
+ 'SKEWG': 0.0,
+ 'SKEWS': 0.0,
+ 'THIG': 0.9447,
+ 'THIS': -0.1383,
+ 'bv': 0.7735,
+ 'C': -1.2835,
+ 'rpi': 2.1354,
+ 'rv': 1.5499,
+ 'tMv': 31.7458,
+ 'tbv': 5.671,
+ 'trv': 0.0168}
 
 

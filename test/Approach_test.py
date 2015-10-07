@@ -19,7 +19,8 @@ tBM10 = Approach.BM10(mBM10, optimization = False)
 # Optimized model
 mopt = Model.ModelDR(optimization = True)
 mopt.parameters.update(DMepsGLO1)
-mopt.ndparameters = np.array([mopt.parameters[name] for name in mopt.parameter_names]+[0.,0.])
+mopt.ndparameters = np.array([mopt.parameters[name] for name in mopt.parameter_names] +
+         [0. for k in range(50-len(mopt.parameter_names))])
 topt = Approach.BM10(mopt, optimization = False)
 
 # Gepard model
@@ -129,6 +130,7 @@ def test_XunpBM10opt():
     assert_almost_equal(topt.Xunp(pt1), 0.028719982588252427)
 
 test_XunpBM10opt.optimization = 1
+test_XunpBM10opt.newfeature = 1
 
 def test_XTP():
     """Calculate transv. polarized cross section XTP in BMK Approach."""

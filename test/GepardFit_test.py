@@ -5,9 +5,7 @@ from nose.tools import *
 import numpy as np
 
 import utils, Model, Approach, Fitter
-
-data = utils.loaddata('data/ep2epgamma', approach=Approach.hotfixedBMK)  
-data.update(utils.loaddata('data/gammastarp2gammap', approach=Approach.hotfixedBMK))
+from abbrevs import *
 
 # Gepard only
 mGepard = Model.ComptonGepard()
@@ -28,11 +26,17 @@ topt = Approach.hotfixedBMK(mopt)
 def setpar(i, val):
     mGepard.parameters[mGepard.parameters_index[i]] = val
 
+# DISpoints = all data from gepard's dis.dat
+DISpoints = data[201] + data[202] + data[203] + data[204] + \
+            data[205] + data[206] + data[207] + data[208] + \
+            data[209] + data[210] + data[211] + data[212]
+
 # DVCSpoints = all data from gepard's dvcs.dat
 # model parameters from DIS fit should be fixed
 DVCSpoints = data[36] + data[37] + data[38] + data[39] + \
   data[40] + data[41] + data[42] + data[43] + data[44] + \
   data[45]
+
 
 # testing data set for fits
 fitpoints = data[31][12:14] + data[8][1:3] + data[30][2:4]
@@ -107,6 +111,7 @@ def test_gepardfitDVCSsumso3():
 test_gepardfitDVCSsumso3.long = 1
 # It's not a 'new feature' - test passes but the test
 # from GepardFitNLO_test.py is more comprehensive
+#  (Actually test fails on 3rd digit)
 test_gepardfitDVCSsumso3.newfeature = 1
 
 def test_gepardfitDVCSnlso3():
@@ -271,13 +276,16 @@ test_hybridfitDVCS.extendedtesting = 1
 def test_gepardfitDIS():
     """Test fitting to H1 DIS via gepard"""
     # DISpoints = all data from gepard's dis.dat
-    t.model.release_parameters('NS', 'AL0S', 'AL0G')
-    f = Fitter.FitterMinuit(DISpoints, t)
+    tGepard.model.fix_parameters('ALL')
+    tGepard.model.release_parameters('NS', 'AL0S', 'AL0G')
+    f = Fitter.FitterMinuit(DISpoints, tGepard)
     f.fit()
-    chisq = t.chisq(fitpoints)[0]
-    assert_almost_equal(chisq, 49.7312, 5)
+    chisq = tGepard.chisq(f.fitpoints)[0]
+    assert_almost_equal(chisq/100, 49.7312/100, 5)
+    tGepard.model.fix_parameters('ALL')
 
-test_gepardfitDIS.newfeature = 1
+test_gepardfitDIS.long = 1
+test_gepardfitDIS.gepardsuite = 1
 
 def test_hybridfit():
     """Test fitting to large- and small-x data
@@ -310,7 +318,6 @@ def test_hybridfit():
     t.m.g.init()
     t.m.release_parameters('M02S','SKEWG', 'Nv', 'C')
     f = Fitter.FitterMinuit(fitpoints+DVCSpoints[:6], t)
-    f.minuit.printMode = 0
     f.fit()
     chisq = t.chisq(fitpoints+DVCSpoints[:6])[0]
     assert_almost_equal(chisq/100, 24.830217692733402/100, 3)
@@ -350,7 +357,6 @@ def test_hybridfitopt():
     topt.m.g.init()
     topt.m.release_parameters('M02S','SKEWG', 'Nv', 'C')
     f = Fitter.FitterMinuit(fitpoints+DVCSpoints[:6], topt)
-    f.minuit.printMode = 0
     f.fit()
     chisq = topt.chisq(fitpoints+DVCSpoints[:6])[0]
     assert_almost_equal(chisq, 24.814072429462982, 2)

@@ -9,14 +9,16 @@ from constants import Mp, Mp2
 from results import KM10b, dvmppars
 
 # KM10b model
-m = Model.ComptonGepard(process='DVMP', p=0)
+m = Model.ComptonGepard(p=0)
 t = Approach.BMK(m)
 t.m.parameters.update(KM10b)
+t.m.g.parint.pid = 2
 
 # generic LO model from big DVMP draft
-mlo = Model.ComptonGepard(process='DVMP', p=0)
+mlo = Model.ComptonGepard(p=0)
 tlo = Approach.BMK(mlo)
 tlo.m.parameters.update(dvmppars)
+tlo.m.g.parint.pid = 2
 
 
 def test_gepardTFFs():
@@ -51,6 +53,7 @@ test_gepardTFFsEvol.gepardsuite = 1
 def test_gepardXrhot():
     """Calculate LO DVMP cross section d sigma / dt"""
     pt = Data.DummyPoint()
+    pt.process = 'gammastarp2rho0p'
     pt.W = 75.
     pt.Q2 = 6.6
     pt.t = -0.025
@@ -58,7 +61,7 @@ def test_gepardXrhot():
     pt.xB = 2*pt.xi/(1.+pt.xi)
     t.m.g.init()
     t.m.g.newcall = 1
-    aux = t.Xrhot(pt)
+    aux = t.X(pt)
     assert_almost_equal(aux/1000., 1212.62165/1000., 2)
 
 test_gepardXrhot.gepardsuite = 1
