@@ -1058,7 +1058,7 @@ class ComptonGepard(ComptonFormFactors):
                'EPS' : 2.0,
              'ESECS' : 0.0,
              'ETHIS' : 0.0,
-             'EKAPS' : 0.0,
+             #'EKAPS' : 0.0,
             'ESKEWS' : 0.0,
              'EAL0G' : 1.1,
              'EALPG' : 0.15,
@@ -1067,7 +1067,7 @@ class ComptonGepard(ComptonFormFactors):
                'EPG' : 2.0,
              'ESECG' : 0.0,
              'ETHIG' : 0.0,
-             'EKAPG' : 0.0,
+             #'EKAPG' : 0.0,
             'ESKEWG' : 0.0   }
 
 
@@ -1124,9 +1124,11 @@ class ComptonGepard(ComptonFormFactors):
            'DELB',
            'ND', 'AL0D', 'ALPD', 'M02D',
            'EAL0S', 'EALPS', 'EM02S',
-           'EDELM2S', 'EPS', 'ESECS', 'ETHIS', 'ESKEWS',
+           'EDELM2S', 'EPS', 'ESECS', 'ETHIS',# 'EKAPS', 
+           'ESKEWS',
            'EAL0G', 'EALPG', 'EM02G',
-           'EDELM2G', 'EPG', 'ESECG', 'ETHIG', 'ESKEWG']
+           'EDELM2G', 'EPG', 'ESECG', 'ETHIG',#'EKAPG', 
+           'ESKEWG']
 
         self.allGPDs = ['gpdHtrajQ', 'gpdHtrajG', 'gpdEtrajQ', 'gpdEtrajG',
                         'gpdHzeroQ', 'gpdHzeroG', 'gpdEzeroQ', 'gpdEzeroG',

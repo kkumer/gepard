@@ -130,6 +130,7 @@ def test_XunpBM10opt():
     assert_almost_equal(topt.Xunp(pt1), 0.028719982588252427)
 
 test_XunpBM10opt.optimization = 1
+test_XunpBM10opt.newfeature = 1
 
 def test_XTP():
     """Calculate transv. polarized cross section XTP in BMK Approach."""

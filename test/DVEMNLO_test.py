@@ -48,3 +48,4 @@ def test_gepardTFFsNLO():
 
 test_gepardTFFsNLO.gepardsuite = 1
 test_gepardTFFsNLO.long = 1
+test_gepardTFFsNLO.newfeature = 1  # regressed to only 1-2 digit agreement

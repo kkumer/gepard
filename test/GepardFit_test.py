@@ -318,7 +318,6 @@ def test_hybridfit():
     t.m.g.init()
     t.m.release_parameters('M02S','SKEWG', 'Nv', 'C')
     f = Fitter.FitterMinuit(fitpoints+DVCSpoints[:6], t)
-    f.minuit.printMode = 0
     f.fit()
     chisq = t.chisq(fitpoints+DVCSpoints[:6])[0]
     assert_almost_equal(chisq/100, 24.830217692733402/100, 3)
@@ -358,7 +357,6 @@ def test_hybridfitopt():
     topt.m.g.init()
     topt.m.release_parameters('M02S','SKEWG', 'Nv', 'C')
     f = Fitter.FitterMinuit(fitpoints+DVCSpoints[:6], topt)
-    f.minuit.printMode = 0
     f.fit()
     chisq = topt.chisq(fitpoints+DVCSpoints[:6])[0]
     assert_almost_equal(chisq, 24.814072429462982, 2)

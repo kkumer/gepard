@@ -137,7 +137,7 @@ for prefix in ['AllEight-']:
             th.model.fix_parameters('ALL')
             th.model.release_parameters('pImH', 'pReE')
             f = Fitter.FitterMinuit(pts, th)
-            f.minuit.printMode = 0
+            f.printMode = 0
             f.fit()
             tmshift, xBshift, Q2shift = shifts[0]
         elif prefix == 'Ht-':
@@ -148,7 +148,7 @@ for prefix in ['AllEight-']:
             th.model.fix_parameters('ALL')
             th.model.release_parameters('pImH', 'pReH', 'pImHt')
             f = Fitter.FitterMinuit(pts, th)
-            f.minuit.printMode = 0
+            f.printMode = 0
             f.fit()
             tmshift, xBshift, Q2shift = shifts[1]
         elif prefix == 'AllEight-':
@@ -160,7 +160,7 @@ for prefix in ['AllEight-']:
             th.model.release_parameters('pImH', 'pReH', 'pImE', 'pReE', 
                     'pImHt', 'pReHt', 'pImEt', 'pReEt')
             f = Fitter.FitterMinuit(pts, th)
-            f.minuit.printMode = 0
+            f.printMode = 0
             f.fit()
             tmshift, xBshift, Q2shift = shifts[1]
         else:
