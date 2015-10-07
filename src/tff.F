@@ -8,13 +8,14 @@ C     *******
 
 C     ****s* tff.F/TFFF
 C  NAME
-C     TFFF  --  calculates flavour components of Transition form factor \mathcal{F}_V
+C     TFFF  --  calculates flavour components of Transition form factor \mathcal{H}_rho
 C  DESCRIPTION
 C    calculates singlet (sea and gluon) and non-singlet components of DVMP
 C    transition form factors \mathcal{H}_M, \mathcal{E}_M, ... by numerical Mellin-Barnes 
 C    integration according to formula Eq. (??) from [Mueller:2013??]
 C      NB!! - only one of three TFFH(0:2) array elements, TFFH(P),
 C             is changed by single call to TFFF!
+C      NB - only CALH is done atm
 C  SYNOPSIS
 
       SUBROUTINE TFFF
@@ -22,19 +23,18 @@ C  SYNOPSIS
 C  PARENTS
 C    PARSIGMA, tffHInternal, tffEInternal
 C  CHILDREN
-C    GETMBGPD, LOOKUPQ, DCTAN
+C    GETMBGPD, GETQIND, DCTAN
 C  SOURCE
 C
 
 
       IMPLICIT NONE
-      INTEGER K, QIND
+      INTEGER K, L, QIND, GETQIND, SEC, NPWS
+      DOUBLE COMPLEX HRHO(4), CH(4)
       DOUBLE COMPLEX EPH, J, CFACRE, CFACIM
-      DOUBLE COMPLEX EFSIG, EFG, EFNS
-      DOUBLE COMPLEX TFFHS, TFFHNS
-      DOUBLE PRECISION REEFSIG, REEFG, REEFNS
-      DOUBLE PRECISION IMEFSIG, IMEFG, IMEFNS
+      DOUBLE PRECISION RE(4), IM(4)
 #include "header.F"
+      DOUBLE PRECISION PWPAR(NPWMAX, 4)
       DOUBLE COMPLEX DCTAN
 * ASMUR2 = alpha_s/(2 pi) at renormalization scale
       DOUBLE PRECISION ASMUR2, ASTRONG
@@ -43,75 +43,70 @@ C
 
       EPH = EXP ( DBLCMPLX(0.0d0, PHI) )
 
-      REEFSIG = 0.d0
-      IMEFSIG = 0.d0
-      REEFG = 0.d0
-      IMEFG = 0.d0
-      REEFNS = 0.d0
-      IMEFNS = 0.d0
-
-      CALL LOOKUPQ(QIND)
+      QIND = GETQIND()
 
 *   Getting GPD values on MB contour ...
 
       CALL GETMBGPD
 
+*   Setting the number and strength of SO(3) partial waves
+      NPWS = 3
+      PWPAR(1, 1) = 1.d0
+      PWPAR(1, 2) = 1.d0
+      PWPAR(2, 1) = PAR(17)
+      PWPAR(2, 2) = PAR(27)
+      PWPAR(3, 1) = PAR(37)
+      PWPAR(3, 2) = PAR(47)
+
 *   MB integration ...
 
-      DO 123 K = 1, NPTS
+      DO 5 L = 1, 4
+        RE(L) = 0.d0
+ 5      IM(L) = 0.d0
+
+      DO 30 K = 1, NPTS
 
         J = N(1,K) - 1
         CFACRE = EPH * DCTAN(PIHALF*J) / XI**(J+1.d0)
         CFACIM = EPH / XI**(J+1.d0)
 
+*       --- rotation of flavour components ---
 
-*       --- flavour components ---
-
-        EFSIG = CGRID(1,QIND,K,1)*GPDH(K,1)
-        EFG   = CGRID(1,QIND,K,2)*GPDH(K,2)
-c       FIXME: 1 --> 3 or so
-        EFNS  = CGRIDNS(QIND,K)*GPDH(K,1)
+*       (SIG, G, NSP, NSM) = FROT * (sea, G, uval, dval)
+c       FIXME: neglecting valence components atm
+c       FIXME: Valid only for NF = 4 !
+c       FIXME: THis is for rho-production !
+        HRHO(1) = GPDH(K,1) / SQRT2
+        HRHO(2) = GPDH(K,2) / SQRT2
+        HRHO(3) = GPDH(K,1) / SQRT2  * (3.d0/20.d0)
+        HRHO(4) = 0.d0
         
-*           --- ading 2nd SO(3) partial wave ---
-
-        EFSIG = EFSIG + PAR(17) * CGRID(2,QIND,K,1) * GPDH(K,1)
-        EFG   = EFG   + PAR(27) * CGRID(2,QIND,K,2) * GPDH(K,2)
-
-*           --- ading 3nd SO(3) partial wave ---
-
-        EFSIG = EFSIG + PAR(37) * CGRID(3,QIND,K,1) * GPDH(K,1)
-        EFG   = EFG   + PAR(47) * CGRID(3,QIND,K,2) * GPDH(K,2)
 
 
-        REEFSIG = REEFSIG + WG(K)*IMAGPART(CFACRE * EFSIG)
-        IMEFSIG = IMEFSIG + WG(K)*IMAGPART(CFACIM * EFSIG)
+c       FIXME: with NS(-), following loop has to go to 4
+        DO 30 L = 1, 3
+          CH(L) = (0.d0, 0.d0)
+*         --- building evolved Wilson coef. summed over SO(3) partial waves ---
+          DO 20 SEC = 1, NPWS
+            CH(L) = CH(L) + PWPAR(SEC, L)*WCE(PID,SEC,QIND,K,L)
+ 20       CONTINUE
+*         --- multiplying with GPD, to finalize that part of MB integrand
+          CH(L) = CH(L) * HRHO(L)
 
-        REEFG = REEFG + WG(K)*IMAGPART(CFACRE * EFG)
-        IMEFG = IMEFG + WG(K)*IMAGPART(CFACIM * EFG)
+          RE(L) = RE(L) + WG(K)*IMAGPART(CFACRE * CH(L))
+          IM(L) = IM(L) + WG(K)*IMAGPART(CFACIM * CH(L))
 
-        REEFNS = REEFNS + WG(K)*IMAGPART(CFACRE * EFNS)
-        IMEFNS = IMEFNS + WG(K)*IMAGPART(CFACIM * EFNS)
-
- 123  CONTINUE
+ 30   CONTINUE
       
 *     Building up complex TFFs with right prefactors
 
-      TFFHS     =  DBLCMPLX(REEFSIG, IMEFSIG) 
-     &    + DBLCMPLX(REEFG, IMEFG)
+      TFFH(P) = (0.d0, 0.d0)
+*     FIXME: singlet-only 
+      DO 40 L = 1, 2
+        TFFH(P) = TFFH(P) + DBLCMPLX(RE(L), IM(L))
+ 40   CONTINUE
 
-
-      TFFHNS    =  DBLCMPLX(REEFNS, IMEFNS)
-
-*     Combining with charge and CG factors for rho-meson production
-*     (using model as in Dieter&Mantas paper)
-
-*  correct?
-C     TFFH(P) = CF * FRHO * ASTRONG / NC / sqrt(Q2)
-C    & * ( TFFHS + 3*TFFHNS/20.d0 ) / SQRT(2.0d0)
-*  singlet-only 
-      TFFH(P) = CF * FRHO * ASTRONG / NC / sqrt(Q2)
-     & * ( TFFHS ) / SQRT(2.0d0)
-
+      TFFH(P) = CF * FRHO * ASTRONG / NC / sqrt(Q2) * TFFH(P)
 
       RETURN
       END

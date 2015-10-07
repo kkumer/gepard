@@ -52,8 +52,7 @@ C
 
 #include "../header.F"
 
-      PROCESS = 'DVCS'
-      FFTYPE = 'SINGLET'
+      PID = 1
 
       CALL READPAR
     

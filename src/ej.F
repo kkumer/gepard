@@ -8,7 +8,11 @@ C     *******
 
 C     ****s* ej.F/EJ
 C  NAME
-C     EJ  --  conformal moment of input-scale singlet GPD  E_{J}
+C     EJ  --  conformal moment of input-scale GPD  E_{J}
+C         FCM(1) -- singlet quark
+C         FCM(2) -- gluon
+C         FCM(3) -- non-siglet quark NS(+)
+C         FCM(4) -- non-siglet quark NS(-)
 C  DESCRIPTION
 C     returns E_{J} for various ansaetze, depending on the variable
 C     ANSATZ
@@ -17,7 +21,7 @@ C  SYNOPSIS
       SUBROUTINE EJ(J, FCM)
 
       IMPLICIT NONE
-      DOUBLE COMPLEX J, FCM(2) 
+      DOUBLE COMPLEX J, FCM(4) 
 
 C  INPUTS
 C           J -- conformal moment
@@ -33,8 +37,7 @@ C
       DOUBLE COMPLEX HSEA, HU, HD
       DOUBLE PRECISION NORMS
       DOUBLE COMPLEX CLNGAMMA, CBETA, POCHSEA, POCHG, POCHHAMMER
-      DOUBLE COMPLEX RATGAMMA, JMA(2)
-      DOUBLE COMPLEX MULTIGAMMA, CORR(2)
+      DOUBLE COMPLEX JMA(2), CORR(2)
       DOUBLE COMPLEX QJ, BETADIP, BETAEXP
       INTEGER LHBETA(4), LHBETAF(4)
       DOUBLE PRECISION LHA(4), LHLAM(4), ALPT(2)
@@ -44,18 +47,22 @@ C
       DATA LHA / 5.1072D0, 3.06432D0, 0.1939875D0, 1.7D0 /
       DATA LHLAM / -0.8D0, -0.8D0, 0.1D0, 0.1D0 /
 
+*     Evolves with NS(-) so not used for most ansaetze
+*     only exception is NSMHOU
+      FCM(4) = ZERO
 *      'Toy' singlet ansatz
       IF (ANSATZ .EQ. 'TOY') THEN
             FCM(1) = 454760.7514415856 * EXP(CLNGAMMA(0.5d0 + J)) /
      &            EXP(CLNGAMMA(10.6d0 + J))
             FCM(2) = 17.837861981813603 * EXP(CLNGAMMA(-0.1d0 + J)) /
      &            EXP(CLNGAMMA(4.7d0 + J))
+            FCM(3) = ZERO
 *      'Toy' non-singlet ansatz
       ELSE IF (ANSATZ .EQ. 'NSTOY') THEN
-            FCM(1) = POCHHAMMER(DBLCMPLX(0.5d0, 0.0d0), 4) /
+            FCM(1) = ZERO
+            FCM(2) = ZERO
+            FCM(3) = POCHHAMMER(DBLCMPLX(0.5d0, 0.0d0), 4) /
      &                  POCHHAMMER(DBLCMPLX(0.5d0, 0.0d0) + J, 4)
-*          'Dummy' gluonic, not used:
-            FCM(2) = (0.0d0, 0.0d0)
 *  ## ansaetze used in PLB paper hep-ph/0605237
       ELSE IF ((ANSATZ .EQ. 'HARD') .OR. (ANSATZ .EQ. 'SOFT')) THEN
             PAR(12) = 1.1d0
@@ -76,11 +83,12 @@ C
      &                                  + J, POCHSEA) / CBETA(
      &            DBLCMPLX(2.0d0 - PAR(12), 0.0d0), POCHSEA) /
      &            (1.0d0 - DEL2)**3
-          FCM(2) = PAR(21) * CBETA(    
+            FCM(2) = PAR(21) * CBETA(    
      &          DBLCMPLX(1.0d0-PAR(22)-PAR(23)*DEL2, 0.0d0) 
      &                                  + J, POCHG) / CBETA(
      &            DBLCMPLX(2.0d0 - PAR(22), 0.0d0), POCHG) /
      &            (1.0d0 - DEL2)**3
+            FCM(3) = ZERO
 *           Killing E contribution
             PAR(18) = 0.0d0
             PAR(28) = 0.0d0
@@ -94,6 +102,7 @@ C
      &            DBLCMPLX(1.0d0 - PAR(22) - PAR(23)*DEL2, 0.0d0)
      &             + J, 6) * POCHHAMMER(
      &            DBLCMPLX(2.0d0 - PAR(22), 0.0d0), 6)
+            FCM(3) = ZERO
 *           Killing E contribution
             PAR(18) = 0.0d0
             PAR(28) = 0.0d0
@@ -106,6 +115,7 @@ C
      &                BETADIP(J, PAR(114), PAR(115), PAR(116))
           FCM(2) = QJ(J, 7, PAR(121), PAR(122), PAR(123), PAR(129)) *
      &                BETADIP(J, PAR(124), PAR(125), PAR(126))
+          FCM(3) = ZERO
       ELSE IF (ANSATZ .EQ. 'EFLEXP') THEN
 * Use    ENS = NS  (with kappa=KAPS=PAR(18) defining normalization)
           PAR(111) = PAR(11)
@@ -115,6 +125,7 @@ C
      &                BETAEXP(PAR(114))
           FCM(2) = QJ(J, 7, PAR(121), PAR(122), PAR(123), PAR(129)) *
      &                BETAEXP(PAR(124))
+          FCM(3) = ZERO
       ELSE IF (ANSATZ .EQ. 'FITNG') THEN
 * Don't use first sum-rule constraint (and not that pochs are different!)
           ALPT(1) = PAR(12) + PAR(13)*DEL2
@@ -125,13 +136,15 @@ C
      &           CLNGAMMA(DBLCMPLX(7.0d0 + ALPT(1), 0.0d0))   )
           CORR(2) = EXP(   CLNGAMMA(DBLCMPLX(7.0d0 + PAR(22), 0.0d0)) -
      &           CLNGAMMA(DBLCMPLX(7.0d0 + ALPT(2), 0.0d0))   )
-        IF ( PROCESS .EQ. 'DIS' ) THEN 
+        IF ( PID .EQ. 0 ) THEN 
+*         ---  DIS  ---
           FCM(1) = PAR(11) * POCHHAMMER(DBLCMPLX(2.0d0 - PAR(12),0.0d0) 
      &              , 8) / POCHHAMMER(1.0d0 - PAR(12)
      &          + J , 8) * (1.0d0 - PAR(12) + J) / (1.0d0 + JMA(1))
           FCM(2) = PAR(21) * POCHHAMMER(DBLCMPLX(2.0d0 - PAR(22),0.0d0)
      &              , 6) / POCHHAMMER(1.0d0 - PAR(22)
      &          + J , 6) * (1.0d0 - PAR(22) + J) / (1.0d0 + JMA(2))
+          FCM(3) = ZERO
         ELSE  
           FCM(1) = PAR(11) * POCHHAMMER(DBLCMPLX(2.0d0 - PAR(12),0.0d0)
      &              , 8) / POCHHAMMER(1.0d0 - PAR(12)
@@ -155,12 +168,8 @@ C
      &           DBLCMPLX(ALPT(2), 0.0d0)) ) / SIN(PI*ALPT(2)) *
      &          (1.0d0 - (SIN(PI*ALPT(2)) -
      &           SIN(J*PI))/SIN(PI*JMA(2)) ) * CORR(2) )
+          FCM(3) = ZERO
         ENDIF
-      ELSE IF (ANSATZ .EQ. 'SPLICE') THEN
-              CALL SPLICE(J, FCM)
-*           Killing E contribution
-            PAR(18) = 0.0d0
-            PAR(28) = 0.0d0
 *  ## ansatz used for "big paper"  hep-ph/0703179 
       ELSE IF (ANSATZ .EQ. 'FITBP') THEN
             HU = PAR(31) * POCHHAMMER(DBLCMPLX(1.0d0 - PAR(32), 0.0d0) 
@@ -191,10 +200,13 @@ C
      &          + J , 6) * (DBLCMPLX(1.0d0 - PAR(22), 0.0d0) + J) /
      &           (DBLCMPLX(1.0d0 - PAR(22) - PAR(23)*DEL2, 0.0d0) + J) /
      &           (1.0d0 - DEL2/(PAR(24)+PAR(25)*J))**PAR(26)
+         FCM(3) = ZERO
 *           Killing E contribution
             PAR(18) = 0.0d0
             PAR(28) = 0.0d0
       ELSE IF (ANSATZ .EQ. 'NSFIT') THEN
+            FCM(1) = ZERO
+            FCM(2) = ZERO
 *    Ugly kludge: NS valence = down
             HD = PAR(41) * POCHHAMMER(DBLCMPLX(1.0d0 - PAR(42), 0.0d0) 
      &              , 4) / POCHHAMMER(DBLCMPLX(1.0d0 - PAR(42), 0.0d0)
@@ -207,9 +219,7 @@ C
      &          + J , 8) * (DBLCMPLX(1.0d0 - PAR(12), 0.0d0) + J) /
      &           (DBLCMPLX(1.0d0 - PAR(12) - PAR(13)*DEL2, 0.0d0) + J) /
      &           (1.0d0 - DEL2/(PAR(14)+PAR(15)*J))**PAR(16)
-          FCM(1) = HD - 0.5d0 / (2.0d0 + 0.5d0) * HSEA
-*    'Dummy' gluonic, not used:
-          FCM(2) = (0.0d0, 0.0d0)
+          FCM(3) = HD - 0.5d0 / (2.0d0 + 0.5d0) * HSEA
 *  ## ansatz for comparison with Les Houches PDF evolution benchmark
       ELSE IF (ANSATZ .EQ. 'HOUCHE') THEN
         FCM(1) =
@@ -224,6 +234,8 @@ C
         FCM(2) = 
      &      LHA(4)*LHBETAF(4) / POCHHAMMER(J-DBLCMPLX(LHLAM(4), 0.0D0),
      &        LHBETA(4)+1) 
+        FCM(3) = ZERO
+        FCM(4) = ZERO
 *           Killing E contribution
             PAR(18) = 0.0d0
             PAR(28) = 0.0d0

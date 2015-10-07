@@ -1,6 +1,7 @@
 # Makefile for gepard Fortran and C sources
 
 # Subdirectories for storing example source files
+TESTDIR = test
 EXDIR = ex
 
 # Directories for storing object files
@@ -8,14 +9,12 @@ ADACFODIR = adacf/obj
 FODIR = Fobj
 ODIR = obj
 MMAODIR = Mobj
+TESTFODIR = test/obj
 EXFODIR = ex/obj
 
-ifndef NOPGPLOT
-  USEPGPLOT := -DPGPLOT
-endif
 
 # "adacf" package Fortran object files
-ADACFOBJS = Harmonic.o Mellin.o WgammaVNSP0F.o WgammaVNSP1F.o\
+ADACFOBJS = Harmonic.o WgammaVNSP0F.o WgammaVNSP1F.o WgammaVNSM1F.o\
 WgammaVNSP2F.o WgammaVQQ0F.o WgammaVQQ1F.o WgammaVQQ2F.o WgammaVQG0F.o\
 WgammaVQG1F.o WgammaVQG2F.o WgammaVGQ0F.o WgammaVGQ1F.o WgammaVGQ2F.o\
 WgammaVGG0F.o WgammaVGG1F.o WgammaVGG2F.o WcVF2NSP0F.o WcVF2NSP1F.o\
@@ -31,42 +30,30 @@ $(ADACFODIR)/%.o: adacf/%.f
 
 # Fortran object files
 FOBJS = Finit.o Fbeta.o Fspecial.o Fdcomplex.o Fastrong.o Flambda.o\
-Fprojectors.o Frnnlo.o Ferfunc.o Fevol.o Fcdvcs.o Fmsbar.o \
-Fdvcs.o Ff2.o Freadpar.o Ferror.o Fgauss.o Fnd.o Fbigcns.o Fintegra.o Fxspace.o\
-Finitc.o Fevolc.o Fgetmbgpd.o Fhj.o Fej.o Fsplice.o Fcff.o Ftff.o Fderiv.o Fbca.o\
-Fhyp2F1.o Fint2F1.o Fcdvem.o 
+Fprojectors.o Frnnlo.o Ferfunc.o Fevol.o Fwccsbar.o Fwcmsbar.o \
+Fdvcs.o Ff2.o Ferror.o Fgauss.o Fnd.o Fintegra.o Freadpar.o\
+Fevolc.o Fgetmbgpd.o Fhj.o Fej.o Fcff.o Ftff.o Fderiv.o\
+Fwcdvmp.o Fc1dvmp.o
 _FOBJS = $(patsubst %,$(FODIR)/%,$(FOBJS))
 
-# Fortran object files needed for DVEM
-FDVEMOBJS = Fhyp2F1.o Fgauss.o Fintegra.o Fint2F1.o Fbeta.o Fspecial.o Fcdvem.o 
-_FDVEMOBJS = $(patsubst %,$(FODIR)/%,$(FDVEMOBJS))
 
 # rule for compiling Fortran .F  files
 # (prefix "F" in "F%.o" is used to avoid possible future clashes with
 #  C-wrappers with the same name)
-$(FODIR)/Fhyp2F1.o: hyp2F1.f90
-	$(FC) -c -o $@ $< $(FFLAGS) $(CPPFLAGS)
-
+#
 $(FODIR)/F%.o: %.F  header.F
 	$(FC) -c -o $@ $< $(FFLAGS) $(CPPFLAGS)
-
-# C object files
-OBJS = flushout.o
-_OBJS = $(patsubst %,$(ODIR)/%,$(OBJS))
 
 # rule for compiling C files
 $(ODIR)/%.o: %.c
 	$(CC) -c -o $@ $< $(CFLAGS) $(INCS)
 
 # All object files together
-export ALLOBJS = $(_OBJS) $(_ADACFOBJS) $(_FOBJS)
+export ALLOBJS = $(_ADACFOBJS) $(_FOBJS)
 
 # Mathlink C object files
 MMAOBJS = fit.tm.o fit.o 
 _MMAOBJS = $(patsubst %,$(MMAODIR)/%,$(MMAOBJS))
-
-MMADVEMOBJS = dvem.tm.o dvem.o 
-_MMADVEMOBJS = $(patsubst %,$(MMAODIR)/%,$(MMADVEMOBJS))
 
 # rules for compiling MathLink C files
 $(MMAODIR)/%.tm.c: %.tm
@@ -76,6 +63,9 @@ $(MMAODIR)/%.tm.o: $(MMAODIR)/%.tm.c $(MMAODIR)/%.o
 $(MMAODIR)/%.o: %.c  header.h
 	$(CC) -c -o $@ $< -I$(MLINCDIR) $(CFLAGS)
 
+# rule for compiling test Fortran programs
+$(TESTFODIR)/%.o: $(TESTDIR)/%.F header.F
+	$(FC) -c -o $@ $< $(FFLAGS)
 
 # rule for compiling example Fortran programs
 $(EXFODIR)/%.o: $(EXDIR)/%.F header.F
@@ -84,47 +74,44 @@ $(EXFODIR)/%.o: $(EXDIR)/%.F header.F
 # Fortran prep files (needed for f2py which ignores preprocessing)
 FPREPDIR = Fprep
 FPREPS = init.f beta.f special.f dcomplex.f astrong.f lambda.f\
-projectors.f rnnlo.f erfunc.f evol.f cdvcs.f msbar.f \
-dvcs.f f2.f error.f gauss.f nd.f bigcns.f integra.f\
-initc.f evolc.f getmbgpd.f hj.f ej.f splice.f cff.f\
-tff.f cdvem.f int2F1.f 
+projectors.f rnnlo.f erfunc.f evol.f wccsbar.f wcmsbar.f \
+dvcs.f f2.f error.f gauss.f nd.f integra.f readpar.f\
+evolc.f getmbgpd.f hj.f ej.f cff.f\
+tff.f wcdvmp.f c1dvmp.f
 _FPREPS = $(patsubst %,$(FPREPDIR)/%,$(FPREPS))
 
 $(FPREPDIR)/%.f: %.F  header.F
 	$(FC) -E $<  > $@
 
-# test and fit targets
 
-$(TESTTARGETS): %: $(ALLOBJS) $(FODIR)/F%.o
-	$(FC) -o ../Tests/$@ $^ $(FFLAGS)
-
-# main fit target  (a variant withouth PGPLOT)
-fit: CPPFLAGS += $(USEPGPLOT)
+# main fit target
 fit: $(ALLOBJS) $(FODIR)/Ffcn.o $(FODIR)/Ffit.o
-	$(FC) -o ../fits/$@ $^ $(FFLAGS) $(CERNLIBS) $(ALLPGPLOTLIBS)
+	$(FC) -o ../fits/$@ $^ $(FFLAGS) $(CERNLIBS)
 
 # targets for processing/presenting GPDs resulting from fit
 $(FITTARGETS): %: $(ALLOBJS) $(EXFODIR)/%.o
-	$(FC) -o ../fits/$@ $^ $(FFLAGS) $(ALLPGPLOTLIBS)
+	$(FC) -o ../fits/$@ $^ $(FFLAGS)
 
 # mma targets
 
-gepard.exe: CPPFLAGS += -DMMA  $(USEPGPLOT)
+gepard.exe: CPPFLAGS += -DMMA
 gepard.exe: $(ALLOBJS) $(FODIR)/Ffcn.o $(_MMAOBJS)  $(FODIR)/Fmninterface.o
-	$(FC) -o ../fits/$@/$(SYS)/$@ $^ $(FFLAGS) $(CERNLIBS) -L$(MLLIBDIR) -l$(MLLIB) $(ALLPGPLOTLIBS) $(MLEXTRA)
+	$(FC) -o ../fits/$@/$(SYS)/$@ $^ $(FFLAGS) $(CERNLIBS) -L$(MLLIBDIR) -l$(MLLIB) $(MLEXTRA)
 
-int2f1.exe dvem.exe: $(ADACFODIR)/Harmonic.o $(_FDVEMOBJS) $(_MMADVEMOBJS)
-	$(FC) -o ../fits/$@/$(SYS)/$@ $^ $(FFLAGS)  -L$(MLLIBDIR) -l$(MLLIB)  $(MLEXTRA)
 
 # pygepard targets
 #
+pygepard: pygepard.so
+
+pygepards: pygepard.so pygepard2.so pygepard3.so
+
 pygepard.so: $(_FPREPS)
-	f2py  -c -m pygepard $^ adacf/*f hyp2F1.f90 -lgomp
-	mv pygepard.so ../fits/
+	f2py2 --fcompiler=gnu95  -c -m pygepard $^ adacf/*f -lgomp
+	mv pygepard.so ../ifaces/
 
 pygepard%.so: $(_FPREPS)
-	f2py  -c -m pygepard$* $^ adacf/*f hyp2F1.f90 -lgomp
-	mv pygepard$*.so ../fits/
+	f2py2 --quiet --fcompiler=gnu95 -c -m pygepard$* $^ adacf/*f -lgomp
+	mv pygepard$*.so ../ifaces/
 
 
 # targets for examples
@@ -132,20 +119,21 @@ pygepard%.so: $(_FPREPS)
 $(EXTARGETS): %: $(ALLOBJS) $(EXFODIR)/%.o
 	$(FC) -o ../ex/$@ $^ $(FFLAGS)
 
+$(TESTTARGETS): %: $(ALLOBJS) $(TESTFODIR)/%.o
+	$(FC) -o ../test/$@ $^ $(FFLAGS)
+
 
 .PHONY: clean
 clean:
 	-rm -f $(ADACFODIR)/*.o $(FODIR)/F*.o $(ODIR)/*.o $(EXFODIR)/*.o $(MMAODIR)/*
 	-rm -f *.s
 	-rm -f $(FPREPDIR)/*.f
-	-rm -f $(patsubst %,../Tests/%,$(TESTTARGETS))
-	-rm -f $(patsubst %,../Tests/%.exe,$(TESTTARGETS))
+	-rm -f $(patsubst %,../test/%,$(TESTTARGETS))
+	-rm -f $(patsubst %,../test/%.exe,$(TESTTARGETS))
 	-rm -f $(patsubst %,../fits/%,$(FITTARGETS))
 	-rm -f $(patsubst %,../fits/%.exe,$(FITTARGETS))
 	-rm -f ../fits/fit ../fits/fit.exe  ../fits/pygepard.so
 	-rm -f $(patsubst %,../ex/%,$(EXTARGETS))
 	-rm -f $(patsubst %,../ex/%.exe,$(EXTARGETS))
-	-rm -f ../fits/gepard.exe/$(SYS)/gepard.exe
-	-rm -f ../fits/dvem.exe/$(SYS)/dvem.exe
-	-rm -f ../fits/int2f1.exe/$(SYS)/int2f1.exe
-	-rm -f hyp_2f1_module.mod
+	-rm -f ../ifaces/gepard.exe/$(SYS)/gepard.exe
+	-rm -f ../ifaces/pygepar*.so

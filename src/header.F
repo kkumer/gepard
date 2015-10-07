@@ -79,6 +79,24 @@ C  SYNOPSIS
       INTEGER CZERO
 C     ***
       
+C     ****v* header.F/PID
+C  DESCRIPTION
+C       PID -- process ID. with possible values:
+C               0 = DIS F2
+C               1 = DVCS (CSBAR)
+C               2 = DVCS (MSBAR)
+C               3 = DVMP (FIXME: just rho presently)
+C              -1 = quark GPD at eta = 0
+C              -2 = gluon GPD at eta = 0
+C              -3 = quark GPD at eta = x
+C              -4 = gluon GPD at eta = x
+C  MEMBER OF
+C     PARINT
+C  SYNOPSIS
+      INTEGER PID
+C     ***
+      
+
 
 C     ****v* header.F/MU02
 C  DESCRIPTION
@@ -203,8 +221,7 @@ C     ***
 
 C     ****v* header.F/SCHEME
 C  DESCRIPTION
-C      SCHEME -- renormalization scheme: CSBAR, MSBAR, MSBDI,
-C                EVOLQ, EVOLG, ZEROQ, ZEROG, TRAJQ, TRAJG
+C      SCHEME -- DVCS renormalization scheme: CSBAR, MSBAR
 C  MEMBER OF
 C     PARCHR
 C  SYNOPSIS
@@ -218,24 +235,6 @@ C  MEMBER OF
 C     PARCHR
 C  SYNOPSIS
       CHARACTER ANSATZ*6
-C     ***
-
-C     ****v* header.F/PROCESS
-C  DESCRIPTION
-C      PROCESS -- process (DVCS or DIS)
-C  MEMBER OF
-C     PARCHR
-C  SYNOPSIS
-      CHARACTER PROCESS*6
-C     ***
-
-C     ****v* header.F/FFTYPE
-C  DESCRIPTION
-C      FFTYPE -- form-factor type (SINGLET or NONSINGLET)
-C  MEMBER OF
-C     PARCHR
-C  SYNOPSIS
-      CHARACTER FFTYPE*10
 C     ***
 
 C     ****v* header.F/DATFILE
@@ -313,22 +312,13 @@ C     ***
 
 C     ****v* header.F/NQS
 C  DESCRIPTION
-C      NQS -- Number of different Q2 values occuring in DVCS
-C             data. Set in subroutine INITC.
+C      NQS -- Number of different Q2 values used for given PID
 C  MEMBER OF
 C     NQS(block)
 C  SYNOPSIS
-      INTEGER NQS
-C     ***
-
-C     ****v* header.F/NQSDIS
-C  DESCRIPTION
-C      NQSDIS -- Number of different Q2 values occuring in DIS
-C                data. Set in subroutine INITC.
-C  MEMBER OF
-C     NQS(block)
-C  SYNOPSIS
-      INTEGER NQSDIS
+      INTEGER PIDMAX
+      PARAMETER (PIDMAX = 3)
+      INTEGER NQS(-4:PIDMAX)
 C     ***
 
 C     ****v* header.F/QS
@@ -339,17 +329,9 @@ C     QS(block)
 C  SYNOPSIS
       INTEGER QINDMAX
       PARAMETER (QINDMAX = 150)
-      DOUBLE PRECISION QS(QINDMAX)
+      DOUBLE PRECISION QS(-4:PIDMAX, QINDMAX)
 C     ***
 
-C     ****v* header.F/QSDIS
-C  DESCRIPTION
-C      QSDIS -- values of Q2 occuring in DIS data. Set in INITC.
-C  MEMBER OF
-C     QS(block)
-C  SYNOPSIS
-      DOUBLE PRECISION  QSDIS(QINDMAX)
-C     ***
 
 C     ****v* header.F/MTIND
 C  DESCRIPTION
@@ -447,17 +429,20 @@ C     ***
 
 *   4. Other
 
-      DOUBLE PRECISION PI, PIHALF, CF, CA, CG, TF, MP2
+      DOUBLE PRECISION PI, PIHALF, CF, CA, CG, TF, MP2, SQRT2
       DOUBLE PRECISION EMC, ZETA2, ZETA3, ZETA4
-      PARAMETER ( EMC  = 0.57721 56649D0, ZETA2 = 1.64493 40668D0,
-     ,            ZETA3 = 1.20205 69032D0, ZETA4 = 1.08232 32337D0 )
-      PARAMETER ( PI = 3.1415 92653 58979 D0 )
-      PARAMETER ( PIHALF = 1.5707 963267 948966 D0 )
-      PARAMETER ( CF = 4.0d0 / 3.0d0, CA = 3.0d0, TF = 0.5d0 )
-      PARAMETER ( CG = -1.0d0 / 6.0d0 )
+      DOUBLE COMPLEX ZERO, ONE
+      PARAMETER ( EMC  = 0.5772156649D0, ZETA2 = 1.6449340668D0,
+     ,            ZETA3 = 1.2020569032D0, ZETA4 = 1.0823232337D0 )
+      PARAMETER ( PI = 3.14159265358979D0 )
+      PARAMETER ( PIHALF = 1.5707963267948966D0 )
+      PARAMETER ( CF = 4.0d0/3.0d0, CA = 3.0d0, TF = 0.5d0 )
+      PARAMETER ( CG = -1.0d0/6.0d0 )
       PARAMETER ( MP2 = 0.880354d0 )
+      PARAMETER ( SQRT2 = 1.414213562373095d0 )
       DOUBLE COMPLEX TWOPII
-      PARAMETER ( TWOPII = (0.0d0, 6.2831 853071 795865 D0) )
+      PARAMETER ( ZERO = (0.D0, 0.D0), ONE = (1.D0, 0.D0) )
+      PARAMETER ( TWOPII = (0.0d0, 6.2831853071795865D0) )
 
 *     - Meson decay constants
       DOUBLE PRECISION FRHO, FOMEGA, FPHI
@@ -572,6 +557,16 @@ C  SYNOPSIS
       DOUBLE COMPLEX BIGC(NPWMAX,NPTSMAX,0:2,2)
 C     ***
 
+C     ****v* header.F/WC
+C  DESCRIPTION
+C     WC(PID, SEC, K, P, L) -- all Wilson coefficients
+C  MEMBER OF
+C     WC(block)
+C  SYNOPSIS
+      DOUBLE COMPLEX WC(-4:PIDMAX,NPWMAX,NPTSMAX,0:2,4)
+C     ***
+
+
 C     ****v* header.F/BIGCF2
 C  DESCRIPTION
 C     BIGCF2(K,P,flavour) -- "Big C" DIS F2 singlet Wilson coefficient  
@@ -584,54 +579,32 @@ C     ***
 
 C     ****v* header.F/GAMNS
 C  DESCRIPTION
-C      GAMNS(K,P) -- non-singlet DIS anomalous dimensions 
+C      GAMNS(SEC, K, P, 0) -- non-singlet DIS anomalous dimensions  \gamma^+
+C      GAMNS(SEC, K, P, 1) -- non-singlet DIS anomalous dimensions  \gamma^-
 C  MEMBER OF
-C     GAMNS(block)
+C     GAM(block)
 C  SYNOPSIS
-      DOUBLE COMPLEX GAMNS(NPTSMAX,0:2)
+      DOUBLE COMPLEX GAMNS(NPWMAX,NPTSMAX,0:2,0:1)
 C     ***
 
 C     ****v* header.F/GAM
 C  DESCRIPTION
-C      GAM(SEC,K,P,flavour_i,flavour_j) -- non-singlet DIS anomalous dimensions 
+C      GAM(SEC,K,P,flavour_i,flavour_j) -- singlet DIS anomalous dimensions 
 C  MEMBER OF
-C     GAMNS(block)
+C     GAM(block)
 C  SYNOPSIS
-      DOUBLE COMPLEX GAM(3,NPTSMAX,0:2,2,2)
+      DOUBLE COMPLEX GAM(NPWMAX,NPTSMAX,0:2,2,2)
 C     ***
 
-C     ****v* header.F/CGRIDNS
+C     ****v* header.F/WCE
 C  DESCRIPTION
-C      CGRIDNS(QIND,K) -- "Evolved" "big C" nonsinglet Wilson
-C      coefficients of DVCS i.e. multiplied by evolution operator for
+C      WCE(PID, SEC, QIND, K, L) -- "Evolved"  Wilson
+C      coefficients for all processes i.e. multiplied by evolution operator for
 C      evolution from Q02 to QS(QIND)
 C  MEMBER OF
-C    CGRIDNS(block)
+C    WCE(block)
 C  SYNOPSIS
-      DOUBLE COMPLEX CGRIDNS(QINDMAX, NPTSMAX)
-C     ***
-
-
-C     ****v* header.F/CGRID
-C  DESCRIPTION
-C      CGRID(SEC,QIND,K,flavour) -- "Evolved" "big C" singlet Wilson
-C      coefficients of DVCS i.e. multiplied by evolution operator for
-C      evolution from Q02 to QS(QIND)
-C  MEMBER OF
-C    CGRID(block)
-C  SYNOPSIS
-      DOUBLE COMPLEX CGRID(NPWMAX, QINDMAX, NPTSMAX, 2)
-C     ***
-
-C     ****v* header.F/CGRIDDIS
-C  DESCRIPTION
-C      CGRIDDIS(QIND,K,flavour) -- "Evolved" "big C" singlet Wilson
-C      coefficients of DIS F2 i.e. multiplied by evolution operator for
-C      evolution from Q02 to QSDIS(QIND)
-C  MEMBER OF
-C    CGRIDDIS(block)
-C  SYNOPSIS
-      DOUBLE COMPLEX CGRIDDIS(QINDMAX, NPTSMAX, 2)
+      DOUBLE COMPLEX WCE(-4:PIDMAX, NPWMAX, QINDMAX, NPTSMAX, 4)
 C     ***
 
 
@@ -739,7 +712,7 @@ C     ****c* header.F/PARINT
 C  DESCRIPTION
 C     Integer parameters
 C  SYNOPSIS
-      COMMON / PARINT /  SPEED, ACC, P, NF, CZERO
+      COMMON / PARINT /  SPEED, ACC, P, NF, CZERO, PID
 C     ***
 
 C     ****c* header.F/ASTRONG
@@ -767,7 +740,7 @@ C     ****c* header.F/PARCHR
 C  DESCRIPTION
 C     String parameters
 C  SYNOPSIS
-      COMMON / PARCHR /  SCHEME, ANSATZ, PROCESS, FFTYPE
+      COMMON / PARCHR /  SCHEME, ANSATZ
 C     ***
 
 C     ****c* header.F/FILENAMES
@@ -801,14 +774,14 @@ C     ****c* header.F/NQS(block)
 C  DESCRIPTION
 C      Number of different Q2 occuring in the DVCS and DIS data
 C  SYNOPSIS
-      COMMON / NQS        /  NQS, NQSDIS
+      COMMON / NQS        /  NQS
 C     ***
 
 C     ****c* header.F/QS(block)
 C  DESCRIPTION
 C      Values of Q2 occuring in the DVCS and DIS data
 C  SYNOPSIS
-      COMMON / QS         /  QS, QSDIS
+      COMMON / QS         /  QS
 C     ***
 
 C     ****c* header.F/MT
@@ -909,18 +882,18 @@ C  SYNOPSIS
       COMMON / BIGC     /  BIGC
 C     ***
 
-C     ****c* header.F/GAMNS(block)
+C     ****c* header.F/WC(block)
 C  DESCRIPTION
-C     Nonsinglet DIS anomalous dimensions 
+C     All Wilson coefficients
 C  SYNOPSIS
-      COMMON / GAMNS    /  GAMNS
+      COMMON / WC       /  WC
 C     ***
 
 C     ****c* header.F/GAM(block)
 C  DESCRIPTION
-C     Singlet DIS anomalous dimensions 
+C     DIS anomalous dimensions 
 C  SYNOPSIS
-      COMMON / GAM      /  GAM
+      COMMON / GAM      /  GAM, GAMNS
 C     ***
 
 C     ****c* header.F/BIGCF2(block)
@@ -930,26 +903,14 @@ C  SYNOPSIS
       COMMON / BIGCF2   /  BIGCF2
 C     ***
 
-C     ****c* header.F/CGRIDNS(block)
+
+C     ****c* header.F/WCE(block)
 C  DESCRIPTION
-C     "Evolved" non-singlet DVCS Wilson coefficients
+C     "Evolved" Wilson coefficients
 C  SYNOPSIS
-      COMMON / CGRIDNS  /  CGRIDNS
+      COMMON / WCE      /  WCE
 C     ***
 
-C     ****c* header.F/CGRID(block)
-C  DESCRIPTION
-C     "Evolved" singlet DVCS Wilson coefficients
-C  SYNOPSIS
-      COMMON / CGRID    /  CGRID
-C     ***
-
-C     ****c* header.F/CGRIDDIS(block)
-C  DESCRIPTION
-C     "Evolved" DIS F2 Wilson coefficients
-C  SYNOPSIS
-      COMMON / CGRIDDIS /  CGRIDDIS
-C     ***
 
 C     ****c* header.F/MBGPD(block)
 C  DESCRIPTION

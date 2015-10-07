@@ -15,13 +15,15 @@ C     Calculation of non-singlet R_1  (cf. my DIS-p61  for singlet case)
 C     - combination of gamma^(n) and beta_m needed in evolution operator 
 C  SYNOPSIS
 
-      SUBROUTINE RNNLONSF (K, R1, R2)
+      SUBROUTINE RNNLONSF (PRTY, SEC, K, R1, R2)
 
       IMPLICIT NONE
-      INTEGER K
+      INTEGER PRTY, SEC, K
       DOUBLE COMPLEX R1, R2
 
 C  INPUTS
+C        PRTY -- 0 for NS(+) and 1 for NS(-)
+C         SEC -- SO(3) PW
 C           K -- Mellin-Barnes integration point index
 C  OUTPUT
 C          R1 --  cf. DIS-p61
@@ -38,14 +40,15 @@ C
 *     Inverse beta_0 is often needed below
       INV = 1.0d0 / BETA0(NF)
 
-      R1 = INV * (GAMNS(K,1) 
-     &            - 0.5d0 * INV * BETA1(NF) * GAMNS(K,0))
+      R1 = INV * (GAMNS(SEC,K,1, PRTY) 
+     &            - 0.5d0 * INV * BETA1(NF) * GAMNS(SEC,K,0, PRTY))
 
       IF (P. GE. 2) THEN
 
-        R2 = INV * ( GAMNS(K, 2) - 0.5d0 * INV * BETA1(NF) * 
-     &     GAMNS(K, 1) - 0.25d0 * INV * BETA2(NF) * GAMNS(K, 0) +
-     &     0.25d0 * INV**2 * BETA1(NF)**2 * GAMNS(K, 0) )
+        R2 = INV * ( GAMNS(SEC,K, 2, PRTY) - 0.5d0 * INV * BETA1(NF) * 
+     &     GAMNS(SEC,K, 1, PRTY) - 0.25d0 * INV * 
+     &     BETA2(NF) * GAMNS(SEC,K, 0, PRTY) +
+     &     0.25d0 * INV**2 * BETA1(NF)**2 * GAMNS(SEC,K, 0, PRTY) )
 
       END IF
 

@@ -23,18 +23,20 @@ C  SYNOPSIS
 C  PARENTS
 C     PROCDATA
 C  CHILDREN
-C     LOOKUPQ
+C     GETQIND
 C  SOURCE
 C
 
       IMPLICIT NONE
-      INTEGER K, QIND
+      INTEGER K, QIND, GETQIND
       DOUBLE PRECISION RES, F2IMAG
       DOUBLE COMPLEX EPH, FPW, J
 #include "header.F"
 
 
-      CALL LOOKUPQ(QIND)
+      PID = 0
+      QIND = GETQIND()
+      CALL GETMBGPD
 
 *     Fixing forward kinematics:
       MTIND = 0
@@ -44,11 +46,19 @@ C
 
       DO 123 K = 1, NPTS
       J = N(1, K) - 1
-      FPW = CGRIDDIS(QIND,K,1) * GPDH(K,1) + 
-     &      CGRIDDIS(QIND,K,2) * GPDH(K,2)
+      FPW = WCE(0,1,QIND,K,1) * GPDH(K,1) + 
+     &      WCE(0,1,QIND,K,2) * GPDH(K,2)
       F2IMAG = IMAGPART( EPH / XI**J * FPW )
       RES = RES + WG(K)*F2IMAG
  123  CONTINUE
+
+      IF (NF .EQ. 3) THEN
+         CHARGEFAC =  2.0D0 / 9.0D0
+      ELSE IF (NF .EQ. 4) THEN
+         CHARGEFAC =  5.0D0 / 18.0D0
+      ELSE
+         STOP
+      END IF
 
       F2(P) = RES * CHARGEFAC / PI
 

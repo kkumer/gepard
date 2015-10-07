@@ -29,8 +29,7 @@ C
 #include "header.F"
 
 
-      PROCESS = 'DVCS'
-      FFTYPE = 'SINGLET'
+      PID = 1
       ANSATZ = 'FITNG'
 
       DATA XIA / 1.D-7,  5.D-7,  1.D-6,  5.D-6,  1.D-5,  5.D-5,
@@ -80,9 +79,6 @@ C
       CALL READPAR
 
       Q2 = 12.0D0
-      NQS = 1
-      QS(1) = Q2
-
        
 
       DO 30 SPEED = 1, 4
@@ -90,7 +86,6 @@ C
       DO 20 K = 1, 21
         XI = XIA(K)
         CALL INIT
-        CALL EVOLC(1,1)
         AUX = SIGMA ()
         WRITE (11, 901) XI, ABS((AUX-REF(K))/REF(K))
  20   CONTINUE

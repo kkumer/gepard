@@ -28,7 +28,7 @@ struct dblcomplex {
 
 /*   1. Constant parameters loaded from 'GEPARD.INI' or fixed by program */
 
-      /* CHARACTER SCHEME*5, ANSATZ*6, PROCESS*6, FFTYPE*10 */
+      /* CHARACTER SCHEME*5, ANSATZ*6, PROCESS*6 */
       /* COMMON / PARINT /  SPEED, ACC, P, NF, CZERO */
       /* DOUBLE PRECISION MU02, ASP(0:2) */
       /* COMMON / ASTRONG/  MU02, ASP */
@@ -36,7 +36,7 @@ struct dblcomplex {
       /* COMMON / PARFLT /  Q02, RF2, RR2, CHARGEFAC (OLD BLOCK) */
       /* COMMON / PARFLT /  Q02, RF2, RGPDF2, RDAF2, RR2, CHARGEFAC */
       /* INTEGER SPEED, ACC, P, NF, CZERO */
-      /* COMMON / PARCHR /  SCHEME, ANSATZ, PROCESS, FFTYPE */
+      /* COMMON / PARCHR /  SCHEME, ANSATZ  */
       /* COMMON / FILENAMES /  DATFILE, OUTFILE, CMDFILE */
 
 struct{

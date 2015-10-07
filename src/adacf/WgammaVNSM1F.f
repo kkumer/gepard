@@ -1,6 +1,7 @@
 *    
-       SUBROUTINE WgammaVNSP1F (NF, n, res)
+       SUBROUTINE WgammaVNSM1F (NF, n, res)
 *
+
 !f2py float(8) intent(in) :: NF
 !f2py complex(8) intent(in) :: n
 !f2py complex(8) intent(out) :: res
@@ -32,11 +33,12 @@
      &  0+3.d0*n+2.63d2*n**3+1.51d2*n**4+9.7d1*(n*n)))/(n**3*(1.
      &  d0+n)**3))+(-5.d-1*CF*CA+CF*CF)*(-3.d0+(1.6d1*(1.d0+2.d0
      &  *n)*S1)/(n**2*(1.d0+n)**2)+2.4d1*S2-(8.d0*(-1.d0+3.d0*n*
-     &  *3+n*n))/(n**3*(1.d0+n)**3)-(1.6d1*(1.d0+2.d0*n+2.d0*(n*
+     &  *3+n*n))/(n**3*(1.d0+n)**3)+(1.6d1*(1.d0+2.d0*n+2.d0*(n*
      &  n)))/(n**3*(1.d0+n)**3)+1.6d1*(-(1/(n*(1.d0+n)))+2.d0*S1
-     &  )*(S2-HS2(5.d-1*n))-8.d0*HS3(5.d-1*n)+6.4d1*(S1/n**2-6.2
-     &  5d-1*ZETA3+MellinF2(
-     &  n)-5.d-1*ZETA2*(-PSI(5.d-1*n)+PSI(5.d-1*(1.d0+n))))))
+     &  )*(S2-HS2(5.d-1*(n-1.d0)))-8.d0*HS3(5.d-1*(n-1.d0))+
+     &  6.4d1*(-S1/n**2-6.2
+     &  5d-1*ZETA3-MellinF2(
+     &  n)+5.d-1*ZETA2*(-PSI(5.d-1*n)+PSI(5.d-1*(1.d0+n))))))
 *
        RETURN
        END

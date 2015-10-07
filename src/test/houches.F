@@ -11,9 +11,7 @@ C    HOUCHES  --  Testing gepard routines
 C            
 C  DESCRIPTION
 C     Calculates evolution of PDFs (defined
-C     as in Les Houches accord) by using special
-C     'EVOLQ' and 'EVOLG' schemes where C = (1, 0) and
-C      (0, 1), respecively, to all orders.
+C     as in Les Houches accord)
 C
 C  CHILDREN
 C     INIT, PARWAVF, AS2PF
@@ -23,16 +21,14 @@ C
       PROGRAM HOUCHES
 
       IMPLICIT NONE
-      INTEGER K,  K1, QIND
+      INTEGER K,  K1
       DOUBLE COMPLEX EPH, J, FPW
-      DOUBLE PRECISION F2IMAG, RES, XG(4)
+      DOUBLE PRECISION F2IMAG, XG(4)
       DOUBLE PRECISION AS
       DOUBLE PRECISION LHXGLO(21), LHXGNLO(21)
       DOUBLE PRECISION LHXGNNLO(21), XIA(21)
 #include "header.F"
 
-      PROCESS = 'DIS'
-      FFTYPE = 'SINGLET'
 
 *  Values of Bjorken x
 
@@ -153,7 +149,7 @@ C
 *   Following artifical renorm. scheme has C = (0, 1) at
 *   all orders, thus effectively putting F_2 -> Q_s^2 x g(x)
 
-      PROCESS = 'DVCSZG'
+      PID = -2
       
 
 *   Parameters of Les Houches benchmark
@@ -168,11 +164,7 @@ C
       ASP(2) = 0.35D0 / (2.0d0 * PI)
 
       Q2 = 1.0D4
-      NQSDIS = 1
-      QSDIS(1) = Q2
-
-
-
+      DEL2 = 0.0d0
 
       OPEN (UNIT = 11, FILE = 'NLOACC.dat', STATUS = 'UNKNOWN') 
       OPEN (UNIT = 12, FILE = 'NNLOACC.dat', STATUS = 'UNKNOWN') 
@@ -184,54 +176,23 @@ C
       WRITE (*,*) 'SPEED = ', SPEED
 
 *  Gluon part - NLO evolution
+      P = 1
+      CALL INIT
       DO 35 K1 = 1, 21
         XI = XIA(K1)
-        RES = 0.0D0
-        P = 1
-        CALL INIT
-        CALL EVOLC(1,1)
-        DEL2 = 0.0d0
-        CALL GETMBGPD
-        EPH = EXP ( DBLCMPLX(0.0d0, PHI) )
-
-        MTIND = 0
-        QIND = 1
-        DO 30 K = 1, NPTS
-        J = N(1,K) - 1
-        FPW = CGRID(1,QIND,K,1) * GPDH(K, 1) + 
-     &        CGRID(1,QIND,K,2) * GPDH(K, 2)
-        F2IMAG = IMAGPART(EPH * (1.0d0/XI)**(J-C) * FPW )
-*       WRITE (*,*) CGRID(1,QIND, K, 1)
-        RES = RES + WG(K)*F2IMAG
- 30     CONTINUE
-
-        XG(3) = (1.0d0/XI)**(C) * RES / 3.1415926535897932
+        CALL CFFF
+        XG(3) = IMAGPART(CFF(P)) * XI / 3.1415926535897932
         WRITE (11, 803) XI, ABS((XG(3)-LHXGNLO(K1))/LHXGNLO(K1))
 *       WRITE (11, 803) XI, XG(3)
  35   CONTINUE
 
 *  Gluon part - NNLO evolution
+      P = 2
+      CALL INIT
       DO 45 K1 = 1, 21
         XI = XIA(K1)
-        RES = 0.0D0
-        P = 2
-        CALL INIT
-        CALL EVOLC(1,1)
-        CALL GETMBGPD
-        EPH = EXP ( DBLCMPLX(0.0d0, PHI) )
-
-
-        MTIND = 0
-        QIND = 1
-        DO 40 K = 1, NPTS
-        J = N(1,K) - 1
-        FPW = CGRID(1,QIND,K,1) * GPDH(K, 1) + 
-     &        CGRID(1,QIND,K,2) * GPDH(K, 2)
-        F2IMAG = IMAGPART(EPH * (1.0d0/XI)**(J-C) * FPW )
-        RES = RES + WG(K)*F2IMAG
- 40     CONTINUE
-
-        XG(4) = (1.0d0/XI)**(C) * RES / 3.1415926535897932
+        CALL CFFF
+        XG(4) = IMAGPART(CFF(P)) * XI / 3.1415926535897932
         WRITE (12, 803) XI, ABS((XG(4)-LHXGNNLO(K1))/LHXGNNLO(K1))
 *       WRITE (12, 803) XI, XG(4)
  45   CONTINUE

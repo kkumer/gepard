@@ -21,21 +21,51 @@ C  SYNOPSIS
 C  PARENTS
 C    PARSIGMA, cffHInternal, cffEInternal
 C  CHILDREN
-C    GETMBGPD, GETMBGPDMMA, LOOKUPQ, DCTAN
+C    GETMBGPD, GETMBGPDMMA, GETQIND, DCTAN
 C  SOURCE
 C
 
 
       IMPLICIT NONE
-      INTEGER K, QIND
-      DOUBLE COMPLEX EPH, J, CFAC, FPWH, FPWE
+      INTEGER K, QIND, GETQIND
+      DOUBLE COMPLEX EPH, J, CFAC, FPWH, FPWHNS, FPWE
       DOUBLE PRECISION RESREALH, RESIMAGH
       DOUBLE PRECISION FREALH, FIMAGH
       DOUBLE PRECISION RESREALE, RESIMAGE
       DOUBLE PRECISION FREALE, FIMAGE
-      DOUBLE PRECISION XIMEM
+      DOUBLE PRECISION XIMEM, CHARGEFACNS
 #include "header.F"
       DOUBLE COMPLEX DCTAN
+
+*     Charge factor
+
+*         -- SINGLET --
+        IF (NF .EQ. 3) THEN
+           CHARGEFAC =  2.0D0 / 9.0D0
+        ELSE IF (NF .EQ. 4) THEN
+           CHARGEFAC =  5.0D0 / 18.0D0
+        ELSE
+           CALL ERROR ('GeParD', ' INIT',
+     & 'NF is not integer equal to 3 or 4!                          ',
+     & 5, 3)
+        END IF
+*         -- NONSINGLET --
+        IF (NF .EQ. 3) THEN
+           CHARGEFACNS =  1.0D0 / 9.0D0
+        ELSE IF (NF .EQ. 4) THEN
+           CHARGEFACNS =  1.0D0 / 6.0D0
+        ELSE
+           CALL ERROR ('GeParD', ' INIT',
+     & 'NF is not integer equal to 3 or 4!                          ',
+     & 5, 3)
+        END IF
+
+*         -- when calculating just GPDs --
+
+      IF (PID .LE. -1) THEN
+          CHARGEFAC = 1.0d0
+          CHARGEFACNS = 1.0d0
+      ENDIF
 
       EPH = EXP ( DBLCMPLX(0.0d0, PHI) )
 
@@ -44,25 +74,12 @@ C
       RESREALE = 0.0d0
       RESIMAGE = 0.0d0
 
-
       XIMEM = XI
 *     -- when calculating just GPDs at eta=0 --
-      IF ( PROCESS(5:5) .EQ. 'Z' ) XI = 0
+      IF ((PID .EQ. -1) .OR. (PID .EQ. -2)) XI = 0
 
-      CALL LOOKUPQ(QIND)
-#ifdef MMA
-      IF (ANSATZ(:3) .EQ. 'MMA') THEN
-        CALL GETMBGPDMMA
-      ELSE
-        CALL GETMBGPD
-      END IF
-#else
-      IF (ANSATZ(:3) .EQ. 'MMA') THEN
-        WRITE(*,*) 'ANSATZ=MMA unavailable. Recompile with -D MMA'
-      ELSE
-        CALL GETMBGPD
-      END IF
-#endif
+      QIND = GETQIND()
+      CALL GETMBGPD
 
       XI = XIMEM
 
@@ -73,23 +90,22 @@ C
       J = N(1,K) - 1
       CFAC = EPH / XI**(J+1.d0)
 
-      IF ( FFTYPE(:7) .EQ. 'NONSING' ) THEN
-        FPWH = CGRIDNS(QIND,K)*GPDH(K,1)        
+        FPWHNS = WCE(PID,1,QIND,K,3)*GPDH(K,3) +
+     &                 WCE(PID,1,QIND,K,4)*GPDH(K,4) 
 *        FIXME: Following line could be wrong parameter no. It's ther
 *               just to avoid compiler warning ... NONSING is maybe
 *               broken!
-        FPWE = CGRIDNS(QIND,K)*PAR(17)*GPDE(K,1)        
-      ELSE
+*       FPWE = WCE(PID,1,QIND,K,3)*PAR(17)*GPDE(K,1)        
 *       --- singlet case ---
 *            --- CFF H ---
-        FPWH = CGRID(1,QIND,K,1)*GPDH(K,1) + 
-     &         CGRID(1,QIND,K,2)*GPDH(K,2)
+        FPWH = WCE(PID,1,QIND,K,1)*GPDH(K,1) + 
+     &         WCE(PID,1,QIND,K,2)*GPDH(K,2)
         FPWH = FPWH +  
-     &              PAR(17) * CGRID(2,QIND,K,1) * GPDH(K,1) + 
-     &              PAR(27) * CGRID(2,QIND,K,2) * GPDH(K,2)
+     &              PAR(17) * WCE(PID,2,QIND,K,1) * GPDH(K,1) + 
+     &              PAR(27) * WCE(PID,2,QIND,K,2) * GPDH(K,2)
         FPWH = FPWH +  
-     &              PAR(37) * CGRID(3,QIND,K,1) * GPDH(K,1) + 
-     &              PAR(47) * CGRID(3,QIND,K,2) * GPDH(K,2)
+     &              PAR(37) * WCE(PID,3,QIND,K,1) * GPDH(K,1) + 
+     &              PAR(47) * WCE(PID,3,QIND,K,2) * GPDH(K,2)
 *            --- CFF E ---
         IF (.NOT. ( (ANSATZ .EQ. 'EFL') .OR. (ANSATZ .EQ. 'EFLEXP')
      &           )) THEN
@@ -105,21 +121,22 @@ C
           PAR(28) = - PAR(18)*PAR(11) / (0.6d0 - PAR(11))
         END IF
 
-        FPWE = CGRID(1,QIND,K,1)*PAR(18)*GPDE(K,1) 
-     &       + CGRID(1,QIND,K,2)*PAR(28)*GPDE(K,2)
+        FPWE = WCE(PID,1,QIND,K,1)*PAR(18)*GPDE(K,1) 
+     &       + WCE(PID,1,QIND,K,2)*PAR(28)*GPDE(K,2)
         FPWE = FPWE +  
-     &            PAR(18) * PAR(117) * CGRID(2,QIND,K,1) * GPDE(K,1) + 
-     &            PAR(28) * PAR(127) * CGRID(2,QIND,K,2) * GPDE(K,2)
+     &          PAR(18) * PAR(117) * WCE(PID,2,QIND,K,1) * GPDE(K,1) + 
+     &          PAR(28) * PAR(127) * WCE(PID,2,QIND,K,2) * GPDE(K,2)
         FPWE = FPWE +  
-     &            PAR(18) * PAR(137) * CGRID(3,QIND,K,1) * GPDE(K,1) + 
-     &            PAR(28) * PAR(147) * CGRID(3,QIND,K,2) * GPDE(K,2)
-      END IF
+     &          PAR(18) * PAR(137) * WCE(PID,3,QIND,K,1) * GPDE(K,1) + 
+     &          PAR(28) * PAR(147) * WCE(PID,3,QIND,K,2) * GPDE(K,2)
 
       IF (ANSATZ(:1) .EQ. 'E') THEN
 *     PAR(38)=Delta-B for CFF-E as proposed by Markus
         FPWE = FPWE * EXP(PAR(48)*DEL2)
       END IF
 
+      FPWH = CHARGEFACNS*FPWHNS + CHARGEFAC*FPWH
+      FPWE = CHARGEFAC*FPWE
       FREALH = IMAGPART(CFAC * DCTAN(PIHALF*J) * FPWH)
       FREALE = IMAGPART(CFAC * DCTAN(PIHALF*J) * FPWE)
 
@@ -135,10 +152,9 @@ C
 
  123  CONTINUE
       
-*     Multiplying with charge factor
 
-      CFF(P) = CHARGEFAC * DBLCMPLX(RESREALH, RESIMAGH)
-      CFFE(P) = CHARGEFAC * DBLCMPLX(RESREALE, RESIMAGE) 
+      CFF(P) = DBLCMPLX(RESREALH, RESIMAGH)
+      CFFE(P) = DBLCMPLX(RESREALE, RESIMAGE) 
 
       RETURN
       END

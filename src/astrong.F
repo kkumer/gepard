@@ -40,7 +40,7 @@ C
       DOUBLE PRECISION FBETA1, FBETA2, FBETA3
       DOUBLE PRECISION XK0, XK1, XK2, XK3
       PARAMETER (NASTPS = 20)
-      PARAMETER ( SXTH = 0.16666 66666 66666 D0 )
+      PARAMETER ( SXTH = 0.166666666666666D0 )
 #include "header.F"
 
 *   The beta functions FBETAn at N^nLO for n = 1, 2, and 3

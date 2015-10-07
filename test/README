@@ -1,4 +1,4 @@
-2010-06-23 
+2014-01-17 
 
 Accuracy and dependence on SPEED (from GEPARD.INI) can be studied by
 the following test programs.
@@ -57,4 +57,7 @@ Good for testing influence of SPEED parameter. Plot it by
 xmgrace acc.dat -batch acc.bat
 
 
+NOTE:  accuracy of tests (especiall fourth and fifth)
+       improves if one increases PHI parameter in GEPARD INI from
+       pi/2 to something like 1.9
 ------------------------------------------------------------------------  

@@ -58,15 +58,13 @@ C
 #include "../header.F"
 
 
-      PROCESS = 'DVCS'
-      FFTYPE = 'SINGLET'
+      PID = 1
 
       CALL READPAR
 
 #include "ansatz.F"
       ANSATZ = 'FITBP'
 *     ANSATZ = 'NSFIT'
-      NQS = 1
 
 
 *     Files that will hold results
@@ -90,8 +88,6 @@ C
 
       Q2 = 2.5d0
       IF (NDEL .EQ. 1) Q2 = 100.0d0
-      NQS = 1
-      QS(1) = Q2
 
       LOGXI = LOGXISTART
       DO 20 PT = 1, LNPOINTS
@@ -125,10 +121,8 @@ C
 
       CALL INIT
       DEL2 = -0.25d0
-      CALL EVOLC(1,1)
       CALL CFFF 
       P = P - 1
-      CALL EVOLC(1,1)
       CALL CFFF 
       P = P + 1
 
