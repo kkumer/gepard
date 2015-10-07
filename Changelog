@@ -1,4 +1,8 @@
-2013-08-07 
+
+Version 0.9.7 2015-10-07 
+	- ADD: Merged pype into gepard 
+	- CHG: Moved to git and gitlab.com
+
 
 Version 0.9.6 2013-08-07 
 	- ADD: DVEM coefficient functions (just starting, DVEM not usable yet)
