@@ -1,10 +1,16 @@
 # Abbreviations for various collections of data
-import utils, Approach
+import os, utils, Approach
 
-data = utils.loaddata('data/gammastarp2gammap', approach=Approach.BMK)  
-data.update(utils.loaddata('data/ep2epgamma', approach=Approach.BMK))
-data.update(utils.loaddata('data/gammastarp2Mp', approach=Approach.BMK))
-data.update(utils.loaddata('data/DIS', approach=Approach.BMK))
+# load experimental data
+DATA_DIR = os.path.join(os.path.dirname(__file__), 'data')
+data = utils.loaddata(os.path.join(DATA_DIR,'ep2epgamma'), 
+       approach=Approach.BMK) 
+data.update(utils.loaddata(os.path.join(DATA_DIR, 'gammastarp2gammap'),
+       approach=Approach.BMK)) 
+data.update(utils.loaddata(os.path.join(DATA_DIR, 'gammastarp2Mp'),
+       approach=Approach.BMK)) 
+data.update(utils.loaddata(os.path.join(DATA_DIR, 'DIS'),
+       approach=Approach.BMK)) 
 #data.update(utils.loaddata('/home/kkumer/pype/data/gammastarp2gammap/EIC', approach=Approach.BMK))
 #data.update(utils.loaddata('/home/kkumer/pype/data/ep2epgamma/EIC', approach=Approach.BMK))
 

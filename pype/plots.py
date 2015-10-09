@@ -24,10 +24,15 @@ from constants import toTeX, Mp2, Mp, OBStoTeX
 from results import *
 
 # load experimental data
-data = utils.loaddata('data/ep2epgamma', approach=Approach.BMK) 
-data.update(utils.loaddata('data/gammastarp2gammap', approach=Approach.BMK)) 
-data.update(utils.loaddata('data/gammastarp2Mp', approach=Approach.BMK)) 
-data.update(utils.loaddata('data/DIS', approach=Approach.BMK)) 
+DATA_DIR = os.path.join(os.path.dirname(__file__), 'data')
+data = utils.loaddata(os.path.join(DATA_DIR,'ep2epgamma'), 
+       approach=Approach.BMK) 
+data.update(utils.loaddata(os.path.join(DATA_DIR, 'gammastarp2gammap'),
+       approach=Approach.BMK)) 
+data.update(utils.loaddata(os.path.join(DATA_DIR, 'gammastarp2Mp'),
+       approach=Approach.BMK)) 
+data.update(utils.loaddata(os.path.join(DATA_DIR, 'DIS'),
+       approach=Approach.BMK)) 
 
 ###  subplots_adjust options and their meanings:
  # left  = 0.125  # the left side of the subplots of the figure
