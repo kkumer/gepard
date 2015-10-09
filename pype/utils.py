@@ -18,6 +18,8 @@ FTFMC -- Fourier series fit with MC error propagation
 cvsets -- n-fold cross-validation sets
 FTanalyse -- Determine the number of harmonics present in bins according to 
              n-fold cross-validation.
+describe_data -- List observables in dataset.
+compare_harmonics --  
 """
 
 import os, re, string, fnmatch, itertools, logging
@@ -298,7 +300,7 @@ def listdata(ids, data):
         except KeyError:
             pass
 
-def listchis(ths, Q2cut=2., Q2max=1.e3, nsets=0):
+def listchis(ths, Q2cut=2., Q2max=1.e3, nsets=0, prob=False):
     """Compare chi-squares of theories for subsets of data."""
     if not isinstance(ths, list): ths = [ths]
     from abbrevs import H1ZEUS, ALUIpts, BCApts, CLASpts, BSDwpoints, BSSwpoints,\
@@ -306,7 +308,8 @@ def listchis(ths, Q2cut=2., Q2max=1.e3, nsets=0):
             BSACLAS_KKpoints, UNP5points, ALTGLO5points, BSACLAS_DMpoints, CLASTSApts,\
             AUTICSpts, CLASKKpts, AUTDVCSpts, H_AULpts, C_AULpts,\
             H_BSDwpts, H_BSSw0pts, H_BSSw1pts,\
-            C_BSDwpts, C_BSSw0pts, C_BSSw1pts
+            C_BSDwpts, C_BSSw0pts, C_BSSw1pts, H_BSD, H_BSS,\
+            C_BSD, C_BSS
     #exps[0] = ['UNP5points', 'ALTGLO5', 'CLAS', 'CLASDM', 'BSDw', 'BSSw', 'TSA1', 'BTSA', 'TPpoints']
     #ptssets[0] = [UNP5points, ALTGLO5points, data[25], data[8], BSDwpoints, BSSwpoints, TSA1points, BTSApoints, TPpoints]
     sets = {}
@@ -336,7 +339,9 @@ def listchis(ths, Q2cut=2., Q2max=1.e3, nsets=0):
             ('HERMES', 'AUTI', AUTIpts),
             ('HERMES', 'AUTICS', AUTICSpts),
             ('HERMES', 'AUTDVCS', AUTDVCSpts)]
-    sets[5] = [('H1ZEUS', 'X_DVCS', H1ZEUS), ('HERMES', 'ALUI', ALUIpts),
+    sets[5] = [
+            ('H1ZEUS', 'X_DVCS', H1ZEUS), 
+            ('HERMES', 'ALUI', ALUIpts),
             ('HERMES', 'BCA', BCApts), ('CLAS', 'BSA', CLASpts),
             ('HRM/CLS', 'AUL', AULpts), ('HERMES', 'ALL', ALLpts),
             ('HERMES', 'AUTI', AUTIpts),
@@ -345,31 +350,51 @@ def listchis(ths, Q2cut=2., Q2max=1.e3, nsets=0):
             ('Hall A', 'BSDw_s1', H_BSDwpts), ('Hall A', 'BSSw_c0', H_BSSw0pts),
             ('Hall A', 'BSSw_c1', H_BSSw1pts)
             ]
+    sets[6] = [
+            ('CLAS', 'BSDw_s1', C_BSDwpts), ('CLAS', 'BSSw_c0', C_BSSw0pts),
+            ('CLAS', 'BSSw_c1', C_BSSw1pts),
+            ('Hall A', 'BSDw_s1', H_BSDwpts), ('Hall A', 'BSSw_c0', H_BSSw0pts),
+            ('Hall A', 'BSSw_c1', H_BSSw1pts)
+            ]
+    sets[7] = [
+            ('CLAS', 'BSD', C_BSD), ('CLAS', 'BSS', C_BSS),
+            ('Hall A', 'BSD', H_BSD), ('Hall A', 'BSS', H_BSS)
+            ]
     #exps[2] = ['H1ZEUS DVCS', 'H1-09 XL', "H1-09 W-dep"]
     #ptssets[2] = [H1ZEUS, H109XL, H109WdepXL]
     #exps[3] = ['CLAS07 BSA', 'CLAS14 BSA', 'CLAS14 TSA', 'CLAS14 BTSA']
     #ptssets[3] = [BSACLAS_KKpoints, CLAS14BSApts, CLAS14TSApts, CLAS14BTSApts]
     names = [th.name[:10] for th in ths]
     sublines = ['------' for th in ths]
-    ftit = 21*' ' + len(names)*'{:^10s}'
-    fstr = '{:9s} {:7s}: ' + len(names)*'{:10.2f}' + '   (np ={dof:3d})'
+    if prob:
+        # We want probabilities
+        ftit = 20*' ' + len(names)*'{:<10s}'
+        fstr = '{:9s} {:7s}:  ' + len(names)*'{:<10.3g}' + '   (np ={dof:3d})'
+        chi_ind = 2
+    else:    
+        # We want chisq/npts
+        ftit = 21*' ' + len(names)*'{:^10s}'
+        fstr = '{:9s} {:7s}: ' + len(names)*'{:10.2f}' + '   (np ={dof:3d})'
+        chi_ind = 0
     print ftit.format(*names)
     print ftit.format(*sublines)
     total_chis = np.array([0. for th in ths])
     total_npts = 0
     for collab, obs, pts in sets[nsets]:
         cutpts = select(pts, criteria=['Q2>=%f' % Q2cut, 'Q2<=%f' % Q2max])
-        chis = [th.chisq(cutpts)[0] for th in ths]
+        chis = [th.chisq(cutpts)[chi_ind] for th in ths]
         total_chis += np.array(chis)
         npts = len(cutpts)
         total_npts += npts
-        # version with chis/npts printed:
-        chis = [chi/npts for chi in chis]
+        if not prob:
+            # version with chis/npts printed:
+            chis = [chi/npts for chi in chis]
         print fstr.format(collab, obs, *chis, dof=npts)
-    # version with chisq/npts:
-    total_chis = total_chis/total_npts
-    print ftit.format(*sublines)
-    print fstr.format('===', 'TOTAL', *total_chis.tolist(), dof=total_npts)
+    if not prob:
+        # version with chisq/npts:
+        total_chis = total_chis/total_npts
+        print ftit.format(*sublines)
+        print fstr.format('===', 'TOTAL', *total_chis.tolist(), dof=total_npts)
 
 
 
@@ -579,3 +604,63 @@ def FTanalyse(bins, HMAX=2, NS=1000, nf=3, Nrep=1):
     print "Highest extractable cos harmonic = {:.3f} +- {:.3f}".format(nc, delc)
     print "Highest extractable sin harmonic = {:.3f} +- {:.3f}\n".format(ns, dels)
     return int(np.round(nc)), int(np.round(ns))
+
+def describe_data(pts):
+    """Print observables and where they come from."""
+    all = []
+    print "{:2s} x {:5s}  {:6s}  {:4s}   {:3s} {:12s}".format(
+     'npt', 'obs', 'collab', 'FTn', 'id', 'ref.')
+    print 45*'-'
+    for pt in pts:
+        props = []
+        for prop in ['y1name', 'collaboration', 'FTn', 'id', 'reference']:
+            if hasattr(pt, prop):
+                if prop=='y1name' and pt.y1name=='X' and pt.has_key('t'):
+                    props.append('Xt')
+                else:
+                    props.append(str(getattr(pt,prop)))
+            else:
+                props.append('N/A')
+        all.append(tuple(props))
+    tot = len(all)
+    uniqs = set(all)
+    cc = 0
+    for uniq in sorted(uniqs):
+        n = all.count(uniq)
+        cc += n
+        print "{:2d} x {:5s}  {:6s}  {:4s}   {:3s} {:12s}".format(n, *uniq)
+    assert cc == tot
+    print 45*'-'
+    print "TOTAL = {}".format(tot)
+    return tot
+
+def _hmax(amp, trig):
+    """Index of largest harmonic"""
+    if amp == 'DVCS':
+        return 2
+    if amp == 'BH':
+        if trig == 'c':
+            return 2
+        else:
+            return 1
+    return 3
+
+def compare_harmonics(th, pt, pol='unp'):
+    """Print relative sizes of nonzero harmonics."""
+    amps = []
+    for amp in ['BH', 'INT', 'DVCS']:
+        prefac = getattr(th, 'PreFac'+amp)(pt)
+        for trig in ['c','s']:
+            for k in range(int(trig=='s'), _hmax(amp,trig)+1):
+                name = trig+amp+str(k)+pol
+                try:
+                    res = prefac*getattr(th,name)(pt)
+                    if abs(res) > 0:
+                        amps.append((abs(res), np.sign(res), name))
+                except AttributeError:
+                    # amps.append(('N/A', name))
+                    pass
+    amps = sorted(amps, reverse=True)
+    max = amps[0][0]
+    for value, sign, name in amps:
+        print "{:9s} = {: .3g}".format(name, sign*value/max)

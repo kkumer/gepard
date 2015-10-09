@@ -17,6 +17,8 @@ if os.sys.platform == 'win32':
 #else: #linux
 #    matplotlib.use('TkAgg')
 #import pylab as plt
+# Following works better in jupyter:
+matplotlib.rcParams['figure.figsize'] = (7.0, 5.0)
 
 
 import Data, Approach, utils
@@ -309,6 +311,15 @@ def HERMES12(path=None, fmt='png', **kwargs):
             if (npanel % 3) == 2:
                 # Adjust x-axis on middle column
                 ax.set_xlim(0.04, 0.25)
+                ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))  # tickmarks
+            if npanel == 2:
+                handles, labels = ax.get_legend_handles_labels()
+                handles.pop()
+                labels.pop()
+                ax.legend(handles, labels, handlelength=2.0,
+                 prop=matplotlib.font_manager.FontProperties(size="small"),
+                    loc="upper center").draw_frame(0)
+    fig.subplots_adjust(wspace=0.3, hspace=0.4)
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
@@ -537,14 +548,14 @@ def HERMES08TP(path=None, fmt='png', **kwargs):
                 xlabels = ['$-t\\; [{\\rm GeV}^2]$', '$x_B$', '$Q^2\\; [{\\rm GeV}^2]$']
                 ax.set_xlabel(xlabels[npanel-7], fontsize=16)
             if npanel == 3 and kwargs:
-                ax.legend(bbox_to_anchor=(0., 1.), loc='upper right',
-                        borderaxespad=0.).draw_frame(0)
+                #ax.legend(bbox_to_anchor=(0., 1.), loc='upper right',
+                #        borderaxespad=0.).draw_frame(0)
                 pass
             ax.yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.2))  # tickmarks
             ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
             for label in ax.get_xticklabels() + ax.get_yticklabels():
                 label.set_fontsize(10)
-    fig.subplots_adjust(bottom=0.35, wspace=0.0, hspace=0.0)
+    fig.subplots_adjust(bottom=0.135, wspace=0.0, hspace=0.0, left=0.15)
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
@@ -559,7 +570,7 @@ def CLAS(path=None, fmt='png', **kwargs):
     #dataset = data[25]
     title = ''
     title = 'CLAS (Girod:2007aa)'
-    fig, axs = plt.subplots(2, 3, sharey=True, sharex=True, figsize=[7,5])
+    fig, axs = plt.subplots(2, 3, sharey=True, sharex=True)
     axs = axs.reshape(6)
     fig.canvas.set_window_title(title)
     fig.suptitle(title)
@@ -693,7 +704,7 @@ def CLAS15(obs='BSA', path=None, fmt='png', **kwargs):
         ymin, ymax = -0.35, 0.35
     else:
         raise ValueError, 'Observable %s unavailable.' % obs
-    fig, axs = plt.subplots(3, 2, sharey=True, sharex=True, figsize=[8,12])
+    fig, axs = plt.subplots(3, 2, sharey=True, sharex=True)
     axs = axs.reshape(6)
     fig.canvas.set_window_title(title)
     fig.suptitle(title + ' -- ' +  obs, fontsize=20)
@@ -919,7 +930,7 @@ def HallAFT(path=None, fmt='png', **kwargs):
                 ['$d^{\,4}\\sigma^{\,\\cos0\\phi,w}$'] + \
                 ['$d^{\,4}\\sigma^{\,\\cos\\phi,w}$']
     title = 'MunozCamacho:2006hx'
-    fig = plt.figure(figsize=[8,6])
+    fig = plt.figure()
     fig.canvas.set_window_title(title)
     fig.suptitle(title)
     Qs = ['1.5', '1.9', '2.3', '2.3', '2.3']
@@ -952,7 +963,7 @@ def HallAphi(path=None, fmt='png', **kwargs):
     subsets[23] = utils.select(data[34], criteria=['t == -0.28'])
     subsets[24] = utils.select(data[34], criteria=['t == -0.33'])
     title = ''
-    fig = plt.figure(figsize=[10,6])
+    fig = plt.figure()
     fig.canvas.set_window_title(title)
     fig.suptitle(title)
     fig.subplots_adjust(wspace=0.2)
@@ -1081,11 +1092,11 @@ def H1ZEUS(path=None, fmt='png', **kwargs):
     xs = ['t', 't', 'W', 'Q2']
     #title = 'H1 07 / ZEUS 08'
     title = ''
-    fig = plt.figure(figsize=[10,6])
+    fig = plt.figure()
     fig.canvas.set_window_title(title)
     fig.suptitle(title)
     #fig.subplots_adjust(bottom=0.1, hspace=0.3)
-    #fig.subplots_adjust(wspace=0.2)
+    fig.subplots_adjust(hspace=0.4)
     for npanel in range(1,5):
         ax = fig.add_subplot(2,2,npanel)
         ax.set_yscale('log')  # y-axis to be logarithmic
@@ -1107,13 +1118,17 @@ def H1ZEUS(path=None, fmt='png', **kwargs):
         else: # npanel 4
             ax.set_xlabel('$Q^2\\quad [{\\rm GeV}^2]$', fontsize=18)
         if npanel==1:
-            ax.text(-0.8, 22, '${\\rm H1}$', fontsize=16)
-            ax.text(-0.8, 10, '${\\rm W = 82}\\, {\\rm GeV}$', fontsize=12)
-            ax.text(-0.8, 3, '$Q^2\\!= 8,\\, 15.5,\\, 25\\,{\\rm GeV}^2$', fontsize=12)
+            ax.text(-0.78, 22, '${\\rm H1}$', fontsize=16)
+            ax.text(-0.78, 10, '${\\rm W = 82}\\, {\\rm GeV}$', fontsize=12)
+            ax.text(-0.78, 3, '$Q^2\\!= 8,\\, 15.5,\\, 25\\,{\\rm GeV}^2$', fontsize=12)
         if npanel==2:
             ax.text(-0.3, 6, '${\\rm ZEUS}$', fontsize=16)
             ax.text(-0.3, 3.5, '${\\rm W = 104}\\, {\\rm GeV}$', fontsize=12)
             ax.text(-0.3, 2.1, '$Q^2\\!= 3.2\\,{\\rm GeV}^2$', fontsize=12)
+            handles, labels = ax.get_legend_handles_labels()
+            handles.pop()
+            labels.pop()
+            ax.legend(handles, labels, loc="upper left").draw_frame(0)
         if npanel==3:
             ax.text(50, 28, '${\\rm ZEUS}\\, (idem):$', fontsize=16)
             ax.text(50, 5, '${\\rm H1}\\, (idem):$', fontsize=16)
@@ -2359,7 +2374,7 @@ def CFF(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
     cffs    -- List of CFFs to be plotted. Each produces two panels.
 
     """
-    title = ''
+    title = 'CFF'
     fig = plt.figure()
     fig.canvas.set_window_title(title)
     fig.suptitle(title)

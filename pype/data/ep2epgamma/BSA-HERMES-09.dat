@@ -36,7 +36,7 @@ out3particle = gamma
 ### Observable 
 # A^{sin *phi}_{LU,I}
 
-y1name = BSA 
+y1name = ALUI
 y1namelong = Beam Spin Asymmetry - Amplitude of Azimuthal Angle Harmonic sin(n phi)
 y1unit = 1
 y1value = column5

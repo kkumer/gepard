@@ -17,6 +17,10 @@ from matplotlib.patches import Polygon
 #import Data, Model, Approach, utils
 from abbrevs import *
 
+RASTER = False
+rorder = -3000
+if RASTER:
+    rorder = 1
 
 ######################################################################
 # Convex Hull code by  Dinu C. Gherman
@@ -102,18 +106,24 @@ for pt in HallAall:
     pta.xB = pta.xB+0.005
     shifted.append(pta)
     
-fixed = [('CLAS', CLASall), ('HERMES', HERMESall), ('Hall A', HallAall+shifted)]
+fixed = [
+         ('HERMES', HERMESall), 
+         ('CLAS', CLASall+data[90]+data[97]), 
+         ('Hall A', data[109]+data[110]+data[111]+HallAall+shifted)]
 
-fig = plt.figure(figsize=(10,5))
+fig = plt.figure(figsize=(8,4))
 
 colors = ['red', 'blue', 'green', 'purple', 'orange']
-markers = ['o', '+', 'v', '+', 's']
+#markers = ['o', '+', 'v', '+', 's']
+markers = ['.', '.', '.', '.', '.']
+styles = ['solid', 'dashed', 'solid', 'dashed', 'dotted']
 
 ordinate = sys.argv[1]
 
 k = 0
 # collider
 ax = fig.add_subplot(121)
+ax.set_rasterization_zorder(rorder)
 ax.set_xscale('log')
 if ordinate == 'Q2':
     ax.set_yscale('log')
@@ -126,50 +136,58 @@ for label, set in collider:
             pass
     hull = convexHull(points)
     ax.add_patch(Polygon(hull, closed=True, fill=True, 
-        facecolor=colors[k], alpha=0.4, label=label))
+        ls=styles[k], lw=2.2,
+        facecolor=colors[k], alpha=0.5, label=label, zorder=0))
     ax.scatter([x for x,y in points], [y for x,y in points], 
-            facecolor=colors[k],marker=markers[k])
+            facecolor=colors[k],marker=markers[k], s=0.5, zorder=1)
     k += 1
-ax.legend(loc=(1.0,0.7),
+ax.legend(loc=(0.05,0.7),
         prop=matplotlib.font_manager.FontProperties(size="larger")).draw_frame(0)
-ax.set_xlabel('$x_B$', fontsize=20)
+ax.set_xlabel('$x_B$', fontsize=14)
 if ordinate == 't':
-    ax.set_ylabel('$t\\,[{\\rm GeV}^2]$', fontsize=20)
-    ax.text(1.5e-4, 0.05, "collider", fontsize=14)
+    ax.set_ylabel('$t\\,[{\\rm GeV}^2]$', fontsize=14)
+    ax.text(1.5e-4, 0.05, "collider", fontsize=12)
 else:
-    ax.set_ylabel('$Q^{2}\\,[{\\rm GeV}^2]$', fontsize=20)
-    ax.text(1.5e-5, 75., "collider", fontsize=14)
+    ax.set_ylabel('$Q^{2}\\,[{\\rm GeV}^2]$', fontsize=14)
+    ax.text(1.5e-5, 75., "collider", fontsize=12)
     ax.yaxis.set_major_formatter(matplotlib.ticker.FormatStrFormatter('%3i'))
 for label in ax.get_xticklabels() + ax.get_yticklabels():
-    label.set_fontsize(14)
+    label.set_fontsize(12)
 ax.autoscale_view()
 # fixed target
 ax = fig.add_subplot(122)
+ax.set_rasterization_zorder(rorder)
 for label, set in fixed:
     points = [(pt.xB, getattr(pt, ordinate)) for pt in set]
     hull = convexHull(points)
-    ax.add_patch(Polygon(hull, closed=True, fill=True, 
-        facecolor=colors[k], alpha=0.5, label=label))
+    ax.add_patch(Polygon(hull, closed=True, fill=True,
+        ls=styles[k], lw=2.2,
+        facecolor=colors[k], alpha=0.5, label=label, zorder=0))
     ax.scatter([x for x,y in points], [y for x,y in points], 
-            facecolor=colors[k],marker=markers[k])
+            facecolor=colors[k],marker=markers[k], s=0.5, zorder=1)
     k += 1
-ax.legend(loc=(1.0,0.7),
-        prop=matplotlib.font_manager.FontProperties(size="larger")).draw_frame(0)
-ax.set_xlabel('$x_B$', fontsize=20)
-#ax.set_ylabel('$Q^2\\,[{\\rm GeV}^2]$', fontsize=20)
+l = ax.legend(loc=(0.48,0.65), 
+        #prop=matplotlib.font_manager.FontProperties(size="larger")
+             )
+l.draw_frame(0)
+#l.set_zorder(rorder)  # to rasterize, but you don't want that
+ax.set_xlabel('$x_B$', fontsize=14)
+#ax.set_ylabel('$Q^2\\,[{\\rm GeV}^2]$', fontsize=12)
 if ordinate == 't':
-    ax.text(0.03, 0.1, "fixed targets", fontsize=14)
+    ax.text(0.03, 0.1, "fixed targets", fontsize=12)
 else:
-    ax.text(0.03, 6.5, "fixed targets", fontsize=14)
+    ax.text(0.03, 6.5, "fixed targets", fontsize=12)
     ax.yaxis.set_major_formatter(matplotlib.ticker.FormatStrFormatter('%2i'))
 for label in ax.get_xticklabels() + ax.get_yticklabels():
-    label.set_fontsize(14)
+    label.set_fontsize(12)
 ax.autoscale_view()
 fig.tight_layout()
-fig.subplots_adjust(wspace=0.4)
-plt.show()
-#fig.savefig('data.pdf', format='pdf')
-
+#fig.subplots_adjust(wspace=0.4)
+#plt.show()
+#fig.savefig('coverage.png', format='png')
+#fig.savefig('coverage.eps', format='eps')   # and set RASTER=True above
+fig.savefig('coverage.pdf', format='pdf')
+# And then rasterize  with pdftops -eps -r 600 coverage.pdf coverage.eps
 
 
 #if __name__ == '__main__':

@@ -69,6 +69,8 @@ CLAS14BTSApts = data[87]
 C_BSDwpts = data[101]
 C_BSSw0pts = data[102][:48]
 C_BSSw1pts = data[102][48:]
+C_BSD = utils.select(data[99], criteria=['val != 0'])
+C_BSS = utils.select(data[100], criteria=['val != 0'])
 #
 # Hall A
 #
@@ -78,6 +80,8 @@ HApts = BSDwpoints[::2] + BSSwpoints[::2]
 H_BSDwpts = data[117]
 H_BSSw0pts = data[116][:10]
 H_BSSw1pts = data[116][10:]
+H_BSD = data[109]+data[110]+data[111]
+H_BSS = data[107]+data[108]
 #
 # EIC mock
 #

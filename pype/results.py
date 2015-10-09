@@ -2531,7 +2531,7 @@ True, 'DELM2G': 0.0}
 #####################################
 # P(chi-square, d.o.f) = P(124.12, 80) = 0.0012
 # 
-# GLOnoBSS2 = H1ZEUS + ALUIpts + BCApts + CLASpts + BSDwpoints + AULpts + ALLpts + AUTIpts
+# GLOnoBSS2 = H1ZEUS + ALUIpts + BCApts + CLASptsOLD + BSDwpoints + AULptsOLD + ALLpts + AUTIpts
 # + BSSwpoints
 # 
 #    Mv =    0.951 +- 0.282  (p = 0.00114)          H1ZEUS: chi/npts =  28.57/35

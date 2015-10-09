@@ -32,23 +32,27 @@ def test_KM10():
     th = db['KM10']
     pts = H1ZEUSpoints + UNP5points
     chisq = th.chisq(pts)[0]
-    assert_almost_equal(chisq, 135.85499940324056)
+    #assert_almost_equal(chisq, 135.85499940324056)
+    # from BSA to ALUI
+    assert_almost_equal(chisq, 135.72627340347722)
 
 test_KM10.long = 1
 
 def test_KM10a():
     """Test model: KM10a"""
     th = db['KM10a']
-    pts = DVCSpoints+data[48]+ALTGLOpoints
+    pts = H1ZEUSpoints+ALTGLOpoints
     chisq = th.chisq(pts)[0]
-    assert_almost_equal(chisq, 132.14636420551949)
+    #assert_almost_equal(chisq, 132.14636420551949)
+    # from BSA to ALUI
+    assert_almost_equal(chisq, 129.18281370844684)
 
-#def test_KM10b():
-    #"""Test model: KM10b"""
-    #th = db['KM10b']
-    #pts = DVCSpoints+GLO1points
-    #chisq = th.chisq(pts)[0]
-    #assert_almost_equal(chisq, ???)
+def test_KM10b():
+    """Test model: KM10b"""
+    th = db['KM10b']
+    pts = DVCSpoints+GLOpoints+data[30]
+    chisq = th.chisq(pts)[0]
+    assert_almost_equal(chisq, 115.54198973827977)
 
 def test_KMM12():
     """Test model: KMM12"""
