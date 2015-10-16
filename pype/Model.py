@@ -83,13 +83,13 @@ class Model(object):
                             % (par, self))
                 self.parameters['fix_'+par] = True
 
-    def print_parameters(self, compare_with=[], exact=False, colors=True):
+    def print_parameters(self, compare_with=[], exact=False, colors=True, delta=0.05):
         """Pretty-print parameters and their values.
 
         Variable parameters are printed green, while parameters with values
         at the limits of their range are printed red.
         If additional models are given in compare_with list, their parameter
-        values are also printed and differences larger than 5% are denoted
+        values are also printed and differences larger than delta are denoted
         by blue and red coloring.
 
         """
@@ -112,15 +112,18 @@ class Model(object):
                 except KeyError:
                     # compared model doesn't have this parameter
                     value2 = 0
-                app = '   %-5.3g' % value2
+                if exact:
+                    app = '   %-g' % value2
+                else:
+                    app = '   %-5.3g' % value2
                 #app = ('   '+parform) % value2
                 # calculate relative diff, or absolute if value is zero
                 diff = value - value2
                 if value != 0:
                     diff = diff/abs(value)
-                if diff > 0.05:
+                if diff > delta:
                     app = stringcolor(app, 'red', colors)
-                elif diff < -0.05:
+                elif diff < -delta:
                     app = stringcolor(app, 'blue', colors)
                 row += app
             row += '\n'
