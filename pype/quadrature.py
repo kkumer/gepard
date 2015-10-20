@@ -19,6 +19,15 @@ roots18 = real(roots18)
 [roots35, weights35] = p_roots(35)  # roots and weigths for 35-th order quadrature
 roots35 = real(roots35)
 
+[roots81, weights81] = p_roots(81)  # roots and weigths for 81-th order quadrature
+roots81 = real(roots81)
+
+def quadSciPy81(func,a,b,args=()):
+    """Compute a definite integral using 81-order Gaussian quadrature.
+    Adapted from scipy."""
+    y = (b-a)*(roots81+1)/2.0 + a
+    return (b-a)/2.0*sum(weights81*func(y,*args),0)
+
 def quadSciPy35(func,a,b,args=()):
     """Compute a definite integral using 35-order Gaussian quadrature.
     Adapted from scipy."""
