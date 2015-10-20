@@ -3642,11 +3642,19 @@ class BM10(BM10ex):
         else:
             return res.real
 
-#
-# class Trento(BMK):
-#     """ This is just for data loading when one wants to stay in Trento frame
-#     Needed for plotting.
-#
-#     """
-#     def to_conventions(pt):
-#         pass
+class BM10tw2(BM10):
+    """According to BM arXiv:1005.5209 [hep-ph]
+
+    This is BM10, but with C^{INT}_{2,3} set to zero for agreement
+    with Dieter.
+    """
+
+    def cINT2unp(self, pt): return 0
+    def cINT3unp(self, pt): return 0
+    def sINT2unp(self, pt): return 0
+    def sINT3unp(self, pt): return 0
+    def cINT2LP(self, pt): return 0
+    def cINT3LP(self, pt): return 0
+    def sINT2LP(self, pt): return 0
+    def sINT3LP(self, pt): return 0
+
