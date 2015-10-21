@@ -47,12 +47,17 @@ def test_KM10a():
     # from BSA to ALUI
     assert_almost_equal(chisq, 129.18281370844684)
 
+test_KM10a.long = 1
+
 def test_KM10b():
     """Test model: KM10b"""
     th = db['KM10b']
     pts = DVCSpoints+GLOpoints+data[30]
     chisq = th.chisq(pts)[0]
     assert_almost_equal(chisq, 115.54198973827977)
+
+test_KM10b.long = 1
+
 
 def test_KMM12():
     """Test model: KMM12"""

@@ -6,12 +6,17 @@ import sys, logging, warnings
 import numpy as np
 
 try:
-    from iminuit import Minuit, InitialParamWarning
+    from minuit import Minuit
 except:
     pass
 
-# FIXME: maybe we should not switch this off so bluntly
-warnings.simplefilter('ignore', InitialParamWarning, append=False)
+try:
+    from iminuit import iMinuit, InitialParamWarning
+    # FIXME: maybe we should not switch this off so bluntly
+    warnings.simplefilter('ignore', InitialParamWarning, append=False)
+except:
+    pass
+
 
 _lg = logging.getLogger('p.%s' % __name__)
 #_lg.setLevel('logging.INFO')
@@ -39,7 +44,7 @@ class FitterMinuit(Fitter):
     def __init__(self, fitpoints, theory, **kwargs):
         self.fitpoints = fitpoints
         self.theory = theory
-        self.printMode = 0 # since iminuit doesn't have it
+        self.printMode = 0
 
         # FIXME: ugly hack because Minuit counts the arguments of fcn so 'self'
         #        is not allowed

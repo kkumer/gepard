@@ -73,6 +73,7 @@ def test_gepardfitsimple():
     assert_almost_equal(chisq, 5.14343218, 3)
     tGepard.model.fix_parameters('ALL')
 
+test_gepardfitsimple.long = 1
 test_gepardfitsimple.gepardsuite = 1
 
 def test_gepardfitDVCSsumso3():
@@ -232,6 +233,8 @@ def test_hybridfitGepard():
     chisq = t.chisq(fitpoints)[0]
     assert_almost_equal(chisq, 5.1423271052023196, 2)
     tGepard.model.fix_parameters('ALL')
+
+test_hybridfitGepard.long = 1
 
     
 def test_hybridfitDVCS():

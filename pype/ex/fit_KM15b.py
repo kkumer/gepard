@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 
 import shelve, logging
 logging.basicConfig(level=logging.INFO)
@@ -8,25 +8,31 @@ from results import *
 from utils import listdb
 from abbrevs import *
 
+db = shelve.open('theories.db')
+
 # Gepard sea part
 mGepard = Model.ComptonGepard(p=0)
 Model.ComptonGepard.gepardPool.pop()
 # DR part
 mDRsea = Model.ComptonModelDRPPsea()
 # Hybridization
-m = Model.HybridDipole(mGepard, mDRsea)
-th = Approach.BM10(m)
+m = Model.HybridKelly(mGepard, mDRsea)
+th = Approach.BM10tw2(m)
 
 ## Do the total DVCS fit
 th.model.fix_parameters('ALL')
 th.model.release_parameters('Mv', 'rv', 'bv', 'C', 'MC', 
 'tMv', 'trv', 'tbv', 'rpi', 'Mpi', 'M02S', 'SECS', 'THIS', 'SECG', 'THIG')
-# Next line helps shorten time
-m.parameters.update(KMM12)
-f = Fitter.FitterMinuit(GLO15 + data[116] + data[117], th)
+#pars_Gepard = db['KM15prelimC'].m.Gepard.parameters
+#pars_DR = db['KM15prelimC'].m.DR.parameters
+#del pars_Gepard['EKAPG']
+#del pars_Gepard['EKAPS']
+#m.parameters.update(pars_Gepard)
+#m.parameters.update(pars_DR)
+f = Fitter.FitterMinuit(GLO15b , th)
 f.minuit.tol = 80
-f.minuit.printMode = 1
-f.minuit.maxcalls = 6000
+#f.minuit.printMode = 1
+#f.minuit.maxcalls = 3000
 f.fit()
 
 th.print_chisq(f.fitpoints)

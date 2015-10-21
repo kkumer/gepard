@@ -143,6 +143,9 @@ GLOnoBSS = H1ZEUS[::3] + ALUIpts + BCApts + CLASptsOLD + BSDwpoints[::2] + AULpt
 #               12         6         12        4           6              4+6      4         4
 GLOnoBSS2 = H1ZEUS + ALUIpts + BCApts + CLASptsOLD + BSDwpoints + AULptsOLD + ALLpts + AUTIpts
 GLO15 = H1ZEUS + ALUIpts + BCApts + CLASpts + AULpts + ALLpts + AUTIpts
+GLO15new = data[94]+data[95]+data[96]+data[101]+data[102]+data[116]+data[117]
+# Removing dependent CLAS07 data and adding all new 2015 data:
+GLO15b = H1ZEUS + ALUIpts + BCApts + CLAS08pts + AULpts + ALLpts + AUTIpts + GLO15new
 unppts = [ALUIpts, BCApts[6:], CLASpts, BSSwpoints[::-2]]
 polpts = [TSA1points[:4], data[54], BTSApoints[:4], AUTIpoints[:4], AUTDVCSpoints[:4]]
 #
