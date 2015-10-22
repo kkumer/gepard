@@ -65,6 +65,16 @@ class Approach(object):
         else:
             return (chi, dof, fitprob)
 
+    def pull(self, points, **kwargs):
+        """Return average pull (O(th)-O(exp)/sigma(exp) for a set of points."""
+        if kwargs.pop('displacement', False):
+            pulls = [(self.predict(pt, observable=pt.yaxis, **kwargs) 
+                - pt.val) / pt.val for pt in points]
+        else:
+            pulls = [(self.predict(pt, observable=pt.yaxis, **kwargs) 
+                - pt.val) / pt.err for pt in points]
+        return sum(pulls)/len(points)
+
     def scan(self, parname, points, npoints=5):
         """Scan chi-square dependence on single parameter."""
         mem = self.m.parameters[parname]
