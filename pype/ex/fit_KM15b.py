@@ -18,6 +18,7 @@ mDRsea = Model.ComptonModelDRPPsea()
 # Hybridization
 m = Model.HybridKelly(mGepard, mDRsea)
 th = Approach.BM10tw2(m)
+th.name = 'KM15prelimE'
 
 ## Do the total DVCS fit
 th.model.fix_parameters('ALL')
@@ -31,8 +32,8 @@ th.model.release_parameters('Mv', 'rv', 'bv', 'C', 'MC',
 #m.parameters.update(pars_DR)
 f = Fitter.FitterMinuit(GLO15b , th)
 f.minuit.tol = 80
-#f.minuit.printMode = 1
-#f.minuit.maxcalls = 3000
+f.minuit.printMode = 1
+f.minuit.maxcalls = 3000
 f.fit()
 
 th.print_chisq(f.fitpoints)
