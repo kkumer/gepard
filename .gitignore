@@ -1,5 +1,6 @@
 # Aux files
 **/*.o
+**/*.swp
 **/*.so
 **/*.pyc
 **/my*

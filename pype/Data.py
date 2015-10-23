@@ -17,7 +17,7 @@ DummyPoint -- class for points which have just few relevant attributes
 import os, re, math, copy
 from numpy import pi
 
-# import pylab as plt
+import pandas as pd
 
 import utils
 from constants import Mp, Mp2
@@ -250,4 +250,20 @@ class DataSet(list):
         tmp = DataSet(self[start:end:step])
         tmp.__dict__ = self.__dict__.copy() # transfer the attributes
         return tmp
+
+    def df(self):
+        """Return pandas DataFrame of dataset."""
+        atrs = self.xaxes + ['val']
+        for typ in ['err', 'stat', 'syst', 'systplus', 'systminus',
+                'statplus', 'statminus', 'normerr']:
+            if self[0].has_key(typ):
+                atrs.append(typ)
+        dat = []
+        for pt in self:
+            row = []
+            for atr in atrs:
+                row.append(getattr(pt, atr))
+            dat.append(row)
+        return pd.DataFrame(dat, columns=atrs)
+
 
