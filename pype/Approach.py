@@ -1038,20 +1038,28 @@ class BMK(Approach):
         """Calculate {A_LT,BHDVCS} as defined by HERMES 1106.2990 Eq. (18) or its harmonics."""
         return self._phiharmonic(self._CBTSA, pt, chargepar=+1, **kwargs)
 
-    def BSD(self, pt, **kwargs):
-        """Calculate 4-fold helicity-dependent cross section measured by HALL A """
+    def _BSD(self, pt, **kwargs):
+        """Calculate 4-fold helicity-dependent cross section"""
 
         R = kwargs.copy()
         R.update({'flip':'in1polarization'})
         return ( self.Xunp(pt, **kwargs)
                 - self.Xunp(pt, **R) ) / 2.
 
-    def BSS(self, pt, **kwargs):
-        """4-fold helicity-independent cross section measured by HALL A """
+    def BSD(self, pt, **kwargs):
+        """Calculate beam spin difference (BSD) or its harmonics."""
+        return self._phiharmonic(self._BSD, pt, **kwargs)
+
+    def _BSS(self, pt, **kwargs):
+        """4-fold helicity-independent cross section"""
         R = kwargs.copy()
         R.update({'flip':'in1polarization'})
         return ( self.Xunp(pt, **kwargs)
                 + self.Xunp(pt, **R) ) / 2.
+
+    def BSS(self, pt, **kwargs):
+        """Calculate beam spin sum (BSS) or its harmonics."""
+        return self._phiharmonic(self._BSS, pt, **kwargs)
 
     def _ALUI(self, pt, **kwargs):
         """Calculate BSA as defined by HERMES 0909.3587 Eq. (2.2) """
