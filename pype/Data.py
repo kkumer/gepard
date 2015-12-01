@@ -240,6 +240,10 @@ class DataSet(list):
             for gridline in data:
                 self.append(DataPoint(gridline, self))
     
+    def __add__(self, rhs):
+        """http://stackoverflow.com/questions/8180014/how-to-subclass-python-list-without-type-problems"""
+        return DataSet(datapoints=list.__add__(self,rhs))
+
     def __repr__(self):
         return "DataSet instance from '" + self.filename + "'"
 
@@ -253,17 +257,20 @@ class DataSet(list):
 
     def df(self):
         """Return pandas DataFrame of dataset."""
-        atrs = self.xaxes + ['val']
-        for typ in ['err', 'stat', 'syst', 'systplus', 'systminus',
-                'statplus', 'statminus', 'normerr']:
-            if self[0].has_key(typ):
-                atrs.append(typ)
+        attrs = ['y1name', 'collaboration', 'FTn', 'id',
+                'xB', 'Q2', 't', 'tm', 'W', 'phi', 'FTn', 'varFTn', 'val',
+                'err', 'stat', 'syst']#, 'systplus', 'systminus',
+                #'statplus', 'statminus', 'normerr']
         dat = []
         for pt in self:
             row = []
-            for atr in atrs:
-                row.append(getattr(pt, atr))
+            for atr in attrs:
+                if hasattr(pt, atr):
+                    row.append(getattr(pt, atr))
+                else:
+                    row.append(None)
+            row.append(pt)
             dat.append(row)
-        return pd.DataFrame(dat, columns=atrs)
+        return pd.DataFrame(dat, columns=attrs+['pt',])
 
 
