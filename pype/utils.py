@@ -300,14 +300,23 @@ def listdata(ids, data):
         except KeyError:
             pass
 
-def listchis(ths, Q2cut=2., Q2max=1.e3, nsets=0, prob=False):
-    """Compare chi-squares of theories for subsets of data."""
+def listchis(ths, Q2cut=1., Q2max=1.e3, nsets=0, out='chis'):
+    """Compare theories for subsets of data.
+    
+    What is printed out depends on 'out' keyword argument:
+     'chis'  --  chisquares
+    'probs'  --  probabilities of chisquares
+    'pulls'  --  sum((th-exp)/err)/sqrt(size)
+
+    """
     if not isinstance(ths, list): ths = [ths]
     from abbrevs import H1ZEUS, ALUIpts, BCApts, CLASpts, BSDwpoints, BSSwpoints,\
             AULpts, ALLpts, AUTIpts, CLAS14BSApts, CLAS14TSApts, CLAS14BTSApts,\
-            BSACLAS_KKpoints, UNP5points, ALTGLO5points, BSACLAS_DMpoints, CLASTSApts,\
+            BSACLAS_KKpoints, UNP5points, ALTGLO5points,\
+            BSACLAS_DMpoints, CLASTSApts,\
             AUTICSpts, CLASKKpts, AUTDVCSpts, H_AULpts, C_AULpts,\
             H_BSDwpts, H_BSSw0pts, H_BSSw1pts,\
+            H_BSDpts, H_BSS0pts, H_BSS1pts,\
             C_BSDwpts, C_BSSw0pts, C_BSSw1pts, H_BSD, H_BSS,\
             C_BSD, C_BSS
     #exps[0] = ['UNP5points', 'ALTGLO5', 'CLAS', 'CLASDM', 'BSDw', 'BSSw', 'TSA1', 'BTSA', 'TPpoints']
@@ -357,40 +366,41 @@ def listchis(ths, Q2cut=2., Q2max=1.e3, nsets=0, prob=False):
             ('Hall A', 'BSSw_c1', H_BSSw1pts)
             ]
     sets[7] = [
-            ('CLAS', 'BSD', C_BSD), ('CLAS', 'BSS', C_BSS),
-            ('Hall A', 'BSD', H_BSD), ('Hall A', 'BSS', H_BSS)
+            ('CLAS', 'BSDw_s1', C_BSDwpts), ('CLAS', 'BSSw_c0', C_BSSw0pts),
+            ('CLAS', 'BSSw_c1', C_BSSw1pts),
+            ('Hall A', 'BSDw_s1', H_BSDwpts), ('Hall A', 'BSSw_c0', H_BSSw0pts),
+            ('Hall A', 'BSSw_c1', H_BSSw1pts),
+            ('Hall A', 'BSD_s1', H_BSDpts), ('Hall A', 'BSS_c0', H_BSS0pts),
+            ('Hall A', 'BSS_c1', H_BSS1pts)
             ]
-    #exps[2] = ['H1ZEUS DVCS', 'H1-09 XL', "H1-09 W-dep"]
-    #ptssets[2] = [H1ZEUS, H109XL, H109WdepXL]
-    #exps[3] = ['CLAS07 BSA', 'CLAS14 BSA', 'CLAS14 TSA', 'CLAS14 BTSA']
-    #ptssets[3] = [BSACLAS_KKpoints, CLAS14BSApts, CLAS14TSApts, CLAS14BTSApts]
     names = [th.name[:10] for th in ths]
     sublines = ['------' for th in ths]
-    if prob:
-        # We want probabilities
-        ftit = 20*' ' + len(names)*'{:<10s}'
-        fstr = '{:9s} {:7s}:  ' + len(names)*'{:<10.3g}' + '   (np ={dof:3d})'
-        chi_ind = 2
-    else:    
+    if out == 'chis':
         # We want chisq/npts
         ftit = 21*' ' + len(names)*'{:^10s}'
         fstr = '{:9s} {:7s}: ' + len(names)*'{:10.2f}' + '   (np ={dof:3d})'
         chi_ind = 0
+    else:    
+        # We want probabilities
+        ftit = 20*' ' + len(names)*'{:<10s}'
+        fstr = '{:9s} {:7s}:  ' + len(names)*'{:<10.3g}' + '   (np ={dof:3d})'
+        chi_ind = 2
     print ftit.format(*names)
     print ftit.format(*sublines)
     total_chis = np.array([0. for th in ths])
     total_npts = 0
     for collab, obs, pts in sets[nsets]:
         cutpts = select(pts, criteria=['Q2>=%f' % Q2cut, 'Q2<=%f' % Q2max])
-        chis = [th.chisq(cutpts)[chi_ind] for th in ths]
-        total_chis += np.array(chis)
         npts = len(cutpts)
-        total_npts += npts
-        if not prob:
-            # version with chis/npts printed:
-            chis = [chi/npts for chi in chis]
-        print fstr.format(collab, obs, *chis, dof=npts)
-    if not prob:
+        if out == 'pulls':
+            quals = [th.chisq(cutpts, sigmas=True).sum()/np.sqrt(npts) for th in ths]
+        else:
+            chis = [th.chisq(cutpts)[chi_ind] for th in ths]
+            total_chis += np.array(chis)
+            total_npts += npts
+            quals = [chi/npts for chi in chis]
+        print fstr.format(collab, obs, *quals, dof=npts)
+    if out == 'chis':
         # version with chisq/npts:
         total_chis = total_chis/total_npts
         print ftit.format(*sublines)
@@ -496,7 +506,7 @@ def FTF(data, cosmax=None, sinmax=None, inverse=False):
         res = np.linalg.lstsq(A, B)
         #print "Sum of residuals = {}".format(res[1])
         z = np.zeros(N-len(res[0]), dtype=A.dtype)
-        vals = np.concatenate((res[0], z), axis=1)
+        vals = np.concatenate((res[0], z), axis=0)
         df = pd.DataFrame({'phi': data.phi.values, 'val': vals})
         #print "Number of harmonics = {}".format(nharm)
     else:

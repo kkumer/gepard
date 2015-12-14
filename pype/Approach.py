@@ -61,7 +61,7 @@ class Approach(object):
         chi = sum(s*s for s in allsigmas)  # equal to m.fval if minuit fit is done
         fitprob = (1.-gammainc(dof/2., chi/2.)) # probability of this chi-sq
         if sigmas:
-            return allsigmas
+            return array(allsigmas)
         else:
             return (chi, dof, fitprob)
 
