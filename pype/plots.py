@@ -257,8 +257,12 @@ def panel(ax, points=None, lines=None, bands=None, xaxis=None, xs=None,
 def thline(th, pts, ex_pt, npts=16):
     """Interpolated theory lines for kinematics in pandas dataframe pts and DataPoint ex_pt."""
     tms = np.linspace(pts.tm.min(), pts.tm.max(), npts)
-    spl_xB = InterpolatedUnivariateSpline(pts.tm.values, pts.xB.values)
-    spl_Q2 = InterpolatedUnivariateSpline(pts.tm.values, pts.Q2.values)
+    try:
+        spl_xB = InterpolatedUnivariateSpline(pts.tm.values, pts.xB.values, k=3)
+        spl_Q2 = InterpolatedUnivariateSpline(pts.tm.values, pts.Q2.values, k=3)
+    except:  # too few points in a bin
+        spl_xB = InterpolatedUnivariateSpline(pts.tm.values, pts.xB.values, k=1)
+        spl_Q2 = InterpolatedUnivariateSpline(pts.tm.values, pts.Q2.values, k=1)
     ys = []
     pt = copy.deepcopy(ex_pt)
     for tm in tms:
