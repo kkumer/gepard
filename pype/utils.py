@@ -351,9 +351,12 @@ def listchis(ths, Q2cut=1., Q2max=1.e3, nsets=0, out='chis'):
     sets[5] = [
             ('H1ZEUS', 'X_DVCS', H1ZEUS), 
             ('HERMES', 'ALUI', ALUIpts),
-            ('HERMES', 'BCA', BCApts), ('CLAS', 'BSA', CLASpts),
+            ('HERMES', 'BCA', BCApts),
             ('HRM/CLS', 'AUL', AULpts), ('HERMES', 'ALL', ALLpts),
             ('HERMES', 'AUTI', AUTIpts),
+            ('CLAS', 'BSA', CLAS14BSApts),
+            ('CLAS', 'TSA', CLAS14TSApts), 
+            ('CLAS', 'BTSA', CLAS14BTSApts),
             ('CLAS', 'BSDw_s1', C_BSDwpts), ('CLAS', 'BSSw_c0', C_BSSw0pts),
             ('CLAS', 'BSSw_c1', C_BSSw1pts),
             ('Hall A', 'BSDw_s1', H_BSDwpts), ('Hall A', 'BSSw_c0', H_BSSw0pts),
@@ -621,9 +624,13 @@ def describe_data(pts):
     print "{:2s} x {:5s}  {:6s}  {:4s}   {:3s} {:12s}".format(
      'npt', 'obs', 'collab', 'FTn', 'id', 'ref.')
     print 45*'-'
+    #print "{:2s} x {:5s}  {:6s}  {:4s}".format(
+     #'npt', 'obs', 'collab', 'FTn')
+    #print 30*'-'
     for pt in pts:
         props = []
         for prop in ['y1name', 'collaboration', 'FTn', 'id', 'reference']:
+        #for prop in ['y1name', 'collaboration', 'FTn']:
             if hasattr(pt, prop):
                 if prop=='y1name' and pt.y1name=='X' and pt.has_key('t'):
                     props.append('Xt')
@@ -639,6 +646,7 @@ def describe_data(pts):
         n = all.count(uniq)
         cc += n
         print "{:2d} x {:5s}  {:6s}  {:4s}   {:3s} {:12s}".format(n, *uniq)
+        #print "{:2d} x {:5s}  {:6s}  {:4s}".format(n, *uniq)
     assert cc == tot
     print 45*'-'
     print "TOTAL = {}".format(tot)
