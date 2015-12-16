@@ -8,6 +8,7 @@ process = ep2epgamma
 exptype = fixed target
 year = 2012
 reference =  arXiv:1203.6287 [hep-ex]
+inspiretex = Airapetian:2012mq
 reference2 = 
 reference3 = combined 1996-2007 data
 

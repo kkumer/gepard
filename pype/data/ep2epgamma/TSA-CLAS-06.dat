@@ -12,6 +12,7 @@ process = ep2epgamma
 exptype = fixed target
 year = 2006
 reference = arXiv:hep-ex/0605012
+inspiretex = Chen:2006na
 
 
 ### Scattering Process

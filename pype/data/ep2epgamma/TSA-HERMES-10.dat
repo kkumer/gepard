@@ -10,6 +10,7 @@ process = ep2epgamma
 exptype = fixed target
 year = 2010
 reference = arXiv:1004.0177v1
+inspiretex = Airapetian:2010ab
 reference2 = Table 4
 
 

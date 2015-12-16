@@ -12,6 +12,7 @@ process = ep2epgamma
 exptype = fixed target
 year = 2007
 reference =  arXiv:0711.4805
+inspiretex = Girod:2007aa
 reference2 = private table
 
 

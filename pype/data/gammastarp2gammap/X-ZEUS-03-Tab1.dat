@@ -10,6 +10,7 @@ process = gammastarp2gammap
 exptype = collider
 year = 2003
 reference = hep-ex/0305028
+inspiretex = Chekanov:2003ya
 reference2 = Table 1
 reference3 = Phys. Lett. B573 (2003) 46-62
 

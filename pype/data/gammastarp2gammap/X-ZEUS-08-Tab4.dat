@@ -9,6 +9,7 @@ process = gammastarp2gammap
 exptype = collider
 year = 2008
 reference = arXiv:0812.2517
+inspiretex = Chekanov:2008vy
 reference2 = Table 4
 
 

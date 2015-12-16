@@ -14,6 +14,7 @@ process = gammastarp2gammap
 exptype = collider
 year = 2005
 reference = hep-ex/0505061
+inspiretex = Aktas:2005ty
 reference2 = Table 1
 reference3 = Eur.Phys.J. C44 (2005) 1-11
 

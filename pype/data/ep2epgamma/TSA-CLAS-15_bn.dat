@@ -8,6 +8,7 @@ process = ep2epgamma
 exptype = fixed target
 year = 2015
 reference = arXiv:1501.07052
+inspiretex = Pisano:2015iqa
 reference2 = bin averages from Silvia Niccolai
 
 ### Scattering Process

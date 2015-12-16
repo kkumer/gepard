@@ -13,6 +13,7 @@ process = ep2epgamma
 exptype = fixed target
 year = 2015
 reference =  arXiv:1504.05453
+inspiretex = Defurne:2015kxq
 reference2 = FT analysis with MC error propagation by KK
 
 
