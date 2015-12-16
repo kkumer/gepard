@@ -977,6 +977,7 @@ def HallAFT(path=None, fmt='png', **kwargs):
 
 
 def HallA06(lines=None, path=None, fmt='png'):
+    title = 'HallA06'
     NPTS = 12
     # tupls are (dataset id, ind_low, ind_high)
     xQbins = [1, 2, 3, 
@@ -1202,6 +1203,7 @@ def CLAS15xs(lines=None, path=None, fmt='png'):
 
 
 def HallA15(lines=None, path=None, fmt='png'):
+    title = 'HallA15'
     NPTS = 12
     # tupls are (dataset id, ind_low, ind_high)
     xQbins = [(117, 0, 4), (117, 5,9), (117, 10, 14), 

@@ -46,9 +46,10 @@ toTeX = {'tm' : '$-t$',  'xB' : '$x_{\\rm B}$', 'Q2' : '$Q^{2}$',
      "BTSA" : '$BTSA$',
      "BCAcos0" : '$A_{C}^{\\cos 0\\phi}$',
      "BCAcos1" : '$A_{C}^{\\cos\\phi}$',
-     "XDVCSt" : '$d\\sigma_{DVCS} / dt$',
-     "XDVCS" : '$\\sigma_{DVCS}$',
-     "X" : '$\\sigma_{DVCS}$',
+     "XDVCSt" : r'$d\sigma_{\rm DVCS} / dt$',
+     "XDVCS" : r'$\sigma_{\rm DVCS}$',
+     "X" : r'$\sigma_{\rm DVCS}$',
+     "Xt" : r'$d\sigma_{\rm DVCS}/dt$',
      "npt" : 'point no.',
      "ImH" : '$\\mathfrak{Im}\\mathcal{H}(\\xi, t)$',
      "ReH" : '$\\mathfrak{Re}\\mathcal{H}(\\xi, t)$',
@@ -74,5 +75,8 @@ OBStoTeX = {
         ('AUTI', 1) : '$A_{\\rm UT,I}^{\\sin(\\phi-\\phi_S) \\cos \\phi}$',
         ('AUTI', 0) : '$A_{\\rm UT,I}^{\\sin(\\phi-\\phi_S)}$',
         ('AUTI', -1) : '$A_{\\rm UT,I}^{\\cos(\\phi-\\phi_S) \\sin \\phi}$',
-        ('AUTDVCS', 0) : '$A_{\\rm UT,DVCS}^{\\sin(\\phi-\\phi_S)}$'
+        ('AUTDVCS', 0) : '$A_{\\rm UT,DVCS}^{\\sin(\\phi-\\phi_S)}$',
+        ('BSDw', -1) : r'$\Delta\sigma^{\sin\phi,w}$',
+        ('BSSw', 0) : r'$d\sigma^{\cos 0\phi,w}$',
+        ('BSSw', 1) : r'$d\sigma^{\cos\phi,w}$'
         }
