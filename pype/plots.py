@@ -27,6 +27,7 @@ from scipy.interpolate import InterpolatedUnivariateSpline
 import Data, Approach, utils
 from constants import toTeX, Mp2, Mp, OBStoTeX
 from results import *
+from abbrevs import DISpoints
 
 # load experimental data
 DATA_DIR = os.path.join(os.path.dirname(__file__), 'data')
@@ -182,6 +183,7 @@ def panel(ax, points=None, lines=None, bands=None, xaxis=None, xs=None,
 
         pointshapes = ['o', 's', '^', 'd', 'o', 's', '^', 'd']  # first circles, then squares ...
         pointcolors = ['blue', 'red', 'green', 'red', 'brown', 'blue', 'black']
+        pointcolors = ['black', 'red', 'green', 'red', 'brown', 'blue', 'black']
         setn = 0
         for pts in points:
             _axpoints(ax, pts, xaxis, linestyle='None', elinewidth=1, 
@@ -207,7 +209,7 @@ def panel(ax, points=None, lines=None, bands=None, xaxis=None, xs=None,
     if lines:
         if not isinstance(lines, list): lines = [lines]
         lineshapes = ['s', '^', 'd', 'h']  # first squares, then triangles, diamonds, hexagons
-        linecolors = ['red', 'black', 'blue', 'green', 'purple']  
+        linecolors = ['blue', 'red', 'black', 'blue', 'green', 'purple']  
         linestyles = ['-', '--', '-.', ':']  # solid, dashed, dot-dashed, dotted
         linen = 0
         for line in lines:
@@ -775,6 +777,80 @@ def CLAS15(obs='BSA', path=None, fmt='png', **kwargs):
             ax.set_xlabel('$-t\\; [{\\rm GeV}^2]$', fontsize=20)
     axs[5].legend(handles, labels, loc="center", borderaxespad=0.).draw_frame(0)
     fig.subplots_adjust(wspace=0.0, hspace=0.0)
+    if path:
+        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+    else:
+        fig.canvas.draw()
+        fig.show()
+    return fig
+
+def HERAF2Q2(path=None, fmt='png', **kwargs):
+    """Makes plot of HERA F2(Q2) DIS data with fit lines and bands"""
+
+    #title = 'H1 hep-ex/9603004 (Aid:1996au)'
+    title = 'H1-F2'
+    ymin, ymax = 0, 1.79
+    fig, ax = plt.subplots(figsize=[8,6])
+    fig.canvas.set_window_title(title)
+    panels = [ data[208],
+               data[202] ]
+    for np, panelset in enumerate(panels):
+        panel(ax, points=panelset, xaxis='Q2', **kwargs)
+        if np == 0:
+	    ax.text(20, 1.1, r'$x_B = {}$'.format(panelset[0].xB), fontsize=16)
+	    # Take legend info once
+	    handles, labels = ax.get_legend_handles_labels()
+        else:
+	    ax.text(50, 0.63, r'$x_B = {}$'.format(panelset[0].xB), fontsize=16)
+
+    ax.set_ylabel(r'$F_{2}^{p}(x_{\rm B}, Q^2)$', fontsize=16)
+    ax.set_xlabel(r'$Q^2\; [{\rm GeV}^2]$', fontsize=16)
+    plt.xlim(0.0, 65)
+    ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(10))
+    ax.xaxis.set_minor_locator(matplotlib.ticker.MultipleLocator(5))
+    ax.tick_params(axis='both', which='major', labelsize=14)
+    plt.ylim(ymin, ymax)
+    #ax.yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))
+    #ax.yaxis.set_minor_locator(matplotlib.ticker.MultipleLocator(0.02))
+    ax.legend(handles, labels, loc="upper right", borderaxespad=0.).draw_frame(0)
+    if path:
+        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+    else:
+        fig.canvas.draw()
+        fig.show()
+    return fig
+
+def HERAF2xB(path=None, fmt='png', **kwargs):
+    """Makes plot of HERA F2(xB) DIS data with fit lines and bands"""
+
+    #title = 'H1 hep-ex/9603004 (Aid:1996au)'
+    title = 'H1-F2'
+    fig, ax = plt.subplots(figsize=[8,6])
+    fig.canvas.set_window_title(title)
+    Q15 = utils.select(DISpoints, criteria=['Q2 == 15'])
+    Q8 = utils.select(DISpoints, criteria=['Q2 == 8.5'])
+    panels = [Q15, Q8 ]
+    for np, panelset in enumerate(panels):
+        panel(ax, points=panelset, xaxis='xB', **kwargs)
+        ax.set_xscale('log')
+        if np == 0:
+	    ax.text(0.0006, 1.3, r'$Q^2 = {:.0f}\, {{\rm GeV}}^2$'.format(panelset[0].Q2), fontsize=16)
+	    ax.text(0.00024, 0.82, r'${:.0f}\, {{\rm GeV}}^2$'.format(panelset[0].Q2), fontsize=16)
+	    # Take legend info once
+	    handles, labels = ax.get_legend_handles_labels()
+        else:
+	    ax.text(0.00013, 1.05, r'${}\, {{\rm GeV}}^2$'.format(panelset[0].Q2), fontsize=16)
+	    ax.text(0.00018, 0.62, r'${}\, {{\rm GeV}}^2$'.format(panelset[0].Q2), fontsize=16)
+    ax.set_ylabel(r'$F_{2}^{p}(x_{\rm B}, Q^2)$', fontsize=16)
+    ax.set_xlabel(r'$x_B$', fontsize=16)
+    plt.xlim(0.0001, 0.02)
+    #ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(10))
+    #ax.xaxis.set_minor_locator(matplotlib.ticker.MultipleLocator(5))
+    ax.tick_params(axis='both', which='major', labelsize=14)
+    plt.ylim(0.3, 1.5)
+    #ax.yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))
+    #ax.yaxis.set_minor_locator(matplotlib.ticker.MultipleLocator(0.02))
+    ax.legend(handles, labels, loc="upper right", borderaxespad=0.).draw_frame(0)
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
