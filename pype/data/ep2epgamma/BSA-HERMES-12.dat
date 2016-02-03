@@ -6,6 +6,7 @@ editor = DM
 ### Experiment
 
 collaboration = HERMES
+process = ep2epgamma
 # recoil detector data
 exptype = fixed target
 year = 2012
