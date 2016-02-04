@@ -73,7 +73,6 @@ def theory(id):
         return th
     elif id == 5:
         # Hybrid fit + 3rd PW to DVCSpoints and GLO1points
-        # P(42.51/40) = 0.3633
         mGepard = Model.ComptonGepard(cutq2=0.5)
         mDRPPsea = Model.ComptonModelDRPPsea()
         m = Model.HybridKelly(mGepard, mDRPPsea)
@@ -85,25 +84,6 @@ def theory(id):
     elif id == 6:
         # Hybrid fit 
         # P(chi-square, d.o.f) = P(124.12, 80) = 0.0012
-# 
-# GLOnoBSS2 = H1ZEUS + ALUIpts + BCApts + CLASpts + BSDwpoints + AULpts + ALLpts + AUTIpts
-# + BSSwpoints
-# 
-#    Mv =    0.951 +- 0.282  (p = 0.00114)          H1ZEUS: chi/npts =  28.57/35
-#    rv =    1.121 +- 0.099  (p = 0)               ALUIpts: chi/npts =  12.47/6
-#    bv =    0.400 +- 0.000  (p = 0)                BCApts: chi/npts =   9.35/12
-#     C =    1.003 +- 0.565  (p = 0.0794)          CLASpts: chi/npts =   5.14/4
-#    MC =    2.080 +- 3.754  (p = 0.581)        BSDwpoints: chi/npts =  12.74/12
-#   tMv =    3.523 +- 13.175  (p = 0.79)        BSSwpoints: chi/npts =  18.80/8
-#   trv =    1.302 +- 0.206  (p = 1.38e-08)         AULpts: chi/npts =  19.66/10
-#   tbv =    0.400 +- 0.001  (p = 0)                ALLpts: chi/npts =  13.77/4
-#   rpi =    3.837 +- 0.141  (p = 0)               AUTIpts: chi/npts =   3.61/4
-#   Mpi =    4.000 +- 0.036  (p = 0)
-#  M02S =    0.462 +- 0.032  (p = 0)
-#  SECS =    0.313 +- 0.039  (p = 8.67e-12)
-#  THIS =   -0.138 +- 0.012  (p = 0)
-#  SECG =   -2.771 +- 0.228  (p = 0)
-#  THIG =    0.945 +- 0.107  (p = 2.03e-13)
         mGepard = Model.ComptonGepard(cutq2=0.5)
         mDRPPsea = Model.ComptonModelDRPPsea()
         m = Model.HybridKelly(mGepard, mDRPPsea)
@@ -111,6 +91,16 @@ def theory(id):
         th.name = 'KMM12'
         g = th.m.g
         th.m.parameters.update(KMM12)
+        return th
+    elif id == 7:
+        # Hybrid fit  KM15   chisq/dof = 240./275
+        mGepard = Model.ComptonGepard(cutq2=0.5)
+        mDRPPsea = Model.ComptonModelDRPPsea()
+        m = Model.HybridKelly(mGepard, mDRPPsea)
+        th = Approach.BM10(m)
+        th.name = 'KM15'
+        g = th.m.g
+        th.m.parameters.update(KM15)
         return th
     else:
         sys.stdout.write('Unknown model: %d\n' % id)
