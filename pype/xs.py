@@ -86,7 +86,7 @@ def theory(id):
         # P(chi-square, d.o.f) = P(124.12, 80) = 0.0012
         mGepard = Model.ComptonGepard(cutq2=0.5)
         mDRPPsea = Model.ComptonModelDRPPsea()
-        m = Model.HybridKelly(mGepard, mDRPPsea)
+        m = Model.HybridDipole(mGepard, mDRPPsea)
         th = Approach.BM10(m)
         th.name = 'KMM12'
         g = th.m.g
@@ -154,6 +154,16 @@ def XSall(id, Q, lam, Ee, Ep, xB, Q2, t, phi):
         sys.exit(1)
     else:
         xstot = [th.Xunp(pt0), 0, 0, 0]
+        #print "BH2  = {}".format(th.TBH2unp(pt0))
+        #print "PreFacBH  = {}".format(th.PreFacBH(pt0))
+        #print "cBH0 = {}".format(th.cBH0unp(pt0))
+        #print "cBH1 = {}".format(th.cBH1unp(pt0))
+        #print "cBH2 = {}".format(th.cBH2unp(pt0))
+        #print "phi = {}".format(pt0.phi)
+        #print "F1 = {}".format(th.m.F1(pt0.t))
+        #print "F2 = {}".format(th.m.F2(pt0.t))
+        #print "t = {}".format(pt0.t)
+        #print th.m.F1
         if id > 5:
             pt0.in2polarizationvector = 'L'
             pt0.in2polarization = 1
@@ -184,7 +194,7 @@ where total cross section is
 
 and theta_S and phi_S are proton polarization polar and
 azimuthal angles, while phi is angle between lepton
-and reaction planes. All in Trento conventions.
+and reaction planes. All in radians and Trento conventions.
 
 ModelID is one of  
    0 debug, always returns 42, 
@@ -194,6 +204,7 @@ ModelID is one of
    4 KM10a - preliminary hybrid fit with LO sea evolution, without Hall A data
    5 KM10b - preliminary hybrid fit with LO sea evolution, with Hall A data
    6 KMM12 - hybrid global fit to unpolarized and polarized DVCS data
+   7 KMM15 - hybrid global fit to unpolarized and polarized DVCS data
 where models 1-5 are for unpolarized target only.
 For convenience, if last argument (phi=n) is larger than 2pi, you get grid 
 of n equidistant points with phi=0..2pi.

@@ -17,8 +17,8 @@ import numpy as np
 import Model, Approach, Fitter, Data, utils, plots
 from constants import Mp, Mp2
 
-data = utils.loaddata('/home/kkumer/pype/data/ep2epgamma', approach=Approach.BMK)  
-db = shelve.open('/home/kkumer/pype/theories.db')
+data = utils.loaddata('/home/kkumer/gepard/pype/data/ep2epgamma', approach=Approach.BMK)  
+db = shelve.open('/home/kkumer/gepard/pype/theories.db')
 
 # Local 4-bin fits
 # Updated data by Morgan and DM
