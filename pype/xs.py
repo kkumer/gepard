@@ -97,7 +97,7 @@ def theory(id):
         mGepard = Model.ComptonGepard(cutq2=0.5)
         mDRPPsea = Model.ComptonModelDRPPsea()
         m = Model.HybridKelly(mGepard, mDRPPsea)
-        th = Approach.BM10(m)
+        th = Approach.BM10tw2(m)
         th.name = 'KM15'
         g = th.m.g
         th.m.parameters.update(KM15)
@@ -204,7 +204,7 @@ ModelID is one of
    4 KM10a - preliminary hybrid fit with LO sea evolution, without Hall A data
    5 KM10b - preliminary hybrid fit with LO sea evolution, with Hall A data
    6 KMM12 - hybrid global fit to unpolarized and polarized DVCS data
-   7 KMM15 - hybrid global fit to unpolarized and polarized DVCS data
+   7 KM15  - hybrid global fit to unpolarized and polarized DVCS data
 where models 1-5 are for unpolarized target only.
 For convenience, if last argument (phi=n) is larger than 2pi, you get grid 
 of n equidistant points with phi=0..2pi.

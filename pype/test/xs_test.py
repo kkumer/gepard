@@ -36,4 +36,4 @@ def test_xs7_KM15():
     (out, err) = proc.communicate()
     exit_code = proc.wait()
     phi, xs_p, xs_cos_p, xs_sin_p, xs_LP_p = np.fromstring(out, sep=' ')
-    assert_almost_equal(xs_p, 0.0943783)
+    assert_almost_equal(xs_p, 0.075842911815713385)
