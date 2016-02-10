@@ -198,19 +198,22 @@ and reaction planes. All in radians and Trento conventions.
 
 ModelID is one of  
    0 debug, always returns 42, 
-   1 KM09a - arXiv:0904.0458 fit without Hall A,
-   2 KM09b - arXiv:0904.0458 fit with Hall A, 
-   3 KM10  - preliminary hybrid fit with LO sea evolution, from Trento presentation,
-   4 KM10a - preliminary hybrid fit with LO sea evolution, without Hall A data
-   5 KM10b - preliminary hybrid fit with LO sea evolution, with Hall A data
-   6 KMM12 - hybrid global fit to unpolarized and polarized DVCS data
-   7 KM15  - hybrid global fit to unpolarized and polarized DVCS data
+   1 KM09a - arXiv:0904.0458 fit without Hall A data,
+   2 KM09b - arXiv:0904.0458 fit with Hall A harmonics ratio,
+   3 KM10  - arXiv:1105.0899 fit with Hall A harmonics
+   4 KM10a - arXiv:1105.0899 fit without Hall A data
+   5 KM10b - arXiv:1105.0899 fit with Hall A harmonics ratio
+   6 KMM12 - arXiv:1301.1230 fit with Hall A harmonics and polarized target
+   7 KM15  - arXiv:1512.09014 fit now includes 2015 CLAS and Hall A data
 where models 1-5 are for unpolarized target only.
 For convenience, if last argument (phi=n) is larger than 2pi, you get grid 
 of n equidistant points with phi=0..2pi.
 
 Example:
-    ./xs.exe 1 -1 1 27.6 0.938  0.111 3. -0.3 20
+    ./xs.exe  7 -1  1  5.75  0  0.36  2.3  -0.17  0.131
+
+(Output:)
+0.131  0.07584357734528  -0.03809893007524   0.00826740897951  -0.03819278821799
 
 """
 
