@@ -35,7 +35,50 @@ def test_GKImH():
 test_GKImH.extendedtesting = 1
 
 def test_GKReH():
-    """Test GK model: Im(CFFH)"""
+    """Test GK model: Re(CFFH)"""
     res = thGK.m.ReH(pt)
     assert_almost_equal(res, -1.94670099930845, 5)
 
+#test_GKReH.extendedtesting = 1
+
+def test_GKImHt():
+    """Test GK model: Im(CFFHt)"""
+    res = thGK.m.ImHt(pt)
+    assert_almost_equal(res, 2.3675474323)
+
+test_GKImHt.extendedtesting = 1
+
+def test_GKReHt():
+    """Test GK model: Re(CFFHt)"""
+    res = thGK.m.ReHt(pt)
+    assert_almost_equal(res, 1.0193853587666957)
+
+test_GKReHt.extendedtesting = 1
+
+def test_GKImE():
+    """Test GK model: Im(CFFE)"""
+    res = thGK.m.ImE(pt)
+    assert_almost_equal(res, -3.3357207038)
+
+test_GKImE.extendedtesting = 1
+
+def test_GKReE():
+    """Test GK model: Re(CFFE)"""
+    res = thGK.m.ReE(pt)
+    assert_almost_equal(res, -5.1576181607)
+
+test_GKReE.extendedtesting = 1
+
+def test_GKImEt():
+    """Test GK model: Im(CFFEt)"""
+    res = thGK.m.ImEt(pt)
+    assert_almost_equal(res, 1.960464892)
+
+test_GKImEt.extendedtesting = 1
+
+def test_GKReEt():
+    """Test GK model: Re(CFFEt)"""
+    res = thGK.m.ReEt(pt)
+    assert_almost_equal(res, 63.030901624)
+
+test_GKReEt.extendedtesting = 1

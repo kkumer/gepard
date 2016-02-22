@@ -14,7 +14,7 @@ import pickle, sys, logging
 from numpy import log, pi, imag, real, sqrt, cos, sin, exp
 from numpy import ndarray, array, sum
 import scipy.stats
-from scipy.special import j0, j1, gamma
+from scipy.special import j0, j1, gamma, beta
 
 from quadrature import PVquadrature, bquadrature, rthtquadrature
 from utils import flatten, hubDict, stringcolor
@@ -861,6 +861,8 @@ class GK12(ComptonDispersionRelations):
         else:
             return -DMKILL*self._intsea(-x, eta, alt, j)  # x < -eta
 
+    ######  GPDs  #########
+
     def Huval(self, x, eta, t, Q2):
         """GK12 model for H^u_val GPD."""
         Q02 = 4.
@@ -905,6 +907,114 @@ class GK12(ComptonDispersionRelations):
     def Hd(self, x, eta, t, Q2): 
         return self.Hdval(x, eta, t, Q2) + self.Hudsea(x, eta, t, Q2)
 
+    def _invAq(self, al, cs):
+        coefs = [1, (1-al)/(5-al), (2-al)*(1-al)/(6-al)/(5-al)]
+        return beta(1-al,4)*sum(cs*coefs)
+
+    def Htuval(self, x, eta, t, Q2):
+        """GK12 model for Ht^u_val GPD."""
+        Q02 = 4.
+        L = log(Q2/Q02)
+        ctuval = array([0.17+0.03*L, 1.34-0.02*L, 0.12-0.4*L])
+        al0, alp = (0.48, 0.45)
+        alt = al0 + alp*t
+        # val() expects series in beta^(j/2), so 0,2,4 -> 0,1,2
+        xs = array([self._val(x, eta, alt, j) for j in [0,2,4]])
+        return 0.926*sum(ctuval*xs)/self._invAq(al0, ctuval)  
+
+    def Htdval(self, x, eta, t, Q2):
+        """GK12 model for Ht^u_val GPD."""
+        Q02 = 4.
+        L = log(Q2/Q02)
+        ctuval = array([-0.32-0.04*L, -1.427-0.176*L, 0.692-0.068*L])
+        al0, alp = (0.48, 0.45)
+        alt = al0 + alp*t
+        # val() expects series in beta^(j/2), so 0,2,4 -> 0,1,2
+        xs = array([self._val(x, eta, alt, j) for j in [0,2,4]])
+        return -0.341*sum(ctuval*xs)/self._invAq(al0,ctuval)  
+
+    def Euval(self, x, eta, t, Q2):
+        """GK12 model for E^u_val GPD."""
+        ceuval = array([1, -1])  # (1-rho)
+        al0, alp = (0.48, 0.9)
+        alt = al0 + alp*t
+        # val() expects series in beta^(j/2), so 0,2 -> 0,1
+        xs = array([self._val(x, eta, alt, j) for j in [0,2]])
+        return 1.67*sum(ceuval*xs)/beta(1-al0,5)  
+
+    def Edval(self, x, eta, t, Q2, DMbeta=False):
+        """GK12 model for E^d_val GPD."""
+        # (1-rho)^2.6 up to rho^8
+        if DMbeta:
+            # Choice of DM in his notebook
+            betd = 6
+            cedval = [1, -3, +3, -1]
+            bmax = 3
+        else:
+            # GK choice
+            betd = 5.6
+            cedval = array([1, -2.6, 2.08, -0.416, -0.0416, -0.011648, -0.0046592, -0.00226304, -0.001244672])
+            bmax = 8
+        al0, alp = (0.48, 0.9)
+        alt = al0 + alp*t
+        # val() expects series in beta^(j/2)
+        xs = array([self._val(x, eta, alt, j) for j in                                                   range(0, 2*bmax+1, 2)])
+        return -2.03*sum(cedval*xs)/beta(1-al0,1+betd)  
+
+    def Esea(self, x, eta, t, Q2):
+        """GK12 model for strange sea GPD."""
+        Q02 = 4.
+        Mp2 = 0.9383**2
+        L = log(Q2/Q02)
+        ces = array([1, -2, 1])
+        al0, alp = (1.10+0.06*L-0.0027*L**2, 0.15)
+        alt = al0 + alp*t
+        xs = array([self._sea(x, eta, alt, j) for j in range(0,5,2)])
+        b = 0.9*(2.58 + 0.25*log(Mp2/(Q2+Mp2)))
+        # Note that opposite sign is also possible:
+        return -0.155*exp(b*t) * sum(ces*xs)
+
+    def Etuval(self, x, eta, t, Q2):
+        """GK12 model for Et^u GPD (non-pole part)."""
+        ces = array([1, -2, 1])
+        al0, alp = (-0.48, 0.45)
+        alt = al0 + alp*t
+        xs = array([self._val(x, eta, alt, j) for j in range(0,5,2)])
+        b = 0.9
+        return 14.*exp(b*t) * sum(ces*xs)
+
+    def Etdval(self, x, eta, t, Q2):
+        """GK12 model for Et^d GPD (non-pole part)."""
+        ces = array([1, -2, 1])
+        al0, alp = (-0.48, 0.45)
+        alt = al0 + alp*t
+        xs = array([self._val(x, eta, alt, j) for j in range(0,5,2)])
+        b = 0.9
+        return 4.*exp(b*t) * sum(ces*xs)
+
+    def _gegen32(self, x):
+        return 15.*x**2/2 - 3./2
+
+    def _phi(self, u, a2=0.22):
+        return 6*u*(1-u)*(1+a2*self._gegen32(2*u+1))
+
+    def Etupole(self, x, eta, t, Q2):
+        if -eta < x < eta:
+            Mp2 = 0.938272013**2
+            gA0 = 1.267
+            LAM2 = 0.44**2
+            mpi2 = 0.1396**2
+            numer = Mp2 * gA0 * (LAM2 - mpi2)
+            denom = (mpi2-t)*(LAM2-t)
+            return numer*self._phi((x+eta)/2/eta)/denom/eta
+        else:
+            return 0
+
+    def Etdpole(self, x, eta, t, Q2):
+        return - self.Etupole(x, eta, t, Q2)
+
+    ######  CFFs  #########
+
     def ImH(self, pt, xi=0):
         """GK12 model for Im(CFFH)."""
         # FIXME: The following solution is not elegant
@@ -929,15 +1039,106 @@ class GK12(ComptonDispersionRelations):
         else:
             return array(res)
 
-    def ImHalt(self, pt):
-        """GK12 model for Im(CFFH) (alternative expression)."""
-        x = pt.xi
+    #def ImHalt(self, pt):
+        #"""GK12 model for Im(CFFH) (alternative expression)."""
+        #x = pt.xi
+        #t = pt.t
+        #Q2 = pt.Q2
+        #assert x>0
+        #return pi*(  (4./9)*(self.Huval(x, x, t, Q2) +2*self.Hudsea(x, x, t, Q2))
+                #+(1./9)*(self.Hdval(x, x, t, Q2)+2*self.Hudsea(x, x, t, Q2))
+                #+(1./9)*(2*self.Hs(x, x, t, Q2)) )
+
+    def ImHt(self, pt, xi=0):
+        """GK12 model for Im(CFFHt)."""
+        # FIXME: The following solution is not elegant
+        if isinstance(xi, ndarray):
+            # function was called with third argument that is xi nd array
+            xs = xi
+        elif xi != 0:
+            # function was called with third argument that is xi number
+            xs = [xi]
+        else:
+            # xi should be taken from pt object
+            xs = [pt.xi]
         t = pt.t
         Q2 = pt.Q2
-        assert x>0
-        return pi*(  (4./9)*(self.Huval(x, x, t, Q2) +2*self.Hudsea(x, x, t, Q2))
-                +(1./9)*(self.Hdval(x, x, t, Q2)+2*self.Hudsea(x, x, t, Q2))
-                +(1./9)*(2*self.Hs(x, x, t, Q2)) )
+        res = []
+        for x in xs:
+            assert x>0
+            res.append( pi*(  (4./9)*self.Htuval(x, x, t, Q2)
+                +(1./9)*self.Htdval(x, x, t, Q2) ) )
+        if len(res) == 1:
+            return res[0]
+        else:
+            return array(res)
+
+    def ImE(self, pt, xi=0, DMbeta=False):
+        """GK12 model for Im(CFFE)."""
+        # FIXME: The following solution is not elegant
+        if isinstance(xi, ndarray):
+            # function was called with third argument that is xi nd array
+            xs = xi
+        elif xi != 0:
+            # function was called with third argument that is xi number
+            xs = [xi]
+        else:
+            # xi should be taken from pt object
+            xs = [pt.xi]
+        t = pt.t
+        Q2 = pt.Q2
+        res = []
+        for x in xs:
+            assert x>0
+            res.append( pi*(  (4./9)*(self.Euval(x, x, t, Q2) 
+                                        +2*self.Esea(x, x, t, Q2))
+                +(1./9)*(self.Edval(x, x, t, Q2, DMbeta)+2*self.Esea(x, x, t, Q2))
+                +(1./9)*(2*self.Esea(x, x, t, Q2)) )  )
+        if len(res) == 1:
+            return res[0]
+        else:
+            return array(res)
+
+    def ImEt(self, pt, xi=0):
+        """GK12 model for Im(CFFEt)."""
+        # FIXME: The following solution is not elegant
+        if isinstance(xi, ndarray):
+            # function was called with third argument that is xi nd array
+            xs = xi
+        elif xi != 0:
+            # function was called with third argument that is xi number
+            xs = [xi]
+        else:
+            # xi should be taken from pt object
+            xs = [pt.xi]
+        t = pt.t
+        Q2 = pt.Q2
+        res = []
+        for x in xs:
+            assert x>0
+            res.append( pi*(  (4./9)*(self.Etuval(x, x, t, Q2) )
+                +(1./9)*(self.Etdval(x, x, t, Q2)) ) ) 
+        if len(res) == 1:
+            return res[0]
+        else:
+            return array(res)
+
+    def ReEtpole(self, pt):
+        Mp2 = 0.938272013**2
+        gA0 = 1.267
+        LAM2 = 0.44**2
+        mpi2 = 0.1396**2
+        numer = Mp2 * gA0 * (LAM2 - mpi2)
+        denom = (mpi2-pt.t)*(LAM2-pt.t)
+        green = numer/denom
+        a2 = 0.22
+        return 2*(1+a2)*green/pt.xi
+
+    def ReEtnonpole(self, pt):
+        return ComptonDispersionRelations.ReEt(self, pt)
+
+    def ReEt(self, pt):
+        return self.ReEtpole(pt) + self.ReEtnonpole(pt)
 
 
 
