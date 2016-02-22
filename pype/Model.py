@@ -6,13 +6,15 @@ fitting procedure).  Theoretical "approach", when given an instance of a model
 and parameter values can calculate observables.
 
 """
+
+from __future__ import division
 #from IPython.Debugger import Tracer; debug_here = Tracer()
 import pickle, sys, logging
 
-from numpy import log, pi, imag, real, sqrt, cos, sin
+from numpy import log, pi, imag, real, sqrt, cos, sin, exp
 from numpy import ndarray, array, sum
 import scipy.stats
-from scipy.special import j0, j1
+from scipy.special import j0, j1, gamma
 
 from quadrature import PVquadrature, bquadrature, rthtquadrature
 from utils import flatten, hubDict, stringcolor
@@ -29,6 +31,7 @@ _lg = logging.getLogger('p.%s' % __name__)
 
 class Model(object):
     """Base class for all models."""
+
 
     def __init__(self, **kwargs):
         """ 
@@ -298,78 +301,6 @@ class ElasticKelly(ElasticFormFactors):
           1.9100884849907935*t**3))/(1 - 0.2831951622975774*t)
  
 
-class GK12(Model):
-    """ Goloskokov-Kroll PDF model 
-
-        From [arXiv:1210.6975], Kroll:2012sm
-        Implementing also F2 for check
-
-    """
-
-    def __init__(self, **kwargs):
-        self.parameters = {}
-        self.parameter_names = []
-        self.allCFFs = []
-        self.allGPDs = []
-
-    def g(self, x, Q2):
-        """GK12 model for gluon PDF."""
-        Q02 = 4.
-        L = log(Q2/Q02)
-        cg = array([2.23+0.362*L, 5.43-7.00*L, -34.0+22.5*L, 40.6-21.6*L])
-        delg = (1.10+0.06*L-0.0027*L**2) - 1
-        ng = 2
-        xs = array([x**(j/2.) for j in range(4)])
-        return x**(-delg)*(1.-x)**(2*ng+1)*sum(cg*xs)
-
-    def s(self, x, Q2):
-        """GK12 model for strange PDF."""
-        Q02 = 4.
-        L = log(Q2/Q02)
-        cs = array([0.123+0.0003*L, -0.327-0.004*L, 0.692-0.068*L, -0.486+0.038*L])
-        delg = (1.10+0.06*L-0.0027*L**2) - 1
-        ng = 2
-        xs = array([x**(j/2.) for j in range(4)])
-        return x**(-delg)*(1.-x)**(2*ng+1)*sum(cs*xs)
-
-    def uval(self, x, Q2):
-        """GK12 model for u_val PDF."""
-        Q02 = 4.
-        L = log(Q2/Q02)
-        cuval = array([1.52+0.248*L, 2.88-0.940*L, -0.095*L, 0 ])
-        delval = 0.48 - 1
-        nval = 1
-        xs = array([x**(j/2.) for j in range(4)])
-        return x**(-delval)*(1.-x)**(2*nval+1)*sum(cuval*xs)
-
-    def dval(self, x, Q2):
-        """GK12 model for d_val PDF."""
-        Q02 = 4.
-        L = log(Q2/Q02)
-        cdval = array([0.76+0.248*L, 3.11-1.36*L, -3.99+1.15*L, 0])
-        delval = 0.48 - 1
-        nval = 1
-        xs = array([x**(j/2.) for j in range(4)])
-        return x**(-delval)*(1.-x)**(2*nval+1)*sum(cdval*xs)
-        
-    def udsea(self, x, Q2):
-        """GK12 model for u or d sea."""
-        kaps = 1.+0.68/(1.+0.52*log(Q2/4.))
-        return kaps * self.s(x,Q2)
-
-
-    def SIG(self, x, Q2):
-        """GK12 model for singlet quark."""
-        return self.uval(x, Q2) + self.dval(x,Q2) + 4*self.udsea(x,Q2) + 2*self.s(x,Q2)
-
-    def DISF2(self, pt):
-        """DIS F2 structure function in GK12 model."""
-        x = pt.xB
-        Q2 = pt.Q2
-        return ( (4./9.) * (self.uval(x, Q2) + 2*self.udsea(x,Q2)) 
-               + (1./9.) * (self.dval(x, Q2) + 2*self.udsea(x,Q2) 
-                                             + 2*self.s(x,Q2))  )
-
 
 class ComptonFormFactors(Model):
     """Twist-two, no-transversity set of 4 CFFs.
@@ -378,6 +309,9 @@ class ComptonFormFactors(Model):
 
     """
 
+    
+    parameters = {}
+    parameter_names = []
     allCFFs = ['ImH', 'ReH', 'ImE', 'ReE', 'ImHt', 'ReHt', 'ImEt', 'ReEt']
     allCFFsb = ['ImH', 'ReH', 'ImE', 'ReE', 'ImHt', 'ReHt', 'ImEt', 'ReEb']
     allCFFeffs = ['ImHeff', 'ReHeff', 'ImEeff', 'ReEeff', 
@@ -799,6 +733,212 @@ class ComptonModelDRPPsea(ComptonModelDRsea):
         """Instead of disp. rel. use pole formula"""
         return self.parameters['rpi'] * 2.16444 / (0.0196 - pt.t) / (1. 
             - pt.t/self.parameters['Mpi']**2)**2 / pt.xi
+
+class GK12(ComptonDispersionRelations):
+    """ Goloskokov-Kroll PDF model 
+
+        From [arXiv:1210.6975], Kroll:2012sm
+        Real part of CFFs is obtained using dispersion relations.
+
+    """
+
+
+    # We keep the forward-case code just in case it's useful
+
+    def g(self, x, Q2):
+        """GK12 model for gluon PDF."""
+        Q02 = 4.
+        L = log(Q2/Q02)
+        cg = array([2.23+0.362*L, 5.43-7.00*L, -34.0+22.5*L, 40.6-21.6*L])
+        delg = (1.10+0.06*L-0.0027*L**2) - 1
+        ng = 2
+        xs = array([x**(j/2.) for j in range(4)])
+        return x**(-delg)*(1.-x)**(2*ng+1)*sum(cg*xs)
+
+    def s(self, x, Q2):
+        """GK12 model for strange PDF."""
+        Q02 = 4.
+        L = log(Q2/Q02)
+        cs = array([0.123+0.0003*L, -0.327-0.004*L, 0.692-0.068*L, -0.486+0.038*L])
+        delg = (1.10+0.06*L-0.0027*L**2) - 1
+        ng = 2
+        xs = array([x**(j/2.) for j in range(4)])
+        return x**(-delg)*(1.-x)**(2*ng+1)*sum(cs*xs)
+
+    def uval(self, x, Q2):
+        """GK12 model for u_val PDF."""
+        Q02 = 4.
+        L = log(Q2/Q02)
+        cuval = array([1.52+0.248*L, 2.88-0.940*L, -0.095*L, 0 ])
+        delval = 0.48 - 1
+        nval = 1
+        xs = array([x**(j/2.) for j in range(4)])
+        return x**(-delval)*(1.-x)**(2*nval+1)*sum(cuval*xs)
+
+    def dval(self, x, Q2):
+        """GK12 model for d_val PDF."""
+        Q02 = 4.
+        L = log(Q2/Q02)
+        cdval = array([0.76+0.248*L, 3.11-1.36*L, -3.99+1.15*L, 0])
+        delval = 0.48 - 1
+        nval = 1
+        xs = array([x**(j/2.) for j in range(4)])
+        return x**(-delval)*(1.-x)**(2*nval+1)*sum(cdval*xs)
+        
+    def udsea(self, x, Q2):
+        """GK12 model for u or d sea."""
+        kaps = 1.+0.68/(1.+0.52*log(Q2/4.))
+        return kaps * self.s(x,Q2)
+
+
+    def SIG(self, x, Q2):
+        """GK12 model for singlet quark."""
+        return self.uval(x, Q2) + self.dval(x,Q2) + 4*self.udsea(x,Q2) + 2*self.s(x,Q2)
+
+    def DISF2(self, pt):
+        """DIS F2 structure function in GK12 model."""
+        x = pt.xB
+        Q2 = pt.Q2
+        return ( (4./9.) * (self.uval(x, Q2) + 2*self.udsea(x,Q2)) 
+               + (1./9.) * (self.dval(x, Q2) + 2*self.udsea(x,Q2) 
+                                             + 2*self.s(x,Q2))  )
+
+    def _intval(self, x, eta, alt, j, zero=False):
+        """Analytic integral over DD for valence sector."""
+        x1 = (x+eta)/(1+eta)
+        p = - alt + j/2
+        if zero:
+            x2 = 0
+        else:
+            x2 = (x-eta)/(1-eta)
+        prefac = (3./2)*gamma(1+p)/gamma(4+p)
+        if not zero and (eta/x < 1e-4):
+            # use Taylor up to O(eta)
+            b = (-2./3)*(p**3+6*p**2+11*p+6)*(x-1)**3*x**p
+        else:
+            # exact (but instable for small eta)
+            b = ((eta**2-x)*(x1**(2+p)-x2**(2+p))
+             +(2+p)*eta*(1-x)*(x1**(2+p)+x2**(2+p)))/eta**3
+        return prefac * b
+
+    def _intsea(self, x, eta, alt, j, zero=False):
+        """Analytic integral over DD for sea sector."""
+        x1 = (x+eta)/(1+eta)
+        p = - alt + j/2
+        if zero:
+            x2 = 0
+        else:
+            x2 = (x-eta)/(1-eta)
+        if not zero and (eta/x < 1e-2):
+            # use Taylor up to O(eta^2)
+            b = eta**2*(p-1)*p+x*(eta**2*(p+6)*(p*(x-2)+7*x)+14*x)
+            return (1-x)**5 * b * x**(p-2) / 14.
+        else:
+            # exact (but instable for small eta)
+            prefac = (15./2)*gamma(1+p)/gamma(6+p)/eta**5
+            brm = 3*(eta**2-x)**2+eta**2*(p**2+6*p+8)*(1-x)**2
+            brp = 3*eta*(eta**2-x)*(3+p)*(1-x)
+            b = brm*(x1**(3+p)-x2**(3+p))+brp*(x1**(3+p)+x2**(3+p))  
+            return prefac * b
+
+    def _val(self, x, eta, alt, j):
+        #assert eta >= 0
+        if x >= eta:
+            return self._intval(x, eta, alt, j)
+        elif -eta < x < eta:
+            return self._intval(x, eta, alt, j, zero=True) 
+        else:
+            return 0
+
+    def _sea(self, x, eta, alt, j):
+        DMKILL = 1 # Set to 0 to agree with DM
+        assert eta >= 0
+        if x >= eta:
+            return self._intsea(x, eta, alt, j)
+        elif -eta < x < eta:
+            return ( self._intsea(self, x, eta, alt, j, zero=True) 
+                      - DMKILL*self._intsea(-x, eta, alt, j, zero=True) )
+        else:
+            return -DMKILL*self._intsea(-x, eta, alt, j)  # x < -eta
+
+    def Huval(self, x, eta, t, Q2):
+        """GK12 model for H^u_val GPD."""
+        Q02 = 4.
+        L = log(Q2/Q02)
+        cuval = array([1.52+0.248*L, 2.88-0.940*L, -0.095*L, 0 ])
+        al0, alp = (0.48, 0.9)
+        alt = al0 + alp*t
+        xs = array([self._val(x, eta, alt, j) for j in range(4)])
+        return sum(cuval*xs)  
+
+    def Hdval(self, x, eta, t, Q2):
+        """GK12 model for H^d_val GPD."""
+        Q02 = 4.
+        L = log(Q2/Q02)
+        cdval = array([0.76+0.248*L, 3.11-1.36*L, -3.99+1.15*L, 0])
+        al0, alp = (0.48, 0.9)
+        alt = al0 + alp*t
+        xs = array([self._val(x, eta, alt, j) for j in range(4)])
+        return sum(cdval*xs)
+
+    def Hs(self, x, eta, t, Q2):
+        """GK12 model for strange sea GPD."""
+        Q02 = 4.
+        Mp2 = 0.9383**2
+        L = log(Q2/Q02)
+        cs = array([0.123+0.0003*L, -0.327-0.004*L, 0.692-0.068*L, -0.486+0.038*L])
+        al0, alp = (1.10+0.06*L-0.0027*L**2, 0.15)
+        alt = al0 + alp*t
+        xs = array([self._sea(x, eta, alt, j) for j in range(4)])
+        b = 2.58 + 0.25*log(Mp2/(Q2+Mp2))
+        return exp(b*t) * sum(cs*xs)
+
+    def Hudsea(self, x, eta, t, Q2):
+        """GK12 model for u or d sea GPDs."""
+        Q02 = 4.
+        kaps = 1.+0.68/(1.+0.52*log(Q2/Q02))
+        return kaps * self.Hs(x, eta, t, Q2)
+
+    def Hu(self, x, eta, t, Q2): 
+        return self.Huval(x, eta, t, Q2) + self.Hudsea(x, eta, t, Q2)
+        
+    def Hd(self, x, eta, t, Q2): 
+        return self.Hdval(x, eta, t, Q2) + self.Hudsea(x, eta, t, Q2)
+
+    def ImH(self, pt, xi=0):
+        """GK12 model for Im(CFFH)."""
+        # FIXME: The following solution is not elegant
+        if isinstance(xi, ndarray):
+            # function was called with third argument that is xi nd array
+            xs = xi
+        elif xi != 0:
+            # function was called with third argument that is xi number
+            xs = [xi]
+        else:
+            # xi should be taken from pt object
+            xs = [pt.xi]
+        t = pt.t
+        Q2 = pt.Q2
+        res = []
+        for x in xs:
+            res.append( pi*(  (4./9)*(self.Hu(x, x, t, Q2) - self.Hu(-x, x, t, Q2))
+                    +(1./9)*(self.Hd(x, x, t, Q2) - self.Hd(-x, x, t, Q2))
+                    +(1./9)*(self.Hs(x, x, t, Q2) - self.Hs(-x, x, t, Q2)) ) )
+        if len(res) == 1:
+            return res[0]
+        else:
+            return array(res)
+
+    def ImHalt(self, pt):
+        """GK12 model for Im(CFFH) (alternative expression)."""
+        x = pt.xi
+        t = pt.t
+        Q2 = pt.Q2
+        assert x>0
+        return pi*(  (4./9)*(self.Huval(x, x, t, Q2) +2*self.Hudsea(x, x, t, Q2))
+                +(1./9)*(self.Hdval(x, x, t, Q2)+2*self.Hudsea(x, x, t, Q2))
+                +(1./9)*(2*self.Hs(x, x, t, Q2)) )
+
 
 
 class ComptonNeuralNets(Model):
