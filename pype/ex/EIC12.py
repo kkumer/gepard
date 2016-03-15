@@ -16,7 +16,7 @@ from math import sqrt
 #import logging
 #logging.basicConfig(level=logging.DEBUG)
 
-db = shelve.open('/home/kkumer/pype/theories.db')
+db = shelve.open('theories.db')
 thAFKM12 = db['AFKM12']
 Model.ComptonGepard.gepardPool.pop()
 thKM10 = db['KM10']

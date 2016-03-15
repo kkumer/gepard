@@ -974,6 +974,9 @@ class GK12(ComptonDispersionRelations):
         # Note that opposite sign is also possible:
         return -0.155*exp(b*t) * sum(ces*xs)
 
+    def Eu(self, x, eta, t, Q2): 
+        return self.Euval(x, eta, t, Q2) + self.Esea(x, eta, t, Q2)
+
     def Etuval(self, x, eta, t, Q2):
         """GK12 model for Et^u GPD (non-pole part)."""
         ces = array([1, -2, 1])
@@ -1141,6 +1144,31 @@ class GK12(ComptonDispersionRelations):
         return self.ReEtpole(pt) + self.ReEtnonpole(pt)
 
 
+    def _GKaux(self, x, ds, Q2=4.):
+        """auxilliary integrand that accepts ndarray"""
+        res = []
+        for d in ds:
+            res.append(self.Hu(x, 0, -d**2, Q2))
+        return res
+
+    def _GKauxE(self, x, ds, Q2=4.):
+        """auxilliary integrand that accepts ndarray"""
+        res = []
+        for d in ds:
+            res.append(self.Eu(x, 0, -d**2, Q2))
+        return res
+
+    def gpdb(self, x, b, Q2=4., inf=2.5):
+        """GPD in b space ??? FIXME."""
+        return bquadrature(lambda d: d*j0(b*d/GeVfm)*self._GKaux(x, d, Q2), 
+                0.0, inf) / (2*pi*GeVfm**2)
+
+    def gpdbpol(self, pol, x, bx, by, Q2=4., inf=2.5):
+        """polarized GPD in b space"""
+        b = sqrt(bx**2 + by**2)
+        aux = bquadrature(lambda d: d**2*j1(b*d/GeVfm)*self._GKauxE(x, d, Q2), 
+                0.0, inf) / (2*pi*GeVfm**2)
+        return self.gpdb(x, b, Q2, inf) + pol*bx*aux/(2*b*Mp)
 
 class ComptonNeuralNets(Model):
     """Neural network CFFs"""
@@ -1764,29 +1792,27 @@ class ComptonGepard(ComptonFormFactors):
             return pt.xi*res/pi
 
     def gpdHskewQ(self, pt):
-        """Skewneess of GPD H_Q"""
+        """Skewness of GPD H_Q"""
         return self.gpdHtrajQ(pt)/self.gpdHzeroQ(pt)
 
     def gpdHskewG(self, pt):
-        """Skewneess of GPD H_G"""
+        """Skewness of GPD H_G"""
         return self.gpdHtrajG(pt)/self.gpdHzeroG(pt)
 
-
-
-    def gpdHQb(self, pt):
+    def gpdHQb(self, pt, inf=2.5):
         """GPD H^sea in b space in fm^-2."""
         b = sqrt(pt.bx**2 + pt.by**2)
         return bquadrature(lambda d: d*j0(b*d/GeVfm)*self.gpdHzeroQ(pt, ts=-d**2), 
-                0.0, 2.5) / (2*pi*GeVfm**2)
+                0.0, inf) / (2*pi*GeVfm**2)
 
-    def gpdHQbpol(self, pt):
+    def gpdHQbpol(self, pt, inf=2.5):
         """polarized GPD H^sea in b space in fm^-2."""
         b = sqrt(pt.bx**2 + pt.by**2)
         aux = bquadrature(lambda d: d**2*j1(b*d/GeVfm)*self.gpdEzeroQ(pt, ts=-d**2), 
-                0.0, 2.5) / (2*pi*GeVfm**2)
+                0.0, inf) / (2*pi*GeVfm**2)
         return self.gpdHQb(pt) + pt.bx*aux/(2*b*Mp)
 
-    def gpdHQbpolpol(self, pt, r, tht):
+    def gpdHQbpolpol(self, pt, r, tht, inf=2.5):
         """Same as gpdHQbpol but in polar coordinate system.
         FIXME: some ugly coding here.
         """
@@ -1801,7 +1827,7 @@ class ComptonGepard(ComptonFormFactors):
             pt.by = rr*sin(tht)
             b = sqrt(pt.bx**2 + pt.by**2)
             aux = bquadrature(lambda d: d**2*j1(b*d/GeVfm)*self.gpdEzeroQ(pt, ts=-d**2), 
-                    0.0, 2.5) / (2*pi*GeVfm**2)
+                    0.0, inf) / (2*pi*GeVfm**2)
             res.append(self.gpdHQb(pt) + pt.bx*aux/(2*b*Mp))
         if not isinstance(r, ndarray):
             r = ra[0]
@@ -1809,52 +1835,54 @@ class ComptonGepard(ComptonFormFactors):
             r = ra
         return array(res)
 
-    def rth(self, pt, tht):
+    def rth(self, pt, tht, inf=2.5):
         """Calculate <r(tht)> """
-        norm = rthtquadrature(lambda r: r*self.gpdHQbpolpol(pt, r, tht), 0.0, 2.5)
+        norm = rthtquadrature(lambda r: r*self.gpdHQbpolpol(pt, r, tht), 0.0, inf)
         prob = rthtquadrature(lambda r: r*r*self.gpdHQbpolpol(pt, r, tht), 0.0, 2.5)
         return prob/norm
 
-    def gpdHQbIntg(self, pt, ba):
+    def gpdHQbIntg(self, pt, ba, inf=2.5):
         """Same as gpdHQb but convenient as integrand."""
         res = []
         for b in ba:
             aux = bquadrature(lambda d: d*j0(b*d/GeVfm)*self.gpdHzeroQ(pt, ts=-d**2), 
-                0.0, 2.5) / (2*pi*GeVfm**2)
+                0.0, inf) / (2*pi*GeVfm**2)
             res.append(aux)
         return array(res)
 
-    def bsq(self, pt):
+    def bsq(self, pt, inf=2.5):
         """Calculate unpolarized <b^2> for model m."""
-        norm = rthtquadrature(lambda b: b*self.gpdHQbIntg(pt, b), 0.0, 2.5)
+        norm = rthtquadrature(lambda b: b*self.gpdHQbIntg(pt, b), 0.0, inf)
         aux = rthtquadrature(lambda b: b**3*self.gpdHQbIntg(pt, b), 0.0, 2.5)
         return aux/norm
     
-    def gpdHGb(self, pt):
+    def gpdHGb(self, pt, inf=2.5):
         """GPD H^G in b space in fm^-2."""
         b = sqrt(pt.bx**2 + pt.by**2)
         return bquadrature(lambda d: d*j0(b*d/GeVfm)*self.gpdHzeroG(pt, ts=-d**2), 
-                0.0, 2.5) / (2*pi*GeVfm**2)
+                0.0, inf) / (2*pi*GeVfm**2)
 
-    def gpdHGbpol(self, pt):
+    def gpdHGbpol(self, pt, inf=2.5):
         """polarized GPD H^sea in b space in fm^-2."""
         b = sqrt(pt.bx**2 + pt.by**2)
         aux = bquadrature(lambda d: d**2*j1(b*d/GeVfm)*self.gpdEzeroG(pt, ts=-d**2), 
-                0.0, 2.5) / (2*pi*GeVfm**2)
+                0.0, inf) / (2*pi*GeVfm**2)
         return self.gpdHGb(pt) + pt.by*aux/(2*b*Mp)
 
 
     def beff(self, pt):
-        """slope of  CFFH."""
+        """slope of  CFFH"""
+        t1 = -0.03
+        t2 = -1.5
         tmem = pt.t
-        pt.t = -0.7
+        pt.t = t2
         self.g.newcall = 1
         up = self.ImH(pt)
-        pt.t = -0.1
+        pt.t = t1
         self.g.newcall = 1
         down = self.ImH(pt)
         pt.t = tmem
-        return - 2 * log(up/down)/0.7
+        return log(up/down)/(t2-t1)
 
 
     def ImH(self, pt):
@@ -2001,6 +2029,8 @@ class ModelDR(ComptonModelDR, ElasticDipole):
 class Gepard(ComptonGepard, ElasticKelly):
     """Complete model as in arXiv:0904.0458.."""
 
+class GK(GK12, ElasticKelly):
+    """Goloskokov-Kroll model as described in arXiv:1210.6975."""
 
 class ModelDRKelly(ComptonModelDR, ElasticKelly):
     """Same, but with Kelly elastic form factors."""
