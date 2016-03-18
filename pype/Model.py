@@ -745,7 +745,7 @@ class GK12(ComptonDispersionRelations):
 
     # We keep the forward-case code just in case it's useful
 
-    def g(self, x, Q2):
+    def G(self, x, Q2):
         """GK12 model for gluon PDF."""
         Q02 = 4.
         L = log(Q2/Q02)
@@ -2022,6 +2022,9 @@ class ComptonLocal(ComptonFormFactors):
         exec('def %s(self, pt): return self.parameters["p%s"]' % (name, name))
 
 ##  --- Complete models built from the above components ---
+
+class PureBetheHeitler(ComptonFormFactors, ElasticKelly):
+    """Pure Bethe-Heitler (all CFFs=0) model."""
 
 class ModelDR(ComptonModelDR, ElasticDipole):
     """Complete model as in arXiv:0904.0458.."""

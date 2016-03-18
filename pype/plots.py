@@ -353,6 +353,80 @@ def HERMES12(path=None, fmt='png', **kwargs):
         fig.show()
     return fig
 
+def HERMES10t(lines=None, path=None, fmt='png'):
+    """Plot AUL(t) and ALL(t) for HERMES 2010 data."""
+    NPTS = 30
+    dfAUL = utils.select(data[52], criteria=['FTn == -1'])[:4].df()
+    dfALL0 = utils.select(data[53], criteria=['FTn == 0'])[:4].df()
+    dfALL1 = utils.select(data[53], criteria=['FTn == 1'])[:4].df()
+    dfs = [dfAUL, dfALL1, dfALL0]
+    ylabels = [r'$A_{UL,+}^{\sin\phi}$', 
+	       r'$-A_{LL,+}^{\cos\phi}$',
+	       r'$A_{LL,+}^{\cos 0\phi}$']
+    ylims = [(-0.32, 0.08), (-0.32, 0.22), (-0.28, 0.55)]
+    yticks = [0.1, 0.1, 0.2]
+    styles = ['b-', 'r--', 'g-.', 'k:']
+    fig, axs = plt.subplots(3, 1, sharex=True, figsize=[7,9])
+    for p, ax in enumerate(axs):
+	pts = dfs[p]
+	ax.errorbar(pts.tm.values, pts.val.values, pts.err.values, 
+		linestyle='None', marker='s', color='black')
+        if not isinstance(lines, list): lines = [lines]
+	for l, th in enumerate(lines):
+	    xs, ys = thline(th, pts, pts.pt[0], npts=NPTS)
+	    ax.plot(xs, ys, styles[l], label=th.name)
+	ax.set_xlim(0.0, 0.51)
+	ax.set_ylim(*ylims[p])
+	ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
+	ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1)) 
+	ax.yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(yticks[p])) 
+	ax.set_ylabel(ylabels[p], fontsize=18)
+	ax.set_xlabel('$-t\\; [{\\rm GeV}^2]$', fontsize=16)
+    axs[1].legend(loc='lower center').draw_frame(0)
+    fig.subplots_adjust(wspace=0.0, hspace=0.0) 
+    if path:
+        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+    else:
+        fig.canvas.draw()
+        fig.show()
+    return fig
+
+def HERMES12t(lines=None, path=None, fmt='png'):
+    """Plot ALU(t) and AC(t) for HERMES data + recoil."""
+    NPTS = 20
+    dfAC = data[67][18:18+6].df()
+    dfALU = data[68][:6].df()
+    dfALUrec = data[122][:4].df()
+    dfs = [dfALU, dfAC]
+    ylabels = [r'$A_{LU,I}^{\sin\phi}$', r'$-A_{C}^{\cos\phi}$']
+    styles = ['b-', 'r--', 'g-.', 'k:']
+    fig, axs = plt.subplots(2, 1, sharex=True, figsize=[7,6])
+    for p, ax in enumerate(axs):
+	pts = dfs[p]
+	ax.errorbar(pts.tm.values, pts.val.values, pts.err.values, 
+		linestyle='None', marker='s', color='black')
+	if p == 0:
+	    # add recoil data
+	    ax.errorbar(dfALUrec.tm.values, dfALUrec.val.values, 
+		    dfALUrec.err.values, fillstyle='none',
+		linestyle='None', marker='s', color='black')
+        if not isinstance(lines, list): lines = [lines]
+	for l, th in enumerate(lines):
+	    xs, ys = thline(th, pts, pts.pt[0], npts=NPTS)
+	    ax.plot(xs, ys, styles[l], label=th.name)
+	ax.set_xlim(0.0, 0.51)
+	ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1)) 
+	ax.set_ylabel(ylabels[p], fontsize=18)
+	ax.set_xlabel('$-t\\; [{\\rm GeV}^2]$', fontsize=16)
+    axs[1].legend(loc='upper right').draw_frame(0)
+    fig.subplots_adjust(wspace=0.0, hspace=0.0) 
+    if path:
+        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+    else:
+        fig.canvas.draw()
+        fig.show()
+    return fig
+
 def HERMES12BCA(path=None, fmt='png', **kwargs):
     """Plot HERMES combined BCA data with fit lines."""
 
