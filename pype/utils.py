@@ -275,7 +275,10 @@ def select(dataset, criteria=[], logic='AND'):
                     break
             if ok:
                 selected.append(pt)
-    return selected
+    # convert list to DataSet instance
+    tmp = Data.DataSet(selected)
+    tmp.__dict__ = dataset.__dict__.copy() # transfer the attributes
+    return tmp
 
 def listdb(db):
     print "%-17s--+--%s" % (17*'-', 60*'-')
