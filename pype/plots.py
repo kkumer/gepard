@@ -209,8 +209,8 @@ def panel(ax, points=None, lines=None, bands=None, xaxis=None, xs=None,
     if lines:
         if not isinstance(lines, list): lines = [lines]
         lineshapes = ['s', '^', 'd', 'h']  # first squares, then triangles, diamonds, hexagons
-        linecolors = ['blue', 'red', 'black', 'blue', 'green', 'purple']  
-        linestyles = ['-', '--', '-.', ':']  # solid, dashed, dot-dashed, dotted
+        linecolors = ['red', 'blue', 'green', 'blue', 'black']  
+        linestyles = ['--', '-', '-.', '--', ':']  # solid, dashed, dot-dashed, dotted
         linen = 0
         for line in lines:
             _axline(ax, lambda pt: line.predict(pt, orig_conventions=True), points, xaxis=xaxis,
@@ -1149,7 +1149,7 @@ def HallA06(lines=None, path=None, fmt='png'):
 	pts = pd.DataFrame([(pt.Q2, pt.xB, pt.tm, pt.val, pt.err) for pt in subsets[iset]], columns=('Q2', 'xB', 'tm', 'val', 'err'))
 	axs[pn].errorbar(pts.tm.values, pts.val.values, pts.err.values, linestyle='None')
         if not isinstance(lines, list): lines = [lines]
-	styles = ['r-', 'k--', 'g:', 'b-.']
+	styles = ['r--', 'b-', 'g-.', 'b--', 'k:']
 	for nl, th in enumerate(lines):
 	    xs, ys = thline(th, pts, subsets[iset][0], npts=NPTS)
 	    axs[pn].plot(xs, ys, styles[nl], label=th.name)
@@ -1326,7 +1326,7 @@ def CLAS15xs(lines=None, path=None, fmt='png'):
 	pts = BSDw[a:b+1]
 	axs[pn].errorbar(pts.tm.values, pts.val.values, pts.err.values, linestyle='None')
         if not isinstance(lines, list): lines = [lines]
-	styles = ['r-', 'k--', 'g:', 'b-.']
+	styles = ['r--', 'b-', 'g-.', 'b--', 'k:']
 	for nl, th in enumerate(lines):
 	    xs, ys = thline(th, pts, data[101][a], npts=NPTS)
 	    axs[pn].plot(xs, ys, styles[nl], label=th.name)
@@ -1369,7 +1369,7 @@ def HallA15(lines=None, path=None, fmt='png'):
         pts = pd.DataFrame([(pt.Q2, pt.xB, pt.tm, pt.val, pt.err) for pt in data[id][a:b+1]], columns=('Q2', 'xB', 'tm', 'val', 'err')) 
         axs[pn].errorbar(pts.tm.values, pts.val.values, pts.err.values, linestyle='None')
         if not isinstance(lines, list): lines = [lines]
-        styles = ['r-', 'k--', 'g:', 'b-.']
+	styles = ['r--', 'b-', 'g-.', 'b--', 'k:']
         for nl, th in enumerate(lines):
             xs, ys = thline(th, pts, data[id][a], npts=NPTS)
             axs[pn].plot(xs, ys, styles[nl], label=th.name)
@@ -2800,12 +2800,12 @@ def CFF2(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
                     'yaxis':cff, 't':ts[nt], 'Q2':4.}, **kwargs)
             ax.axhspan(-0.0005, 0.0005, facecolor='g', alpha=0.6)  # horizontal bar
             ax.text(0.31, 0.02, "$t = %s\\, {\\rm GeV}^2$" % str(ts[nt]), 
-                    transform=ax.transAxes, fontsize=18)
+                    transform=ax.transAxes, fontsize=14)
             ax.xaxis.set_major_formatter(matplotlib.ticker.FormatStrFormatter('%s'))
             if nt == 0:
                 # plot data-region vertical band for left panels
                 #ax.axvspan(0.025, 0.136, facecolor='g', edgecolor='black', alpha=0.2)
-                ax.set_ylabel(toTeX['%s' % cff], fontsize=20)
+                ax.set_ylabel(toTeX['%s' % cff], fontsize=16)
             if nt == 1:
                 # no y tick labels on right panels
                 ax.set_yticklabels([])
@@ -2814,7 +2814,7 @@ def CFF2(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
                 ax.set_xticklabels([])
             if n == len(cffs)-1:
                 # x-label only on lower panels
-                ax.set_xlabel(toTeX['xixB'], fontsize=18)
+                ax.set_xlabel(toTeX['xixB'], fontsize=14)
             if n == 0 and nt == 0:
                 # put legend in first panel
                 ax.legend(loc='upper right')
@@ -2829,8 +2829,8 @@ def CFF2(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
             ax.set_xlim(ximin, ximax)
             #ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.02))  # tickmarks
             for label in ax.get_xticklabels() + ax.get_yticklabels():
-                label.set_fontsize(14)
-    fig.subplots_adjust(bottom=0.4, wspace=0.0, hspace=0.0)
+                label.set_fontsize(12)
+    fig.subplots_adjust(bottom=0.2, wspace=0.0, hspace=0.0)
     if path:
         #fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
         fig.set_size_inches((14, 16))
@@ -2877,7 +2877,7 @@ def CFFt(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
         ax = fig.add_subplot(len(cffs), 2, 2*n+2)
         panel(ax, xaxis='tm', xs=tmvals, kins={'yaxis':cff, 'xB':0.05, 'Q2':4.}, **kwargs)
         ax.set_xlabel(toTeX['tm'], fontsize=15)
-        ax.set_ylabel(toTeX['%s' % cff], fontsize=18)
+        ax.set_ylabel(toTeX['%s' % cff], fontsize=14)
         ax.axhspan(-0.0005, 0.0005, facecolor='g', alpha=0.6)  # horizontal bar
         if n == 0:
             ax.legend(loc='upper right')

@@ -11,7 +11,7 @@ db = shelve.open('theories.db')
 # testing data set
 testpoints = [data[31][12]] + [data[8][1]] + [data[29][2]] + [data[30][3]]
 # testing data set for fits
-fitpoints = data[31][12:14] + data[8][1:3] + data[30][2:4]
+fitpoints = data[31] + data[8]
 
 # test-network 
 testNN = db['KMS11-NN']
@@ -30,15 +30,15 @@ test_basicNN.long=1
 
 def test_fitNN():
     """Testing Neural Net fitting by FitterBrain."""
-    numpy.random.seed(68)
-    mNN = Model.ModelNN()
-    tNN = Approach.hotfixedBMK(mNN)
-    fNN = Fitter.FitterBrain(2*fitpoints, tNN, nnets=1, nbatch=6)
+    numpy.random.seed(81)
+    mNN = Model.ModelNN(output_layer=['ImH', 'ReH'])
+    tNN = Approach.BMK(mNN)
+    fNN = Fitter.FitterBrain(fitpoints, tNN, nnets=1, nbatch=6)
     fNN.fit()
-    chisq = tNN.chisq(2*fitpoints)[0]
-    assert_almost_equal(chisq, 22.754514666801569)
+    chisq = tNN.chisq(fitpoints)[0]
+    assert_almost_equal(chisq, 34.73003122832)
 
 # Actually this test was broken by Approach.observables consolidation
-test_fitNN.newfeature = 1
+test_fitNN.long = 1
 
 db.close()
