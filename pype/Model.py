@@ -1244,7 +1244,7 @@ class ComptonNeuralNets(Model):
 
     def subtraction(self, pt):
         return 2.25  # temporary
-        if self.parameters['outputvalueC'] != None:
+        if self.parameters['outputvalueC'] is not None:
             # this occurs during training: value is set by training
             # routine by calling with outputvalueC set by training routine
             return self.parameters['outputvalueC']
@@ -1285,7 +1285,7 @@ class ComptonNeuralNets(Model):
             # function was called with third argument that is xi nd array
             # and we already have some nets so disp.int. can be calculated
             x = xi
-        elif self.parameters['outputvalue'] != None:
+        elif self.parameters['outputvalue'] is not None:
             # this occurs during training: value is set by training
             # routine by calling with outputvalue set by training routine
             return self.parameters['outputvalue'][ind]

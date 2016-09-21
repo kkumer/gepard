@@ -347,6 +347,7 @@ class FitterBrain(Fitter):
                 sfitprob = utils.stringcolor("%5.4f" % fitprob, 'green', True)
             print "Net %2i ---> TestError: %8.3g  ---> P(chisq = %1.2f) = %s " % (
                     n, memerr, chi, sfitprob)
+        self.theory.model.parameters['nnet'] = 'ALL'
         return self.theory
 
     def prune(self, minprob=0.01):
@@ -368,5 +369,6 @@ class FitterBrain(Fitter):
         # replace all nets with good ones
         self.theory.model.nets = goodnets
         self.nnets = len(goodnets)
+        self.theory.model.parameters['nnet'] = 'ALL'
         return self.theory
 
