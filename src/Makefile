@@ -103,7 +103,7 @@ gepard.exe: $(ALLOBJS) $(FODIR)/Ffcn.o $(_MMAOBJS)  $(FODIR)/Fmninterface.o
 #
 pygepard: pygepard.so
 
-pygepards: pygepard.so pygepard2.so pygepard3.so
+pygepards: pygepard.so pygepard2.so pygepard3.so pygepard4.so pygepard5.so pygepard6.so
 
 pygepard.so: $(_FPREPS)
 	f2py2 --fcompiler=gnu95  -c -m pygepard $^ adacf/*f -lgomp

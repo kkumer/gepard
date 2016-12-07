@@ -379,6 +379,10 @@ def listchis(ths, Q2cut=1., Q2max=1.e3, nsets=0, out='chis'):
             ('Hall A', 'BSD_s1', H_BSDpts), ('Hall A', 'BSS_c0', H_BSS0pts),
             ('Hall A', 'BSS_c1', H_BSS1pts)
             ]
+    sets[8] = [('HERMES', 'ALUI', ALUIpts),
+            ('HERMES', 'BCA', BCApts), ('CLAS', 'BSA', CLASpts),
+            ('Hall A', 'BSDw', BSDwpoints), ('Hall A', 'BSSw', BSSwpoints),
+            ('HERMES', 'AUTI', AUTIpts)]
     names = [th.name[:10] for th in ths]
     sublines = ['------' for th in ths]
     if out == 'chis':
