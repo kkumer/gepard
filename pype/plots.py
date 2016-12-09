@@ -1131,8 +1131,8 @@ def HallA06(lines=None, path=None, fmt='png'):
     NPTS = 12
     # tupls are (dataset id, ind_low, ind_high)
     xQbins = [1, 2, 3, 
-	      'blank', 'blank', 4,
-	      'blank', 'blank', 5]
+              'blank', 'blank', 4,
+              'blank', 'blank', 5]
     subsets = {}
     subsets[1] = utils.select(data[50], criteria=['Q2 == 1.5', 'FTn == -1'])
     subsets[2] = utils.select(data[50], criteria=['Q2 == 1.9', 'FTn == -1'])
@@ -1143,46 +1143,46 @@ def HallA06(lines=None, path=None, fmt='png'):
     fig, axs = plt.subplots(3, 3, figsize=[7,9])
     axs = axs.reshape(9)
     for pn, iset in enumerate(xQbins):
-	if iset == 'blank': 
-	    axs[pn].axis('off')
-	    continue
-	pts = pd.DataFrame([(pt.Q2, pt.xB, pt.tm, pt.val, pt.err) for pt in subsets[iset]], columns=('Q2', 'xB', 'tm', 'val', 'err'))
-	axs[pn].errorbar(pts.tm.values, pts.val.values, pts.err.values, linestyle='None')
+        if iset == 'blank': 
+            axs[pn].axis('off')
+            continue
+        pts = pd.DataFrame([(pt.Q2, pt.xB, pt.tm, pt.val, pt.err) for pt in subsets[iset]], columns=('Q2', 'xB', 'tm', 'val', 'err'))
+        axs[pn].errorbar(pts.tm.values, pts.val.values, pts.err.values, linestyle='None')
         if not isinstance(lines, list): lines = [lines]
-	styles = ['r--', 'b-', 'g-.', 'b--', 'k:']
-	for nl, th in enumerate(lines):
-	    xs, ys = thline(th, pts, subsets[iset][0], npts=NPTS)
-	    axs[pn].plot(xs, ys, styles[nl], label=th.name)
-	axs[pn].set_xlim(0.12, 0.42)
-	axs[pn].xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1)) 
-	s1 = r'$Q^2 =\, {:.2f}$'.format(pts.Q2.mean())
-	s1 += '\n'
-	s1 += r'$x_B =\, {:.2f}$'.format(pts.xB.mean())
-	if pn<3:
-	    axs[pn].text(0.25, 0.0175, s1, fontsize=14)
-	    axs[pn].set_ylim(0.0,0.024)
-	if pn in [4,5]:
-	    #axs[pn].text(0.25, 0.06, s1, fontsize=16)
-	    axs[pn].set_ylim(0.0,0.088)
-	    axs[pn].yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.03)) 
-	if pn in [7,8]:
-	    #axs[pn].text(0.25, 0.0005, s1, fontsize=16)
-	    axs[pn].set_ylim(-0.005, 0.017)
-	    axs[pn].axhline(y=0, linewidth=1, color='g')  # y=0 thin line
-	    axs[pn].yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.01))
-	#else:
-	    #axs[pn].text(0.22, 0.05, s1, fontsize=16)
-	if pn in [0,1,8]:
-	    axs[pn].set_xlabel(r'$-t\; [{\rm GeV}^2]$', fontsize=16)
-	if pn == 5:
-	    axs[pn].set_ylabel(r'$d\sigma^{\cos 0\phi,w}$', fontsize=20)
-	if pn == 8:
-	    axs[pn].set_ylabel(r'$d\sigma^{\cos \phi,w}$', fontsize=20)
-	    axs[pn].legend(loc=(-1.7,1.), fontsize=14, handlelength=3).draw_frame(0)
-	if pn == 0:
-	    axs[pn].set_ylabel(r'$\Delta\sigma^{\sin\phi,w}$', fontsize=20)
-	if pn in [1,2]:
-	    axs[pn].get_yaxis().set_visible(False)
+        styles = ['r--', 'b-', 'g-.', 'b--', 'k:']
+        for nl, th in enumerate(lines):
+            xs, ys = thline(th, pts, subsets[iset][0], npts=NPTS)
+            axs[pn].plot(xs, ys, styles[nl], label=th.name)
+        axs[pn].set_xlim(0.12, 0.42)
+        axs[pn].xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1)) 
+        s1 = r'$Q^2 =\, {:.2f}$'.format(pts.Q2.mean())
+        s1 += '\n'
+        s1 += r'$x_B =\, {:.2f}$'.format(pts.xB.mean())
+        if pn<3:
+            axs[pn].text(0.25, 0.0175, s1, fontsize=14)
+            axs[pn].set_ylim(0.0,0.024)
+        if pn in [4,5]:
+            #axs[pn].text(0.25, 0.06, s1, fontsize=16)
+            axs[pn].set_ylim(0.0,0.088)
+            axs[pn].yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.03)) 
+        if pn in [7,8]:
+            #axs[pn].text(0.25, 0.0005, s1, fontsize=16)
+            axs[pn].set_ylim(-0.005, 0.017)
+            axs[pn].axhline(y=0, linewidth=1, color='g')  # y=0 thin line
+            axs[pn].yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.01))
+        #else:
+            #axs[pn].text(0.22, 0.05, s1, fontsize=16)
+        if pn in [0,1,8]:
+            axs[pn].set_xlabel(r'$-t\; [{\rm GeV}^2]$', fontsize=16)
+        if pn == 5:
+            axs[pn].set_ylabel(r'$d\sigma^{\cos 0\phi,w}$', fontsize=20)
+        if pn == 8:
+            axs[pn].set_ylabel(r'$d\sigma^{\cos \phi,w}$', fontsize=20)
+            axs[pn].legend(loc=(-1.7,1.), fontsize=14, handlelength=3).draw_frame(0)
+        if pn == 0:
+            axs[pn].set_ylabel(r'$\Delta\sigma^{\sin\phi,w}$', fontsize=20)
+        if pn in [1,2]:
+            axs[pn].get_yaxis().set_visible(False)
     fig.subplots_adjust(wspace=0.0, hspace=0.0) 
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
@@ -1323,26 +1323,26 @@ def CLAS15xs(lines=None, path=None, fmt='png'):
     fig, axs = plt.subplots(2,5, sharey='row', sharex=True, figsize=[12,9])
     axs = axs.reshape(10)
     for pn, (a,b) in enumerate(xQbins):
-	pts = BSDw[a:b+1]
-	axs[pn].errorbar(pts.tm.values, pts.val.values, pts.err.values, linestyle='None')
+        pts = BSDw[a:b+1]
+        axs[pn].errorbar(pts.tm.values, pts.val.values, pts.err.values, linestyle='None')
         if not isinstance(lines, list): lines = [lines]
-	styles = ['r--', 'b-', 'g-.', 'b--', 'k:']
-	for nl, th in enumerate(lines):
-	    xs, ys = thline(th, pts, data[101][a], npts=NPTS)
-	    axs[pn].plot(xs, ys, styles[nl], label=th.name)
-	axs[pn].set_xlim(0.05, 0.55)
-	axs[pn].xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1)) 
-	s1 = '$Q^2 = {:.2f}$'.format(pts.Q2.mean())
-	s1 += '\n'
-	s1 += '$x_B = {:.2f}$'.format(pts.xB.mean())
-	if pn<5:
-	    axs[pn].text(0.2, 0.32, s1, fontsize=16)
-	else:
-	    axs[pn].text(0.22, 0.05, s1, fontsize=16)
-	if pn == 7:
-	    axs[pn].set_xlabel('$-t\\; [{\\rm GeV}^2]$', fontsize=16)
-	if (pn % 5) == 0:
-	    axs[pn].set_ylabel(r'$\Delta\sigma^{\sin\phi,w}$', fontsize=34)
+        styles = ['r--', 'b-', 'g-.', 'b--', 'k:', 'r:', 'k--']
+        for nl, th in enumerate(lines):
+            xs, ys = thline(th, pts, data[101][a], npts=NPTS)
+            axs[pn].plot(xs, ys, styles[nl], label=th.name)
+        axs[pn].set_xlim(0.05, 0.55)
+        axs[pn].xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1)) 
+        s1 = '$Q^2 = {:.2f}$'.format(pts.Q2.mean())
+        s1 += '\n'
+        s1 += '$x_B = {:.2f}$'.format(pts.xB.mean())
+        if pn<5:
+            axs[pn].text(0.2, 0.32, s1, fontsize=16)
+        else:
+            axs[pn].text(0.22, 0.05, s1, fontsize=16)
+        if pn == 7:
+            axs[pn].set_xlabel('$-t\\; [{\\rm GeV}^2]$', fontsize=16)
+        if (pn % 5) == 0:
+            axs[pn].set_ylabel(r'$\Delta\sigma^{\sin\phi,w}$', fontsize=34)
     fig.subplots_adjust(wspace=0.0, hspace=0.0) 
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
