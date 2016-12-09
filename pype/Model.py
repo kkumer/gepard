@@ -434,6 +434,7 @@ class ComptonDispersionRelations(ComptonFormFactors):
             # as for H, but with opposite sign
             return pvpi + self.subtraction(pt)
 
+    @staticmethod
     def ReEt(self, pt):
         """ Real part of CFF Et. 
         
@@ -1172,6 +1173,19 @@ class GK12(ComptonDispersionRelations):
         aux = bquadrature(lambda d: d**2*j1(b*d/GeVfm)*self._GKauxE(x, d, Q2), 
                 0.0, inf) / (2*pi*GeVfm**2)
         return self.gpdb(x, b, Q2, inf) + pol*bx*aux/(2*b*Mp)
+
+class GK12D(GK12):
+    """ Goloskokov-Kroll PDF model with added D-term
+
+        From [arXiv:1210.6975], Kroll:2012sm
+        Real part of CFFs is obtained using dispersion relations.
+
+    """
+
+    def subtraction(self, pt):
+        """D-term"""
+        denom = (1 - pt.t/(0.841*0.487**2))**0.841
+        return -(10./9.)*(-1.9/denom)
 
 class ComptonNeuralNets(Model):
     """Neural network CFFs"""
@@ -2037,6 +2051,9 @@ class Gepard(ComptonGepard, ElasticKelly):
 
 class GK(GK12, ElasticKelly):
     """Goloskokov-Kroll model as described in arXiv:1210.6975."""
+
+class GKD(GK12D, ElasticKelly):
+    """Goloskokov-Kroll model as described in arXiv:1210.6975 + D-term."""
 
 class ModelDRKelly(ComptonModelDR, ElasticKelly):
     """Same, but with Kelly elastic form factors."""
