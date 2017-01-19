@@ -85,9 +85,6 @@ H_BSS0pts = data[120][:10]
 H_BSS1pts = data[120][10:]
 H_BSD = data[109]+data[110]+data[111]
 H_BSS = data[107]+data[108]
-H_BSDpts = data[121]
-H_BSS0pts = data[120][:10]
-H_BSS1pts = data[120][10:]
 #
 # EIC mock
 #
