@@ -66,14 +66,14 @@ class Approach(object):
             return (chi, dof, fitprob)
 
     def pull(self, points, **kwargs):
-        """Return average pull (O(th)-O(exp)/sigma(exp) for a set of points."""
+        """Return compound pull sum((O(th)-O(exp)/sigma(exp))/sqrt(N)for a set of N points."""
         if kwargs.pop('displacement', False):
             pulls = [(self.predict(pt, observable=pt.yaxis, **kwargs) 
                 - pt.val) / pt.val for pt in points]
         else:
             pulls = [(self.predict(pt, observable=pt.yaxis, **kwargs) 
                 - pt.val) / pt.err for pt in points]
-        return sum(pulls)/len(points)
+        return sum(pulls)/sqrt(len(points))
 
     def scan(self, parname, points, npoints=5):
         """Scan chi-square dependence on single parameter."""
@@ -316,10 +316,26 @@ class BMK(Approach):
                 else:
                     raise ValueError('varFTn = %d not allowed. Only +/-1!' % pt.varFTn)
             pt.newframe = 'BMK'
+        # C4. cross-sections should be in nb
+        if pt.units[pt.y1name] == 'pb/GeV^4':
+            pt.val = pt.val/1000
+            for errtype in ['err', 'stat', 'syst', 'systminus', 'systplus']:
+                if hasattr(pt, errtype):
+                    err = getattr(pt, errtype)
+                    setattr(pt, errtype, err/1000)
+            pt.newunits[pt.y1name] = 'nb/GeV^4'
+
     to_conventions = staticmethod(to_conventions)
 
     def from_conventions(pt):
         """Transform stuff from Approach's conventions into original data's."""
+        # C4. cross-sections should be in nb
+        if pt.units[pt.y1name] == 'pb/GeV^4':
+            pt.val = pt.val*1000
+            for errtype in ['err', 'stat', 'syst', 'systminus', 'systplus']:
+                if hasattr(pt, errtype):
+                    err = getattr(pt, errtype)
+                    setattr(pt, errtype, err*1000)
         # C2. phi_{BKM} -> (pi - phi_{Trento})
         if pt.has_key('frame') and pt.frame == 'Trento':
             if pt.has_key('phi'):
