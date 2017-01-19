@@ -36,7 +36,7 @@ out3particle = gamma
 ### Observable 
 
 y1name = BSD
-y1long = Weighted beam spin difference
+y1long = Weighted(?!) beam spin difference
 y1unit = nb/GeV^4
 y1value = column4
 y1errorstatistic = column5
