@@ -67,12 +67,8 @@ class Approach(object):
 
     def pull(self, points, **kwargs):
         """Return compound pull sum((O(th)-O(exp)/sigma(exp))/sqrt(N)for a set of N points."""
-        if kwargs.pop('displacement', False):
-            pulls = [(self.predict(pt, observable=pt.yaxis, **kwargs) 
-                - pt.val) / pt.val for pt in points]
-        else:
-            pulls = [(self.predict(pt, observable=pt.yaxis, **kwargs) 
-                - pt.val) / pt.err for pt in points]
+        pulls = [(self.predict(pt, observable=pt.yaxis, **kwargs) 
+            - pt.val) / pt.err for pt in points]
         return sum(pulls)/sqrt(len(points))
 
     def scan(self, parname, points, npoints=5):
