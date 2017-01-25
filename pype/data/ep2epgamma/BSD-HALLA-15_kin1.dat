@@ -42,7 +42,7 @@ y1errorstatistic = column6
 #sysm (sysp) gives the negative (positive) value 
 y1errorsystematicminus = column7
 y1errorsystematicplus = column8
-
+y1errornormalization = 0.034
 
 
 ### x-axes
