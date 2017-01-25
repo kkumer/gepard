@@ -132,7 +132,7 @@ class DataPoint(DummyPoint):
                 # TODO: This should be, of course, treated in a assymetric way
                 self.statplus = gridline[int(self.y1errorstatisticplus.split('column')[1])-1]
                 self.statminus = gridline[int(self.y1errorstatisticminus.split('column')[1])-1]
-                self.stat = max(self.statplus, -self.statminus)
+                self.stat = max(self.statplus, abs(self.statminus))
             else:  # stat error not given, assumed zero
                 self.stat = 0.
             # 2. systematic error
@@ -144,7 +144,7 @@ class DataPoint(DummyPoint):
                 # TODO: This should be, of course, treated in a assymetric way
                 self.systplus = gridline[int(self.y1errorsystematicplus.split('column')[1])-1]
                 self.systminus = gridline[int(self.y1errorsystematicminus.split('column')[1])-1]
-                self.syst = max(self.systplus, -self.systminus)
+                self.syst = max(self.systplus, abs(self.systminus))
             else:  # syst error not given, assumed zero
                 self.syst = 0.
             # adding syst and stat in quadrature
