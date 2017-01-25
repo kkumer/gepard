@@ -66,9 +66,13 @@ class Approach(object):
             return (chi, dof, fitprob)
 
     def pull(self, points, **kwargs):
-        """Return compound pull sum((O(th)-O(exp)/sigma(exp))/sqrt(N)for a set of N points."""
-        pulls = [(self.predict(pt, observable=pt.yaxis, **kwargs) 
-            - pt.val) / pt.err for pt in points]
+        """Return compound pull for a set of data points.
+
+        Result is sum((O(th)-O(exp)/sigma(exp))/sqrt(N) in original (e.g. Trento) conventions
+        
+        """
+        pulls = [(self.predict(pt, observable=pt.yaxis, orig_conventions=True, **kwargs) 
+            - pt.origval) / pt.err for pt in points]
         return sum(pulls)/sqrt(len(points))
 
     def scan(self, parname, points, npoints=5):
@@ -292,6 +296,7 @@ class BMK(Approach):
 
     def to_conventions(pt):
         """Transform stuff into BMK conventions."""
+        pt.origval = pt.val  # to remember it for later convenience
         # C1. azimutal angle phi should be in radians.
         if pt.has_key('phi') and pt.units['phi'][:3]=='deg':
             pt.phi = pt.phi * pi / 180.

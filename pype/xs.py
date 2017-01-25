@@ -143,6 +143,7 @@ def XSall(id, Q, lam, Ee, Ep, xB, Q2, t, phi):
     pt0.y1name = 'BSS'
     pt0.units = {'phi': 'radian', 'BSS': 'nb/GeV^4'}
     pt0.frame = 'Trento'
+    pt0.val = None
     utils.fill_kinematics(pt0)
     th = theory(id)
     th.to_conventions(pt0)
