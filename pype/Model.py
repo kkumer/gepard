@@ -985,7 +985,7 @@ class GK12(ComptonDispersionRelations):
     def Etuval(self, x, eta, t, Q2):
         """GK12 model for Et^u GPD (non-pole part)."""
         ces = array([1, -2, 1])
-        al0, alp = (-0.48, 0.45)
+        al0, alp = (0.48, 0.45)
         alt = al0 + alp*t
         xs = array([self._val(x, eta, alt, j) for j in range(0,5,2)])
         b = 0.9
@@ -994,7 +994,7 @@ class GK12(ComptonDispersionRelations):
     def Etdval(self, x, eta, t, Q2):
         """GK12 model for Et^d GPD (non-pole part)."""
         ces = array([1, -2, 1])
-        al0, alp = (-0.48, 0.45)
+        al0, alp = (0.48, 0.45)
         alt = al0 + alp*t
         xs = array([self._val(x, eta, alt, j) for j in range(0,5,2)])
         b = 0.9

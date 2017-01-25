@@ -72,13 +72,15 @@ test_GKReE.extendedtesting = 1
 def test_GKImEt():
     """Test GK model: Im(CFFEt)"""
     res = thGK.m.ImEt(pt)
-    assert_almost_equal(res, 1.960464892)
+    #assert_almost_equal(res, 1.960464892) # with wrong al0 from KMS paper
+    assert_almost_equal(res, 39.522321114885344)
 
 test_GKImEt.extendedtesting = 1
 
 def test_GKReEt():
     """Test GK model: Re(CFFEt)"""
     res = thGK.m.ReEt(pt)
-    assert_almost_equal(res, 63.030901624)
+    #assert_almost_equal(res, 63.030901624) # with wrong al0 from KMS paper
+    assert_almost_equal(res, 100.94485648382198)
 
 test_GKReEt.extendedtesting = 1
