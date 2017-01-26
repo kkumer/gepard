@@ -50,20 +50,29 @@ class Approach(object):
         """Save theory to database."""
         db[self.name] = self
 
-    def chisq(self, points, sigmas=False, **kwargs):
+    def chisq(self, points, sigmas=False, pull=False, **kwargs):
         """Return tuple (chi-square, d.o.f., probability). If the approach and model
            provide uncertainties, they are ignored - only experimental uncertainties
            are taken into account."""
         nfreepars=utils.npars(self.model)
-        dof = len(points) - nfreepars
-        allsigmas = [(self.predict(pt, observable=pt.yaxis, **kwargs) - pt.val) / pt.err for
-                    pt in points]
-        chi = sum(s*s for s in allsigmas)  # equal to m.fval if minuit fit is done
+        npts = len(points)
+        dof = npts - nfreepars
+        pulls = []
+        for pt in points:
+            diff = (self.predict(pt, observable=pt.yaxis, orig_conventions=True, **kwargs) 
+                          - pt.origval)
+            if diff > 0:
+                pulls.append(diff/pt.errplus)
+            else:
+                pulls.append(diff/pt.errminus)
+        chi = sum(p*p for p in pulls)  # equal to m.fval if minuit fit is done
         fitprob = (1.-gammainc(dof/2., chi/2.)) # probability of this chi-sq
-        if sigmas:
-            return array(allsigmas)
+        if pull:
+            return chi/npts, sum(pulls)/sqrt(npts), npts
+        elif sigmas:
+            return array(pulls)
         else:
-            return (chi, dof, fitprob)
+            return chi, dof, fitprob
 
     def pull(self, points, **kwargs):
         """Return compound pull for a set of data points.
@@ -320,7 +329,7 @@ class BMK(Approach):
         # C4. cross-sections should be in nb
         if pt.units[pt.y1name] == 'pb/GeV^4':
             pt.val = pt.val/1000
-            for errtype in ['err', 'stat', 'syst', 'systminus', 'systplus']:
+            for errtype in ['err', 'errminus', 'errplus']:
                 if hasattr(pt, errtype):
                     err = getattr(pt, errtype)
                     setattr(pt, errtype, err/1000)
@@ -333,7 +342,7 @@ class BMK(Approach):
         # C4. cross-sections should be in nb
         if pt.units[pt.y1name] == 'pb/GeV^4':
             pt.val = pt.val*1000
-            for errtype in ['err', 'stat', 'syst', 'systminus', 'systplus']:
+            for errtype in ['err', 'errminus', 'errplus']:
                 if hasattr(pt, errtype):
                     err = getattr(pt, errtype)
                     setattr(pt, errtype, err*1000)

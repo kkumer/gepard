@@ -123,6 +123,8 @@ class DataPoint(DummyPoint):
         # 2d. y-axis errors
         if self.has_key('y1error'):  # we are given total error already
             self.err = gridline[int(self.y1error.split('column')[1])-1]
+            self.errplus = self.err
+            self.errminus = self.err
         else:  # we have to add various contributions. We do addition of variances.
             self.varsym = 0     # symmetric contributions
             self.varplus = 0
