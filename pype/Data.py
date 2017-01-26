@@ -123,37 +123,31 @@ class DataPoint(DummyPoint):
         # 2d. y-axis errors
         if self.has_key('y1error'):  # we are given total error already
             self.err = gridline[int(self.y1error.split('column')[1])-1]
-        else:  # we have to add stat and syst in quadrature
+        else:  # we have to add various contributions. We do addition of variances.
+            self.varsym = 0     # symmetric contributions
+            self.varplus = 0
+            self.varminus = 0
             # 1. statistical error
             if self.has_key('y1errorstatistic'):
-                self.stat = gridline[int(self.y1errorstatistic.split('column')[1])-1]
-            elif self.has_key('y1errorstatisticplus'): 
-                # we have stat+ and stat-. Taking the larger one as a systematic error.
-                # TODO: This should be, of course, treated in a assymetric way
-                self.statplus = gridline[int(self.y1errorstatisticplus.split('column')[1])-1]
-                self.statminus = gridline[int(self.y1errorstatisticminus.split('column')[1])-1]
-                self.stat = max(self.statplus, abs(self.statminus))
-            else:  # stat error not given, assumed zero
-                self.stat = 0.
+                self.varsym += gridline[int(self.y1errorstatistic.split('column')[1])-1]**2
+            if self.has_key('y1errorstatisticplus'): 
+                self.varplus += gridline[int(self.y1errorstatisticplus.split('column')[1])-1]**2
+                self.varminus += gridline[int(self.y1errorstatisticminus.split('column')[1])-1]**2
             # 2. systematic error
             if self.has_key('y1errorsystematic'):
-                self.syst = gridline[int(self.y1errorsystematic.split('column')[1])-1]
-                self.err = math.sqrt( self.stat**2 + self.syst**2 )
-            elif self.has_key('y1errorsystematicplus'): 
-                # we have syst+ and syst-. Taking the larger one as a systematic error.
-                # TODO: This should be, of course, treated in a assymetric way
-                self.systplus = gridline[int(self.y1errorsystematicplus.split('column')[1])-1]
-                self.systminus = gridline[int(self.y1errorsystematicminus.split('column')[1])-1]
-                self.syst = max(self.systplus, abs(self.systminus))
-            else:  # syst error not given, assumed zero
-                self.syst = 0.
-            # adding syst and stat in quadrature
-            self.err = math.sqrt( self.stat**2 + self.syst**2 )
-			# 3. normalization error
-			# FIXME: We treat it as point-to-point uncorrelated, so add it in quadrature
+                self.varsym += gridline[int(self.y1errorsystematic.split('column')[1])-1]**2
+            if self.has_key('y1errorsystematicplus'): 
+                self.varplus += gridline[int(self.y1errorsystematicplus.split('column')[1])-1]**2
+                self.varminus += gridline[int(self.y1errorsystematicminus.split('column')[1])-1]**2
+	    # 3. normalization error
             if self.has_key('y1errornormalization'):
-                self.normerr = self.y1errornormalization * self.val
-                self.err = math.sqrt( self.err**2 + self.normerr**2 )
+                self.varsym += (self.y1errornormalization * self.val)**2
+            # 4. TOTAL variances and errors
+            self.varplus += self.varsym  
+            self.varminus += self.varsym
+            self.errplus = math.sqrt(self.varplus)
+            self.errminus = math.sqrt(self.varminus)
+            self.err = (self.errplus+self.errminus)/2.
         # 2e. calculate standard kinematical variables
         utils.fill_kinematics(self)
         # 2f. polarizations
