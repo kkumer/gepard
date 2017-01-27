@@ -59,8 +59,8 @@ class Approach(object):
         dof = npts - nfreepars
         pulls = []
         for pt in points:
-            diff = (self.predict(pt, observable=pt.yaxis, orig_conventions=True, **kwargs) 
-                          - pt.origval)
+            diff = (self.predict(pt, observable=pt.yaxis, **kwargs) 
+                          - pt.val)
             if diff > 0:
                 pulls.append(diff/pt.errplus)
             else:
@@ -68,7 +68,16 @@ class Approach(object):
         chi = sum(p*p for p in pulls)  # equal to m.fval if minuit fit is done
         fitprob = (1.-gammainc(dof/2., chi/2.)) # probability of this chi-sq
         if pull:
-            return chi/npts, sum(pulls)/sqrt(npts), npts
+            P = sum(pulls)/sqrt(npts)
+            # FIXME: CLUDGE for getting Trento convention pull copied from orig_conv..
+            pt = points[0]
+            if pt.has_key('frame') and pt.frame == 'Trento' and pt.has_key('FTn'):
+                if pt.FTn == 1 or pt.FTn == 3 or pt.FTn == -2:
+                    P = - P
+            if pt.has_key('frame') and pt.frame == 'Trento' and pt.has_key('varFTn'):
+                if pt.varFTn == 1 or pt.varFTn == -1:
+                    P = - P
+            return chi/npts, P, npts
         elif sigmas:
             return array(pulls)
         else:
@@ -306,6 +315,9 @@ class BMK(Approach):
     def to_conventions(pt):
         """Transform stuff into BMK conventions."""
         pt.origval = pt.val  # to remember it for later convenience
+        pt.origerr = pt.err
+        pt.origerrplus = pt.errplus
+        pt.origerrminus = pt.errminus
         # C1. azimutal angle phi should be in radians.
         if pt.has_key('phi') and pt.units['phi'][:3]=='deg':
             pt.phi = pt.phi * pi / 180.

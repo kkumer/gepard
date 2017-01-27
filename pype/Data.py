@@ -255,7 +255,7 @@ class DataSet(list):
         """Return pandas DataFrame of dataset."""
         attrs = ['y1name', 'collaboration', 'FTn', 'id',
                 'xB', 'Q2', 't', 'tm', 'W', 'phi', 'FTn', 'varFTn', 'val',
-                'err', 'stat', 'syst']#, 'systplus', 'systminus',
+                'err', 'errplus', 'errminus']#, 'systplus', 'systminus',
                 #'statplus', 'statminus', 'normerr']
         dat = []
         for pt in self:
