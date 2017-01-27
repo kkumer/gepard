@@ -126,29 +126,29 @@ class DataPoint(DummyPoint):
             self.errplus = self.err
             self.errminus = self.err
         else:  # we have to add various contributions. We do addition of variances.
-            self.varsym = 0     # symmetric contributions
-            self.varplus = 0
-            self.varminus = 0
+            varsym = 0     # symmetric contributions
+            varplus = 0
+            varminus = 0
             # 1. statistical error
             if self.has_key('y1errorstatistic'):
-                self.varsym += gridline[int(self.y1errorstatistic.split('column')[1])-1]**2
+                varsym += gridline[int(self.y1errorstatistic.split('column')[1])-1]**2
             if self.has_key('y1errorstatisticplus'): 
-                self.varplus += gridline[int(self.y1errorstatisticplus.split('column')[1])-1]**2
-                self.varminus += gridline[int(self.y1errorstatisticminus.split('column')[1])-1]**2
+                varplus += gridline[int(self.y1errorstatisticplus.split('column')[1])-1]**2
+                varminus += gridline[int(self.y1errorstatisticminus.split('column')[1])-1]**2
             # 2. systematic error
             if self.has_key('y1errorsystematic'):
-                self.varsym += gridline[int(self.y1errorsystematic.split('column')[1])-1]**2
+                varsym += gridline[int(self.y1errorsystematic.split('column')[1])-1]**2
             if self.has_key('y1errorsystematicplus'): 
-                self.varplus += gridline[int(self.y1errorsystematicplus.split('column')[1])-1]**2
-                self.varminus += gridline[int(self.y1errorsystematicminus.split('column')[1])-1]**2
+                varplus += gridline[int(self.y1errorsystematicplus.split('column')[1])-1]**2
+                varminus += gridline[int(self.y1errorsystematicminus.split('column')[1])-1]**2
 	    # 3. normalization error
             if self.has_key('y1errornormalization'):
-                self.varsym += (self.y1errornormalization * self.val)**2
+                varsym += (self.y1errornormalization * self.val)**2
             # 4. TOTAL variances and errors
-            self.varplus += self.varsym  
-            self.varminus += self.varsym
-            self.errplus = math.sqrt(self.varplus)
-            self.errminus = math.sqrt(self.varminus)
+            varplus += varsym
+            varminus += varsym
+            self.errplus = math.sqrt(varplus)
+            self.errminus = math.sqrt(varminus)
             self.err = (self.errplus+self.errminus)/2.
         # 2e. calculate standard kinematical variables
         utils.fill_kinematics(self)
