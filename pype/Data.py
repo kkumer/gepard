@@ -60,9 +60,12 @@ class DataPoint(DummyPoint):
     `xB` -- x_Bjorken
     `Q2` -- squared momentum of virtual photon
     `val` -- measurement value
-    `stat` -- statistical error of `val`
-    `syst` -- systematic error of `val`
+    `errstat` -- statistical error of `val`
+    `errsyst` -- systematic error of `val`
+    `errnorm` -- normalization error of `val` (included also in errsyst)
     `err` --  `stat` and `syst` added in quadrature
+    `errplus` --  total positive error
+    `errplus` --  total negative error
      ...
 
     Information that is common to all data of a given dataset (i.e.
@@ -125,31 +128,56 @@ class DataPoint(DummyPoint):
             self.err = gridline[int(self.y1error.split('column')[1])-1]
             self.errplus = self.err
             self.errminus = self.err
-        else:  # we have to add various contributions. We do addition of variances.
-            varsym = 0     # symmetric contributions
+        else:
+            # we have to add various contributions. We do addition of variances:
+            # stat = statsym + max(stat+,stat-)
+            # syst_uncorr = systsym + max(syst+,syst-)
+            # syst = syst_uncorr + norm
+            # err = stat + syst   # This is used for fitting chisq
+            # Following two are used for pulls:
+            # err+ = statsym + stat+ + systsym + syst+ + norm
+            # err- = statsym + stat- + systsym + syst- + norm
+            varstat = 0
+            varsyst = 0  # uncorrelated syst err
+            varsym = 0
             varplus = 0
             varminus = 0
+            varnorm = 0
             # 1. statistical error
             if self.has_key('y1errorstatistic'):
-                varsym += gridline[int(self.y1errorstatistic.split('column')[1])-1]**2
-            if self.has_key('y1errorstatisticplus'): 
-                varplus += gridline[int(self.y1errorstatisticplus.split('column')[1])-1]**2
-                varminus += gridline[int(self.y1errorstatisticminus.split('column')[1])-1]**2
+                es = gridline[int(self.y1errorstatistic.split('column')[1])-1]**2
+                varstat += es
+                varsym  += es
+            if self.has_key('y1errorstatisticplus'):
+                ep = gridline[int(self.y1errorstatisticplus.split('column')[1])-1]**2
+                em = gridline[int(self.y1errorstatisticminus.split('column')[1])-1]**2
+                varstat += max(ep, em)
+                varplus  += ep
+                varminus += em
             # 2. systematic error
             if self.has_key('y1errorsystematic'):
-                varsym += gridline[int(self.y1errorsystematic.split('column')[1])-1]**2
-            if self.has_key('y1errorsystematicplus'): 
-                varplus += gridline[int(self.y1errorsystematicplus.split('column')[1])-1]**2
-                varminus += gridline[int(self.y1errorsystematicminus.split('column')[1])-1]**2
-	    # 3. normalization error
+                es = gridline[int(self.y1errorsystematic.split('column')[1])-1]**2
+                varsyst += es
+                varsym  += es
+            if self.has_key('y1errorsystematicplus'):
+                ep = gridline[int(self.y1errorsystematicplus.split('column')[1])-1]**2
+                em = gridline[int(self.y1errorsystematicminus.split('column')[1])-1]**2
+                varsyst += max(ep, em)
+                varplus  += ep
+                varminus += em
+	    # 3. normalization error (specified as percentage)
             if self.has_key('y1errornormalization'):
-                varsym += (self.y1errornormalization * self.val)**2
-            # 4. TOTAL variances and errors
-            varplus += varsym
-            varminus += varsym
-            self.errplus = math.sqrt(varplus)
-            self.errminus = math.sqrt(varminus)
-            self.err = (self.errplus+self.errminus)/2.
+                varnorm += (self.y1errornormalization * self.val)**2
+            # 4. TOTAL errors
+            self.errplus = math.sqrt(varsym + varplus + varnorm)
+            self.errminus = math.sqrt(varsym + varminus + varnorm)
+            self.errstat = math.sqrt(varstat)
+            self.errsyst = math.sqrt(varsyst + varnorm)
+            self.errnorm = math.sqrt(varnorm)
+            # FIXME: One needs to make a choice here and we go conservative
+            self.err = math.sqrt(varstat + varsyst + varnorm)
+            # alternative:
+            # self.err = (self.errplus+self.errminus)/2.
         # 2e. calculate standard kinematical variables
         utils.fill_kinematics(self)
         # 2f. polarizations

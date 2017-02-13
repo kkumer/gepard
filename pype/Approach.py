@@ -10,6 +10,9 @@ import pandas as pd
 import utils, quadrature, Data
 from constants import *
 
+# FIXME: This looks nonpythonic, see static class variables
+errtypes =  ['err', 'errminus', 'errplus', 'errstat', 'errsyst', 'errnorm']
+
 class Approach(object):
     """Class of approaches to calculation of observables.
 
@@ -37,6 +40,13 @@ class Approach(object):
         self.name = 'N/A'  # to be used as identifier in theory database
         self.description = 'N/A'  # something human-understandable
 
+    # Static class variable according to
+    # http://stackoverflow.com/questions/68645/static-class-variables-in-python
+    #_errtypes =  ['err', 'errminus', 'errplus', 'errstat', 'errsyst', 'errnorm']
+    #@property
+    #def errtypes(self):
+        #return type(self)._errtypes
+
     def __repr__(self):
         return "<Theory: %s + %s at %s>" % utils.flatten(
                 (str(self.__class__).split()[1][1:-2],
@@ -50,26 +60,36 @@ class Approach(object):
         """Save theory to database."""
         db[self.name] = self
 
-    def chisq(self, points, sigmas=False, pull=False, **kwargs):
-        """Return tuple (chi-square, d.o.f., probability). If the approach and model
-           provide uncertainties, they are ignored - only experimental uncertainties
-           are taken into account."""
+    def chisq(self, points, pulls=False, pull=False, asym=False, **kwargs):
+        """Return tuple (chi-square, d.o.f., probability).
+
+           pulls=True   returns array of pulls for each points
+           pull=True    returns compound pull of dataset
+           asym=True    treats carefully asymmetric errors
+
+           If the approach and model provide uncertainties, they are ignored -
+           only experimental uncertainties are taken into account.
+
+           """
         nfreepars=utils.npars(self.model)
         npts = len(points)
         dof = npts - nfreepars
-        pulls = []
+        allpulls = []
         for pt in points:
             diff = (self.predict(pt, observable=pt.yaxis, **kwargs) 
                           - pt.val)
-            if diff > 0:
-                pulls.append(diff/pt.errplus)
+            if asym:
+                if diff > 0:
+                    allpulls.append(diff/pt.errplus)
+                else:
+                    allpulls.append(diff/pt.errminus)
             else:
-                pulls.append(diff/pt.errminus)
-        chi = sum(p*p for p in pulls)  # equal to m.fval if minuit fit is done
+                allpulls.append(diff/pt.err)
+        chi = sum(p*p for p in allpulls)  # equal to m.fval if minuit fit is done
         fitprob = (1.-gammainc(dof/2., chi/2.)) # probability of this chi-sq
         if pull:
-            P = sum(pulls)/sqrt(npts)
-            # FIXME: CLUDGE for getting Trento convention pull copied from orig_conv..
+            P = sum(allpulls)/sqrt(npts)
+            # FIXME: CLUDGE to print pull in Trento convention (should be done by from_conventions)
             pt = points[0]
             if pt.has_key('frame') and pt.frame == 'Trento' and pt.has_key('FTn'):
                 if pt.FTn == 1 or pt.FTn == 3 or pt.FTn == -2:
@@ -78,16 +98,16 @@ class Approach(object):
                 if pt.varFTn == 1 or pt.varFTn == -1:
                     P = - P
             return chi/npts, P, npts
-        elif sigmas:
-            return array(pulls)
+        elif pulls:
+            return array(allpulls)
         else:
             return chi, dof, fitprob
 
     def pull(self, points, **kwargs):
-        """Return compound pull for a set of data points.
+        """Return compound pull for a set of data points. (Obsoleted by new chisq?)
 
         Result is sum((O(th)-O(exp)/sigma(exp))/sqrt(N) in original (e.g. Trento) conventions
-        
+
         """
         pulls = [(self.predict(pt, observable=pt.yaxis, orig_conventions=True, **kwargs) 
             - pt.origval) / pt.err for pt in points]
@@ -105,10 +125,10 @@ class Approach(object):
         self.m.ndparameters[self.m.parameter_names.index(parname)] = mem
 
 
-    def print_chisq(self, points, sigmas=False, **kwargs):
+    def print_chisq(self, points, pulls=False, **kwargs):
         """Pretty-print the chi-square."""
-        if sigmas:
-            print self.chisq(points, sigmas=True, **kwargs)
+        if pulls:
+            print self.chisq(points, pulls=True, **kwargs)
         print 'P(chi-square, d.o.f) = P(%1.2f, %2d) = %5.4f' % self.chisq(points, **kwargs)
 
 
@@ -315,9 +335,9 @@ class BMK(Approach):
     def to_conventions(pt):
         """Transform stuff into BMK conventions."""
         pt.origval = pt.val  # to remember it for later convenience
-        pt.origerr = pt.err
-        pt.origerrplus = pt.errplus
-        pt.origerrminus = pt.errminus
+        for errtype in errtypes:
+            if hasattr(pt, errtype):
+                setattr(pt, 'orig'+errtype, getattr(pt,errtype))
         # C1. azimutal angle phi should be in radians.
         if pt.has_key('phi') and pt.units['phi'][:3]=='deg':
             pt.phi = pt.phi * pi / 180.
@@ -341,7 +361,7 @@ class BMK(Approach):
         # C4. cross-sections should be in nb
         if pt.units[pt.y1name] == 'pb/GeV^4':
             pt.val = pt.val/1000
-            for errtype in ['err', 'errminus', 'errplus']:
+            for errtype in errtypes:
                 if hasattr(pt, errtype):
                     err = getattr(pt, errtype)
                     setattr(pt, errtype, err/1000)
@@ -354,7 +374,7 @@ class BMK(Approach):
         # C4. cross-sections should be in nb
         if pt.units[pt.y1name] == 'pb/GeV^4':
             pt.val = pt.val*1000
-            for errtype in ['err', 'errminus', 'errplus']:
+            for errtype in errtypes:
                 if hasattr(pt, errtype):
                     err = getattr(pt, errtype)
                     setattr(pt, errtype, err*1000)
