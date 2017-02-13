@@ -48,9 +48,11 @@ y1namelong = Beam Helicity Independent Cross Section
 y1unit = nb/GeV^4
 y1value = column3
 y1errorstatistic = column4
-y1errorsystematic = column5
 # only statistic error was given
 # systematic error according to publication is 5.6%
+y1errornormalization = 0.056
+# and then column5 below is NOT used at all (kept for now in this file)
+# y1errorsystematic = column5
 
 
 ### x-axes
