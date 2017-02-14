@@ -38,7 +38,9 @@ y1name = BSSw
 y1unit = 1
 y1value = column3
 y1errorstatistic = column4
-y1errorsystematic = column5
+y1errornormalization = 0.056
+# OLD way, using last column below which is obsolete now:
+# y1errorsystematic = column5
 
 
 ### x-axes
@@ -63,7 +65,7 @@ x4value = column2
 
 ### Data
 
-#  t    FTn    BSSw      stat        syst(6.5%)
+#  t    FTn    BSSw      stat        syst(5.6%)
 ##########################################################
 -0.17   0   0.065704   0.000531   0.003679
 -0.17   -1   -0.001395   0.000674   0.000078
