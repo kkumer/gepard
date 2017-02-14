@@ -1147,7 +1147,8 @@ def HallA06(lines=None, path=None, fmt='png'):
             axs[pn].axis('off')
             continue
         pts = pd.DataFrame([(pt.Q2, pt.xB, pt.tm, pt.val, pt.err) for pt in subsets[iset]], columns=('Q2', 'xB', 'tm', 'val', 'err'))
-        axs[pn].errorbar(pts.tm.values, pts.val.values, pts.err.values, linestyle='None')
+        axs[pn].errorbar(pts.tm.values, pts.val.values, pts.err.values, linestyle='None',
+		capsize=2, color='black')
         if not isinstance(lines, list): lines = [lines]
         styles = ['r--', 'b-', 'g-.', 'b--', 'k:']
         for nl, th in enumerate(lines):
@@ -1352,13 +1353,18 @@ def CLAS15xs(lines=None, path=None, fmt='png'):
     return fig
 
 
-def HallA15(lines=None, path=None, fmt='png'):
+def HallA15(lines=None, enh=True, path=None, fmt='png'):
     title = 'HallA15'
     NPTS = 12
     # tupls are (dataset id, ind_low, ind_high)
-    xQbins = [(117, 0, 4), (117, 5,9), (117, 10, 14), 
-          ('blank', 0, 0), (116, 0, 4), (116, 5, 9),
-          ('blank', 0, 0), (116, 10, 14), (116, 15, 19)]
+    if enh:
+	xQbins = [(117, 0, 4), (117, 5,9), (117, 10, 14), 
+	      ('blank', 0, 0), (116, 0, 4), (116, 5, 9),
+	      ('blank', 0, 0), (116, 10, 14), (116, 15, 19)]
+    else:
+	xQbins = [(117, 0, 4), (117, 5,9), (117, 10, 14), 
+	      ('blank', 0, 0), (123, 0, 4), (123, 5, 9),
+	      ('blank', 0, 0), (123, 10, 14), (123, 15, 19)]
     #fig, axs = plt.subplots(3, 3, sharey='row', sharex=True, figsize=[8,10])
     fig, axs = plt.subplots(3, 3, figsize=[7,9])
     axs = axs.reshape(9)
@@ -1367,7 +1373,8 @@ def HallA15(lines=None, path=None, fmt='png'):
             axs[pn].axis('off')
             continue
         pts = pd.DataFrame([(pt.Q2, pt.xB, pt.tm, pt.val, pt.err) for pt in data[id][a:b+1]], columns=('Q2', 'xB', 'tm', 'val', 'err')) 
-        axs[pn].errorbar(pts.tm.values, pts.val.values, pts.err.values, linestyle='None')
+        axs[pn].errorbar(pts.tm.values, pts.val.values, pts.err.values, linestyle='None',
+		capsize=2, color='black')
         if not isinstance(lines, list): lines = [lines]
 	styles = ['r--', 'b-', 'g-.', 'b--', 'k:']
         for nl, th in enumerate(lines):
