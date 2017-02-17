@@ -281,7 +281,7 @@ class DataSet(list):
 
     def df(self):
         """Return pandas DataFrame of dataset."""
-        attrs = ['y1name', 'collaboration', 'FTn', 'id',
+        attrs = ['y1name', 'collaboration', 'id',
                 'xB', 'Q2', 't', 'tm', 'W', 'phi', 'FTn', 'varFTn', 'val',
                  'err', 'errminus', 'errplus', 'errstat', 'errsyst', 'errnorm']
         dat = []
