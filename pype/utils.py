@@ -495,12 +495,13 @@ def stringcolor(a, c, colors=False):
     else:
         return _fakecolor(a, c)
 
-def FTF(data, cosmax=None, sinmax=None, inverse=False):
+
+def FTF(data, testdata=None, cosmax=None, sinmax=None, inverse=False):
     """Fourier series fit to data (takes and returns pandas dataframe).
-    
+
     cosmax, sinmax  - index of highest harmonics
     inverse = True  - data values ARE harmonics, calculate function(phi)
-    
+
     """
     N = len(data)
     # If length of series is not specified by the user, use maximal one
@@ -510,7 +511,11 @@ def FTF(data, cosmax=None, sinmax=None, inverse=False):
     if not sinmax and not (sinmax == 0):
         sinmax = cosmax + ((N-1) % 2)  # maximal sin harmonic
     nharm = 1 + cosmax + sinmax  # number of harmonics
-    A = np.array([[np.cos(n*phi) for n in range(cosmax+1)] + [np.sin(n*phi) for n in range(1,sinmax+1)] for phi in data.phi.values])
+    if isinstance(testdata, pd.DataFrame):
+        A = np.array([[np.cos(n*phi) for n in range(cosmax+1)] + [np.sin(n*phi) for n in range(1,sinmax+1)] for phi in testdata.phi.values])
+    else:
+        # take phis from first argument data
+        A = np.array([[np.cos(n*phi) for n in range(cosmax+1)] + [np.sin(n*phi) for n in range(1,sinmax+1)] for phi in data.phi.values])
     B = data.val.values
     if not inverse:
         res = np.linalg.lstsq(A, B)
@@ -520,8 +525,13 @@ def FTF(data, cosmax=None, sinmax=None, inverse=False):
         df = pd.DataFrame({'phi': data.phi.values, 'val': vals})
         #print "Number of harmonics = {}".format(nharm)
     else:
-        res = np.dot(A, B[:nharm])
-        df = pd.DataFrame({'phi': data.phi.values, 'val': res})
+        if isinstance(testdata, pd.DataFrame):
+            res = np.dot(A, B[:nharm])
+            df = pd.DataFrame({'phi': testdata.phi.values, 'val': testdata.val.values, 'pred': res})
+        else:
+            # we invert on phis of first argument
+            res = np.dot(A, B[:nharm])
+            df = pd.DataFrame({'phi': data.phi.values, 'val': res})
     return df
 
 
@@ -587,7 +597,7 @@ def cvsets(df_in, nfolds=3, shuffle=True):
         return sets
 
 
-def FTanalyse(bins, HMAX=2, NS=1000, nf=3, Nrep=1):
+def FTanalyse(bins, HMAX=2, nf=4, Nrep=1):
     """Determine the number of harmonics present in bins according to n-fold cross-validation.
 
        bins - dictionary with bins
@@ -608,12 +618,18 @@ def FTanalyse(bins, HMAX=2, NS=1000, nf=3, Nrep=1):
                     errs = []
                     for cvtrain, cvtest in cvsets(df, nfolds=nf):
                         cvtest.reset_index(drop=True, inplace=True)
-                        dfo = FTFMC(cvtrain, nsamples=NS, cosmax=CM, sinmax=SM)[:len(cvtest)]
-                        dfo['phi'] = cvtest['phi']
-                        errs.append(((FTFMC(dfo, nsamples=NS, cosmax=CM, sinmax=SM, inverse=True)
-                          -cvtest)**2).val.values.sum())
+                        dfFT = FTF(cvtrain, cosmax=CM, sinmax=SM)
+                        dftest = FTF(dfFT, testdata=cvtest, cosmax=CM, sinmax=SM, inverse=True)
+                        errs.append(np.sum((dftest.val.values-dftest.pred.values)**2))
                     errs = np.array(errs)
-                    err = errs.mean() / (len(cvtest)-CM-SM-1)
+                    # We divide by npts and not ndof because test set
+                    # is NOT used for fitting, so there should be no penalization
+                    # of model's complexity
+                    err = errs.mean() / len(cvtest)
+                    # However, experiments show that small penalty for complexity
+                    # sometimes improves accuracy (but this is quite simple
+                    # and creates problems with large number of folds)
+                    #err = errs.mean() /(len(cvtest)-np.sqrt(CM+SM+1))
                     #print CM, SM, err
                     if err <= err_min:
                         err_min = err
