@@ -401,7 +401,10 @@ class BMK(Approach):
     def orig_conventions(pt, val):
         """Like from_conventions, but for the prediction val."""
         # This doesn't touches pt
-        # C2. phi_{BKM} -> (pi - phi_{Trento})
+        # C4. cross-sections nb --> pb
+        if pt.units[pt.y1name] == 'pb/GeV^4':
+            val = val*1000
+        # C2. phi_{BKM} --> (pi - phi_{Trento})
         if pt.has_key('frame') and pt.frame == 'Trento' and pt.has_key('FTn'):
             if pt.FTn == 1 or pt.FTn == 3 or pt.FTn == -2:
                 val = - val
