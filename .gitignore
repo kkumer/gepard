@@ -6,3 +6,5 @@
 **/*.exe
 **/my*
 **/*prep/*.f
+
+**/*sublime-workspace
