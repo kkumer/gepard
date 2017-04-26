@@ -416,6 +416,18 @@ class BMK(Approach):
 
     def prepare(pt):
         """Pre-calculate GPD-independent kinamatical constants and functions."""
+        if not hasattr(pt, "s"):
+            #This is for variable beam energy;  code duplication
+            if pt.process == 'ep2epgamma':
+                if pt.exptype == 'fixed target':
+                    pt.s = 2 * Mp * pt.in1energy + Mp2
+                elif pt.exptype == 'collider':
+                    pt.s = 2 * pt.in1energy * (pt.in2energy + math.sqrt(
+                        pt.in2energy**2 - Mp2)) + Mp2
+                else:
+                    pass # FIXME: raise error
+            else:
+                pass # FIXME: should I raise error here?
         pt.y = (pt.W**2 + pt.Q2 - Mp2) / (pt.s - Mp2)
         pt.eps = 2. * pt.xB * Mp / sqrt(pt.Q2)
         pt.eps2 = pt.eps**2

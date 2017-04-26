@@ -14,7 +14,7 @@ DummyPoint -- class for points which have just few relevant attributes
 # FIXME: Could use __slots__ to optimize DataPoint and the
 # number and names of attributes
 
-import os, re, math, copy
+import os, re, math, copy, logging
 from numpy import pi
 
 import pandas as pd
@@ -22,6 +22,7 @@ import pandas as pd
 import utils
 from constants import Mp, Mp2
 
+_lg = logging.getLogger('p.%s' % __name__)
 
 class DummyPoint(object):
     """This is only used for creating simple DataPoint-like objects"""
@@ -251,15 +252,18 @@ class DataSet(list):
                 self.in1charge = +1
             elif self.in1particle == 'e' or self.in1particle == 'e-' or self.in1particle == 'em':
                 self.in1charge = -1
-            # Mandelstam s
-            if self.process == 'ep2epgamma':
-                if self.exptype == 'fixed target':
-                    self.s = 2 * Mp * self.in1energy + Mp2
-                elif self.exptype == 'collider':
-                    self.s = 2 * self.in1energy * (self.in2energy + math.sqrt(
-                        self.in2energy**2 - Mp2)) + Mp2
-                else:
-                    pass # FIXME: raise error
+            # Mandelstam s, if specified
+            try:
+                if self.process == 'ep2epgamma':
+                    if self.exptype == 'fixed target':
+                        self.s = 2 * Mp * self.in1energy + Mp2
+                    elif self.exptype == 'collider':
+                        self.s = 2 * self.in1energy * (self.in2energy + math.sqrt(
+                            self.in2energy**2 - Mp2)) + Mp2
+                    else:
+                        pass # FIXME: raise error
+            except AttributeError:
+                _lg.debug('Variable beam energy dataset in {}'.format(datafile))
 
             for gridline in data:
                 self.append(DataPoint(gridline, self))
