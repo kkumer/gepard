@@ -38,9 +38,7 @@ y1name = BSDw
 y1long = Weighted beam spin difference
 y1unit = nb/GeV^4
 y1value = column5
-# Stat error includes also point-to-point asymmetric syst err
-# approximated by max(err+,err-) and added in quadrature to
-# stat err before FT
+# Stat error by MC propagation 
 y1errorstatistic = column6
 # Normalization error of 4.2% from p. 4 of Hall A paper
 y1errornormalization = 0.042
@@ -71,8 +69,8 @@ x5value = -1
 
 ### Data
 table=
-#  E    Q2     xB     tm     FTval     FTerr
-#############################################
+#  E    Q2     xB     tm     FTval   FTstaterr
+################################################
 5.550  1.51  0.359  0.180  0.009593  0.002316
 5.550  1.51  0.359  0.237  0.010267  0.002261
 5.550  1.52  0.361  0.298  0.009124  0.002605
