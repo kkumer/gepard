@@ -319,6 +319,7 @@ def listchis(ths, Q2cut=1., Q2max=1.e3, nsets=0, out='chis'):
             BSACLAS_DMpoints, CLASTSApts,\
             AUTICSpts, CLASKKpts, AUTDVCSpts, H_AULpts, C_AULpts,\
             H_BSDwpts, H_BSSw0pts, H_BSSw1pts,\
+            H17_BSDwpts, H17_BSSw0pts, H17_BSSw1pts,\
             H_BSDpts, H_BSS0pts, H_BSS1pts,\
             C_BSDwpts, C_BSSw0pts, C_BSSw1pts, H_BSD, H_BSS,\
             C_BSD, C_BSS
@@ -383,6 +384,12 @@ def listchis(ths, Q2cut=1., Q2max=1.e3, nsets=0, out='chis'):
             ('HERMES', 'BCA', BCApts), ('CLAS', 'BSA', CLASpts),
             ('Hall A', 'BSDw', BSDwpoints), ('Hall A', 'BSSw', BSSwpoints),
             ('HERMES', 'AUTI', AUTIpts)]
+    sets[9] = [
+            ('Hall A 17', 'BSDw_s1', H17_BSDwpts), ('Hall A 17', 'BSSw_c0', H17_BSSw0pts),
+            ('Hall A 17', 'BSSw_c1', H17_BSSw1pts),
+            ('Hall A 15', 'BSDw_s1', H_BSDwpts), ('Hall A 15', 'BSSw_c0', H_BSSw0pts),
+            ('Hall A 15', 'BSSw_c1', H_BSSw1pts)
+            ]
     names = [th.name[:10] for th in ths]
     sublines = ['------' for th in ths]
     if out == 'chis':
