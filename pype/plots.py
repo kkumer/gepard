@@ -258,7 +258,7 @@ def panel(ax, points=None, lines=None, bands=None, xaxis=None, xs=None,
 
 def thline(th, pts, ex_pt, npts=16):
     """Interpolated theory lines for kinematics in pandas dataframe pts and DataPoint ex_pt."""
-    tms = np.linspace(pts.tm.min(), pts.tm.max(), npts)
+    tms = np.linspace(pts.tm.min()-0.02, pts.tm.max()+0.03, npts)
     try:
         spl_xB = InterpolatedUnivariateSpline(pts.tm.values, pts.xB.values, k=3)
         spl_Q2 = InterpolatedUnivariateSpline(pts.tm.values, pts.Q2.values, k=3)
@@ -1411,6 +1411,102 @@ def HallA15(lines=None, enh=True, path=None, fmt='png'):
         if pn in [1,2,5,8]:
             axs[pn].get_yaxis().set_visible(False)
     fig.subplots_adjust(wspace=0.0, hspace=0.0) 
+    if path:
+        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+    else:
+        fig.canvas.draw()
+        fig.show()
+    return fig
+
+
+def HallA17(obs='BSScos0', lines=None, path=None, fmt='png'):
+    title = 'HallA (2017) '+obs
+    NPTS = 24
+    #   E    Q2   ind_low  ind_high
+    #  5.6  1.5   0  2
+    #  3.4  1.5   3  5
+    #  5.5  1.75  6  9
+    #  4.5  1.75  10 13
+    #  5.6  2     14 17
+    #  4.5  2     18 21
+    # tupls are (dataset id, ind_low, ind_high)
+    xQbins = [(136, 14, 17), (136, 6, 9), (136, 0, 2),
+          (136, 18, 21), (136, 10, 13), (136, 3, 5)]
+    if obs == 'BSScos0':
+        ylab = r'$d\sigma^{\cos 0\phi,w}$'
+        yminU, ymaxU = 0.0, 0.099   # upper row of panels
+        yTU = 0.006
+        ytickU = 0.02
+        yminD, ymaxD = 0.0, 0.24   # lower row of panels
+        yTD = 0.01
+        ytickD = 0.05
+        dshift = 0
+        pshift = 0
+    elif obs == 'BSScos1':
+        ylab = r'$d\sigma^{\cos \phi,w}$'
+        yminU, ymaxU = -0.005, 0.06   # upper row of panels
+        yTU = 0.0006
+        ytickU = 0.02
+        yminD, ymaxD = -0.005, 0.06   # lower row of panels
+        yTD = -0.003
+        ytickD = 0.02
+        dshift = 0
+        pshift = 22
+    elif obs == 'BSDsin1':
+        ylab = r'$\Delta\sigma^{\sin\phi,w}$'
+        yminU, ymaxU = -0.00, 0.019   # upper row of panels
+        yTU = 0.0006
+        ytickU = 0.005
+        yminD, ymaxD = -0.005, 0.047   # lower row of panels
+        yTD = -0.003
+        ytickD = 0.01
+        dshift = -1
+        pshift = 0
+        xQbins[3] = ('blank', 0, 0)
+    else:
+        raise ValueError, 'Observable %s unavailable.' % obs
+    #fig, axs = plt.subplots(2, 3, sharey='row', sharex='all', figsize=[12,10])
+    fig, axs = plt.subplots(2, 3, figsize=[12,10])
+    axs = axs.reshape(6)
+    for pn, (id, a, b) in enumerate(xQbins):
+        if id == 'blank':
+            axs[pn].axis('off')
+            continue
+        pts = pd.DataFrame([(pt.in1energy, pt.Q2, pt.xB, pt.tm, pt.val, pt.err) for
+            pt in data[id+dshift][a+pshift:b+pshift+1]], columns=('E', 'Q2', 'xB', 'tm', 'val', 'err'))
+        axs[pn].errorbar(pts.tm.values, pts.val.values, pts.err.values, linestyle='None',
+        capsize=2, color='black', label='Hall A 2017')
+        if not isinstance(lines, list): lines = [lines]
+        styles = ['r--', 'b-', 'g-.', 'b--', 'k:']
+        for nl, th in enumerate(lines):
+            xs, ys = thline(th, pts, data[id+dshift][a+pshift], npts=NPTS)
+            axs[pn].plot(xs, ys, styles[nl], label=th.name)
+        axs[pn].set_xlim(0.12, 0.42)
+        axs[pn].xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))
+        s1 = r'$Q^2 =\, {:.2f}$'.format(pts.Q2.mean())
+        s1 += '\n'
+        s1 += r'$E =\, {:.2f}$'.format(pts.E.mean())
+        axs[pn].axhline(y=0, linewidth=0.5, linestyle='-.', color='g')  # y=0 thin line
+        if pn < 3:
+            # upper row of panels
+            axs[pn].set_ylim(yminU,ymaxU)
+            axs[pn].yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(ytickU))
+            axs[pn].text(0.25, yTU, s1, fontsize=14)
+        else:
+            # lower row of panels
+            axs[pn].set_xlabel(r'$-t\; [{\rm GeV}^2]$', fontsize=14)
+            axs[pn].set_ylim(yminD,ymaxD)
+            axs[pn].yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(ytickD))
+            axs[pn].text(0.25, yTD, s1, fontsize=14)
+        if pn in [0,3] or (obs == 'BSDsin1' and pn == 4):
+            axs[pn].set_ylabel(ylab, fontsize=20)
+        if obs[:6] == 'BSDcos' and pn in [1,2,4,5]:
+            axs[pn].get_yaxis().set_visible(False)
+        if obs == 'BSDsin1' and pn in [1,2,5]:
+            axs[pn].get_yaxis().set_visible(False)
+        if pn == 0:
+            axs[pn].legend(loc=2, fontsize=14, handlelength=3).draw_frame(1)
+    fig.subplots_adjust(wspace=0.0, hspace=0.0)
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
