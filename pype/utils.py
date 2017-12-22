@@ -334,7 +334,7 @@ def listchis(ths, Q2cut=1., Q2max=1.e3, nsets=0, out='chis'):
     sets[1] = [('CLAS07_KK', 'BSA', BSACLAS_KKpoints),
                ('CLAS14_KK', 'BSA', CLAS14BSApts),
                ('CLAS14_KK', 'TSA', CLAS14TSApts), 
-               ('CLAS14_KK', 'BTSA', CLAS14BTSApts)]
+               ('CLAS15_KK', 'BTSA', CLAS14BTSApts)]
     sets[2] = [('CLAS07_DM', 'BSA', BSACLAS_DMpoints),
                ('CLAS06', 'TSA', CLASTSApts),
                ('CLAS14_KK', 'BSA', CLAS14BSApts),

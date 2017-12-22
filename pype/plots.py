@@ -1500,7 +1500,7 @@ def HallA17(obs='BSScos0', lines=None, path=None, fmt='png'):
             axs[pn].text(0.25, yTD, s1, fontsize=14)
         if pn in [0,3] or (obs == 'BSDsin1' and pn == 4):
             axs[pn].set_ylabel(ylab, fontsize=20)
-        if obs[:6] == 'BSDcos' and pn in [1,2,4,5]:
+        if obs[:6] == 'BSScos' and pn in [1,2,4,5]:
             axs[pn].get_yaxis().set_visible(False)
         if obs == 'BSDsin1' and pn in [1,2,5]:
             axs[pn].get_yaxis().set_visible(False)
