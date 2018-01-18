@@ -305,6 +305,16 @@ class ElasticKelly(ElasticFormFactors):
           1.9100884849907935*t**3))/(1 - 0.2831951622975774*t)
  
 
+class ElasticZero(ElasticFormFactors):
+    """Set F1=F2=0 to get just DVCS^2."""
+
+    def F1(self, t):
+        return 0.
+
+    def F2(self, t):
+        return 0.
+
+
 
 class ComptonFormFactors(Model):
     """Twist-two, no-transversity set of 4 CFFs.
@@ -2074,6 +2084,10 @@ class ModelDRPP(ComptonModelDRPP, ElasticDipole):
 
 class HybridKelly(ComptonHybrid, ElasticKelly):
     """As Hybrid, but with Kelly elasticd FFs."""
+
+class HybridZero(ComptonHybrid, ElasticZero):
+    """As Hybrid, but with zero elasticd FFs, so giving only DVCS^2 contrib."""
+
 
 class ModelLocal(ComptonLocal, ElasticKelly):
     """Model for local fitting of CFFs themselves."""

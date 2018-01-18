@@ -102,6 +102,21 @@ def theory(id):
         g = th.m.g
         th.m.parameters.update(KM15)
         return th
+    elif id == 8:
+        # Pure Bethe-Heitler
+        m = Model.PureBetheHeitler()
+        th = Approach.BM10tw2(m)
+        th.name = 'pure BH'
+        return th
+    elif id == 9:
+        mGepard = Model.ComptonGepard(cutq2=0.5)
+        mDRPPsea = Model.ComptonModelDRPPsea()
+        m = Model.HybridZero(mGepard, mDRPPsea)
+        th = Approach.BM10tw2(m)
+        th.name = 'KM15DVCS'
+        g = th.m.g
+        th.m.parameters.update(KM15)
+        return th
     else:
         sys.stdout.write('Unknown model: %d\n' % id)
         sys.exit(1)
@@ -207,6 +222,8 @@ ModelID is one of
    5 KM10b - arXiv:1105.0899 fit with Hall A harmonics ratio
    6 KMM12 - arXiv:1301.1230 fit with Hall A harmonics and polarized target
    7 KM15  - arXiv:1512.09014 fit now includes 2015 CLAS and Hall A data
+   8 BH    - pure Bethe-Heitler contribution
+   9 KM15DVCS - KM15 DVCS^2 contribution only
 where models 1-5 are for unpolarized target only.
 For convenience, if last argument (phi=n) is larger than 2pi, you get grid 
 of n equidistant points with phi=0..2pi.
