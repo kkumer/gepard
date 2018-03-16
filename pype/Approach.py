@@ -276,6 +276,16 @@ class BMK(Approach):
                 1. - tm / t ) * brace
     K2 = staticmethod(K2)
 
+    def Ktilde(Q2, xB, t, eps2):
+        """BMJ NPB 878 Eq. (8)"""
+        tmin = BMK.tmin(Q2, xB, eps2)
+        tmax = BMK.tmax(Q2, xB, eps2)
+        aux = (tmin-t)*(t-tmax)/Q2
+        aux = ((1.-xB)*xB + eps2/4.) * aux
+        return sqrt(aux)
+    Ktilde = staticmethod(Ktilde)
+
+
     def J(Q2, xB, t, y, eps2):
         """BMK below Eq. (32)"""
         return (1.-y-y*eps2/2.) * (1. + t/Q2) - (1.-xB)*(2.-y)*t/Q2
