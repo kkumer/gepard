@@ -276,16 +276,6 @@ class BMK(Approach):
                 1. - tm / t ) * brace
     K2 = staticmethod(K2)
 
-    def Ktilde(Q2, xB, t, eps2):
-        """BMJ NPB 878 Eq. (8)"""
-        tmin = BMK.tmin(Q2, xB, eps2)
-        tmax = BMK.tmax(Q2, xB, eps2)
-        aux = (tmin-t)*(t-tmax)/Q2
-        aux = ((1.-xB)*xB + eps2/4.) * aux
-        return sqrt(aux)
-    Ktilde = staticmethod(Ktilde)
-
-
     def J(Q2, xB, t, y, eps2):
         """BMK below Eq. (32)"""
         return (1.-y-y*eps2/2.) * (1. + t/Q2) - (1.-xB)*(2.-y)*t/Q2
@@ -448,6 +438,9 @@ class BMK(Approach):
             pt.tK2 = pt.K2*pt.Q2/(1-pt.y-pt.eps2*pt.y**2/4.)
             pt.tK = sqrt(pt.tK2)
             pt.r = BMK.r(pt.Q2, pt.xB, pt.t, pt.y, pt.eps2)
+            # Needed for BMP higher-twist stuff:
+            pt.chi0 = sqrt(2.*pt.Q2)*pt.tK/sqrt(1+pt.eps2)/(pt.Q2+pt.t)
+            pt.chi = (pt.Q2-pt.t+2.*pt.xB*pt.t)/sqrt(1+pt.eps2)/(pt.Q2+pt.t) - 1.
             # First option is numerical, second is analytical and faster
             #pt.intP1P2 = quadrature.Hquadrature(lambda phi: P1P2(pt, phi), 0, 2.0*pi)
             pt.intP1P2 = BMK.anintP1P2(pt)

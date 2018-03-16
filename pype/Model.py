@@ -2049,6 +2049,95 @@ class ComptonLocal(ComptonFormFactors):
     for name in ComptonFormFactors.allCFFs:
         exec('def %s(self, pt): return self.parameters["p%s"]' % (name, name))
 
+
+class BMP(ComptonFormFactors):
+    """This is poor-man's higher twist model, according to Braun et al.
+
+    In general, instance of any model has to return CFFs as defined by BMJ,
+    so here rotation from BMP is defined
+
+    """
+
+    allCFFs = ['ImH', 'ReH', 'ImE', 'ReE', 'ImHt', 'ReHt', 'ImEt', 'ReEt']
+    allCFFeffs = ['ImHeff', 'ReHeff', 'ImEeff', 'ReEeff',
+                     'ImHteff', 'ReHteff', 'ImEteff', 'ReEteff']
+
+    ###  BMJ CFFs:
+
+    #  Fp = F_{+,+} = F_{-,-}
+    #  F0 = F_{0,+} = F_{0,-}
+    #  Fm = F_{-,+} = F_{+,-}  -- FIXME: not implemented yet
+
+
+    ###  BMP CFFs:
+
+    #  BFp, BF0, BFm  in complete analogy to above. They are
+    #                 parameters of this model!
+
+    #  Fp = BHp + (chi/2)*(BFp+BFm) - chi0*BF0
+    #  F0 = -(1+chi)*BH0 + chi0*(BFp+BHm)
+
+    # Prefixing parameters with 'p' below (like pIMBH0) is
+    # not really necessary, but I do it for consistent naming
+    # of "local" fitting models
+
+    def __init__(self, **kwargs):
+        self.parameters = {
+            'pImHBp' :  0.0,   'pImHB0' :  0.0,
+            'pReHBp' :  0.0,   'pReHB0' :  0.0,
+            'pImEBp' :  0.0,   'pImEB0' :  0.0,
+            'pReEBp' :  0.0,   'pReEB0' :  0.0,
+           'pImHtBp' :  0.0,  'pImHtB0' :  0.0,
+           'pReHtBp' :  0.0,  'pReHtB0' :  0.0,
+           'pImEtBp' :  0.0,  'pImEtB0' :  0.0,
+           'pReEtBp' :  0.0,  'pReEtB0' :  0.0}
+
+        self.parameter_names = [
+             'pImHBp', 'pReHBp', 'pImHtBp', 'pReHtBp',
+             'pImEBp', 'pReEBp', 'pImEtBp', 'pReEtBp',
+             'pImHB0', 'pReHB0', 'pImHtB0', 'pReHtB0',
+             'pImEB0', 'pReEB0', 'pImEtB0', 'pReEtB0']
+
+        # now do whatever else is necessary
+        ComptonFormFactors.__init__(self, **kwargs)
+
+
+    # BMJ leading twist CFFs:
+    #     F = Fp i.e. F_{+,+}
+
+    for name in allCFFs:
+        exec('def {0}(self, pt): return self.BMJ_CFFp("{0}", pt)'.format(name))
+
+    # BMJ eff. tw-3 CFFs:
+    #    Feff = sqrt(1+eps2)*Q*(2-xB+xB*t/Q2)/sqrt(2)/Ktilde * F0
+
+    for name in allCFFs:
+        exec('def {0}eff(self, pt): return sqrt(1.+pt.eps2)*sqrt(pt.Q2)*(2.-pt.xB+pt.xB*pt.t/pt.Q2)/sqrt(2.)/pt.tK * self.BMJ_CFF0("{0}", pt)'.format(name))
+
+
+    def BMJ_CFFp(self, CFF, pt):
+        """ BMJ Fp i.e. F_{+,+} in terms of BMP CFFs """
+
+        BCFFp = self.parameters['p{}Bp'.format(CFF)]
+        BCFF0 = self.parameters['p{}B0'.format(CFF)]
+        BCFFm = 0   # NOT IMPLEMENTED
+        return BCFFp + (pt.chi)/2.*(BCFFp+BCFFm) - pt.chi0*BCFF0
+
+    def BMJ_CFF0(self, CFF, pt):
+        """ BMJ F0 in terms of BMP CFFs """
+
+        BCFFp = self.parameters['p{}Bp'.format(CFF)]
+        BCFF0 = self.parameters['p{}B0'.format(CFF)]
+        BCFFm = 0   # NOT IMPLEMENTED
+        return -(1.+pt.chi)*BCFF0 + pt.chi0*(BCFFp+BCFFm)
+
+    def BMJ_CFFm(self, CFF, pt):
+        """ BMJ Fm i.e. F_{-,+} in terms of BMP CFFs """
+
+        # NOT IMPLEMENTED
+        return 0.
+
+
 ##  --- Complete models built from the above components ---
 
 class PureBetheHeitler(ComptonFormFactors, ElasticKelly):
@@ -2099,3 +2188,6 @@ class ModelLocal(ComptonLocal, ElasticKelly):
     def ReEt(self, pt):
         #To get sensible numbers for parameter.
         return (2.-pt.xB)/pt.xB * self.parameters['pReEt']
+
+class ModelBMP(BMP, ElasticKelly):
+    """Model for local fitting of CFFs in Braun et al. framework"""
