@@ -448,6 +448,16 @@ class BMK(Approach):
             pt.P1P2 = BMK.P1P2(pt)
     prepare = staticmethod(prepare)
 
+    ### Some kinematical functions which are not in BKM paper but are convenient
+    ### to define here
+
+    def long2trans(self, pt):
+        """ Ratio of longitudinal to transverse photon flux 1304.0077 Eq. (2.9) """
+        return (1.-pt.y-pt.eps2*pt.y**2/4.)/(1-pt.y+pt.y**2/2+pt.eps2*pt.y**2/4.)
+
+    def HandFlux(self, pt):
+        """ Virtual photon flux (Hand convention) 1304.0077 Eq. (2.9) """
+        return (alpha/2./pi)*(pt.y**2/(1.-self.long2trans(pt)))*(1-pt.xB)/pt.xB/pt.Q2
 
     ################################################
     #                                              #

@@ -335,13 +335,13 @@ class ComptonFormFactors(Model):
 
     def print_CFFs(self, pt, format=None):
         """Print values of CFFs at given kinematic point."""
-        vals = map(lambda cff: getattr(self, cff)(pt), allCFFs)
+        vals = map(lambda cff: getattr(self, cff)(pt), self.allCFFs)
         if format == 'mma':
             s = "{" + 8*"%s -> %f, "
             s = s[:-2] + "}"
         else:
             s = 8*"%4s = %5.2f\n"
-        print s % flatten(tuple(zip(allCFFs, vals)))
+        print s % flatten(tuple(zip(self.allCFFs, vals)))
 
 
     # Initial definition of all CFFs. All just return zero.
