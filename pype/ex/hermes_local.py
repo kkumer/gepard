@@ -21,12 +21,12 @@ from quadrature import rthtquadrature
 
 ## [1] Load experimental data and theoretical models
 
-data = utils.loaddata('/home/kkumer/pype/data/ep2epgamma', approach=Approach.BMK)  
-data.update(utils.loaddata('/home/kkumer/pype/data/gammastarp2gammap', approach=Approach.BMK))
-#data.update(utils.loaddata('/home/kkumer/pype/data/gammastarp2gammap/EIC', approach=Approach.BMK))
-#data.update(utils.loaddata('/home/kkumer/pype/data/ep2epgamma/EIC', approach=Approach.BMK))
-db = shelve.open('/home/kkumer/pype/theories.db')
-#dell = shelve.open('/home/kkumer/pype/dellB.db')
+data = utils.loaddata('/home/kkumer/gepard/pype/data/ep2epgamma', approach=Approach.BMK)  
+data.update(utils.loaddata('/home/kkumer/gepard/pype/data/gammastarp2gammap', approach=Approach.BMK))
+#data.update(utils.loaddata('/home/kkumer/gepard/pype/data/gammastarp2gammap/EIC', approach=Approach.BMK))
+#data.update(utils.loaddata('/home/kkumer/gepard/pype/data/ep2epgamma/EIC', approach=Approach.BMK))
+db = shelve.open('/home/kkumer/gepard/pype/theories.db')
+#dell = shelve.open('/home/kkumer/gepard/pype/dellB.db')
 
 ## [2] Choose subset of datapoints for fitting
 
