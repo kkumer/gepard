@@ -19,7 +19,7 @@ except:
 
 
 _lg = logging.getLogger('p.%s' % __name__)
-#_lg.setLevel('logging.INFO')
+_lg.setLevel(logging.WARNING)
 #_lg = logging.Logger('A.F')
 #_lg.addHandler(logging.StreamHandler())
 

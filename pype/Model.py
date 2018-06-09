@@ -1985,7 +1985,7 @@ class ComptonHybrid(ComptonFormFactors):
         # relaxing xBmin and removing Q2max
         return ( (1.5 <= pt.Q2) and 
                  (pt.tm < min(1., pt.Q2/4)) and
-                 (1e-5 < pt.xB < 0.5)
+                 (1e-5 < pt.xB < 0.65)
                )
 
     def ImH(self, pt, xi=0):
