@@ -35,8 +35,8 @@ out3particle = gamma
 
 
 ### Observable 
-y1long = Weighted(?) beam spin sum
-y1name = BSS(?)
+y1long = Beam spin sum
+y1name = BSS
 y1unit = nb/GeV^4
 y1value = column5
 y1errorstatistic = column6
