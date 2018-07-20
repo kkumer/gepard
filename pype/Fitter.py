@@ -139,6 +139,7 @@ class FitterBrain(Fitter):
         self.usenet = None
         self.crossvalidation = True
         self.nnets = 4
+        self.maxtries = 200
         self.nbatch = 20
         self.batchlen = 5
         self.verbose = 0
@@ -347,6 +348,40 @@ class FitterBrain(Fitter):
                 sfitprob = utils.stringcolor("%5.4f" % fitprob, 'green', True)
             print "Net %2i ---> TestError: %8.3g  ---> P(chisq = %1.2f) = %s " % (
                     n, memerr, chi, sfitprob)
+        self.theory.model.parameters['nnet'] = 'ALL'
+        return self.theory
+
+    def fitgood(self):
+        """Create and train neural networks with good chisq."""
+        n = 0
+        k = 0
+        while n < self.nnets and k < self.maxtries:
+            k += 1
+            #if self.theory.m.useDR:
+            if False:  # switch subtraction constant off temporarily
+                # some Re parts are obtained via DR
+                net, netC, memerr, memerrC = self.makenetDR(self.fitpoints)
+                self.theory.model.netsC.append(netC)
+            else:
+                # decoupled Im and Re Parts are all net outputs
+                net, memerr = self.makenet(self.fitpoints)
+            if isinstance(self.usenet, int):
+                # just set actual number to the one of requested net
+                self.theory.model.parameters['nnet'] = self.usenet
+            else:
+                # append newly created net to nets
+                self.theory.model.nets.append(net)
+                self.theory.model.parameters['nnet'] = n
+            chi, dof, fitprob = self.theory.chisq(self.fitpoints)
+            if fitprob < 0.05:
+                sfitprob = utils.stringcolor("%5.4f" % fitprob, 'red', True)
+                del self.theory.model.nets[-1]
+                self.theory.model.parameters['nnet'] = n-1
+            else:
+                sfitprob = utils.stringcolor("%5.4f" % fitprob, 'green', True)
+                n +=1
+            print "[%3i/%3i] Net %2i ---> TestError: %8.3g  ---> P(chisq = %1.2f) = %s " % (
+                    k, self.maxtries, n, memerr, chi, sfitprob)
         self.theory.model.parameters['nnet'] = 'ALL'
         return self.theory
 

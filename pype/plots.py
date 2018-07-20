@@ -2814,16 +2814,16 @@ def CFF(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
 
     """
     title = 'CFF'
-    fig = plt.figure()
-    fig.canvas.set_window_title(title)
-    fig.suptitle(title)
+    fig = plt.figure(figsize=(12,4*len(cffs)))
+    #fig.canvas.set_window_title(title)
+    #fig.suptitle(title)
     colors = ['red', 'brown']     # worm human colors :-)
     nncolors = ['blue', 'green']  # cold computer colors
     linestyles = ['solid', 'dashed']
     # Define abscissas
     #logxvals = np.power(10., np.arange(-3.0, -0.001, 0.1))  # left panel
-    logxvals = np.logspace(-5.0, -0.01, 20)  # left panel
-    xvals = np.linspace(0.02, 0.15, 20) # right panel
+    logxvals = np.logspace(-2.0, -0.01, 20)  # left panel
+    xvals = np.linspace(0.1, 0.22, 20) # right panel
     # ordinates 
     #ylims = {'ImH': (-4.3, 35), 'ReH': (-6.5, 8),
     ylims = {'ImH': (-4.3, 35), 'ReH': (-15, 8),
@@ -2836,7 +2836,8 @@ def CFF(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
         # all-x logarithmic
         ax = fig.add_subplot(len(cffs), 2, 2*n+1)
         ax.set_xscale('log')  # x-axis to be logarithmic
-        panel(ax, xaxis='xi', xs=logxvals, kins={'yaxis':cff, 't':-0.2, 'Q2':4.}, **kwargs)
+        panel(ax, xaxis='xi', xs=logxvals, kins={'yaxis':cff, 't':-0.2, 'Q2':4.,
+	    'units':{'CFF': 1}, 'y1name': 'CFF'}, **kwargs)
         ax.set_xlabel(toTeX['xixB'], fontsize=15)
         ax.set_ylabel(toTeX['%s' % cff], fontsize=18)
         ax.axhspan(-0.0005, 0.0005, facecolor='g', alpha=0.6)  # horizontal bar
@@ -2848,11 +2849,12 @@ def CFF(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
         if n == 0:
             ax.legend(loc='upper right')
             ax.legend().draw_frame(0)
-            ax.text(0.006, 0.5, "$t = -0.2\\, {\\rm GeV}^2$",# transform=ax.transAxes, 
-                    fontsize=15)
+            ax.text(0.0006, 0.5, "$t = -0.2\\, {\\rm GeV}^2$",# transform=ax.transAxes, 
+                    fontsize=10)
         # measured x linear
         ax = fig.add_subplot(len(cffs), 2, 2*n+2)
-        panel(ax, xaxis='xi', xs=xvals, kins={'yaxis':cff, 't':-0.2,  'Q2':4.}, **kwargs)
+        panel(ax, xaxis='xi', xs=xvals, kins={'yaxis':cff, 't':-0.2, 'Q2':4.,
+	    'units':{'CFF': 1}, 'y1name': 'CFF'}, **kwargs)
         ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
         ax.set_xlabel(toTeX['xixB'], fontsize=15)
         #apply(ax.set_ylim, ylims[cff])
@@ -2900,7 +2902,7 @@ def CFF2(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
             ax = fig.add_subplot(len(cffs), 2, 2*n+nt+1)
             ax.set_xscale('log')  # x-axis to be logarithmic
             panel(ax, xaxis='xi', xs=logxvals, kins={
-                    'yaxis':cff, 't':ts[nt], 'Q2':4.}, **kwargs)
+                    'yaxis':cff, 't':ts[nt], 'Q2':4., 'units':{'CFF': 1}, 'y1name': 'CFF'}, **kwargs)
             ax.axhspan(-0.0005, 0.0005, facecolor='g', alpha=0.6)  # horizontal bar
             ax.text(0.31, 0.02, "$t = %s\\, {\\rm GeV}^2$" % str(ts[nt]), 
                     transform=ax.transAxes, fontsize=14)
@@ -2946,13 +2948,13 @@ def CFF2(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
 def CFFt(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
     """Makes plots of cffs as function of t given by various theories/models
     
-    cffs    -- List of CFFs to be plotted. Each produces two panels: ImF, ReF.
+    cffs    -- List of CFFs to be plotted.
 
     """
     title = ''
-    fig = plt.figure()
-    fig.canvas.set_window_title(title)
-    fig.suptitle(title)
+    fig = plt.figure(figsize=(12,4*len(cffs)))
+    #fig.canvas.set_window_title(title)
+    #fig.suptitle(title)
     colors = ['red', 'brown']     # worm human colors :-)
     nncolors = ['blue', 'green']  # cold computer colors
     linestyles = ['solid', 'dashed']
@@ -2965,30 +2967,32 @@ def CFFt(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
         cff = cffs[n]
         # small x
         ax = fig.add_subplot(len(cffs), 2, 2*n+1)
-        panel(ax, xaxis='tm', xs=tmvals, kins={'yaxis':cff, 'xB':0.001, 'Q2':4.}, **kwargs)
+        panel(ax, xaxis='tm', xs=tmvals, kins={'yaxis':cff, 'xB':0.001, 'Q2':4., 
+	    'units':{'CFF': 1}, 'y1name': 'CFF'}, **kwargs)
         ax.set_xlabel(toTeX['tm'], fontsize=15)
         ax.set_ylabel(toTeX['%s' % cff], fontsize=18)
         ax.axhspan(-0.0005, 0.0005, facecolor='g', alpha=0.6)  # horizontal bar
         if n == 0:
             ax.legend(loc='upper right')
             ax.legend().draw_frame(0)
-            ax.text(0.03, 600, "$x_B = 0.001$",# transform=ax.transAxes, 
-                    fontsize=15)
-            ax.text(0.03, 40, "$Q^2 = 4\\, {\\rm GeV}^2$",# transform=ax.transAxes, 
-                    fontsize=15)
+            ax.text(0.03, 4, "$x_B = 0.001$",# transform=ax.transAxes, 
+                    fontsize=10)
+            ax.text(0.03, 0.4, "$Q^2 = 4\\, {\\rm GeV}^2$",# transform=ax.transAxes, 
+                    fontsize=10)
         # moderate x
         ax = fig.add_subplot(len(cffs), 2, 2*n+2)
-        panel(ax, xaxis='tm', xs=tmvals, kins={'yaxis':cff, 'xB':0.05, 'Q2':4.}, **kwargs)
+        panel(ax, xaxis='tm', xs=tmvals, kins={'yaxis':cff, 'xB':0.2, 'Q2':4.,
+	    'units':{'CFF': 1}, 'y1name': 'CFF'}, **kwargs)
         ax.set_xlabel(toTeX['tm'], fontsize=15)
         ax.set_ylabel(toTeX['%s' % cff], fontsize=14)
         ax.axhspan(-0.0005, 0.0005, facecolor='g', alpha=0.6)  # horizontal bar
         if n == 0:
             ax.legend(loc='upper right')
             ax.legend().draw_frame(0)
-            ax.text(0.03, 4, "$x_B = 0.05$",# transform=ax.transAxes, 
-                    fontsize=15)
+            ax.text(0.03, 2.5, "$x_B = 0.2$",# transform=ax.transAxes, 
+                    fontsize=10)
             ax.text(0.03, 0.4, "$Q^2 = 4\\, {\\rm GeV}^2$",# transform=ax.transAxes, 
-                    fontsize=15)
+                    fontsize=10)
     fig.subplots_adjust(bottom=0.1)
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
@@ -3020,7 +3024,8 @@ def CFF3(path=None, fmt='png', **kwargs):
         leftcff = leftcffs[n]
         ax = fig.add_subplot(2, 2, 2*n+1)
         ax.set_xscale('log')  # x-axis to be logarithmic
-        panel(ax, xaxis='xi', xs=logxvals, kins={'yaxis':leftcff, 't':-0.2, 'Q2':4.}, **kwargs)
+        panel(ax, xaxis='xi', xs=logxvals, kins={'yaxis':leftcff, 't':-0.2, 'Q2':4.,
+	    'units':{'CFF': 1}, 'y1name': 'CFF'}, **kwargs)
         ax.set_xlabel(toTeX['xixB'], fontsize=15)
         ax.set_ylabel(toTeX['%s' % leftcff], fontsize=18)
         ax.axhspan(-0.0005, 0.0005, facecolor='g', alpha=0.6)  # horizontal bar
@@ -3028,7 +3033,8 @@ def CFF3(path=None, fmt='png', **kwargs):
         rightcff = rightcffs[n]
         ax = fig.add_subplot(2, 2, 2*n+2)
         ax.set_xscale('log')  # x-axis to be logarithmic
-        panel(ax, xaxis='xi', xs=logxvals, kins={'yaxis':rightcff, 't':-0.2, 'Q2':4.}, **kwargs)
+        panel(ax, xaxis='xi', xs=logxvals, kins={'yaxis':rightcff, 't':-0.2, 'Q2':4.,
+	    'units':{'CFF': 1}, 'y1name': 'CFF'}, **kwargs)
         ax.set_xlabel(toTeX['xixB'], fontsize=15)
         ax.set_ylabel(toTeX['%s' % rightcff], fontsize=18)
         ax.axhspan(-0.0005, 0.0005, facecolor='g', alpha=0.6)  # horizontal bar
