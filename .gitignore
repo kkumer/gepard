@@ -6,5 +6,7 @@
 **/*.exe
 **/my*
 **/*prep/*.f
+**/nn*.db
+**/ex/fit_*.py
 
 **/*sublime-workspace
