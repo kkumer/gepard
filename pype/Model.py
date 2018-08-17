@@ -2143,6 +2143,12 @@ class BMP(ComptonFormFactors):
 class PureBetheHeitler(ComptonFormFactors, ElasticKelly):
     """Pure Bethe-Heitler (all CFFs=0) model."""
 
+    def is_within_model_kinematics(self, pt):
+        return ( (1.5 <= pt.Q2) and
+                 (pt.tm < min(1., pt.Q2/4)) and
+                 (1e-5 < pt.xB < 0.65)
+               )
+
 class ModelDR(ComptonModelDR, ElasticDipole):
     """Complete model as in arXiv:0904.0458.."""
 
