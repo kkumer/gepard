@@ -2817,19 +2817,14 @@ def CFF(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
     fig = plt.figure(figsize=(12,4*len(cffs)))
     #fig.canvas.set_window_title(title)
     #fig.suptitle(title)
-    colors = ['red', 'brown']     # worm human colors :-)
-    nncolors = ['blue', 'green']  # cold computer colors
-    linestyles = ['solid', 'dashed']
     # Define abscissas
-    #logxvals = np.power(10., np.arange(-3.0, -0.001, 0.1))  # left panel
     logxvals = np.logspace(-2.0, -0.01, 20)  # left panel
     xvals = np.linspace(0.1, 0.22, 20) # right panel
-    # ordinates 
-    #ylims = {'ImH': (-4.3, 35), 'ReH': (-6.5, 8),
-    ylims = {'ImH': (-4.3, 35), 'ReH': (-15, 8),
+    # ranges of y axis
+    ylims = {'ImH': (-4.3, 35), 'ReH': (-3, 1),
              'ImE': (-40, 35), 'ReE': (-15, 30),
              'ImEt': (-200, 300), 'ReEt': (-150, 150),
-             'ImHt': (-40, 50), 'ReHt': (-15, 30)}
+             'ImHt': (-6, 4), 'ReHt': (-12, 12)}
     # Plot panels
     for n in range(len(cffs)):
         cff = cffs[n]
@@ -2838,28 +2833,30 @@ def CFF(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
         ax.set_xscale('log')  # x-axis to be logarithmic
         panel(ax, xaxis='xi', xs=logxvals, kins={'yaxis':cff, 't':-0.2, 'Q2':4.,
 	    'units':{'CFF': 1}, 'y1name': 'CFF'}, **kwargs)
-        ax.set_xlabel(toTeX['xixB'], fontsize=15)
-        ax.set_ylabel(toTeX['%s' % cff], fontsize=18)
-        ax.axhspan(-0.0005, 0.0005, facecolor='g', alpha=0.6)  # horizontal bar
+        ax.set_xlabel(toTeX['xixB'], fontsize=12)
+        ax.set_ylabel(toTeX['%s' % cff], fontsize=16)
+        ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
+        ax.set_xlabel(toTeX['xixB'], fontsize=12)
+        apply(ax.set_ylim, ylims[cff])
+        #ax.set_xlim(0.005, 1.0)
         #ax.axvspan(0.025, 0.136, facecolor='g', alpha=0.1)  # vertical band
         #ax.text(0.35, 0.95, "data region", transform=ax.transAxes, 
         #        fontsize=14, fontweight='bold', va='top')
         #apply(ax.set_ylim, ylims[cff])
-        #ax.set_xlim(0.005, 1.0)
         if n == 0:
             ax.legend(loc='upper right')
             ax.legend().draw_frame(0)
-            ax.text(0.0006, 0.5, "$t = -0.2\\, {\\rm GeV}^2$",# transform=ax.transAxes, 
+            ax.text(0.6, 0.5, "$t = -0.2\\, {\\rm GeV}^2$",# transform=ax.transAxes, 
                     fontsize=10)
         # measured x linear
         ax = fig.add_subplot(len(cffs), 2, 2*n+2)
         panel(ax, xaxis='xi', xs=xvals, kins={'yaxis':cff, 't':-0.2, 'Q2':4.,
 	    'units':{'CFF': 1}, 'y1name': 'CFF'}, **kwargs)
         ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
-        ax.set_xlabel(toTeX['xixB'], fontsize=15)
-        #apply(ax.set_ylim, ylims[cff])
-        #ax.axvspan(0.025, 0.136, facecolor='g', alpha=0.1)  # vertical band
+        ax.set_xlabel(toTeX['xixB'], fontsize=12)
+        apply(ax.set_ylim, ylims[cff])
         #ax.set_xlim(0.02, 0.142)
+        #ax.axvspan(0.025, 0.136, facecolor='g', alpha=0.1)  # vertical band
         #ax.text(0.20, 0.95, "d   a   t   a       r   e   g   i   o   n", 
         #        transform=ax.transAxes, fontsize=14, fontweight='bold', va='top')
         #ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.02))  # tickmarks
