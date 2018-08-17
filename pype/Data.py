@@ -14,7 +14,7 @@ DummyPoint -- class for points which have just few relevant attributes
 # FIXME: Could use __slots__ to optimize DataPoint and the
 # number and names of attributes
 
-import os, re, math, copy, logging
+import os, sys, re, math, copy, logging
 from numpy import pi
 
 import pandas as pd
@@ -275,13 +275,27 @@ class DataSet(list):
     def __repr__(self):
         return "DataSet instance from '" + self.filename + "'"
 
-    def __getslice__(self, start, end, step=None):
-        if start >= len(self):
-            raise IndexError, """%s has only %d items and your slice 
-                starts at %d""" % (self, len(self), start)
-        tmp = DataSet(self[start:end:step])
-        tmp.__dict__ = self.__dict__.copy() # transfer the attributes
-        return tmp
+    def __getitem__(self, key):
+        # From https://stackoverflow.com/questions/2936863/
+        if isinstance(key, slice):
+            lst = [self[k] for k in xrange(*key.indices(len(self)))]
+            tmp = DataSet(lst)
+            tmp.__dict__ = self.__dict__.copy() # transfer the attributes
+            return tmp
+        elif isinstance(key, int):
+            return list.__getitem__(self, key)
+        else:
+            raise TypeError, "Invalid argument type."
+
+    # Cf. https://docs.python.org/2/reference/datamodel.html#object.__getslice__
+    if sys.version_info < (2, 0):
+        def __getslice__(self, start, end, step=None):
+            if start >= len(self):
+                raise IndexError, """%s has only %d items and your slice 
+                    starts at %d""" % (self, len(self), start)
+            tmp = DataSet(self[start:end:step])
+            tmp.__dict__ = self.__dict__.copy() # transfer the attributes
+            return tmp
 
     def df(self):
         """Return pandas DataFrame of dataset."""
