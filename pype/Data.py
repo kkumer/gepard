@@ -273,7 +273,7 @@ class DataSet(list):
         return DataSet(datapoints=list.__add__(self,rhs))
 
     def __repr__(self):
-        return "DataSet instance from '" + self.filename + "'"
+        return 'DataSet with {} points'.format(len(self))
 
     def __getitem__(self, key):
         # From https://stackoverflow.com/questions/2936863/
@@ -287,15 +287,13 @@ class DataSet(list):
         else:
             raise TypeError, "Invalid argument type."
 
-    # Cf. https://docs.python.org/2/reference/datamodel.html#object.__getslice__
-    if sys.version_info < (2, 0):
-        def __getslice__(self, start, end, step=None):
-            if start >= len(self):
-                raise IndexError, """%s has only %d items and your slice 
-                    starts at %d""" % (self, len(self), start)
-            tmp = DataSet(self[start:end:step])
-            tmp.__dict__ = self.__dict__.copy() # transfer the attributes
-            return tmp
+    def __getslice__(self, start, end):
+        # This is called by [:], while [::] calls __getitem__()
+        if start >= len(self):
+            raise IndexError, """%s has only %d items and your slice 
+                starts at %d""" % (self, len(self), start)
+        return DataSet(self[start:end:None])
+
 
     def df(self):
         """Return pandas DataFrame of dataset."""
