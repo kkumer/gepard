@@ -9,7 +9,9 @@ def trans(o, theory_and_pt, oC=0):
     theory, pt = theory_and_pt
     if theory.model.endpointpower:
         # multiplying with (1-xB)^2 to implement constraint CFF(xB=1) = 0
-        o = o * (1-pt.xB)**theory.model.endpointpower
+        fac = (1-pt.xB)**theory.model.endpointpower
+        ep = [int(cff[:2]=='Re')+int(cff[:2]=='Im')*fac for cff in theory.m.output_layer]
+        o = o * ep
     res = theory.predict(pt, parameters={'outputvalue':o, 'outputvalueC':oC})
     return res
 

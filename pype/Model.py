@@ -1217,7 +1217,7 @@ class ComptonNeuralNets(Model):
         output_layer:  keyword argument output_layer is a list specifying
                        names of CFFs will be given by neural nets. Rest are
                        zero.
-        endpointpower: CFFs are defined as NN*(1-xB)**endpointpower to enforce
+        endpointpower: Im(CFF)s are defined as NN*(1-xB)**endpointpower to enforce
                        vanishing at xB=0 and to improve convergence
                 useDR:  use dispersion relations for some Re(CFF)s.
                          E.g.  useDR = ['ReH', 'ReE', 'ReEt', 'ReHt']
@@ -1331,7 +1331,7 @@ class ComptonNeuralNets(Model):
         for xB in xBs:
             ar = []
             for net in self.nets:
-                if self.endpointpower:
+                if self.endpointpower and self.curname[:2] == 'Im':
                     ar.append(net.activate([xB, pt.t])[ind]*(1-xB)**self.endpointpower)
                 else:
                     ar.append(net.activate([xB, pt.t])[ind])
