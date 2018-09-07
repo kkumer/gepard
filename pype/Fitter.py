@@ -139,7 +139,7 @@ class FitterBrain(Fitter):
         self.usenet = None
         self.crossvalidation = True
         self.nnets = 4
-        self.maxtries = 200
+        self.maxtries = 999
         self.nbatch = 20
         self.batchlen = 5
         self.verbose = 0
@@ -382,6 +382,10 @@ class FitterBrain(Fitter):
                 n +=1
             print "[%3i/%3i] Net %2i ---> TestError: %8.3g  ---> P(chisq = %1.2f) = %s " % (
                     k, self.maxtries, n, memerr, chi, sfitprob)
+            # If we have no nets after spending 5% of maxtries, give up
+            if (k > self.maxtries/20.) and (n < 2):
+                print "Less than 2 nets found after 5% of maxtries. Giving up this fit."
+                break
         self.theory.model.parameters['nnet'] = 'ALL'
         return self.theory
 

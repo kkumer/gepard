@@ -119,8 +119,8 @@ def _axband(ax, fun, pts, xaxis, **kwargs):
     xaxis -- 'Q2', 't', 'xB', ...
 
     """
-    if not (isinstance(pts[0], Data.DataPoint) or isinstance(pts[0], Data.DummyPoint)):
-        raise ValueError, "%s is not single dataset" % str(pts)
+    #if not (isinstance(pts[0], Data.DataPoint) or isinstance(pts[0], Data.DummyPoint)):
+    #    raise ValueError, "%s is not single dataset" % str(pts)
 
     if pts[0].has_key('phi') and pts[0].frame == 'Trento':
         # go back to degrees
@@ -209,7 +209,7 @@ def panel(ax, points=None, lines=None, bands=None, xaxis=None, xs=None,
     if lines:
         if not isinstance(lines, list): lines = [lines]
         lineshapes = ['s', '^', 'd', 'h']  # first squares, then triangles, diamonds, hexagons
-        linecolors = ['red', 'blue', 'green', 'blue', 'black']  
+        linecolors = ['red', 'black', 'blue', 'green', 'blue']  
         linestyles = ['--', '-', '-.', '--', ':']  # solid, dashed, dot-dashed, dotted
         linen = 0
         for line in lines:
@@ -220,7 +220,7 @@ def panel(ax, points=None, lines=None, bands=None, xaxis=None, xs=None,
 
     if bands:
         if not isinstance(bands, list): bands = [bands]
-        bandcolors = ['red', 'green', 'blue', 'purple']
+        bandcolors = ['blue', 'green', 'purple']
         hatches = ['////', '\\\\', '|', '.']
         bandn = 0
         for band in bands:
@@ -1531,7 +1531,7 @@ def H1ZEUS(path=None, fmt='png', **kwargs):
     xs = ['t', 't', 'W', 'Q2']
     #title = 'H1 07 / ZEUS 08'
     title = ''
-    fig = plt.figure()
+    fig = plt.figure(figsize=[10,6])
     fig.canvas.set_window_title(title)
     fig.suptitle(title)
     #fig.subplots_adjust(bottom=0.1, hspace=0.3)
@@ -2819,12 +2819,12 @@ def CFF(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
     #fig.suptitle(title)
     # Define abscissas
     logxvals = np.logspace(-2.0, -0.01, 20)  # left panel
-    xvals = np.linspace(0.1, 0.22, 20) # right panel
+    xvals = np.linspace(0.04, 0.25, 20) # right panel
     # ranges of y axis
     ylims = {'ImH': (-4.3, 35), 'ReH': (-3, 1),
-             'ImE': (-40, 35), 'ReE': (-15, 30),
+             'ImE': (-40, 35), 'ReE': (-40, 10),
              'ImEt': (-200, 300), 'ReEt': (-150, 150),
-             'ImHt': (-6, 4), 'ReHt': (-12, 12)}
+             'ImHt': (-6, 10), 'ReHt': (-12, 12)}
     # Plot panels
     for n in range(len(cffs)):
         cff = cffs[n]
@@ -2837,12 +2837,12 @@ def CFF(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
         ax.set_ylabel(toTeX['%s' % cff], fontsize=16)
         ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
         ax.set_xlabel(toTeX['xixB'], fontsize=12)
-        apply(ax.set_ylim, ylims[cff])
+        #apply(ax.set_ylim, ylims[cff])
         #ax.set_xlim(0.005, 1.0)
         #ax.axvspan(0.025, 0.136, facecolor='g', alpha=0.1)  # vertical band
         #ax.text(0.35, 0.95, "data region", transform=ax.transAxes, 
         #        fontsize=14, fontweight='bold', va='top')
-        #apply(ax.set_ylim, ylims[cff])
+        apply(ax.set_ylim, ylims[cff])
         if n == 0:
             ax.legend(loc='upper right')
             ax.legend().draw_frame(0)
@@ -3163,7 +3163,7 @@ def jbod(path=None, fmt='png', **kwargs):
     fig.suptitle(title)
     ax = fig.add_subplot(1, 1, 1)
     n = 1
-    if isinstance(kwargs['points'][0], Data.DataPoint):
+    if isinstance(kwargs['points'], Data.DataSet):
         kwargs['points'] = [kwargs['points']]
     for pts in kwargs['points']:
         label = string.join(set('%s-%s-%s' % (pt.collaboration, 

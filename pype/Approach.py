@@ -956,8 +956,9 @@ class BMK(Approach):
         """Partial DVCS cross section w.r.t. Mandelstam t."""
 
         eps2 = 4. * pt.xB**2 * Mp2 / pt.Q2
-        self.m.g.parint.pid = 1
-        self.m.g.newcall = 1
+        if self.model.__dict__.has_key('g'):
+            self.m.g.parint.pid = 1
+            self.m.g.newcall = 1
         ImH, ReH, ImE, ReE = self.m.ImH(pt), self.m.ReH(pt), self.m.ImE(pt), self.m.ReE(pt)
         res = 65.14079453579676 * ( pt.xB**2 / pt.Q2**2 / (1-pt.xB) / (2-pt.xB)**2 /
                 sqrt(1 + eps2) * (

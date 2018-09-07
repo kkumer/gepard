@@ -111,6 +111,14 @@ fixed = [
          ('CLAS', CLASall+data[90]+data[97]), 
          ('Hall A', data[109]+data[110]+data[111]+HallAall+shifted)]
 
+# New temporary for NN fits
+HA15pts = H_BSDwpts + H_BSSw0pts + H_BSSw1pts
+HA17pts = H17_BSDwpts + H17_BSSw0pts + H17_BSSw1pts
+fixed = [
+         ('HERMES', BCApts+ALUIpts+LPpoints[::2][:6]+TPpoints), 
+         ('CLAS', C_BSDwpts[::2]+ C_BSSw0pts[::2] + C_BSSw1pts[::2]), 
+         ('Hall A', HA17pts[::2]+HA15pts)]
+
 fig = plt.figure(figsize=(8,4))
 
 colors = ['red', 'blue', 'green', 'purple', 'orange']
