@@ -179,10 +179,10 @@ class Approach(object):
         #        return result.mean()
 
         if obs in m.allCFFs or obs in m.allGPDs:
-            # we need a model attribute
+            # we want GPD/CFF, which are model attributes
             fun = getattr(m, obs)
         else:
-            # we need a "real" observable
+            # we want a "real" observable, which is theory attribute
             fun = getattr(self, obs)
 
         if error:

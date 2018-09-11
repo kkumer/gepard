@@ -333,7 +333,6 @@ class FitterBrain(Fitter):
         """Create and train neural networks."""
         for n in range(self.nnets):
             if self.theory.m.useDR:
-            #if False:  # switch subtraction constant off temporarily
                 # some Re parts are obtained via DR
                 net, netC, memerr, memerrC = self.makenetDR(self.fitpoints)
                 self.theory.model.netsC.append(netC)
@@ -364,7 +363,6 @@ class FitterBrain(Fitter):
         while n < self.nnets and k < self.maxtries:
             k += 1
             if self.theory.m.useDR:
-            #if False:  # switch subtraction constant off temporarily
                 # some Re parts are obtained via DR
                 net, netC, memerr, memerrC = self.makenetDR(self.fitpoints)
                 self.theory.model.netsC.append(netC)
@@ -382,6 +380,7 @@ class FitterBrain(Fitter):
             if fitprob < 0.05:
                 sfitprob = utils.stringcolor("%5.4f" % fitprob, 'red', True)
                 del self.theory.model.nets[-1]
+                del self.theory.model.netsC[-1]
                 self.theory.model.parameters['nnet'] = n-1
             else:
                 sfitprob = utils.stringcolor("%5.4f" % fitprob, 'green', True)
