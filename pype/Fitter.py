@@ -152,8 +152,14 @@ class FitterBrain(Fitter):
             deriv = []
             for k in range(self.outputs):
                 left[k] = 1.2
-                deriv.append((theory.predict(pt, parameters={'outputvalue':tuple(left)}) -
-                         theory.predict(pt, parameters={'outputvalue':tuple(right)})) / 0.2)
+                if self.theory.m.useDR:
+                    deriv.append((theory.predict(pt, 
+                        parameters={'outputvalue':tuple(left), 'outputvalueC':1.0}) -
+                                  theory.predict(pt, 
+                        parameters={'outputvalue':tuple(right), 'outputvalueC':1.0})) / 0.2)
+                else:
+                    deriv.append((theory.predict(pt, parameters={'outputvalue':tuple(left)}) -
+                             theory.predict(pt, parameters={'outputvalue':tuple(right)})) / 0.2)
                 # return left to default value of [1, 1, ...]
                 left[k] = 1.0
             pt.deriv = np.array(deriv)
@@ -320,14 +326,14 @@ class FitterBrain(Fitter):
             elif testerr > 100 or trainerr > 100 or testerrC > 100 or trainerrC > 100:
                 print "---- Further training is hopeless. Giving up. ----"
                 break
-        sys.stderr.write(str(trans.outmem))
+        #sys.stderr.write(str(trans.outmem))
         return memnet, memnetC, memerr, memerrC
     
     def fit(self):
         """Create and train neural networks."""
         for n in range(self.nnets):
-            #if self.theory.m.useDR:
-            if False:  # switch subtraction constant off temporarily
+            if self.theory.m.useDR:
+            #if False:  # switch subtraction constant off temporarily
                 # some Re parts are obtained via DR
                 net, netC, memerr, memerrC = self.makenetDR(self.fitpoints)
                 self.theory.model.netsC.append(netC)
@@ -357,8 +363,8 @@ class FitterBrain(Fitter):
         k = 0
         while n < self.nnets and k < self.maxtries:
             k += 1
-            #if self.theory.m.useDR:
-            if False:  # switch subtraction constant off temporarily
+            if self.theory.m.useDR:
+            #if False:  # switch subtraction constant off temporarily
                 # some Re parts are obtained via DR
                 net, netC, memerr, memerrC = self.makenetDR(self.fitpoints)
                 self.theory.model.netsC.append(netC)

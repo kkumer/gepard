@@ -34,11 +34,11 @@ def quadSciPy35(func,a,b,args=()):
     y = (b-a)*(roots35+1)/2.0 + a
     return (b-a)/2.0*sum(weights35*func(y,*args),0)
 
-def quadSciPy18(func,a,b,args=()):
+def quadSciPy18transposed(func,a,b,args=()):
     """Compute a definite integral using 18-order Gaussian quadrature.
     Adapted from scipy."""
     y = (b-a)*(roots18+1)/2.0 + a
-    return (b-a)/2.0*sum(weights18*func(y,*args),0)
+    return (b-a)/2.0*sum((weights18*func(y,*args)).transpose(),0)
 
 def quadSciPy10(func,a,b,args=()):
     """Compute a definite integral using tenth-order Gaussian quadrature.
@@ -80,7 +80,7 @@ def quadSciPy4(func,a,b,args=()):
     return (b-a)/2.0*sum(weights4*func(y,*args),0)
 
 # Choice of routine used for P.V. integration
-PVquadrature = quadSciPy18
+PVquadrature = quadSciPy18transposed
 
 # Choice of routine used for harmonic projection
 Hquadrature = quadSciPy10transposed

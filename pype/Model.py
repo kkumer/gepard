@@ -8,7 +8,7 @@ and parameter values can calculate observables.
 """
 
 from __future__ import division
-#from IPython.Debugger import Tracer; debug_here = Tracer()
+#from IPython.core.debugger import set_trace
 import pickle, sys, logging
 
 from numpy import log, pi, imag, real, sqrt, cos, sin, exp
@@ -31,6 +31,7 @@ import pygepard7 as g7
 import optModel
 
 _lg = logging.getLogger('p.%s' % __name__)
+_lg.setLevel(logging.WARNING)  #DEBUG, INFO, WARNING, ERROR, CRITICAL
 #_lg.setLevel(logging.DEBUG)  #DEBUG, INFO, WARNING, ERROR, CRITICAL
 
 class Model(object):
@@ -1271,7 +1272,7 @@ class ComptonNeuralNets(Model):
         #return 0
 
     def subtraction(self, pt):
-        return 2.25  # temporary
+        #return 2.25  # for testing, return fixed value
         if self.parameters['outputvalueC'] is not None:
             # this occurs during training: value is set by training
             # routine by calling with outputvalueC set by training routine
@@ -1292,18 +1293,29 @@ class ComptonNeuralNets(Model):
                     raise IndexError, str(self)+' has only '+str(len(self.netsC))+' nets!'
         # by default, we get mean value (FIXME:this should never occurr?)
         else:
+            _lg.debug('FIXME: This line should never be reached')
             return all.mean()
 
     def CFF(self, pt, xi=0):
-        # FIXME: This function is HEAVILY sub-optimal and non-pythonic!
-        #_lg.debug('NN model CFF called as = %s\n' % self.curname)
+        # FIXME: This function is HEAVILY sub-optimal and non-pythonic and messy!
+        _lg.debug('NN model CFF called as = %s\n' % self.curname)
         if hasattr(self, 'useDR') and self.useDR and self.curname in self.useDR:
-            #_lg.debug('Doing DR for CFF: %s\n' % self.curname)
+            _lg.debug('Doing DR for CFF: %s\n' % self.curname)
             if self.curname == 'ReH':
-                #debug_here()
-                return DR.intV(self.ImH, pt) - self.subtraction(pt)
+                #set_trace()
+                a = DR.intVNN(self.ImH, pt)
+                b = self.subtraction(pt)
+                if isinstance(b, ndarray):
+                    b = b.reshape(b.size,1)
+                return a - b
+                #return DR.intVNN(self.ImH, pt) - self.subtraction(pt)
             elif self.curname == 'ReE':
-                return DR.intV(self.ImE, pt) + self.subtraction(pt)
+                a = DR.intVNN(self.ImE, pt)
+                b = self.subtraction
+                if isinstance(b, ndarray):
+                    b = b.reshape(b.size,1)
+                return a + b
+                #return DR.intVNN(self.ImE, pt) + self.subtraction(pt)
             elif self.curname in ['ReHt', 'ReEt']:
                 return DR.intA(self.__getattr__('Im'+self.curname[2:]), pt)
             else:
@@ -1352,7 +1364,7 @@ class ComptonNeuralNets(Model):
         res = array(res)
         if res.shape == (1,):
             # returns number
-            return res[0]  
+            return res[0]
         else:
             # returns ndarray
             return res.transpose()
