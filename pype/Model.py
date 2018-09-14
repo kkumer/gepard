@@ -354,7 +354,7 @@ class ComptonFormFactors(Model):
 
     # Define E-bar as xi*E-tilde
     def ReEb(self, pt):
-        return (pt.xB/2.)*self.ReEt(pt)
+        return (pt.xi)*self.ReEt(pt)
 
     def is_within_model_kinematics(self, pt):
         return ( (1.5 <= pt.Q2 <= 5.) and 
@@ -1296,9 +1296,24 @@ class ComptonNeuralNets(Model):
             _lg.debug('FIXME: This line should never be reached')
             return all.mean()
 
+    def _pipole(self, pt):
+        """FIXME: code duplication from GK12 model"""
+        Mp2 = 0.938272013**2
+        gA0 = 1.267
+        LAM2 = 0.44**2
+        mpi2 = 0.1396**2
+        numer = Mp2 * gA0 * (LAM2 - mpi2)
+        denom = (mpi2-pt.t)*(LAM2-pt.t)
+        green = numer/denom
+        a2 = 0.22
+        return 2*(1+a2)*green/pt.xi
+
     def CFF(self, pt, xi=0):
         # FIXME: This function is HEAVILY sub-optimal and non-pythonic and messy!
         _lg.debug('NN model CFF called as = %s\n' % self.curname)
+        # Uncomment the following block to switch on the pion pole
+        #if self.curname == 'ReEt':
+        #    return self._pipole(pt)
         if hasattr(self, 'useDR') and self.useDR and self.curname in self.useDR:
             _lg.debug('Doing DR for CFF: %s\n' % self.curname)
             if self.curname == 'ReH':
@@ -1311,13 +1326,13 @@ class ComptonNeuralNets(Model):
                 #return DR.intVNN(self.ImH, pt) - self.subtraction(pt)
             elif self.curname == 'ReE':
                 a = DR.intVNN(self.ImE, pt)
-                b = self.subtraction
+                b = self.subtraction(pt)
                 if isinstance(b, ndarray):
                     b = b.reshape(b.size,1)
                 return a + b
                 #return DR.intVNN(self.ImE, pt) + self.subtraction(pt)
             elif self.curname in ['ReHt', 'ReEt']:
-                return DR.intA(self.__getattr__('Im'+self.curname[2:]), pt)
+                return DR.intANN(self.__getattr__('Im'+self.curname[2:]), pt)
             else:
                 raise ValueError, 'Only Re(CFF) can be calculated via disp. rel.'
         ind = self.output_layer.index(self.curname)

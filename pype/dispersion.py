@@ -57,3 +57,9 @@ def intA(fun, pt):
     pvpi = (res + log((1.+pt.xi)/(1.-pt.xi)) * fun(pt))/pi
     return pvpi 
 
+def intANN(fun, pt):
+    """ Axial-vector P.V. dispersion integral of fun divided by pi"""
+    res = PVquadrature(dispA, 0, 1, (fun, pt))
+    pvpi = (res.reshape(res.size,1) + log((1.+pt.xi)/(1.-pt.xi)) * fun(pt))/pi
+    return pvpi 
+

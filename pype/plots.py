@@ -208,14 +208,16 @@ def panel(ax, points=None, lines=None, bands=None, xaxis=None, xs=None,
 
     if lines:
         if not isinstance(lines, list): lines = [lines]
-        lineshapes = ['s', '^', 'd', 'h']  # first squares, then triangles, diamonds, hexagons
-        linecolors = ['red', 'black', 'blue', 'green', 'blue']  
-        linestyles = ['--', '-', '-.', '--', ':']  # solid, dashed, dot-dashed, dotted
+        linecolors = ['red', 'black', 'blue', 'green', 'darkorchid', 'olive',
+	       	'darkcyan', 'indianred', 'red', 'black', 'blue', 'green', 
+		'darkorchid', 'olive', 'darkcyan', 'indianred']  
+        linestyles = ['-', '--', '-.', ':','-', '--', '-.', ':',
+		'-', '--', '-.', ':','-', '--', '-.', ':']
         linen = 0
         for line in lines:
             _axline(ax, lambda pt: line.predict(pt, orig_conventions=True), points, xaxis=xaxis,
                     color=linecolors[linen], linestyle=linestyles[linen], 
-                    linewidth=2, label=line.name, **kwargs)
+                    linewidth=1, alpha=1.0, label=line.name, **kwargs)
             linen += 1
 
     if bands:
@@ -308,7 +310,7 @@ def HERMES12(path=None, fmt='png', **kwargs):
     """Plot HERMES combined BCA and BSA data with fit lines."""
 
     title = ''
-    fig = plt.figure()
+    fig = plt.figure(figsize=(14,14))
     fig.canvas.set_window_title(title)
     fig.suptitle(title)
     xaxes = ['tm', 'xB', 'Q2']
@@ -345,7 +347,7 @@ def HERMES12(path=None, fmt='png', **kwargs):
                 ax.legend(handles, labels, handlelength=2.0,
                  prop=matplotlib.font_manager.FontProperties(size="small"),
                     loc="upper center").draw_frame(0)
-    fig.subplots_adjust(wspace=0.3, hspace=0.4)
+    fig.subplots_adjust(wspace=0.1, hspace=0.1)
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
@@ -2811,6 +2813,7 @@ def CFF(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
     """Makes plots of cffs given by various theories/models
     
     cffs    -- List of CFFs to be plotted. Each produces two panels.
+        FIXME: gepard CFFs via DR are NOT plotted correctly!!!
 
     """
     title = 'CFF'
@@ -2821,7 +2824,9 @@ def CFF(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
     logxvals = np.logspace(-2.0, -0.01, 20)  # left panel
     xvals = np.linspace(0.04, 0.25, 20) # right panel
     # ranges of y axis
-    ylims = {'ImH': (-4.3, 35), 'ReH': (-3, 1),
+    ylims = {
+	     #'ImH': (-4.3, 35), 'ReH': (-3, 1),
+	     'ImH': (-5, 10), 'ReH': (-10, 2),
              'ImE': (-40, 35), 'ReE': (-40, 10),
              'ImEt': (-200, 300), 'ReEt': (-150, 150),
              'ImHt': (-6, 10), 'ReHt': (-12, 12)}

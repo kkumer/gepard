@@ -150,7 +150,7 @@ class Approach(object):
 
         Keyword arguments:
         error - if available, produce tuple (mean, error)
-        CL - error is not std.dev., but 68% C.L. (mean, errplus, errminus)
+        CL - (NNet only) error is not std.dev., but 68% C.L. (mean, errplus, errminus)
         observable - string. Default is pt.yaxis. It is acceptable also
                      to pass CFF as observable, e.g., observable = 'ImH'
         parameters - dictionary which will temporarily update model's one
@@ -187,6 +187,7 @@ class Approach(object):
 
         if error:
             try:
+                # We now do standard propagation of error from m to observable
                 pars = [p for p in m.parameter_names if m.parameters['fix_'+p] == False]
                 var = 0
                 dfdp = {}
