@@ -222,7 +222,7 @@ def panel(ax, points=None, lines=None, bands=None, xaxis=None, xs=None,
 
     if bands:
         if not isinstance(bands, list): bands = [bands]
-        bandcolors = ['blue', 'green', 'purple']
+        bandcolors = ['blue', 'green', 'purple', 'indianred', 'darkcyan']
         hatches = ['////', '\\\\', '|', '.']
         bandn = 0
         for band in bands:
