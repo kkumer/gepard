@@ -1288,15 +1288,18 @@ def CLAS15phi(path=None, fmt='png', **kwargs):
     for np, panelset in enumerate(panels):
         ax = axs[np]
         panel(ax, points=panelset, xaxis='phi', kinlabels=['xB', 'Q2', 't'], **kwargs)
-        ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(100))
-        ax.xaxis.set_minor_locator(matplotlib.ticker.MultipleLocator(50))
+        ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(60))
+        ax.xaxis.set_minor_locator(matplotlib.ticker.MultipleLocator(6))
         #ax.yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))
         #ax.yaxis.set_minor_locator(matplotlib.ticker.MultipleLocator(0.02))
         if np == 0:
             # Take legend info on this panel
             handles, labels = ax.get_legend_handles_labels()
             # Draw legend on this panel
-            ax.legend(handles, labels, loc="upper center", borderaxespad=0.).draw_frame(0)
+            ax.legend(handles, labels, loc="upper center", 
+		    borderpad=0.8, handlelength=3, fancybox=True, framealpha=1.0,
+		    facecolor='navajowhite',
+                    prop=matplotlib.font_manager.FontProperties(size="x-large"))
             ax.set_ylabel(r'$d\sigma = d\sigma^{\leftarrow} + d\sigma^{\rightarrow}$', fontsize=20)
         elif np == 3:
             ax.set_ylabel(r'$\Delta\sigma = d\sigma^{\leftarrow} - d\sigma^{\rightarrow}$', fontsize=20)
@@ -1311,6 +1314,8 @@ def CLAS15phi(path=None, fmt='png', **kwargs):
             ax.set_ylim(-0.03, 0.3)
         else:
             ax.set_ylim(-0.1, 0.1)
+	ax.tick_params(axis='both', which='major', labelsize=12)
+    	ax.tick_params(axis='both', which='minor', labelsize=12)
     fig.subplots_adjust(wspace=0.0, hspace=0.0)
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
@@ -1327,7 +1332,7 @@ def CLAS15xs(lines=None, path=None, fmt='png'):
     axs = axs.reshape(10)
     for pn, (a,b) in enumerate(xQbins):
         pts = BSDw[a:b+1]
-        axs[pn].errorbar(pts.tm.values, pts.val.values, pts.err.values, linestyle='None')
+        axs[pn].errorbar(pts.tm.values, pts.val.values, pts.err.values, linestyle='None', color='black')
         if not isinstance(lines, list): lines = [lines]
         styles = ['r--', 'b-', 'g-.', 'b--', 'k:', 'r:', 'k--']
         for nl, th in enumerate(lines):
@@ -1339,13 +1344,20 @@ def CLAS15xs(lines=None, path=None, fmt='png'):
         s1 += '\n'
         s1 += '$x_B = {:.2f}$'.format(pts.xB.mean())
         if pn<5:
-            axs[pn].text(0.2, 0.32, s1, fontsize=16)
+            axs[pn].text(0.2, 0.30, s1, fontsize=16)
         else:
-            axs[pn].text(0.22, 0.05, s1, fontsize=16)
+            axs[pn].text(0.22, 0.045, s1, fontsize=16)
         if pn == 7:
             axs[pn].set_xlabel('$-t\\; [{\\rm GeV}^2]$', fontsize=16)
         if (pn % 5) == 0:
-            axs[pn].set_ylabel(r'$\Delta\sigma^{\sin\phi,w}$', fontsize=34)
+            axs[pn].set_ylabel(r'$\Delta\sigma^{\sin\phi,w}$', fontsize=24)
+	if pn == 9:
+	    axs[pn].legend(loc=(-0.5,0.5), 
+		    borderpad=0.8, handlelength=3, fancybox=True, framealpha=1.0,
+		    facecolor='navajowhite',
+                    prop=matplotlib.font_manager.FontProperties(size="x-large"))
+	axs[pn].tick_params(axis='both', which='major', labelsize=12)
+    	axs[pn].tick_params(axis='both', which='minor', labelsize=12)
     fig.subplots_adjust(wspace=0.0, hspace=0.0) 
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
@@ -2841,30 +2853,34 @@ def CFF(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
         ax.set_xlabel(toTeX['xixB'], fontsize=12)
         ax.set_ylabel(toTeX['%s' % cff], fontsize=16)
         ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
-        ax.set_xlabel(toTeX['xixB'], fontsize=12)
+        ax.set_xlabel(toTeX['xixB'], fontsize=14)
         #apply(ax.set_ylim, ylims[cff])
         #ax.set_xlim(0.005, 1.0)
         #ax.axvspan(0.025, 0.136, facecolor='g', alpha=0.1)  # vertical band
         #ax.text(0.35, 0.95, "data region", transform=ax.transAxes, 
         #        fontsize=14, fontweight='bold', va='top')
         apply(ax.set_ylim, ylims[cff])
+        ax.tick_params(axis='both', which='major', labelsize=14)
+	ax.tick_params(axis='both', which='minor', labelsize=14)
         if n == 0:
             ax.legend(loc='upper right')
             ax.legend().draw_frame(0)
-            ax.text(0.6, 0.5, "$t = -0.2\\, {\\rm GeV}^2$",# transform=ax.transAxes, 
-                    fontsize=10)
+            ax.text(0.2, 0.4, r"$t = -0.2\,\, {\rm GeV}^2$", transform=ax.transAxes, 
+                    fontsize=14)
         # measured x linear
         ax = fig.add_subplot(len(cffs), 2, 2*n+2)
         panel(ax, xaxis='xi', xs=xvals, kins={'yaxis':cff, 't':-0.2, 'Q2':4.,
 	    'units':{'CFF': 1}, 'y1name': 'CFF'}, **kwargs)
         ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
-        ax.set_xlabel(toTeX['xixB'], fontsize=12)
+        ax.set_xlabel(toTeX['xixB'], fontsize=14)
         apply(ax.set_ylim, ylims[cff])
         #ax.set_xlim(0.02, 0.142)
         #ax.axvspan(0.025, 0.136, facecolor='g', alpha=0.1)  # vertical band
         #ax.text(0.20, 0.95, "d   a   t   a       r   e   g   i   o   n", 
         #        transform=ax.transAxes, fontsize=14, fontweight='bold', va='top')
         #ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.02))  # tickmarks
+        ax.tick_params(axis='both', which='major', labelsize=14)
+	ax.tick_params(axis='both', which='minor', labelsize=14)
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
