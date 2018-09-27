@@ -2829,58 +2829,61 @@ def CFF(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
 
     """
     title = 'CFF'
-    fig = plt.figure(figsize=(12,4*len(cffs)))
+    fig, axs = plt.subplots(len(cffs), 2, sharex='col', sharey='row', figsize=(12,3.5*len(cffs)))
     #fig.canvas.set_window_title(title)
     #fig.suptitle(title)
     # Define abscissas
-    logxvals = np.logspace(-2.0, -0.01, 20)  # left panel
-    xvals = np.linspace(0.04, 0.25, 20) # right panel
+    xmin = 0.04
+    xmax = 0.25
+    xvals = np.linspace(xmin, xmax, 20) # left panel
+    logxvals = np.logspace(-2.0, -0.01, 20)  # right panel
     # ranges of y axis
     ylims = {
-	     #'ImH': (-4.3, 35), 'ReH': (-3, 1),
+	     #'ImH': (-4.8, 35), 'ReH': (-3, 2),
 	     'ImH': (-5, 10), 'ReH': (-10, 2),
-             'ImE': (-40, 35), 'ReE': (-40, 10),
+             'ImE': (-30, 30), 'ReE': (-40, 10),
+             #'ImE': (-40, 35), 'ReE': (-40, 10),
              'ImEt': (-200, 300), 'ReEt': (-150, 150),
-             'ImHt': (-6, 10), 'ReHt': (-12, 12)}
+             #'ImHt': (-4, 8), 'ReHt': (-12, 12)}
+             'ImHt': (-5, 10), 'ReHt': (-5, 10)}
     # Plot panels
     for n in range(len(cffs)):
         cff = cffs[n]
-        # all-x logarithmic
-        ax = fig.add_subplot(len(cffs), 2, 2*n+1)
-        ax.set_xscale('log')  # x-axis to be logarithmic
-        panel(ax, xaxis='xi', xs=logxvals, kins={'yaxis':cff, 't':-0.2, 'Q2':4.,
+	# [LEFT:] data range
+	if len(cffs) == 1:
+	    ax = axs[0]
+	else:
+            ax = axs[n, 0]
+        panel(ax, xaxis='xi', xs=xvals, kins={'yaxis':cff, 't':-0.2, 'Q2':4.,
 	    'units':{'CFF': 1}, 'y1name': 'CFF'}, **kwargs)
-        ax.set_xlabel(toTeX['xixB'], fontsize=12)
-        ax.set_ylabel(toTeX['%s' % cff], fontsize=16)
         ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
-        ax.set_xlabel(toTeX['xixB'], fontsize=14)
-        #apply(ax.set_ylim, ylims[cff])
-        #ax.set_xlim(0.005, 1.0)
-        #ax.axvspan(0.025, 0.136, facecolor='g', alpha=0.1)  # vertical band
-        #ax.text(0.35, 0.95, "data region", transform=ax.transAxes, 
-        #        fontsize=14, fontweight='bold', va='top')
         apply(ax.set_ylim, ylims[cff])
+        ax.set_ylabel(toTeX['%s' % cff], fontsize=20)
         ax.tick_params(axis='both', which='major', labelsize=14)
 	ax.tick_params(axis='both', which='minor', labelsize=14)
         if n == 0:
             ax.legend(loc='upper right')
             ax.legend().draw_frame(0)
-            ax.text(0.2, 0.4, r"$t = -0.2\,\, {\rm GeV}^2$", transform=ax.transAxes, 
+            ax.text(0.6, 0.6, r"$t = -0.2\,\, {\rm GeV}^2$", transform=ax.transAxes, 
                     fontsize=14)
-        # measured x linear
-        ax = fig.add_subplot(len(cffs), 2, 2*n+2)
-        panel(ax, xaxis='xi', xs=xvals, kins={'yaxis':cff, 't':-0.2, 'Q2':4.,
+	if n == len(cffs)-1:
+        	ax.set_xlabel(toTeX['xi'], fontsize=16)
+	# [RIGHT:] extrapolation range (logarithmic)
+	if len(cffs) == 1:
+	    ax = axs[1]
+	else:
+            ax = axs[n, 1]
+        ax.set_xscale('log')  # x-axis to be logarithmic
+        panel(ax, xaxis='xi', xs=logxvals, kins={'yaxis':cff, 't':-0.2, 'Q2':4.,
 	    'units':{'CFF': 1}, 'y1name': 'CFF'}, **kwargs)
+        ax.axvspan(0.04, 0.25, facecolor='g', alpha=0.1)  # vertical band
         ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
-        ax.set_xlabel(toTeX['xixB'], fontsize=14)
         apply(ax.set_ylim, ylims[cff])
-        #ax.set_xlim(0.02, 0.142)
-        #ax.axvspan(0.025, 0.136, facecolor='g', alpha=0.1)  # vertical band
-        #ax.text(0.20, 0.95, "d   a   t   a       r   e   g   i   o   n", 
-        #        transform=ax.transAxes, fontsize=14, fontweight='bold', va='top')
-        #ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.02))  # tickmarks
         ax.tick_params(axis='both', which='major', labelsize=14)
 	ax.tick_params(axis='both', which='minor', labelsize=14)
+	if n == len(cffs)-1:
+        	ax.set_xlabel(toTeX['xi'], fontsize=16)
+    fig.subplots_adjust(wspace=0.04, hspace=0.06)
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
