@@ -1272,6 +1272,9 @@ class ComptonNeuralNets(Model):
         #return 0
 
     def subtraction(self, pt):
+        """This subtraction constant is negative of the one which is standard
+            in the literature!
+        """
         #return 2.25  # for testing, return fixed value
         if self.parameters['outputvalueC'] is not None:
             # this occurs during training: value is set by training
