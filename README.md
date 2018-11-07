@@ -7,13 +7,14 @@ Modelling GPDs in momentum fraction or conformal moment space, perturbative QCD 
 
 ## Installation
 
-First make the pygepard extension library.
+First make multiple copies of the pygepard extension library.
 **Prerequisites**: C and Fortran compilers. 
 ```sh
 make pygepards
 ```
 Then go into pype directory and compile auxilliary library
 ```sh
+cd pype
 make optModel.so
 ```
 
