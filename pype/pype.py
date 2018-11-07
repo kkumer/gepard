@@ -3,7 +3,8 @@
 import shelve, copy, sys, logging, __builtin__
 import numpy as np
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.WARNING)
+#logging.basicConfig(level=logging.INFO)
 #logging.basicConfig(level=logging.DEBUG)
 
 import Model, Approach, Fitter, Data, utils, plots
@@ -13,19 +14,28 @@ from abbrevs import *
 
 db = shelve.open('theories.db')
 
-#th = db['KMM12']
-#Model.ComptonGepard.gepardPool.pop()
+th = db['KM15']
+Model.ComptonGepard.gepardPool.pop()
 #thb = db['KMM12']
-#Model.ComptonGepard.gepardPool.pop()
-#thb.m.parameters.update(KMM12b)
-#thC = db['KM15prelimC']
-#thC.name = 'KM15pC'
 #Model.ComptonGepard.gepardPool.pop()
 
 #mGK = Model.GK12()
 #thGK = Approach.BM10(mGK)
 #thGK.name = 'GK12'
 
+
+# Some combination of datasets used for global fitting
+pts = GLO15b
+
+utils.describe_data(pts)
+
+# Print chi-square of model w.r.t. this dataset
+th.print_chisq(pts)
+
+
+## --- New fit ---
+
+## --- Creating new model: ---
 ## Gepard sea part
 #mGepard = Model.ComptonGepard(p=0, q02=4.0)
 #Model.ComptonGepard.gepardPool.pop()
@@ -35,13 +45,6 @@ db = shelve.open('theories.db')
 ## Hybridization
 #m = Model.HybridDipole(mGepard, mDRsea)
 #th = Approach.BM10(m)
-
-pts = GLOnoBSS2 + BSSwpoints
-
-GLOfix = (ALUIpts + BCApts + CLASpts + BSDwpoints + 
-            AULpts + ALLpts + AUTIpts + BSSwpoints)
-
-## [4] Do the fit
 #th.model.fix_parameters('ALL')
 #th.model.release_parameters(
 #   'ALPS', 'M03S', 'SECS', 'THIS', 'ALPG', 'M02G', 'SECG', 'THIG')
@@ -52,46 +55,7 @@ GLOfix = (ALUIpts + BCApts + CLASpts + BSDwpoints +
 #f.minuit.printMode = 1
 #f.minuit.maxcalls = 1000
 
-allpars = ['Mv', 'rv', 'bv', 'C', 'MC', 
-'tMv', 'trv', 'tbv', 'rpi', 'Mpi', 'M02S', 'SECS', 'THIS', 'SECG', 'THIG']
+# allpars = ['Mv', 'rv', 'bv', 'C', 'MC', 
+# 'tMv', 'trv', 'tbv', 'rpi', 'Mpi', 'M02S', 'SECS', 'THIS', 'SECG', 'THIG']
 
 #f.fit()
-#fl = open('aux.par')
-#fl.write(str(th.m.chisq(f.fitpoints)))
-#fl.write(str(th.m.parameters))
-#fl.write('\n')
-#fl.write(str(th.m.covariance))
-#fl.close()
-#f.fit()
-
-
-## [5] Some shortcuts ...
-
-
-def _derpt(th, p, pt, f=False, h=0.05):
-    """Compute derivative of f w.r.t. model parameter p at point pt.
-    
-    Simple difference is used (f(p+h/2)-f(p-h/2))/h.
-    f is string representing appropriate method of th, or
-    observable will be taken as yaxis of pt
-
-    """
-    if f:
-        fun = th.__getattribute__(f) 
-    else:
-        fun = th.__getattribute__(pt.yaxis)
-    mem = th.m.parameters[p]
-    th.m.parameters[p] = mem+h/2.
-    up = fun(pt)
-    th.m.parameters[p] = mem-h/2.
-    down = fun(pt)
-    th.m.parameters[p] = mem
-    return (up-down)/h
-
-
-def der(th, pars, pts, f=False,  h=0.05):
-    """Compute average derivative at points for each par in pars."""
-
-    for par in pars:
-        ders = np.array([_derpt(th, par, pt, f, h) for pt in pts])
-        print '%4s  |  %7.4f' % (par, ders.mean())

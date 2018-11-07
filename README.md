@@ -23,6 +23,13 @@ Note that python code is still version 2!
 Start (i)python v2 and 
 run either `pype.py` which is generic or one of more specific example scripts in `ex` subdir.
 
+## Testing
+
+If you are changing gepard code and want to be sure that you haven't broken something important, tests of many functions are available in subdir `test`. Fast suite of most important tests:
+```
+nosetests2 --rednose -vA "not newfeature and not long and not extendedtesting"
+```
+
 
 ## License
 
