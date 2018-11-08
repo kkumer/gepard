@@ -24,6 +24,8 @@ Note that python code is still version 2!
 Start (i)python v2 and 
 run either `pype.py` which is generic or one of more specific example scripts in `ex` subdir.
 
+For least-squares fitting you need Minuit python package. Tested with iminuit-1.3.3. (Hardwired limit on number of paramters maybe needs to be increased for some models. It's 50 I think.)
+
 ## Testing
 
 If you are changing gepard code and want to be sure that you haven't broken something important, tests of many functions are available in subdir `test`. Fast suite of most important tests:
