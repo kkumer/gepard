@@ -5,13 +5,13 @@ import sys, logging, warnings
 
 import numpy as np
 
-try:
-    from minuit import Minuit
-except:
-    pass
+# try:
+    # from minuit import Minuit
+# except:
+    # pass
 
 try:
-    from iminuit import iMinuit, InitialParamWarning
+    from iminuit import Minuit, InitialParamWarning
     # FIXME: maybe we should not switch this off so bluntly
     warnings.simplefilter('ignore', InitialParamWarning, append=False)
 except:
