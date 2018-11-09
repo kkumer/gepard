@@ -202,6 +202,7 @@ class FitterBrain(Fitter):
             ys = self.outputs * [0]
             # Rounding the number, to make matching of trans.map2pt work
             # regardless of computer rounding behaviour
+            # pt.err is assumed to come from measurement, it's not percentage err
             ys[0] = pt.val + round(np.random.normal(0, pt.err, 1)[0], 5)
             # ys[1:] are zero and are never used.
             trans.map2pt[ys[0]] = (self.theory, pt)
