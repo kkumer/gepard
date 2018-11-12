@@ -5,10 +5,10 @@ import shelve
 
 import plots, utils, Approach
 
-print """
+print("""
 This will produce figures 3, 4 and 5 for KMS11 paper.
 For paper, this script was run with pype ver. 149.
-"""
+""")
 
 ## [1] Load experimental data and theoretical models
 
@@ -23,4 +23,4 @@ plots.COMPASSt(lines=[db['KM09a'], db['KM09b']], bands=[db['KMS11-NN']])
 
 plots.CFF2(lines=[db['KM09a'], db['KM09b']], bands=[db['KMS11-NN'], db['KMS11-DR']])
 
-raw_input('Press ENTER to finish:')
+input('Press ENTER to finish:')

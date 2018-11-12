@@ -51,8 +51,7 @@ class FitterMinuit(Fitter):
         # fcnargs = "NS, alS, ..."
         # pardict = "'NS': NS, 'alS': alS, ..."
         fcnargs = ", ".join(theory.model.parameter_names) 
-        pardict = ", ".join(map(lambda x: "'%s': %s" % x, 
-                          zip(theory.model.parameter_names, theory.model.parameter_names)))
+        pardict = ", ".join(["'%s': %s" % x for x in zip(theory.model.parameter_names, theory.model.parameter_names)])
         exec(
 """
 def fcn(%s):
@@ -71,7 +70,7 @@ def fcn(%s):
         if isinstance(theory.model.parameters, utils.hubDict):
             # This is needed because in Python <=2.5 ** operator
             # requires dict as an argument, i.e. my hubDict wouldn't work:
-            auxdict = dict((it for it in theory.model.parameters.items()))
+            auxdict = dict((it for it in list(theory.model.parameters.items())))
             self.minuit = Minuit(fcn, **auxdict)
         else:
             self.minuit = Minuit(fcn, **theory.model.parameters)
@@ -83,12 +82,12 @@ def fcn(%s):
     def fit(self):
         self.minuit.migrad()
         if self.printMode > 0:
-            print "ncalls = \n", self.minuit.ncalls
+            print("ncalls = \n", self.minuit.ncalls)
             self.theory.print_chisq(self.fitpoints)
         # Set/update covariance matrix of model:
         self.theory.model.covariance = self.minuit.covariance
         if self.printMode > 0:
-            print ""
+            print("")
             self.theory.model.print_parameters_errors(pvalues=True, 
                     ndof=len(self.fitpoints)-utils.npars(self.theory.model))
 
@@ -116,8 +115,8 @@ def fcn(%s):
     def print_parameters(self):
         for par in self.theory.model.parameter_names:
             if not self.theory.model.parameters['fix_'+par]:
-                print '%5s = %4.2f +- %4.2f' % (par, 
-                        self.minuit.values[par], self.minuit.errors[par])
+                print('%5s = %4.2f +- %4.2f' % (par, 
+                        self.minuit.values[par], self.minuit.errors[par]))
          
 
 
@@ -243,18 +242,18 @@ class FitterBrain(Fitter):
                 trainerr, testerr = (self.trainer.testOnData(self.dstrain), 
                         self.trainer.testOnData(self.dstest))
                 if self.verbose > 1:
-                    print "Epoch: %6i   ---->    Error: %8.3g  TestError: %8.3g / %6.3g" % (
-                            self.trainer.epoch, trainerr, testerr, memerr)
+                    print("Epoch: %6i   ---->    Error: %8.3g  TestError: %8.3g / %6.3g" % (
+                            self.trainer.epoch, trainerr, testerr, memerr))
                 if testerr < memerr:
                     memerr = testerr
                     memnet = net.copy()
                     if self.verbose:
                         if self.verbose > 1:
-                            print "---- New best result:  ----"
-                        print "Epoch: %6i   ---->    Error: %8.3g  TestError: %8.3g" % (
-                                self.trainer.epoch, trainerr, testerr)
+                            print("---- New best result:  ----")
+                        print("Epoch: %6i   ---->    Error: %8.3g  TestError: %8.3g" % (
+                                self.trainer.epoch, trainerr, testerr))
                 elif testerr > 100 or trainerr > 100:
-                    print "---- This one is hopeless. Giving up. ----"
+                    print("---- This one is hopeless. Giving up. ----")
                     break
             return memnet, memerr
         else:
@@ -302,30 +301,30 @@ class FitterBrain(Fitter):
             trainerrC, testerrC = (self.trainerC.testOnData(self.dstrainC), 
                     self.trainerC.testOnData(self.dstestC))
             if self.verbose > 1:
-                print "Epoch: %6i   ---->    TrainErr: %8.3g  TestErr: %8.3g / %6.3g" % (
-                        self.trainer.epoch, trainerr, testerr, memerr)
-                print "       EpochC: %6i   ---->    TrainErrC: %8.3g  TestErrC: %8.3g / %6.3g" % (
-                        self.trainerC.epoch, trainerrC, testerrC, memerrC)
+                print("Epoch: %6i   ---->    TrainErr: %8.3g  TestErr: %8.3g / %6.3g" % (
+                        self.trainer.epoch, trainerr, testerr, memerr))
+                print("       EpochC: %6i   ---->    TrainErrC: %8.3g  TestErrC: %8.3g / %6.3g" % (
+                        self.trainerC.epoch, trainerrC, testerrC, memerrC))
             if testerr < memerr:
                 memerr = testerr
                 memnet = net.copy()
                 if self.verbose:
                     if self.verbose > 1:
-                        print "---- New best result:  ----"
-                    print "Epoch: %6i   ---->    TrainErr: %8.3g  TestErr: %8.3g" % (
-                            self.trainer.epoch, trainerr, testerr)
-                    print "          EpochC: %6i   ---->    TrainErr: %8.3g  TestErr: %8.3g" % (
-                            self.trainer.epoch, trainerr, testerr)
+                        print("---- New best result:  ----")
+                    print("Epoch: %6i   ---->    TrainErr: %8.3g  TestErr: %8.3g" % (
+                            self.trainer.epoch, trainerr, testerr))
+                    print("          EpochC: %6i   ---->    TrainErr: %8.3g  TestErr: %8.3g" % (
+                            self.trainer.epoch, trainerr, testerr))
             if testerrC < memerrC:
                 memerrC = testerrC
                 memnetC = netC.copy()
                 if self.verbose:
                     if self.verbose > 1:
-                        print "---- New best resultC:  ----"
-                    print "EpochC: %6i   ---->    TrainErrC: %8.3g  TestErrC: %8.3g" % (
-                            self.trainerC.epoch, trainerrC, testerrC)
+                        print("---- New best resultC:  ----")
+                    print("EpochC: %6i   ---->    TrainErrC: %8.3g  TestErrC: %8.3g" % (
+                            self.trainerC.epoch, trainerrC, testerrC))
             elif testerr > 100 or trainerr > 100 or testerrC > 100 or trainerrC > 100:
-                print "---- Further training is hopeless. Giving up. ----"
+                print("---- Further training is hopeless. Giving up. ----")
                 break
         #sys.stderr.write(str(trans.outmem))
         return memnet, memnetC, memerr, memerrC
@@ -352,8 +351,8 @@ class FitterBrain(Fitter):
                 sfitprob = utils.stringcolor("%5.4f" % fitprob, 'red', True)
             else:
                 sfitprob = utils.stringcolor("%5.4f" % fitprob, 'green', True)
-            print "Net %2i ---> TestError: %8.3g  ---> P(chisq = %1.2f) = %s " % (
-                    n, memerr, chi, sfitprob)
+            print("Net %2i ---> TestError: %8.3g  ---> P(chisq = %1.2f) = %s " % (
+                    n, memerr, chi, sfitprob))
         self.theory.model.parameters['nnet'] = 'ALL'
         return self.theory
 
@@ -386,11 +385,11 @@ class FitterBrain(Fitter):
             else:
                 sfitprob = utils.stringcolor("%5.4f" % fitprob, 'green', True)
                 n +=1
-            print "[%3i/%3i] Net %2i ---> TestError: %8.3g  ---> P(chisq = %1.2f) = %s " % (
-                    k, self.maxtries, n, memerr, chi, sfitprob)
+            print("[%3i/%3i] Net %2i ---> TestError: %8.3g  ---> P(chisq = %1.2f) = %s " % (
+                    k, self.maxtries, n, memerr, chi, sfitprob))
             # If we have no nets after spending 5% of maxtries, give up
             if (k > self.maxtries/20.) and (n < 2):
-                print "Less than 2 nets found after 5% of maxtries. Giving up this fit."
+                print("Less than 2 nets found after 5% of maxtries. Giving up this fit.")
                 break
         self.theory.model.parameters['nnet'] = 'ALL'
         return self.theory
@@ -401,11 +400,11 @@ class FitterBrain(Fitter):
         for n in range(self.nnets):
             self.theory.model.parameters['nnet'] = n
             chi, dof, fitprob = self.theory.chisq(self.fitpoints)
-            print "Net %2i ---> P(chisq = %1.2f) = %5.4f " % (
-                    n, chi, fitprob)
+            print("Net %2i ---> P(chisq = %1.2f) = %5.4f " % (
+                    n, chi, fitprob))
             if fitprob < minprob:
-                print "       P <  %5.4f. Removing net %2i" % (
-                        minprob, n)
+                print("       P <  %5.4f. Removing net %2i" % (
+                        minprob, n))
                 bad.append(n)
         goodnets = []
         for n in range(len(self.theory.model.nets)):

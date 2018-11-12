@@ -85,7 +85,7 @@ def HMG(f, theories=[], path=None, fmt='png'):
             for mt in mts:
                 pt.mt = mt
                 pt.t = -mt
-                if th.model.__dict__.has_key('Gepard'): th.m.g.newcall = 1
+                if 'Gepard' in th.model.__dict__: th.m.g.newcall = 1
                 res = th.model.ImH(pt)/np.pi  # M. Guidal conventions!
                 f.write('%5.3f   %5.3f\n' % (mt, res))
                 ImHvals.append(res)
@@ -110,7 +110,7 @@ def HMG(f, theories=[], path=None, fmt='png'):
             for mt in mts:
                 pt.mt = mt
                 pt.t = -mt
-                if th.model.__dict__.has_key('Gepard'): th.m.g.newcall = 1
+                if 'Gepard' in th.model.__dict__: th.m.g.newcall = 1
                 res = -th.model.ReH(pt)       # M. Guidal conventions!
                 ReHvals.append(res)
                 f.write('%5.3f   %5.3f\n' % (mt, res))

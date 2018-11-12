@@ -43,9 +43,9 @@ def _myDet(p, q, r):
     return sum1 - sum2
 
 
-def _isRightTurn((p, q, r)):
+def _isRightTurn(xxx_todo_changeme):
     "Do the vectors pq:qr form a right turn, or not?"
-
+    (p, q, r) = xxx_todo_changeme
     assert p != q and q != r and p != r
             
     if _myDet(p, q, r) < 0:
@@ -58,7 +58,7 @@ def _isPointInPolygon(r, P):
     "Is point r inside a given polygon P?"
 
     # We assume the polygon is a list of points, listed clockwise!
-    for i in xrange(len(P[:-1])):
+    for i in range(len(P[:-1])):
         p, q = P[i], P[i+1]
         if not _isRightTurn((p, q, r)):
             return 0 # Out!        
@@ -73,7 +73,7 @@ def convexHull(P):
     for p in P:
         unique[p] = 1
 
-    points = unique.keys()
+    points = list(unique.keys())
     points.sort()
 
     # Build upper half of the hull.

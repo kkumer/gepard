@@ -52,7 +52,7 @@ th.m.parameters.update(KKunp5)
 
 models = [th, tDR, tDR1]
 
-print "Calculating predictions for HERMES ..."
+print("Calculating predictions for HERMES ...")
 
 kins = [
 (0.118, 0.097,  2.505),

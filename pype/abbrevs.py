@@ -187,7 +187,7 @@ L4_ALTI_0 = utils.select(data[74], criteria=['FTn==0'])[:-1]
 L4_ALTI_m1 = utils.select(data[74], criteria=['FTn==-1'])[:-1]
 L4_ALTBHDVCS_0 = utils.select(data[73], criteria=['FTn==0'])[:-1]
 
-bins = zip(L4_ALUI, L4_AC_0, L4_AC_1, L4_AUL, L4_ALL_0, 
+bins = list(zip(L4_ALUI, L4_AC_0, L4_AC_1, L4_AUL, L4_ALL_0, 
         L4_ALL_1, L4_AUTI_1, L4_AUTI_0, L4_AUTI_m1, L4_AUTDVCS,
-        L4_ALTI_m1, L4_ALTI_0, L4_ALTI_1, L4_ALTBHDVCS_0)
+        L4_ALTI_m1, L4_ALTI_0, L4_ALTI_1, L4_ALTBHDVCS_0))
 

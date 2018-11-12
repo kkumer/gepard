@@ -107,9 +107,9 @@ class SupervisedDataSetTransformed(SupervisedDataSet):
                 totalError += e
                 ponderation += len(target)
                 if verbose:
-                    print     'out:    ', fListToString( list( res ) )
-                    print     'correct:', fListToString( target )
-                    print     'error: % .8f' % e
+                    print('out:    ', fListToString( list( res ) ))
+                    print('correct:', fListToString( target ))
+                    print('error: % .8f' % e)
         else:
             # we are training netC (giving subtraction constant) so CFFs are
             # read from trans.memory
@@ -125,7 +125,7 @@ class SupervisedDataSetTransformed(SupervisedDataSet):
                 totalError += e
                 ponderation += len(target)
                 if verbose:
-                    print     'out:    ', fListToString( list( res ) )
-                    print     'correct:', fListToString( target )
-                    print     'error: % .8f' % e
+                    print('out:    ', fListToString( list( res ) ))
+                    print('correct:', fListToString( target ))
+                    print('error: % .8f' % e)
         return totalError, ponderation                

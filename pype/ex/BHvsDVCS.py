@@ -121,7 +121,7 @@ def ggrid(kin):
     f = open(title.split()[0]+'-gamma.dat', 'w')
     gammas = np.linspace(0.01, gmax, 150)
     dvcss = np.array([xsPart('DVCS', xB, Q2, om1=E1, om2=E2, gamma=g) for g in gammas])
-    z = zip(gammas, dvcss)
+    z = list(zip(gammas, dvcss))
     for it in z:
         f.write('%s  %s\n' % it)
     f.close()
@@ -132,7 +132,7 @@ def tgrid(kin):
     f = open(title.split()[0]+'-t.dat', 'w')
     ts = np.linspace(tmin(Q2, xB), -1.0, 100)
     dvcss = np.array([xsPart('DVCS', xB, Q2, om1=E1, om2=E2, t=itt) for itt in ts])
-    z = zip(ts, dvcss)
+    z = list(zip(ts, dvcss))
     for it in z:
         f.write('%s  %s\n' % it)
     f.close()
@@ -165,4 +165,4 @@ for n in range(4):
 fig.canvas.draw()
 fig.show()
 
-raw_input('press ENTER to end')
+input('press ENTER to end')

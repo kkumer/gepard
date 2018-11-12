@@ -246,7 +246,7 @@ Example:
         sys.stdout.write(usage)
         sys.exit(1)
     if args[-1] <= 2*3.141592:
-        lst = apply(XSall, args)
+        lst = XSall(*args)
         lst.insert(0, args[-1])
         if args[0] > 5:
             sys.stdout.write("%.3f  %.14f  % .14f  % .14f  % .14f\n" % tuple(lst))
@@ -259,7 +259,7 @@ Example:
         for k in range(npts):
             phi = 2*pi*k / (npts-1)
             args[-1] = phi
-            lst = apply(XSall, args)
+            lst = XSall(*args)
             lst.insert(0, phi)
             if args[0] > 5:
                 sys.stdout.write("%.3f  %.14f  % .14f  % .14f  % .14f\n" % tuple(lst))

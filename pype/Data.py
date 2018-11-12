@@ -33,13 +33,13 @@ class DummyPoint(object):
 
     def has_key(self, name):
         """Does point (or dataset) have attribute `name`?"""
-        if self.__dict__.has_key(name):
+        if name in self.__dict__:
             return True
         return False
 
     def keys(self):
         """Simulate dictionary."""
-        return self.__dict__.keys()
+        return list(self.__dict__.keys())
 
     def to_conventions(self, approach):
         approach.to_conventions(self)
@@ -125,7 +125,7 @@ class DataPoint(DummyPoint):
         # 2c. y-axis 
         self.val = gridline[int(self.y1value.split('column')[1])-1]
         # 2d. y-axis errors
-        if self.has_key('y1error'):  # we are given total error already
+        if 'y1error' in self:  # we are given total error already
             self.err = gridline[int(self.y1error.split('column')[1])-1]
             self.errplus = self.err
             self.errminus = self.err
@@ -145,29 +145,29 @@ class DataPoint(DummyPoint):
             varminus = 0
             varnorm = 0
             # 1. statistical error
-            if self.has_key('y1errorstatistic'):
+            if 'y1errorstatistic' in self:
                 es = gridline[int(self.y1errorstatistic.split('column')[1])-1]**2
                 varstat += es
                 varsym  += es
-            if self.has_key('y1errorstatisticplus'):
+            if 'y1errorstatisticplus' in self:
                 ep = gridline[int(self.y1errorstatisticplus.split('column')[1])-1]**2
                 em = gridline[int(self.y1errorstatisticminus.split('column')[1])-1]**2
                 varstat += max(ep, em)
                 varplus  += ep
                 varminus += em
             # 2. systematic error
-            if self.has_key('y1errorsystematic'):
+            if 'y1errorsystematic' in self:
                 es = gridline[int(self.y1errorsystematic.split('column')[1])-1]**2
                 varsyst += es
                 varsym  += es
-            if self.has_key('y1errorsystematicplus'):
+            if 'y1errorsystematicplus' in self:
                 ep = gridline[int(self.y1errorsystematicplus.split('column')[1])-1]**2
                 em = gridline[int(self.y1errorsystematicminus.split('column')[1])-1]**2
                 varsyst += max(ep, em)
                 varplus  += ep
                 varminus += em
 	    # 3. normalization error (specified as percentage)
-            if self.has_key('y1errornormalization'):
+            if 'y1errornormalization' in self:
                 varnorm += (self.y1errornormalization * self.val)**2
             # 4. TOTAL errors
             self.errplus = math.sqrt(varsym + varplus + varnorm)
@@ -183,12 +183,12 @@ class DataPoint(DummyPoint):
         utils.fill_kinematics(self)
         # 2f. polarizations
         # Unpolarized in1 particle
-        if not self.has_key('in1polarization'):
+        if 'in1polarization' not in self:
             self.in1polarization = 0
         # For transversaly polarized target set, if needed and
         # if not already set, by default take dominant sine-varphi harmonic
-        if (self.has_key('in2polarizationvector') and self.in2polarizationvector == 'T' and 
-                not self.has_key('varFTn')):
+        if ('in2polarizationvector' in self and self.in2polarizationvector == 'T' and 
+                'varFTn' not in self):
             self.varFTn = -1
         return
 
@@ -278,20 +278,20 @@ class DataSet(list):
     def __getitem__(self, key):
         # From https://stackoverflow.com/questions/2936863/
         if isinstance(key, slice):
-            lst = [self[k] for k in xrange(*key.indices(len(self)))]
+            lst = [self[k] for k in range(*key.indices(len(self)))]
             tmp = DataSet(lst)
             tmp.__dict__ = self.__dict__.copy() # transfer the attributes
             return tmp
         elif isinstance(key, int):
             return list.__getitem__(self, key)
         else:
-            raise TypeError, "Invalid argument type."
+            raise TypeError("Invalid argument type.")
 
     def __getslice__(self, start, end):
         # This is called by [:], while [::] calls __getitem__()
         if start >= len(self):
-            raise IndexError, """%s has only %d items and your slice 
-                starts at %d""" % (self, len(self), start)
+            raise IndexError("""%s has only %d items and your slice 
+                starts at %d""" % (self, len(self), start))
         return DataSet(self[start:end:None])
 
 

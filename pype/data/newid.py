@@ -37,6 +37,6 @@ for file in datafiles:
 
 ids.sort()
 
-print "Used ids are: "
-print ids
-print "So first unused is: [ %d ]" % (ids[-1]+1,)
+print("Used ids are: ")
+print(ids)
+print("So first unused is: [ %d ]" % (ids[-1]+1,))
