@@ -4,8 +4,8 @@
 import sys, logging
 
 # Loading pybrain classes whose methods need overriding
-from pybrain.datasets import SupervisedDataSet
-from pybrain.supervised import BackpropTrainer, RPropMinusTrainer
+from pybrain3.datasets import SupervisedDataSet
+from pybrain3.supervised import BackpropTrainer, RPropMinusTrainer
 
 _lg = logging.getLogger('p.%s' % __name__)
 

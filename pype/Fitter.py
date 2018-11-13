@@ -23,7 +23,7 @@ _lg.setLevel(logging.WARNING)
 #_lg = logging.Logger('A.F')
 #_lg.addHandler(logging.StreamHandler())
 
-from pybrain.tools.shortcuts import buildNetwork
+from pybrain3.tools.shortcuts import buildNetwork
 import brain
 import trans  # output layer transformation for FitterBrain
 import utils

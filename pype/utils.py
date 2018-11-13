@@ -47,8 +47,8 @@ def loaddata(datadir='data', approach=False):
     """
     data = {}
     for file in os.listdir(datadir):
-        _lg.debug('Loading datafile %s' % file)
         if os.path.splitext(file)[1] == ".dat":
+            _lg.debug('Loading datafile %s' % file)
             dataset = Data.DataSet(datafile=os.path.join(datadir, file))
             if approach and dataset.process == 'ep2epgamma':
                 [pt.to_conventions(approach) for pt in dataset]
@@ -157,7 +157,8 @@ def parse(datafile):
         # only lines with '=' (premble) or with numbers only (data grid) are parsed
         if re.search(r'=', dataFileLine):
             # converting preamble line into dictionary item
-            desctpl = tuple(map(string.strip,string.split(dataFileLine,"=")))
+            #desctpl = tuple(map(string.strip,string.split(dataFileLine,"=")))
+            desctpl = tuple([s.strip() for s in dataFileLine.split("=")])
             desc[desctpl[0]] = desctpl[1] 
         if re.match(r'([ \t]*[-\.\d]+[ \t\r]+)+', dataFileLine):
             # FIXME: TAB-delimited columns are not handled! Only spaces are OK.
@@ -189,7 +190,10 @@ def str2num(s):
     http://mail.python.org/pipermail/tutor/2003-November/026136.html
     """
 
-    return ("." in s and [float(s)] or [int(s)])[0]
+    if "." in s:
+        return float(s) 
+    else:
+        return int(s)
 
 
 def prettyprint(all_numbers):

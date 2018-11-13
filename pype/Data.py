@@ -24,22 +24,15 @@ from constants import Mp, Mp2
 
 _lg = logging.getLogger('p.%s' % __name__)
 
-class DummyPoint(object):
+class DummyPoint(dict):
     """This is only used for creating simple DataPoint-like objects"""
 
     def __init__(self, init=None):
+        # from https://stackoverflow.com/questions/4984647/
+        super(DummyPoint, self).__init__()
+        self.__dict__ = self
         if init:
-            self.__dict__.update(init)
-
-    def has_key(self, name):
-        """Does point (or dataset) have attribute `name`?"""
-        if name in self.__dict__:
-            return True
-        return False
-
-    def keys(self):
-        """Simulate dictionary."""
-        return list(self.__dict__.keys())
+            self.update(init)
 
     def to_conventions(self, approach):
         approach.to_conventions(self)
@@ -83,7 +76,7 @@ class DataPoint(DummyPoint):
     For user's and programmer's convenience, these `dataset` attributes 
     are also inherited by `DataPoint` objects, so 
         point.dataset.yaxis == point.yaxis 
-    (Is this type of ineritance, know also as "aquisition", good idea?)
+    (Is this type of inheritance, know also as "aquisition", good idea?)
 
     """ 
 
@@ -101,15 +94,17 @@ class DataPoint(DummyPoint):
         `dataset` is container `DataSet` that is to contain this `DataPoint`
         FIXME: this passing of higher-level DataSet as argument sounds wrong!
                 (See comment about aquisition in class docstring.|
-
-        FIXME: Should DataPoint be subclas of dict?
         """
 
+        # from https://stackoverflow.com/questions/4984647/
+        # we want accessibility via both attributes and dict keys
+        super(DataPoint, self).__init__()
+        self.__dict__ = self
         # 1. Put reference to container into attribute
         self.dataset = dataset
         # 2. Put data into attributes
         # 2a. first acquire also attributes of parent DataSet
-        self.__dict__.update(dataset.__dict__)
+        self.update(dataset.__dict__)
         # 2b. x-axes
         for name in self.xnames:
             nameindex = int(name[1:].split('name')[0])  # = 1, 0, 2, ...
@@ -192,8 +187,8 @@ class DataPoint(DummyPoint):
             self.varFTn = -1
         return
 
-    def __repr__(self):
-        return "DataPoint: " + self.yaxis + " = " + str(self.val)
+    # def __repr__(self):
+        # return "DataPoint: " + self.yaxis + " = " + str(self.val)
 
 
 class DataSet(list):

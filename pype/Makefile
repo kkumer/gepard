@@ -113,7 +113,7 @@ $(TESTTARGETS) $(MMATARGETS):
 
 
 optModel.so: optModel.f
-	f2py2 --fcompiler=$(FC) -c -m optModel $^ 
+	f2py --fcompiler=$(FC) -c -m optModel $^ 
 
 .PHONY: clean 
 clean:
