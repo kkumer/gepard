@@ -187,8 +187,8 @@ class DataPoint(DummyPoint):
             self.varFTn = -1
         return
 
-    # def __repr__(self):
-        # return "DataPoint: " + self.yaxis + " = " + str(self.val)
+    def __repr__(self):
+        return "DataPoint: " + self.yaxis + " = " + str(self.val)
 
 
 class DataSet(list):

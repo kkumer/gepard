@@ -30,26 +30,26 @@ mGepard.parameters.update(DM12)
 
 
 # testing data point for hotfixedBMK
-pt0 = copy.deepcopy(data[31][12])  # was data[1][0]
+pt0 = data[31][12].copy()
 pt0.in1polarization = 1
 pt0.in1charge = -1
 pt0.FTn = -1
 pt0.prepare(Approach.hotfixedBMK)
 
 # testing data point for BM10
-pt1 = copy.deepcopy(data[33][-1])
+pt1 = data[33][-1].copy()
 pt1.in2polarization = 1
 pt1.phi = 2.*np.pi/5.
 pt1.prepare(Approach.BM10)
 
 # testing data points for BM10 and long. TSA and BTSA
-ptt = copy.deepcopy(data[52][6])
+ptt = data[52][6].copy()
 ptt.prepare(Approach.BM10)
-ptb = copy.deepcopy(data[53][3])
+ptb = data[53][3].copy()
 ptb.prepare(Approach.BM10)
 
 # testing data point for transversal TSA in BMK
-pttrans = copy.deepcopy(ptt)
+pttrans = ptt.copy()
 pttrans.phi = 0.5
 pttrans.in2polarizationvector = 'T'
 pttrans.varFTn = 1
