@@ -45,7 +45,7 @@ class Model(object):
         """
         self.optimization = kwargs.pop('optimization', False)
         # Intially all parameters are fixed and should be released by user
-        exec('fixed = {' + ", ".join(["'fix_%s': %s" % x for x in zip(self.parameter_names, len(self.parameter_names)*['True'])]) + '}')
+        fixed = {'fix_{}'.format(p):True for p in self.parameter_names}
         # FIXME: duplication of stuff: parameters and ndparameters!
         self.parameters.update(fixed)
         # right-pad with zeros to the array of 50 elements 
