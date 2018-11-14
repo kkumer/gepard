@@ -10,4 +10,5 @@
 **/ex/fit_*.py
 
 **/*sublime-workspace
-**/*ipynb_checkpoints
+**/*.ipynb
+**/*.ipynb_checkpoints

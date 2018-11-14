@@ -487,9 +487,9 @@ class hubDict(dict):
         except KeyError:
             return self.d2.popitem()
 
-    def __repr__(self):
-        return 'First: %s\nSecond: %s' % (
-                self.d1.__repr__(), self.d2.__repr__())
+    # def __repr__(self):
+        # return 'First: %s\nSecond: %s' % (
+                # self.d1.__repr__(), self.d2.__repr__())
 
 
 def _fakecolor(a, b):
