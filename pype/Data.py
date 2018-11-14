@@ -44,7 +44,9 @@ class DummyPoint(dict):
 
     def copy(self):
         # Do we need copy.deepcopy?
-        return copy.copy(self)
+        new = copy.copy(self)
+        new.__dict__ = new
+        return new
 
 class DataPoint(DummyPoint):
 

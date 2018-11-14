@@ -1,6 +1,6 @@
 #from IPython.Debugger import Tracer; debug_here = Tracer()
 
-import copy
+import copy, logging
 
 from numpy import sin, cos, pi, sqrt, array, linspace, ndarray, transpose
 from scipy.special import gammainc
@@ -9,6 +9,9 @@ import pandas as pd
 
 import utils, quadrature, Data
 from constants import *
+
+# _lg = logging.getLogger('p.%s' % __name__)
+# _lg.debug('Loading module %s' % __name__)
 
 # FIXME: This looks nonpythonic, see static class variables
 errtypes =  ['err', 'errminus', 'errplus', 'errstat', 'errsyst', 'errnorm']
