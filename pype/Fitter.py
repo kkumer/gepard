@@ -46,34 +46,29 @@ class FitterMinuit(Fitter):
         self.theory = theory
         self.printMode = 0
 
-        # FIXME: ugly hack because Minuit counts the arguments of fcn so 'self'
-        #        is not allowed
-        # fcnargs = "NS, alS, ..."
-        # pardict = "'NS': NS, 'alS': alS, ..."
-        fcnargs = ", ".join(theory.model.parameter_names) 
-        pardict = ", ".join(["'%s': %s" % x for x in zip(theory.model.parameter_names, theory.model.parameter_names)])
-        exec(
-"""
-def fcn(%s):
-    theory.model.parameters.update({%s})
-    new = [%s]
-    if theory.model.__dict__.has_key('Gepard'):
-        theory.model.ndparameters.put(range(theory.model.DR.ndparameters.size), new[:50])
-    else:
-        theory.model.ndparameters.put(range(theory.model.ndparameters.size), new)
-    chisq = 0.
-    for pt in fitpoints:
-        chisq = chisq + (
-                (getattr(theory, pt.yaxis)(pt) - pt.val)**2 / pt.err**2 )
-    return chisq
-""" % (fcnargs, pardict, fcnargs), locals(),locals())
+        def fcn(p):
+            """Cost function for minimization - chi-square."""
+            for n, pname in enumerate(theory.model.parameter_names):
+                # FIXME: only non-fixed should be treated here; or total np array
+                theory.model.parameters[pname] = p[n]
+            if 'Gepard' in theory.model.__dict__:
+                theory.model.ndparameters.put(range(theory.model.DR.ndparameters.size), p[:50])
+            else:
+                theory.model.ndparameters.put(range(theory.model.ndparameters.size), p)
+            chisq = 0
+            for pt in fitpoints:
+                chisq += (getattr(theory, pt.yaxis)(pt) - pt.val)**2 / pt.err**2 
+            return chisq
+
         if isinstance(theory.model.parameters, utils.hubDict):
             # This is needed because in Python <=2.5 ** operator
             # requires dict as an argument, i.e. my hubDict wouldn't work:
             auxdict = dict((it for it in list(theory.model.parameters.items())))
-            self.minuit = Minuit(fcn, **auxdict)
+            self.minuit = Minuit(fcn, use_array_call=True, errordef=1, 
+                    forced_parameters=theory.model.parameter_names, **auxdict)
         else:
-            self.minuit = Minuit(fcn, **theory.model.parameters)
+            self.minuit = Minuit(fcn, use_array_call=True, errordef=1, 
+                    forced_parameters=theory.model.parameter_names, **theory.model.parameters)
         for key in kwargs:
             setattr(self.minuit, key, kwargs[key])
         Fitter.__init__(self, **kwargs)

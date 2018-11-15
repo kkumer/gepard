@@ -48,7 +48,7 @@ def loaddata(datadir='data', approach=False):
     data = {}
     for file in os.listdir(datadir):
         if os.path.splitext(file)[1] == ".dat":
-            _lg.debug('Loading datafile %s' % file)
+            # _lg.debug('Loading datafile %s' % file)
             dataset = Data.DataSet(datafile=os.path.join(datadir, file))
             if approach and dataset.process == 'ep2epgamma':
                 [pt.to_conventions(approach) for pt in dataset]

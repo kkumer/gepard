@@ -3,6 +3,11 @@ import copy
 from nose.tools import *
 import numpy as np
 
+
+import logging 
+mpl_logger = logging.getLogger('matplotlib') 
+mpl_logger.setLevel(logging.WARNING)
+
 import utils, Model, Approach, Fitter
 from results import DMGLO1, DMepsGLO1  #use some testpars here?
 
