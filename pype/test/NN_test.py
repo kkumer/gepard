@@ -43,6 +43,5 @@ def test_fitNN():
 
 # Actually this test was broken by Approach.observables consolidation
 test_fitNN.long = 1
-test_basicNN.py3fail=1
 
 #db.close()
