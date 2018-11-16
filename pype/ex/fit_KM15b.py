@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 
 import shelve, logging
 logging.basicConfig(level=logging.INFO)

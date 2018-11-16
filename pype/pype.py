@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 
 import shelve, copy, sys, logging, builtins
 import numpy as np
