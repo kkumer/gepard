@@ -43,7 +43,7 @@ else:
     sys.exit(1)
 
 
-print "Calculating predictions for HERMES with recoil ..."
+print("Calculating predictions for HERMES with recoil ...")
 
 kins = [
 (0.102, 2.640, -0.130),

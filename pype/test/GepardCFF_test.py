@@ -50,7 +50,7 @@ def test_CFF():
     pt.xi = 0.01
     t.m.g.parint.p = 0
     t.m.g.init()
-    print (m.ReH(pt), m.ImH(pt))
+    print((m.ReH(pt), m.ImH(pt)))
     assert_almost_equal(m.ImH(pt)/100, 66.5255/100, 4)
     assert_almost_equal(m.ReH(pt)/100, 26.9984/100, 4)
 

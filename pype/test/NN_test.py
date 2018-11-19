@@ -5,7 +5,7 @@ import shelve, numpy
 import utils, Model, Approach, Fitter
 
 data = utils.loaddata('data/ep2epgamma', approach=Approach.hotfixedBMK)  
-db = shelve.open('theories.db')
+db = shelve.open('theories.db', 'r')
 
 
 # testing data set
@@ -41,4 +41,3 @@ def test_fitNN():
 # Actually this test was broken by Approach.observables consolidation
 test_fitNN.long = 1
 
-db.close()

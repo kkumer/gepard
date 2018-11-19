@@ -7,7 +7,7 @@ import shelve
 #from utils import listdb
 from abbrevs import *
 
-db = shelve.open('theories.db')
+db = shelve.open('theories.db', 'r')
 
 def test_KM09a():
     """Test model: KM09a"""
@@ -25,7 +25,7 @@ def test_KM09b():
     chisq = th.chisq(pts)[0]
     assert_almost_equal(chisq, 33.36747338543438)
 
-#test_KM09b.long = 1
+test_KM09b.long = 1
 
 def test_KM10():
     """Test model: KM10"""
@@ -71,3 +71,4 @@ def test_KMM12():
     assert_almost_equal(chisq, 123.53321520926985)
 
 test_KMM12.long = 1
+

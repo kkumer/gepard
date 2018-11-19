@@ -7,7 +7,7 @@ and parameter values can calculate observables.
 
 """
 
-from __future__ import division
+
 #from IPython.core.debugger import set_trace
 import pickle, sys, logging
 
@@ -17,7 +17,7 @@ import scipy.stats
 from scipy.special import j0, j1, gamma, beta
 
 from quadrature import PVquadrature, bquadrature, rthtquadrature
-from utils import flatten, hubDict, stringcolor
+from utils import flatten, hubDictNew, stringcolor
 from constants import tolerance2, GeVfm, Mp
 import dispersion as DR
 
@@ -45,8 +45,7 @@ class Model(object):
         """
         self.optimization = kwargs.pop('optimization', False)
         # Intially all parameters are fixed and should be released by user
-        exec('fixed = {' + ", ".join(map(lambda x: "'fix_%s': %s" % x, 
-                    zip(self.parameter_names, len(self.parameter_names)*['True']))) + '}')
+        fixed = {'fix_{}'.format(p):True for p in self.parameter_names}
         # FIXME: duplication of stuff: parameters and ndparameters!
         self.parameters.update(fixed)
         # right-pad with zeros to the array of 50 elements 
@@ -108,7 +107,7 @@ class Model(object):
                 row = '%5s -> %-g,' % (name, value)
             else:
                 row = '%5s -> %-5.3g' % (name, value)
-            if self.parameters.has_key('limit_'+name):
+            if 'limit_'+name in self.parameters:
                 lo, hi = self.parameters['limit_'+name]
                 if (abs((lo-value)*(hi-value)) < 0.001):
                     row = stringcolor(row, 'red', colors)
@@ -136,7 +135,7 @@ class Model(object):
                 row += app
             row += '\n'
             s += row
-        print s
+        print(s)
 
     def print_parameters_fortran(self, output=sys.stdout):
         """Print model parameters in Fortran form
@@ -165,9 +164,9 @@ class Model(object):
             err = sqrt(tolerance2)*sqrt(self.covariance[p,p])
             if pvalues:
                 pval = 2*(1.-scipy.stats.t.cdf(abs(val/err), ndof))
-                print '%5s = %8.3f +- %5.3f  (p = %.3g)' % (p, val, err, pval)
+                print('%5s = %8.3f +- %5.3f  (p = %.3g)' % (p, val, err, pval))
             else:
-                print '%5s = %8.3f +- %5.3f' % (p, val, err)
+                print('%5s = %8.3f +- %5.3f' % (p, val, err))
 
     def print_covariance(self, colors=True, correlations=False):
         """Pretty-print covariance matrix
@@ -336,13 +335,13 @@ class ComptonFormFactors(Model):
 
     def print_CFFs(self, pt, format=None):
         """Print values of CFFs at given kinematic point."""
-        vals = map(lambda cff: getattr(self, cff)(pt), self.allCFFs)
+        vals = [getattr(self, cff)(pt) for cff in self.allCFFs]
         if format == 'mma':
             s = "{" + 8*"%s -> %f, "
             s = s[:-2] + "}"
         else:
             s = 8*"%4s = %5.2f\n"
-        print s % flatten(tuple(zip(self.allCFFs, vals)))
+        print(s % flatten(tuple(zip(self.allCFFs, vals))))
 
 
     # Initial definition of all CFFs. All just return zero.
@@ -1246,7 +1245,7 @@ class ComptonNeuralNets(Model):
             return self.CFF
                 #and self.useDR \
         #elif hasattr(self, 'useDR') \
-        elif self.__dict__.has_key('useDR') \
+        elif 'useDR' in self.__dict__ \
                 and object.__getattribute__(self, 'useDR') \
                 and name in object.__getattribute__(self, 'useDR'):
             self.curname = name
@@ -1260,13 +1259,13 @@ class ComptonNeuralNets(Model):
             self.curname = name
             return self.zero
         elif name in ['endpointpower', 'optimization', 'useDR']:
-            if self.__dict__.has_key(name):
+            if name in self.__dict__:
                 return self.__dict__[name]
             else:
                 return None
         else:
             #syst.stderr.write('Possibly caught exception: AttErr: $s\n' % name)
-            raise AttributeError, name
+            raise AttributeError(name)
 
     #def zero(self, *args, **kwargs):
         #return 0
@@ -1284,7 +1283,7 @@ class ComptonNeuralNets(Model):
         for netC in self.netsC:
             ar.append(netC.activate([pt.t])[0])
         all = array(ar).flatten()
-        if self.parameters.has_key('nnet'):
+        if 'nnet' in self.parameters:
             if self.parameters['nnet'] == 'ALL':
                 return all
             elif self.parameters['nnet'] == 'AVG':
@@ -1293,7 +1292,7 @@ class ComptonNeuralNets(Model):
                 try:
                     return all[self.parameters['nnet']]
                 except IndexError:
-                    raise IndexError, str(self)+' has only '+str(len(self.netsC))+' nets!'
+                    raise IndexError(str(self)+' has only '+str(len(self.netsC))+' nets!')
         # by default, we get mean value (FIXME:this should never occurr?)
         else:
             _lg.debug('FIXME: This line should never be reached')
@@ -1337,7 +1336,7 @@ class ComptonNeuralNets(Model):
             elif self.curname in ['ReHt', 'ReEt']:
                 return DR.intANN(self.__getattr__('Im'+self.curname[2:]), pt)
             else:
-                raise ValueError, 'Only Re(CFF) can be calculated via disp. rel.'
+                raise ValueError('Only Re(CFF) can be calculated via disp. rel.')
         ind = self.output_layer.index(self.curname)
         if isinstance(xi, ndarray) and len(self.nets)>0:
             # function was called with third argument that is xi nd array
@@ -1366,7 +1365,7 @@ class ComptonNeuralNets(Model):
                 else:
                     ar.append(net.activate([xB, pt.t])[ind])
             all = array(ar).flatten()
-            if self.parameters.has_key('nnet'):
+            if 'nnet' in self.parameters:
                 if self.parameters['nnet'] == 'ALL':
                     res.append(all)
                 elif self.parameters['nnet'] == 'AVG':
@@ -1375,7 +1374,7 @@ class ComptonNeuralNets(Model):
                     try:
                         res.append(all[self.parameters['nnet']])
                     except IndexError:
-                        raise IndexError, str(self)+' has only '+str(len(self.nets))+' nets!'
+                        raise IndexError(str(self)+' has only '+str(len(self.nets))+' nets!')
             # by default, we get mean value (FIXME:this should never occurr?)
             else:
                 res.append(all.mean())
@@ -1412,7 +1411,7 @@ class ComptonNeuralNets(Model):
             for net in self.nets:
                 ar.append(0.)
             all = array(ar).flatten()
-            if self.parameters.has_key('nnet'):
+            if 'nnet' in self.parameters:
                 if self.parameters['nnet'] == 'ALL':
                     res.append(all)
                 elif self.parameters['nnet'] == 'AVG':
@@ -1581,7 +1580,7 @@ class ComptonGepard(ComptonFormFactors):
                  46 : 'PD'})
         elif ansatz not in ['FIT', 'FIT14', 'FITEXP', 'EPH', 'EPHEXP', 'EFL', 
                 'EFLEXP', 'HOUCHE', 'NSPHOU', 'NSMHOU','TEST']:
-            raise ValueError, "Invalid ansatz: %s\n" % ansatz
+            raise ValueError("Invalid ansatz: %s\n" % ansatz)
         
         if ansatz == 'FITEXP':
             self.parameters['ALPS'] = 0.0   # like in smallx.nb
@@ -1663,7 +1662,7 @@ class ComptonGepard(ComptonFormFactors):
         # We have to remove unpicklable gepard module object
         _lg.debug('Shelving [ComptonGepard] %s.\n' % str(self))
         del self.g
-        if self.kwargs.has_key('newgepard'):
+        if 'newgepard' in self.kwargs:
             _lg.warning("Model with newgepard atribute saved. It will consume one GepardPool module when restored.\n")
         return self.__dict__
 
@@ -1875,7 +1874,7 @@ class ComptonGepard(ComptonFormFactors):
         FIXME: some ugly coding here.
         """
         if not isinstance(r, ndarray):
-            assert isinstance(r, (int, long, float)) 
+            assert isinstance(r, (int, float)) 
             ra = array([r])
         else:
             ra = r
@@ -1990,7 +1989,7 @@ class ComptonHybrid(ComptonFormFactors):
         self.DR.ndparameters[0] = 0.  # sea comes from Gepard part
         #self.parameters = hubDict(self.Gepard.parameters, self.DR.parameters)
         #self.parameter_names = self.Gepard.parameter_names + self.DR.parameter_names
-        self.parameters = hubDict(self.DR.parameters, self.Gepard.parameters)
+        self.parameters = hubDictNew(self.DR.parameters, self.Gepard.parameters)
         self.parameter_names = self.DR.parameter_names + self.Gepard.parameter_names
 
         self.g = self.Gepard.g

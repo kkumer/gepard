@@ -1,6 +1,6 @@
 #from IPython.Debugger import Tracer; debug_here = Tracer()
 
-import copy
+import copy, logging
 
 from numpy import sin, cos, pi, sqrt, array, linspace, ndarray, transpose
 from scipy.special import gammainc
@@ -9,6 +9,9 @@ import pandas as pd
 
 import utils, quadrature, Data
 from constants import *
+
+# _lg = logging.getLogger('p.%s' % __name__)
+# _lg.debug('Loading module %s' % __name__)
 
 # FIXME: This looks nonpythonic, see static class variables
 errtypes =  ['err', 'errminus', 'errplus', 'errstat', 'errsyst', 'errnorm']
@@ -91,10 +94,10 @@ class Approach(object):
             P = sum(allpulls)/sqrt(npts)
             # FIXME: CLUDGE to print pull in Trento convention (should be done by from_conventions)
             pt = points[0]
-            if pt.has_key('frame') and pt.frame == 'Trento' and pt.has_key('FTn'):
+            if 'frame' in pt and pt.frame == 'Trento' and 'FTn' in pt:
                 if pt.FTn == 1 or pt.FTn == 3 or pt.FTn == -2:
                     P = - P
-            if pt.has_key('frame') and pt.frame == 'Trento' and pt.has_key('varFTn'):
+            if 'frame' in pt and pt.frame == 'Trento' and 'varFTn' in pt:
                 if pt.varFTn == 1 or pt.varFTn == -1:
                     P = - P
             return chi/npts, P, npts
@@ -120,7 +123,7 @@ class Approach(object):
             self.m.parameters[parname] = val
             self.m.ndparameters[self.m.parameter_names.index(parname)] = val
             chi, dof, fitprob = self.chisq(points)
-            print '%s  ->  %s' % (val, chi)
+            print('%s  ->  %s' % (val, chi))
         self.m.parameters[parname] = mem  # restore original value
         self.m.ndparameters[self.m.parameter_names.index(parname)] = mem
 
@@ -128,16 +131,16 @@ class Approach(object):
     def print_chisq(self, points, pulls=False, **kwargs):
         """Pretty-print the chi-square."""
         if pulls:
-            print self.chisq(points, pulls=True, **kwargs)
-        print 'P(chi-square, d.o.f) = P(%1.2f, %2d) = %5.4f' % self.chisq(points, **kwargs)
+            print(self.chisq(points, pulls=True, **kwargs))
+        print('P(chi-square, d.o.f) = P(%1.2f, %2d) = %5.4f' % self.chisq(points, **kwargs))
 
 
     def df_CFFs(self, pt, compare_with=[]):
         """Return pandas dataframe of CFFs at given kinematic point."""
-        data = [map(lambda cff: getattr(self.m, cff)(pt), self.m.allCFFsb)]
+        data = [[getattr(self.m, cff)(pt) for cff in self.m.allCFFsb]]
         names = [self.name]
         for th in compare_with:
-            data.append(map(lambda cff: getattr(th.m, cff)(pt), th.m.allCFFsb))
+            data.append([getattr(th.m, cff)(pt) for cff in th.m.allCFFsb])
             names.append(th.name)
         df = pd.DataFrame(transpose(data),
                 index=self.m.allCFFsb, columns=names)
@@ -159,12 +162,12 @@ class Approach(object):
 
         """
         m = self.model
-        if kwargs.has_key('observable'):
+        if 'observable' in kwargs:
             obs = kwargs['observable']
         else:
             obs = pt.yaxis
 
-        if kwargs.has_key('parameters'):
+        if 'parameters' in kwargs:
             old = m.parameters.copy()
             m.parameters.update(kwargs['parameters'])
         #elif isinstance(m, Model.ComptonNeuralNets):
@@ -196,10 +199,10 @@ class Approach(object):
                     h=sqrt(m.covariance[p,p])
                     mem = m.parameters[p]
                     m.parameters[p] = mem+h/2.
-                    if self.model.__dict__.has_key('g'): self.m.g.newcall = 1
+                    if 'g' in self.model.__dict__: self.m.g.newcall = 1
                     up = fun(pt)
                     m.parameters[p] = mem-h/2.
-                    if self.model.__dict__.has_key('g'): self.m.g.newcall = 1
+                    if 'g' in self.model.__dict__: self.m.g.newcall = 1
                     down = fun(pt)
                     m.parameters[p] = mem
                     dfdp[p] = (up-down)/h
@@ -226,13 +229,13 @@ class Approach(object):
                     # one sigma
                     result = (allnets.mean(), allnets.std())
         else:
-            if self.model.__dict__.has_key('g'): self.m.g.newcall = 1
+            if 'g' in self.model.__dict__: self.m.g.newcall = 1
             result = fun(pt)
             if isinstance(result, ndarray):
                 # we have neural net
                 result = result.mean()
 
-        if kwargs.has_key('parameters'):
+        if 'parameters' in kwargs:
             # restore old values
             self.model.parameters.update(old)
 
@@ -340,20 +343,20 @@ class BMK(Approach):
             if hasattr(pt, errtype):
                 setattr(pt, 'orig'+errtype, getattr(pt,errtype))
         # C1. azimutal angle phi should be in radians.
-        if pt.has_key('phi') and pt.units['phi'][:3]=='deg':
+        if 'phi' in pt and pt.units['phi'][:3]=='deg':
             pt.phi = pt.phi * pi / 180.
             pt.newunits['phi'] = 'rad'
         # C2. phi_{Trento} -> (pi - phi_{BKM})
-        if pt.has_key('frame') and pt.frame == 'Trento':
-            if pt.has_key('phi'):
+        if 'frame' in pt and pt.frame == 'Trento':
+            if 'phi' in pt:
                 pt.phi = pi - pt.phi
-            elif pt.has_key('FTn'):
+            elif 'FTn' in pt:
                 if pt.FTn == 1 or pt.FTn == 3 or pt.FTn == -2:
                     pt.val = - pt.val
         # C3. varphi_{Trento} -> (varphi_{BKM} + pi)
-            if pt.has_key('varphi'):
+            if 'varphi' in pt:
                 pt.varphi = pt.varphi - pi
-            elif pt.has_key('varFTn'):
+            elif 'varFTn' in pt:
                 if pt.varFTn == 1 or pt.varFTn == -1:
                     pt.val = - pt.val
                 else:
@@ -380,21 +383,21 @@ class BMK(Approach):
                     err = getattr(pt, errtype)
                     setattr(pt, errtype, err*1000)
         # C2. phi_{BKM} -> (pi - phi_{Trento})
-        if pt.has_key('frame') and pt.frame == 'Trento':
-            if pt.has_key('phi'):
+        if 'frame' in pt and pt.frame == 'Trento':
+            if 'phi' in pt:
                 pt.phi = pi - pt.phi
-            elif pt.has_key('FTn'):
+            elif 'FTn' in pt:
                 if pt.FTn == 1 or pt.FTn == 3:
                     pt.val = - pt.val
         # C3. varphi_{Trento} -> (varphi_{BKM} + pi)
-            if pt.has_key('varphi'):
+            if 'varphi' in pt:
                 pt.varphi = pt.varphi + pi
-            elif pt.has_key('varFTn'):
+            elif 'varFTn' in pt:
                 if pt.varFTn == 1 or pt.varFTn == -1:
                     pt.val = - pt.val
             pt.newframe = 'Trento'
         # C1. azimutal angle phi back to degrees
-        if pt.has_key('phi') and pt.units['phi'][:3]=='deg':
+        if 'phi' in pt and pt.units['phi'][:3]=='deg':
             pt.phi = pt.phi / pi * 180.
         return pt
     from_conventions = staticmethod(from_conventions)
@@ -406,10 +409,10 @@ class BMK(Approach):
         if pt.units[pt.y1name] == 'pb/GeV^4':
             val = val*1000
         # C2. phi_{BKM} --> (pi - phi_{Trento})
-        if pt.has_key('frame') and pt.frame == 'Trento' and pt.has_key('FTn'):
+        if 'frame' in pt and pt.frame == 'Trento' and 'FTn' in pt:
             if pt.FTn == 1 or pt.FTn == 3 or pt.FTn == -2:
                 val = - val
-        if pt.has_key('frame') and pt.frame == 'Trento' and pt.has_key('varFTn'):
+        if 'frame' in pt and pt.frame == 'Trento' and 'varFTn' in pt:
             if pt.varFTn == 1 or pt.varFTn == -1:
                 val = - val
         return val
@@ -432,7 +435,7 @@ class BMK(Approach):
         pt.y = (pt.W**2 + pt.Q2 - Mp2) / (pt.s - Mp2)
         pt.eps = 2. * pt.xB * Mp / sqrt(pt.Q2)
         pt.eps2 = pt.eps**2
-        if pt.has_key('t'):
+        if 't' in pt:
             pt.J = BMK.J(pt.Q2, pt.xB, pt.t, pt.y, pt.eps2)
             pt.K2 = BMK.K2(pt.Q2, pt.xB, pt.t, pt.y, pt.eps2)
             pt.K = sqrt(pt.K2)
@@ -445,7 +448,7 @@ class BMK(Approach):
             # First option is numerical, second is analytical and faster
             #pt.intP1P2 = quadrature.Hquadrature(lambda phi: P1P2(pt, phi), 0, 2.0*pi)
             pt.intP1P2 = BMK.anintP1P2(pt)
-        if pt.has_key('phi'):
+        if 'phi' in pt:
             pt.P1P2 = BMK.P1P2(pt)
     prepare = staticmethod(prepare)
 
@@ -818,7 +821,7 @@ class BMK(Approach):
 
         """
         # Overriding pt kinematics with those from kwargs
-        if kwargs.has_key('vars'):
+        if 'vars' in kwargs:
             ptvars = Data.DummyPoint(init=kwargs['vars'])
             kin = utils.fill_kinematics(ptvars, old=pt)
             BMK.prepare(kin)
@@ -834,15 +837,15 @@ class BMK(Approach):
 
         # Copy non-kinematical info
         for atr in ['in1charge', 'in1polarization', 'in2polarization']:
-            if pt.has_key(atr):
+            if atr in pt:
                 setattr(kin, atr, getattr(pt, atr))
 
         # For efficient calculation of XS with unpolarized beam
-        if kwargs.has_key('zeropolarized') and kwargs['zeropolarized']:
+        if 'zeropolarized' in kwargs and kwargs['zeropolarized']:
             kin.in1polarization = 0
 
         # Flipping spins and/or charges for asymmetries
-        if kwargs.has_key('flip') and kwargs['flip']:
+        if 'flip' in kwargs and kwargs['flip']:
             if isinstance(kwargs['flip'], list):
                 for item in kwargs['flip']:
                     setattr(kin, item, - getattr(pt, item))
@@ -850,13 +853,13 @@ class BMK(Approach):
                 setattr(kin, kwargs['flip'], - getattr(pt, kwargs['flip']))
 
         # Weighting the integrand by BH propagators
-        if kwargs.has_key('weighted') and kwargs['weighted']:
+        if 'weighted' in kwargs and kwargs['weighted']:
             wgh = self.w(kin)
         else:
             wgh = 1
 
         # Gepard may need resetting
-        if self.model.__dict__.has_key('g'):
+        if 'g' in self.model.__dict__:
             self.m.g.newcall = 1
             self.m.g.parint.pid = 1
 
@@ -922,7 +925,7 @@ class BMK(Approach):
         """DIS F2 form factor."""
 
         # Gepard may need resetting
-        if self.model.__dict__.has_key('g'):
+        if 'g' in self.model.__dict__:
             self.m.g.parint.pid = 0
             self.m.g.newcall = 1
         res = self.m.DISF2(pt)
@@ -957,7 +960,7 @@ class BMK(Approach):
         """Partial DVCS cross section w.r.t. Mandelstam t."""
 
         eps2 = 4. * pt.xB**2 * Mp2 / pt.Q2
-        if self.model.__dict__.has_key('g'):
+        if 'g' in self.model.__dict__:
             self.m.g.parint.pid = 1
             self.m.g.newcall = 1
         ImH, ReH, ImE, ReE = self.m.ImH(pt), self.m.ReH(pt), self.m.ImE(pt), self.m.ReE(pt)
@@ -992,7 +995,7 @@ class BMK(Approach):
 
     def X(self, pt):
         """Total DVCS or DVMP cross section. """
-        if pt.has_key('t') or pt.has_key('tm'):
+        if 't' in pt or 'tm' in pt:
             # partial XS w.r.t momentum transfer t
             if hasattr(pt, 'process') and pt.process == 'gammastarp2rho0p':
                 return self._Xrhot(pt)
@@ -1001,7 +1004,7 @@ class BMK(Approach):
 
         else:
             # total XS
-            if pt.has_key('tmmax'):
+            if 'tmmax' in pt:
                 tmmax = pt.tmmax
             else:
                 tmmax = 1.  # default -t cuttoff in GeV^2
@@ -1017,10 +1020,10 @@ class BMK(Approach):
         corresponding to pt.FTn.
 
         """
-        if pt.has_key('phi') or (kwargs.has_key('vars')
-                and kwargs['vars'].has_key('phi')):
+        if 'phi' in pt or ('vars' in kwargs
+                and 'phi' in kwargs['vars']):
             return fun(pt, **kwargs)
-        elif pt.has_key('FTn'):
+        elif 'FTn' in pt:
             if pt.FTn < 0:
                 res = quadrature.Hquadrature(lambda phi:
                         fun(pt, vars={'phi':phi}, **kwargs) * sin(-pt.FTn*phi), 0, 2*pi)
@@ -1230,11 +1233,11 @@ class BMK(Approach):
 
     def BSAold(self, pt, **kwargs):
         """Calculate beam spin asymmetry (BSA) or its harmonics."""
-        if pt.has_key('phi'):
+        if 'phi' in pt:
             return self._BSA(pt, **kwargs)
-        elif pt.has_key('FTn') and pt.FTn == -1:
+        elif 'FTn' in pt and pt.FTn == -1:
             # FIXME: faster shortcut (approximate!)
-            if kwargs.has_key('vars'):
+            if 'vars' in kwargs:
                 kwargs['vars'].update({'phi':pi/2.})
             else:
                 kwargs['vars'] = {'phi':pi/2.}
@@ -1249,9 +1252,9 @@ class BMK(Approach):
 
     def BSAexact(self, pt, **kwargs):
         """Calculate beam spin asymmetry (BSA) or its harmonics."""
-        if pt.has_key('phi'):
+        if 'phi' in pt:
             return self._BSA(pt, **kwargs)
-        elif pt.has_key('FTn') and pt.FTn == -1:
+        elif 'FTn' in pt and pt.FTn == -1:
             res = quadrature.Hquadrature(lambda phi:
                     self._BSA(pt, vars={'phi':phi}) * sin(phi), 0, 2*pi)
         else:

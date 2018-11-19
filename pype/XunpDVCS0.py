@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 
 #from IPython.Debugger import Tracer; debug_here = Tracer()
 
@@ -216,6 +216,6 @@ Example:
     if len(args) != 8:
         sys.stdout.write(usage)
         sys.exit(1)
-    res = apply(cDVCS0unp, args)
+    res = cDVCS0unp(*args)
     sys.stdout.write("{}\n".format(res))
     sys.stdout.flush()

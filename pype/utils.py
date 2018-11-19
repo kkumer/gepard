@@ -11,7 +11,7 @@ flatten -- flattens tuples
 listFiles -- listfiles in subdirs matching pattern
 select -- selecting DataPoints according to criteria
 listdb --  listing the content of database of models
-hubDict -- merges two dicts, but not actually but by forwarding
+hubDictNew -- merges two dicts, but not actually but by forwarding
 stringcolor -- coloring string for output, if possible
 FTF -- Fourier series fit
 FTFMC -- Fourier series fit with MC error propagation
@@ -22,7 +22,7 @@ describe_data -- List observables in dataset.
 compare_harmonics --  
 """
 
-import os, re, string, fnmatch, itertools, logging
+import os, re, fnmatch, itertools, logging
 import numpy as np
 import pandas as pd
 
@@ -47,8 +47,8 @@ def loaddata(datadir='data', approach=False):
     """
     data = {}
     for file in os.listdir(datadir):
-        _lg.debug('Loading datafile %s' % file)
         if os.path.splitext(file)[1] == ".dat":
+            # _lg.debug('Loading datafile %s' % file)
             dataset = Data.DataSet(datafile=os.path.join(datadir, file))
             if approach and dataset.process == 'ep2epgamma':
                 [pt.to_conventions(approach) for pt in dataset]
@@ -58,26 +58,26 @@ def loaddata(datadir='data', approach=False):
 
 def _complete_xBWQ2(kin):
     """Make trio {xB, W, Q2} complete if two of them are given in 'kin'."""
-    if kin.has_key('W') and kin.has_key('Q2') and not kin.has_key('xB'):
+    if 'W' in kin and 'Q2' in kin and 'xB' not in kin:
         kin.xB = kin.Q2 / (kin.W**2 + kin.Q2 - Mp2)
-    elif kin.has_key('xB') and kin.has_key('Q2') and not kin.has_key('W'):
+    elif 'xB' in kin and 'Q2' in kin and 'W' not in kin:
         kin.W = np.sqrt(kin.Q2 / kin.xB - kin.Q2 + Mp2)
-    elif kin.has_key('xB') and kin.has_key('W') and not kin.has_key('Q2'):
+    elif 'xB' in kin and 'W' in kin and 'Q2' not in kin:
         kin.Q2 = kin.xB * (kin.W**2 - Mp2) / (1. - kin.xB)
     else:
-        raise KinematicsError, 'Exactly two of {xB, W, Q2} should be given.'
+        raise KinematicsError('Exactly two of {xB, W, Q2} should be given.')
     return
 
 def _complete_tmt(kin):
     """Make duo {t, tm} complete if one of them is given in 'kin'."""
-    if kin.has_key('t') and not kin.has_key('tm'):
+    if 't' in kin and 'tm' not in kin:
         assert kin.t <= 0
         kin.tm = - kin.t
-    elif kin.has_key('tm') and not kin.has_key('t'):
+    elif 'tm' in kin and 't' not in kin:
         assert kin.tm >= 0
         kin.t = - kin.tm
     else:
-        raise KinematicsError, 'Exactly one of {t, tm} should be given.'
+        raise KinematicsError('Exactly one of {t, tm} should be given.')
     return
 
 def fill_kinematics(kin, old={}):
@@ -92,7 +92,7 @@ def fill_kinematics(kin, old={}):
     kkeys = set(kin.keys())
     trio = set(['xB', 'W', 'Q2'])
     if len(trio.intersection(kkeys)) == 3:
-        raise KinematicsError, 'Overdetermined set {xB, W, Q2} given.'
+        raise KinematicsError('Overdetermined set {xB, W, Q2} given.')
     elif len(trio.intersection(kkeys)) == 2:
         _complete_xBWQ2(kin)
     elif len(trio.intersection(kkeys)) == 1 and old:
@@ -116,7 +116,7 @@ def fill_kinematics(kin, old={}):
     kin.xi = kin.xB / (2. - kin.xB)
     duo = set(['t', 'tm'])
     if len(duo.intersection(kkeys)) == 2:
-        raise KinematicsError, 'Overdetermined set {t, tm=-t} given.'
+        raise KinematicsError('Overdetermined set {t, tm=-t} given.')
     elif len(duo.intersection(kkeys)) == 1:
         _complete_tmt(kin)
     else:
@@ -125,12 +125,12 @@ def fill_kinematics(kin, old={}):
             for key in duo:
                 kin.__setattr__(key, old.__getattribute__(key))
     # s is just copied from old, if there is one
-    if old and old.has_key('s'):
+    if old and 's' in old:
         kin.s = old.s
     # phi and varphi are copied from old, if possible and necessary
-    if not kin.has_key('phi') and old.has_key('phi'):
+    if 'phi' not in kin and 'phi' in old:
         kin.phi = old.phi
-    if not kin.has_key('varphi') and old.has_key('varphi'):
+    if 'varphi' not in kin and 'varphi' in old:
         kin.varphi = old.varphi
     return kin
 
@@ -157,7 +157,7 @@ def parse(datafile):
         # only lines with '=' (premble) or with numbers only (data grid) are parsed
         if re.search(r'=', dataFileLine):
             # converting preamble line into dictionary item
-            desctpl = tuple(map(string.strip,string.split(dataFileLine,"=")))
+            desctpl = tuple([s.strip() for s in dataFileLine.split("=")])
             desc[desctpl[0]] = desctpl[1] 
         if re.match(r'([ \t]*[-\.\d]+[ \t\r]+)+', dataFileLine):
             # FIXME: TAB-delimited columns are not handled! Only spaces are OK.
@@ -169,7 +169,7 @@ def parse(datafile):
                     numbers.append(int(f))
                 else:
                     numbers.append(f)
-            data.append(map(float, numbers))
+            data.append(list(map(float, numbers)))
         dataFileLine = dataFile.readline()
 
     return desc, data
@@ -179,7 +179,7 @@ def npars(m):
 
     n = 0
     for key in m.parameter_names:
-        if m.parameters.has_key('fix_'+key) and not m.parameters['fix_'+key]:
+        if 'fix_'+key in m.parameters and not m.parameters['fix_'+key]:
             n += 1
     return n
 
@@ -189,7 +189,10 @@ def str2num(s):
     http://mail.python.org/pipermail/tutor/2003-November/026136.html
     """
 
-    return ("." in s and [float(s)] or [int(s)])[0]
+    if "." in s:
+        return float(s) 
+    else:
+        return int(s)
 
 
 def prettyprint(all_numbers):
@@ -211,7 +214,7 @@ def prettyprint(all_numbers):
 
     for s, l in zip(formatted_numbers, space_on_the_left):
         padding = ' '*(left_total - l)
-        print '%s%s' % (padding, s)
+        print('%s%s' % (padding, s))
     return
 
 def flatten(T):
@@ -281,11 +284,11 @@ def select(dataset, criteria=[], logic='AND'):
     return tmp
 
 def listdb(db):
-    print "%-17s--+--%s" % (17*'-', 60*'-')
-    print "%-17s  |  %s" % ('name', 'description')
-    print "%-17s--+--%s" % (17*'-', 60*'-')
+    print("%-17s--+--%s" % (17*'-', 60*'-'))
+    print("%-17s  |  %s" % ('name', 'description'))
+    print("%-17s--+--%s" % (17*'-', 60*'-'))
     for key in db:
-        print "%-17s  |  %s" % (key, db[key].description)
+        print("%-17s  |  %s" % (key, db[key].description))
     #print "\n WARNING: gepard models are now likely broken. Reinitialize them!"
 
 def listdata(ids, data):
@@ -299,7 +302,7 @@ def listdata(ids, data):
                 ref2 = dt.reference2
             except:
                 ref2 =  ''
-            print '[%3i] %8s %3i %9s %10s %s' % (dt.id, dt.collaboration, len(dt), dt.y1name, ref, ref2)
+            print('[%3i] %8s %3i %9s %10s %s' % (dt.id, dt.collaboration, len(dt), dt.y1name, ref, ref2))
         except KeyError:
             pass
 
@@ -402,8 +405,8 @@ def listchis(ths, Q2cut=1., Q2max=1.e3, nsets=0, out='chis'):
         ftit = 20*' ' + len(names)*'{:<10s}'
         fstr = '{:9s} {:7s}:  ' + len(names)*'{:<10.3g}' + '   (np ={dof:3d})'
         chi_ind = 2
-    print ftit.format(*names)
-    print ftit.format(*sublines)
+    print(ftit.format(*names))
+    print(ftit.format(*sublines))
     total_chis = np.array([0. for th in ths])
     total_npts = 0
     for collab, obs, pts in sets[nsets]:
@@ -416,32 +419,31 @@ def listchis(ths, Q2cut=1., Q2max=1.e3, nsets=0, out='chis'):
             total_chis += np.array(chis)
             total_npts += npts
             quals = [chi/npts for chi in chis]
-        print fstr.format(collab, obs, *quals, dof=npts)
+        print(fstr.format(collab, obs, *quals, dof=npts))
     if out == 'chis':
         # version with chisq/npts:
         total_chis = total_chis/total_npts
-        print ftit.format(*sublines)
-        print fstr.format('===', 'TOTAL', *total_chis.tolist(), dof=total_npts)
+        print(ftit.format(*sublines))
+        print(fstr.format('===', 'TOTAL', *total_chis.tolist(), dof=total_npts))
 
 
-
-class hubDict(dict):
+class hubDictNew(dict):
     """Merges two dictionaries, but not actually but just by forwarding."""
 
 # most of the methods below are probably not necessary
 
-    def __init__(self, da, db):
+    def __init__(self, da=None, db=None):
         self.d1 = da
         self.d2 = db
 
     def __getitem__(self, name):
-        if self.d1.has_key(name):
+        if name in self.d1:
             return self.d1[name]
         else:
             return self.d2[name]
 
     def __setitem__(self, name, value):
-        if self.d1.has_key(name):
+        if name in self.d1:
             self.d1[name] = value
         else:
             self.d2[name] = value
@@ -450,28 +452,28 @@ class hubDict(dict):
         return itertools.chain(self.d1.__iter__(), self.d2.__iter__())
 
     def has_key(self, name):
-        if self.d1.has_key(name) or self.d2.has_key(name):
+        if name in self.d1 or name in self.d2:
             return True
         else:
             return False
 
     def keys(self):
-        return self.d1.keys() + self.d2.keys()
+        return list(self.d1.keys()) + list(self.d2.keys())
 
     def items(self):
-        return self.d1.items() + self.d2.items()
+        return list(self.d1.items()) + list(self.d2.items())
 
     def iteritems(self):
-        return itertools.chain(self.d1.iteritems(), self.d2.iteritems())
+        return itertools.chain(iter(self.d1.items()), iter(self.d2.items()))
 
     def iterkeys(self):
-        return itertools.chain(self.d1.iterkeys(), self.d2.iterkeys())
+        return itertools.chain(iter(self.d1.keys()), iter(self.d2.keys()))
 
     def itervalues(self):
-        return itertools.chain(self.d1.itervalues(), self.d2.itervalues())
+        return itertools.chain(iter(self.d1.values()), iter(self.d2.values()))
 
     def copy(self):
-        print "Can't copy hubDict yet!!!"
+        print("Can't copy hubDictNew yet!!!")
 
     def update(self, d):
         for key in d:
@@ -483,9 +485,9 @@ class hubDict(dict):
         except KeyError:
             return self.d2.popitem()
 
-    def __repr__(self):
-        return 'First: %s\nSecond: %s' % (
-                self.d1.__repr__(), self.d2.__repr__())
+    # def __repr__(self):
+        # return 'First: %s\nSecond: %s' % (
+                # self.d1.__repr__(), self.d2.__repr__())
 
 
 def _fakecolor(a, b):
@@ -595,7 +597,7 @@ def cvsets(df_in, nfolds=3, shuffle=True):
         sets = []
         # my ugly coding
         for f in range(nfolds):
-            inds = range(nfolds)
+            inds = list(range(nfolds))
             k = inds.pop(f)
             train = chunks[inds[0]]
             for i in inds[1:]:
@@ -644,16 +646,16 @@ def FTanalyse(bins, HMAX=2, nf=4, Nrep=1):
             mins.append(h_min)
     nc, ns = np.array(mins).mean(axis=0)
     delc, dels = np.array(mins).std(axis=0)
-    print "Highest extractable cos harmonic = {:.3f} +- {:.3f}".format(nc, delc)
-    print "Highest extractable sin harmonic = {:.3f} +- {:.3f}\n".format(ns, dels)
+    print("Highest extractable cos harmonic = {:.3f} +- {:.3f}".format(nc, delc))
+    print("Highest extractable sin harmonic = {:.3f} +- {:.3f}\n".format(ns, dels))
     return int(np.round(nc)), int(np.round(ns))
 
 def describe_data(pts):
     """Print observables and where they come from."""
     all = []
-    print "{:2s} x {:5s}  {:6s}  {:4s}   {:3s} {:12s}".format(
-     'npt', 'obs', 'collab', 'FTn', 'id', 'ref.')
-    print 45*'-'
+    print("{:2s} x {:5s}  {:6s}  {:4s}   {:3s} {:12s}".format(
+     'npt', 'obs', 'collab', 'FTn', 'id', 'ref.'))
+    print(45*'-')
     #print "{:2s} x {:5s}  {:6s}  {:4s}".format(
      #'npt', 'obs', 'collab', 'FTn')
     #print 30*'-'
@@ -662,7 +664,7 @@ def describe_data(pts):
         for prop in ['y1name', 'collaboration', 'FTn', 'id', 'reference']:
         #for prop in ['y1name', 'collaboration', 'FTn']:
             if hasattr(pt, prop):
-                if prop=='y1name' and pt.y1name=='X' and pt.has_key('t'):
+                if prop=='y1name' and pt.y1name=='X' and 't' in pt:
                     props.append('Xt')
                 else:
                     props.append(str(getattr(pt,prop)))
@@ -675,11 +677,11 @@ def describe_data(pts):
     for uniq in sorted(uniqs):
         n = all.count(uniq)
         cc += n
-        print "{:2d} x {:5s}  {:6s}  {:4s}   {:3s} {:12s}".format(n, *uniq)
+        print("{:2d} x {:5s}  {:6s}  {:4s}   {:3s} {:12s}".format(n, *uniq))
         #print "{:2d} x {:5s}  {:6s}  {:4s}".format(n, *uniq)
     assert cc == tot
-    print 45*'-'
-    print "TOTAL = {}".format(tot)
+    print(45*'-')
+    print("TOTAL = {}".format(tot))
     return tot
 
 def _hmax(amp, trig):
@@ -711,4 +713,4 @@ def compare_harmonics(th, pt, pol='unp'):
     amps = sorted(amps, reverse=True)
     max = amps[0][0]
     for value, sign, name in amps:
-        print "{:9s} = {: .3g}".format(name, sign*value/max)
+        print("{:9s} = {: .3g}".format(name, sign*value/max))

@@ -73,7 +73,7 @@ def CFF(t, ImH=True, path=None, fmt='png', average=True):
       ax.set_xlabel('$x_{\\rm Bj}$', fontsize=15)
       #ax.set_ylabel('%s / $\\pi$' % cff, fontsize=18)
       ax.set_ylabel('$\\Im{\\rm m}\\, {\\cal H}(x_{\\rm Bj}, t) / \\pi$', fontsize=18)
-      apply(ax.set_ylim, (-2.0, 4.0))
+      ax.set_ylim(*(-2.0, 4.0))
       ax.set_xlim(0.05, 0.4)
       ax.text(0.065, 0.5, "$t=0$", fontsize=14)
       ax.text(0.065, -1.5, "$t=-0.3\,{\\rm GeV}^2$", fontsize=14)
@@ -92,7 +92,7 @@ def CFF(t, ImH=True, path=None, fmt='png', average=True):
     ax.set_xlabel('$x_{\\rm Bj}$', fontsize=15)
     #ax.set_ylabel('%s / $\\pi$' % cff, fontsize=18)
     ax.set_ylabel('$\\Re{\\rm e}\\, {\\cal H}(x_{\\rm Bj}, t) / \\pi$', fontsize=18)
-    apply(ax.set_ylim, (-2.0, 4.0))
+    ax.set_ylim(*(-2.0, 4.0))
     ax.set_xlim(0.05, 0.4)
     ax.text(0.065, 0.5, "$t=0$", fontsize=14)
     ax.text(0.065, -1.5, "$t=-0.3\,{\\rm GeV}^2$", fontsize=14)
@@ -133,5 +133,5 @@ if __name__ == '__main__':
         pt.xB = xB
         pt.xi = pt.xB / (2. - pt.xB)
         res = tNN.m.ImH(pt)/np.pi
-        print 'Im(CFF_H(xB = %s))/pi = %.2f +- %.2f' %(str(xB), res.mean(), res.std())
+        print('Im(CFF_H(xB = %s))/pi = %.2f +- %.2f' %(str(xB), res.mean(), res.std()))
 

@@ -52,7 +52,7 @@ tDR1.m.parameters.update(DMepsGLO1)
 #print "fit to HERMES+CLAS+HALLA ..."
 #tDR1.print_chisq(GLO1points)
 
-print "Plotting predictions for COMPASS ..."
+print("Plotting predictions for COMPASS ...")
 
 kins = [
 (1.4, 0.007),

@@ -63,17 +63,17 @@ L4_ALTI_0 = utils.select(data[74], criteria=['FTn==0'])[:-1]
 L4_ALTI_m1 = utils.select(data[74], criteria=['FTn==-1'])[:-1]
 L4_ALTBHDVCS_0 = utils.select(data[73], criteria=['FTn==0'])[:-1]
 
-bins = zip(L4_ALUI, L4_AC_0, L4_AC_1, L4_AUL, L4_ALL_0, 
+bins = list(zip(L4_ALUI, L4_AC_0, L4_AC_1, L4_AUL, L4_ALL_0, 
         L4_ALL_1, L4_AUTI_1, L4_AUTI_0, L4_AUTI_m1, L4_AUTDVCS,
-        L4_ALTI_m1, L4_ALTI_0, L4_ALTI_1, L4_ALTBHDVCS_0)
+        L4_ALTI_m1, L4_ALTI_0, L4_ALTI_1, L4_ALTBHDVCS_0))
 
 #bins = zip(L4_ALUI, L4_AC_0, L4_AC_1, L4_AUL, L4_ALL_0, 
 #        L4_ALL_1, L4_AUTI_1, L4_AUTI_0, L4_AUTI_m1, #L4_AUTDVCS,
 #        L4_ALTI_m1, L4_ALTI_0, L4_ALTI_1)#, L4_ALTBHDVCS_0)
 
 # 8 obs
-bins = zip(L4_ALUI, L4_AC_1, L4_AUL, L4_ALL_1, 
-           L4_AUTI_1, L4_AUTI_m1, L4_ALTI_1, L4_ALTI_m1)
+bins = list(zip(L4_ALUI, L4_AC_1, L4_AUL, L4_ALL_1, 
+           L4_AUTI_1, L4_AUTI_m1, L4_ALTI_1, L4_ALTI_m1))
 
 ## [4] Do the fit bin by bin
 
@@ -124,7 +124,7 @@ for nextCFF in ['pReE']:
             pval = 2*(1.-scipy.stats.t.cdf(abs(val/err), ndof))
             fl.write('%5s = %8.3f +- %5.3f  (p = %.3g)\n' % (p, val, err, pval))
 
-    print '\n %s: TOTAL chisq = %f' % (nextCFF, totchi)
+    print('\n %s: TOTAL chisq = %f' % (nextCFF, totchi))
     fl.write('==== %s: TOTAL chisq = %f' % (nextCFF, totchi))
 fl.close()
 

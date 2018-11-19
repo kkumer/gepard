@@ -39,5 +39,5 @@ dbn = shelve.open(GEPARD_DIR+'/pype/nndr.db')
 tNN1.save(dbn)
 dbn.close()
 
-print '10 NNs selfix {:.1f}/{} p={:.3g}'.format(*tNN1.chisq(pts))
+print('10 NNs selfix {:.1f}/{} p={:.3g}'.format(*tNN1.chisq(pts)))
 

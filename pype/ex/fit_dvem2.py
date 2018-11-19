@@ -3,7 +3,7 @@
 #import pylab
 #import matplotlib.pyplot as plt
 
-import shelve, copy, sys, logging, __builtin__
+import shelve, copy, sys, logging, builtins
 
 import numpy as np
 import scipy.stats
@@ -51,7 +51,7 @@ for pt in utils.select(data[79], criteria=['Q2 >= 4.0']):
     ptxl.y1namelong = 'differential cross section XL'
     H109WdepXL.append(ptxl)
 
-__builtin__.H109WdepXL = H109WdepXL
+builtins.H109WdepXL = H109WdepXL
 
 ## [3] Create a theory
 
@@ -88,9 +88,9 @@ def pc(th, Q2cut=4.):
     exps = ['H1ZEUS DVCS', 'H1-09 XL', "H1-09 W-dep"]
     ptssets = [H1ZEUS, H109XL, H109WdepXL]
     for name, pts in zip(exps,ptssets):
-        print '%10s: chi/npts = %6.2f/%d' % (name, th.chisq(pts)[0], len(pts))
+        print('%10s: chi/npts = %6.2f/%d' % (name, th.chisq(pts)[0], len(pts)))
         cutpts = utils.select(pts, criteria=['Q2>=%f' % Q2cut])
-        print '%10s: chi/npts = %6.2f/%d (cut)' % (name, th.chisq(cutpts)[0], len(cutpts))
+        print('%10s: chi/npts = %6.2f/%d (cut)' % (name, th.chisq(cutpts)[0], len(cutpts)))
 
 
 def _derpt(th, p, pt, f=False, h=0.05):
@@ -119,7 +119,7 @@ def der(th, pars, pts, f=False,  h=0.05):
 
     for par in pars:
         ders = np.array([_derpt(th, par, pt, f, h) for pt in pts])
-        print '%4s  |  %5.2f' % (par, ders.mean())
+        print('%4s  |  %5.2f' % (par, ders.mean()))
 
 #def rth(m, pt, tht):
 #    """Calculate <r(tht)> for model m."""

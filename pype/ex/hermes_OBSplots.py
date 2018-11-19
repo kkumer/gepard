@@ -45,20 +45,20 @@ L4_ALTI_0 = utils.select(data[74], criteria=['FTn==0'])[:-1]
 L4_ALTI_m1 = utils.select(data[74], criteria=['FTn==-1'])[:-1]
 L4_ALTBHDVCS_0 = utils.select(data[73], criteria=['FTn==0'])[:-1]
 
-bins = zip(L4_ALUI, L4_AC_0, L4_AC_1, L4_AUL, L4_ALL_0, 
-        L4_ALL_1, L4_AUTI_1, L4_AUTI_0, L4_AUTI_m1, L4_AUTDVCS)
+bins = list(zip(L4_ALUI, L4_AC_0, L4_AC_1, L4_AUL, L4_ALL_0, 
+        L4_ALL_1, L4_AUTI_1, L4_AUTI_0, L4_AUTI_m1, L4_AUTDVCS))
 
 # Full 14 obs
-bins = zip(L4_ALUI, L4_AC_0, L4_AC_1, L4_AUL, L4_ALL_0, 
+bins = list(zip(L4_ALUI, L4_AC_0, L4_AC_1, L4_AUL, L4_ALL_0, 
         L4_ALL_1, L4_AUTI_1, L4_AUTI_0, L4_AUTI_m1, L4_AUTDVCS,
-        L4_ALTI_m1, L4_ALTI_0, L4_ALTI_1, L4_ALTBHDVCS_0)
+        L4_ALTI_m1, L4_ALTI_0, L4_ALTI_1, L4_ALTBHDVCS_0))
 obsnames = ['ALUI', 'AC0', 'AC1', 'AUL', 'ALL0', 'ALL1', 
         'AUTI1', 'AUTI0', 'AUTIm1', 'AUTDVCS',
         'ALTIm1', 'ALTI0', 'ALTI1', 'ALTBHDVCS']
 
 # 8 obs given by INT term
-bins = zip(L4_ALUI, L4_AC_1, L4_AUL, L4_ALL_1, 
-           L4_AUTI_1, L4_AUTI_m1, L4_ALTI_1, L4_ALTI_m1)
+bins = list(zip(L4_ALUI, L4_AC_1, L4_AUL, L4_ALL_1, 
+           L4_AUTI_1, L4_AUTI_m1, L4_ALTI_1, L4_ALTI_m1))
 obsnames = ['ALUI', 'AC1', 'AUL',  'ALL1', 
             'AUTI1',  'AUTIm1', 'ALTIm1', 'ALTI1']
 
@@ -66,7 +66,7 @@ obsnames = ['ALUI', 'AC1', 'AUL',  'ALL1',
 def Hptval(pt):
     """pt.val in HERMES conventions"""
     # cos-varphi and sin-varphi harmonics change sign
-    if pt.has_key('varFTn'):
+    if 'varFTn' in pt:
         val = -pt.val
     else:
         val = pt.val
@@ -112,7 +112,7 @@ printset('fits/HERMES-ALTBHDVCS', L4_ALTBHDVCS_0)
 tmshifts = [0.02, 0.03, 0]
 xBshifts = [0.01, 0.015, 0]
 Q2shifts = [0.2, 0.3, 0]
-shifts = zip(tmshifts, xBshifts, Q2shifts)
+shifts = list(zip(tmshifts, xBshifts, Q2shifts))
 ## [3] Iterate over all models:
 #for prefix in ['', 'Ht-', 'KM12a-']:
 for prefix in ['AllEight-']:
@@ -189,7 +189,7 @@ for prefix in ['AllEight-']:
             files = [fQ for ft, fx, fQ in fls]
             x = 'Q2'
             xshift = Q2shift
-        for f, obs, nobs in zip(files, obsnames, range(len(obsnames))):
+        for f, obs, nobs in zip(files, obsnames, list(range(len(obsnames)))):
             val, err = th.predict(pts[nobs], error=True, orig_conventions=True)
             f.write('%f  %f  %f\n' % (getattr(pts[nobs], x)+xshift, val, err))
 
@@ -199,5 +199,5 @@ for prefix in ['AllEight-']:
         fQ.close()
 
 
-    print '%sTOTAL chisq = %f' % (prefix, totchi)
+    print('%sTOTAL chisq = %f' % (prefix, totchi))
 
