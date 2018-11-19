@@ -22,7 +22,7 @@ describe_data -- List observables in dataset.
 compare_harmonics --  
 """
 
-import os, re, string, fnmatch, itertools, logging
+import os, re, fnmatch, itertools, logging
 import numpy as np
 import pandas as pd
 
@@ -157,7 +157,6 @@ def parse(datafile):
         # only lines with '=' (premble) or with numbers only (data grid) are parsed
         if re.search(r'=', dataFileLine):
             # converting preamble line into dictionary item
-            #desctpl = tuple(map(string.strip,string.split(dataFileLine,"=")))
             desctpl = tuple([s.strip() for s in dataFileLine.split("=")])
             desc[desctpl[0]] = desctpl[1] 
         if re.match(r'([ \t]*[-\.\d]+[ \t\r]+)+', dataFileLine):

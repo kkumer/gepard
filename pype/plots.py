@@ -6,7 +6,7 @@ of some specific datasets and CFFs.
 
 #from IPython.Debugger import Tracer; debug_here = Tracer()
 
-import sys, os, math, copy, string, subprocess, itertools
+import sys, os, math, copy, subprocess, itertools
 import numpy as np
 import pandas as pd
 
@@ -268,7 +268,7 @@ def thline(th, pts, ex_pt, npts=16):
         spl_xB = InterpolatedUnivariateSpline(pts.tm.values, pts.xB.values, k=1)
         spl_Q2 = InterpolatedUnivariateSpline(pts.tm.values, pts.Q2.values, k=1)
     ys = []
-    pt = copy.deepcopy(ex_pt)
+    pt = ex_pt.copy()
     for tm in tms:
         pt.tm = tm
         pt.xB = spl_xB(tm)[()]
@@ -752,7 +752,7 @@ def CLAS14(obs='BSA', path=None, fmt='png', **kwargs):
         # ... and plot
         if np == 2:
             # fake doubling of points to get line visibility
-            ptd = copy.deepcopy(panelset[0])
+            ptd = panelset[0].copy()
             ptd.tm = ptd.tm+0.02
             panelset.append(ptd)
             panel(ax, points=panelset, xaxis='tm', kinlabels=['Q2', 'xB'], **kwargs)
@@ -820,7 +820,7 @@ def CLAS15(obs='BSA', path=None, fmt='png', **kwargs):
         ax = axs[np]
         if (np == 0) or (np == 4):
             # fake doubling of points to get line visibility
-            ptd = copy.deepcopy(panelset[0])
+            ptd = panelset[0].copy()
             ptd.tm = ptd.tm+0.02
             panelset.append(ptd)
             panel(ax, points=panelset, xaxis='tm', kinlabels=['Q2', 'xB'], **kwargs)
@@ -1013,7 +1013,7 @@ def CLASJ(path=None, fmt='png', **kwargs):
         # ... and plot
         if np == 2:
             # fake doubling of points to get line visibility
-            ptd = copy.deepcopy(panelset[0])
+            ptd = panelset[0].copy()
             ptd.tm = ptd.tm+0.02
             panelset.append(ptd)
             panel(ax, points=panelset, xaxis='tm', kinlabels=['Q2', 'xB'], **kwargs)
@@ -3190,8 +3190,8 @@ def jbod(path=None, fmt='png', **kwargs):
     if isinstance(kwargs['points'], Data.DataSet):
         kwargs['points'] = [kwargs['points']]
     for pts in kwargs['points']:
-        label = string.join(set('%s-%s-%s' % (pt.collaboration, 
-            str(pt.year)[-2:], pt.yaxis) for pt in pts), ' + ')
+        label = ' + '.join(set('%s-%s-%s' % (pt.collaboration, 
+            str(pt.year)[-2:], pt.yaxis) for pt in pts))
         ax.text(n, 0, label)
         for pt in pts:
             pt.npt = n
