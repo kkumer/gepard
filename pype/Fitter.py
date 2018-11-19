@@ -62,9 +62,9 @@ class FitterMinuit(Fitter):
                 self.minuit.get_num_call_fcn()+1, chisq, len(fitpoints)))
             return chisq
 
-        if isinstance(theory.model.parameters, utils.hubDict):
+        if isinstance(theory.model.parameters, utils.hubDictNew):
             # This is needed because in Python <=2.5 ** operator
-            # requires dict as an argument, i.e. my hubDict wouldn't work:
+            # requires dict as an argument, i.e. my hubDictNew wouldn't work:
             auxdict = dict((it for it in list(theory.model.parameters.items())))
             self.minuit = Minuit(fcn, use_array_call=True, errordef=1, 
                     forced_parameters=theory.model.parameter_names, **auxdict)

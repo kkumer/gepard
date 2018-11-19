@@ -17,7 +17,7 @@ import scipy.stats
 from scipy.special import j0, j1, gamma, beta
 
 from quadrature import PVquadrature, bquadrature, rthtquadrature
-from utils import flatten, hubDict, stringcolor
+from utils import flatten, hubDictNew, stringcolor
 from constants import tolerance2, GeVfm, Mp
 import dispersion as DR
 
@@ -1989,7 +1989,7 @@ class ComptonHybrid(ComptonFormFactors):
         self.DR.ndparameters[0] = 0.  # sea comes from Gepard part
         #self.parameters = hubDict(self.Gepard.parameters, self.DR.parameters)
         #self.parameter_names = self.Gepard.parameter_names + self.DR.parameter_names
-        self.parameters = hubDict(self.DR.parameters, self.Gepard.parameters)
+        self.parameters = hubDictNew(self.DR.parameters, self.Gepard.parameters)
         self.parameter_names = self.DR.parameter_names + self.Gepard.parameter_names
 
         self.g = self.Gepard.g
