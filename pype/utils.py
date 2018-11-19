@@ -428,15 +428,21 @@ def listchis(ths, Q2cut=1., Q2max=1.e3, nsets=0, out='chis'):
         print(fstr.format('===', 'TOTAL', *total_chis.tolist(), dof=total_npts))
 
 
-
-class hubDict(dict):
+class hubDictNew(dict):
     """Merges two dictionaries, but not actually but just by forwarding."""
 
 # most of the methods below are probably not necessary
 
-    def __init__(self, da, db):
-        self.d1 = da
-        self.d2 = db
+    def __init__(self, da=None, db=None):
+        _lg.debug('Doing __init__ for %s.' % str(self))
+        if da:
+            self.d1 = da
+        else:
+            self.d1 = {}
+        if db:
+            self.d2 = db
+        else:
+            self.d2 = {}
 
     def __getitem__(self, name):
         if name in self.d1:
@@ -445,6 +451,93 @@ class hubDict(dict):
             return self.d2[name]
 
     def __setitem__(self, name, value):
+        _lg.debug('Doing __setitem__ for %s.' % str(self))
+        if name in self.d1:
+            self.d1[name] = value
+        else:
+            self.d2[name] = value
+
+    def __reduce__(self):
+        _lg.debug('Reducing hubDict')
+        return (hubDict, (), self.__getstate__())
+
+    def __getstate__(self):
+        _lg.debug('Getstating hubDict')
+        return self.__dict__
+
+    def __setstate__(self, d):
+        _lg.debug('Setstating hubDict')
+        self.__dict__ = d
+        self.d1 = d['d1']
+        self.d2 = d['d2']
+
+
+    def __iter__(self):
+        return itertools.chain(self.d1.__iter__(), self.d2.__iter__())
+
+    def has_key(self, name):
+        if name in self.d1 or name in self.d2:
+            return True
+        else:
+            return False
+
+    def keys(self):
+        return list(self.d1.keys()) + list(self.d2.keys())
+
+    def items(self):
+        return list(self.d1.items()) + list(self.d2.items())
+
+    def iteritems(self):
+        return itertools.chain(iter(self.d1.items()), iter(self.d2.items()))
+
+    def iterkeys(self):
+        return itertools.chain(iter(self.d1.keys()), iter(self.d2.keys()))
+
+    def itervalues(self):
+        return itertools.chain(iter(self.d1.values()), iter(self.d2.values()))
+
+    def copy(self):
+        print("Can't copy hubDict yet!!!")
+
+    def update(self, d):
+        for key in d:
+            self.__setitem__(key, d[key])
+
+    def popitem(self):
+        try:
+            return self.d1.popitem()
+        except KeyError:
+            return self.d2.popitem()
+
+    # def __repr__(self):
+        # return 'First: %s\nSecond: %s' % (
+                # self.d1.__repr__(), self.d2.__repr__())
+
+
+class hubDict(dict):
+    """Merges two dictionaries, but not actually but just by forwarding."""
+
+# most of the methods below are probably not necessary
+
+    def __init__(self, da=None, db=None):
+        _lg.debug('Doing __init__ for %s.' % str(self))
+        if da:
+            self.d1 = da
+        else:
+            self.d1 = {}
+        if db:
+            self.d2 = db
+        else:
+            self.d2 = {}
+
+    def __getitem__(self, name):
+        if name in self.d1:
+            return self.d1[name]
+        else:
+            return self.d2[name]
+
+    def __setitem__(self, name, value):
+        _lg.debug('Doing __setitem__ for %s.' % str(self))
         if name in self.d1:
             self.d1[name] = value
         else:
