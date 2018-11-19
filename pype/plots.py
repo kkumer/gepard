@@ -209,10 +209,10 @@ def panel(ax, points=None, lines=None, bands=None, xaxis=None, xs=None,
     if lines:
         if not isinstance(lines, list): lines = [lines]
         linecolors = ['red', 'black', 'blue', 'green', 'darkorchid', 'olive',
-	       	'darkcyan', 'indianred', 'red', 'black', 'blue', 'green', 
-		'darkorchid', 'olive', 'darkcyan', 'indianred']  
+            'darkcyan', 'indianred', 'red', 'black', 'blue', 'green', 
+            'darkorchid', 'olive', 'darkcyan', 'indianred']  
         linestyles = ['-', '--', '-.', ':','-', '--', '-.', ':',
-		'-', '--', '-.', ':','-', '--', '-.', ':']
+            '-', '--', '-.', ':','-', '--', '-.', ':']
         linen = 0
         for line in lines:
             _axline(ax, lambda pt: line.predict(pt, orig_conventions=True), points, xaxis=xaxis,
@@ -363,27 +363,27 @@ def HERMES10t(lines=None, path=None, fmt='png'):
     dfALL1 = utils.select(data[53], criteria=['FTn == 1'])[:4].df()
     dfs = [dfAUL, dfALL1, dfALL0]
     ylabels = [r'$A_{UL,+}^{\sin\phi}$', 
-	       r'$-A_{LL,+}^{\cos\phi}$',
-	       r'$A_{LL,+}^{\cos 0\phi}$']
+                r'$-A_{LL,+}^{\cos\phi}$',
+                r'$A_{LL,+}^{\cos 0\phi}$']
     ylims = [(-0.32, 0.08), (-0.32, 0.22), (-0.28, 0.55)]
     yticks = [0.1, 0.1, 0.2]
     styles = ['b-', 'r--', 'g-.', 'k:']
     fig, axs = plt.subplots(3, 1, sharex=True, figsize=[7,9])
     for p, ax in enumerate(axs):
-	pts = dfs[p]
-	ax.errorbar(pts.tm.values, pts.val.values, pts.err.values, 
-		linestyle='None', marker='s', color='black')
+        pts = dfs[p]
+        ax.errorbar(pts.tm.values, pts.val.values, pts.err.values, 
+                linestyle='None', marker='s', color='black')
         if not isinstance(lines, list): lines = [lines]
-	for l, th in enumerate(lines):
-	    xs, ys = thline(th, pts, pts.pt[0], npts=NPTS)
-	    ax.plot(xs, ys, styles[l], label=th.name)
-	ax.set_xlim(0.0, 0.51)
-	ax.set_ylim(*ylims[p])
-	ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
-	ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1)) 
-	ax.yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(yticks[p])) 
-	ax.set_ylabel(ylabels[p], fontsize=18)
-	ax.set_xlabel('$-t\\; [{\\rm GeV}^2]$', fontsize=16)
+        for l, th in enumerate(lines):
+            xs, ys = thline(th, pts, pts.pt[0], npts=NPTS)
+            ax.plot(xs, ys, styles[l], label=th.name)
+        ax.set_xlim(0.0, 0.51)
+        ax.set_ylim(*ylims[p])
+        ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
+        ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1)) 
+        ax.yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(yticks[p])) 
+        ax.set_ylabel(ylabels[p], fontsize=18)
+        ax.set_xlabel('$-t\\; [{\\rm GeV}^2]$', fontsize=16)
     axs[1].legend(loc='lower center').draw_frame(0)
     fig.subplots_adjust(wspace=0.0, hspace=0.0) 
     if path:
@@ -404,22 +404,22 @@ def HERMES12t(lines=None, path=None, fmt='png'):
     styles = ['b-', 'r--', 'g-.', 'k:']
     fig, axs = plt.subplots(2, 1, sharex=True, figsize=[7,6])
     for p, ax in enumerate(axs):
-	pts = dfs[p]
-	ax.errorbar(pts.tm.values, pts.val.values, pts.err.values, 
-		linestyle='None', marker='s', color='black')
-	if p == 0:
-	    # add recoil data
-	    ax.errorbar(dfALUrec.tm.values, dfALUrec.val.values, 
-		    dfALUrec.err.values, fillstyle='none',
-		linestyle='None', marker='s', color='black')
+        pts = dfs[p]
+        ax.errorbar(pts.tm.values, pts.val.values, pts.err.values, 
+                linestyle='None', marker='s', color='black')
+        if p == 0:
+            # add recoil data
+            ax.errorbar(dfALUrec.tm.values, dfALUrec.val.values, 
+                    dfALUrec.err.values, fillstyle='none',
+                linestyle='None', marker='s', color='black')
         if not isinstance(lines, list): lines = [lines]
-	for l, th in enumerate(lines):
-	    xs, ys = thline(th, pts, pts.pt[0], npts=NPTS)
-	    ax.plot(xs, ys, styles[l], label=th.name)
-	ax.set_xlim(0.0, 0.51)
-	ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1)) 
-	ax.set_ylabel(ylabels[p], fontsize=18)
-	ax.set_xlabel('$-t\\; [{\\rm GeV}^2]$', fontsize=16)
+        for l, th in enumerate(lines):
+            xs, ys = thline(th, pts, pts.pt[0], npts=NPTS)
+            ax.plot(xs, ys, styles[l], label=th.name)
+        ax.set_xlim(0.0, 0.51)
+        ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1)) 
+        ax.set_ylabel(ylabels[p], fontsize=18)
+        ax.set_xlabel('$-t\\; [{\\rm GeV}^2]$', fontsize=16)
     axs[1].legend(loc='upper right').draw_frame(0)
     fig.subplots_adjust(wspace=0.0, hspace=0.0) 
     if path:
@@ -873,11 +873,11 @@ def HERAF2Q2(path=None, fmt='png', **kwargs):
     for np, panelset in enumerate(panels):
         panel(ax, points=panelset, xaxis='Q2', **kwargs)
         if np == 0:
-	    ax.text(20, 1.1, r'$x_B = {}$'.format(panelset[0].xB), fontsize=16)
-	    # Take legend info once
-	    handles, labels = ax.get_legend_handles_labels()
+            ax.text(20, 1.1, r'$x_B = {}$'.format(panelset[0].xB), fontsize=16)
+            # Take legend info once
+            handles, labels = ax.get_legend_handles_labels()
         else:
-	    ax.text(50, 0.63, r'$x_B = {}$'.format(panelset[0].xB), fontsize=16)
+            ax.text(50, 0.63, r'$x_B = {}$'.format(panelset[0].xB), fontsize=16)
 
     ax.set_ylabel(r'$F_{2}^{p}(x_{\rm B}, Q^2)$', fontsize=16)
     ax.set_xlabel(r'$Q^2\; [{\rm GeV}^2]$', fontsize=16)
@@ -910,13 +910,13 @@ def HERAF2xB(path=None, fmt='png', **kwargs):
         panel(ax, points=panelset, xaxis='xB', **kwargs)
         ax.set_xscale('log')
         if np == 0:
-	    ax.text(0.0006, 1.3, r'$Q^2 = {:.0f}\, {{\rm GeV}}^2$'.format(panelset[0].Q2), fontsize=16)
-	    ax.text(0.00024, 0.82, r'${:.0f}\, {{\rm GeV}}^2$'.format(panelset[0].Q2), fontsize=16)
-	    # Take legend info once
-	    handles, labels = ax.get_legend_handles_labels()
+            ax.text(0.0006, 1.3, r'$Q^2 = {:.0f}\, {{\rm GeV}}^2$'.format(panelset[0].Q2), fontsize=16)
+            ax.text(0.00024, 0.82, r'${:.0f}\, {{\rm GeV}}^2$'.format(panelset[0].Q2), fontsize=16)
+            # Take legend info once
+            handles, labels = ax.get_legend_handles_labels()
         else:
-	    ax.text(0.00013, 1.05, r'${}\, {{\rm GeV}}^2$'.format(panelset[0].Q2), fontsize=16)
-	    ax.text(0.00018, 0.62, r'${}\, {{\rm GeV}}^2$'.format(panelset[0].Q2), fontsize=16)
+            ax.text(0.00013, 1.05, r'${}\, {{\rm GeV}}^2$'.format(panelset[0].Q2), fontsize=16)
+            ax.text(0.00018, 0.62, r'${}\, {{\rm GeV}}^2$'.format(panelset[0].Q2), fontsize=16)
     ax.set_ylabel(r'$F_{2}^{p}(x_{\rm B}, Q^2)$', fontsize=16)
     ax.set_xlabel(r'$x_B$', fontsize=16)
     plt.xlim(0.0001, 0.02)
@@ -1150,7 +1150,7 @@ def HallA06(lines=None, path=None, fmt='png'):
             continue
         pts = pd.DataFrame([(pt.Q2, pt.xB, pt.tm, pt.val, pt.err) for pt in subsets[iset]], columns=('Q2', 'xB', 'tm', 'val', 'err'))
         axs[pn].errorbar(pts.tm.values, pts.val.values, pts.err.values, linestyle='None',
-		capsize=2, color='black')
+            capsize=2, color='black')
         if not isinstance(lines, list): lines = [lines]
         styles = ['r--', 'b-', 'g-.', 'b--', 'k:']
         for nl, th in enumerate(lines):
@@ -1297,9 +1297,9 @@ def CLAS15phi(path=None, fmt='png', **kwargs):
             handles, labels = ax.get_legend_handles_labels()
             # Draw legend on this panel
             ax.legend(handles, labels, loc="upper center", 
-		    borderpad=0.8, handlelength=3, fancybox=True, framealpha=1.0,
-		    facecolor='navajowhite',
-                    prop=matplotlib.font_manager.FontProperties(size="x-large"))
+                borderpad=0.8, handlelength=3, fancybox=True, framealpha=1.0,
+                facecolor='navajowhite',
+                prop=matplotlib.font_manager.FontProperties(size="x-large"))
             ax.set_ylabel(r'$d\sigma = d\sigma^{\leftarrow} + d\sigma^{\rightarrow}$', fontsize=20)
         elif np == 3:
             ax.set_ylabel(r'$\Delta\sigma = d\sigma^{\leftarrow} - d\sigma^{\rightarrow}$', fontsize=20)
@@ -1314,8 +1314,8 @@ def CLAS15phi(path=None, fmt='png', **kwargs):
             ax.set_ylim(-0.03, 0.3)
         else:
             ax.set_ylim(-0.1, 0.1)
-	ax.tick_params(axis='both', which='major', labelsize=12)
-    	ax.tick_params(axis='both', which='minor', labelsize=12)
+        ax.tick_params(axis='both', which='major', labelsize=12)
+        ax.tick_params(axis='both', which='minor', labelsize=12)
     fig.subplots_adjust(wspace=0.0, hspace=0.0)
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
@@ -1351,13 +1351,13 @@ def CLAS15xs(lines=None, path=None, fmt='png'):
             axs[pn].set_xlabel('$-t\\; [{\\rm GeV}^2]$', fontsize=16)
         if (pn % 5) == 0:
             axs[pn].set_ylabel(r'$\Delta\sigma^{\sin\phi,w}$', fontsize=24)
-	if pn == 9:
-	    axs[pn].legend(loc=(-0.5,0.5), 
-		    borderpad=0.8, handlelength=3, fancybox=True, framealpha=1.0,
-		    facecolor='navajowhite',
-                    prop=matplotlib.font_manager.FontProperties(size="x-large"))
-	axs[pn].tick_params(axis='both', which='major', labelsize=12)
-    	axs[pn].tick_params(axis='both', which='minor', labelsize=12)
+        if pn == 9:
+            axs[pn].legend(loc=(-0.5,0.5), 
+                borderpad=0.8, handlelength=3, fancybox=True, framealpha=1.0,
+                facecolor='navajowhite',
+                prop=matplotlib.font_manager.FontProperties(size="x-large"))
+        axs[pn].tick_params(axis='both', which='major', labelsize=12)
+        axs[pn].tick_params(axis='both', which='minor', labelsize=12)
     fig.subplots_adjust(wspace=0.0, hspace=0.0) 
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
@@ -1372,13 +1372,13 @@ def HallA15(lines=None, enh=True, path=None, fmt='png'):
     NPTS = 12
     # tupls are (dataset id, ind_low, ind_high)
     if enh:
-	xQbins = [(117, 0, 4), (117, 5,9), (117, 10, 14), 
-	      ('blank', 0, 0), (116, 0, 4), (116, 5, 9),
-	      ('blank', 0, 0), (116, 10, 14), (116, 15, 19)]
+        xQbins = [(117, 0, 4), (117, 5,9), (117, 10, 14), 
+            ('blank', 0, 0), (116, 0, 4), (116, 5, 9),
+            ('blank', 0, 0), (116, 10, 14), (116, 15, 19)]
     else:
-	xQbins = [(117, 0, 4), (117, 5,9), (117, 10, 14), 
-	      ('blank', 0, 0), (123, 0, 4), (123, 5, 9),
-	      ('blank', 0, 0), (123, 10, 14), (123, 15, 19)]
+        xQbins = [(117, 0, 4), (117, 5,9), (117, 10, 14), 
+            ('blank', 0, 0), (123, 0, 4), (123, 5, 9),
+            ('blank', 0, 0), (123, 10, 14), (123, 15, 19)]
     #fig, axs = plt.subplots(3, 3, sharey='row', sharex=True, figsize=[8,10])
     fig, axs = plt.subplots(3, 3, figsize=[7,9])
     axs = axs.reshape(9)
@@ -1388,9 +1388,9 @@ def HallA15(lines=None, enh=True, path=None, fmt='png'):
             continue
         pts = pd.DataFrame([(pt.Q2, pt.xB, pt.tm, pt.val, pt.err) for pt in data[id][a:b+1]], columns=('Q2', 'xB', 'tm', 'val', 'err')) 
         axs[pn].errorbar(pts.tm.values, pts.val.values, pts.err.values, linestyle='None',
-		capsize=2, color='black')
+            capsize=2, color='black')
         if not isinstance(lines, list): lines = [lines]
-	styles = ['r--', 'b-', 'g-.', 'b--', 'k:']
+        styles = ['r--', 'b-', 'g-.', 'b--', 'k:']
         for nl, th in enumerate(lines):
             xs, ys = thline(th, pts, data[id][a], npts=NPTS)
             axs[pn].plot(xs, ys, styles[nl], label=th.name)
@@ -2839,8 +2839,8 @@ def CFF(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
     logxvals = np.logspace(-2.0, -0.01, 20)  # right panel
     # ranges of y axis
     ylims = {
-	     #'ImH': (-4.8, 35), 'ReH': (-3, 2),
-	     'ImH': (-5, 10), 'ReH': (-10, 2),
+              #'ImH': (-4.8, 35), 'ReH': (-3, 2),
+              'ImH': (-5, 10), 'ReH': (-10, 2),
              'ImE': (-30, 30), 'ReE': (-40, 10),
              #'ImE': (-40, 35), 'ReE': (-40, 10),
              'ImEt': (-200, 300), 'ReEt': (-150, 150),
@@ -2849,40 +2849,40 @@ def CFF(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
     # Plot panels
     for n in range(len(cffs)):
         cff = cffs[n]
-	# [LEFT:] data range
-	if len(cffs) == 1:
-	    ax = axs[0]
-	else:
+        # [LEFT:] data range
+        if len(cffs) == 1:
+            ax = axs[0]
+        else:
             ax = axs[n, 0]
         panel(ax, xaxis='xi', xs=xvals, kins={'yaxis':cff, 't':-0.2, 'Q2':4.,
-	    'units':{'CFF': 1}, 'y1name': 'CFF'}, **kwargs)
+        'units':{'CFF': 1}, 'y1name': 'CFF'}, **kwargs)
         ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
         ax.set_ylim(*ylims[cff])
         ax.set_ylabel(toTeX['%s' % cff], fontsize=20)
         ax.tick_params(axis='both', which='major', labelsize=14)
-	ax.tick_params(axis='both', which='minor', labelsize=14)
+        ax.tick_params(axis='both', which='minor', labelsize=14)
         if n == 0:
             ax.legend(loc='upper right')
             ax.legend().draw_frame(0)
             ax.text(0.6, 0.6, r"$t = -0.2\,\, {\rm GeV}^2$", transform=ax.transAxes, 
                     fontsize=14)
-	if n == len(cffs)-1:
-        	ax.set_xlabel(toTeX['xi'], fontsize=16)
-	# [RIGHT:] extrapolation range (logarithmic)
-	if len(cffs) == 1:
-	    ax = axs[1]
-	else:
+        if n == len(cffs)-1:
+            ax.set_xlabel(toTeX['xi'], fontsize=16)
+        # [RIGHT:] extrapolation range (logarithmic)
+        if len(cffs) == 1:
+            ax = axs[1]
+        else:
             ax = axs[n, 1]
         ax.set_xscale('log')  # x-axis to be logarithmic
         panel(ax, xaxis='xi', xs=logxvals, kins={'yaxis':cff, 't':-0.2, 'Q2':4.,
-	    'units':{'CFF': 1}, 'y1name': 'CFF'}, **kwargs)
+            'units':{'CFF': 1}, 'y1name': 'CFF'}, **kwargs)
         ax.axvspan(0.04, 0.25, facecolor='g', alpha=0.1)  # vertical band
         ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
         ax.set_ylim(*ylims[cff])
         ax.tick_params(axis='both', which='major', labelsize=14)
-	ax.tick_params(axis='both', which='minor', labelsize=14)
-	if n == len(cffs)-1:
-        	ax.set_xlabel(toTeX['xi'], fontsize=16)
+        ax.tick_params(axis='both', which='minor', labelsize=14)
+        if n == len(cffs)-1:
+            ax.set_xlabel(toTeX['xi'], fontsize=16)
     fig.subplots_adjust(wspace=0.04, hspace=0.06)
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
@@ -2989,7 +2989,7 @@ def CFFt(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
         # small x
         ax = fig.add_subplot(len(cffs), 2, 2*n+1)
         panel(ax, xaxis='tm', xs=tmvals, kins={'yaxis':cff, 'xB':0.001, 'Q2':4., 
-	    'units':{'CFF': 1}, 'y1name': 'CFF'}, **kwargs)
+           'units':{'CFF': 1}, 'y1name': 'CFF'}, **kwargs)
         ax.set_xlabel(toTeX['tm'], fontsize=15)
         ax.set_ylabel(toTeX['%s' % cff], fontsize=18)
         ax.axhspan(-0.0005, 0.0005, facecolor='g', alpha=0.6)  # horizontal bar
@@ -3003,7 +3003,7 @@ def CFFt(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
         # moderate x
         ax = fig.add_subplot(len(cffs), 2, 2*n+2)
         panel(ax, xaxis='tm', xs=tmvals, kins={'yaxis':cff, 'xB':0.2, 'Q2':4.,
-	    'units':{'CFF': 1}, 'y1name': 'CFF'}, **kwargs)
+            'units':{'CFF': 1}, 'y1name': 'CFF'}, **kwargs)
         ax.set_xlabel(toTeX['tm'], fontsize=15)
         ax.set_ylabel(toTeX['%s' % cff], fontsize=14)
         ax.axhspan(-0.0005, 0.0005, facecolor='g', alpha=0.6)  # horizontal bar
@@ -3046,7 +3046,7 @@ def CFF3(path=None, fmt='png', **kwargs):
         ax = fig.add_subplot(2, 2, 2*n+1)
         ax.set_xscale('log')  # x-axis to be logarithmic
         panel(ax, xaxis='xi', xs=logxvals, kins={'yaxis':leftcff, 't':-0.2, 'Q2':4.,
-	    'units':{'CFF': 1}, 'y1name': 'CFF'}, **kwargs)
+            'units':{'CFF': 1}, 'y1name': 'CFF'}, **kwargs)
         ax.set_xlabel(toTeX['xixB'], fontsize=15)
         ax.set_ylabel(toTeX['%s' % leftcff], fontsize=18)
         ax.axhspan(-0.0005, 0.0005, facecolor='g', alpha=0.6)  # horizontal bar
@@ -3055,7 +3055,7 @@ def CFF3(path=None, fmt='png', **kwargs):
         ax = fig.add_subplot(2, 2, 2*n+2)
         ax.set_xscale('log')  # x-axis to be logarithmic
         panel(ax, xaxis='xi', xs=logxvals, kins={'yaxis':rightcff, 't':-0.2, 'Q2':4.,
-	    'units':{'CFF': 1}, 'y1name': 'CFF'}, **kwargs)
+                'units':{'CFF': 1}, 'y1name': 'CFF'}, **kwargs)
         ax.set_xlabel(toTeX['xixB'], fontsize=15)
         ax.set_ylabel(toTeX['%s' % rightcff], fontsize=18)
         ax.axhspan(-0.0005, 0.0005, facecolor='g', alpha=0.6)  # horizontal bar
