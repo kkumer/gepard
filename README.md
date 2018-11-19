@@ -1,6 +1,8 @@
 ## Synopsis
 
-**Gepard** - package for working with generalized parton distributions (GPDs)
+**Gepard** - package for working with generalized parton distributions (GPDs) - python2 version
+
+(This version is heavily used and tested, but not developed any more.)
 
 Modelling GPDs in momentum fraction or conformal moment space, perturbative QCD evolution and calculation of conformal Compton form factors (CFFs) up to NNLO accuracy. Modelling CFFs using dispersion relations. Calculation of DVCS and DVMP observables. Fitting to experimental data (both least-squares and neural nets).
 
