@@ -68,7 +68,21 @@ def test_KMM12():
     pts = H1ZEUS + ALUIpts + BCApts + CLASptsOLD + BSDwpoints\
             + AULptsOLD + ALLpts + AUTIpts + BSSwpoints
     chisq = th.chisq(pts)[0]
+    # For difference to EPJA review, see comment for KM15 below
     assert_almost_equal(chisq, 123.53321520926985)
 
 test_KMM12.long = 1
+
+def test_KM15():
+    """Test model: KM15"""
+    th = db['KM15']
+    pts = GLO15b
+    chisq = th.chisq(pts)[0]
+    # Number is slightly different from EPJA review due to change in
+    # treatment of uncertainties of Hall A 2015 data 
+    # in commit 4033d7accb5bea7c371e4145343ef650cb38b6b9
+    # on Feb 14 2017 
+    assert_almost_equal(chisq, 245.82778194537178)
+
+test_KM15.long = 1
 
