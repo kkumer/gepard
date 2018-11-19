@@ -5,8 +5,7 @@ import shelve, numpy
 import utils, Model, Approach, Fitter
 
 data = utils.loaddata('data/ep2epgamma', approach=Approach.hotfixedBMK)  
-# uncomment for dealing with py3fail
-#db = shelve.open('theories.db')
+db = shelve.open('theories.db', 'r')
 
 
 # testing data set
@@ -15,9 +14,8 @@ testpoints = [data[31][12]] + [data[8][1]] + [data[29][2]] + [data[30][3]]
 fitpoints = data[31] + data[8]
 
 # test-network 
-# uncomment for dealing with py3fail
-#testNN = db['KMS11-NN']
-#testNN.m.useDR = None
+testNN = db['KMS11-NN']
+testNN.m.useDR = None
 
 
 def test_basicNN():
@@ -29,7 +27,6 @@ def test_basicNN():
     assert_almost_equal(chisq, 20.094357450964957)
 
 test_basicNN.long=1
-test_basicNN.py3fail=1
 
 def test_fitNN():
     """Testing Neural Net fitting by FitterBrain."""
@@ -44,4 +41,3 @@ def test_fitNN():
 # Actually this test was broken by Approach.observables consolidation
 test_fitNN.long = 1
 
-#db.close()
