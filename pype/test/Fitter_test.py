@@ -49,7 +49,9 @@ def test_fit2():
     f = Fitter.FitterMinuit(fitpoints, t)
     f.fit()
     chisq = t.chisq(fitpoints)[0]
-    assert_almost_equal(chisq, 8.4891170857950087, 4)
+    #assert_almost_equal(chisq, 8.4891170857950087, 4)
+    # after pyminuit --> iminuit change. Cf. #5.
+    assert_almost_equal(chisq, 8.139867648231014, 4)
 
 test_fit2.long = 1
 test_fit2.batch = 1
