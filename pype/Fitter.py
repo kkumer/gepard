@@ -58,7 +58,7 @@ class FitterMinuit(Fitter):
             chisq = 0
             for pt in fitpoints:
                 chisq += (getattr(theory, pt.yaxis)(pt) - pt.val)**2 / pt.err**2 
-            _lg.info('Minuit: {:4d} calls --> chisq/npt = {:.2f}/{}'.format(
+            _lg.info('Minuit: {:4d} calls --> chisq/npt = {:.3f}/{}'.format(
                 self.minuit.get_num_call_fcn()+1, chisq, len(fitpoints)))
             return chisq
 
