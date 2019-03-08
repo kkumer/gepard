@@ -303,7 +303,7 @@ def HERMES09BCA(path=None, fmt='png', **kwargs):
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
         fig.canvas.draw()
-        fig.show()
+        #fig.show()
     return fig
 
 def HERMES12(path=None, fmt='png', **kwargs):
@@ -893,7 +893,7 @@ def HERAF2Q2(path=None, fmt='png', **kwargs):
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
         fig.canvas.draw()
-        fig.show()
+        #fig.show()
     return fig
 
 def HERAF2xB(path=None, fmt='png', **kwargs):
@@ -1595,7 +1595,7 @@ def H1ZEUS(path=None, fmt='png', **kwargs):
         fig.show()
     return fig
 
-def DVMP(path=None, fmt='png', **kwargs):
+def DVMP(H109WdepXL, path=None, fmt='png', **kwargs):
     """Makes plot of H1 DVMP data with fit lines"""
 
     subsets = {}
@@ -1608,7 +1608,7 @@ def DVMP(path=None, fmt='png', **kwargs):
     subsets[4] = [] 
     xs = ['Q2', 'W', 't', 'Q2']
     title = 'H1 DVMP'
-    fig = plt.figure()
+    fig = plt.figure(figsize=(14,8))
     fig.canvas.set_window_title(title)
     fig.suptitle(title)
     fig.subplots_adjust(bottom=0.1, hspace=0.3)
@@ -1647,7 +1647,7 @@ def DVMP(path=None, fmt='png', **kwargs):
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
         fig.canvas.draw()
-        fig.show()
+        #fig.show()
     return fig
 
 def COMPASSt(path=None, fmt='png', **kwargs):
@@ -2867,8 +2867,7 @@ def CFF(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
             ax.text(0.6, 0.6, r"$t = -0.2\,\, {\rm GeV}^2$", transform=ax.transAxes, 
                     fontsize=14)
         if n == len(cffs)-1:
-            ax.set_xlabel(toTeX['xi'], fontsize=16)
-        # [RIGHT:] extrapolation range (logarithmic)
+            ax.set_xlabel(toTeX['xi'], fontsize=16) # [RIGHT:] extrapolation range (logarithmic)
         if len(cffs) == 1:
             ax = axs[1]
         else:
@@ -2888,7 +2887,7 @@ def CFF(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
         fig.canvas.draw()
-        fig.show()
+        #fig.show()
     return fig
 
 def CFF2(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
@@ -3192,7 +3191,9 @@ def jbod(path=None, fmt='png', **kwargs):
     for pts in kwargs['points']:
         label = ' + '.join(set('%s-%s-%s' % (pt.collaboration, 
             str(pt.year)[-2:], pt.yaxis) for pt in pts))
-        ax.text(n, 0, label)
+        # x-coordinate is in data frame, while y-coordinate is in 0.0-1.0 frame
+        ax.text(n, 0.9, label, transform=matplotlib.transforms.blended_transform_factory(
+            ax.transData, ax.transAxes))
         for pt in pts:
             pt.npt = n
             n += 1
@@ -3201,7 +3202,7 @@ def jbod(path=None, fmt='png', **kwargs):
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
         fig.canvas.draw()
-        fig.show()
+        #fig.show()
     return fig
 
 def bspace(th, parsets=False, path=None, fmt='png', error=False, **kwargs):
