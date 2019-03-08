@@ -1198,6 +1198,28 @@ class GK12D(GK12):
         denom = (1 - pt.t/(0.841*0.487**2))**0.841
         return -(10./9.)*(-1.9/denom)
 
+class GK0(GK12):
+    """ Goloskokov-Kroll PDF model with only CFF H """
+
+    def ImE(self, pt, xi=0): 
+        return 0.
+
+    def ReE(self, pt, xi=0): 
+        return 0.
+
+    def ImHt(self, pt, xi=0): 
+        return 0.
+
+    def ReHt(self, pt, xi=0): 
+        return 0.
+
+    def ImEt(self, pt, xi=0): 
+        return 0.
+
+    def ReEt(self, pt, xi=0): 
+        return 0.
+
+
 class ComptonNeuralNets(Model):
     """Neural network CFFs"""
 
@@ -2189,6 +2211,9 @@ class GK(GK12, ElasticKelly):
 
 class GKD(GK12D, ElasticKelly):
     """Goloskokov-Kroll model as described in arXiv:1210.6975 + D-term."""
+
+class GKonlyH(GK0, ElasticKelly):
+    """Goloskokov-Kroll model with only CFF H != 0"""
 
 class ModelDRKelly(ComptonModelDR, ElasticKelly):
     """Same, but with Kelly elastic form factors."""
