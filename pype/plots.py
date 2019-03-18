@@ -2857,15 +2857,15 @@ def CFF(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
         panel(ax, xaxis='xi', xs=xvals, kins={'yaxis':cff, 't':-0.2, 'Q2':4.,
         'units':{'CFF': 1}, 'y1name': 'CFF'}, **kwargs)
         ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
-        ax.set_ylim(*ylims[cff])
+        #ax.set_ylim(*ylims[cff])
         ax.set_ylabel(toTeX['%s' % cff], fontsize=20)
         ax.tick_params(axis='both', which='major', labelsize=14)
         ax.tick_params(axis='both', which='minor', labelsize=14)
         if n == 0:
             ax.legend(loc='upper right')
             ax.legend().draw_frame(0)
-            ax.text(0.6, 0.6, r"$t = -0.2\,\, {\rm GeV}^2$", transform=ax.transAxes, 
-                    fontsize=14)
+            ax.text(0.2, 0.9, r"$t = -0.2\,\, {\rm GeV}^2$", transform=ax.transAxes, 
+                    fontsize=12)
         if n == len(cffs)-1:
             ax.set_xlabel(toTeX['xi'], fontsize=16) # [RIGHT:] extrapolation range (logarithmic)
         if len(cffs) == 1:
@@ -2877,7 +2877,7 @@ def CFF(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
             'units':{'CFF': 1}, 'y1name': 'CFF'}, **kwargs)
         ax.axvspan(0.04, 0.25, facecolor='g', alpha=0.1)  # vertical band
         ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
-        ax.set_ylim(*ylims[cff])
+        #ax.set_ylim(*ylims[cff])
         ax.tick_params(axis='both', which='major', labelsize=14)
         ax.tick_params(axis='both', which='minor', labelsize=14)
         if n == len(cffs)-1:
@@ -2962,7 +2962,7 @@ def CFF2(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
         mkpdf(path)
     else:
         fig.canvas.draw()
-        fig.show()
+        #fig.show()
     return fig
 
 def CFFt(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
@@ -2975,9 +2975,6 @@ def CFFt(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
     fig = plt.figure(figsize=(12,4*len(cffs)))
     #fig.canvas.set_window_title(title)
     #fig.suptitle(title)
-    colors = ['red', 'brown']     # worm human colors :-)
-    nncolors = ['blue', 'green']  # cold computer colors
-    linestyles = ['solid', 'dashed']
     # Define abscissas
     tmvals = np.linspace(0.02, 0.6, 10) # right panel
     # ordinates 
@@ -2987,7 +2984,7 @@ def CFFt(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
         cff = cffs[n]
         # small x
         ax = fig.add_subplot(len(cffs), 2, 2*n+1)
-        panel(ax, xaxis='tm', xs=tmvals, kins={'yaxis':cff, 'xB':0.001, 'Q2':4., 
+        panel(ax, xaxis='tm', xs=tmvals, kins={'yaxis':cff, 'xB':0.1, 'Q2':4., 
            'units':{'CFF': 1}, 'y1name': 'CFF'}, **kwargs)
         ax.set_xlabel(toTeX['tm'], fontsize=15)
         ax.set_ylabel(toTeX['%s' % cff], fontsize=18)
@@ -2995,10 +2992,10 @@ def CFFt(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
         if n == 0:
             ax.legend(loc='upper right')
             ax.legend().draw_frame(0)
-            ax.text(0.03, 4, "$x_B = 0.001$",# transform=ax.transAxes, 
-                    fontsize=10)
-            ax.text(0.03, 0.4, "$Q^2 = 4\\, {\\rm GeV}^2$",# transform=ax.transAxes, 
-                    fontsize=10)
+            ax.text(0.1, 0.18, "$x_B = 0.1$", transform=ax.transAxes, 
+                    fontsize=12)
+            # ax.text(0.1, 0.12, "$Q^2 = 4\\, {\\rm GeV}^2$", transform=ax.transAxes, 
+                    # fontsize=12)
         # moderate x
         ax = fig.add_subplot(len(cffs), 2, 2*n+2)
         panel(ax, xaxis='tm', xs=tmvals, kins={'yaxis':cff, 'xB':0.2, 'Q2':4.,
@@ -3009,16 +3006,16 @@ def CFFt(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
         if n == 0:
             ax.legend(loc='upper right')
             ax.legend().draw_frame(0)
-            ax.text(0.03, 2.5, "$x_B = 0.2$",# transform=ax.transAxes, 
-                    fontsize=10)
-            ax.text(0.03, 0.4, "$Q^2 = 4\\, {\\rm GeV}^2$",# transform=ax.transAxes, 
-                    fontsize=10)
+            ax.text(0.1, 0.18, "$x_B = 0.2$", transform=ax.transAxes, 
+                    fontsize=12)
+            # ax.text(0.1, 0.12, "$Q^2 = 4\\, {\\rm GeV}^2$", transform=ax.transAxes, 
+                    # fontsize=12)
     fig.subplots_adjust(bottom=0.1)
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
         fig.canvas.draw()
-        fig.show()
+        #fig.show()
     return fig
 
 def CFF3(path=None, fmt='png', **kwargs):
@@ -3063,7 +3060,7 @@ def CFF3(path=None, fmt='png', **kwargs):
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
         fig.canvas.draw()
-        fig.show()
+        #fig.show()
     return fig
 
 def GPDt(path=None, fmt='png', **kwargs):
@@ -3103,7 +3100,7 @@ def GPDt(path=None, fmt='png', **kwargs):
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
         fig.canvas.draw()
-        fig.show()
+        #fig.show()
     return fig
 
 def skewness(path=None, fmt='png', **kwargs):
