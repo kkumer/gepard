@@ -57,7 +57,7 @@ class FitterMinuit(Fitter):
                 theory.model.ndparameters.put(range(theory.model.ndparameters.size), p)
             chisq = 0
             for pt in fitpoints:
-                chisq += (getattr(theory, pt.yaxis)(pt) - pt.val)**2 / pt.err**2 
+                chisq += (getattr(theory, pt.yaxis)(pt) - pt.val)**2 / pt.err**2
             _lg.info('Minuit: {:4d} calls --> chisq/npt = {:.3f}/{}'.format(
                 self.minuit.get_num_call_fcn()+1, chisq, len(fitpoints)))
             return chisq
@@ -66,10 +66,10 @@ class FitterMinuit(Fitter):
             # This is needed because in Python <=2.5 ** operator
             # requires dict as an argument, i.e. my hubDictNew wouldn't work:
             auxdict = dict((it for it in list(theory.model.parameters.items())))
-            self.minuit = Minuit(fcn, use_array_call=True, errordef=1, 
+            self.minuit = Minuit(fcn, use_array_call=True, errordef=1,
                     forced_parameters=theory.model.parameter_names, **auxdict)
         else:
-            self.minuit = Minuit(fcn, use_array_call=True, errordef=1, 
+            self.minuit = Minuit(fcn, use_array_call=True, errordef=1,
                     forced_parameters=theory.model.parameter_names, **theory.model.parameters)
         for key in kwargs:
             setattr(self.minuit, key, kwargs[key])
@@ -85,7 +85,7 @@ class FitterMinuit(Fitter):
         self.theory.model.covariance = self.minuit.covariance
         if self.printMode > 0:
             print("")
-            self.theory.model.print_parameters_errors(pvalues=True, 
+            self.theory.model.print_parameters_errors(pvalues=True,
                     ndof=len(self.fitpoints)-utils.npars(self.theory.model))
 
     def fix_parameters(self, *args):
@@ -96,7 +96,7 @@ class FitterMinuit(Fitter):
             self.theory.model.fix_parameters('ALL')
             for par in self.theory.model.parameter_names:
                 self.minuit.fixed[par] = True
-                    
+
         else:
             self.theory.model.fix_parameters(*args)
             for par in args:
@@ -112,19 +112,19 @@ class FitterMinuit(Fitter):
     def print_parameters(self):
         for par in self.theory.model.parameter_names:
             if not self.theory.model.parameters['fix_'+par]:
-                print('%5s = %4.2f +- %4.2f' % (par, 
+                print('%5s = %4.2f +- %4.2f' % (par,
                         self.minuit.values[par], self.minuit.errors[par]))
-         
+
 
 
 
 class FitterBrain(Fitter):
     """Fits using PyBrain neural net library.
-    
+
     Named arguments:
     nnets = int (default 4) -- number of neural nets created
     nbatch = int (default 20) -- number of training batches
-    batchlen = int (default 5) -- number of epochs in batch 
+    batchlen = int (default 5) -- number of epochs in batch
     verbose = int (default 0) -- verbosity
     (Architecture of the net is specified by Model instance.)
 
@@ -149,9 +149,9 @@ class FitterBrain(Fitter):
             for k in range(self.outputs):
                 left[k] = 1.2
                 if self.theory.m.useDR:
-                    deriv.append((theory.predict(pt, 
+                    deriv.append((theory.predict(pt,
                         parameters={'outputvalue':tuple(left), 'outputvalueC':1.0}) -
-                                  theory.predict(pt, 
+                                  theory.predict(pt,
                         parameters={'outputvalue':tuple(right), 'outputvalueC':1.0})) / 0.2)
                 else:
                     deriv.append((theory.predict(pt, parameters={'outputvalue':tuple(left)}) -
@@ -166,7 +166,7 @@ class FitterBrain(Fitter):
 
     def artificialData(self, datapoints, trainpercentage=70, useDR=None):
         """Create artificial data replica.
-        
+
         Replica is created by randomly picking value around mean value taken from
         original data, using normal Gaussian distribution with width equal to
         uncertainty of the original data point. Resulting set of artificial
@@ -181,9 +181,9 @@ class FitterBrain(Fitter):
                            instance used for subtraction constant netC training
                            and similarly testingC (which is maybe not needed?)
 
-           
+
         """
-        training = brain.SupervisedDataSetTransformed(self.inputs, self.outputs) 
+        training = brain.SupervisedDataSetTransformed(self.inputs, self.outputs)
         testing = brain.SupervisedDataSetTransformed(self.inputs, self.outputs)
         if useDR:
             # for subtraction constant
@@ -227,7 +227,7 @@ class FitterBrain(Fitter):
             else:
                 _lg.debug('Creating new %s net' % str(self.theory.model.architecture))
                 net = buildNetwork(*self.theory.model.architecture)
-            self.trainer = brain.RPropMinusTrainerTransformed(net, learningrate = 0.9, 
+            self.trainer = brain.RPropMinusTrainerTransformed(net, learningrate = 0.9,
                 lrdecay = 0.98, momentum = 0.0, batchlearning = True, verbose = False)
             _lg.debug('Doing cross-validation training')
             #self.dstrain, self.dstest = self.artificialData(datapoints)
@@ -236,7 +236,7 @@ class FitterBrain(Fitter):
             memnet = net.copy()
             for k in range(self.nbatch):
                 self.trainer.trainOnDataset(self.dstrain, self.batchlen)
-                trainerr, testerr = (self.trainer.testOnData(self.dstrain), 
+                trainerr, testerr = (self.trainer.testOnData(self.dstrain),
                         self.trainer.testOnData(self.dstest))
                 if self.verbose > 1:
                     print("Epoch: %6i   ---->    Error: %8.3g  TestError: %8.3g / %6.3g" % (
@@ -261,7 +261,7 @@ class FitterBrain(Fitter):
             else:
                 _lg.debug('Creating new %s net' % str(self.theory.model.architecture))
                 net = buildNetwork(*self.theory.model.architecture)
-            self.trainer = brain.RPropMinusTrainerTransformed(net, learningrate = 0.9, 
+            self.trainer = brain.RPropMinusTrainerTransformed(net, learningrate = 0.9,
                 lrdecay = 0.98, momentum = 0.0, batchlearning = True, verbose = False)
             _lg.debug('Doing simple non--cross-validated training')
             # simple training
@@ -273,7 +273,7 @@ class FitterBrain(Fitter):
         """Create trained nets and return tuple (net, netC, error).
         net is network giving CFF outputs, while netC is network with
         single input and output giving subtraction constant C(t)
-        
+
         """
         self.dstrain, self.dstrainC, self.dstest, self.dstestC = self.artificialData(
                 datapoints, useDR=True)
@@ -281,9 +281,9 @@ class FitterBrain(Fitter):
         net = buildNetwork(*self.theory.model.architecture)
         netC = buildNetwork(1, 3, 1)  # hardwired hidden layer good enough?
 
-        self.trainer = brain.RPropMinusTrainerTransformed(net, learningrate = 0.9, 
+        self.trainer = brain.RPropMinusTrainerTransformed(net, learningrate = 0.9,
                 lrdecay = 0.98, momentum = 0.0, batchlearning = True, verbose = False)
-        self.trainerC = brain.RPropMinusTrainerTransformed(netC, learningrate = 0.9, 
+        self.trainerC = brain.RPropMinusTrainerTransformed(netC, learningrate = 0.9,
                 lrdecay = 0.98, momentum = 0.0, batchlearning = True, verbose = False)
 
         memerr = 1.  # large initial error, certain to be bettered
@@ -293,9 +293,9 @@ class FitterBrain(Fitter):
         for k in range(self.nbatch):
             self.trainer.trainOnDataset(self.dstrain, self.batchlen)
             self.trainerC.trainOnDataset(self.dstrainC, self.batchlen)
-            trainerr, testerr = (self.trainer.testOnData(self.dstrain), 
+            trainerr, testerr = (self.trainer.testOnData(self.dstrain),
                     self.trainer.testOnData(self.dstest))
-            trainerrC, testerrC = (self.trainerC.testOnData(self.dstrainC), 
+            trainerrC, testerrC = (self.trainerC.testOnData(self.dstrainC),
                     self.trainerC.testOnData(self.dstestC))
             if self.verbose > 1:
                 print("Epoch: %6i   ---->    TrainErr: %8.3g  TestErr: %8.3g / %6.3g" % (
@@ -325,7 +325,7 @@ class FitterBrain(Fitter):
                 break
         #sys.stderr.write(str(trans.outmem))
         return memnet, memnetC, memerr, memerrC
-    
+
     def fit(self):
         """Create and train neural networks."""
         for n in range(self.nnets):
@@ -377,7 +377,8 @@ class FitterBrain(Fitter):
             if fitprob < 0.05:
                 sfitprob = utils.stringcolor("%5.4f" % fitprob, 'red', True)
                 del self.theory.model.nets[-1]
-                del self.theory.model.netsC[-1]
+                if self.theory.m.useDR:
+                    del self.theory.model.netsC[-1]
                 self.theory.model.parameters['nnet'] = n-1
             else:
                 sfitprob = utils.stringcolor("%5.4f" % fitprob, 'green', True)
@@ -412,4 +413,3 @@ class FitterBrain(Fitter):
         self.nnets = len(goodnets)
         self.theory.model.parameters['nnet'] = 'ALL'
         return self.theory
-
