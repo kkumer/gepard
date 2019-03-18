@@ -243,7 +243,7 @@ class Approach(object):
             # express result in conventions of original datapoint
             try:
                 result = (self.orig_conventions(pt, result[0]),) + result[1:]
-            except IndexError:
+            except (IndexError, TypeError):
                 result = self.orig_conventions(pt, result)
         return result
 
