@@ -1,4 +1,4 @@
-""" 
+"""
 Plotting functions written for ad-hoc plotting
 of some specific datasets and CFFs.
 
@@ -31,14 +31,14 @@ from abbrevs import DISpoints
 
 # load experimental data
 DATA_DIR = os.path.join(os.path.dirname(__file__), 'data')
-data = utils.loaddata(os.path.join(DATA_DIR,'ep2epgamma'), 
-       approach=Approach.BMK) 
+data = utils.loaddata(os.path.join(DATA_DIR,'ep2epgamma'),
+       approach=Approach.BMK)
 data.update(utils.loaddata(os.path.join(DATA_DIR, 'gammastarp2gammap'),
-       approach=Approach.BMK)) 
+       approach=Approach.BMK))
 data.update(utils.loaddata(os.path.join(DATA_DIR, 'gammastarp2Mp'),
-       approach=Approach.BMK)) 
+       approach=Approach.BMK))
 data.update(utils.loaddata(os.path.join(DATA_DIR, 'DIS'),
-       approach=Approach.BMK)) 
+       approach=Approach.BMK))
 
 ###  subplots_adjust options and their meanings:
  # left  = 0.125  # the left side of the subplots of the figure
@@ -89,7 +89,7 @@ def _axpoints(ax, pts, xaxis, **kwargs):
     ax.errorbar(xvals, yvals, yerrs, **kwargs)
 
 def _axline(ax, fun, points, xaxis, **kwargs):
-    """Make a line(s) corresponding to points 
+    """Make a line(s) corresponding to points
 
     fun -- real-valued function of DataPoint instance
     points -- list of sets of DataPoint instances
@@ -111,7 +111,7 @@ def _axline(ax, fun, points, xaxis, **kwargs):
         ax.plot(xvals, yvals, **kwargs)
 
 def _axband(ax, fun, pts, xaxis, **kwargs):
-    """Make a band corresponding to points 
+    """Make a band corresponding to points
 
     fun -- function of DataPoint instance returning tuple
            (mean, err) or (mean, err+, err-) defining errorband
@@ -139,7 +139,7 @@ def _axband(ax, fun, pts, xaxis, **kwargs):
         #FIXME: symmetric error assumed
         yvals, yerrs = np.array([((up+down)/2, (up-down)/2) for up,down in res]).transpose()
         xvals = [x+0.1 for x in xvals]
-        ax.errorbar(xvals, yvals, yerrs, marker='d', color='red', linestyle='None', 
+        ax.errorbar(xvals, yvals, yerrs, marker='d', color='red', linestyle='None',
                 elinewidth=3)
     else:
         x = np.concatenate( (xvals, xvals[::-1]) )
@@ -150,7 +150,7 @@ def _axband(ax, fun, pts, xaxis, **kwargs):
         ax.fill(x, y, alpha=0.5, **kwargs)
 
 
-def panel(ax, points=None, lines=None, bands=None, xaxis=None, xs=None, 
+def panel(ax, points=None, lines=None, bands=None, xaxis=None, xs=None,
         kins={}, kinlabels=None, CL=False, **kwargs):
     """Plot datapoints together with fit/theory line(s) and band(s).
 
@@ -186,7 +186,7 @@ def panel(ax, points=None, lines=None, bands=None, xaxis=None, xs=None,
         pointcolors = ['black', 'red', 'green', 'red', 'brown', 'blue', 'black']
         setn = 0
         for pts in points:
-            _axpoints(ax, pts, xaxis, linestyle='None', elinewidth=1, 
+            _axpoints(ax, pts, xaxis, linestyle='None', elinewidth=1,
                     label = '{} {}'.format(pts[0].collaboration, pts[0].year),
                     marker=pointshapes[setn], color=pointcolors[setn], **kwargs)
             setn += 1
@@ -209,14 +209,14 @@ def panel(ax, points=None, lines=None, bands=None, xaxis=None, xs=None,
     if lines:
         if not isinstance(lines, list): lines = [lines]
         linecolors = ['red', 'black', 'blue', 'green', 'darkorchid', 'olive',
-            'darkcyan', 'indianred', 'red', 'black', 'blue', 'green', 
-            'darkorchid', 'olive', 'darkcyan', 'indianred']  
+            'darkcyan', 'indianred', 'red', 'black', 'blue', 'green',
+            'darkorchid', 'olive', 'darkcyan', 'indianred']
         linestyles = ['-', '--', '-.', ':','-', '--', '-.', ':',
             '-', '--', '-.', ':','-', '--', '-.', ':']
         linen = 0
         for line in lines:
             _axline(ax, lambda pt: line.predict(pt, orig_conventions=True), points, xaxis=xaxis,
-                    color=linecolors[linen], linestyle=linestyles[linen], 
+                    color=linecolors[linen], linestyle=linestyles[linen],
                     linewidth=1, alpha=1.0, label=line.name, **kwargs)
             linen += 1
 
@@ -228,7 +228,7 @@ def panel(ax, points=None, lines=None, bands=None, xaxis=None, xs=None,
         for band in bands:
             for pts in points:
                 _axband(ax, lambda pt: band.predict(pt, error=True, CL=CL, orig_conventions=True), pts, xaxis=xaxis,
-                        hatch=hatches[bandn], 
+                        hatch=hatches[bandn],
                         #color=bandcolors[bandn],
                         #facecolor=bandcolors[bandn], # band  color
                         facecolor='none',
@@ -254,7 +254,7 @@ def panel(ax, points=None, lines=None, bands=None, xaxis=None, xs=None,
             try:
                 labtxt += toTeX[lab] + ' = ' + str(getattr(points[0],lab)) + ', '
             except AttributeError:
-                # If dataset doesn't have it, all points should have it 
+                # If dataset doesn't have it, all points should have it
                 labtxt += toTeX[lab] + ' = ' + str(getattr(points[0][0],lab)) + ', '
         ax.text(labx, laby, labtxt[:-2])
 
@@ -362,7 +362,7 @@ def HERMES10t(lines=None, path=None, fmt='png'):
     dfALL0 = utils.select(data[53], criteria=['FTn == 0'])[:4].df()
     dfALL1 = utils.select(data[53], criteria=['FTn == 1'])[:4].df()
     dfs = [dfAUL, dfALL1, dfALL0]
-    ylabels = [r'$A_{UL,+}^{\sin\phi}$', 
+    ylabels = [r'$A_{UL,+}^{\sin\phi}$',
                 r'$-A_{LL,+}^{\cos\phi}$',
                 r'$A_{LL,+}^{\cos 0\phi}$']
     ylims = [(-0.32, 0.08), (-0.32, 0.22), (-0.28, 0.55)]
@@ -371,7 +371,7 @@ def HERMES10t(lines=None, path=None, fmt='png'):
     fig, axs = plt.subplots(3, 1, sharex=True, figsize=[7,9])
     for p, ax in enumerate(axs):
         pts = dfs[p]
-        ax.errorbar(pts.tm.values, pts.val.values, pts.err.values, 
+        ax.errorbar(pts.tm.values, pts.val.values, pts.err.values,
                 linestyle='None', marker='s', color='black')
         if not isinstance(lines, list): lines = [lines]
         for l, th in enumerate(lines):
@@ -380,12 +380,12 @@ def HERMES10t(lines=None, path=None, fmt='png'):
         ax.set_xlim(0.0, 0.51)
         ax.set_ylim(*ylims[p])
         ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
-        ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1)) 
-        ax.yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(yticks[p])) 
+        ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))
+        ax.yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(yticks[p]))
         ax.set_ylabel(ylabels[p], fontsize=18)
         ax.set_xlabel('$-t\\; [{\\rm GeV}^2]$', fontsize=16)
     axs[1].legend(loc='lower center').draw_frame(0)
-    fig.subplots_adjust(wspace=0.0, hspace=0.0) 
+    fig.subplots_adjust(wspace=0.0, hspace=0.0)
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
@@ -405,11 +405,11 @@ def HERMES12t(lines=None, path=None, fmt='png'):
     fig, axs = plt.subplots(2, 1, sharex=True, figsize=[7,6])
     for p, ax in enumerate(axs):
         pts = dfs[p]
-        ax.errorbar(pts.tm.values, pts.val.values, pts.err.values, 
+        ax.errorbar(pts.tm.values, pts.val.values, pts.err.values,
                 linestyle='None', marker='s', color='black')
         if p == 0:
             # add recoil data
-            ax.errorbar(dfALUrec.tm.values, dfALUrec.val.values, 
+            ax.errorbar(dfALUrec.tm.values, dfALUrec.val.values,
                     dfALUrec.err.values, fillstyle='none',
                 linestyle='None', marker='s', color='black')
         if not isinstance(lines, list): lines = [lines]
@@ -417,11 +417,11 @@ def HERMES12t(lines=None, path=None, fmt='png'):
             xs, ys = thline(th, pts, pts.pt[0], npts=NPTS)
             ax.plot(xs, ys, styles[l], label=th.name)
         ax.set_xlim(0.0, 0.51)
-        ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1)) 
+        ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))
         ax.set_ylabel(ylabels[p], fontsize=18)
         ax.set_xlabel('$-t\\; [{\\rm GeV}^2]$', fontsize=16)
     axs[1].legend(loc='upper right').draw_frame(0)
-    fig.subplots_adjust(wspace=0.0, hspace=0.0) 
+    fig.subplots_adjust(wspace=0.0, hspace=0.0)
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
@@ -639,7 +639,7 @@ def HERMES08TP(path=None, fmt='png', **kwargs):
                 ax.set_ylabel('')
                 ax.set_yticklabels([])
             else:
-                ylabels = ['$A_{UT,I}^{\\sin(\\phi-\\phi_S)\\cos\\phi}$', 
+                ylabels = ['$A_{UT,I}^{\\sin(\\phi-\\phi_S)\\cos\\phi}$',
                            '$A_{UT,DVCS}^{\\sin(\\phi-\\phi_S)}$']
                 ax.set_ylabel(ylabels[(npanel-1)/3], fontsize=16)
             if npanel < 4:
@@ -810,7 +810,7 @@ def CLAS15(obs='BSA', path=None, fmt='png', **kwargs):
     axs = axs.reshape(6)
     fig.canvas.set_window_title(title)
     fig.suptitle(title + ' -- ' +  obs, fontsize=20)
-    # 
+    #
     panels = [ dataset[:1],
                dataset[1:4],
                dataset[4:7],
@@ -945,7 +945,7 @@ def HERAF2(path=None, fmt='png', **kwargs):
     axs = axs.reshape(2)
     fig.canvas.set_window_title(title)
     #fig.suptitle(title + ' -- ' +  obs)
-    # 
+    #
     panels = [ data[208],
                data[202] ]
     for np, panelset in enumerate(panels):
@@ -986,7 +986,7 @@ def CLASJ(path=None, fmt='png', **kwargs):
     """
 
     # old data
-    aux = [(Q2, Data.DataSet(grp)) for Q2, grp in 
+    aux = [(Q2, Data.DataSet(grp)) for Q2, grp in
             itertools.groupby(data[25], lambda pt: pt.Q2)]
     old = []
     for Q2, ds in aux:
@@ -1132,7 +1132,7 @@ def HallA06(lines=None, path=None, fmt='png'):
     title = 'HallA06'
     NPTS = 12
     # tupls are (dataset id, ind_low, ind_high)
-    xQbins = [1, 2, 3, 
+    xQbins = [1, 2, 3,
               'blank', 'blank', 4,
               'blank', 'blank', 5]
     subsets = {}
@@ -1145,7 +1145,7 @@ def HallA06(lines=None, path=None, fmt='png'):
     fig, axs = plt.subplots(3, 3, figsize=[7,9])
     axs = axs.reshape(9)
     for pn, iset in enumerate(xQbins):
-        if iset == 'blank': 
+        if iset == 'blank':
             axs[pn].axis('off')
             continue
         pts = pd.DataFrame([(pt.Q2, pt.xB, pt.tm, pt.val, pt.err) for pt in subsets[iset]], columns=('Q2', 'xB', 'tm', 'val', 'err'))
@@ -1157,7 +1157,7 @@ def HallA06(lines=None, path=None, fmt='png'):
             xs, ys = thline(th, pts, subsets[iset][0], npts=NPTS)
             axs[pn].plot(xs, ys, styles[nl], label=th.name)
         axs[pn].set_xlim(0.12, 0.42)
-        axs[pn].xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1)) 
+        axs[pn].xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))
         s1 = r'$Q^2 =\, {:.2f}$'.format(pts.Q2.mean())
         s1 += '\n'
         s1 += r'$x_B =\, {:.2f}$'.format(pts.xB.mean())
@@ -1167,7 +1167,7 @@ def HallA06(lines=None, path=None, fmt='png'):
         if pn in [4,5]:
             #axs[pn].text(0.25, 0.06, s1, fontsize=16)
             axs[pn].set_ylim(0.0,0.088)
-            axs[pn].yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.03)) 
+            axs[pn].yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.03))
         if pn in [7,8]:
             #axs[pn].text(0.25, 0.0005, s1, fontsize=16)
             axs[pn].set_ylim(-0.005, 0.017)
@@ -1186,7 +1186,7 @@ def HallA06(lines=None, path=None, fmt='png'):
             axs[pn].set_ylabel(r'$\Delta\sigma^{\sin\phi,w}$', fontsize=20)
         if pn in [1,2]:
             axs[pn].get_yaxis().set_visible(False)
-    fig.subplots_adjust(wspace=0.0, hspace=0.0) 
+    fig.subplots_adjust(wspace=0.0, hspace=0.0)
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
@@ -1296,7 +1296,7 @@ def CLAS15phi(path=None, fmt='png', **kwargs):
             # Take legend info on this panel
             handles, labels = ax.get_legend_handles_labels()
             # Draw legend on this panel
-            ax.legend(handles, labels, loc="upper center", 
+            ax.legend(handles, labels, loc="upper center",
                 borderpad=0.8, handlelength=3, fancybox=True, framealpha=1.0,
                 facecolor='navajowhite',
                 prop=matplotlib.font_manager.FontProperties(size="x-large"))
@@ -1339,7 +1339,7 @@ def CLAS15xs(lines=None, path=None, fmt='png'):
             xs, ys = thline(th, pts, data[101][a], npts=NPTS)
             axs[pn].plot(xs, ys, styles[nl], label=th.name)
         axs[pn].set_xlim(0.05, 0.55)
-        axs[pn].xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1)) 
+        axs[pn].xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))
         s1 = '$Q^2 = {:.2f}$'.format(pts.Q2.mean())
         s1 += '\n'
         s1 += '$x_B = {:.2f}$'.format(pts.xB.mean())
@@ -1352,13 +1352,13 @@ def CLAS15xs(lines=None, path=None, fmt='png'):
         if (pn % 5) == 0:
             axs[pn].set_ylabel(r'$\Delta\sigma^{\sin\phi,w}$', fontsize=24)
         if pn == 9:
-            axs[pn].legend(loc=(-0.5,0.5), 
+            axs[pn].legend(loc=(-0.5,0.5),
                 borderpad=0.8, handlelength=3, fancybox=True, framealpha=1.0,
                 facecolor='navajowhite',
                 prop=matplotlib.font_manager.FontProperties(size="x-large"))
         axs[pn].tick_params(axis='both', which='major', labelsize=12)
         axs[pn].tick_params(axis='both', which='minor', labelsize=12)
-    fig.subplots_adjust(wspace=0.0, hspace=0.0) 
+    fig.subplots_adjust(wspace=0.0, hspace=0.0)
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
@@ -1372,21 +1372,21 @@ def HallA15(lines=None, enh=True, path=None, fmt='png'):
     NPTS = 12
     # tupls are (dataset id, ind_low, ind_high)
     if enh:
-        xQbins = [(117, 0, 4), (117, 5,9), (117, 10, 14), 
+        xQbins = [(117, 0, 4), (117, 5,9), (117, 10, 14),
             ('blank', 0, 0), (116, 0, 4), (116, 5, 9),
             ('blank', 0, 0), (116, 10, 14), (116, 15, 19)]
     else:
-        xQbins = [(117, 0, 4), (117, 5,9), (117, 10, 14), 
+        xQbins = [(117, 0, 4), (117, 5,9), (117, 10, 14),
             ('blank', 0, 0), (123, 0, 4), (123, 5, 9),
             ('blank', 0, 0), (123, 10, 14), (123, 15, 19)]
     #fig, axs = plt.subplots(3, 3, sharey='row', sharex=True, figsize=[8,10])
     fig, axs = plt.subplots(3, 3, figsize=[7,9])
     axs = axs.reshape(9)
     for pn, (id, a,b) in enumerate(xQbins):
-        if id == 'blank': 
+        if id == 'blank':
             axs[pn].axis('off')
             continue
-        pts = pd.DataFrame([(pt.Q2, pt.xB, pt.tm, pt.val, pt.err) for pt in data[id][a:b+1]], columns=('Q2', 'xB', 'tm', 'val', 'err')) 
+        pts = pd.DataFrame([(pt.Q2, pt.xB, pt.tm, pt.val, pt.err) for pt in data[id][a:b+1]], columns=('Q2', 'xB', 'tm', 'val', 'err'))
         axs[pn].errorbar(pts.tm.values, pts.val.values, pts.err.values, linestyle='None',
             capsize=2, color='black')
         if not isinstance(lines, list): lines = [lines]
@@ -1395,7 +1395,7 @@ def HallA15(lines=None, enh=True, path=None, fmt='png'):
             xs, ys = thline(th, pts, data[id][a], npts=NPTS)
             axs[pn].plot(xs, ys, styles[nl], label=th.name)
         axs[pn].set_xlim(0.12, 0.42)
-        axs[pn].xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1)) 
+        axs[pn].xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))
         s1 = r'$Q^2 =\, {:.2f}$'.format(pts.Q2.mean())
         s1 += '\n'
         s1 += r'$x_B =\, {:.2f}$'.format(pts.xB.mean())
@@ -1405,7 +1405,7 @@ def HallA15(lines=None, enh=True, path=None, fmt='png'):
         if pn in [4,5]:
             #axs[pn].text(0.25, 0.06, s1, fontsize=16)
             axs[pn].set_ylim(0.0,0.088)
-            axs[pn].yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.03)) 
+            axs[pn].yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.03))
         if pn in [7,8]:
             #axs[pn].text(0.25, 0.0005, s1, fontsize=16)
             axs[pn].set_ylim(-0.005, 0.017)
@@ -1424,7 +1424,7 @@ def HallA15(lines=None, enh=True, path=None, fmt='png'):
             axs[pn].set_ylabel(r'$\Delta\sigma^{\sin\phi,w}$', fontsize=20)
         if pn in [1,2,5,8]:
             axs[pn].get_yaxis().set_visible(False)
-    fig.subplots_adjust(wspace=0.0, hspace=0.0) 
+    fig.subplots_adjust(wspace=0.0, hspace=0.0)
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
@@ -1534,12 +1534,12 @@ def H1ZEUS(path=None, fmt='png', **kwargs):
 
     subsets = {}
     subsets[1] = [utils.select(data[63], criteria=['Q2 == 8.']),
-            utils.select(data[63], criteria=['Q2 == 15.5']), 
+            utils.select(data[63], criteria=['Q2 == 15.5']),
             utils.select(data[63], criteria=['Q2 == 25.'])]
     subsets[2] = [data[46]] # ZEUS t-dep
     subsets[3] = [data[48],
             utils.select(data[41], criteria=['Q2 == 8.']),
-            utils.select(data[41], criteria=['Q2 == 15.5']), 
+            utils.select(data[41], criteria=['Q2 == 15.5']),
             utils.select(data[41], criteria=['Q2 == 25.'])]
     subsets[4] = [data[47]] # ZEUS Q2-dep
     xs = ['t', 't', 'W', 'Q2']
@@ -1601,11 +1601,11 @@ def DVMP(H109WdepXL, path=None, fmt='png', **kwargs):
     subsets = {}
     subsets[1] = [data[76]]
     subsets[2] = [utils.select(H109WdepXL, criteria=['Q2 == 6.6']),
-            utils.select(H109WdepXL, criteria=['Q2 == 11.9']), 
-            utils.select(H109WdepXL, criteria=['Q2 == 19.5']), 
+            utils.select(H109WdepXL, criteria=['Q2 == 11.9']),
+            utils.select(H109WdepXL, criteria=['Q2 == 19.5']),
             utils.select(H109WdepXL, criteria=['Q2 == 35.6'])]
     subsets[3] = []
-    subsets[4] = [] 
+    subsets[4] = []
     xs = ['Q2', 'W', 't', 'Q2']
     title = 'H1 DVMP'
     fig = plt.figure(figsize=(14,8))
@@ -1657,9 +1657,9 @@ def COMPASSt(path=None, fmt='png', **kwargs):
     fig = plt.figure()
     fig.canvas.set_window_title(title)
     fig.suptitle(title)
-    #kinpoints = [(0.007, 1.5), (0.014, 2.5), (0.024, 3.7), 
+    #kinpoints = [(0.007, 1.5), (0.014, 2.5), (0.024, 3.7),
     #                       (0.045, 3.0), (0.1, 3.0), (0.2, 4.4)]
-    kinpoints = [(0.01, 1.4), (0.015, 2.4), (0.03, 5.0), 
+    kinpoints = [(0.01, 1.4), (0.015, 2.4), (0.03, 5.0),
                  (0.04, 1.4), (0.07, 2.4), (0.13, 5.0)]
     pn = 1
     ks = {'exptype' : 'fixed target'}
@@ -1720,7 +1720,7 @@ def COMPASSt(path=None, fmt='png', **kwargs):
 
 def COMPASS(lines=[], xB=0.05, Q2=2, path=None, fmt='png', numbers=False):
     """Plot COMPASS BCS asymmetry and difference and summ of xs for FormFactors model ff.
-    
+
     FIXME: kinematic completion, charge etc. must be explicit here
     """
 
@@ -1754,7 +1754,7 @@ def COMPASS(lines=[], xB=0.05, Q2=2, path=None, fmt='png', numbers=False):
         approach.__class__.to_conventions(pt)
         approach.__class__.prepare(pt)
         line = approach.BCSA(pt, vars={'phi':np.pi - phi})
-        ax.plot(phi, line, linestyles[pn], linewidth=2, label=approach.name) 
+        ax.plot(phi, line, linestyles[pn], linewidth=2, label=approach.name)
         asym.append(line)
         pn += 1
     #ax.set_ylim(0.0, 0.5)
@@ -1772,7 +1772,7 @@ def COMPASS(lines=[], xB=0.05, Q2=2, path=None, fmt='png', numbers=False):
     #    approach.__class__.prepare(pt)
     #    # nb converted to pb:
     #    line = 1000. * approach.BCSD(pt, vars={'phi':np.pi - phi})
-    #    ax.plot(phi, line, linestyles[pn], linewidth=2, label=approach.name) 
+    #    ax.plot(phi, line, linestyles[pn], linewidth=2, label=approach.name)
     #    diff.append(line)
     #    pn += 1
     ##ax.set_ylim(0.0, 0.5)
@@ -1790,7 +1790,7 @@ def COMPASS(lines=[], xB=0.05, Q2=2, path=None, fmt='png', numbers=False):
     #    approach.__class__.prepare(pt)
     #    # nb converted to pb:
     #    line = 1000. * approach.BCSS(pt, vars={'phi':np.pi - phi})
-    #    ax.plot(phi, line, linestyles[pn], linewidth=2, label=approach.name) 
+    #    ax.plot(phi, line, linestyles[pn], linewidth=2, label=approach.name)
     #    summ.append(line)
     #    pn += 1
     ##ax.set_ylim(0.0, 0.5)
@@ -1802,7 +1802,7 @@ def COMPASS(lines=[], xB=0.05, Q2=2, path=None, fmt='png', numbers=False):
     #    pn = 0
     #    for approach in lines:
     #        mat = np.array([phi, asym[pn], diff[pn], summ[pn]]).transpose()
-    #        np.savetxt('%s-%s.dat' % (filename, labels[pn]), mat, fmt='% f', 
+    #        np.savetxt('%s-%s.dat' % (filename, labels[pn]), mat, fmt='% f',
     #                delimiter='   ')
     #        pn += 1
     if path:
@@ -1817,7 +1817,7 @@ def COMPASS(lines=[], xB=0.05, Q2=2, path=None, fmt='png', numbers=False):
 
 def EIC(lines=[], path=None, fmt='png'):
     """Plot EIC cross section.
-    
+
     FIXME: kinematic completion, charge etc. must be explicit here
     """
 
@@ -1853,7 +1853,7 @@ def EIC(lines=[], path=None, fmt='png'):
         approach.__class__.to_conventions(pt)
         approach.__class__.prepare(pt)
         line = approach.Xunp(pt, vars={'phi':phi})
-        ax.plot(phi, line, linestyles[pn], linewidth=1, label=labels[pn]) 
+        ax.plot(phi, line, linestyles[pn], linewidth=1, label=labels[pn])
         pn += 1
     labels = ['$(\\sigma^{\\uparrow} + \\sigma^{\\downarrow})/2$ ' + t.name for t in lines]
     pn = 0
@@ -1861,7 +1861,7 @@ def EIC(lines=[], path=None, fmt='png'):
         approach.__class__.to_conventions(pt)
         approach.__class__.prepare(pt)
         lineBSS = approach.BSS(pt, vars={'phi':phi})
-        ax.plot(phi, lineBSS, linestyles[pn], linewidth=3, label=labels[pn]) 
+        ax.plot(phi, lineBSS, linestyles[pn], linewidth=3, label=labels[pn])
         pn += 1
     #ax.set_ylim(0.0, 0.5)
     # axes labels
@@ -1905,7 +1905,7 @@ def EICt(path=None, fmt='png', **kwargs):
 
 def EICTTSA(lines=[], path=None, fmt='png'):
     """Plot EIC TTSA.
-    
+
     FIXME: kinematic completion, charge etc. must be explicit here
     """
 
@@ -1949,7 +1949,7 @@ def EICTTSA(lines=[], path=None, fmt='png'):
             approach.m.parameters['KAPS'] = kaps
             # Must go to BKM explicitely here
             line = approach.TSA(pt, vars={'phi':np.pi-phi})
-            ax.plot(phi, line, linestyles[pn], dashes=dasheslengths[pn], linewidth=2, label='$\\kappa_{S}$ = % 4.1f' % kaps) 
+            ax.plot(phi, line, linestyles[pn], dashes=dasheslengths[pn], linewidth=2, label='$\\kappa_{S}$ = % 4.1f' % kaps)
             pn += 1
         approach.m.parameters['KAPS'] = mem
 
@@ -1981,7 +1981,7 @@ def EICTTSA(lines=[], path=None, fmt='png'):
 
 def H(theories=[], path=None, fmt='png'):
     """Makes plot of x*Im(cffH)/pi = x * H
-    
+
     """
     title = '' # 'Fig 15'
     fig = plt.figure()
@@ -1993,7 +1993,7 @@ def H(theories=[], path=None, fmt='png'):
     pt.Q2 = 2.
     ax = fig.add_subplot(1,1,1)
     ax.set_xscale('log')  # x-axis to be logarithmic
-    xval = np.power(10., np.arange(-3.5, 0, 0.01)) 
+    xval = np.power(10., np.arange(-3.5, 0, 0.01))
     colors = ['red', 'green', 'blue', 'purple']
     styles = ['-', '--', '-.', ':']
     pn = 0
@@ -2012,7 +2012,7 @@ def H(theories=[], path=None, fmt='png'):
             ImHvals.append(t.model.ImH(pt, xi))
         line2 = xval * ImHvals / np.pi
         #ax.plot(xval, line1, color=colors[pn], linestyle=styles[pn], linewidth=2)
-        ax.plot(xval, line2, color=colors[pn], linestyle=styles[pn], linewidth=3, label=t.name) 
+        ax.plot(xval, line2, color=colors[pn], linestyle=styles[pn], linewidth=3, label=t.name)
         pn += 1
     ax.set_ylim(0.0, 0.4)
     ax.set_xlim(0.0005, 1.0)
@@ -2072,7 +2072,7 @@ def EICspinALU(th, path=None, fmt='png'):
     th.__class__.prepare(pt)
     # Must go to BKM explicitely here
     line = th._BSA(pt, vars={'phi':np.pi-phi})
-    ax.plot(phi, line, linestyles[pn], dashes=dasheslengths[pn], linewidth=2, label=th.name) 
+    ax.plot(phi, line, linestyles[pn], dashes=dasheslengths[pn], linewidth=2, label=th.name)
     ax.set_xlim(0.0, 2*np.pi)
     ax.set_ylim(-0.65, 0.65)
     # axes labels
@@ -2099,7 +2099,7 @@ def EICspinALU(th, path=None, fmt='png'):
     for tm in tms:
         pt.t = -tm
         line.append(th.BSA(pt))
-    ax.plot(tms, line, linestyles[pn], dashes=dasheslengths[pn], linewidth=2) 
+    ax.plot(tms, line, linestyles[pn], dashes=dasheslengths[pn], linewidth=2)
     ax.set_xlim(0., 0.9)
     ax.set_ylim(-0.65, 0.65)
     ax.set_xlabel('$-t \\,{\\rm [GeV}^2{\\rm ]}$', fontsize=20)
@@ -2124,7 +2124,7 @@ def EICspinALU(th, path=None, fmt='png'):
         utils._complete_xBWQ2(pt)
         line.append(th.BSA(pt))
     ax.semilogx(xBs, line, linestyles[pn], dashes=dasheslengths[pn], linewidth=2,
-            label="$Q^2= %s \\,{\\rm GeV}^2$" % pt.Q2) 
+            label="$Q^2= %s \\,{\\rm GeV}^2$" % pt.Q2)
     pn += 1
     line = []
     pt.Q2 = 13.9
@@ -2134,7 +2134,7 @@ def EICspinALU(th, path=None, fmt='png'):
         utils._complete_xBWQ2(pt)
         line.append(th.BSA(pt))
     ax.semilogx(xBs, line, linestyles[pn], dashes=dasheslengths[pn], linewidth=2,
-            label="$Q^2= %s \\,{\\rm GeV}^2$" % pt.Q2) 
+            label="$Q^2= %s \\,{\\rm GeV}^2$" % pt.Q2)
     ax.set_xlim(5.e-5, 0.2)
     ax.set_ylim(-0.65, 0.65)
     ax.set_xlabel('$x_{\\rm B}$', fontsize=20)
@@ -2197,7 +2197,7 @@ def EICspinAUT(th, path=None, fmt='png'):
     th.__class__.prepare(pt)
     # Must go to BKM explicitely here
     line = th.TSA(pt, vars={'phi':np.pi-phi})
-    ax.plot(phi, line, linestyles[pn], dashes=dasheslengths[pn], linewidth=2, label=th.name) 
+    ax.plot(phi, line, linestyles[pn], dashes=dasheslengths[pn], linewidth=2, label=th.name)
     ax.set_xlim(0.0, 2*np.pi)
     ax.set_ylim(-0.65, 0.65)
     # axes labels
@@ -2225,7 +2225,7 @@ def EICspinAUT(th, path=None, fmt='png'):
         pt.t = -tm
         # Must change sign to go to Trento:
         line.append(-th.TSA(pt))
-    ax.plot(tms, line, linestyles[pn], dashes=dasheslengths[pn], linewidth=2) 
+    ax.plot(tms, line, linestyles[pn], dashes=dasheslengths[pn], linewidth=2)
     ax.set_xlim(0., 0.9)
     ax.set_ylim(-0.65, 0.65)
     ax.set_xlabel('$-t \\,{\\rm [GeV}^2{\\rm ]}$', fontsize=20)
@@ -2251,7 +2251,7 @@ def EICspinAUT(th, path=None, fmt='png'):
         # Must change sign to go to Trento:
         line.append(-th.TSA(pt))
     ax.semilogx(xBs, line, linestyles[pn], dashes=dasheslengths[pn], linewidth=2,
-            label="$Q^2 = %s \\,{\\rm GeV}^2$" % pt.Q2) 
+            label="$Q^2 = %s \\,{\\rm GeV}^2$" % pt.Q2)
     pn += 1
     line = []
     pt.Q2 = 13.9
@@ -2261,7 +2261,7 @@ def EICspinAUT(th, path=None, fmt='png'):
         utils._complete_xBWQ2(pt)
         line.append(-th.TSA(pt))
     ax.semilogx(xBs, line, linestyles[pn], dashes=dasheslengths[pn], linewidth=2,
-            label="$Q^2 = %s \\,{\\rm GeV}^2$" % pt.Q2) 
+            label="$Q^2 = %s \\,{\\rm GeV}^2$" % pt.Q2)
     ax.set_xlim(5.e-5, 0.2)
     ax.set_ylim(-0.65, 0.65)
     ax.set_xlabel('$x_{\\rm B}$', fontsize=20)
@@ -2324,7 +2324,7 @@ def EICspinAUL(th, path=None, fmt='png'):
     th.__class__.prepare(pt)
     # Must go to BKM explicitely here
     line = th.TSA(pt, vars={'phi':np.pi-phi})
-    ax.plot(phi, line, linestyles[pn], dashes=dasheslengths[pn], linewidth=2, label=th.name) 
+    ax.plot(phi, line, linestyles[pn], dashes=dasheslengths[pn], linewidth=2, label=th.name)
     ax.set_xlim(0.0, 2*np.pi)
     ax.set_ylim(-0.65, 0.65)
     # axes labels
@@ -2351,7 +2351,7 @@ def EICspinAUL(th, path=None, fmt='png'):
     for tm in tms:
         pt.t = -tm
         line.append(th.TSA(pt))
-    ax.plot(tms, line, linestyles[pn], dashes=dasheslengths[pn], linewidth=2) 
+    ax.plot(tms, line, linestyles[pn], dashes=dasheslengths[pn], linewidth=2)
     ax.set_xlim(0., 0.9)
     ax.set_ylim(-0.65, 0.65)
     ax.set_xlabel('$-t \\,{\\rm [GeV}^2{\\rm ]}$', fontsize=20)
@@ -2376,7 +2376,7 @@ def EICspinAUL(th, path=None, fmt='png'):
         utils._complete_xBWQ2(pt)
         line.append(th.TSA(pt))
     ax.semilogx(xBs, line, linestyles[pn], dashes=dasheslengths[pn], linewidth=2,
-            label="$Q^2 = %s \\,{\\rm GeV}^2$" % pt.Q2) 
+            label="$Q^2 = %s \\,{\\rm GeV}^2$" % pt.Q2)
     pn += 1
     line = []
     pt.Q2 = 13.9
@@ -2386,7 +2386,7 @@ def EICspinAUL(th, path=None, fmt='png'):
         utils._complete_xBWQ2(pt)
         line.append(th.TSA(pt))
     ax.semilogx(xBs, line, linestyles[pn], dashes=dasheslengths[pn], linewidth=2,
-            label="$Q^2 = %s \\,{\\rm GeV}^2$" % pt.Q2) 
+            label="$Q^2 = %s \\,{\\rm GeV}^2$" % pt.Q2)
     ax.set_xlim(5.e-5, 0.2)
     ax.set_ylim(-0.65, 0.65)
     ax.set_xlabel('$x_{\\rm B}$', fontsize=20)
@@ -2445,7 +2445,7 @@ def EICphase1(th, path=None, fmt='png'):
     th.__class__.prepare(pt)
     # Must go to BKM explicitely here
     line = th._BSA(pt, vars={'phi':np.pi-phi})
-    ax.plot(phi, line, linestyles[pn], dashes=dasheslengths[pn], linewidth=2, label=th.name) 
+    ax.plot(phi, line, linestyles[pn], dashes=dasheslengths[pn], linewidth=2, label=th.name)
     ax.set_xlim(0.0, 2*np.pi)
     ax.set_ylim(-0.65, 0.65)
     # axes labels
@@ -2473,7 +2473,7 @@ def EICphase1(th, path=None, fmt='png'):
     for tm in tms:
         pt.t = -tm
         line.append(th.BSA(pt))
-    ax.plot(tms, line, linestyles[pn], dashes=dasheslengths[pn], linewidth=2) 
+    ax.plot(tms, line, linestyles[pn], dashes=dasheslengths[pn], linewidth=2)
     ax.set_xlim(0., 0.9)
     ax.set_ylim(-0.65, 0.65)
     ax.set_yticklabels([])
@@ -2494,7 +2494,7 @@ def EICphase1(th, path=None, fmt='png'):
         utils._complete_xBWQ2(pt)
         line.append(th.BSA(pt))
     ax.semilogx(xBs, line, linestyles[pn], dashes=dasheslengths[pn], linewidth=2,
-            label="$Q^2= %s \\,{\\rm GeV}^2$" % pt.Q2) 
+            label="$Q^2= %s \\,{\\rm GeV}^2$" % pt.Q2)
     pn += 1
     line = []
     pt.Q2 = 13.9
@@ -2504,7 +2504,7 @@ def EICphase1(th, path=None, fmt='png'):
         utils._complete_xBWQ2(pt)
         line.append(th.BSA(pt))
     ax.semilogx(xBs, line, linestyles[pn], dashes=dasheslengths[pn], linewidth=2,
-            label="$Q^2= %s \\,{\\rm GeV}^2$" % pt.Q2) 
+            label="$Q^2= %s \\,{\\rm GeV}^2$" % pt.Q2)
     ax.set_xlim(5.e-5, 0.2)
     ax.set_ylim(-0.65, 0.65)
     ax.set_yticklabels([])
@@ -2552,7 +2552,7 @@ def EICphase1(th, path=None, fmt='png'):
     th.__class__.prepare(pt)
     # Must go to BKM explicitely here
     line = th.TSA(pt, vars={'phi':np.pi-phi})
-    ax.plot(phi, line, linestyles[pn], dashes=dasheslengths[pn], linewidth=2, label=th.name) 
+    ax.plot(phi, line, linestyles[pn], dashes=dasheslengths[pn], linewidth=2, label=th.name)
     ax.set_xlim(0.0, 2*np.pi)
     ax.set_ylim(-0.65, 0.65)
     # axes labels
@@ -2570,7 +2570,7 @@ def EICphase1(th, path=None, fmt='png'):
         pt.t = -tm
         # Must change sign to go to Trento:
         line.append(-th.TSA(pt))
-    ax.plot(tms, line, linestyles[pn], dashes=dasheslengths[pn], linewidth=2) 
+    ax.plot(tms, line, linestyles[pn], dashes=dasheslengths[pn], linewidth=2)
     ax.set_xlim(0., 0.9)
     ax.set_ylim(-0.65, 0.65)
     ax.set_yticklabels([])
@@ -2592,7 +2592,7 @@ def EICphase1(th, path=None, fmt='png'):
         # Must change sign to go to Trento:
         line.append(-th.TSA(pt))
     ax.semilogx(xBs, line, linestyles[pn], dashes=dasheslengths[pn], linewidth=2,
-            label="$Q^2 = %s \\,{\\rm GeV}^2$" % pt.Q2) 
+            label="$Q^2 = %s \\,{\\rm GeV}^2$" % pt.Q2)
     pn += 1
     line = []
     pt.Q2 = 13.9
@@ -2602,13 +2602,13 @@ def EICphase1(th, path=None, fmt='png'):
         utils._complete_xBWQ2(pt)
         line.append(-th.TSA(pt))
     ax.semilogx(xBs, line, linestyles[pn], dashes=dasheslengths[pn], linewidth=2,
-            label="$Q^2 = %s \\,{\\rm GeV}^2$" % pt.Q2) 
+            label="$Q^2 = %s \\,{\\rm GeV}^2$" % pt.Q2)
     ax.set_xlim(5.e-5, 0.2)
     ax.set_ylim(-0.65, 0.65)
     ax.set_yticklabels([])
     #
     #   A_UL
-    # 
+    #
     pt = Data.DummyPoint()
     pt.exptype = 'collider'
     pt.in1particle = 'e'
@@ -2640,7 +2640,7 @@ def EICphase1(th, path=None, fmt='png'):
     th.__class__.prepare(pt)
     # Must go to BKM explicitely here
     line = th.TSA(pt, vars={'phi':np.pi-phi})
-    ax.plot(phi, line, linestyles[pn], dashes=dasheslengths[pn], linewidth=2, label=th.name) 
+    ax.plot(phi, line, linestyles[pn], dashes=dasheslengths[pn], linewidth=2, label=th.name)
     ax.set_xlim(0.0, 2*np.pi)
     ax.set_ylim(-0.65, 0.65)
     # axes labels
@@ -2657,7 +2657,7 @@ def EICphase1(th, path=None, fmt='png'):
     for tm in tms:
         pt.t = -tm
         line.append(th.TSA(pt))
-    ax.plot(tms, line, linestyles[pn], dashes=dasheslengths[pn], linewidth=2) 
+    ax.plot(tms, line, linestyles[pn], dashes=dasheslengths[pn], linewidth=2)
     ax.set_xlim(0., 0.9)
     ax.set_ylim(-0.65, 0.65)
     ax.set_yticklabels([])
@@ -2678,7 +2678,7 @@ def EICphase1(th, path=None, fmt='png'):
         utils._complete_xBWQ2(pt)
         line.append(th.TSA(pt))
     ax.semilogx(xBs, line, linestyles[pn], dashes=dasheslengths[pn], linewidth=2,
-            label="$Q^2 = %s \\,{\\rm GeV}^2$" % pt.Q2) 
+            label="$Q^2 = %s \\,{\\rm GeV}^2$" % pt.Q2)
     pn += 1
     line = []
     pt.Q2 = 13.9
@@ -2688,7 +2688,7 @@ def EICphase1(th, path=None, fmt='png'):
         utils._complete_xBWQ2(pt)
         line.append(th.TSA(pt))
     ax.semilogx(xBs, line, linestyles[pn], dashes=dasheslengths[pn], linewidth=2,
-            label="$Q^2 = %s \\,{\\rm GeV}^2$" % pt.Q2) 
+            label="$Q^2 = %s \\,{\\rm GeV}^2$" % pt.Q2)
     ax.set_xlim(5.e-5, 0.2)
     ax.set_ylim(-0.65, 0.65)
     ax.set_yticklabels([])
@@ -2722,7 +2722,7 @@ def EICphase1(th, path=None, fmt='png'):
     th.__class__.prepare(pt)
     # Must go to BKM explicitely here
     line = th.BCA(pt, vars={'phi':np.pi-phi})
-    ax.plot(phi, line, linestyles[pn], dashes=dasheslengths[pn], linewidth=2, label=th.name) 
+    ax.plot(phi, line, linestyles[pn], dashes=dasheslengths[pn], linewidth=2, label=th.name)
     ax.set_xlim(0.0, 2*np.pi)
     ax.set_ylim(-0.45, 0.45)
     # axes labels
@@ -2740,7 +2740,7 @@ def EICphase1(th, path=None, fmt='png'):
         pt.t = -tm
         # Change sign to go to Trento
         line.append(-th.BCA(pt))
-    ax.plot(tms, line, linestyles[pn], dashes=dasheslengths[pn], linewidth=2) 
+    ax.plot(tms, line, linestyles[pn], dashes=dasheslengths[pn], linewidth=2)
     ax.set_xlim(0., 0.9)
     ax.set_ylim(-0.45, 0.45)
     ax.set_xlabel('$-t \\,{\\rm [GeV}^2{\\rm ]}$', fontsize=20)
@@ -2762,7 +2762,7 @@ def EICphase1(th, path=None, fmt='png'):
         utils._complete_xBWQ2(pt)
         line.append(-th.BCA(pt))
     ax.semilogx(xBs, line, linestyles[pn], dashes=dasheslengths[pn], linewidth=2,
-            label="$Q^2= %s \\,{\\rm GeV}^2$" % pt.Q2) 
+            label="$Q^2= %s \\,{\\rm GeV}^2$" % pt.Q2)
     pn += 1
     line = []
     pt.Q2 = 13.9
@@ -2772,7 +2772,7 @@ def EICphase1(th, path=None, fmt='png'):
         utils._complete_xBWQ2(pt)
         line.append(-th.BCA(pt))
     ax.semilogx(xBs, line, linestyles[pn], dashes=dasheslengths[pn], linewidth=2,
-            label="$Q^2= %s \\,{\\rm GeV}^2$" % pt.Q2) 
+            label="$Q^2= %s \\,{\\rm GeV}^2$" % pt.Q2)
     ax.set_xlim(5.e-5, 0.2)
     ax.set_ylim(-0.45, 0.45)
     ax.set_xlabel('$x_{\\rm B}$', fontsize=20)
@@ -2792,7 +2792,7 @@ def EICphase1(th, path=None, fmt='png'):
 
 def xBt(points, path=None, fmt='png'):
     """Plot xB-t distribution of data sets. """
-    
+
     title = 'xB-t distribution of data'
     fig = plt.figure()
     fig.canvas.set_window_title(title)
@@ -2823,7 +2823,7 @@ def xBt(points, path=None, fmt='png'):
 
 def CFF(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
     """Makes plots of cffs given by various theories/models
-    
+
     cffs    -- List of CFFs to be plotted. Each produces two panels.
         FIXME: gepard CFFs via DR are NOT plotted correctly!!!
 
@@ -2840,7 +2840,7 @@ def CFF(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
     # ranges of y axis
     ylims = {
               #'ImH': (-4.8, 35), 'ReH': (-3, 2),
-              'ImH': (-5, 10), 'ReH': (-10, 2),
+              'ImH': (-5, 30), 'ReH': (-10, 2),
              'ImE': (-30, 30), 'ReE': (-40, 10),
              #'ImE': (-40, 35), 'ReE': (-40, 10),
              'ImEt': (-200, 300), 'ReEt': (-150, 150),
@@ -2857,14 +2857,14 @@ def CFF(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
         panel(ax, xaxis='xi', xs=xvals, kins={'yaxis':cff, 't':-0.2, 'Q2':4.,
         'units':{'CFF': 1}, 'y1name': 'CFF'}, **kwargs)
         ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
-        #ax.set_ylim(*ylims[cff])
+        ax.set_ylim(*ylims[cff])
         ax.set_ylabel(toTeX['%s' % cff], fontsize=20)
         ax.tick_params(axis='both', which='major', labelsize=14)
         ax.tick_params(axis='both', which='minor', labelsize=14)
         if n == 0:
             ax.legend(loc='upper right')
             ax.legend().draw_frame(0)
-            ax.text(0.2, 0.9, r"$t = -0.2\,\, {\rm GeV}^2$", transform=ax.transAxes, 
+            ax.text(0.2, 0.9, r"$t = -0.2\,\, {\rm GeV}^2$", transform=ax.transAxes,
                     fontsize=12)
         if n == len(cffs)-1:
             ax.set_xlabel(toTeX['xi'], fontsize=16) # [RIGHT:] extrapolation range (logarithmic)
@@ -2892,7 +2892,7 @@ def CFF(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
 
 def CFF2(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
     """Makes plots of cffs at two t given by various theories/models
-    
+
     cffs    -- List of CFFs to be plotted. Each produces two panels.
 
     """
@@ -2907,7 +2907,7 @@ def CFF2(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
     ximin = 0.01
     ximax = 0.3
     logxvals = np.logspace(np.log10(ximin), np.log10(ximax), 40)
-    # ordinates 
+    # ordinates
     #ylims = {'ImH': (-4.3, 35), 'ReH': (-6.5, 8)}
     ylims = {'ImH': (-4.3, 35), 'ReH': (-3.5, 2),
              'ImE': (-40, 35), 'ReE': (-25, 5),
@@ -2924,7 +2924,7 @@ def CFF2(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
             panel(ax, xaxis='xi', xs=logxvals, kins={
                     'yaxis':cff, 't':ts[nt], 'Q2':4., 'units':{'CFF': 1}, 'y1name': 'CFF'}, **kwargs)
             ax.axhspan(-0.0005, 0.0005, facecolor='g', alpha=0.6)  # horizontal bar
-            ax.text(0.31, 0.02, "$t = %s\\, {\\rm GeV}^2$" % str(ts[nt]), 
+            ax.text(0.31, 0.02, "$t = %s\\, {\\rm GeV}^2$" % str(ts[nt]),
                     transform=ax.transAxes, fontsize=14)
             ax.xaxis.set_major_formatter(matplotlib.ticker.FormatStrFormatter('%s'))
             if nt == 0:
@@ -2947,8 +2947,8 @@ def CFF2(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
                         borderaxespad=0.).draw_frame(0)
                 pass
                 #ax.legend().draw_frame(0)
-                # 
-                #ax.text(0.33, 0.95, "data region", transform=ax.transAxes, 
+                #
+                #ax.text(0.33, 0.95, "data region", transform=ax.transAxes,
                 #        fontsize=14, fontweight='bold', va='top')
             ax.set_ylim(*ylims[cff])
             ax.set_xlim(ximin, ximax)
@@ -2967,7 +2967,7 @@ def CFF2(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
 
 def CFFt(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
     """Makes plots of cffs as function of t given by various theories/models
-    
+
     cffs    -- List of CFFs to be plotted.
 
     """
@@ -2977,14 +2977,14 @@ def CFFt(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
     #fig.suptitle(title)
     # Define abscissas
     tmvals = np.linspace(0.02, 0.6, 10) # right panel
-    # ordinates 
+    # ordinates
     #ylims = {'ImH': (-4.3, 35), 'ReH': (-6.5, 8),
     # Plot panels
     for n in range(len(cffs)):
         cff = cffs[n]
-        # small x
+        # smaller x
         ax = fig.add_subplot(len(cffs), 2, 2*n+1)
-        panel(ax, xaxis='tm', xs=tmvals, kins={'yaxis':cff, 'xB':0.1, 'Q2':4., 
+        panel(ax, xaxis='tm', xs=tmvals, kins={'yaxis':cff, 'xB':0.1, 'Q2':4.,
            'units':{'CFF': 1}, 'y1name': 'CFF'}, **kwargs)
         ax.set_xlabel(toTeX['tm'], fontsize=15)
         ax.set_ylabel(toTeX['%s' % cff], fontsize=18)
@@ -2992,11 +2992,11 @@ def CFFt(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
         if n == 0:
             ax.legend(loc='upper right')
             ax.legend().draw_frame(0)
-            ax.text(0.1, 0.18, "$x_B = 0.1$", transform=ax.transAxes, 
+            ax.text(0.1, 0.18, "$x_B = 0.1$", transform=ax.transAxes,
                     fontsize=12)
-            # ax.text(0.1, 0.12, "$Q^2 = 4\\, {\\rm GeV}^2$", transform=ax.transAxes, 
+            # ax.text(0.1, 0.12, "$Q^2 = 4\\, {\\rm GeV}^2$", transform=ax.transAxes,
                     # fontsize=12)
-        # moderate x
+        # larger x
         ax = fig.add_subplot(len(cffs), 2, 2*n+2)
         panel(ax, xaxis='tm', xs=tmvals, kins={'yaxis':cff, 'xB':0.2, 'Q2':4.,
             'units':{'CFF': 1}, 'y1name': 'CFF'}, **kwargs)
@@ -3006,9 +3006,9 @@ def CFFt(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
         if n == 0:
             ax.legend(loc='upper right')
             ax.legend().draw_frame(0)
-            ax.text(0.1, 0.18, "$x_B = 0.2$", transform=ax.transAxes, 
+            ax.text(0.1, 0.18, "$x_B = 0.2$", transform=ax.transAxes,
                     fontsize=12)
-            # ax.text(0.1, 0.12, "$Q^2 = 4\\, {\\rm GeV}^2$", transform=ax.transAxes, 
+            # ax.text(0.1, 0.12, "$Q^2 = 4\\, {\\rm GeV}^2$", transform=ax.transAxes,
                     # fontsize=12)
     fig.subplots_adjust(bottom=0.1)
     if path:
@@ -3020,7 +3020,7 @@ def CFFt(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
 
 def CFF3(path=None, fmt='png', **kwargs):
     """Makes plots of cffs given by various theories/models
-    
+
     cffs    -- List of CFFs to be plotted. Each produces two panels.
 
     """
@@ -3032,8 +3032,8 @@ def CFF3(path=None, fmt='png', **kwargs):
     nncolors = ['blue', 'green']  # cold computer colors
     linestyles = ['solid', 'dashed']
     # Define abscissas
-    logxvals = np.logspace(-5.0, -2, 20) 
-    # ordinates 
+    logxvals = np.logspace(-5.0, -2, 20)
+    # ordinates
     leftcffs = ['ImH', 'ImE']
     rightcffs = ['ReH', 'ReE']
     for n in range(2):
@@ -3075,7 +3075,7 @@ def GPDt(path=None, fmt='png', **kwargs):
     linestyles = ['solid', 'dashed', 'solid', 'dashed']
     # Define abscissas
     tmvals = np.linspace(0.02, 0.8, 20) # right panel
-    # ordinates 
+    # ordinates
     #ylims = {'ImH': (-4.3, 35), 'ReH': (-6.5, 8),
     # Plot panels
     obses = ['gpdHtrajQ', 'gpdHtrajG', 'gpdEtrajQ', 'gpdEtrajG']
@@ -3091,9 +3091,9 @@ def GPDt(path=None, fmt='png', **kwargs):
         if n == 0:
             ax.legend(loc='upper right')
             ax.legend().draw_frame(0)
-            ax.text(0.3, 60, "$x_B = 0.001$",# transform=ax.transAxes, 
+            ax.text(0.3, 60, "$x_B = 0.001$",# transform=ax.transAxes,
                     fontsize=15)
-            ax.text(0.3, 3000, "$Q^2 = 4\\, {\\rm GeV}^2$",# transform=ax.transAxes, 
+            ax.text(0.3, 3000, "$Q^2 = 4\\, {\\rm GeV}^2$",# transform=ax.transAxes,
                     fontsize=15)
     fig.subplots_adjust(bottom=0.1)
     if path:
@@ -3125,7 +3125,7 @@ def skewness(path=None, fmt='png', **kwargs):
         ax.set_xlabel(toTeX['xixB'], fontsize=18)
         if kp == 1:
             ax.set_ylabel('$r^{\\rm sea}$', fontsize=20)
-            ax.text(0.001, 0.3, "$Q^2 = 4\\, {\\rm GeV}^2$",# transform=ax.transAxes, 
+            ax.text(0.001, 0.3, "$Q^2 = 4\\, {\\rm GeV}^2$",# transform=ax.transAxes,
                     fontsize=15)
         if kp == 2:
             ax.set_ylabel('$r^{\\rm G}$', fontsize=20)
@@ -3151,7 +3151,7 @@ def skewness(path=None, fmt='png', **kwargs):
         ax.set_xlabel(toTeX['Q2'], fontsize=18)
         if kp == 3:
             ax.set_ylabel('$r^{\\rm sea}$', fontsize=20)
-            ax.text(20, 0.4, "$\\xi = 0.001$",# transform=ax.transAxes, 
+            ax.text(20, 0.4, "$\\xi = 0.001$",# transform=ax.transAxes,
                     fontsize=15)
         if kp == 4:
             ax.set_ylabel('$r^{\\rm G}$', fontsize=20)
@@ -3175,7 +3175,7 @@ def skewness(path=None, fmt='png', **kwargs):
 
 def jbod(path=None, fmt='png', **kwargs):
     """Plot "just a bunch of data" with lines
-    
+
     """
     title = 'just-a-bunch-of-data'
     fig = plt.figure()
@@ -3186,7 +3186,7 @@ def jbod(path=None, fmt='png', **kwargs):
     if isinstance(kwargs['points'], Data.DataSet):
         kwargs['points'] = [kwargs['points']]
     for pts in kwargs['points']:
-        label = ' + '.join(set('%s-%s-%s' % (pt.collaboration, 
+        label = ' + '.join(set('%s-%s-%s' % (pt.collaboration,
             str(pt.year)[-2:], pt.yaxis) for pt in pts))
         # x-coordinate is in data frame, while y-coordinate is in 0.0-1.0 frame
         ax.text(n, 0.9, label, transform=matplotlib.transforms.blended_transform_factory(
@@ -3228,7 +3228,7 @@ def bspace(th, parsets=False, path=None, fmt='png', error=False, **kwargs):
     for pars in parsets:
         th.m.parameters.update(eval(pars))
         if (error and cov): th.m.covariance = eval(pars+'cov')
-        # ordinates 
+        # ordinates
         ys = []
         for b in bvals:
             pt.by = b
@@ -3245,8 +3245,8 @@ def bspace(th, parsets=False, path=None, fmt='png', error=False, **kwargs):
         k += 1
     ax.set_xlabel('$b_y \\quad {\\rm [fm]}$', fontsize=14)
     ax.set_ylabel('$x q(x, b) \\quad {\\rm [fm}^{-2}{\\rm ]}$', fontsize=14)
-    ax.axhline(y=0, color="black", linestyle="--", linewidth=1)    
-    ax.axvline(x=0, color="black", linestyle="--", linewidth=1)    
+    ax.axhline(y=0, color="black", linestyle="--", linewidth=1)
+    ax.axvline(x=0, color="black", linestyle="--", linewidth=1)
     #ax.set_ylim(0, 1.8)
     ###    SECOND panel
     k = 0
@@ -3254,7 +3254,7 @@ def bspace(th, parsets=False, path=None, fmt='png', error=False, **kwargs):
     for pars in parsets:
         th.m.parameters.update(eval(pars))
         if (error and cov): th.m.covariance = eval(pars+'cov')
-        # ordinates 
+        # ordinates
         ys = []
         for b in bvals:
             pt.by = b
@@ -3271,8 +3271,8 @@ def bspace(th, parsets=False, path=None, fmt='png', error=False, **kwargs):
         k += 1
     ax.set_xlabel('$b_y \\quad {\\rm [fm]}$', fontsize=14)
     ax.set_ylabel('$x q^{\\uparrow}(x, b) \\quad {\\rm [fm}^{-2}{\\rm ]}$', fontsize=14)
-    ax.axhline(y=0, color="black", linestyle="--", linewidth=1)    
-    ax.axvline(x=0, color="black", linestyle="--", linewidth=1)    
+    ax.axhline(y=0, color="black", linestyle="--", linewidth=1)
+    ax.axvline(x=0, color="black", linestyle="--", linewidth=1)
     ax.set_ylim(0, 1.8)
     ###    THIRD panel
     k = 0
@@ -3280,7 +3280,7 @@ def bspace(th, parsets=False, path=None, fmt='png', error=False, **kwargs):
     for pars in parsets:
         th.m.parameters.update(eval(pars))
         if (error and cov): th.m.covariance = eval(pars+'cov')
-        # ordinates 
+        # ordinates
         ys = []
         for b in bvals:
             pt.by = b
@@ -3297,8 +3297,8 @@ def bspace(th, parsets=False, path=None, fmt='png', error=False, **kwargs):
         k += 1
     ax.set_xlabel('$b_y \\quad {\\rm [fm]}$', fontsize=14)
     ax.set_ylabel('$x g(x, b) \\quad {\\rm [fm}^{-2}{\\rm ]}$', fontsize=14)
-    ax.axhline(y=0, color="black", linestyle="--", linewidth=1)    
-    ax.axvline(x=0, color="black", linestyle="--", linewidth=1)    
+    ax.axhline(y=0, color="black", linestyle="--", linewidth=1)
+    ax.axvline(x=0, color="black", linestyle="--", linewidth=1)
     ax.set_ylim(0, 1.8)
     #fig.subplots_adjust(bottom=0.1,wspace=0.3)
     fig.tight_layout()
@@ -3321,7 +3321,7 @@ def bspace2D(th, flavor='Q', path=None, fmt='png', **kwargs):
     pt.xi = 0.001
     pt.Q2 = 4.0
     pt.t = -0.2
-    # ordinates 
+    # ordinates
     bxs = np.linspace(-1.7, 1.7, 20)
     bys = np.linspace(-1.7, 1.7, 20)
     X, Y = np.meshgrid(bxs, bys)
@@ -3350,14 +3350,14 @@ def bspace2D(th, flavor='Q', path=None, fmt='png', **kwargs):
     ax.set_ylabel('by', fontsize=18)
     props = dict(color="black", linestyle="--", linewidth=1)
     ax.axvline(x=0, **props)
-    ax.axhline(y=0, **props)    
+    ax.axhline(y=0, **props)
     ax = fig.add_subplot(1, 2, 2)
     ax.contourf(X, Y, Zpol, cmap=plt.cm.jet)
     ax.set_xlabel('bx', fontsize=15)
     ax.set_ylabel('by', fontsize=18)
     props = dict(color="black", linestyle="--", linewidth=1)
     ax.axvline(x=0, **props)
-    ax.axhline(y=0, **props)    
+    ax.axhline(y=0, **props)
     #fig.subplots_adjust(bottom=0.1)
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
@@ -3443,7 +3443,7 @@ def markus(th, error=False, path=None, fmt='png', **kwargs):
     ax.set_xlabel('$b_x \\; {\\rm [fm]}$', fontsize=24)
     ax.set_ylabel('$b_y \\; {\\rm [fm]}$', fontsize=24)
     ax.axvline(x=0, **props)
-    ax.axhline(y=0, **props)    
+    ax.axhline(y=0, **props)
     #ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.02))  # tickmarks
     for label in ax.get_xticklabels() + ax.get_yticklabels():
         label.set_fontsize(16)
@@ -3471,7 +3471,7 @@ def beff(m, pars1, pars2, path=None, fmt='png', **kwargs):
     ax.set_xscale('log')  # x-axis to be logarithmic
     # Define abscissas
     logxBvals = np.logspace(-4, -2)
-    # ordinates 
+    # ordinates
     n = 0
     m.parameters.update(pars1)
     for Q2 in [4., 8., 16.]:
@@ -3492,7 +3492,7 @@ def beff(m, pars1, pars2, path=None, fmt='png', **kwargs):
     ax.set_xscale('log')  # x-axis to be logarithmic
     # Define abscissas
     logxBvals = np.logspace(-4, -2)
-    # ordinates 
+    # ordinates
     n = 0
     m.parameters.update(pars2)
     for Q2 in [4., 8., 16.]:
@@ -3580,5 +3580,3 @@ def plotpts(bin1, bin2=None, replica=None, FT=False, errors=False, path=None, fm
         fig.canvas.draw()
         fig.show()
     return fig
-
-
