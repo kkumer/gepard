@@ -2833,14 +2833,14 @@ def CFF(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
     #fig.canvas.set_window_title(title)
     #fig.suptitle(title)
     # Define abscissas
-    xmin = 0.04
+    xmin = 0.1
     xmax = 0.25
     xvals = np.linspace(xmin, xmax, 20) # left panel
     logxvals = np.logspace(-2.0, -0.01, 20)  # right panel
     # ranges of y axis
     ylims = {
               #'ImH': (-4.8, 35), 'ReH': (-3, 2),
-              'ImH': (-5, 30), 'ReH': (-10, 2),
+              'ImH': (-5, 30), 'ReH': (-4, 2),
              'ImE': (-30, 30), 'ReE': (-40, 10),
              #'ImE': (-40, 35), 'ReE': (-40, 10),
              'ImEt': (-200, 300), 'ReEt': (-150, 150),
@@ -2856,11 +2856,12 @@ def CFF(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
             ax = axs[n, 0]
         panel(ax, xaxis='xi', xs=xvals, kins={'yaxis':cff, 't':-0.2, 'Q2':4.,
         'units':{'CFF': 1}, 'y1name': 'CFF'}, **kwargs)
-        ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
+        ax.axhline(y=0, linewidth=0.5, color='k')  # y=0 thin line
         ax.set_ylim(*ylims[cff])
         ax.set_ylabel(toTeX['%s' % cff], fontsize=20)
         ax.tick_params(axis='both', which='major', labelsize=14)
         ax.tick_params(axis='both', which='minor', labelsize=14)
+        ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.05))  # tickmarks
         if n == 0:
             ax.legend(loc='upper right')
             ax.legend().draw_frame(0)
@@ -2875,8 +2876,8 @@ def CFF(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
         ax.set_xscale('log')  # x-axis to be logarithmic
         panel(ax, xaxis='xi', xs=logxvals, kins={'yaxis':cff, 't':-0.2, 'Q2':4.,
             'units':{'CFF': 1}, 'y1name': 'CFF'}, **kwargs)
-        ax.axvspan(0.04, 0.25, facecolor='g', alpha=0.1)  # vertical band
-        ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
+        ax.axvspan(0.1, 0.25, facecolor='g', alpha=0.1)  # vertical band
+        ax.axhline(y=0, linewidth=0.5, color='k')  # y=0 thin line
         #ax.set_ylim(*ylims[cff])
         ax.tick_params(axis='both', which='major', labelsize=14)
         ax.tick_params(axis='both', which='minor', labelsize=14)
@@ -2984,7 +2985,7 @@ def CFFt(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
         cff = cffs[n]
         # smaller x
         ax = fig.add_subplot(len(cffs), 2, 2*n+1)
-        panel(ax, xaxis='tm', xs=tmvals, kins={'yaxis':cff, 'xB':0.1, 'Q2':4.,
+        panel(ax, xaxis='tm', xs=tmvals, kins={'yaxis':cff, 'xi':0.12, 'Q2':4.,
            'units':{'CFF': 1}, 'y1name': 'CFF'}, **kwargs)
         ax.set_xlabel(toTeX['tm'], fontsize=15)
         ax.set_ylabel(toTeX['%s' % cff], fontsize=18)
@@ -2992,13 +2993,13 @@ def CFFt(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
         if n == 0:
             ax.legend(loc='upper right')
             ax.legend().draw_frame(0)
-            ax.text(0.1, 0.18, "$x_B = 0.1$", transform=ax.transAxes,
+            ax.text(0.1, 0.18, r"$\xi = 0.12$", transform=ax.transAxes,
                     fontsize=12)
             # ax.text(0.1, 0.12, "$Q^2 = 4\\, {\\rm GeV}^2$", transform=ax.transAxes,
                     # fontsize=12)
         # larger x
         ax = fig.add_subplot(len(cffs), 2, 2*n+2)
-        panel(ax, xaxis='tm', xs=tmvals, kins={'yaxis':cff, 'xB':0.2, 'Q2':4.,
+        panel(ax, xaxis='tm', xs=tmvals, kins={'yaxis':cff, 'xi':0.22, 'Q2':4.,
             'units':{'CFF': 1}, 'y1name': 'CFF'}, **kwargs)
         ax.set_xlabel(toTeX['tm'], fontsize=15)
         ax.set_ylabel(toTeX['%s' % cff], fontsize=14)
@@ -3006,7 +3007,7 @@ def CFFt(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
         if n == 0:
             ax.legend(loc='upper right')
             ax.legend().draw_frame(0)
-            ax.text(0.1, 0.18, "$x_B = 0.2$", transform=ax.transAxes,
+            ax.text(0.1, 0.18, r"$\xi = 0.22$", transform=ax.transAxes,
                     fontsize=12)
             # ax.text(0.1, 0.12, "$Q^2 = 4\\, {\\rm GeV}^2$", transform=ax.transAxes,
                     # fontsize=12)
