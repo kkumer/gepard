@@ -32,48 +32,33 @@ headertypes:
     c "Common Block" commonblock
     v "Variable" variable
 accept files:
-   headers.h
-   accuracy.F
+   header.h
+   header.F
    astrong.F
-   aux.F
-   bca.F
    beta.F
-   bigcns.F
-   cdvcs.F
+   c1dvmp.F
    cff.F
    dcomplex.F
    deriv.F
    dvcs.F
+   ej.F
    erfunc.F
    error.F
    evol.F
    evolc.F
-   evoldep.F
    f2.F
-   fit.F
-   fit.c
-   fcn.F
    gauss.F
    getmbgpd.F
    hj.F
-   houches.F
    init.F
-   initc.F
    integra.F
    lambda.F
-   msbar.F
    nd.F
    projectors.F
-   radcorr.F
    readpar.F
    rnnlo.F
-   scaledep.F
    special.F
-   test.F
-   radNLO.F
-   radQ.F
-   radNNLO.F
-   scalesNS.F
-   header.F
-   mninterface.F
-   xspace.F
+   tff.F
+   wccsbar.F
+   wcdvmp.F
+   wcmsbar.F
