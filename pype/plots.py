@@ -248,7 +248,7 @@ def panel(ax, points=None, lines=None, bands=None, xaxis=None, xs=None,
                     xvals.append(getattr(pt, xaxis))
                 yvals.append(pt.val)
         labx = min(0, min(xvals)) + (max(xvals) - min(0, min(xvals))) * 0.15
-        laby = min(0, min(yvals)) + (max(yvals) - min(0, min(yvals))) * 0.04
+        laby = min(0, min(yvals)) + (max(yvals) - min(0, min(yvals))) * 0.04 - 0.03
         labtxt = ""
         for lab in kinlabels:
             try:
@@ -256,7 +256,7 @@ def panel(ax, points=None, lines=None, bands=None, xaxis=None, xs=None,
             except AttributeError:
                 # If dataset doesn't have it, all points should have it
                 labtxt += toTeX[lab] + ' = ' + str(getattr(points[0][0],lab)) + ', '
-        ax.text(labx, laby, labtxt[:-2])
+        ax.text(labx, laby, labtxt[:-2], fontsize=14)
 
 def thline(th, pts, ex_pt, npts=16):
     """Interpolated theory lines for kinematics in pandas dataframe pts and DataPoint ex_pt."""
@@ -1298,7 +1298,7 @@ def CLAS15phi(path=None, fmt='png', **kwargs):
             # Draw legend on this panel
             ax.legend(handles, labels, loc="upper center",
                 borderpad=0.8, handlelength=3, fancybox=True, framealpha=1.0,
-                facecolor='navajowhite',
+                #facecolor='navajowhite',
                 prop=matplotlib.font_manager.FontProperties(size="x-large"))
             ax.set_ylabel(r'$d\sigma = d\sigma^{\leftarrow} + d\sigma^{\rightarrow}$', fontsize=20)
         elif np == 3:
@@ -1314,8 +1314,8 @@ def CLAS15phi(path=None, fmt='png', **kwargs):
             ax.set_ylim(-0.03, 0.3)
         else:
             ax.set_ylim(-0.1, 0.1)
-        ax.tick_params(axis='both', which='major', labelsize=12)
-        ax.tick_params(axis='both', which='minor', labelsize=12)
+        ax.tick_params(axis='both', which='major', labelsize=14)
+        ax.tick_params(axis='both', which='minor', labelsize=14)
     fig.subplots_adjust(wspace=0.0, hspace=0.0)
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
