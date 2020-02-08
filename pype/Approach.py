@@ -343,7 +343,7 @@ class BMK(Approach):
             if hasattr(pt, errtype):
                 setattr(pt, 'orig'+errtype, getattr(pt,errtype))
         # C1. azimutal angle phi should be in radians.
-        if 'phi' in pt and pt.units['phi'][:3]=='deg':
+        if 'phi' in pt and hasattr(pt, 'units') and pt.units['phi'][:3]=='deg':
             pt.phi = pt.phi * pi / 180.
             pt.newunits['phi'] = 'rad'
         # C2. phi_{Trento} -> (pi - phi_{BKM})
@@ -363,7 +363,7 @@ class BMK(Approach):
                     raise ValueError('varFTn = %d not allowed. Only +/-1!' % pt.varFTn)
             pt.newframe = 'BMK'
         # C4. cross-sections should be in nb
-        if pt.units[pt.y1name] == 'pb/GeV^4':
+        if hasattr(pt, 'units') and pt.units[pt.y1name] == 'pb/GeV^4':
             pt.val = pt.val/1000
             for errtype in errtypes:
                 if hasattr(pt, errtype):
@@ -376,7 +376,7 @@ class BMK(Approach):
     def from_conventions(pt):
         """Transform stuff from Approach's conventions into original data's."""
         # C4. cross-sections should be in nb
-        if pt.units[pt.y1name] == 'pb/GeV^4':
+        if hasattr(pt, 'units') and pt.units[pt.y1name] == 'pb/GeV^4':
             pt.val = pt.val*1000
             for errtype in errtypes:
                 if hasattr(pt, errtype):
@@ -397,7 +397,7 @@ class BMK(Approach):
                     pt.val = - pt.val
             pt.newframe = 'Trento'
         # C1. azimutal angle phi back to degrees
-        if 'phi' in pt and pt.units['phi'][:3]=='deg':
+        if 'phi' in pt and hasattr(pt, 'units') and pt.units['phi'][:3]=='deg':
             pt.phi = pt.phi / pi * 180.
         return pt
     from_conventions = staticmethod(from_conventions)
@@ -406,7 +406,7 @@ class BMK(Approach):
         """Like from_conventions, but for the prediction val."""
         # This doesn't touches pt
         # C4. cross-sections nb --> pb
-        if pt.units[pt.y1name] == 'pb/GeV^4':
+        if hasattr(pt, 'units') and pt.units[pt.y1name] == 'pb/GeV^4':
             val = val*1000
         # C2. phi_{BKM} --> (pi - phi_{Trento})
         if 'frame' in pt and pt.frame == 'Trento' and 'FTn' in pt:

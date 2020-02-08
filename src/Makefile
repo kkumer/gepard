@@ -107,11 +107,11 @@ pygepards: pygepard.so pygepard2.so pygepard3.so pygepard4.so pygepard5.so pygep
 
 pygepard.so: $(_FPREPS)
 	f2py --fcompiler=gnu95  -c -m pygepard $^ adacf/*f -lgomp 
-	mv pygepard.cpython-37m-x86_64-linux-gnu.so ../pype/pygepard.so
+	mv pygepard.cpython-38-x86_64-linux-gnu.so ../pype/pygepard.so
 
 pygepard%.so: $(_FPREPS)
 	f2py --quiet --fcompiler=gnu95 -c -m pygepard$* $^ adacf/*f -lgomp
-	mv pygepard$*.cpython-37m-x86_64-linux-gnu.so ../pype/pygepard$*.so
+	mv pygepard$*.cpython-38-x86_64-linux-gnu.so ../pype/pygepard$*.so
 
 
 # targets for examples

@@ -1543,15 +1543,16 @@ def H1ZEUS(path=None, fmt='png', **kwargs):
             utils.select(data[41], criteria=['Q2 == 25.'])]
     subsets[4] = [data[47]] # ZEUS Q2-dep
     xs = ['t', 't', 'W', 'Q2']
-    #title = 'H1 07 / ZEUS 08'
-    title = ''
-    fig = plt.figure(figsize=[10,6])
-    fig.canvas.set_window_title(title)
+    title = 'H1_07_ZEUS_08_DVCS'
+    fig, (axu, axl) = plt.subplots(2,2,figsize=[14,8])
     fig.suptitle(title)
     #fig.subplots_adjust(bottom=0.1, hspace=0.3)
-    fig.subplots_adjust(hspace=0.4)
+    #fig.subplots_adjust(hspace=0.4)
     for npanel in range(1,5):
-        ax = fig.add_subplot(2,2,npanel)
+        if npanel < 3:
+            ax = axu[npanel-1]
+        else:
+            ax = axl[npanel-3]
         ax.set_yscale('log')  # y-axis to be logarithmic
         panel(ax, points=subsets[npanel], xaxis=xs[npanel-1], **kwargs)
         if npanel < 3:
@@ -1583,16 +1584,18 @@ def H1ZEUS(path=None, fmt='png', **kwargs):
             labels.pop()
             ax.legend(handles, labels, loc="upper left").draw_frame(0)
         if npanel==3:
-            ax.text(50, 28, '${\\rm ZEUS}\\, (idem):$', fontsize=16)
-            ax.text(50, 5, '${\\rm H1}\\, (idem):$', fontsize=16)
+            pass
+            #ax.text(50, 28, '${\\rm ZEUS}\\, (idem):$', fontsize=16)
+            #ax.text(50, 5, '${\\rm H1}\\, (idem):$', fontsize=16)
         else: # npanel==4
-            ax.text(30, 3, '${\\rm ZEUS}\\, (idem)$', fontsize=16)
+            pass
+            #ax.text(30, 3, '${\\rm ZEUS}\\, (idem)$', fontsize=16)
             #ax.set_xlim(0, 80)
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
         fig.canvas.draw()
-        fig.show()
+        #fig.show()
     return fig
 
 def DVMP(H109WdepXL, path=None, fmt='png', **kwargs):
@@ -3109,7 +3112,7 @@ def skewness(path=None, fmt='png', **kwargs):
 
     """
     title = 'skewness ratios'
-    fig = plt.figure()
+    fig = plt.figure(figsize=(12,12))
     fig.canvas.set_window_title(title)
     # Define abscissas
     logxvals = np.logspace(-4.0, -1.5, 10)
@@ -3140,15 +3143,16 @@ def skewness(path=None, fmt='png', **kwargs):
             label.set_fontsize(14)
         kp += 1
     # Define abscissas. Q2 can be expensive at NLO MSBAR
-    Q2vals = np.linspace(3, 40, 4)
+    Q2vals = np.logspace(np.log10(4.), np.log10(1.e5), 30)
     # Plot panels
     for obs in ['gpdHskewQ', 'gpdHskewG']:
         # all-x logarithmic
         ax = fig.add_subplot(2, 2, kp)
+        ax.set_xscale('log')  # x-axis to be logarithmic
         panel(ax, xaxis='Q2', xs=Q2vals, kins={
                 'yaxis':obs, 't':0., 'xi':0.001}, **kwargs)
         ax.axhspan(-0.0005, 0.0005, facecolor='g', alpha=0.6)  # horizontal bar
-        ax.xaxis.set_major_formatter(matplotlib.ticker.FormatStrFormatter('%s'))
+        #ax.xaxis.set_major_formatter(matplotlib.ticker.FormatStrFormatter('%s'))
         ax.set_xlabel(toTeX['Q2'], fontsize=18)
         if kp == 3:
             ax.set_ylabel('$r^{\\rm sea}$', fontsize=20)
@@ -3157,20 +3161,20 @@ def skewness(path=None, fmt='png', **kwargs):
         if kp == 4:
             ax.set_ylabel('$r^{\\rm G}$', fontsize=20)
         #apply(ax.set_ylim, ylims[cff])
-        ax.set_xlim(3, 40)
-        ax.set_ylim(-0.2, 3.0)
+        #ax.set_xlim(3, 40)
+        #ax.set_ylim(-0.2, 3.0)
         #ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(5.))  # tickmarks
         for label in ax.get_xticklabels() + ax.get_yticklabels():
             label.set_fontsize(14)
         kp += 1
-    fig.subplots_adjust(bottom=0.1, wspace=0.2, hspace=0.2)
+    fig.subplots_adjust(bottom=0.1, wspace=0.25, hspace=0.2)
     if path:
         #fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
         fig.set_size_inches((14, 16))
         mkpdf(path)
     else:
         fig.canvas.draw()
-        fig.show()
+        #fig.show()
     return fig
 
 
