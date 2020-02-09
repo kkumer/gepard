@@ -30,10 +30,10 @@ def test_KellyFFp_one():
 # Neutron:
 
 def test_KellyFFn_zero():
-    assert_almost_equal(m.F1n(0.), 0.)
-    assert_almost_equal(m.F2n(0.), mun, 6)
+    assert_almost_equal(m.nF1(0.), 0.)
+    assert_almost_equal(m.nF2(0.), mun, 6)
 
 def test_KellyFFn_none():
-    assert_almost_equal(m.F1n(-1.)*10., -0.0441597*10., 2)
-    assert_almost_equal(m.F2n(-1.), -0.306797, 2)
+    assert_almost_equal(m.nF1(-1.)*10., -0.0441597*10., 2)
+    assert_almost_equal(m.nF2(-1.), -0.306797, 2)
 
