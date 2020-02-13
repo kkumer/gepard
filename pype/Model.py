@@ -1327,13 +1327,6 @@ class ComptonNeuralNets(Model):
         #if name in self.output_layer:
             self.curname = name
             return self.CFF
-                #and self.useDR \
-        #elif hasattr(self, 'useDR') \
-        elif 'useDR' in self.__dict__ \
-                and object.__getattribute__(self, 'useDR') \
-                and name in object.__getattribute__(self, 'useDR'):
-            self.curname = name
-            return self.CFF
         elif name in ComptonFormFactors.allCFFs:
             # if asked for CFF which is not in output_layer, return 0
             self.curname = name
