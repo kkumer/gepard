@@ -477,15 +477,15 @@ class BMK(Approach):
     def cBH0unpSX(self, pt):
         """ BKM Eq. (35) - small-x approximation """
         return 16. * pt.K2 * (pt.Q2/pt.t) * (
-                self.m.F1(pt.t)**2 - (pt.t/(4.0*Mp2)) * self.m.F2(pt.t)**2
+                self.m.F1(pt)**2 - (pt.t/(4.0*Mp2)) * self.m.F2(pt)**2
                   ) + 8. * (2. - pt.y)**2 * (
-                self.m.F1(pt.t)**2 - (pt.t/(4.0*Mp2)) * self.m.F2(pt.t)**2 )
+                self.m.F1(pt)**2 - (pt.t/(4.0*Mp2)) * self.m.F2(pt)**2 )
 
     def cBH0unp(self, pt):
         """ BKM Eq. (35) """
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
-        FE2 = self.m.F1(t)**2 - t * self.m.F2(t)**2 / (4.0 * Mp2)
-        FM2 = (self.m.F1(t) + self.m.F2(t))**2
+        FE2 = self.m.F1(pt)**2 - t * self.m.F2(pt)**2 / (4.0 * Mp2)
+        FM2 = (self.m.F1(pt) + self.m.F2(pt))**2
         # braces are expressions in {..} in Eq. (35)
         brace1 = (2.+3.*eps2) * (Q2/t) * FE2 + 2.* xB**2 * FM2
         brace2 = (  (2.+eps2)*( (4.*xB**2*Mp2/t)*(1.+t/Q2)**2 +
@@ -500,8 +500,8 @@ class BMK(Approach):
     def cBH1unp(self, pt):
         """ BKM Eq. (36) """
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
-        FE2 = self.m.F1(t)**2 - t * self.m.F2(t)**2 / (4.0 * Mp2)
-        FM2 = (self.m.F1(t) + self.m.F2(t))**2
+        FE2 = self.m.F1(pt)**2 - t * self.m.F2(pt)**2 / (4.0 * Mp2)
+        FM2 = (self.m.F1(pt) + self.m.F2(pt))**2
         brace = ( (4.*xB**2*Mp2/t - 2.*xB - eps2) * FE2 +
                    2.*xB**2*(1.-(1.-2.*xB)*t/Q2) * FM2 )
         return 8. * pt.K * (2.-y) * brace
@@ -509,8 +509,8 @@ class BMK(Approach):
     def cBH2unp(self, pt):
         """ BKM Eq. (37) """
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
-        FE2 = self.m.F1(t)**2 - t * self.m.F2(t)**2 / (4.0 * Mp2)
-        FM2 = (self.m.F1(t) + self.m.F2(t))**2
+        FE2 = self.m.F1(pt)**2 - t * self.m.F2(pt)**2 / (4.0 * Mp2)
+        FM2 = (self.m.F1(pt) + self.m.F2(pt))**2
         brace = 4.*Mp2/t * FE2 + 2. * FM2
         return 8. * xB**2 * pt.K2 * brace
 
@@ -524,7 +524,7 @@ class BMK(Approach):
     def cBH0TP(self, pt):
         """ BKM Eq. (40) """
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
-        F1, F2 = self.m.F1(t), self.m.F2(t)
+        F1, F2 = self.m.F1(pt), self.m.F2(pt)
         sqrt1yeps = sqrt(1-y-eps2*y**2/4.)
         brace = ( xB**3*Mp2/Q2*(1-t/Q2)*(F1+F2) +
                 (1-(1-xB)*t/Q2)*(xB**2*Mp2/t*(1-t/Q2)*F1+xB/2.*F2) )
@@ -534,7 +534,7 @@ class BMK(Approach):
     def cBH1TP(self, pt):
         """ BKM Eq. (41) """
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
-        F1, F2 = self.m.F1(t), self.m.F2(t)
+        F1, F2 = self.m.F1(pt), self.m.F2(pt)
         sqrt1yeps = sqrt(1-y-eps2*y**2/4.)
         brace = ( 2*pt.K**2*Q2/t/sqrt1yeps**2 * (xB*(1-t/Q2)*F1 +
             t/4./Mp2*F2) + (1+eps2)*xB*(1-t/Q2)*(F1+t/4./Mp2*F2) )
@@ -544,7 +544,7 @@ class BMK(Approach):
     def sBH1TP(self, pt):
         """ BKM Eq. (42) """
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
-        F1, F2 = self.m.F1(t), self.m.F2(t)
+        F1, F2 = self.m.F1(pt), self.m.F2(pt)
         sqrt1yeps = sqrt(1-y-eps2*y**2/4.)
         return (16*pt.in1polarization*sin(pt.varphi)*xB**2*y*
                 sqrt1yeps*Mp/sqrt(Q2)*sqrt((1+eps2)**3)*
@@ -635,27 +635,27 @@ class BMK(Approach):
     def ReCCALINTunp(self, pt):
         """ Real part of BKM Eq. (69) """
 
-        return self.m.F1(pt.t)*self.m.ReH(pt) + pt.xB/(2.-pt.xB)*(self.m.F1(pt.t)+
-                self.m.F2(pt.t))*self.m.ReHt(pt) - pt.t/(4.*Mp2)*self.m.F2(pt.t)*self.m.ReE(pt)
+        return self.m.F1(pt)*self.m.ReH(pt) + pt.xB/(2.-pt.xB)*(self.m.F1(pt)+
+                self.m.F2(pt))*self.m.ReHt(pt) - pt.t/(4.*Mp2)*self.m.F2(pt)*self.m.ReE(pt)
 
     def ImCCALINTunp(self, pt):
         """ Imag part of BKM Eq. (69) """
 
-        return self.m.F1(pt.t)*self.m.ImH(pt) + pt.xB/(2.-pt.xB)*(self.m.F1(pt.t)+
-                self.m.F2(pt.t))*self.m.ImHt(pt) - pt.t/(4.*Mp2)*self.m.F2(pt.t)*self.m.ImE(pt)
+        return self.m.F1(pt)*self.m.ImH(pt) + pt.xB/(2.-pt.xB)*(self.m.F1(pt)+
+                self.m.F2(pt))*self.m.ImHt(pt) - pt.t/(4.*Mp2)*self.m.F2(pt)*self.m.ImE(pt)
 
     def ReDELCCALINTunp(self, pt):
         """ Real part of BKM Eq. (72) """
 
         fx = pt.xB / (2. - pt.xB)
-        return - fx * (self.m.F1(pt.t)+self.m.F2(pt.t)) * ( fx *(self.m.ReH(pt)
+        return - fx * (self.m.F1(pt)+self.m.F2(pt)) * ( fx *(self.m.ReH(pt)
             + self.m.ReE(pt)) + self.m.ReHt(pt) )
 
     def ImDELCCALINTunp(self, pt):
         """ Imag part of BKM Eq. (72) """
 
         fx = pt.xB / (2. - pt.xB)
-        return - fx * (self.m.F1(pt.t)+self.m.F2(pt.t)) * ( fx *(self.m.ImH(pt)
+        return - fx * (self.m.F1(pt)+self.m.F2(pt)) * ( fx *(self.m.ImH(pt)
             + self.m.ImE(pt)) + self.m.ImHt(pt) )
 
     def ReCCALINTunpEFF(self, pt):
@@ -706,7 +706,7 @@ class BMK(Approach):
     def ReCCALINTTPp(self, pt):
         """ Real part of BKM Eq. (71) """
 
-        xB, t, F1, F2 = pt.xB, pt.t, self.m.F1(pt.t), self.m.F2(pt.t)
+        xB, t, F1, F2 = pt.xB, pt.t, self.m.F1(pt), self.m.F2(pt)
         H, E, Ht, Et = self.m.ReH(pt), self.m.ReE(pt), self.m.ReHt(pt), self.m.ReEt(pt)
         brace1 = xB**2/(2-xB)*(H+xB/2.*E) + xB*t/4./Mp2*E
         brace2 = 4*(1-xB)/(2-xB)*F2*Ht - (xB*F1+xB**2/(2-xB)*F2)*Et
@@ -715,7 +715,7 @@ class BMK(Approach):
     def ImCCALINTTPp(self, pt):
         """ Imag part of BKM Eq. (71) FIXME: code duplication """
 
-        xB, t, F1, F2 = pt.xB, pt.t, self.m.F1(pt.t), self.m.F2(pt.t)
+        xB, t, F1, F2 = pt.xB, pt.t, self.m.F1(pt), self.m.F2(pt)
         H, E, Ht, Et = self.m.ImH(pt), self.m.ImE(pt), self.m.ImHt(pt), self.m.ImEt(pt)
         brace1 = xB**2/(2-xB)*(H+xB/2.*E) + xB*t/4./Mp2*E
         brace2 = 4*(1-xB)/(2-xB)*F2*Ht - (xB*F1+xB**2/(2-xB)*F2)*Et
@@ -724,7 +724,7 @@ class BMK(Approach):
     def ReCCALINTTPm(self, pt):
         """ Real part of BKM Eq. (71) """
 
-        xB, t, F1, F2 = pt.xB, pt.t, self.m.F1(pt.t), self.m.F2(pt.t)
+        xB, t, F1, F2 = pt.xB, pt.t, self.m.F1(pt), self.m.F2(pt)
         H, E, Ht, Et = self.m.ReH(pt), self.m.ReE(pt), self.m.ReHt(pt), self.m.ReEt(pt)
         xBaux = xB**2/(2-xB)
         paren1 = xB**2*F1 - (1-xB)*t/Mp2*F2
@@ -734,7 +734,7 @@ class BMK(Approach):
     def ImCCALINTTPm(self, pt):
         """ Imag part of BKM Eq. (71)  FIXME: code duplication"""
 
-        xB, t, F1, F2 = pt.xB, pt.t, self.m.F1(pt.t), self.m.F2(pt.t)
+        xB, t, F1, F2 = pt.xB, pt.t, self.m.F1(pt), self.m.F2(pt)
         H, E, Ht, Et = self.m.ImH(pt), self.m.ImE(pt), self.m.ImHt(pt), self.m.ImEt(pt)
         xBaux = xB**2/(2-xB)
         paren1 = xB**2*F1 - (1-xB)*t/Mp2*F2
@@ -744,28 +744,28 @@ class BMK(Approach):
     def ReDELCCALINTTPp(self, pt):
         """ Real part of BKM Eq. (74) """
 
-        xB, t, F1, F2 = pt.xB, pt.t, self.m.F1(pt.t), self.m.F2(pt.t)
+        xB, t, F1, F2 = pt.xB, pt.t, self.m.F1(pt), self.m.F2(pt)
         Ht, Et = self.m.ReHt(pt), self.m.ReEt(pt)
         return -t/Mp2*(F2*Ht - xB/(2-xB)*(F1+xB*F2/2)*Et)
 
     def ImDELCCALINTTPp(self, pt):
         """ Imag part of BKM Eq. (74) FIXME: code duplication """
 
-        xB, t, F1, F2 = pt.xB, pt.t, self.m.F1(pt.t), self.m.F2(pt.t)
+        xB, t, F1, F2 = pt.xB, pt.t, self.m.F1(pt), self.m.F2(pt)
         Ht, Et = self.m.ImHt(pt), self.m.ImEt(pt)
         return -t/Mp2*(F2*Ht - xB/(2-xB)*(F1+xB*F2/2)*Et)
 
     def ReDELCCALINTTPm(self, pt):
         """ Real part of BKM Eq. (75) """
 
-        xB, t, F1, F2 = pt.xB, pt.t, self.m.F1(pt.t), self.m.F2(pt.t)
+        xB, t, F1, F2 = pt.xB, pt.t, self.m.F1(pt), self.m.F2(pt)
         H, E = self.m.ReH(pt), self.m.ReE(pt)
         return t/Mp2*(F2*H - F1*E)
 
     def ImDELCCALINTTPm(self, pt):
         """ Imag part of BKM Eq. (75) FIXME: code duplication """
 
-        xB, t, F1, F2 = pt.xB, pt.t, self.m.F1(pt.t), self.m.F2(pt.t)
+        xB, t, F1, F2 = pt.xB, pt.t, self.m.F1(pt), self.m.F2(pt)
         H, E = self.m.ImH(pt), self.m.ImE(pt)
         return t/Mp2*(F2*H - F1*E)
 
@@ -1440,8 +1440,8 @@ class BM10ex(hotfixedBMK):
     def cBH0LP(self, pt):
         """ BKM Eq. (38) """
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
-        FE = self.m.F1(t) + t * self.m.F2(t) / (4.0 * Mp2)
-        FM = self.m.F1(t) + self.m.F2(t)
+        FE = self.m.F1(pt) + t * self.m.F2(pt) / (4.0 * Mp2)
+        FM = self.m.F1(pt) + self.m.F2(pt)
         # brackets are expressions in [..] in Eq. (39)
         bracket1 = (xB/2.)*(1.-t/Q2) - t/(4.*Mp2)
         bracket2 = ( 2 - xB - 2.*(1.-xB)**2 * t/Q2 + eps2*(1-t/Q2) -
@@ -1456,8 +1456,8 @@ class BM10ex(hotfixedBMK):
     def cBH1LP(self, pt):
         """ BKM Eq. (39) """
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
-        FE = self.m.F1(t) + t * self.m.F2(t) / (4.0 * Mp2)
-        FM = self.m.F1(t) + self.m.F2(t)
+        FE = self.m.F1(pt) + t * self.m.F2(pt) / (4.0 * Mp2)
+        FM = self.m.F1(pt) + self.m.F2(pt)
         bracket1 = t/(2.*Mp2) - xB*(1.-t/Q2)
         bracket2 = ( 1.+xB-(3.-2.*xB)*(1.+xB*t/Q2) -
                 4.*xB**2*Mp2/t*(1.+t**2/Q2**2) )
@@ -1615,8 +1615,8 @@ class BM10ex(hotfixedBMK):
             CFFEt = (self.m.ReEt(pt)) + 1j * ( self.m.ImEt(pt))
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
         res = (
-    self.m.F1(t)*CFFH - (t/(4*Mp2))*self.m.F2(t)*CFFE +
-     (xB/((2 - xB) + (t*xB)/pt.Q2))*(self.m.F1(t) + self.m.F2(t))*CFFHt
+    self.m.F1(pt)*CFFH - (t/(4*Mp2))*self.m.F2(pt)*CFFE +
+     (xB/((2 - xB) + (t*xB)/pt.Q2))*(self.m.F1(pt) + self.m.F2(pt))*CFFHt
     )
         if im:
             return res.imag
@@ -1638,7 +1638,7 @@ class BM10ex(hotfixedBMK):
             CFFEt = (self.m.ReEt(pt)) + 1j * ( self.m.ImEt(pt))
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
         res = (
-    (xB/((2 - xB) + (t*xB)/pt.Q2))*(self.m.F1(t) + self.m.F2(t))*
+    (xB/((2 - xB) + (t*xB)/pt.Q2))*(self.m.F1(pt) + self.m.F2(pt))*
      (CFFH + CFFE)
     )
         if im:
@@ -1662,7 +1662,7 @@ class BM10ex(hotfixedBMK):
             CFFEt = (self.m.ReEt(pt)) + 1j * ( self.m.ImEt(pt))
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
         res = (
-    (xB/((2 - xB) + (t*xB)/pt.Q2))*(self.m.F1(t) + self.m.F2(t))*CFFHt
+    (xB/((2 - xB) + (t*xB)/pt.Q2))*(self.m.F1(pt) + self.m.F2(pt))*CFFHt
     )
         if im:
             return res.imag
@@ -1685,15 +1685,15 @@ class BM10ex(hotfixedBMK):
             CFFEt = (self.m.ReEt(pt)) + 1j * ( self.m.ImEt(pt))
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
         res = (
-    (xB/((2 - xB) + (t*xB)/pt.Q2))*(self.m.F1(t) + self.m.F2(t))*
+    (xB/((2 - xB) + (t*xB)/pt.Q2))*(self.m.F1(pt) + self.m.F2(pt))*
       (CFFH + (xB/2)*(1 - t/pt.Q2)*
         CFFE) + (1 + (Mp2/pt.Q2)*
         ((2*xB**2)/((2 - xB) + (t*xB)/pt.Q2))*
-        (3 + t/pt.Q2))*self.m.F1(t)*CFFHt -
+        (3 + t/pt.Q2))*self.m.F1(pt)*CFFHt -
      (t/pt.Q2)*((xB*(1 - 2*xB))/((2 - xB) +
-        (t*xB)/pt.Q2))*self.m.F2(t)*CFFHt -
+        (t*xB)/pt.Q2))*self.m.F2(pt)*CFFHt -
      (xB/((2 - xB) + (t*xB)/pt.Q2))*
-      ((xB/2)*(1 - t/pt.Q2)*self.m.F1(t) + (t/(4*Mp2))*self.m.F2(t))*
+      ((xB/2)*(1 - t/pt.Q2)*self.m.F1(pt) + (t/(4*Mp2))*self.m.F2(pt))*
       CFFEt
     )
         if im:
@@ -1717,7 +1717,7 @@ class BM10ex(hotfixedBMK):
             CFFEt = (self.m.ReEt(pt)) + 1j * ( self.m.ImEt(pt))
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
         res = (
-    (xB/((2 - xB) + (t*xB)/pt.Q2))*(self.m.F1(t) + self.m.F2(t))*
+    (xB/((2 - xB) + (t*xB)/pt.Q2))*(self.m.F1(pt) + self.m.F2(pt))*
      (CFFH + (xB/2)*(1 - t/pt.Q2)*
        CFFE)
     )
@@ -1742,7 +1742,7 @@ class BM10ex(hotfixedBMK):
             CFFEt = (self.m.ReEt(pt)) + 1j * ( self.m.ImEt(pt))
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
         res = (
-    (xB/((2 - xB) + (t*xB)/pt.Q2))*(self.m.F1(t) + self.m.F2(t))*
+    (xB/((2 - xB) + (t*xB)/pt.Q2))*(self.m.F1(pt) + self.m.F2(pt))*
      ((1 + (2*Mp2*xB)/pt.Q2)*CFFHt +
       (xB/2)*CFFEt)
     )
@@ -3630,8 +3630,8 @@ class BM10(BM10ex):
             CFFEt = (self.m.ReEt(pt)) + 1j * ( self.m.ImEt(pt))
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
         res = (
-            self.m.F1(t)*CFFH - (t/(4*Mp2))*self.m.F2(t)*CFFE +
-              xB/(2 - xB)*(self.m.F1(t) + self.m.F2(t))*CFFHt
+            self.m.F1(pt)*CFFH - (t/(4*Mp2))*self.m.F2(pt)*CFFE +
+              xB/(2 - xB)*(self.m.F1(pt) + self.m.F2(pt))*CFFHt
               )
         if im:
             return res.imag
@@ -3653,7 +3653,7 @@ class BM10(BM10ex):
             CFFEt = (self.m.ReEt(pt)) + 1j * ( self.m.ImEt(pt))
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
         res = (
-        xB/(2 - xB)*(self.m.F1(t) + self.m.F2(t)) * (CFFH + CFFE)
+        xB/(2 - xB)*(self.m.F1(pt) + self.m.F2(pt)) * (CFFH + CFFE)
               )
         if im:
             return res.imag
@@ -3675,7 +3675,7 @@ class BM10(BM10ex):
             CFFEt = (self.m.ReEt(pt)) + 1j * ( self.m.ImEt(pt))
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
         res = (
-    (xB/(2 - xB))*(self.m.F1(t) + self.m.F2(t))*CFFHt
+    (xB/(2 - xB))*(self.m.F1(pt) + self.m.F2(pt))*CFFHt
     )
         if im:
             return res.imag
@@ -3697,10 +3697,10 @@ class BM10(BM10ex):
             CFFEt = (self.m.ReEt(pt)) + 1j * ( self.m.ImEt(pt))
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
         res = (
-          xB/(2 - xB)*(self.m.F1(t) + self.m.F2(t))*(CFFH + (xB/2)*CFFE)
-          + self.m.F1(t)*CFFHt
-          - xB/(2 - xB)*((xB/2)*self.m.F1(t)
-                   + (t/(4*Mp2))*self.m.F2(t))*CFFEt
+          xB/(2 - xB)*(self.m.F1(pt) + self.m.F2(pt))*(CFFH + (xB/2)*CFFE)
+          + self.m.F1(pt)*CFFHt
+          - xB/(2 - xB)*((xB/2)*self.m.F1(pt)
+                   + (t/(4*Mp2))*self.m.F2(pt))*CFFEt
               )
         if im:
             return res.imag
@@ -3722,7 +3722,7 @@ class BM10(BM10ex):
             CFFEt = (self.m.ReEt(pt)) + 1j * ( self.m.ImEt(pt))
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
         res = (
-          xB/(2 - xB)*(self.m.F1(t) + self.m.F2(t))*(CFFH + (xB/2)*CFFE)
+          xB/(2 - xB)*(self.m.F1(pt) + self.m.F2(pt))*(CFFH + (xB/2)*CFFE)
               )
         if im:
             return res.imag
@@ -3744,7 +3744,7 @@ class BM10(BM10ex):
             CFFEt = (self.m.ReEt(pt)) + 1j * ( self.m.ImEt(pt))
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
         res = (
-         xB/(2 - xB)*(self.m.F1(t) + self.m.F2(t))*(CFFHt + (xB/2)*CFFEt)
+         xB/(2 - xB)*(self.m.F1(pt) + self.m.F2(pt))*(CFFHt + (xB/2)*CFFEt)
               )
         if im:
             return res.imag

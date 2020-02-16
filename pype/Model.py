@@ -261,19 +261,35 @@ class ElasticFormFactors(Model):
 class ElasticDipole(ElasticFormFactors):
     """Dipole approximation from DM's notebook."""
 
-    def F1(self, t):
+    def F1(self, pt):
         """Dirac elastic proton form factor - dipole parametrization."""
+        t = pt.t
         return (1.41 * (1.26 - t))/((0.71 - t)**2 * (3.53 - t))
 
-    def F2(self, t):
+    def F2(self, pt):
         """Pauli elastic proton form factor - dipole parametrization."""
+        t = pt.t
         return 3.2 / ((0.71 - t)**2 * (3.53 - t))
 
 
 class ElasticKelly(ElasticFormFactors):
     """Kelly's approximation from DM's notebook."""
 
-    def F1(self, t):
+    def F1(self, pt):
+        """Dirac elastic nucleon form factor - Kelly's parametrization."""
+        if 'in2particle' in pt and pt.in2particle == 'n':
+            return self.nF1(pt.t)
+        else:   # proton is default
+            return self.pF1(pt.t)
+
+    def F2(self, pt):
+        """Dirac elastic nucleon form factor - Kelly's parametrization."""
+        if 'in2particle' in pt and pt.in2particle == 'n':
+            return self.nF2(pt.t)
+        else:   # proton is default
+            return self.pF2(pt.t)
+
+    def pF1(self, t):
         """Dirac elastic proton form factor - Kelly's parametrization."""
         return ((1 + 0.06815437285120148*t)/(1 - 3.118062557942468*t + 
              1.0338391956016382*t**2 - 0.5031268669574522*t**3) - 
@@ -281,7 +297,7 @@ class ElasticKelly(ElasticFormFactors):
               (1 - 3.115222792407001*t + 1.520921000705686*t**2 - 
              0.14999913420898098*t**3))/(1 - 0.28397655354667284*t)
 
-    def F2(self, t):
+    def pF2(self, t):
         """Pauli elastic proton form factor - Kelly's parametrization."""
         return (-((1 + 0.06815437285120148*t)/(1 - 3.118062557942468*t + 
              1.0338391956016382*t**2 - 0.5031268669574522*t**3)) + 
@@ -308,10 +324,10 @@ class ElasticKelly(ElasticFormFactors):
 class ElasticZero(ElasticFormFactors):
     """Set F1=F2=0 to get just DVCS^2."""
 
-    def F1(self, t):
+    def F1(self, pt):
         return 0.
 
-    def F2(self, t):
+    def F2(self, pt):
         return 0.
 
 
@@ -2304,11 +2320,6 @@ class PureBetheHeitler(ComptonFormFactors, ElasticKelly):
                  (1e-5 < pt.xB < 0.65)
                )
 
-class PureBetheHeitlerNeutron(ComptonFormFactors, ElasticKelly):
-    """Pure Bethe-Heitler (all CFFs=0) model for neutrons."""
-
-    F1 = ElasticKelly.nF1
-    F2 = ElasticKelly.nF2
 
 class ModelDR(ComptonModelDR, ElasticDipole):
     """Complete model as in arXiv:0904.0458.."""
@@ -2343,25 +2354,6 @@ class ModelDRPP(ComptonModelDRPP, ElasticDipole):
 
 class HybridKelly(ComptonHybrid, ElasticKelly):
     """As Hybrid, but with Kelly elasticd FFs."""
-
-
-class HybridKellyNeutron(ComptonHybrid, ElasticKelly):
-    """As HybridKelly, but with n --> p isospin flip
-    in order to be able to use unchanged proton DVCS observables code for
-    calculation of neutron DVCS observables."""
-
-    F1 = ElasticKelly.nF1
-    F2 = ElasticKelly.nF2
-
-    ImH = ComptonHybrid.nImH
-    ImHt = ComptonHybrid.nImHt
-    ImE = ComptonHybrid.nImE
-    ImEt = ComptonHybrid.nImEt
-
-    ReH = ComptonHybrid.nReH
-    ReHt = ComptonHybrid.nReHt
-    ReE = ComptonHybrid.nReE
-    ReEt = ComptonHybrid.nReEt
 
 
 class HybridZero(ComptonHybrid, ElasticZero):
