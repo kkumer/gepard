@@ -1286,10 +1286,12 @@ class ComptonNeuralNets(Model):
     """Neural network CFFs"""
 
     # FIXME: this variable should be purged out of the code most likely
-    allCFFs = ['ImH', 'ReH', 'ImE', 'ReE', 'ImHt', 'ReHt', 'ImEt', 'ReEt']
+    allCFFs = ['ImH', 'ReH', 'ImE', 'ReE', 'ImHt', 'ReHt', 'ImEt', 'ReEt',
+            'ImHu', 'ImHd', 'ReHu', 'ReHd']
     allGPDs = []
 
-    def __init__(self, hidden_layers=[7], output_layer=['ImH', 'ReH'], endpointpower=None, useDR=None):
+    def __init__(self, hidden_layers=[7], output_layer=['ImH', 'ReH'], 
+            endpointpower=None, useDR=None, flavored=None):
         """Model CFFs by neural networks.
         
         Neural network, created actually by Fitter instance, will have
@@ -1305,6 +1307,7 @@ class ComptonNeuralNets(Model):
                        vanishing at xB=0 and to improve convergence
                 useDR:  use dispersion relations for some Re(CFF)s.
                          E.g.  useDR = ['ReH', 'ReE', 'ReEt', 'ReHt']
+             flavored: use flavor decomposition for some Re(CFF)s.
         
         """
         self.architecture = [2] + hidden_layers + [len(output_layer)]
@@ -1315,6 +1318,7 @@ class ComptonNeuralNets(Model):
         self.parameter_names = ['nnet', 'outputvalue', 'outputvalueC']
         self.endpointpower = endpointpower
         self.useDR = useDR
+        self.flavored = flavored
         # now do whatever else is necessary
         #ComptonFormFactors.__init__(self)
 
@@ -1335,7 +1339,7 @@ class ComptonNeuralNets(Model):
             # if asked for CFF which is not in output_layer, return 0
             self.curname = name
             return self.zero
-        elif name in ['endpointpower', 'optimization', 'useDR']:
+        elif name in ['endpointpower', 'optimization', 'useDR', 'flavored']:
             if name in self.__dict__:
                 return self.__dict__[name]
             else:
@@ -1393,6 +1397,25 @@ class ComptonNeuralNets(Model):
         # Uncomment the following block to switch on the pion pole
         #if self.curname == 'ReEt':
         #    return self._pipole(pt)
+        if hasattr(self, 'flavored') and self.flavored and self.curname in self.flavored:
+            _lg.debug('Doing flavors for CFF: %s\n' % self.curname)
+            if self.curname == 'ImH':
+                u = self.ImHu(pt)
+                d = self.ImHd(pt)
+                if pt.in1particle == 'n':
+                    return (4./9.)*d + (1./9.)*u
+                else:
+                    return (4./9.)*u + (1./9.)*d
+            elif self.curname == 'ReH':
+                u = self.ReHu(pt)
+                d = self.ReHd(pt)
+                if pt.in1particle == 'n':
+                    return (4./9.)*d + (1./9.)*u
+                else:
+                    return (4./9.)*u + (1./9.)*d
+                # return DR.intANN(self.__getattr__('Im'+self.curname[2:]), pt)
+            else:
+                raise ValueError('Only ImH and ReH can be flavored')
         if hasattr(self, 'useDR') and self.useDR and self.curname in self.useDR:
             _lg.debug('Doing DR for CFF: %s\n' % self.curname)
             if self.curname == 'ReH':

@@ -241,6 +241,7 @@ class FitterBrain(Fitter):
                 if self.verbose > 1:
                     print("Epoch: %6i   ---->    Error: %8.3g  TestError: %8.3g / %6.3g" % (
                             self.trainer.epoch, trainerr, testerr, memerr))
+                    #print ("Net for pt0 = {}".format(net.activate([datapoints[0].xB, datapoints[0].t])))
                 if testerr < memerr:
                     memerr = testerr
                     memnet = net.copy()
