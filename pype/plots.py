@@ -2860,8 +2860,11 @@ def CFF(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
         panel(ax, xaxis='xi', xs=xvals, kins={'yaxis':cff, 't':-0.2, 'Q2':4.,
         'units':{'CFF': 1}, 'y1name': 'CFF'}, **kwargs)
         ax.axhline(y=0, linewidth=0.5, color='k')  # y=0 thin line
-        ax.set_ylim(*ylims[cff])
-        ax.set_ylabel(toTeX['%s' % cff], fontsize=20)
+        try:
+            ax.set_ylim(*ylims[cff])
+            ax.set_ylabel(toTeX['%s' % cff], fontsize=20)
+        except KeyError:
+            pass
         ax.tick_params(axis='both', which='major', labelsize=14)
         ax.tick_params(axis='both', which='minor', labelsize=14)
         ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.05))  # tickmarks
@@ -2991,7 +2994,10 @@ def CFFt(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
         panel(ax, xaxis='tm', xs=tmvals, kins={'yaxis':cff, 'xi':0.12, 'Q2':4.,
            'units':{'CFF': 1}, 'y1name': 'CFF'}, **kwargs)
         ax.set_xlabel(toTeX['tm'], fontsize=15)
-        ax.set_ylabel(toTeX['%s' % cff], fontsize=18)
+        try:
+            ax.set_ylabel(toTeX['%s' % cff], fontsize=18)
+        except KeyError:
+            pass
         ax.axhspan(-0.0005, 0.0005, facecolor='g', alpha=0.6)  # horizontal bar
         if n == 0:
             ax.legend(loc='upper right')
@@ -3005,7 +3011,10 @@ def CFFt(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
         panel(ax, xaxis='tm', xs=tmvals, kins={'yaxis':cff, 'xi':0.22, 'Q2':4.,
             'units':{'CFF': 1}, 'y1name': 'CFF'}, **kwargs)
         ax.set_xlabel(toTeX['tm'], fontsize=15)
-        ax.set_ylabel(toTeX['%s' % cff], fontsize=14)
+        try:
+            ax.set_ylabel(toTeX['%s' % cff], fontsize=18)
+        except KeyError:
+            pass
         ax.axhspan(-0.0005, 0.0005, facecolor='g', alpha=0.6)  # horizontal bar
         if n == 0:
             ax.legend(loc='upper right')
