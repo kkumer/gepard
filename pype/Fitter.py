@@ -138,6 +138,7 @@ class FitterBrain(Fitter):
         self.maxtries = 999
         self.nbatch = 20
         self.batchlen = 5
+        self.minprob = 0.05
         self.verbose = 0
         self.inputs = theory.model.architecture[0]
         self.outputs = theory.model.architecture[-1]
@@ -345,7 +346,7 @@ class FitterBrain(Fitter):
                 self.theory.model.nets.append(net)
                 self.theory.model.parameters['nnet'] = n
             chi, dof, fitprob = self.theory.chisq(self.fitpoints)
-            if fitprob < 0.05:
+            if fitprob < self.minprob:
                 sfitprob = utils.stringcolor("%5.4f" % fitprob, 'red', True)
             else:
                 sfitprob = utils.stringcolor("%5.4f" % fitprob, 'green', True)
@@ -375,7 +376,7 @@ class FitterBrain(Fitter):
                 self.theory.model.nets.append(net)
                 self.theory.model.parameters['nnet'] = n
             chi, dof, fitprob = self.theory.chisq(self.fitpoints)
-            if fitprob < 0.05:
+            if fitprob < self.minprob:
                 sfitprob = utils.stringcolor("%5.4f" % fitprob, 'red', True)
                 del self.theory.model.nets[-1]
                 if self.theory.m.useDR:
