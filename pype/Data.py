@@ -251,7 +251,7 @@ class DataSet(list):
                 self.in1charge = -1
             # Mandelstam s, if specified
             try:
-                if self.process == 'ep2epgamma':
+                if self.process in ['ep2epgamma', 'en2engamma']:
                     if self.exptype == 'fixed target':
                         self.s = 2 * Mp * self.in1energy + Mp2
                     elif self.exptype == 'collider':

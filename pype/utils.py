@@ -50,7 +50,7 @@ def loaddata(datadir='data', approach=False):
         if os.path.splitext(file)[1] == ".dat":
             # _lg.debug('Loading datafile %s' % file)
             dataset = Data.DataSet(datafile=os.path.join(datadir, file))
-            if approach and dataset.process == 'ep2epgamma':
+            if approach and dataset.process in ['ep2epgamma', 'en2engamma']:
                 [pt.to_conventions(approach) for pt in dataset]
                 [pt.prepare(approach) for pt in dataset]
             data[dataset.id] = dataset

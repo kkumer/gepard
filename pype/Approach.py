@@ -422,7 +422,7 @@ class BMK(Approach):
         """Pre-calculate GPD-independent kinamatical constants and functions."""
         if not hasattr(pt, "s"):
             #This is for variable beam energy;  code duplication
-            if pt.process == 'ep2epgamma':
+            if pt.process in ['ep2epgamma', 'en2engamma']:
                 if pt.exptype == 'fixed target':
                     pt.s = 2 * Mp * pt.in1energy + Mp2
                 elif pt.exptype == 'collider':
