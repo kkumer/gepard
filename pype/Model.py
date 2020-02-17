@@ -343,7 +343,6 @@ class ComptonFormFactors(Model):
     parameters = {}
     parameter_names = []
     allCFFs = ['ImH', 'ReH', 'ImE', 'ReE', 'ImHt', 'ReHt', 'ImEt', 'ReEt']
-    allnCFFs = ['nImH', 'nReH', 'nImE', 'nReE', 'nImHt', 'nReHt', 'nImEt', 'nReEt'] # neutron
     allCFFsb = ['ImH', 'ReH', 'ImE', 'ReE', 'ImHt', 'ReHt', 'ImEt', 'ReEb']
     allCFFeffs = ['ImHeff', 'ReHeff', 'ImEeff', 'ReEeff', 
                      'ImHteff', 'ReHteff', 'ImEteff', 'ReEteff']
@@ -363,9 +362,6 @@ class ComptonFormFactors(Model):
 
     # Initial definition of all CFFs. All just return zero.
     for name in allCFFs:
-        exec('def %s(self, pt): return 0.' % name)
-
-    for name in allnCFFs:
         exec('def %s(self, pt): return 0.' % name)
 
     for name in allCFFeffs:
@@ -536,7 +532,11 @@ class ComptonModelDR(ComptonDispersionRelations):
         t = pt.t
         twox = 2.*x / (1.+x)
         onex = (1.-x) / (1.+x)
-        val = ( (2.*4./9. + 1./9.) * p['Nv'] * p['rv'] * twox**(-p['alv']-p['alpv']*t) *
+        if 'in2particle' in pt and pt.in2particle == 'n':
+            chgfac = (1.*4./9. + 2./9.)  # neutron
+        else:
+            chgfac = (2.*4./9. + 1./9.)  # proton
+        val = ( chgfac * p['Nv'] * p['rv'] * twox**(-p['alv']-p['alpv']*t) *
                  onex**p['bv'] / (1. - onex*t/(p['Mv']**2))  )
         sea = ( (2./9.) * p['NS'] * p['rS'] * twox**(-p['alS']-p['alpS']*t) *
                  onex**p['bS'] / (1. - onex*t/(p['MS']**2))**2 )
@@ -563,7 +563,11 @@ class ComptonModelDR(ComptonDispersionRelations):
         except KeyError:
             # Old models take Regge trajectory params from H:
             regge = (-p['alv']-p['alpv']*t)
-        val = ( (2.*4./9. + 1./9.) * p['tNv'] * p['trv'] * 
+        if 'in2particle' in pt and pt.in2particle == 'n':
+            chgfac = (1.*4./9. + 2./9.)  # neutron
+        else:
+            chgfac = (2.*4./9. + 1./9.)  # proton
+        val = ( chgfac * p['tNv'] * p['trv'] * 
             twox**regge *
                  onex**p['tbv'] / (1. - onex*t/(p['tMv']**2))  )
         return pi * val / (1.+x)
@@ -681,34 +685,16 @@ class ComptonModelDRsea(ComptonDispersionRelations):
         t = pt.t
         twox = 2.*x / (1.+x)
         onex = (1.-x) / (1.+x)
-        val = ( (2.*4./9. + 1./9.) * p['Nv'] * p['rv'] * twox**(-p['alv']-p['alpv']*t) *
+        if 'in2particle' in pt and pt.in2particle == 'n':
+            chgfac = (1.*4./9. + 2./9.)  # neutron
+        else:
+            chgfac = (2.*4./9. + 1./9.)  # proton
+        val = ( chgfac * p['Nv'] * p['rv'] * twox**(-p['alv']-p['alpv']*t) *
                  onex**p['bv'] / (1. - onex*t/(p['Mv']**2))  )
         sea = ( (2./9.) * p['Nsea'] * p['rS'] * twox**(-p['alS']-p['alpS']*t) *
                  onex**p['bS'] / (1. - onex*t/(p['MS']**2))**2 )
         return pi * (val + sea) / (1.+x)
 
-    def nImH(self, pt, xi=0):
-        """Imaginary part of neutron CFF H."""
-        p = self.parameters # just a shortcut
-        # FIXME: The following solution is not elegant
-        if isinstance(xi, ndarray):
-            # function was called with third argument that is xi nd array
-            x = xi
-        elif xi != 0:
-            # function was called with third argument that is xi number
-            x = xi
-        else:
-            # xi should be taken from pt object
-            x = pt.xi
-        t = pt.t
-        twox = 2.*x / (1.+x)
-        onex = (1.-x) / (1.+x)
-        # Just isospin rotation from proton valence ImH:
-        val = ( (1.*4./9. + 2./9.) * p['Nv'] * p['rv'] * twox**(-p['alv']-p['alpv']*t) *
-                 onex**p['bv'] / (1. - onex*t/(p['Mv']**2))  )
-        sea = ( (2./9.) * p['Nsea'] * p['rS'] * twox**(-p['alS']-p['alpS']*t) *
-                 onex**p['bS'] / (1. - onex*t/(p['MS']**2))**2 )
-        return pi * (val + sea) / (1.+x)
 
     def ImHt(self, pt, xi=0):
         """Imaginary part of CFF Ht i.e. \tilde{H}."""
@@ -731,34 +717,11 @@ class ComptonModelDRsea(ComptonDispersionRelations):
         except KeyError:
             # Old models take Regge trajectory params from H:
             regge = (-p['alv']-p['alpv']*t)
-        val = ( (2.*4./9. + 1./9.) * p['tNv'] * p['trv'] * 
-            twox**regge *
-                 onex**p['tbv'] / (1. - onex*t/(p['tMv']**2))  )
-        return pi * val / (1.+x)
-
-    def nImHt(self, pt, xi=0):
-        """Imaginary part of neutron CFF Ht i.e. \tilde{H}."""
-        p = self.parameters # just a shortcut
-        # FIXME: The following solution is not elegant
-        if isinstance(xi, ndarray):
-            # function was called with third argument that is xi nd array
-            x = xi
-        elif xi != 0:
-            # function was called with third argument that is xi number
-            x = xi
+        if 'in2particle' in pt and pt.in2particle == 'n':
+            chgfac = (1.*4./9. + 2./9.)  # neutron
         else:
-            # xi should be taken from pt object
-            x = pt.xi
-        t = pt.t
-        twox = 2.*x / (1.+x)
-        onex = (1.-x) / (1.+x)
-        try:
-            regge = (-p['tal']-p['talp']*t)
-        except KeyError:
-            # Old models take Regge trajectory params from H:
-            regge = (-p['alv']-p['alpv']*t)
-        # Just isospin rotation from proton valence ImH:
-        val = ( (1.*4./9. + 2./9.) * p['tNv'] * p['trv'] * 
+            chgfac = (2.*4./9. + 1./9.)  # proton
+        val = ( chgfac * p['tNv'] * p['trv'] * 
             twox**regge *
                  onex**p['tbv'] / (1. - onex*t/(p['tMv']**2))  )
         return pi * val / (1.+x)
@@ -770,16 +733,12 @@ class ComptonModelDRsea(ComptonDispersionRelations):
         # to make it compatible for dispersion integral
         return 0
 
-    nImE = ImE
-    # def nImE(self, pt, xi=0):
-        # return 0*self.ImH(pt,xi)
 
     def ReEt(self, pt):
         """Instead of disp. rel. use pole formula."""
         return (2.2390424 * (1. - (1.7*(0.0196 - pt.t))/(1. 
             - pt.t/2.)**2))/((0.0196 - pt.t)*pt.xi)
 
-    nReEt = ReEt     # take same pion pole for neutron
 
 class ComptonModelDRPPsea(ComptonModelDRsea):
     """As DRPP but with NS->Nsea. For combining with Gepard sea"""
@@ -825,7 +784,6 @@ class ComptonModelDRPPsea(ComptonModelDRsea):
         return self.parameters['rpi'] * 2.16444 / (0.0196 - pt.t) / (1. 
             - pt.t/self.parameters['Mpi']**2)**2 / pt.xi
 
-    nReEt = ReEt     # take same pion pole for neutron
 
 class GK12(ComptonDispersionRelations):
     """ Goloskokov-Kroll PDF model 
@@ -2170,31 +2128,6 @@ class ComptonHybrid(ComptonFormFactors):
     def DISF2(self, pt):
         return  self.Gepard.DISF2(pt)
 
-    # TODO: maybe neutron should be done using some particle attribute of CFFs
-
-    def nImH(self, pt, xi=0):
-        return  self.Gepard.ImH(pt) + self.DR.nImH(pt, xi)
-
-    def nReH(self, pt):
-        return  self.Gepard.ReH(pt) + self.DR.nReH(pt)
-
-    def nImE(self, pt, xi=0):
-        return  self.Gepard.ImE(pt) + self.DR.nImE(pt, xi)
-
-    def nReE(self, pt):
-        return  self.Gepard.ReE(pt) + self.DR.nReE(pt)
-
-    def nImHt(self, pt, xi=0):
-        return  self.DR.nImHt(pt, xi)
-
-    def nReHt(self, pt):
-        return  self.DR.nReHt(pt)
-
-    def nImEt(self, pt):
-        return  self.DR.nImEt(pt)
-
-    def nReEt(self, pt):
-        return  self.DR.nReEt(pt)
 
 
 class ComptonLocal(ComptonFormFactors):

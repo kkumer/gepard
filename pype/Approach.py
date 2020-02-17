@@ -836,7 +836,7 @@ class BMK(Approach):
             #            'in1polarization', 'in2particle'])
 
         # Copy non-kinematical info
-        for atr in ['in1charge', 'in1polarization', 'in2polarization']:
+        for atr in ['in1charge', 'in1polarization', 'in2polarization', 'in2particle']:
             if atr in pt:
                 setattr(kin, atr, getattr(pt, atr))
 
