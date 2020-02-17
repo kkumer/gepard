@@ -1,0 +1,83 @@
+id = 138
+editor = MC
+#Feb. 2020
+
+###Experiment
+
+collaboration = HALLA
+process = en2engamma
+exptype = fixed target
+year = 2020
+reference =  doi:10.1038/s41567-019-0774-3
+inspiretex = Benali:2020vma
+reference2 = Table 4 
+
+
+### Scattering Process
+
+frame = Trento
+
+in1particle = e-
+in1energyunit = GeV
+
+in2particle = n
+
+out1particle = e-
+out2particle = n
+out3particle = gamma
+
+
+### Observable 
+y1name = BSS
+y1namelong = Beam Helicity Independent Cross Section 
+# or Beam spin sum
+y1unit = nb/GeV^4
+y1value = column3
+y1errorstatistic = column4
+y1errorsystematicplus = column5
+y1errorsystematicminus = column6
+
+
+
+
+### x-axes
+
+x1name = in1energy
+x1unit = GeV
+x1value = column1
+
+x2name = t
+x2unit = GeV^2
+x2value = column2
+
+x3name = xB
+x3unit = 1
+x3value = 0.36
+
+x4name = Q2
+x4unit = GeV^2
+x4value = 1.75
+
+x5name = FTn
+x5unit = 1
+x5value = 0.00
+#not really
+
+### Data
+
+#in1energy t          BSS         stat       sysplus     sysminus
+#################################################################
+4.45	-0.4		158.236 	14.5541     7.4943      15.5272
+4.45	-0.32		212.044 	14.3933	    14.7062	    18.6288
+4.45	-0.25		231.783 	15.8883	    21.0129	    17.1038
+4.45	-0.18		316.769 	19.873	    53.6245	    53.6414
+5.55	-0.4		75.4917 	7.33347	    4.82241	    10.4664
+5.55	-0.32		104.844 	8.68874	    10.1964	    12.114
+5.55	-0.25		89.4442 	8.01033	    10.6179 	8.95029
+5.55	-0.18		158.66  	12.4602	    28.4245	    28.7282
+
+
+
+
+
+
