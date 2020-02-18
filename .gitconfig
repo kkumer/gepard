@@ -1,9 +1,0 @@
-[alias]
-        st = status
-[user]
-        name = marijacuic
-        email = mcuic@phy.hr
-[color]
-        ui = auto
-[push]
-        default = simple
