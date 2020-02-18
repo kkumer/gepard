@@ -1376,14 +1376,14 @@ class ComptonNeuralNets(Model):
             if self.curname == 'ImH':
                 u = self.ImHu(pt)
                 d = self.ImHd(pt)
-                if pt.in1particle == 'n':
+                if pt.in2particle == 'n':
                     return (4./9.)*d + (1./9.)*u
                 else:
                     return (4./9.)*u + (1./9.)*d
             elif self.curname == 'ReH':
                 u = self.ReHu(pt)
                 d = self.ReHd(pt)
-                if pt.in1particle == 'n':
+                if pt.in2particle == 'n':
                     return (4./9.)*d + (1./9.)*u
                 else:
                     return (4./9.)*u + (1./9.)*d
