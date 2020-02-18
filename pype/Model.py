@@ -580,8 +580,12 @@ class ComptonModelDR(ComptonDispersionRelations):
 
     def ReEt(self, pt):
         """Instead of disp. rel. use pole formula."""
-        return (2.2390424 * (1. - (1.7*(0.0196 - pt.t))/(1. 
+        pole = (2.2390424 * (1. - (1.7*(0.0196 - pt.t))/(1.
             - pt.t/2.)**2))/((0.0196 - pt.t)*pt.xi)
+        if 'in2particle' in pt and pt.in2particle == 'n':
+            return -pole  # neutron
+        else:
+            return  pole  # proton
 
 
 class ComptonModelDRPP(ComptonModelDR):
@@ -625,8 +629,12 @@ class ComptonModelDRPP(ComptonModelDR):
 
     def ReEt(self, pt):
         """Instead of disp. rel. use pole formula"""
-        return self.parameters['rpi'] * 2.16444 / (0.0196 - pt.t) / (1. 
+        pole = self.parameters['rpi'] * 2.16444 / (0.0196 - pt.t) / (1.
             - pt.t/self.parameters['Mpi']**2)**2 / pt.xi
+        if 'in2particle' in pt and pt.in2particle == 'n':
+            return -pole  # neutron
+        else:
+            return  pole  # proton
 
 
 class ComptonModelDRsea(ComptonDispersionRelations):
@@ -736,8 +744,12 @@ class ComptonModelDRsea(ComptonDispersionRelations):
 
     def ReEt(self, pt):
         """Instead of disp. rel. use pole formula."""
-        return (2.2390424 * (1. - (1.7*(0.0196 - pt.t))/(1. 
+        pole = (2.2390424 * (1. - (1.7*(0.0196 - pt.t))/(1.
             - pt.t/2.)**2))/((0.0196 - pt.t)*pt.xi)
+        if 'in2particle' in pt and pt.in2particle == 'n':
+            return -pole  # neutron
+        else:
+            return  pole  # proton
 
 
 class ComptonModelDRPPsea(ComptonModelDRsea):
@@ -781,8 +793,12 @@ class ComptonModelDRPPsea(ComptonModelDRsea):
 
     def ReEt(self, pt):
         """Instead of disp. rel. use pole formula"""
-        return self.parameters['rpi'] * 2.16444 / (0.0196 - pt.t) / (1. 
-            - pt.t/self.parameters['Mpi']**2)**2 / pt.xi
+        pole = self.parameters['rpi'] * 2.16444 / (0.0196 - pt.t) / (1.
+                - pt.t/self.parameters['Mpi']**2)**2 / pt.xi
+        if 'in2particle' in pt and pt.in2particle == 'n':
+            return -pole  # neutron
+        else:
+            return  pole  # proton
 
 
 class GK12(ComptonDispersionRelations):
