@@ -9,6 +9,8 @@ data.update(utils.loaddata(os.path.join(DATA_DIR, 'gammastarp2gammap'),
        approach=Approach.BMK)) 
 data.update(utils.loaddata(os.path.join(DATA_DIR, 'gammastarp2Mp'),
        approach=Approach.BMK)) 
+data.update(utils.loaddata(os.path.join(DATA_DIR, 'en2engamma'),
+       approach=Approach.BMK))
 data.update(utils.loaddata(os.path.join(DATA_DIR, 'DIS'),
        approach=Approach.BMK)) 
 #data.update(utils.loaddata('/home/kkumer/pype/data/gammastarp2gammap/EIC', approach=Approach.BMK))
