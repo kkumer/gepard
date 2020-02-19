@@ -16,7 +16,7 @@ Then go into pype directory and compile C-wrappers
 ```sh
 % cd pype
 % gcc -c $(python3-config --cflags) kmcffs.c && gcc kmcffs.o $(python3-config --ldflags)  -lpython3.8  -o kmcffs
-% gcc -c $(python3-config --cflags) xloop.c && gcc xloop.o $(python3-config --ldflags)  -lpython3.8  -o xloop
+% gcc -c $(python3-config --cflags) xbloop.c && gcc xbloop.o $(python3-config --ldflags)  -lpython3.8  -o xbloop
 ```
 First one is for specifying kinematics on command line, and second one is example which loops over range of xB values.
 
@@ -30,7 +30,7 @@ Usage: kmcffs xB t Q2
 ```
 
 ```sh
-% ./xloop 
+% ./xbloop 
    xB        t         Q2      ImH      ReH      ImE      ReE      ImHt     ReHt    ImEt      ReEt
 0.010000 -0.300000 4.000000 116.702178 17.066079 0.000000 1.900110 3.617266 1.087262 0.000000 3436.355292 
 0.032821 -0.300000 4.000000 30.989010 2.017216 0.000000 1.900110 2.878577 0.964549 0.000000 1035.007765 
