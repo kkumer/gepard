@@ -46,13 +46,15 @@ Usage: kmcffs xB t Q2
 ```
 
 Second output should be consistent with what you get by going to
-[http://calculon.phy.hr/gpd/server/CFF-grid.html](GPD server) and just switching
+[GPD server](http://calculon.phy.hr/gpd/server/CFF-grid.html) and just switching
 from `log` to `lin`.
 
+On my Intel Xeon CPU E5-2620 v3 @ 2.40GHz, all 24 threads are used and CFFs are generated in about 1 milisecond per kinematic point.
 
 
 
 ## License
 
 Copyright kkumer@phy.hr
+
 All rights reserved.
