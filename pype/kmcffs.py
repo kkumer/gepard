@@ -8,7 +8,7 @@ cffs = ['ImH', 'ReH', 'ImE', 'ReE', 'ImHt', 'ReHt', 'ImEt', 'ReEt']
 
 pt = Data.DummyPoint()
 
-def kmcffs(xB, t, Q2):
+def getcffs(xB, t, Q2):
     pt.Q2 = Q2
     pt.t = t
     pt.xB = xB
