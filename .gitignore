@@ -4,23 +4,5 @@
 **/*.so
 **/*.pyc
 **/*.exe
-**/my*
 **/*prep/*.f
-**/nn*.db
-**/ex/fit_*.py
 
-# Prelim TensorFlow mod by icoric
-**/pype/*_new.py
-
-# Generated documentation
-doc/html/
-doc/tex/*aux
-doc/tex/*log
-doc/tex/*out
-doc/tex/*toc
-doc/tex/gepard.pdf
-doc/tex/gepard-api.pdf
-
-**/*sublime-workspace
-**/*.ipynb
-**/*.ipynb_checkpoints
