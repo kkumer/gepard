@@ -22,13 +22,6 @@ from constants import tolerance2, GeVfm, Mp
 import dispersion as DR
 
 import pygepard as g1
-import pygepard2 as g2
-import pygepard3 as g3
-import pygepard4 as g4
-import pygepard5 as g5
-import pygepard6 as g6
-import pygepard7 as g7
-import optModel
 
 _lg = logging.getLogger('p.%s' % __name__)
 _lg.setLevel(logging.WARNING)  #DEBUG, INFO, WARNING, ERROR, CRITICAL
@@ -1529,8 +1522,8 @@ class ComptonGepard(ComptonFormFactors):
 
     # To have different Gepard models available we have to
     # use separate modules - otherwise things clash
-    gepardPool = [g1, g2, g3, g4, g5, g6, g7]  #  modules to choose from
-    #gepardPool = [g1]  #  modules to choose from
+    #gepardPool = [g1, g2, g3, g4, g5, g6, g7]  #  modules to choose from
+    gepardPool = [g1]  #  modules to choose from
 
     def __init__(self, cutq2=0.0, ansatz='FIT', p=0, scheme='MSBAR', speed=1, q02=4.0, **kwargs):
         _lg.debug('Creating %s.\n' % str(self))
