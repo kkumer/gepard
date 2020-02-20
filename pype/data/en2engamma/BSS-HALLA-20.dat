@@ -31,7 +31,7 @@ out3particle = gamma
 y1name = BSS
 y1namelong = Beam Helicity Independent Cross Section 
 # or Beam spin sum
-y1unit = nb/GeV^4
+y1unit = pb/GeV^4
 y1value = column4
 y1errorstatistic = column5
 y1errorsystematicplus = column6
