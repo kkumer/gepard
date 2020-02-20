@@ -6,7 +6,6 @@
 **/*.exe
 **/my*
 **/*prep/*.f
-**/nn*.db
 **/ex/fit_*.py
 
 # Prelim TensorFlow mod by icoric
