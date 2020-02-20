@@ -6,3 +6,5 @@
 **/*.exe
 **/*prep/*.f
 
+pype/xbloop
+pype/kmcffs

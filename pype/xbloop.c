@@ -22,6 +22,8 @@ int main(int argc, char *argv[])
     }
 
     Py_Initialize();
+    PyRun_SimpleString("import sys");
+    PyRun_SimpleString("sys.path.append(\".\")");
     pName = PyUnicode_DecodeFSDefault("kmcffs");
     /* Error checking of pName left out */
 
@@ -95,7 +97,7 @@ int main(int argc, char *argv[])
     }
     else {
         PyErr_Print();
-        fprintf(stderr, "Failed to load \"%s\"\n", "getcffs");
+        fprintf(stderr, "Failed to load Python module \"%s\"\n", "kmcffs");
         return 1;
     }
     if (Py_FinalizeEx() < 0) {
