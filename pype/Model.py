@@ -264,12 +264,18 @@ class ElasticDipole(ElasticFormFactors):
     def F1(self, pt):
         """Dirac elastic proton form factor - dipole parametrization."""
         t = pt.t
-        return (1.41 * (1.26 - t))/((0.71 - t)**2 * (3.53 - t))
+        if 'in2particle' in pt and pt.in2particle == 'p':
+            return (1.41 * (1.26 - t))/((0.71 - t)**2 * (3.53 - t))
+        else:
+            print('Neutron dipole elastic FFs are not implemented yet!')
 
     def F2(self, pt):
         """Pauli elastic proton form factor - dipole parametrization."""
         t = pt.t
-        return 3.2 / ((0.71 - t)**2 * (3.53 - t))
+        if 'in2particle' in pt and pt.in2particle == 'p':
+            return 3.2 / ((0.71 - t)**2 * (3.53 - t))
+        else:
+            print('Neutron dipole elastic FFs are not implemented yet!')
 
 
 class ElasticKelly(ElasticFormFactors):

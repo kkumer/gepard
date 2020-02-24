@@ -7,8 +7,8 @@ md = Model.ModelDR()  # dipole FFs
 m = Model.ModelDRKelly()  # Kelly's FFs
 
 # proton
-pt = Data.DummyPoint(init = {'Q2':4., 't':0., 'xB':0.1})
-pt1 = Data.DummyPoint(init = {'Q2':4., 't':-1., 'xB':0.1})
+pt = Data.DummyPoint(init = {'in2particle':'p', 'Q2':4., 't':0., 'xB':0.1})
+pt1 = Data.DummyPoint(init = {'in2particle':'p', 'Q2':4., 't':-1., 'xB':0.1})
 
 # neutron
 npt = Data.DummyPoint(init = {'in2particle':'n', 'Q2':4., 't':0., 'xB':0.1})
