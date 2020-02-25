@@ -53,7 +53,7 @@ def theory(id):
         # Hybrid preliminary fit shown in Trento
         # P(132.80, 160) = 0.943  (for UNP5 and H1ZEUS)
         mGepard = Model.ComptonGepard(cutq2=0.5)
-        mDRPPsea = Model.ComptonModelDRPPsea()
+        mDRPPsea = Model.ComptonModelDRPP()
         m = Model.HybridDipole(mGepard, mDRPPsea)
         th = Approach.BM10(m)
         th.name = 'KM10'
@@ -64,7 +64,7 @@ def theory(id):
         # Hybrid fit + 3rd PW to DVCSpoints + data[48] + ALTGLOpoints
         # P(133.06, 155) = 0.8983
         mGepard = Model.ComptonGepard(cutq2=0.5)
-        mDRsea = Model.ComptonModelDRsea()
+        mDRsea = Model.ComptonModelDR()
         m = Model.HybridDipole(mGepard, mDRsea)
         th = Approach.hotfixedBMK(m)
         th.name = 'KM10a'
@@ -74,7 +74,7 @@ def theory(id):
     elif id == 5:
         # Hybrid fit + 3rd PW to DVCSpoints and GLO1points
         mGepard = Model.ComptonGepard(cutq2=0.5)
-        mDRPPsea = Model.ComptonModelDRPPsea()
+        mDRPPsea = Model.ComptonModelDRPP()
         m = Model.HybridKelly(mGepard, mDRPPsea)
         th = Approach.BM10(m)
         th.name = 'KM10b'
@@ -85,7 +85,7 @@ def theory(id):
         # Hybrid fit 
         # P(chi-square, d.o.f) = P(124.12, 80) = 0.0012
         mGepard = Model.ComptonGepard(cutq2=0.5)
-        mDRPPsea = Model.ComptonModelDRPPsea()
+        mDRPPsea = Model.ComptonModelDRPP()
         m = Model.HybridDipole(mGepard, mDRPPsea)
         th = Approach.BM10(m)
         th.name = 'KMM12'
@@ -95,7 +95,7 @@ def theory(id):
     elif id == 7:
         # Hybrid fit  KM15   chisq/dof = 240./275
         mGepard = Model.ComptonGepard(cutq2=0.5)
-        mDRPPsea = Model.ComptonModelDRPPsea()
+        mDRPPsea = Model.ComptonModelDRPP()
         m = Model.HybridKelly(mGepard, mDRPPsea)
         th = Approach.BM10tw2(m)
         th.name = 'KM15'
@@ -110,7 +110,7 @@ def theory(id):
         return th
     elif id == 9:
         mGepard = Model.ComptonGepard(cutq2=0.5)
-        mDRPPsea = Model.ComptonModelDRPPsea()
+        mDRPPsea = Model.ComptonModelDRPP()
         m = Model.HybridZero(mGepard, mDRPPsea)
         th = Approach.BM10tw2(m)
         th.name = 'KM15DVCS'

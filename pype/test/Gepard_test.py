@@ -74,7 +74,7 @@ test_gepardXDVCSevol.gepardsuite = 1
 
 def test_hybrid():
     """GepardDR with switched-off DR should be same as Gepard."""
-    mDRsea = Model.ComptonModelDRsea()
+    mDRsea = Model.ComptonModelDR()
     mBoth = Model.HybridDipole(m, mDRsea)
     tBoth = Approach.hotfixedBMK(mBoth)
     tBoth.m.parameters['Nv'] = 0
@@ -91,7 +91,7 @@ def test_hybrid():
 
 def test_hybridopt():
     """GepardDR optimized with switched-off DR should be same as Gepard."""
-    mDRsea = Model.ComptonModelDRsea(optimization=True)
+    mDRsea = Model.ComptonModelDR(optimization=True)
     mBoth = Model.HybridDipole(m, mDRsea)
     tBoth = Approach.hotfixedBMK(mBoth)
     tBoth.m.parameters['Nv'] = 0

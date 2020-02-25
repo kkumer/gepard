@@ -481,169 +481,9 @@ class ComptonDispersionRelations(ComptonFormFactors):
         return pvpi   # this is P.V./pi 
 
 
+
 class ComptonModelDR(ComptonDispersionRelations):
     """Model for CFFs as in arXiv:0904.0458."""
-
-    def __init__(self, **kwargs):
-        # initial values of parameters and limits on their values
-        self.parameters = {
-              'NS' : 1.5,                                 
-             'alS' : 1.13,                              
-            'alpS' : 0.15,                              
-              'MS' : 0.707,                               
-              'rS' : 1.0,                               
-              'bS' : 2.0,     'limit_bS' : (0.4, 5.0),
-              'Nv' : 1.35,                              
-             'alv' : 0.43,                              
-            'alpv' : 0.85,                              
-              'Mv' : 1.0,     'limit_Mv' : (0.4, 1.5),
-              'rv' : 0.5,     'limit_rv' : (0., 8.),
-              'bv' : 2.2,     'limit_bv' : (0.4, 5.),
-               'C' : 7.0,      'limit_C' : (-10., 10.),
-              'MC' : 1.3,     'limit_MC' : (0.4, 2.),
-             'tNv' : 0.0,                             
-             'tal' : 0.43,                             
-             'talp' : 0.85,                             
-             'tMv' : 2.7,    'limit_tMv' : (0.4, 2.),
-             'trv' : 6.0,    'limit_trv' : (0., 8.),
-             'tbv' : 3.0,    'limit_tbv' : (0.4, 5.)   }
-
-        # order matters to fit.MinuitFitter, so it is defined by:
-        self.parameter_names = ['NS', 'alS', 'alpS', 'MS', 'rS', 'bS',
-                                'Nv', 'alv', 'alpv', 'Mv', 'rv', 'bv',
-                                'C', 'MC',
-                                'tNv', 'tal', 'talp',
-                                'tMv', 'trv', 'tbv']
-
-        # now do whatever else is necessary
-        ComptonFormFactors.__init__(self, **kwargs)
-
-    def subtraction(self, pt):
-        return self.parameters['C']/(1.-pt.t/self.parameters['MC']**2)**2
-
-    def ImH(self, pt, xi=0):
-        """Imaginary part of CFF H."""
-        p = self.parameters # just a shortcut
-        # FIXME: The following solution is not elegant
-        if isinstance(xi, ndarray):
-            # function was called with third argument that is xi nd array
-            x = xi
-        elif xi != 0:
-            # function was called with third argument that is xi number
-            x = xi
-        else:
-            # xi should be taken from pt object
-            x = pt.xi
-        t = pt.t
-        twox = 2.*x / (1.+x)
-        onex = (1.-x) / (1.+x)
-        if 'in2particle' in pt and pt.in2particle == 'n':
-            chgfac = (1.*4./9. + 2./9.)  # neutron
-        else:
-            chgfac = (2.*4./9. + 1./9.)  # proton
-        val = ( chgfac * p['Nv'] * p['rv'] * twox**(-p['alv']-p['alpv']*t) *
-                 onex**p['bv'] / (1. - onex*t/(p['Mv']**2))  )
-        sea = ( (2./9.) * p['NS'] * p['rS'] * twox**(-p['alS']-p['alpS']*t) *
-                 onex**p['bS'] / (1. - onex*t/(p['MS']**2))**2 )
-        return pi * (val + sea) / (1.+x)
-
-    def ImHt(self, pt, xi=0):
-        """Imaginary part of CFF Ht i.e. \tilde{H}."""
-        p = self.parameters # just a shortcut
-        # FIXME: The following solution is not elegant
-        if isinstance(xi, ndarray):
-            # function was called with third argument that is xi nd array
-            x = xi
-        elif xi != 0:
-            # function was called with third argument that is xi number
-            x = xi
-        else:
-            # xi should be taken from pt object
-            x = pt.xi
-        t = pt.t
-        twox = 2.*x / (1.+x)
-        onex = (1.-x) / (1.+x)
-        try:
-            regge = (-p['tal']-p['talp']*t)
-        except KeyError:
-            # Old models take Regge trajectory params from H:
-            regge = (-p['alv']-p['alpv']*t)
-        if 'in2particle' in pt and pt.in2particle == 'n':
-            chgfac = (1.*4./9. + 2./9.)  # neutron
-        else:
-            chgfac = (2.*4./9. + 1./9.)  # proton
-        val = ( chgfac * p['tNv'] * p['trv'] * 
-            twox**regge *
-                 onex**p['tbv'] / (1. - onex*t/(p['tMv']**2))  )
-        return pi * val / (1.+x)
-
-    def ImE(self, pt, xi=0):
-        """Imaginary part of CFF E."""
-        # Just changing function signature w.r.t. ComptonFormFactors
-        # to make it compatible for dispersion integral
-        return 0
-
-    def ReEt(self, pt):
-        """Instead of disp. rel. use pole formula."""
-        pole = (2.2390424 * (1. - (1.7*(0.0196 - pt.t))/(1.
-            - pt.t/2.)**2))/((0.0196 - pt.t)*pt.xi)
-        if 'in2particle' in pt and pt.in2particle == 'n':
-            return -pole  # neutron
-        else:
-            return  pole  # proton
-
-
-class ComptonModelDRPP(ComptonModelDR):
-    """Model for CFFs as in arXiv:0904.0458. + free pion pole"""
-
-    def __init__(self, **kwargs):
-        # initial values of parameters and limits on their values
-        self.parameters = {
-              'NS' : 1.5,                                 
-             'alS' : 1.13,                              
-            'alpS' : 0.15,                              
-              'MS' : 0.707,                               
-              'rS' : 1.0,                               
-              'bS' : 2.0,     'limit_bS' : (0.4, 5.0),
-              'Nv' : 1.35,                              
-             'alv' : 0.43,                              
-            'alpv' : 0.85,                              
-              'Mv' : 1.0,     'limit_Mv' : (0.4, 4.),
-              'rv' : 0.5,     'limit_rv' : (0., 8.),
-              'bv' : 2.2,     'limit_bv' : (0.4, 5.),
-               'C' : 7.0,      'limit_C' : (-10., 10.),
-              'MC' : 1.3,     'limit_MC' : (0.4, 4.),
-             'tNv' : 0.0,                             
-             'tal' : 0.43,                             
-             'talp' : 0.85,                             
-             'tMv' : 2.7,    'limit_tMv' : (0.4, 4.),
-             'trv' : 6.0,    'limit_trv' : (0., 8.),
-             'tbv' : 3.0,    'limit_tbv' : (0.4, 5.),
-             'rpi' : 1.0,    'limit_rpi' : (-8, 8.),
-             'Mpi' : 1.0,    'limit_Mpi' : (0.4, 4.)   }
-
-        # order matters to fit.MinuitFitter, so it is defined by:
-        self.parameter_names = ['NS', 'alS', 'alpS', 'MS', 'rS', 'bS',
-                                'Nv', 'alv', 'alpv', 'Mv', 'rv', 'bv',
-                                'C', 'MC',
-                                'tNv', 'tal', 'talp',
-                                'tMv', 'trv', 'tbv', 'rpi', 'Mpi']
-
-        # now do whatever else is necessary
-        ComptonFormFactors.__init__(self, **kwargs)
-
-    def ReEt(self, pt):
-        """Instead of disp. rel. use pole formula"""
-        pole = self.parameters['rpi'] * 2.16444 / (0.0196 - pt.t) / (1.
-            - pt.t/self.parameters['Mpi']**2)**2 / pt.xi
-        if 'in2particle' in pt and pt.in2particle == 'n':
-            return -pole  # neutron
-        else:
-            return  pole  # proton
-
-
-class ComptonModelDRsea(ComptonDispersionRelations):
-    """DR Model intended for combining with Gepard sea. NS->Nsea"""
 
     def __init__(self, **kwargs):
         # initial values of parameters and limits on their values
@@ -756,9 +596,11 @@ class ComptonModelDRsea(ComptonDispersionRelations):
         else:
             return  pole  # proton
 
+# For compatibility with old models in database:
+ComptonModelDRsea = ComptonModelDR   
 
-class ComptonModelDRPPsea(ComptonModelDRsea):
-    """As DRPP but with NS->Nsea. For combining with Gepard sea"""
+class ComptonModelDRPP(ComptonModelDR):
+    """Model for CFFs as in arXiv:0904.0458. + free pion pole"""
 
     def __init__(self, **kwargs):
         # initial values of parameters and limits on their values
@@ -799,11 +641,16 @@ class ComptonModelDRPPsea(ComptonModelDRsea):
     def ReEt(self, pt):
         """Instead of disp. rel. use pole formula"""
         pole = self.parameters['rpi'] * 2.16444 / (0.0196 - pt.t) / (1.
-                - pt.t/self.parameters['Mpi']**2)**2 / pt.xi
+            - pt.t/self.parameters['Mpi']**2)**2 / pt.xi
         if 'in2particle' in pt and pt.in2particle == 'n':
             return -pole  # neutron
         else:
             return  pole  # proton
+
+
+# For compatibility with old models in database:
+ComptonModelDRPPsea = ComptonModelDRPP
+
 
 
 class GK12(ComptonDispersionRelations):
