@@ -257,7 +257,7 @@ def listFiles(root, patterns='*', recurse=1, return_folders=0):
 
 
 def select(dataset, criteria=[], logic='AND'):
-    """Return list (not DataSet) of DataPoints satisfying criteria.
+    """Return DataSet of DataPoints satisfying criteria.
 
     logic='OR': select points satisfying any
     of the list of criteria.
@@ -527,7 +527,7 @@ def FTF(data, testdata=None, cosmax=None, sinmax=None, inverse=False):
         A = np.array([[np.cos(n*phi) for n in range(cosmax+1)] + [np.sin(n*phi) for n in range(1,sinmax+1)] for phi in data.phi.values])
     B = data.val.values
     if not inverse:
-        res = np.linalg.lstsq(A, B)
+        res = np.linalg.lstsq(A, B, rcond=None)
         #print "Sum of residuals = {}".format(res[1])
         z = np.zeros(N-len(res[0]), dtype=A.dtype)
         vals = np.concatenate((res[0], z), axis=0)
@@ -562,7 +562,7 @@ def FTFMC(data, nsamples=100, cosmax=None, sinmax=None, inverse=False):
     A = np.array([[np.cos(n*phi) for n in range(cosmax+1)] + [np.sin(n*phi) for n in range(1,sinmax+1)] for phi in data.phi.values])
     B = np.transpose((np.ones((nsamples,N))*data.val.values + np.random.randn(nsamples,N)*data.err.values))  # replicas
     if not inverse:
-        res = np.linalg.lstsq(A, B)
+        res = np.linalg.lstsq(A, B, rcond=None)
         z = np.zeros((nsamples, N-len(res[0])), dtype=A.dtype)
         vals = np.concatenate((res[0].T, z), axis=1)
         df = pd.DataFrame({'phi': data.phi.values, 'val': vals.mean(axis=0), 'err': vals.std(axis=0)})

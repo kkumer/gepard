@@ -140,6 +140,7 @@ def XSall(id, Q, lam, Ee, Ep, xB, Q2, t, phi):
 #       id, Q, lam, Ee, Ep, xB, Q2, t, phi))
     pt0 = Data.DummyPoint()
     pt0.in1energy = Ee
+    pt0.in2particle = 'p'
     if Ep > Mp:
         # collider
         pt0.in2energy = Ep

@@ -11,6 +11,7 @@
 FC = gfortran
 CC = gcc
 OPT_CFLAGS = -O3 -fPIC
+PYSUFFIX = $(shell python3-config --extension-suffix)
 
 # optimized, debug and profiling modes
 #
@@ -114,6 +115,8 @@ $(TESTTARGETS) $(MMATARGETS):
 
 optModel.so: optModel.f
 	f2py --fcompiler=$(FC) -c -m optModel $^ 
+	mv optModel$(PYSUFFIX) optModel.so
+
 
 .PHONY: clean 
 clean:

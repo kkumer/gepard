@@ -264,12 +264,18 @@ class ElasticDipole(ElasticFormFactors):
     def F1(self, pt):
         """Dirac elastic proton form factor - dipole parametrization."""
         t = pt.t
-        return (1.41 * (1.26 - t))/((0.71 - t)**2 * (3.53 - t))
+        if 'in2particle' in pt and pt.in2particle == 'p':
+            return (1.41 * (1.26 - t))/((0.71 - t)**2 * (3.53 - t))
+        else:
+            print('Neutron dipole elastic FFs are not implemented yet!')
 
     def F2(self, pt):
         """Pauli elastic proton form factor - dipole parametrization."""
         t = pt.t
-        return 3.2 / ((0.71 - t)**2 * (3.53 - t))
+        if 'in2particle' in pt and pt.in2particle == 'p':
+            return 3.2 / ((0.71 - t)**2 * (3.53 - t))
+        else:
+            print('Neutron dipole elastic FFs are not implemented yet!')
 
 
 class ElasticKelly(ElasticFormFactors):
@@ -1392,14 +1398,14 @@ class ComptonNeuralNets(Model):
             if self.curname == 'ImH':
                 u = self.ImHu(pt)
                 d = self.ImHd(pt)
-                if pt.in2particle == 'n':
+                if 'in2particle' in pt and pt.in2particle == 'n':
                     return (4./9.)*d + (1./9.)*u
                 else:
                     return (4./9.)*u + (1./9.)*d
             elif self.curname == 'ReH':
                 u = self.ReHu(pt)
                 d = self.ReHd(pt)
-                if pt.in2particle == 'n':
+                if 'in2particle' in pt and pt.in2particle == 'n':
                     return (4./9.)*d + (1./9.)*u
                 else:
                     return (4./9.)*u + (1./9.)*d
@@ -2290,6 +2296,10 @@ class ModelDRKelly(ComptonModelDR, ElasticKelly):
 
 
 class ModelNN(ComptonNeuralNets, ElasticDipole):
+    """Complete model."""
+
+
+class ModelNNKelly(ComptonNeuralNets, ElasticKelly):
     """Complete model."""
 
 
