@@ -252,6 +252,8 @@ class FitterBrain(Fitter):
                         print("Epoch: %6i   ---->    Error: %8.3g  TestError: %8.3g" % (
                                 self.trainer.epoch, trainerr, testerr))
                 elif testerr > 100 or trainerr > 100:
+                    print("Epoch: %6i   ---->    Error: %8.3g  TestError: %8.3g" % (
+                            self.trainer.epoch, trainerr, testerr))
                     print("---- This one is hopeless. Giving up. ----")
                     break
             return memnet, memerr
