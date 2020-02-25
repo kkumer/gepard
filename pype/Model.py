@@ -603,40 +603,14 @@ class ComptonModelDRPP(ComptonModelDR):
     """Model for CFFs as in arXiv:0904.0458. + free pion pole"""
 
     def __init__(self, **kwargs):
-        # initial values of parameters and limits on their values
-        self.parameters = {
-              'Nsea' : 1.5,                                 
-             'alS' : 1.13,                              
-            'alpS' : 0.15,                              
-              'MS' : 0.707,                               
-              'rS' : 1.0,                               
-              'bS' : 2.0,     'limit_bS' : (0.4, 5.0),
-              'Nv' : 1.35,                              
-             'alv' : 0.43,                              
-            'alpv' : 0.85,                              
-              'Mv' : 1.0,     'limit_Mv' : (0.4, 4.),
-              'rv' : 0.5,     'limit_rv' : (0., 8.),
-              'bv' : 2.2,     'limit_bv' : (0.4, 5.),
-               'C' : 7.0,      'limit_C' : (-10., 10.),
-              'MC' : 1.3,     'limit_MC' : (0.4, 4.),
-             'tNv' : 0.0,                             
-             'tal' : 0.43,                             
-             'talp' : 0.85,                             
-             'tMv' : 2.7,    'limit_tMv' : (0.4, 4.),
-             'trv' : 6.0,    'limit_trv' : (0., 8.),
-             'tbv' : 3.0,    'limit_tbv' : (0.4, 5.),
+        # First inhert what's needed
+        ComptonModelDR.__init__(self, **kwargs)
+        # Adding two extra parameters:
+        self.parameters.update({
              'rpi' : 1.0,    'limit_rpi' : (-8, 8.),
-             'Mpi' : 1.0,    'limit_Mpi' : (0.4, 4.)   }
-
-        # order matters to fit.MinuitFitter, so it is defined by:
-        self.parameter_names = ['Nsea', 'alS', 'alpS', 'MS', 'rS', 'bS',
-                                'Nv', 'alv', 'alpv', 'Mv', 'rv', 'bv',
-                                'C', 'MC',
-                                'tNv', 'tal', 'talp',
-                                'tMv', 'trv', 'tbv', 'rpi', 'Mpi']
-
-        # now do whatever else is necessary
-        ComptonFormFactors.__init__(self, **kwargs)
+             'Mpi' : 1.0,    'limit_Mpi' : (0.4, 4.)   })
+        self.parameter_names.append('rpi')
+        self.parameter_names.append('Mpi')
 
     def ReEt(self, pt):
         """Instead of disp. rel. use pole formula"""
