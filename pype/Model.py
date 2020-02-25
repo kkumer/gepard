@@ -267,7 +267,7 @@ class ElasticDipole(ElasticFormFactors):
         if 'in2particle' in pt and pt.in2particle == 'p':
             return (1.41 * (1.26 - t))/((0.71 - t)**2 * (3.53 - t))
         else:
-            print('Neutron dipole elastic FFs are not implemented yet!')
+            print('Neutron dipole elastic FFs are not implemented yet! Use Kelly.')
 
     def F2(self, pt):
         """Pauli elastic proton form factor - dipole parametrization."""
@@ -275,7 +275,7 @@ class ElasticDipole(ElasticFormFactors):
         if 'in2particle' in pt and pt.in2particle == 'p':
             return 3.2 / ((0.71 - t)**2 * (3.53 - t))
         else:
-            print('Neutron dipole elastic FFs are not implemented yet!')
+            print('Neutron dipole elastic FFs are not implemented yet! Use Kelly.')
 
 
 class ElasticKelly(ElasticFormFactors):
@@ -385,7 +385,7 @@ class ComptonFormFactors(Model):
     
     
 class ComptonDispersionRelations(ComptonFormFactors):
-    """Use dispersion relations for ReH and ReE
+    """Use dispersion relations for real parts of CFFs
 
     methods: ReH, ReE, ReHt, ReEt, subtraction
     Subclass should implement ansaetze for ImH, ImE, ImHt, ImEt 
@@ -415,7 +415,7 @@ class ComptonDispersionRelations(ComptonFormFactors):
         order to tame the singularity at x=0. 
         
         """
-        ga = 0.9  # Value same as for V-case (FIXME: is this the best choice?)
+        ga = 0.9  # Value same as for V-case (TODO: is this the best choice?)
         u = x**(1./(1.-ga))
         res = u**ga * ( fun(pt, u) - fun(pt) )
         return (2.* pt.xi) / (pt.xi**2 - u**2) * res / (1.-ga)
@@ -467,7 +467,6 @@ class ComptonDispersionRelations(ComptonFormFactors):
             # as for H, but with opposite sign
             return pvpi + self.subtraction(pt)
 
-    @staticmethod
     def ReEt(self, pt):
         """ Real part of CFF Et. 
         
@@ -1283,9 +1282,9 @@ class ComptonNeuralNets(Model):
 
     # FIXME: this variable should be purged out of the code most likely
     allCFFs = ['ImH', 'ReH', 'ImE', 'ReE', 'ImHt', 'ReHt', 'ImEt', 'ReEt',
-            'ImHu', 'ImHd', 'ReHu', 'ReHd', 
-            'ImHtu', 'ImHtd', 'ReHtu', 'ReHtd', 
-            'ImEu', 'ImEd', 'ReEu', 'ReEd', 
+            'ImHu', 'ImHd', 'ReHu', 'ReHd',
+            'ImHtu', 'ImHtd', 'ReHtu', 'ReHtd',
+            'ImEu', 'ImEd', 'ReEu', 'ReEd',
             'ImEtu', 'ImEtd', 'ReEtu', 'ReEtd'
             ]
     allGPDs = []
