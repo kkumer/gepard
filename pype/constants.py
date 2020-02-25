@@ -59,6 +59,22 @@ toTeX = {'tm' : '$-t$',  'xB' : '$x_{\\rm B}$', 'Q2' : '$Q^{2}$',
      "ReHt" : '$\\mathfrak{Re}\\,\\tilde{\\mathcal{H}}$',
      "ImEt" : '$\\mathfrak{Im}\\,\\tilde{\\mathcal{E}}$',
      "ReEt" : '$\\mathfrak{Re}\\,\\tilde{\\mathcal{E}}$',
+     "ImHu" : '$\\mathfrak{Im}\\,\\mathcal{H}_{u}$',
+     "ReHu" : '$\\mathfrak{Re}\\,\\mathcal{H}_{u}$',
+     "ImEu" : '$\\mathfrak{Im}\\,\\mathcal{E}_{u}$',
+     "ReEu" : '$\\mathfrak{Re}\\,\\mathcal{E}_{u}$',
+     "ImHtu" : '$\\mathfrak{Im}\\,\\tilde{\\mathcal{H}}_{u}$',
+     "ReHtu" : '$\\mathfrak{Re}\\,\\tilde{\\mathcal{H}}_{u}$',
+     "ImEtu" : '$\\mathfrak{Im}\\,\\tilde{\\mathcal{E}}_{u}$',
+     "ReEtu" : '$\\mathfrak{Re}\\,\\tilde{\\mathcal{E}}_{u}$',
+     "ImHd" : '$\\mathfrak{Im}\\,\\mathcal{H}_{d}$',
+     "ReHd" : '$\\mathfrak{Re}\\,\\mathcal{H}_{d}$',
+     "ImEd" : '$\\mathfrak{Im}\\,\\mathcal{E}_{d}$',
+     "ReEd" : '$\\mathfrak{Re}\\,\\mathcal{E}_{d}$',
+     "ImHtd" : '$\\mathfrak{Im}\\,\\tilde{\\mathcal{H}}_{d}$',
+     "ReHtd" : '$\\mathfrak{Re}\\,\\tilde{\\mathcal{H}}_{d}$',
+     "ImEtd" : '$\\mathfrak{Im}\\,\\tilde{\\mathcal{E}}_{d}$',
+     "ReEtd" : '$\\mathfrak{Re}\\,\\tilde{\\mathcal{E}}_{d}$'
      }
 
 # Dictionary that maps observable tuples to their LaTeX representation

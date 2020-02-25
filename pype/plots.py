@@ -352,7 +352,7 @@ def HERMES12(path=None, fmt='png', **kwargs):
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
         fig.canvas.draw()
-        fig.show()
+        #fig.show()
     return fig
 
 def HERMES10t(lines=None, path=None, fmt='png'):
@@ -390,7 +390,7 @@ def HERMES10t(lines=None, path=None, fmt='png'):
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
         fig.canvas.draw()
-        fig.show()
+        #fig.show()
     return fig
 
 def HERMES12t(lines=None, path=None, fmt='png'):
@@ -426,7 +426,7 @@ def HERMES12t(lines=None, path=None, fmt='png'):
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
         fig.canvas.draw()
-        fig.show()
+        #fig.show()
     return fig
 
 def HERMES12BCA(path=None, fmt='png', **kwargs):
@@ -466,7 +466,7 @@ def HERMES12BCA(path=None, fmt='png', **kwargs):
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
         fig.canvas.draw()
-        fig.show()
+        #fig.show()
     return fig
 
 def HERMES12BSA(path=None, fmt='png', **kwargs):
@@ -506,7 +506,7 @@ def HERMES12BSA(path=None, fmt='png', **kwargs):
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
         fig.canvas.draw()
-        fig.show()
+        #fig.show()
     return fig
 
 def HERMES09(path=None, fmt='png', **kwargs):
@@ -555,7 +555,7 @@ def HERMES09(path=None, fmt='png', **kwargs):
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
         fig.canvas.draw()
-        fig.show()
+        #fig.show()
     return fig
 
 def HERMES10LP(obs='TSA', path=None, fmt='png', **kwargs):
@@ -611,7 +611,7 @@ def HERMES10LP(obs='TSA', path=None, fmt='png', **kwargs):
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
         fig.canvas.draw()
-        fig.show()
+        #fig.show()
     return fig
 
 def HERMES08TP(path=None, fmt='png', **kwargs):
@@ -662,7 +662,7 @@ def HERMES08TP(path=None, fmt='png', **kwargs):
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
         fig.canvas.draw()
-        fig.show()
+        #fig.show()
     return fig
 
 def CLAS(path=None, fmt='png', **kwargs):
@@ -705,7 +705,7 @@ def CLAS(path=None, fmt='png', **kwargs):
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
         fig.canvas.draw()
-        fig.show()
+        #fig.show()
     return fig
 
 def CLAS14(obs='BSA', path=None, fmt='png', **kwargs):
@@ -779,7 +779,7 @@ def CLAS14(obs='BSA', path=None, fmt='png', **kwargs):
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
         fig.canvas.draw()
-        fig.show()
+        #fig.show()
     return fig
 
 def CLAS15(obs='BSA', path=None, fmt='png', **kwargs):
@@ -857,7 +857,7 @@ def CLAS15(obs='BSA', path=None, fmt='png', **kwargs):
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
         fig.canvas.draw()
-        fig.show()
+        #fig.show()
     return fig
 
 def HERAF2Q2(path=None, fmt='png', **kwargs):
@@ -931,7 +931,7 @@ def HERAF2xB(path=None, fmt='png', **kwargs):
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
         fig.canvas.draw()
-        fig.show()
+        #fig.show()
     return fig
 
 def HERAF2(path=None, fmt='png', **kwargs):
@@ -977,7 +977,7 @@ def HERAF2(path=None, fmt='png', **kwargs):
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
         fig.canvas.draw()
-        fig.show()
+        #fig.show()
     return fig
 
 def CLASJ(path=None, fmt='png', **kwargs):
@@ -1043,7 +1043,7 @@ def CLASJ(path=None, fmt='png', **kwargs):
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
         fig.canvas.draw()
-        fig.show()
+        #fig.show()
     return fig
 
 
@@ -1069,7 +1069,7 @@ def CLAS08(path=None, fmt='png', **kwargs):
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
         fig.canvas.draw()
-        fig.show()
+        #fig.show()
     return fig
 
 def CLASTSA(path=None, fmt='png', **kwargs):
@@ -1089,7 +1089,7 @@ def CLASTSA(path=None, fmt='png', **kwargs):
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
         fig.canvas.draw()
-        fig.show()
+        #fig.show()
     return fig
 
 def HallAFT(path=None, fmt='png', **kwargs):
@@ -1124,7 +1124,7 @@ def HallAFT(path=None, fmt='png', **kwargs):
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
         fig.canvas.draw()
-        fig.show()
+        #fig.show()
     return fig
 
 
@@ -1191,7 +1191,7 @@ def HallA06(lines=None, path=None, fmt='png'):
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
         fig.canvas.draw()
-        fig.show()
+        #fig.show()
     return fig
 
 def HallAphi(path=None, fmt='png', **kwargs):
@@ -1236,7 +1236,7 @@ def HallAphi(path=None, fmt='png', **kwargs):
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
         fig.canvas.draw()
-        fig.show()
+        #fig.show()
     return fig
 
 def CLAS14phi(path=None, fmt='png', **kwargs):
@@ -1267,7 +1267,7 @@ def CLAS14phi(path=None, fmt='png', **kwargs):
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
         fig.canvas.draw()
-        fig.show()
+        #fig.show()
     return fig
 
 def CLAS15phi(path=None, fmt='png', **kwargs):
@@ -1321,7 +1321,7 @@ def CLAS15phi(path=None, fmt='png', **kwargs):
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
         fig.canvas.draw()
-        fig.show()
+        #fig.show()
     return fig
 
 def CLAS15xs(lines=None, path=None, fmt='png'):
@@ -1363,7 +1363,7 @@ def CLAS15xs(lines=None, path=None, fmt='png'):
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
         fig.canvas.draw()
-        fig.show()
+        #fig.show()
     return fig
 
 
@@ -1429,7 +1429,7 @@ def HallA15(lines=None, enh=True, path=None, fmt='png'):
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
         fig.canvas.draw()
-        fig.show()
+        #fig.show()
     return fig
 
 
@@ -1525,7 +1525,7 @@ def HallA17(obs='BSScos0', lines=None, path=None, fmt='png'):
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
         fig.canvas.draw()
-        fig.show()
+        #fig.show()
     return fig
 
 
@@ -1716,7 +1716,7 @@ def COMPASSt(path=None, fmt='png', **kwargs):
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
         fig.canvas.draw()
-        fig.show()
+        #fig.show()
     return fig
 
 ### FIXME: Following plots are done without using panel(), so they cannot plot bands
@@ -1815,7 +1815,7 @@ def COMPASS(lines=[], xB=0.05, Q2=2, path=None, fmt='png', numbers=False):
         fig.savefig(os.path.join(path, filename+'.'+fmt), format=fmt)
     else:
         fig.canvas.draw()
-        fig.show()
+        #fig.show()
     return fig
 
 def EIC(lines=[], path=None, fmt='png'):
@@ -1882,7 +1882,7 @@ def EIC(lines=[], path=None, fmt='png'):
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
         fig.canvas.draw()
-        fig.show()
+        #fig.show()
     return fig
 
 def EICt(path=None, fmt='png', **kwargs):
@@ -1903,7 +1903,7 @@ def EICt(path=None, fmt='png', **kwargs):
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
         fig.canvas.draw()
-        fig.show()
+        #fig.show()
     return fig
 
 def EICTTSA(lines=[], path=None, fmt='png'):
@@ -1979,7 +1979,7 @@ def EICTTSA(lines=[], path=None, fmt='png'):
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
         fig.canvas.draw()
-        fig.show()
+        #fig.show()
     return fig
 
 def H(theories=[], path=None, fmt='png'):
@@ -2032,7 +2032,7 @@ def H(theories=[], path=None, fmt='png'):
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
         fig.canvas.draw()
-        fig.show()
+        #fig.show()
     return fig
 
 def EICspinALU(th, path=None, fmt='png'):
@@ -2155,7 +2155,7 @@ def EICspinALU(th, path=None, fmt='png'):
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
         fig.canvas.draw()
-        fig.show()
+        #fig.show()
     return fig
 
 def EICspinAUT(th, path=None, fmt='png'):
@@ -2282,7 +2282,7 @@ def EICspinAUT(th, path=None, fmt='png'):
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
         fig.canvas.draw()
-        fig.show()
+        #fig.show()
     return fig
 
 def EICspinAUL(th, path=None, fmt='png'):
@@ -2407,7 +2407,7 @@ def EICspinAUL(th, path=None, fmt='png'):
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
         fig.canvas.draw()
-        fig.show()
+        #fig.show()
     return fig
 
 def EICphase1(th, path=None, fmt='png'):
@@ -2784,7 +2784,7 @@ def EICphase1(th, path=None, fmt='png'):
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
         fig.canvas.draw()
-        fig.show()
+        #fig.show()
     return fig
 
 #################################################################
@@ -2821,7 +2821,7 @@ def xBt(points, path=None, fmt='png'):
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
         fig.canvas.draw()
-        fig.show()
+        #fig.show()
     return fig
 
 def CFF(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
@@ -3320,7 +3320,7 @@ def bspace(th, parsets=False, path=None, fmt='png', error=False, **kwargs):
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
         fig.canvas.draw()
-        fig.show()
+        #fig.show()
     return fig
 
 def bspace2D(th, flavor='Q', path=None, fmt='png', **kwargs):
@@ -3377,7 +3377,7 @@ def bspace2D(th, flavor='Q', path=None, fmt='png', **kwargs):
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
         fig.canvas.draw()
-        fig.show()
+        #fig.show()
     return fig
 
 def markus(th, error=False, path=None, fmt='png', **kwargs):
@@ -3466,7 +3466,7 @@ def markus(th, error=False, path=None, fmt='png', **kwargs):
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
         fig.canvas.draw()
-        fig.show()
+        #fig.show()
     return fig
 
 def beff(m, pars1, pars2, path=None, fmt='png', **kwargs):
@@ -3528,7 +3528,7 @@ def beff(m, pars1, pars2, path=None, fmt='png', **kwargs):
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
         fig.canvas.draw()
-        fig.show()
+        #fig.show()
     return fig
 
 def binplot(path=None, fmt='png', **kwargs):
@@ -3565,7 +3565,7 @@ def binplot(path=None, fmt='png', **kwargs):
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
         fig.canvas.draw()
-        fig.show()
+        #fig.show()
     return fig
 
 def plotpts(bin1, bin2=None, replica=None, FT=False, errors=False, path=None, fmt='png'):
@@ -3592,5 +3592,5 @@ def plotpts(bin1, bin2=None, replica=None, FT=False, errors=False, path=None, fm
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
         fig.canvas.draw()
-        fig.show()
+        #fig.show()
     return fig

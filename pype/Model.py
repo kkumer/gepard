@@ -1283,7 +1283,11 @@ class ComptonNeuralNets(Model):
 
     # FIXME: this variable should be purged out of the code most likely
     allCFFs = ['ImH', 'ReH', 'ImE', 'ReE', 'ImHt', 'ReHt', 'ImEt', 'ReEt',
-            'ImHu', 'ImHd', 'ReHu', 'ReHd']
+            'ImHu', 'ImHd', 'ReHu', 'ReHd', 
+            'ImHtu', 'ImHtd', 'ReHtu', 'ReHtd', 
+            'ImEu', 'ImEd', 'ReEu', 'ReEd', 
+            'ImEtu', 'ImEtd', 'ReEtu', 'ReEtd'
+            ]
     allGPDs = []
 
     def __init__(self, hidden_layers=[7], output_layer=['ImH', 'ReH'], 
@@ -1395,23 +1399,13 @@ class ComptonNeuralNets(Model):
         #    return self._pipole(pt)
         if hasattr(self, 'flavored') and self.flavored and self.curname in self.flavored:
             _lg.debug('Doing flavors for CFF: %s\n' % self.curname)
-            if self.curname == 'ImH':
-                u = self.ImHu(pt)
-                d = self.ImHd(pt)
-                if 'in2particle' in pt and pt.in2particle == 'n':
-                    return (4./9.)*d + (1./9.)*u
-                else:
-                    return (4./9.)*u + (1./9.)*d
-            elif self.curname == 'ReH':
-                u = self.ReHu(pt)
-                d = self.ReHd(pt)
-                if 'in2particle' in pt and pt.in2particle == 'n':
-                    return (4./9.)*d + (1./9.)*u
-                else:
-                    return (4./9.)*u + (1./9.)*d
-                # return DR.intANN(self.__getattr__('Im'+self.curname[2:]), pt)
+            nme = self.curname  # because next line changes curnname to 'ImHu'
+            u = getattr(self, '{}u'.format(nme))(pt)
+            d = getattr(self, '{}d'.format(nme))(pt)
+            if 'in2particle' in pt and pt.in2particle == 'n':
+                return (4./9.)*d + (1./9.)*u
             else:
-                raise ValueError('Only ImH and ReH can be flavored')
+                return (4./9.)*u + (1./9.)*d
         if hasattr(self, 'useDR') and self.useDR and self.curname in self.useDR:
             _lg.debug('Doing DR for CFF: %s\n' % self.curname)
             if self.curname == 'ReH':
