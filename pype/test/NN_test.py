@@ -70,16 +70,3 @@ def test_fitNNDR():
 test_fitNNDR.long = 1
 
 
-def test_fitNNFlavored():
-    """Testing Flavored Neural Net fitting by FitterBrain."""
-    numpy.random.seed(81)
-    mNN = Model.ModelNN(output_layer=['ImH', 'ImHu', 'ImHd',
-        'ReH', 'ReHu', 'ReHd', 'ImHt'],
-            flavored=['ImH', 'ReH'])
-    tNN = Approach.BMK(mNN)
-    fNN = Fitter.FitterBrain(fitpointsC, tNN, nnets=1, nbatch=12)
-    fNN.fit()
-    chisq = tNN.chisq(fitpointsC)[0]
-    assert_almost_equal(chisq, 17.68)
-
-test_fitNNFlavored.newfeature = 1

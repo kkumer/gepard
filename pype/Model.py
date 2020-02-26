@@ -626,6 +626,161 @@ class ComptonModelDRPP(ComptonModelDR):
 ComptonModelDRPPsea = ComptonModelDRPP
 
 
+class ComptonModelDRFlavored(ComptonModelDRPP):
+    """Model for CFFs with u and d flavors separated"""
+
+    def __init__(self, **kwargs):
+        # First inhert what's needed
+        ComptonModelDRPP.__init__(self, **kwargs)
+        # Adding two extra parameters:
+        self.parameters.update({
+              # ImH
+             'rvu' : 2.0,    'limit_rvu' : (0., 15.),
+             'rvd' : 1.0,    'limit_rvd' : (0., 15.),
+             'Mvu' : 1.0,    'limit_Mvu' : (0.4, 10.),
+             'Mvd' : 1.0,    'limit_Mvd' : (0.4, 10.),
+              # ImE
+             'rEu' : 2.0,    'limit_rEu' : (0., 15.),
+             'rEd' : 1.0,    'limit_rEd' : (0., 15.),
+              'bE' : 4.0,    'limit_bE' : (1., 8.),
+             'MEu' : 1.0,    'limit_MEu' : (0.4, 10.),
+             'MEd' : 1.0,    'limit_MEd' : (0.4, 10.),
+              # ImHt
+            'trvu' : 6.0,    'limit_trvu' : (0., 15.),
+            'trvd' : 6.0,    'limit_trvd' : (0., 15.),
+            'tMvu' : 2.0,    'limit_tMvu' : (0.4, 10.),
+            'tMvd' : 2.0,    'limit_tMvd' : (0.4, 10.),
+              # subtraction constant
+              'Cu' : 14.0,      'limit_C' : (-20., 20.),
+              'Cd' : 7.0,      'limit_C' : (-20., 20.),
+              'MC' : 1.3,     'limit_MC' : (0.4, 10.),
+              })
+        self.parameter_names += ['rvu', 'rvd', 'Mvu', 'Mvd',
+                'rEu', 'rEd', 'bE', 'MEu', 'MEd',
+                'trvu', 'trvd', 'tMvu', 'tMvd', 'Cu', 'Cd']
+        # now do whatever else is necessary
+        ComptonFormFactors.__init__(self, **kwargs)
+
+
+    def subtraction(self, pt, f=None):
+        """Flavor u-d separated DR subtraction constant."""
+        p = self.parameters # just a shortcut
+        if f == 'u':
+            return p['Cu']/(1.-pt.t/p['MC']**2)**2
+        elif f == 'd':
+            return p['Cd']/(1.-pt.t/p['MC']**2)**2
+        else:
+            if 'in2particle' in pt and pt.in2particle == 'n':
+                return ( 4./9. * self.subtraction(pt, f='d') +
+                        1./9. * self.subtraction(pt, f='u') )  # neutron
+            else:
+                return ( 4./9. * self.subtraction(pt, f='u') +
+                        1./9. * self.subtraction(pt, f='d') )  # proton
+
+    def ImH(self, pt, xi=0, f=None):
+        """Imaginary part of CFF H."""
+        p = self.parameters # just a shortcut
+        # FIXME: The following solution is not elegant
+        if isinstance(xi, ndarray):
+            # function was called with third argument that is xi nd array
+            x = xi
+        elif xi != 0:
+            # function was called with third argument that is xi number
+            x = xi
+        else:
+            # xi should be taken from pt object
+            x = pt.xi
+        t = pt.t
+        twox = 2.*x / (1.+x)
+        onex = (1.-x) / (1.+x)
+        if f  == 'u':
+            val = ( p['Nv'] * p['rvu'] * twox**(-p['alv']-p['alpv']*t) *
+                     onex**p['bv'] / (1. - onex*t/(p['Mvu']**2))  )
+            val = pi * val / (1.+x)
+            return val
+        elif f  == 'd':
+            val = ( p['Nv'] * p['rvd'] * twox**(-p['alv']-p['alpv']*t) *
+                     onex**p['bv'] / (1. - onex*t/(p['Mvd']**2))  )
+            val = pi * val / (1.+x)
+            return val
+        else:
+            if 'in2particle' in pt and pt.in2particle == 'n':
+                return ( 4./9. * self.ImH(pt, xi=x, f='d') +
+                        1./9. * self.ImH(pt, xi=x, f='u') )  # neutron
+            else:
+                return ( 4./9. * self.ImH(pt, xi=x, f='u') +
+                        1./9. * self.ImH(pt, xi=x, f='d') )  # proton
+
+    def ImE(self, pt, xi=0, f=None):
+        """Imaginary part of CFF H."""
+        p = self.parameters # just a shortcut
+        # FIXME: The following solution is not elegant
+        if isinstance(xi, ndarray):
+            # function was called with third argument that is xi nd array
+            x = xi
+        elif xi != 0:
+            # function was called with third argument that is xi number
+            x = xi
+        else:
+            # xi should be taken from pt object
+            x = pt.xi
+        t = pt.t
+        twox = 2.*x / (1.+x)
+        onex = (1.-x) / (1.+x)
+        if f  == 'u':
+            val = ( p['Nv'] * p['rEu'] * twox**(-p['alv']-p['alpv']*t) *
+                     onex**p['bE'] / (1. - onex*t/(p['MEu']**2))  )
+            val = pi * val / (1.+x)
+            return val
+        elif f  == 'd':
+            val = ( p['Nv'] * p['rEd'] * twox**(-p['alv']-p['alpv']*t) *
+                     onex**p['bE'] / (1. - onex*t/(p['MEd']**2))  )
+            val = pi * val / (1.+x)
+            return val
+        else:
+            if 'in2particle' in pt and pt.in2particle == 'n':
+                return ( 4./9. * self.ImE(pt, xi=x, f='d') +
+                        1./9. * self.ImE(pt, xi=x, f='u') )  # neutron
+            else:
+                return ( 4./9. * self.ImE(pt, xi=x, f='u') +
+                        1./9. * self.ImE(pt, xi=x, f='d') )  # proton
+
+
+    def ImHt(self, pt, xi=0, f=None):
+        """Imaginary part of CFF Ht."""
+        p = self.parameters # just a shortcut
+        # FIXME: The following solution is not elegant
+        if isinstance(xi, ndarray):
+            # function was called with third argument that is xi nd array
+            x = xi
+        elif xi != 0:
+            # function was called with third argument that is xi number
+            x = xi
+        else:
+            # xi should be taken from pt object
+            x = pt.xi
+        t = pt.t
+        twox = 2.*x / (1.+x)
+        onex = (1.-x) / (1.+x)
+        if f  == 'u':
+            val = ( p['Nv'] * p['trvu'] * twox**(-p['tal']-p['talp']*t) *
+                     onex**p['tbv'] / (1. - onex*t/(p['tMvu']**2))  )
+            val = pi * val / (1.+x)
+            return val
+        elif f  == 'd':
+            val = ( p['Nv'] * p['trvd'] * twox**(-p['tal']-p['talp']*t) *
+                     onex**p['tbv'] / (1. - onex*t/(p['tMvd']**2))  )
+            val = pi * val / (1.+x)
+            return val
+        else:
+            if 'in2particle' in pt and pt.in2particle == 'n':
+                return ( 4./9. * self.ImHt(pt, xi=x, f='d') +
+                        1./9. * self.ImHt(pt, xi=x, f='u') )  # neutron
+            else:
+                return ( 4./9. * self.ImHt(pt, xi=x, f='u') +
+                        1./9. * self.ImHt(pt, xi=x, f='d') )  # proton
+
+
 
 class GK12(ComptonDispersionRelations):
     """ Goloskokov-Kroll PDF model 
@@ -2108,6 +2263,8 @@ class GKonlyH(GK0, ElasticKelly):
 class ModelDRKelly(ComptonModelDR, ElasticKelly):
     """Same, but with Kelly elastic form factors."""
 
+class ModelDRFlavored(ComptonModelDRFlavored, ElasticKelly):
+    """DR KM model with flavors."""
 
 class ModelNN(ComptonNeuralNets, ElasticDipole):
     """Complete model."""
