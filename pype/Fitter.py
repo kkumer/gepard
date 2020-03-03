@@ -2,6 +2,7 @@
 #from IPython.Debugger import Tracer; debug_here = Tracer()
 
 import sys, logging, warnings
+from logzero import logger
 
 import numpy as np
 
@@ -18,11 +19,6 @@ except:
     pass
 
 
-_lg = logging.getLogger('p.%s' % __name__)
-#_lg.setLevel(logging.WARNING)
-#_lg = logging.Logger('A.F')
-#_lg.addHandler(logging.StreamHandler())
-
 from pybrain3.tools.shortcuts import buildNetwork
 import brain
 import trans  # output layer transformation for FitterBrain
@@ -35,7 +31,7 @@ class Fitter(object):
     def __init__(self, **kwargs):
         for key in kwargs:
             setattr(self, key, kwargs[key])
-        _lg.info('Fitter instance created')
+        logger.info('Fitter instance created')
 
 
 class FitterMinuit(Fitter):
@@ -58,7 +54,7 @@ class FitterMinuit(Fitter):
             chisq = 0
             for pt in fitpoints:
                 chisq += (getattr(theory, pt.yaxis)(pt) - pt.val)**2 / pt.err**2
-            _lg.info('Minuit: {:4d} calls --> chisq/npt = {:.3f}/{}'.format(
+            logger.info('Minuit: {:4d} calls --> chisq/npt = {:.3f}/{}'.format(
                 self.minuit.get_num_call_fcn()+1, chisq, len(fitpoints)))
             return chisq
 
@@ -223,14 +219,14 @@ class FitterBrain(Fitter):
         if self.crossvalidation:
             self.dstrain, self.dstest = self.artificialData(datapoints)
             if isinstance(self.usenet, int):
-                _lg.debug('Training existing net No. %s' % str(self.usenet))
+                logger.info('Training existing net No. %s' % str(self.usenet))
                 net = self.theory.m.nets[self.usenet]
             else:
-                _lg.debug('Creating new %s net' % str(self.theory.model.architecture))
+                logger.info('Creating new %s net' % str(self.theory.model.architecture))
                 net = buildNetwork(*self.theory.model.architecture)
             self.trainer = brain.RPropMinusTrainerTransformed(net, learningrate = 0.9,
                 lrdecay = 0.98, momentum = 0.0, batchlearning = True, verbose = False)
-            _lg.debug('Doing cross-validation training')
+            logger.info('Doing cross-validation training')
             #self.dstrain, self.dstest = self.artificialData(datapoints)
             # train using cross-validation procedure to avoid overfitting
             memerr = 1.  # large initial error, certain to be bettered
@@ -240,7 +236,7 @@ class FitterBrain(Fitter):
                 trainerr, testerr = (self.trainer.testOnData(self.dstrain),
                         self.trainer.testOnData(self.dstest))
                 if self.verbose > 1:
-                    print("Epoch: %6i   ---->    Error: %8.3g  TestError: %8.3g / %6.3g" % (
+                    logger.info("Epoch: %6i   ---->    Error: %8.3g  TestError: %8.3g / %6.3g" % (
                             self.trainer.epoch, trainerr, testerr, memerr))
                     #print ("Net for pt0 = {}".format(net.activate([datapoints[0].xB, datapoints[0].t])))
                 if testerr < memerr:
@@ -248,26 +244,26 @@ class FitterBrain(Fitter):
                     memnet = net.copy()
                     if self.verbose:
                         if self.verbose > 1:
-                            print("---- New best result:  ----")
-                        print("Epoch: %6i   ---->    Error: %8.3g  TestError: %8.3g" % (
+                            logger.info("---- New best result:  ----")
+                        logger.info("Epoch: %6i   ---->    Error: %8.3g  TestError: %8.3g" % (
                                 self.trainer.epoch, trainerr, testerr))
                 elif testerr > 100 or trainerr > 100:
-                    print("Epoch: %6i   ---->    Error: %8.3g  TestError: %8.3g" % (
+                    logger.warning("Epoch: %6i   ---->    Error: %8.3g  TestError: %8.3g" % (
                             self.trainer.epoch, trainerr, testerr))
-                    print("---- This one is hopeless. Giving up. ----")
+                    logger.warning("---- This one is hopeless. Giving up. ----")
                     break
             return memnet, memerr
         else:
             self.dstrain, self.dstest = self.artificialData(datapoints, trainpercentage=100)
             if isinstance(self.usenet, int):
-                _lg.debug('Training existing net No. %s' % str(self.usenet))
+                logger.info('Training existing net No. %s' % str(self.usenet))
                 net = self.theory.m.nets[self.usenet]
             else:
-                _lg.debug('Creating new %s net' % str(self.theory.model.architecture))
+                logger.info('Creating new %s net' % str(self.theory.model.architecture))
                 net = buildNetwork(*self.theory.model.architecture)
             self.trainer = brain.RPropMinusTrainerTransformed(net, learningrate = 0.9,
                 lrdecay = 0.98, momentum = 0.0, batchlearning = True, verbose = False)
-            _lg.debug('Doing simple non--cross-validated training')
+            logger.info('Doing simple non--cross-validated training')
             # simple training
             self.trainer.trainOnDataset(self.dstrain, self.nbatch*self.batchlen)
             return net, 0
@@ -302,30 +298,30 @@ class FitterBrain(Fitter):
             trainerrC, testerrC = (self.trainerC.testOnData(self.dstrainC),
                     self.trainerC.testOnData(self.dstestC))
             if self.verbose > 1:
-                print("Epoch: %6i   ---->    TrainErr: %8.3g  TestErr: %8.3g / %6.3g" % (
+                logger.info("Epoch: %6i   ---->    TrainErr: %8.3g  TestErr: %8.3g / %6.3g" % (
                         self.trainer.epoch, trainerr, testerr, memerr))
-                print("       EpochC: %6i   ---->    TrainErrC: %8.3g  TestErrC: %8.3g / %6.3g" % (
+                logger.info("       EpochC: %6i   ---->    TrainErrC: %8.3g  TestErrC: %8.3g / %6.3g" % (
                         self.trainerC.epoch, trainerrC, testerrC, memerrC))
             if testerr < memerr:
                 memerr = testerr
                 memnet = net.copy()
                 if self.verbose:
                     if self.verbose > 1:
-                        print("---- New best result:  ----")
-                    print("Epoch: %6i   ---->    TrainErr: %8.3g  TestErr: %8.3g" % (
+                        logger.info("---- New best result:  ----")
+                    logger.info("Epoch: %6i   ---->    TrainErr: %8.3g  TestErr: %8.3g" % (
                             self.trainer.epoch, trainerr, testerr))
-                    print("          EpochC: %6i   ---->    TrainErr: %8.3g  TestErr: %8.3g" % (
+                    logger.info("          EpochC: %6i   ---->    TrainErr: %8.3g  TestErr: %8.3g" % (
                             self.trainer.epoch, trainerr, testerr))
             if testerrC < memerrC:
                 memerrC = testerrC
                 memnetC = netC.copy()
                 if self.verbose:
                     if self.verbose > 1:
-                        print("---- New best resultC:  ----")
-                    print("EpochC: %6i   ---->    TrainErrC: %8.3g  TestErrC: %8.3g" % (
+                        logger.info("---- New best resultC:  ----")
+                    logger.info("EpochC: %6i   ---->    TrainErrC: %8.3g  TestErrC: %8.3g" % (
                             self.trainerC.epoch, trainerrC, testerrC))
             elif testerr > 100 or trainerr > 100 or testerrC > 100 or trainerrC > 100:
-                print("---- Further training is hopeless. Giving up. ----")
+                logger.warning("---- Further training is hopeless. Giving up. ----")
                 break
         #sys.stderr.write(str(trans.outmem))
         return memnet, memnetC, memerr, memerrC
@@ -352,7 +348,7 @@ class FitterBrain(Fitter):
                 sfitprob = utils.stringcolor("%5.4f" % fitprob, 'red', True)
             else:
                 sfitprob = utils.stringcolor("%5.4f" % fitprob, 'green', True)
-            print("Net %2i ---> TestError: %8.3g  ---> P(chisq = %1.2f) = %s " % (
+            logger.info("Net %2i ---> TestError: %8.3g  ---> P(chisq = %1.2f) = %s " % (
                     n, memerr, chi, sfitprob))
         self.theory.model.parameters['nnet'] = 'ALL'
         return self.theory
@@ -387,11 +383,11 @@ class FitterBrain(Fitter):
             else:
                 sfitprob = utils.stringcolor("%5.4f" % fitprob, 'green', True)
                 n +=1
-            print("[%3i/%3i] Net %2i ---> TestError: %8.3g  ---> P(chisq = %1.2f) = %s " % (
+            logger.info("[%3i/%3i] Net %2i ---> TestError: %8.3g  ---> P(chisq = %1.2f) = %s " % (
                     k, self.maxtries, n, memerr, chi, sfitprob))
             # If we have no nets after spending 5% of maxtries, give up
             if (k > self.maxtries/20.) and (n < 2):
-                print("Less than 2 nets found after 5% of maxtries. Giving up this fit.")
+                logger.warning("Less than 2 nets found after 5% of maxtries. Giving up this fit.")
                 break
         self.theory.model.parameters['nnet'] = 'ALL'
         return self.theory
@@ -402,10 +398,10 @@ class FitterBrain(Fitter):
         for n in range(self.nnets):
             self.theory.model.parameters['nnet'] = n
             chi, dof, fitprob = self.theory.chisq(self.fitpoints)
-            print("Net %2i ---> P(chisq = %1.2f) = %5.4f " % (
+            logger.info("Net %2i ---> P(chisq = %1.2f) = %5.4f " % (
                     n, chi, fitprob))
             if fitprob < minprob:
-                print("       P <  %5.4f. Removing net %2i" % (
+                logger.info("       P <  %5.4f. Removing net %2i" % (
                         minprob, n))
                 bad.append(n)
         goodnets = []
