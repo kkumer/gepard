@@ -12,9 +12,10 @@ and parameter values can calculate observables.
 import pickle, sys, logging
 
 from numpy import log, pi, imag, real, sqrt, cos, sin, exp
-from numpy import ndarray, array, sum
+from numpy import ndarray, array, sum, loadtxt
 import scipy.stats
 from scipy.special import j0, j1, gamma, beta
+from scipy.interpolate import SmoothBivariateSpline
 
 from quadrature import PVquadrature, bquadrature, rthtquadrature
 from utils import flatten, hubDictNew, stringcolor
@@ -31,7 +32,7 @@ import pygepard7 as g7
 import optModel
 
 _lg = logging.getLogger('p.%s' % __name__)
-_lg.setLevel(logging.WARNING)  #DEBUG, INFO, WARNING, ERROR, CRITICAL
+_lg.setLevel(logging.INFO)  #DEBUG, INFO, WARNING, ERROR, CRITICAL
 #_lg.setLevel(logging.DEBUG)  #DEBUG, INFO, WARNING, ERROR, CRITICAL
 
 class Model(object):
@@ -780,6 +781,44 @@ class ComptonModelDRFlavored(ComptonModelDRPP):
                 return ( 4./9. * self.ImHt(pt, xi=x, f='u') +
                         1./9. * self.ImHt(pt, xi=x, f='d') )  # proton
 
+
+class FromGrid(object):
+    """CFF model built by grid interpolation."""
+
+    allCFFs = ['ImH', 'ReH', 'ImE', 'ReE', 'ImHt', 'ReHt', 'ImEt', 'ReEt']
+    allGPDs = []
+    parameter_names = []
+
+    def __init__(self, gridfile, **kwargs):
+        """Grid file is of format  xB  t  ImH  ReH  ImHt ...
+
+	CFF columns should be ordered as in allCFFs list, without
+        skipping.
+        """
+        grid = loadtxt(gridfile)
+        xB = grid[:,0]
+        t = grid[:,1]
+        maxcff = grid.shape[1]  # index of last CFF provided by grid
+        self.spline = {}
+        for col in range(2,maxcff):
+            self.spline[self.allCFFs[col-2]] = SmoothBivariateSpline(xB, t, grid[:,col])
+
+    def __getattr__(self, name):
+        """Forward call to appropriate CFF"""
+        if name in self.spline.keys():
+            self.curname = name
+            return self.CFF
+        elif name in self.allCFFs:
+            self.curname = name
+            return self.zero
+        else:
+            raise AttributeError(name)
+
+    def zero(self, *args, **kwargs):
+        return 0.
+
+    def CFF(self, pt):
+        return self.spline[self.curname](pt.xB, pt.t)[0][0]
 
 
 class GK12(ComptonDispersionRelations):
@@ -2263,14 +2302,20 @@ class GKonlyH(GK0, ElasticKelly):
 class ModelDRKelly(ComptonModelDR, ElasticKelly):
     """Same, but with Kelly elastic form factors."""
 
+
 class ModelDRFlavored(ComptonModelDRFlavored, ElasticKelly):
     """DR KM model with flavors."""
+
 
 class ModelNN(ComptonNeuralNets, ElasticDipole):
     """Complete model."""
 
 
 class ModelNNKelly(ComptonNeuralNets, ElasticKelly):
+    """Complete model."""
+
+
+class ModelFromGrid(FromGrid, ElasticKelly):
     """Complete model."""
 
 
