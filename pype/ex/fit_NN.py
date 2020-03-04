@@ -19,25 +19,29 @@ HA17pts = H17_BSDwpts + H17_BSSw0pts + H17_BSSw1pts
 
 #pts = BCApts + ALUIpts + HA15pts + C_BSDwpts[::4] + C_BSSw0pts[::4] + C_BSSw1pts[::4]  
 # increase 89 --> 128 and introduce target polarization data
-pts = C_BSDwpts[::4]+ C_BSSw0pts[::4] + C_BSSw1pts[::4] + HA15pts + BCApts + ALUIpts + LPpoints[::2] + TPpoints
+#pts = C_BSDwpts[::4]+ C_BSSw0pts[::4] + C_BSSw1pts[::4] + HA15pts + BCApts + ALUIpts + LPpoints[::2] + TPpoints
+
+pts = data[101]
+
+for pt in pts:
+    pt.err = 0.02
 
 numn = 10
 
 #numpy.random.seed(68)
 
 mNN1 = Model.ModelNN(
-        output_layer=['ImH', 'ReH', 'ImE', 'ReE', 'ImHt', 'ReHt', 'ImEt', 'ReEt'], 
-        useDR=['ReH', 'ReE', 'ReHt', 'ReEt'], 
+        output_layer=['ImH', 'ReH'], 
         endpointpower=1)
 
 tNN1 = Approach.BM10tw2(mNN1)
-tNN1.name = "NNDR-selfix-8"
+tNN1.name = "NN-noerr-101"
 fNN1 = Fitter.FitterBrain(pts, tNN1, nnets=numn, nbatch=30)
 #fNN1.maxtries = 68000
 fNN1.fitgood()
-dbn = shelve.open(GEPARD_DIR+'/pype/nndr.db')
-tNN1.save(dbn)
-dbn.close()
+#dbn = shelve.open(GEPARD_DIR+'/pype/nndr.db')
+#tNN1.save(dbn)
+#dbn.close()
 
-print('10 NNs selfix {:.1f}/{} p={:.3g}'.format(*tNN1.chisq(pts)))
+print('{} NNs {} {:.1f}/{} p={:.3g}'.format(numn, tNN1.name, *tNN1.chisq(pts)))
 

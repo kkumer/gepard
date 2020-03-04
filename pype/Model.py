@@ -9,7 +9,10 @@ and parameter values can calculate observables.
 
 
 #from IPython.core.debugger import set_trace
-import pickle, sys, logging
+import pickle, sys
+
+import logzero
+_lg = logzero.logger
 
 from numpy import log, pi, imag, real, sqrt, cos, sin, exp
 from numpy import ndarray, array, sum, loadtxt
@@ -31,9 +34,6 @@ import pygepard6 as g6
 import pygepard7 as g7
 import optModel
 
-_lg = logging.getLogger('p.%s' % __name__)
-_lg.setLevel(logging.INFO)  #DEBUG, INFO, WARNING, ERROR, CRITICAL
-#_lg.setLevel(logging.DEBUG)  #DEBUG, INFO, WARNING, ERROR, CRITICAL
 
 class Model(object):
     """Base class for all models."""

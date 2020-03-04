@@ -22,7 +22,8 @@ import pandas as pd
 import utils
 from constants import Mp, Mp2
 
-_lg = logging.getLogger('p.%s' % __name__)
+import logzero
+_lg = logzero.logger
 
 class DummyPoint(dict):
     """This is only used for creating simple DataPoint-like objects"""
