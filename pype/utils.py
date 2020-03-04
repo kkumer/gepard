@@ -22,7 +22,7 @@ describe_data -- List observables in dataset.
 compare_harmonics --  
 """
 
-import os, re, fnmatch, itertools, logging
+import os, re, fnmatch, itertools
 import numpy as np
 import pandas as pd
 
@@ -30,9 +30,6 @@ import Data, Approach
 from constants import Mp, Mp2
 
 #from IPython.Debugger import Tracer; debug_here = Tracer()
-_lg = logging.getLogger('p.%s' % __name__)
-_lg.debug('Loading module %s' % __name__)
-
 
 class KinematicsError(Exception):
     pass
@@ -48,7 +45,6 @@ def loaddata(datadir='data', approach=False):
     data = {}
     for file in os.listdir(datadir):
         if os.path.splitext(file)[1] == ".dat":
-            # _lg.debug('Loading datafile %s' % file)
             dataset = Data.DataSet(datafile=os.path.join(datadir, file))
             if approach and dataset.process in ['ep2epgamma', 'en2engamma']:
                 [pt.to_conventions(approach) for pt in dataset]
@@ -179,7 +175,7 @@ def npars(m):
 
     n = 0
     for key in m.parameter_names:
-        if 'fix_'+key in m.parameters and not m.parameters['fix_'+key]:
+        if 'fix_'+key in m.parameters.keys() and not m.parameters['fix_'+key]:
             n += 1
     return n
 
