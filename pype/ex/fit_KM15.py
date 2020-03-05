@@ -8,7 +8,7 @@ from results import *
 from utils import listdb
 from abbrevs import *
 
-db = shelve.open('theories.db')
+db = shelve.open('theories.db', flag='r')
 
 # Gepard sea part
 mGepard = Model.ComptonGepard(p=0)
@@ -25,14 +25,14 @@ th.model.release_parameters('Mv', 'rv', 'bv', 'C', 'MC',
 'tMv', 'trv', 'tbv', 'rpi', 'Mpi', 'M02S', 'SECS', 'THIS', 'SECG', 'THIG')
 pars_Gepard = db['KMM12'].m.Gepard.parameters
 pars_DR = db['KMM12'].m.DR.parameters
-#del pars_Gepard['EKAPG']
-#del pars_Gepard['EKAPS']
+del pars_Gepard['EKAPG']
+del pars_Gepard['EKAPS']
 m.parameters.update(pars_Gepard)
 m.parameters.update(pars_DR)
 f = Fitter.FitterMinuit(GLO15b , th)
 f.minuit.tol = 80
-f.minuit.printMode = 1
-f.minuit.maxcalls = 15000
+f.minuit.print_level = 2
+#f.minuit.maxcalls = 15000
 f.fit()
 
 th.print_chisq(f.fitpoints)

@@ -439,10 +439,18 @@ class hubDictNew(dict):
             return self.d2[name]
 
     def __setitem__(self, name, value):
-        if name in self.d1:
-            self.d1[name] = value
-        else:
-            self.d2[name] = value
+        try:
+            if name in self.d1:
+                self.d1[name] = value
+            else:
+                #sys.stderr.write('{} = {} not in d1\n'.format(name, value))
+                self.d2[name] = value
+        except AttributeError:
+            # FIXME: During unpickling of hybrid models from shelve this
+            # __setitem__ gets called with Model.parameters hubDict not
+            # having d1 and d2 attributes.
+            # Still, in the end everythings turns out fine. Very weird.
+            pass
 
     def __iter__(self):
         return itertools.chain(self.d1.__iter__(), self.d2.__iter__())
