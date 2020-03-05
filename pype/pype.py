@@ -6,7 +6,7 @@ import numpy as np
 import logging, logzero
 _lg = logzero.logger
 logzero.loglevel(logging.WARNING)
-logzero.logfile("/tmp/pype.log", loglevel=logging.INFO, maxBytes=1000000, backupCount=5)
+logzero.logfile("/tmp/{}.log".format(__name__), loglevel=logging.INFO, maxBytes=1000000, backupCount=5)
 
 import Model, Approach, Fitter, Data, utils, plots
 from results import *

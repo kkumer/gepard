@@ -625,6 +625,75 @@ class ComptonModelDRPP(ComptonModelDR):
             return  pole  # proton
 
 
+class ComptonModelDRE(ComptonModelDR):
+    """Adding ImE and switching to non-pion-pole ImEt."""
+
+    def __init__(self, **kwargs):
+        # First inhert what's needed
+        ComptonModelDRPP.__init__(self, **kwargs)
+        # Adding extra parameters:
+        self.parameters.update({
+             'rE' : 2.0,    'limit_rE' : (0., 15.),
+             'bE' : 4.0,    'limit_bE' : (1., 8.),
+             'ME' : 1.0,    'limit_ME' : (0.4, 10.),
+             'rEt' : 2.0,    'limit_rEt' : (0., 15.),
+             'bEt' : 4.0,    'limit_bEt' : (1., 8.),
+             'MEt' : 1.0,    'limit_MEt' : (0.4, 10.),
+              })
+        self.parameter_names += ['rE', 'bE', 'ME', 'rEt', 'bEt', 'MEt']
+        # now do whatever else is necessary
+        ComptonFormFactors.__init__(self, **kwargs)
+
+    def ImE(self, pt, xi=0):
+        """Imaginary part of CFF E."""
+        p = self.parameters # just a shortcut
+        # FIXME: The following solution is not elegant
+        if isinstance(xi, ndarray):
+            # function was called with third argument that is xi nd array
+            x = xi
+        elif xi != 0:
+            # function was called with third argument that is xi number
+            x = xi
+        else:
+            # xi should be taken from pt object
+            x = pt.xi
+        t = pt.t
+        twox = 2.*x / (1.+x)
+        onex = (1.-x) / (1.+x)
+        if 'in2particle' in pt and pt.in2particle == 'n':
+            chgfac = (1.*4./9. + 2./9.)  # neutron
+        else:
+            chgfac = (2.*4./9. + 1./9.)  # proton
+        val = ( chgfac * p['Nv'] * p['rE'] * twox**(-p['alv']-p['alpv']*t) *
+                 onex**p['bE'] / (1. - onex*t/(p['ME']**2))  )
+        return pi * val / (1.+x)
+
+    def ImEt(self, pt, xi=0):
+        """Imaginary part of CFF E."""
+        p = self.parameters # just a shortcut
+        # FIXME: The following solution is not elegant
+        if isinstance(xi, ndarray):
+            # function was called with third argument that is xi nd array
+            x = xi
+        elif xi != 0:
+            # function was called with third argument that is xi number
+            x = xi
+        else:
+            # xi should be taken from pt object
+            x = pt.xi
+        t = pt.t
+        twox = 2.*x / (1.+x)
+        onex = (1.-x) / (1.+x)
+        if 'in2particle' in pt and pt.in2particle == 'n':
+            chgfac = (1.*4./9. + 2./9.)  # neutron
+        else:
+            chgfac = (2.*4./9. + 1./9.)  # proton
+        val = ( chgfac * p['Nv'] * p['rEt'] * twox**(-p['alv']-p['alpv']*t) *
+                 onex**p['bEt'] / (1. - onex*t/(p['MEt']**2))  )
+        return pi * val / (1.+x)
+
+
+
 # For compatibility with old models in database:
 ComptonModelDRPPsea = ComptonModelDRPP
 
