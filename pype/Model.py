@@ -612,6 +612,8 @@ class ComptonModelDRPP(ComptonModelDR):
              'Mpi' : 1.0,    'limit_Mpi' : (0.4, 4.)   })
         self.parameter_names.append('rpi')
         self.parameter_names.append('Mpi')
+        # now do whatever else is necessary
+        ComptonFormFactors.__init__(self, **kwargs)
 
     def ReEt(self, pt):
         """Instead of disp. rel. use pole formula"""
