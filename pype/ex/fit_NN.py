@@ -1,7 +1,11 @@
 
+import logging, logzero, os
+_lg = logzero.logger
+logzero.loglevel(logging.INFO)
+basename = os.path.splitext(os.path.basename(__file__))[0]
+logzero.logfile("/home/kkumer/tmp/{}.log".format(basename), loglevel=logging.INFO)
 
-import sys, shelve, logging
-logging.basicConfig(level=logging.ERROR)
+import sys, shelve
 GEPARD_DIR = '/home/kkumer/gepard'
 sys.path.append(GEPARD_DIR+'/pype')
 import Model, Approach, Fitter, Data, utils, plots
@@ -21,23 +25,23 @@ HA17pts = H17_BSDwpts + H17_BSSw0pts + H17_BSSw1pts
 # increase 89 --> 128 and introduce target polarization data
 #pts = C_BSDwpts[::4]+ C_BSSw0pts[::4] + C_BSSw1pts[::4] + HA15pts + BCApts + ALUIpts + LPpoints[::2] + TPpoints
 
-pts = data[101]
+# 1. pts = GLO15new + data[136] - fail
 
-for pt in pts:
-    pt.err = 0.02
+pts = GLO15new
 
 numn = 10
 
-#numpy.random.seed(68)
+numpy.random.seed(68)
 
 mNN1 = Model.ModelNN(
-        output_layer=['ImH', 'ReH'], 
-        endpointpower=1)
+        output_layer=['ImH', 'ReH', 'ImE', 'ReE', 'ImHt', 'ReHt', 'ImEt', 'ReEt']
+        )
 
 tNN1 = Approach.BM10tw2(mNN1)
-tNN1.name = "NN-noerr-101"
-fNN1 = Fitter.FitterBrain(pts, tNN1, nnets=numn, nbatch=30)
-#fNN1.maxtries = 68000
+tNN1.name = "nfNN-eight-J15"
+fNN1 = Fitter.FitterBrain(pts, tNN1, nnets=numn, nbatch=30, minprob=0.000001)
+fNN1.verbose = 1
+print('\n--- NN fit to {} data points ---\n'.format(len(pts)))
 fNN1.fitgood()
 #dbn = shelve.open(GEPARD_DIR+'/pype/nndr.db')
 #tNN1.save(dbn)

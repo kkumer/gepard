@@ -1,7 +1,12 @@
 #!/usr/bin/env python
 
-import shelve, logging
-logging.basicConfig(level=logging.INFO)
+import logging, logzero, os
+_lg = logzero.logger
+logzero.loglevel(logging.INFO)
+basename = os.path.splitext(os.path.basename(__file__))[0]
+logzero.logfile("/home/kkumer/tmp/{}.log".format(basename), loglevel=logging.INFO)
+
+import shelve
 
 import Model, Approach, Fitter, Data, utils, plots
 from results import *

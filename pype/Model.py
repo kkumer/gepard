@@ -482,8 +482,30 @@ class ComptonDispersionRelations(ComptonFormFactors):
         return pvpi   # this is P.V./pi 
 
 
+class PionPole(object):
+    """Various options for pion-pole contribution."""
 
-class ComptonModelDR(ComptonDispersionRelations):
+
+    def DMfixpole(self, pt):
+        """Fixed pion-pole as used by Dieter."""
+        pole = (2.2390424 * (1. - (1.7*(0.0196 - pt.t))/(1.
+            - pt.t/2.)**2))/((0.0196 - pt.t)*pt.xi)
+        if 'in2particle' in pt and pt.in2particle == 'n':
+            return -pole  # neutron
+        else:
+            return  pole  # proton
+
+
+    def DMfreepole(self, pt):
+        """Free pion-pole as proposed by Dieter."""
+        pole = self.parameters['rpi'] * 2.16444 / (0.0196 - pt.t) / (1.
+            - pt.t/self.parameters['Mpi']**2)**2 / pt.xi
+        if 'in2particle' in pt and pt.in2particle == 'n':
+            return -pole  # neutron
+        else:
+            return  pole  # proton
+
+class ComptonModelDR(ComptonDispersionRelations, PionPole):
     """Model for CFFs as in arXiv:0904.0458."""
 
     def __init__(self, **kwargs):
@@ -590,12 +612,8 @@ class ComptonModelDR(ComptonDispersionRelations):
 
     def ReEt(self, pt):
         """Instead of disp. rel. use pole formula."""
-        pole = (2.2390424 * (1. - (1.7*(0.0196 - pt.t))/(1.
-            - pt.t/2.)**2))/((0.0196 - pt.t)*pt.xi)
-        if 'in2particle' in pt and pt.in2particle == 'n':
-            return -pole  # neutron
-        else:
-            return  pole  # proton
+        return self.DMfixpole(pt)
+
 
 # For compatibility with old models in database:
 ComptonModelDRsea = ComptonModelDR   
@@ -617,12 +635,11 @@ class ComptonModelDRPP(ComptonModelDR):
 
     def ReEt(self, pt):
         """Instead of disp. rel. use pole formula"""
-        pole = self.parameters['rpi'] * 2.16444 / (0.0196 - pt.t) / (1.
-            - pt.t/self.parameters['Mpi']**2)**2 / pt.xi
-        if 'in2particle' in pt and pt.in2particle == 'n':
-            return -pole  # neutron
-        else:
-            return  pole  # proton
+        return self.DMfreepole(pt)
+
+
+# For compatibility with old models in database:
+ComptonModelDRPPsea = ComptonModelDRPP
 
 
 class ComptonModelDRE(ComptonModelDR):
@@ -693,9 +710,10 @@ class ComptonModelDRE(ComptonModelDR):
         return pi * val / (1.+x)
 
 
+    def ReEt(self, pt):
+        """Instead of disp. rel. use pole formula"""
+        return self.DMfreepole(pt)
 
-# For compatibility with old models in database:
-ComptonModelDRPPsea = ComptonModelDRPP
 
 
 class ComptonModelDRFlavored(ComptonModelDRPP):
@@ -732,6 +750,7 @@ class ComptonModelDRFlavored(ComptonModelDRPP):
                 'trvu', 'trvd', 'tMvu', 'tMvd', 'Cu', 'Cd']
         # now do whatever else is necessary
         ComptonFormFactors.__init__(self, **kwargs)
+
 
 
     def subtraction(self, pt, f=None):
@@ -851,6 +870,7 @@ class ComptonModelDRFlavored(ComptonModelDRPP):
             else:
                 return ( 4./9. * self.ImHt(pt, xi=x, f='u') +
                         1./9. * self.ImHt(pt, xi=x, f='d') )  # proton
+
 
 
 class FromGrid(object):
