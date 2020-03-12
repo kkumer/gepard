@@ -12,6 +12,11 @@ def trans(o, theory_and_pt, oC=0):
         fac = (1-pt.xB)**theory.model.endpointpower
         ep = [int(cff[:2]=='Re')+int(cff[:2]=='Im')*fac for cff in theory.m.output_layer]
         o = o * ep
+    if theory.model.zeropointpower:
+        # multiplying Eb with 1/xi if Eb and not Et is parametrized by NN
+        zp = [int(cff[2:]!='Et')+int(cff[2:]=='Et')*(2.-pt.xB)/pt.xB 
+                for cff in theory.m.output_layer]
+        o = o * zp
     res = theory.predict(pt, parameters={'outputvalue':o, 'outputvalueC':oC})
     return res
 

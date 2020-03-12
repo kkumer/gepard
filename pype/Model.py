@@ -642,8 +642,8 @@ class ComptonModelDRPP(ComptonModelDR):
 ComptonModelDRPPsea = ComptonModelDRPP
 
 
-class ComptonModelDRE(ComptonModelDR):
-    """Adding ImE and switching to non-pion-pole ImEt."""
+class ComptonModelDRE(ComptonModelDRPP):
+    """Adding ImE, ImEt and pion-pole ReEt."""
 
     def __init__(self, **kwargs):
         # First inhert what's needed
@@ -1396,7 +1396,7 @@ class ComptonNeuralNets(Model):
     allGPDs = []
 
     def __init__(self, hidden_layers=[7], output_layer=['ImH', 'ReH'], 
-            endpointpower=None, useDR=None, flavored=None):
+            endpointpower=None, zeropointpower=False, useDR=None, flavored=None):
         """Model CFFs by neural networks.
         
         Neural network, created actually by Fitter instance, will have
@@ -1410,6 +1410,7 @@ class ComptonNeuralNets(Model):
                        zero.
         endpointpower: Im(CFF)s are defined as NN*(1-xB)**endpointpower to enforce
                        vanishing at xB=0 and to improve convergence
+        zeropointpower: Eb, defined as xi*Et is parametrized instead of Et
                 useDR:  use dispersion relations for some Re(CFF)s.
                          E.g.  useDR = ['ReH', 'ReE', 'ReEt', 'ReHt']
              flavored: use flavor decomposition for some Re(CFF)s.
@@ -1422,6 +1423,7 @@ class ComptonNeuralNets(Model):
         self.parameters = {'nnet':0, 'outputvalue':None, 'outputvalueC':None}
         self.parameter_names = ['nnet', 'outputvalue', 'outputvalueC']
         self.endpointpower = endpointpower
+        self.zeropointpower = zeropointpower
         self.useDR = useDR
         self.flavored = flavored
         # now do whatever else is necessary
@@ -1444,7 +1446,8 @@ class ComptonNeuralNets(Model):
             # if asked for CFF which is not in output_layer, return 0
             self.curname = name
             return self.zero
-        elif name in ['endpointpower', 'optimization', 'useDR', 'flavored']:
+        elif name in ['endpointpower', 'zeropointpower',
+                          'optimization', 'useDR', 'flavored']:
             if name in self.__dict__:
                 return self.__dict__[name]
             else:
@@ -1555,7 +1558,9 @@ class ComptonNeuralNets(Model):
         for xB in xBs:
             ar = []
             for net in self.nets:
-                if self.endpointpower and self.curname[:2] == 'Im':
+                if self.zeropointpower and self.curname[2:] == 'Et':
+                    ar.append(net.activate([xB, pt.t])[ind]*(2.-xB)/xB)
+                elif self.endpointpower and self.curname[:2] == 'Im':
                     ar.append(net.activate([xB, pt.t])[ind]*(1-xB)**self.endpointpower)
                 else:
                     ar.append(net.activate([xB, pt.t])[ind])
