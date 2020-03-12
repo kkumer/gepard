@@ -5,8 +5,11 @@ import numpy as np
 
 import logging, logzero
 _lg = logzero.logger
-logzero.loglevel(logging.WARNING)
-logzero.logfile("/tmp/{}.log".format(__name__), loglevel=logging.INFO, maxBytes=1000000, backupCount=5)
+logzero.loglevel(logging.INFO)
+basename = os.path.splitext(os.path.basename(__file__))[0]
+logfilename = "/home/kkumer/tmp/{}.log".format(basename)
+logzero.logfile(logfilename,
+        loglevel=logging.INFO, maxBytes=1000000, backupCount=5)
 
 import Model, Approach, Fitter, Data, utils, plots
 from results import *
@@ -42,3 +45,7 @@ f.minuit.print_level = 1
 
 _lg.info('Start fit to {} data points'.format(len(f.fitpoints)))
 f.fit()
+
+_lg.info('Done. Emailing log file.')
+utils.mailfile('kkumer@calculon.phy.hr', 'kkumer@calculon.phy.hr',
+        'pype fit is done', logfilename)

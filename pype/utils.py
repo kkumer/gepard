@@ -23,6 +23,8 @@ compare_harmonics --
 """
 
 import os, re, fnmatch, itertools
+import smtplib
+from email.message import EmailMessage
 import numpy as np
 import pandas as pd
 
@@ -718,3 +720,23 @@ def compare_harmonics(th, pt, pol='unp'):
     max = amps[0][0]
     for value, sign, name in amps:
         print("{:9s} = {: .3g}".format(name, sign*value/max))
+
+def mailfile(me, you, subject, textfile):
+    """Email some file, e.g. log file when fit done."""
+    # taken from https://docs.python.org/3/library/email.examples.html
+    # Open a plain text file 
+    with open(textfile) as fp:
+        # Create a text/plain message
+        msg = EmailMessage()
+        msg.set_content(fp.read())
+
+    # me == the sender's email address
+    # you == the recipient's email address
+    msg['Subject'] = subject
+    msg['From'] = me
+    msg['To'] = you
+
+    # Send the message via our own SMTP server
+    s = smtplib.SMTP('localhost')
+    s.send_message(msg)
+    s.quit()
