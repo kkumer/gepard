@@ -304,7 +304,7 @@ def listdata(ids, data):
         except KeyError:
             pass
 
-def listchis(ths, Q2cut=1., Q2max=1.e3, nsets=0, out='chis'):
+def listchis(ths, Q2cut=1., Q2max=1.e3, nsets=10, out='chis'):
     """Compare theories for subsets of data.
     
     What is printed out depends on 'out' keyword argument:
@@ -386,10 +386,37 @@ def listchis(ths, Q2cut=1., Q2max=1.e3, nsets=0, out='chis'):
             ('Hall A', 'BSDw', BSDwpoints), ('Hall A', 'BSSw', BSSwpoints),
             ('HERMES', 'AUTI', AUTIpts)]
     sets[9] = [
-            ('Hall A 17', 'BSDw_s1', H17_BSDwpts), ('Hall A 17', 'BSSw_c0', H17_BSSw0pts),
-            ('Hall A 17', 'BSSw_c1', H17_BSSw1pts),
-            ('Hall A 15', 'BSDw_s1', H_BSDwpts), ('Hall A 15', 'BSSw_c0', H_BSSw0pts),
-            ('Hall A 15', 'BSSw_c1', H_BSSw1pts)
+            ('CLAS', 'BSA', CLAS14BSApts),
+            ('CLAS', 'TSA', CLAS14TSApts), 
+            ('CLAS', 'BTSA', CLAS14BTSApts),
+            ('CLAS', 'BSDw_s1', C_BSDwpts), 
+	    ('CLAS', 'BSSw_c0', C_BSSw0pts),
+            ('CLAS', 'BSSw_c1', C_BSSw1pts),
+            ('HallA 15', 'BSDw_s1', H_BSDwpts), 
+	    ('HallA 15', 'BSSw_c0', H_BSSw0pts),
+            ('HallA 15', 'BSSw_c1', H_BSSw1pts),
+	    ('HallA 17', 'BSSw_c0', H17_BSSw0pts),
+            ('HallA 17', 'BSSw_c1', H17_BSSw1pts)
+            ]
+    sets[10] = [
+            ('H1ZEUS', 'X_DVCS', H1ZEUS), 
+            ('HERMES', 'ALUI', ALUIpts),
+            ('HERMES', 'BCA', BCApts),
+            ('HRM/CLS', 'AUL', AULpts), 
+	    ('HERMES', 'ALL', ALLpts),
+            ('HERMES', 'AUTI', AUTIpts),
+            ('CLAS', 'BSA', CLAS14BSApts),
+            ('CLAS', 'TSA', CLAS14TSApts), 
+            ('CLAS', 'BTSA', CLAS14BTSApts),
+            ('CLAS', 'BSDw_s1', C_BSDwpts), 
+	    ('CLAS', 'BSSw_c0', C_BSSw0pts),
+            ('CLAS', 'BSSw_c1', C_BSSw1pts),
+            ('HallA 15', 'BSDw_s1', H_BSDwpts), 
+	    ('HallA 15', 'BSSw_c0', H_BSSw0pts),
+            ('HallA 15', 'BSSw_c1', H_BSSw1pts),
+            ('HallA 17', 'BSDw_s1', H17_BSDwpts), 
+	    ('HallA 17', 'BSSw_c0', H17_BSSw0pts),
+            ('HallA 17', 'BSSw_c1', H17_BSSw1pts)
             ]
     names = [th.name[:10] for th in ths]
     sublines = ['------' for th in ths]

@@ -328,7 +328,7 @@ def HERMES12(path=None, fmt='png', **kwargs):
                 ax.set_ylabel('')
             else:
                 ylabels = ['$A_{C}^{\\cos \\phi}$', '$A_{C}^{\\cos 0\\phi}$', '$A_{LU,I}^{\\sin\\phi}$']
-                ax.set_ylabel(ylabels[(npanel-1)/3], fontsize=16)
+                ax.set_ylabel(ylabels[int((npanel-1)/3)], fontsize=16)
             if npanel < 7:
                 # Leave labels only on lowest panels
                 ax.set_xlabel('')
@@ -452,7 +452,7 @@ def HERMES12BCA(path=None, fmt='png', **kwargs):
                 ax.set_ylabel('')
             else:
                 ylabels = ['$BCA\\; \\cos 0\\phi$', '$BCA\\; \\cos \\phi$', '$BCA\\; \\cos 2\\phi$']
-                ax.set_ylabel(ylabels[(npanel-1)/3], fontsize=18)
+                ax.set_ylabel(ylabels[int((npanel-1)/3)], fontsize=18)
             if npanel < 7:
                 # Leave labels only on lowest panels
                 ax.set_xlabel('')
@@ -1206,7 +1206,7 @@ def HallAphi(path=None, fmt='png', **kwargs):
     subsets[23] = utils.select(data[34], criteria=['t == -0.28'])
     subsets[24] = utils.select(data[34], criteria=['t == -0.33'])
     title = ''
-    fig = plt.figure()
+    fig = plt.figure(figsize=[12,7])
     fig.canvas.set_window_title(title)
     fig.suptitle(title)
     fig.subplots_adjust(wspace=0.2)
@@ -2983,7 +2983,7 @@ def CFFt(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
     #fig.canvas.set_window_title(title)
     #fig.suptitle(title)
     # Define abscissas
-    tmvals = np.linspace(0.02, 0.6, 10) # right panel
+    tmvals = np.linspace(0.05, 0.55, 10) # right panel
     # ordinates
     #ylims = {'ImH': (-4.3, 35), 'ReH': (-6.5, 8),
     # Plot panels
@@ -2998,7 +2998,7 @@ def CFFt(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
             ax.set_ylabel(toTeX['%s' % cff], fontsize=18)
         except KeyError:
             pass
-        ax.axhspan(-0.0005, 0.0005, facecolor='g', alpha=0.6)  # horizontal bar
+        ax.axhline(y=0, linewidth=0.5, color='g')  # y=0 thin line
         if n == 0:
             ax.legend(loc='upper right')
             ax.legend().draw_frame(0)
@@ -3015,7 +3015,7 @@ def CFFt(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
             ax.set_ylabel(toTeX['%s' % cff], fontsize=18)
         except KeyError:
             pass
-        ax.axhspan(-0.0005, 0.0005, facecolor='g', alpha=0.6)  # horizontal bar
+        ax.axhline(y=0, linewidth=0.5, color='g')  # y=0 thin line
         if n == 0:
             ax.legend(loc='upper right')
             ax.legend().draw_frame(0)
@@ -3038,36 +3038,43 @@ def CFF3(path=None, fmt='png', **kwargs):
 
     """
     title = ''
-    fig = plt.figure()
+    fig = plt.figure(figsize=(14,12))
     fig.canvas.set_window_title(title)
     fig.suptitle(title)
     colors = ['red', 'brown']     # worm human colors :-)
     nncolors = ['blue', 'green']  # cold computer colors
     linestyles = ['solid', 'dashed']
     # Define abscissas
-    logxvals = np.logspace(-5.0, -2, 20)
+    xvals = np.linspace(0.05, 0.3, 40)
     # ordinates
-    leftcffs = ['ImH', 'ImE']
-    rightcffs = ['ReH', 'ReE']
-    for n in range(2):
+    leftcffs = ['ImH', 'ImE', 'ImHt']
+    rightcffs = ['ReH', 'ReE', 'ReHt']
+    for n in range(3):
         # left panel
         leftcff = leftcffs[n]
-        ax = fig.add_subplot(2, 2, 2*n+1)
-        ax.set_xscale('log')  # x-axis to be logarithmic
-        panel(ax, xaxis='xi', xs=logxvals, kins={'yaxis':leftcff, 't':-0.2, 'Q2':4.,
+        ax = fig.add_subplot(3, 2, 2*n+1)
+        panel(ax, xaxis='xi', xs=xvals, kins={'yaxis':leftcff, 't':-0.2, 'Q2':4.,
             'units':{'CFF': 1}, 'y1name': 'CFF'}, **kwargs)
         ax.set_xlabel(toTeX['xixB'], fontsize=15)
         ax.set_ylabel(toTeX['%s' % leftcff], fontsize=18)
         ax.axhspan(-0.0005, 0.0005, facecolor='g', alpha=0.6)  # horizontal bar
+        if n == 0:
+            leg = ax.legend(loc='upper right', handlelength=4.0, fancybox=True)
+            frame  = leg.get_frame()
+            frame.set_facecolor('0.90')    # set the frame face color to light gray
+            for t in leg.get_texts():
+                t.set_fontsize(14)    # the legend text fontsize
+            for l in leg.get_lines():
+                l.set_linewidth(2.0)  # the legend line width
         # right panel
         rightcff = rightcffs[n]
-        ax = fig.add_subplot(2, 2, 2*n+2)
-        ax.set_xscale('log')  # x-axis to be logarithmic
-        panel(ax, xaxis='xi', xs=logxvals, kins={'yaxis':rightcff, 't':-0.2, 'Q2':4.,
+        ax = fig.add_subplot(3, 2, 2*n+2)
+        panel(ax, xaxis='xi', xs=xvals, kins={'yaxis':rightcff, 't':-0.2, 'Q2':4.,
                 'units':{'CFF': 1}, 'y1name': 'CFF'}, **kwargs)
         ax.set_xlabel(toTeX['xixB'], fontsize=15)
         ax.set_ylabel(toTeX['%s' % rightcff], fontsize=18)
         ax.axhspan(-0.0005, 0.0005, facecolor='g', alpha=0.6)  # horizontal bar
+        ax.axhline(y=0, linewidth=0.5, color='g')  # y=0 thin line
     fig.subplots_adjust(bottom=0.10)
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
