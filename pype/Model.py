@@ -854,12 +854,12 @@ class ComptonModelDRFlavored(ComptonModelDRPP):
         twox = 2.*x / (1.+x)
         onex = (1.-x) / (1.+x)
         if f  == 'u':
-            val = ( p['Nv'] * p['trvu'] * twox**(-p['tal']-p['talp']*t) *
+            val = ( p['tNv'] * p['trvu'] * twox**(-p['tal']-p['talp']*t) *
                      onex**p['tbv'] / (1. - onex*t/(p['tMvu']**2))  )
             val = pi * val / (1.+x)
             return val
         elif f  == 'd':
-            val = ( p['Nv'] * p['trvd'] * twox**(-p['tal']-p['talp']*t) *
+            val = ( p['tNv'] * p['trvd'] * twox**(-p['tal']-p['talp']*t) *
                      onex**p['tbv'] / (1. - onex*t/(p['tMvd']**2))  )
             val = pi * val / (1.+x)
             return val
