@@ -730,8 +730,8 @@ class ComptonModelDRFlavored(ComptonModelDRPP):
              'Mvu' : 1.0,    'limit_Mvu' : (0.4, 10.),
              'Mvd' : 1.0,    'limit_Mvd' : (0.4, 10.),
               # ImE
-             'rEu' : 2.0,    'limit_rEu' : (0., 15.),
-             'rEd' : 1.0,    'limit_rEd' : (0., 15.),
+             'rEu' : 0.0,    'limit_rEu' : (0., 15.),
+             'rEd' : 0.0,    'limit_rEd' : (0., 15.),
               'bE' : 4.0,    'limit_bE' : (1., 8.),
              'MEu' : 1.0,    'limit_MEu' : (0.4, 10.),
              'MEd' : 1.0,    'limit_MEd' : (0.4, 10.),
@@ -741,13 +741,15 @@ class ComptonModelDRFlavored(ComptonModelDRPP):
             'tMvu' : 2.0,    'limit_tMvu' : (0.4, 10.),
             'tMvd' : 2.0,    'limit_tMvd' : (0.4, 10.),
               # subtraction constant
-              'Cu' : 14.0,      'limit_C' : (-20., 20.),
-              'Cd' : 7.0,      'limit_C' : (-20., 20.),
-              'MC' : 1.3,     'limit_MC' : (0.4, 10.),
+              'Cu' : 14.0,     'limit_Cu' : (-20., 20.),
+              'Cd' : 7.0,      'limit_Cd' : (-20., 20.),
+              'MCu' : 1.3,     'limit_MCu' : (0.4, 10.),
+              'MCd' : 1.3,     'limit_MCd' : (0.4, 10.),
               })
         self.parameter_names += ['rvu', 'rvd', 'Mvu', 'Mvd',
                 'rEu', 'rEd', 'bE', 'MEu', 'MEd',
-                'trvu', 'trvd', 'tMvu', 'tMvd', 'Cu', 'Cd']
+                'trvu', 'trvd', 'tMvu', 'tMvd', 'Cu', 'Cd',
+                'MCu', 'MCd']
         # now do whatever else is necessary
         ComptonFormFactors.__init__(self, **kwargs)
 
