@@ -323,7 +323,7 @@ def listchis(ths, Q2cut=1., Q2max=1.e3, nsets=10, out='chis'):
             H17_BSDwpts, H17_BSSw0pts, H17_BSSw1pts,\
             H_BSDpts, H_BSS0pts, H_BSS1pts,\
             C_BSDwpts, C_BSSw0pts, C_BSSw1pts, H_BSD, H_BSS,\
-            C_BSD, C_BSS
+            C_BSD, C_BSS, H20_nBSSw0pts, H20_nBSSw1pts
     #exps[0] = ['UNP5points', 'ALTGLO5', 'CLAS', 'CLASDM', 'BSDw', 'BSSw', 'TSA1', 'BTSA', 'TPpoints']
     #ptssets[0] = [UNP5points, ALTGLO5points, data[25], data[8], BSDwpoints, BSSwpoints, TSA1points, BTSApoints, TPpoints]
     sets = {}
@@ -417,6 +417,21 @@ def listchis(ths, Q2cut=1., Q2max=1.e3, nsets=10, out='chis'):
             ('HallA 17', 'BSDw_s1', H17_BSDwpts), 
 	    ('HallA 17', 'BSSw_c0', H17_BSSw0pts),
             ('HallA 17', 'BSSw_c1', H17_BSSw1pts)
+            ]
+    sets[11] = [
+            ('CLAS', 'BSA', CLAS14BSApts),
+            ('CLAS', 'TSA', CLAS14TSApts), 
+            ('CLAS', 'BTSA', CLAS14BTSApts),
+            ('CLAS', 'BSDw_s1', C_BSDwpts), 
+	    ('CLAS', 'BSSw_c0', C_BSSw0pts),
+            ('CLAS', 'BSSw_c1', C_BSSw1pts),
+            ('HallA 15', 'BSDw_s1', H_BSDwpts), 
+	    ('HallA 15', 'BSSw_c0', H_BSSw0pts),
+            ('HallA 15', 'BSSw_c1', H_BSSw1pts),
+	    ('HallA 17', 'BSSw_c0', H17_BSSw0pts),
+            ('HallA 17', 'BSSw_c1', H17_BSSw1pts),
+	    ('HallA 20', 'nBSSw_c0', H20_nBSSw0pts),
+	    ('HallA 20', 'nBSSw_c1', H20_nBSSw1pts)
             ]
     names = [th.name[:10] for th in ths]
     sublines = ['------' for th in ths]

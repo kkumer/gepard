@@ -90,6 +90,8 @@ H_BSS = data[107]+data[108]
 H17_BSDwpts = data[135]
 H17_BSSw0pts = data[136][:22]
 H17_BSSw1pts = data[136][22:]
+H20_nBSSw0pts = data[140][:8]
+H20_nBSSw1pts = data[140][8:]
 #
 # EIC mock
 #
