@@ -1,14 +1,15 @@
 # Output layer transformation function
 
-def trans(o, theory_and_pt, oC=0):
+def trans(o, theory_and_pt, oC=0, oCu=0, oCd=0):
     """Predict pt within theory with CFFs given by NN's output layer o.
     
-    oC -- value of subtraction constant
+    oC -- value of subtraction constant in non-flavored model
+    oCu, oCd -- values of subtraction constant in flavored model
     
     """
     theory, pt = theory_and_pt
     if theory.model.endpointpower:
-        # multiplying with (1-xB)^2 to implement constraint CFF(xB=1) = 0
+        # multiplying imag parts of CFF with (1-xB)^2 to make them zero at xB=1
         fac = (1-pt.xB)**theory.model.endpointpower
         ep = [int(cff[:2]=='Re')+int(cff[:2]=='Im')*fac for cff in theory.m.output_layer]
         o = o * ep
@@ -17,7 +18,8 @@ def trans(o, theory_and_pt, oC=0):
         zp = [int(cff[2:]!='Et')+int(cff[2:]=='Et')*(2.-pt.xB)/pt.xB 
                 for cff in theory.m.output_layer]
         o = o * zp
-    res = theory.predict(pt, parameters={'outputvalue':o, 'outputvalueC':oC})
+    res = theory.predict(pt, parameters={'outputvalue':o, 'outputvalueC':oC, 
+        'outputvalueCu':oCu, 'outputvalueCd':oCd})
     return res
 
 

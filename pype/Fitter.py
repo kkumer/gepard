@@ -147,10 +147,19 @@ class FitterBrain(Fitter):
             for k in range(self.outputs):
                 left[k] = 1.2
                 if self.theory.m.useDR:
-                    deriv.append((theory.predict(pt,
-                        parameters={'outputvalue':tuple(left), 'outputvalueC':1.0}) -
-                                  theory.predict(pt,
-                        parameters={'outputvalue':tuple(right), 'outputvalueC':1.0})) / 0.2)
+                    # approximate primitive derivative
+                    if hasattr(self.theory.m, 'flavored') and self.theory.m.flavored:
+                        deriv.append((theory.predict(pt,
+                            parameters={'outputvalue':tuple(left), 
+                                'outputvalueCu':1.0, 'outputvalueCd':1.0}) -
+                                      theory.predict(pt,
+                            parameters={'outputvalue':tuple(right), 
+                                'outputvalueCu':1.0, 'outputvalueCd':1.0})) / 0.2)
+                    else:
+                        deriv.append((theory.predict(pt,
+                            parameters={'outputvalue':tuple(left), 'outputvalueC':1.0}) -
+                                      theory.predict(pt,
+                            parameters={'outputvalue':tuple(right), 'outputvalueC':1.0})) / 0.2)
                 else:
                     deriv.append((theory.predict(pt, parameters={'outputvalue':tuple(left)}) -
                              theory.predict(pt, parameters={'outputvalue':tuple(right)})) / 0.2)
@@ -158,8 +167,20 @@ class FitterBrain(Fitter):
                 left[k] = 1.0
             pt.deriv = np.array(deriv)
             # adding derivative w.r.t. subtraction constant
-            pt.derivC = (theory.predict(pt, parameters={'outputvalue':tuple(right), 'outputvalueC':1.2}) -
-                     theory.predict(pt, parameters={'outputvalue':tuple(right), 'outputvalueC':1.0})) / 0.2
+            if hasattr(self.theory.m, 'flavored') and self.theory.m.flavored:
+                pt.derivCu = (theory.predict(pt, parameters={'outputvalue':tuple(right), 
+                    'outputvalueCu':1.2, 'outputvalueCd':1.0}) -
+                         theory.predict(pt, parameters={'outputvalue':tuple(right), 
+                             'outputvalueCu':1.0, 'outputvalueCd':1.0})) / 0.2
+                pt.derivCd = (theory.predict(pt, parameters={'outputvalue':tuple(right), 
+                    'outputvalueCu':1.0, 'outputvalueCd':1.2}) -
+                         theory.predict(pt, parameters={'outputvalue':tuple(right), 
+                             'outputvalueCu':1.0, 'outputvalueCd':1.0})) / 0.2
+            else:
+                pt.derivC = (theory.predict(pt, parameters={'outputvalue':tuple(right), 
+                    'outputvalueC':1.2}) -
+                     theory.predict(pt, parameters={'outputvalue':tuple(right),
+                         'outputvalueC':1.0})) / 0.2
         Fitter.__init__(self, **kwargs)
 
     def artificialData(self, datapoints, trainpercentage=70, useDR=None):
@@ -200,7 +221,10 @@ class FitterBrain(Fitter):
             ys[0] = pt.val + round(np.random.normal(0, pt.err, 1)[0], 5)
             # ys[1:] are zero and are never used.
             trans.map2pt[ys[0]] = (self.theory, pt)
-            trans.outmem[ys[0]] = (0, 0)
+            if hasattr(self.theory.m, 'flavored') and self.theory.m.flavored:
+                trans.outmem[ys[0]] = (0, 0, 0)
+            else:
+                trans.outmem[ys[0]] = (0, 0)
             if i < trainsize:
                 training.addSample(xs, ys)
                 if useDR:
@@ -312,7 +336,7 @@ class FitterBrain(Fitter):
                     _lg.info("Epoch: %6i   ---->    TrainErr: %8.3g  TestErr: %8.3g" % (
                             self.trainer.epoch, trainerr, testerr))
                     _lg.info("          EpochC: %6i   ---->    TrainErr: %8.3g  TestErr: %8.3g" % (
-                            self.trainer.epoch, trainerr, testerr))
+                            self.trainer.epoch, trainerrC, testerrC))
             if testerrC < memerrC:
                 memerrC = testerrC
                 memnetC = netC.copy()
@@ -327,13 +351,97 @@ class FitterBrain(Fitter):
         #sys.stderr.write(str(trans.outmem))
         return memnet, memnetC, memerr, memerrC
 
+
+    def makenetDRflavored(self, datapoints):
+        """Create trained nets and return tuple (net, netCu, netCd, error).
+        net is network giving CFF outputs, while netCu/d are networks with
+        single input and output giving subtraction constants Cu(t) and Cd(t)
+
+        """
+        self.dstrain, self.dstrainC, self.dstest, self.dstestC = self.artificialData(
+                datapoints, useDR=True)
+
+        net = buildNetwork(*self.theory.model.architecture)
+        netCu = buildNetwork(1, 5, 1)  # hardwired hidden layer good enough?
+        netCd = buildNetwork(1, 4, 1)  # hardwired hidden layer good enough?
+
+        self.trainer = brain.RPropMinusTrainerTransformed(net, learningrate = 0.9,
+                lrdecay = 0.98, momentum = 0.0, batchlearning = True, verbose = False)
+        self.trainerCu = brain.RPropMinusTrainerTransformed(netCu, learningrate = 0.9,
+                lrdecay = 0.98, momentum = 0.0, batchlearning = True, verbose = False)
+        self.trainerCd = brain.RPropMinusTrainerTransformed(netCd, learningrate = 0.9,
+                lrdecay = 0.98, momentum = 0.0, batchlearning = True, verbose = False)
+
+        memerr = 1.  # large initial error, certain to be bettered
+        memerrCu = 1.
+        memerrCd = 1.
+        memnet = net.copy()
+        memnetCu = netCu.copy()
+        memnetCd = netCd.copy()
+        for k in range(self.nbatch):
+            self.trainer.trainOnDataset(self.dstrain, self.batchlen)
+            self.trainerCu.trainOnDataset(self.dstrainC, self.batchlen)
+            self.trainerCd.trainOnDataset(self.dstrainC, self.batchlen)
+            trainerr, testerr = (self.trainer.testOnData(self.dstrain),
+                    self.trainer.testOnData(self.dstest))
+            trainerrCu, testerrCu = (self.trainerCu.testOnData(self.dstrainC),
+                    self.trainerCu.testOnData(self.dstestC))
+            trainerrCd, testerrCd = (self.trainerCd.testOnData(self.dstrainC),
+                    self.trainerCd.testOnData(self.dstestC))
+            if self.verbose > 1:
+                _lg.info("Epoch: %6i   ---->    TrainErr: %8.3g  TestErr: %8.3g / %6.3g" % (
+                        self.trainer.epoch, trainerr, testerr, memerr))
+                _lg.info("       EpochCu: %6i   ---->    TrainErrCu: %8.3g  TestErrCu: %8.3g / %6.3g" % (self.trainerCu.epoch, trainerrCu, testerrCu, memerrCu))
+                _lg.info("       EpochCd: %6i   ---->    TrainErrCd: %8.3g  TestErrCd: %8.3g / %6.3g" % (self.trainerCd.epoch, trainerrCd, testerrCd, memerrCd))
+            if testerr < memerr:
+                memerr = testerr
+                memnet = net.copy()
+                if self.verbose:
+                    if self.verbose > 1:
+                        _lg.info("---- New best result:  ----")
+                    _lg.info("Epoch: %6i   ---->    TrainErr: %8.3g  TestErr: %8.3g" % (
+                            self.trainer.epoch, trainerr, testerr))
+                    _lg.info("          EpochCu: %6i   ---->    TrainErr: %8.3g  TestErr: %8.3g" % (
+                            self.trainer.epoch, trainerrCu, testerrCu))
+                    _lg.info("          EpochCd: %6i   ---->    TrainErr: %8.3g  TestErr: %8.3g" % (
+                            self.trainer.epoch, trainerr, testerr))
+            if testerrCu < memerrCu:
+                memerrCu = testerrCu
+                memnetCu = netCu.copy()
+                if self.verbose:
+                    if self.verbose > 1:
+                        _lg.info("---- New best resultC:  ----")
+                    _lg.info("EpochCu: %6i   ---->    TrainErrCu: %8.3g  TestErrCu: %8.3g" % (
+                            self.trainerCu.epoch, trainerrCu, testerrCu))
+            elif testerr > 100 or trainerr > 100 or testerrCu > 100 or trainerrCu > 100:
+                _lg.warning("---- Further training is hopeless. Giving up. ----")
+                break
+            if testerrCd < memerrCd:
+                memerrCd = testerrCd
+                memnetCd = netCd.copy()
+                if self.verbose:
+                    if self.verbose > 1:
+                        _lg.info("---- New best resultC:  ----")
+                    _lg.info("EpochCd: %6i   ---->    TrainErrCd: %8.3g  TestErrCd: %8.3g" % (
+                            self.trainerCd.epoch, trainerrCd, testerrCd))
+            elif testerr > 100 or trainerr > 100 or testerrCd > 100 or trainerrCd > 100:
+                _lg.warning("---- Further training is hopeless. Giving up. ----")
+                break
+        #sys.stderr.write(str(trans.outmem))
+        return memnet, memnetCu, memnetCd, memerr, memerrCu, memerrCd
+
     def fit(self):
         """Create and train neural networks."""
         for n in range(self.nnets):
             if self.theory.m.useDR:
                 # some Re parts are obtained via DR
-                net, netC, memerr, memerrC = self.makenetDR(self.fitpoints)
-                self.theory.model.netsC.append(netC)
+                if hasattr(self.theory.m, 'flavored') and self.theory.m.flavored:
+                    net, netCu, netCd, memerr, memerrCu, memerrCd = self.makenetDRflavored(self.fitpoints)
+                    self.theory.model.netsCu.append(netCu)
+                    self.theory.model.netsCd.append(netCd)
+                else:
+                    net, netC, memerr, memerrC = self.makenetDR(self.fitpoints)
+                    self.theory.model.netsC.append(netC)
             else:
                 # decoupled Im and Re Parts are all net outputs
                 net, memerr = self.makenet(self.fitpoints)
@@ -362,8 +470,13 @@ class FitterBrain(Fitter):
             k += 1
             if self.theory.m.useDR:
                 # some Re parts are obtained via DR
-                net, netC, memerr, memerrC = self.makenetDR(self.fitpoints)
-                self.theory.model.netsC.append(netC)
+                if hasattr(self.theory.m, 'flavored') and self.theory.m.flavored:
+                    net, netCu, netCd, memerr, memerrCu, memerrCd = self.makenetDRflavored(self.fitpoints)
+                    self.theory.model.netsCu.append(netCu)
+                    self.theory.model.netsCd.append(netCd)
+                else:
+                    net, netC, memerr, memerrC = self.makenetDR(self.fitpoints)
+                    self.theory.model.netsC.append(netC)
             else:
                 # decoupled Im and Re Parts are all net outputs
                 net, memerr = self.makenet(self.fitpoints)
@@ -379,7 +492,11 @@ class FitterBrain(Fitter):
                 sfitprob = utils.stringcolor("%5.4f" % fitprob, 'red', True)
                 del self.theory.model.nets[-1]
                 if self.theory.m.useDR:
-                    del self.theory.model.netsC[-1]
+                    if hasattr(self.theory.m, 'flavored') and self.theory.m.flavored:
+                        del self.theory.model.netsCu[-1]
+                        del self.theory.model.netsCd[-1]
+                    else:
+                        del self.theory.model.netsC[-1]
                 self.theory.model.parameters['nnet'] = n-1
             else:
                 sfitprob = utils.stringcolor("%5.4f" % fitprob, 'green', True)
@@ -395,6 +512,7 @@ class FitterBrain(Fitter):
 
     def prune(self, minprob=0.01):
         """Remove nets with low chi-square probability."""
+        ## FIXME i.e. check is this ok with DR nets?
         bad = []
         for n in range(self.nnets):
             self.theory.model.parameters['nnet'] = n

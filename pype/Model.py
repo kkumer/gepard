@@ -1420,10 +1420,17 @@ class ComptonNeuralNets(Model):
         """
         self.architecture = [2] + hidden_layers + [len(output_layer)]
         self.output_layer = output_layer
+        assert hidden_layers[0] > 5   # Or recognition of Cu-Cd wouldn't work
         self.nets = []
-        self.netsC = []  # for subtraction constants if useDR
-        self.parameters = {'nnet':0, 'outputvalue':None, 'outputvalueC':None}
-        self.parameter_names = ['nnet', 'outputvalue', 'outputvalueC']
+        if flavored:
+            self.netsCu = []  # for subtraction constants if useDR
+            self.netsCd = []  # for subtraction constants if useDR
+        else:
+            self.netsC = []  # for subtraction constants if useDR
+        self.parameters = {'nnet':0, 'outputvalue':None, 'outputvalueC':None,
+                'outputvalueCu':None, 'outputvalueCd':None}
+        self.parameter_names = ['nnet', 'outputvalue', 'outputvalueC',
+                'outputvalueCu', 'outputvalueCd']
         self.endpointpower = endpointpower
         self.zeropointpower = zeropointpower
         self.useDR = useDR
@@ -1461,7 +1468,7 @@ class ComptonNeuralNets(Model):
     #def zero(self, *args, **kwargs):
         #return 0
 
-    def subtraction(self, pt):
+    def subtraction(self, pt, f=None):
         """This subtraction constant is negative of the one which is standard
             in the literature!
         """
@@ -1470,9 +1477,21 @@ class ComptonNeuralNets(Model):
             # this occurs during training: value is set by training
             # routine by calling with outputvalueC set by training routine
             return self.parameters['outputvalueC']
+        if f=='u' and self.parameters['outputvalueCu'] is not None:
+            return self.parameters['outputvalueCu']
+        if f=='d' and self.parameters['outputvalueCd'] is not None:
+            return self.parameters['outputvalueCd']
+
         ar = []
-        for netC in self.netsC:
-            ar.append(netC.activate([pt.t])[0])
+        if f=='u':
+            for netCu in self.netsCu:
+                ar.append(netCu.activate([pt.t])[0])
+        elif f=='d':
+            for netCd in self.netsCd:
+                ar.append(netCd.activate([pt.t])[0])
+        else:
+            for netC in self.netsC:
+                ar.append(netC.activate([pt.t])[0])
         all = array(ar).flatten()
         if 'nnet' in self.parameters:
             if self.parameters['nnet'] == 'ALL':
@@ -1526,6 +1545,20 @@ class ComptonNeuralNets(Model):
                     b = b.reshape(b.size,1)
                 return a - b
                 #return DR.intVNN(self.ImH, pt) - self.subtraction(pt)
+            elif self.curname == 'ReHu':
+                #set_trace()
+                a = DR.intVNN(self.ImHu, pt)
+                b = self.subtraction(pt, f='u')
+                if isinstance(b, ndarray):
+                    b = b.reshape(b.size,1)
+                return a - b
+            elif self.curname == 'ReHd':
+                #set_trace()
+                a = DR.intVNN(self.ImHd, pt)
+                b = self.subtraction(pt, f='d')
+                if isinstance(b, ndarray):
+                    b = b.reshape(b.size,1)
+                return a - b
             elif self.curname == 'ReE':
                 a = DR.intVNN(self.ImE, pt)
                 b = self.subtraction(pt)
@@ -1533,6 +1566,18 @@ class ComptonNeuralNets(Model):
                     b = b.reshape(b.size,1)
                 return a + b
                 #return DR.intVNN(self.ImE, pt) + self.subtraction(pt)
+            elif self.curname == 'ReEu':
+                a = DR.intVNN(self.ImEu, pt)
+                b = self.subtraction(pt, f='u')
+                if isinstance(b, ndarray):
+                    b = b.reshape(b.size,1)
+                return a + b
+            elif self.curname == 'ReEd':
+                a = DR.intVNN(self.ImEd, pt)
+                b = self.subtraction(pt, f='d')
+                if isinstance(b, ndarray):
+                    b = b.reshape(b.size,1)
+                return a + b
             elif self.curname in ['ReHt', 'ReEt']:
                 return DR.intANN(self.__getattr__('Im'+self.curname[2:]), pt)
             else:
