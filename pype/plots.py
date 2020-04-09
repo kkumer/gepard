@@ -3048,14 +3048,15 @@ def CFF3(path=None, fmt='png', **kwargs):
     xvals = np.linspace(0.05, 0.3, 40)
     # ordinates
     leftcffs = ['ImH', 'ImE', 'ImHt']
-    rightcffs = ['ReH', 'ReE', 'ReHt']
+    rightcffs = ['ReH', 'ReE', 'ImEt']
     for n in range(3):
         # left panel
         leftcff = leftcffs[n]
         ax = fig.add_subplot(3, 2, 2*n+1)
         panel(ax, xaxis='xi', xs=xvals, kins={'yaxis':leftcff, 't':-0.2, 'Q2':4.,
             'units':{'CFF': 1}, 'y1name': 'CFF'}, **kwargs)
-        ax.set_xlabel(toTeX['xixB'], fontsize=15)
+        if n == 2:
+            ax.set_xlabel(toTeX['xixB'], fontsize=15)
         ax.set_ylabel(toTeX['%s' % leftcff], fontsize=18)
         ax.axhspan(-0.0005, 0.0005, facecolor='g', alpha=0.6)  # horizontal bar
         if n == 0:
@@ -3071,7 +3072,8 @@ def CFF3(path=None, fmt='png', **kwargs):
         ax = fig.add_subplot(3, 2, 2*n+2)
         panel(ax, xaxis='xi', xs=xvals, kins={'yaxis':rightcff, 't':-0.2, 'Q2':4.,
                 'units':{'CFF': 1}, 'y1name': 'CFF'}, **kwargs)
-        ax.set_xlabel(toTeX['xixB'], fontsize=15)
+        if n == 2:
+            ax.set_xlabel(toTeX['xixB'], fontsize=15)
         ax.set_ylabel(toTeX['%s' % rightcff], fontsize=18)
         ax.axhspan(-0.0005, 0.0005, facecolor='g', alpha=0.6)  # horizontal bar
         ax.axhline(y=0, linewidth=0.5, color='g')  # y=0 thin line

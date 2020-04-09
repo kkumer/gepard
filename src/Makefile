@@ -1,5 +1,5 @@
 # Makefile for gepard Fortran and C sources
-PYSUFFIX = $(shell python3-config --extension-suffix)
+PYSUFFIX = $(shell python-config --extension-suffix)
 
 # Subdirectories for storing example source files
 TESTDIR = test

@@ -282,11 +282,11 @@ def select(dataset, criteria=[], logic='AND'):
     return tmp
 
 def listdb(db):
-    print("%-17s--+--%s" % (17*'-', 60*'-'))
-    print("%-17s  |  %s" % ('name', 'description'))
-    print("%-17s--+--%s" % (17*'-', 60*'-'))
+    print("%-22s--+--%s" % (22*'-', 60*'-'))
+    print("%-22s  |  %s" % ('name', 'description'))
+    print("%-22s--+--%s" % (22*'-', 60*'-'))
     for key in db:
-        print("%-17s  |  %s" % (key, db[key].description))
+        print("%-22s  |  %s" % (key, db[key].description))
     #print "\n WARNING: gepard models are now likely broken. Reinitialize them!"
 
 def listdata(ids, data):
