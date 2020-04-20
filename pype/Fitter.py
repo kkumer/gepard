@@ -462,7 +462,7 @@ class FitterBrain(Fitter):
         self.theory.model.parameters['nnet'] = 'ALL'
         return self.theory
 
-    def fitgood(self):
+    def fitgood(self, minchi=0):
         """Create and train neural networks with good chisq."""
         n = 0
         k = 0
@@ -488,7 +488,7 @@ class FitterBrain(Fitter):
                 self.theory.model.nets.append(net)
                 self.theory.model.parameters['nnet'] = n
             chi, dof, fitprob = self.theory.chisq(self.fitpoints)
-            if fitprob < self.minprob:
+            if fitprob < self.minprob and chi > minchi:
                 sfitprob = utils.stringcolor("%5.4f" % fitprob, 'red', True)
                 del self.theory.model.nets[-1]
                 if self.theory.m.useDR:
