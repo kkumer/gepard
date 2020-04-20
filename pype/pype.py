@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import shelve, copy, sys, builtins
+import os, shelve, copy, sys, builtins
 import numpy as np
 
 import logging, logzero

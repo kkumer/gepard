@@ -435,7 +435,7 @@ def listchis(ths, Q2cut=1., Q2max=1.e3, nsets=10, out='chis'):
             ]
     names = [th.name[:10] for th in ths]
     sublines = ['------' for th in ths]
-    if out == 'chis':
+    if out == 'chis' or out == 'pulls':
         # We want chisq/npts
         ftit = 21*' ' + len(names)*'{:^10s}'
         fstr = '{:9s} {:7s}: ' + len(names)*'{:10.2f}' + '   (np ={dof:3d})'
@@ -453,11 +453,14 @@ def listchis(ths, Q2cut=1., Q2max=1.e3, nsets=10, out='chis'):
         cutpts = select(pts, criteria=['Q2>=%f' % Q2cut, 'Q2<=%f' % Q2max])
         npts = len(cutpts)
         if out == 'pulls':
-            quals = [th.chisq(cutpts, sigmas=True).sum()/np.sqrt(npts) for th in ths]
+            chis = [th.chisq(cutpts, pull=True)[chi_ind] for th in ths]
         else:
             chis = [th.chisq(cutpts)[chi_ind] for th in ths]
-            total_chis += np.array(chis)
-            total_npts += npts
+        total_chis += np.array(chis)
+        total_npts += npts
+        if out == 'pulls':
+            quals = [chi/np.sqrt(npts) for chi in chis]
+        else:
             quals = [chi/npts for chi in chis]
         print(fstr.format(collab, obs, *quals, dof=npts))
     if out == 'chis':

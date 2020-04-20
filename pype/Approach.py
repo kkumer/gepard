@@ -89,7 +89,7 @@ class Approach(object):
         chi = sum(p*p for p in allpulls)  # equal to m.fval if minuit fit is done
         fitprob = (1.-gammainc(dof/2., chi/2.)) # probability of this chi-sq
         if pull:
-            P = sum(allpulls)/sqrt(npts)
+            P = sum(allpulls)
             # FIXME: CLUDGE to print pull in Trento convention (should be done by from_conventions)
             pt = points[0]
             if 'frame' in pt and pt.frame == 'Trento' and 'FTn' in pt:
@@ -98,7 +98,8 @@ class Approach(object):
             if 'frame' in pt and pt.frame == 'Trento' and 'varFTn' in pt:
                 if pt.varFTn == 1 or pt.varFTn == -1:
                     P = - P
-            return chi/npts, P, npts
+            #return chi/npts, P, npts
+            return P, npts, chi
         elif pulls:
             return array(allpulls)
         else:
