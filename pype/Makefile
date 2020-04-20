@@ -114,7 +114,7 @@ $(TESTTARGETS) $(MMATARGETS):
 
 
 optModel.so: optModel.f
-	f2py --fcompiler=$(FC) -c -m optModel $^ 
+	f2py3 --fcompiler=$(FC) -c -m optModel $^
 	mv optModel$(PYSUFFIX) optModel.so
 
 

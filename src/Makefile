@@ -1,5 +1,5 @@
 # Makefile for gepard Fortran and C sources
-PYSUFFIX = $(shell python-config --extension-suffix)
+PYSUFFIX = $(shell python3-config --extension-suffix)
 
 # Subdirectories for storing example source files
 TESTDIR = test
@@ -107,11 +107,11 @@ pygepard: pygepard.so
 pygepards: pygepard.so pygepard2.so pygepard3.so pygepard4.so pygepard5.so pygepard6.so pygepard7.so
 
 pygepard.so: $(_FPREPS)
-	f2py --fcompiler=gnu95  -c -m pygepard $^ adacf/*f -lgomp 
+	f2py3 --fcompiler=gnu95  -c -m pygepard $^ adacf/*f -lgomp 
 	mv pygepard$(PYSUFFIX) ../pype/pygepard.so
 
 pygepard%.so: $(_FPREPS)
-	f2py --quiet --fcompiler=gnu95 -c -m pygepard$* $^ adacf/*f -lgomp
+	f2py3 --quiet --fcompiler=gnu95 -c -m pygepard$* $^ adacf/*f -lgomp
 	mv pygepard$*$(PYSUFFIX) ../pype/pygepard$*.so
 
 
