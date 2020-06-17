@@ -28,8 +28,8 @@ out3particle = gamma
 
 
 ### Observable 
-y1name = BSS
-y1namelong = Beam Helicity Independent Cross Section 
+y1name = XSintphi
+y1namelong = 3-fold cross section
 # or Beam spin sum
 y1unit = pb/GeV^4
 y1value = column3

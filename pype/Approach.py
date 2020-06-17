@@ -1147,6 +1147,15 @@ class BMK(Approach):
         return ( self.Xunp(pt, **kwargs)
                 + self.Xunp(pt, **R) ) / 2.
 
+    def XSintphi(self, pt, **kwargs):
+        """Return XS integrated over azimuthal angle"""
+        mem = pt.__dict__.pop('FTn', None)
+        pt.FTn = 0
+        res = self.BSS(pt, **kwargs)
+        # restore old value if needed
+        if mem: pt.in2polarization = mem
+        return 2*pi*self.BSS(pt, **kwargs)
+
     def BSS(self, pt, **kwargs):
         """Calculate beam spin sum (BSS) or its harmonics."""
         return self._phiharmonic(self._BSS, pt, **kwargs)

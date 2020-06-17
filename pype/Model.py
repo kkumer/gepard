@@ -2264,6 +2264,8 @@ class ComptonHybrid(ComptonFormFactors):
                  (1e-5 < pt.xB < 0.65)
                )
 
+    # FIXME: this below looks inconsistent generally for xi != pt.xi !!
+
     def ImH(self, pt, xi=0):
         return  self.Gepard.ImH(pt) + self.DR.ImH(pt, xi)
 

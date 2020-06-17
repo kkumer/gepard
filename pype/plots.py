@@ -217,7 +217,7 @@ def panel(ax, points=None, lines=None, bands=None, xaxis=None, xs=None,
         for line in lines:
             _axline(ax, lambda pt: line.predict(pt, orig_conventions=True), points, xaxis=xaxis,
                     color=linecolors[linen], linestyle=linestyles[linen],
-                    linewidth=1, alpha=1.0, label=line.name, **kwargs)
+                    linewidth=2, alpha=1.0, label=r'\texttt{{{}}}'.format(line.name), **kwargs)
             linen += 1
 
     if bands:
@@ -234,7 +234,7 @@ def panel(ax, points=None, lines=None, bands=None, xaxis=None, xs=None,
                         facecolor='none',
                         edgecolor=bandcolors[bandn], # band edge color
                         linewidth=2,
-                        label=band.name, **kwargs)
+                        label=r'\texttt{{{}}}'.format(band.name), **kwargs)
             bandn += 1
 
     if kinlabels:
@@ -248,7 +248,7 @@ def panel(ax, points=None, lines=None, bands=None, xaxis=None, xs=None,
                     xvals.append(getattr(pt, xaxis))
                 yvals.append(pt.val)
         labx = min(0, min(xvals)) + (max(xvals) - min(0, min(xvals))) * 0.15
-        laby = min(0, min(yvals)) + (max(yvals) - min(0, min(yvals))) * 0.04 - 0.03
+        laby = min(0, min(yvals)) + (max(yvals) - min(0, min(yvals))) * 0.04 
         labtxt = ""
         for lab in kinlabels:
             try:
@@ -1209,7 +1209,7 @@ def HallAphi(path=None, fmt='png', **kwargs):
     fig = plt.figure(figsize=[12,7])
     fig.canvas.set_window_title(title)
     fig.suptitle(title)
-    fig.subplots_adjust(wspace=0.2)
+    fig.subplots_adjust(hspace=0.3,wspace=0.2)
     npanel = 1
     for id in ids:
         ax = fig.add_subplot(2,3,npanel)
@@ -3031,53 +3031,56 @@ def CFFt(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
         #fig.show()
     return fig
 
-def CFF3(path=None, fmt='png', **kwargs):
-    """Makes plots of cffs given by various theories/models
+def CFF3(cffs=['ImH', 'ReH', 'ImE', 'ReE'],
+        path=None, fmt='png', **kwargs):
+    """Return plot of cffs given by various theories/models
 
-    cffs    -- List of CFFs to be plotted. Each produces two panels.
+    cffs    -- List of even number of CFFs to be plotted.
 
     """
-    title = ''
-    fig = plt.figure(figsize=(14,12))
-    fig.canvas.set_window_title(title)
-    fig.suptitle(title)
+    nrows = int(len(cffs)/2)
+    fig, axs = plt.subplots(nrows, 2, figsize=[12, nrows*3], sharex='col')
     colors = ['red', 'brown']     # worm human colors :-)
     nncolors = ['blue', 'green']  # cold computer colors
     linestyles = ['solid', 'dashed']
     # Define abscissas
-    xvals = np.linspace(0.05, 0.3, 40)
+    xvals = np.linspace(0.05, 0.3, 100)
     # ordinates
-    leftcffs = ['ImH', 'ImE', 'ImHt']
-    rightcffs = ['ReH', 'ReE', 'ImEt']
-    for n in range(3):
-        # left panel
-        leftcff = leftcffs[n]
-        ax = fig.add_subplot(3, 2, 2*n+1)
-        panel(ax, xaxis='xi', xs=xvals, kins={'yaxis':leftcff, 't':-0.2, 'Q2':4.,
+    for pn, ax in enumerate(axs.flatten()):
+        cff = cffs[pn]
+        panel(ax, xaxis='xi', xs=xvals, kins={'yaxis':cff, 't':-0.2, 'Q2':4.,
             'units':{'CFF': 1}, 'y1name': 'CFF'}, **kwargs)
-        if n == 2:
-            ax.set_xlabel(toTeX['xixB'], fontsize=15)
-        ax.set_ylabel(toTeX['%s' % leftcff], fontsize=18)
-        ax.axhspan(-0.0005, 0.0005, facecolor='g', alpha=0.6)  # horizontal bar
-        if n == 0:
+        ax.set_ylabel(toTeX['{}'.format(cff)], fontsize=18)
+        ax.axhline(y=0, lw=0.5, color='k', ls=':')  # horizontal bar
+        for ticklabel in ax.get_xticklabels() + ax.get_yticklabels():
+                    ticklabel.set_fontsize(16)
+        if pn >= 2*(nrows-1):
+            ax.set_xlabel(toTeX['xixB'], fontsize=16)
+        if pn == 0:
             leg = ax.legend(loc='upper right', handlelength=4.0, fancybox=True)
             frame  = leg.get_frame()
-            frame.set_facecolor('0.90')    # set the frame face color to light gray
+            #frame.set_facecolor('0.90')    # set the frame face color to light gray
             for t in leg.get_texts():
-                t.set_fontsize(14)    # the legend text fontsize
+                t.set_fontsize(16)    # the legend text fontsize
             for l in leg.get_lines():
                 l.set_linewidth(2.0)  # the legend line width
-        # right panel
-        rightcff = rightcffs[n]
-        ax = fig.add_subplot(3, 2, 2*n+2)
-        panel(ax, xaxis='xi', xs=xvals, kins={'yaxis':rightcff, 't':-0.2, 'Q2':4.,
-                'units':{'CFF': 1}, 'y1name': 'CFF'}, **kwargs)
-        if n == 2:
-            ax.set_xlabel(toTeX['xixB'], fontsize=15)
-        ax.set_ylabel(toTeX['%s' % rightcff], fontsize=18)
-        ax.axhspan(-0.0005, 0.0005, facecolor='g', alpha=0.6)  # horizontal bar
-        ax.axhline(y=0, linewidth=0.5, color='g')  # y=0 thin line
-    fig.subplots_adjust(bottom=0.10)
+        if cff == 'ImHt':
+            ax.set_ylim(0,3.8)
+            ax.yaxis.set_major_locator( matplotlib.ticker.MultipleLocator(1.)) 
+            ax.yaxis.set_minor_locator( matplotlib.ticker.MultipleLocator(0.2)) 
+        elif cff == 'ImH':
+            ax.yaxis.set_major_locator( matplotlib.ticker.MultipleLocator(3.)) 
+            ax.yaxis.set_minor_locator( matplotlib.ticker.MultipleLocator(1.)) 
+        elif cff == 'ReE':
+            ax.yaxis.set_major_locator( matplotlib.ticker.MultipleLocator(10.)) 
+            ax.yaxis.set_minor_locator( matplotlib.ticker.MultipleLocator(2.)) 
+        elif cff == 'ImEt':
+            ax.yaxis.set_major_locator( matplotlib.ticker.MultipleLocator(20.)) 
+            ax.yaxis.set_minor_locator( matplotlib.ticker.MultipleLocator(5.)) 
+        elif cff == 'ImE':
+            ax.set_ylabel(toTeX['{}'.format(cff)], fontsize=18, labelpad=-8)
+
+    fig.subplots_adjust(hspace=0., wspace=0.25)
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
