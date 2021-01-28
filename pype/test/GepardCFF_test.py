@@ -1,15 +1,17 @@
 
 import copy
-from nose.tools import *
-import numpy as np
 
-import utils, Model, Approach, Data
-from results import hy1
+import numpy as np
+from nose.tools import *
+
+import Approach
+import Data
+import Model
+import utils
 
 data = utils.loaddata('data/ep2epgamma', approach=Approach.hotfixedBMK)  
 
 m = Model.ComptonGepard(scheme='CSBAR')
-m.parameters.update(hy1)
 t = Approach.hotfixedBMK(m)
 
 t.m.g.parint.pid = 1
@@ -52,7 +54,9 @@ def test_CFF():
     t.m.g.init()
     print((m.ReH(pt), m.ImH(pt)))
     assert_almost_equal(m.ImH(pt)/100, 66.5255/100, 4)
+    # assert_almost_equal(m.ImH(pt)/100, 60.1622/100, 4)   # for Q2=4.
     assert_almost_equal(m.ReH(pt)/100, 26.9984/100, 4)
+    # assert_almost_equal(m.ReH(pt)/100, 18.9540/100, 4)  # for Q2=4.
 
 test_CFF.gepardsuite = 1
 
@@ -64,6 +68,8 @@ def test_CFFE():
     t.m.g.parint.p = 0
     t.m.g.init()
     assert_almost_equal(m.ImE(pt)/100, 43.6024/100, 4)
+    # assert_almost_equal(m.ImE(pt)/100, 42.11355/100, 4)  # for Q2=4.
     assert_almost_equal(m.ReE(pt)/100, 13.5297/100, 4)
+    # assert_almost_equal(m.ReE(pt)/100, 13.2678/100, 4)  # for Q2=4.
 
 test_CFF.gepardsuite = 1

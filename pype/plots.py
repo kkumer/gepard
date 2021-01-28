@@ -6,13 +6,27 @@ of some specific datasets and CFFs.
 
 #from IPython.Debugger import Tracer; debug_here = Tracer()
 
-import sys, os, math, copy, subprocess, itertools
-import numpy as np
-import pandas as pd
+import copy
+import itertools
+import math
+import os
+import subprocess
+import sys
 
 import matplotlib
 import matplotlib.pyplot as plt
-from matplotlib.backends.backend_pdf import PdfPages # for PDF creation
+import numpy as np
+import pandas as pd
+from matplotlib.backends.backend_pdf import PdfPages  # for PDF creation
+from scipy.interpolate import InterpolatedUnivariateSpline
+
+import Approach
+import Data
+import utils
+from abbrevs import DISpoints
+from constants import Mp, Mp2, OBStoTeX, toTeX
+from results import *
+
 if os.sys.platform == 'win32':
     matplotlib.use('WxAgg')
 #else: #linux
@@ -21,13 +35,8 @@ if os.sys.platform == 'win32':
 # Following works better in jupyter:
 matplotlib.rcParams['figure.figsize'] = (7.0, 5.0)
 
-from scipy.interpolate import InterpolatedUnivariateSpline
 
 
-import Data, Approach, utils
-from constants import toTeX, Mp2, Mp, OBStoTeX
-from results import *
-from abbrevs import DISpoints
 
 # load experimental data
 DATA_DIR = os.path.join(os.path.dirname(__file__), 'data')
@@ -222,8 +231,8 @@ def panel(ax, points=None, lines=None, bands=None, xaxis=None, xs=None,
 
     if bands:
         if not isinstance(bands, list): bands = [bands]
-        bandcolors = ['blue', 'green', 'purple', 'indianred', 'darkcyan']
-        hatches = ['////', '\\\\', '|', '.']
+        bandcolors = ['xkcd:teal', 'red', 'darkcyan', 'blue', 'green', 'purple']
+        hatches = ['\\\\', '////', '|', '.']
         bandn = 0
         for band in bands:
             for pts in points:
@@ -1545,7 +1554,7 @@ def H1ZEUS(path=None, fmt='png', **kwargs):
     xs = ['t', 't', 'W', 'Q2']
     title = 'H1_07_ZEUS_08_DVCS'
     fig, (axu, axl) = plt.subplots(2,2,figsize=[14,8])
-    fig.suptitle(title)
+    #fig.suptitle(title)
     #fig.subplots_adjust(bottom=0.1, hspace=0.3)
     #fig.subplots_adjust(hspace=0.4)
     for npanel in range(1,5):
@@ -2839,16 +2848,15 @@ def CFF(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
     xmin = 0.1
     xmax = 0.25
     xvals = np.linspace(xmin, xmax, 20) # left panel
-    logxvals = np.logspace(-2.0, -0.01, 20)  # right panel
+    logxvals = np.logspace(-2.3, -0.01, 20)  # right panel
     # ranges of y axis
     ylims = {
               #'ImH': (-4.8, 35), 'ReH': (-3, 2),
-              'ImH': (-5, 30), 'ReH': (-4, 2),
-             'ImE': (-30, 30), 'ReE': (-40, 10),
-             #'ImE': (-40, 35), 'ReE': (-40, 10),
-             'ImEt': (-200, 300), 'ReEt': (-150, 150),
+              'ImH': (-5, 20), 'ReH': (-4, 2),
+             'ImE': (-10, 0), 'ReE': (-40, 40),
+             'ImEt': (-50, 50), 'ReEt': (-50, 50),
              #'ImHt': (-4, 8), 'ReHt': (-12, 12)}
-             'ImHt': (-5, 10), 'ReHt': (-5, 10)}
+             'ImHt': (-1, 3), 'ReHt': (-5, 10)}
     # Plot panels
     for n in range(len(cffs)):
         cff = cffs[n]
@@ -3087,6 +3095,67 @@ def CFF3(cffs=['ImH', 'ReH', 'ImE', 'ReE'],
         fig.canvas.draw()
         #fig.show()
     return fig
+
+def CFF3log(cffs=['ImH', 'ReH', 'ImE', 'ReE', 'ImHt', 'ImEt'], tval=-0.2,
+        path=None, fmt='png', **kwargs):
+    """Return plot of cffs given by various theories/models
+
+    cffs    -- List of even number of CFFs to be plotted.
+
+    """
+    nrows = int(len(cffs)/2)
+    fig, axs = plt.subplots(nrows, 2, figsize=[12, nrows*3], sharex='col')
+    colors = ['red', 'brown']     # worm human colors :-)
+    nncolors = ['xkcd:teal', 'xkcd:tomato']  # cold computer colors
+    linestyles = ['solid', 'dashed']
+    # Define abscissas
+    xvals = np.logspace(-2.3, -0.01, 50)
+    # ordinates
+    for pn, ax in enumerate(axs.flatten()):
+        cff = cffs[pn]
+        ax.set_xscale('log')  # x-axis to be logarithmic
+        panel(ax, xaxis='xi', xs=xvals, kins={'yaxis':cff, 't':tval, 'Q2':4.,
+            'units':{'CFF': 1}, 'y1name': 'CFF'}, **kwargs)
+        ax.set_ylabel(toTeX['{}'.format(cff)], fontsize=18)
+        ax.axhline(y=0, lw=0.5, color='k', ls=':')  # horizontal bar
+        for ticklabel in ax.get_xticklabels() + ax.get_yticklabels():
+                    ticklabel.set_fontsize(16)
+        if pn >= 2*(nrows-1):
+            ax.set_xlabel(toTeX['xixB'], fontsize=16)
+        if pn == 0:
+            leg = ax.legend(loc='upper right', handlelength=4.0, fancybox=True)
+            frame  = leg.get_frame()
+            #frame.set_facecolor('0.90')    # set the frame face color to light gray
+            for t in leg.get_texts():
+                t.set_fontsize(16)    # the legend text fontsize
+            for l in leg.get_lines():
+                l.set_linewidth(2.0)  # the legend line width
+        if cff == 'ImHt':
+            # ax.set_ylim(0,3.8)
+            ax.yaxis.set_major_locator( matplotlib.ticker.MultipleLocator(1.)) 
+            ax.yaxis.set_minor_locator( matplotlib.ticker.MultipleLocator(0.2)) 
+        elif cff == 'ImH':
+            ax.yaxis.set_major_locator( matplotlib.ticker.MultipleLocator(3.)) 
+            ax.yaxis.set_minor_locator( matplotlib.ticker.MultipleLocator(1.)) 
+            ax.text(0.1, 0.1, r'$t = {}\, {{\rm GeV}}^2$'.format(tval),
+                    transform=ax.transAxes, fontsize=16)
+        elif cff == 'ReE':
+            ax.yaxis.set_major_locator( matplotlib.ticker.MultipleLocator(10.)) 
+            ax.yaxis.set_minor_locator( matplotlib.ticker.MultipleLocator(2.)) 
+        elif cff == 'ImEt':
+            ax.yaxis.set_major_locator( matplotlib.ticker.MultipleLocator(20.)) 
+            ax.yaxis.set_minor_locator( matplotlib.ticker.MultipleLocator(5.)) 
+        elif cff == 'ImE':
+            ax.set_ylabel(toTeX['{}'.format(cff)], fontsize=18, labelpad=-8)
+
+    fig.subplots_adjust(hspace=0., wspace=0.25)
+    if path:
+        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+    else:
+        fig.canvas.draw()
+        #fig.show()
+    return fig
+
 
 def GPDt(path=None, fmt='png', **kwargs):
     """Makes plots of GPDs as function of t given by various theories/models

@@ -22,13 +22,18 @@ describe_data -- List observables in dataset.
 compare_harmonics --  
 """
 
-import os, re, fnmatch, itertools
+import fnmatch
+import itertools
+import os
+import re
 import smtplib
 from email.message import EmailMessage
+
 import numpy as np
 import pandas as pd
 
-import Data, Approach
+import Approach
+import Data
 from constants import Mp, Mp2
 
 #from IPython.Debugger import Tracer; debug_here = Tracer()
