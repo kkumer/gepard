@@ -4,13 +4,18 @@
 # Numbers below are produced by gepard's ex/evolut
 
 
-import shutil, copy, math
-from nose.tools import *
+import copy
+import math
+import shutil
+
+import Approach
+import Data
+import Fitter
+import Model
 import numpy as np
-
-import utils, Model, Approach, Data, Fitter
-
-from constants import Mp, Mp2
+import utils
+from consts import Mp, Mp2
+from nose.tools import *
 
 m = Model.ComptonGepard(ansatz='FITBP', q02=2.5)
 t = Approach.hotfixedBMK(m)

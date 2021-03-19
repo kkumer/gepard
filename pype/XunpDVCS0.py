@@ -7,7 +7,7 @@ from math import sqrt, pi
 
 import Data, Model, Approach, utils
 
-from constants import Mp, Mp2
+from consts import Mp, Mp2
 
 from results import *
 

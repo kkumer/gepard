@@ -22,7 +22,7 @@ from scipy.interpolate import SmoothBivariateSpline
 
 from quadrature import PVquadrature, bquadrature, rthtquadrature
 from utils import flatten, hubDictNew, stringcolor
-from constants import tolerance2, GeVfm, Mp
+from consts import tolerance2, GeVfm, Mp
 import dispersion as DR
 
 import pygepard as g1
@@ -1858,8 +1858,8 @@ class ComptonGepard(ComptonFormFactors):
             # Just use the last gepard module, but leave it in the gepardPool
             try:
                 self.g = ComptonGepard.gepardPool[-1]
-                _lg.debug('Using %s from gepardPool, and leaving it there. Their number is %i.\n' 
-                    % (self.g.__file__, len(ComptonGepard.gepardPool)))
+                # _lg.debug('Using %s from gepardPool, and leaving it there. Their number is %i.\n' 
+                    # % (self.g.__file__, len(ComptonGepard.gepardPool)))
             except IndexError:
                 sys.stderr.write(emptyPoolMessage)
                 return -1

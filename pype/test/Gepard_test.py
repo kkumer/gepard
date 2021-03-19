@@ -5,7 +5,7 @@ import numpy as np
 
 import utils, Model, Approach, Data, Fitter
 
-from constants import Mp, Mp2
+from consts import Mp, Mp2
 
 m = Model.ComptonGepard(ansatz='TEST', scheme='CSBAR')
 t = Approach.hotfixedBMK(m)

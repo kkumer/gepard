@@ -4,7 +4,7 @@ from nose.tools import *
 from subprocess import Popen, PIPE
 import numpy as np
 from abbrevs import HallAall
-from constants import Mp
+from consts import Mp
 
 ptb = HallAall[288]   # standard Hall A benchmark point
 kin = [ptb.in1energy, Mp, ptb.xB, ptb.Q2, ptb.t, np.pi-ptb.phi]

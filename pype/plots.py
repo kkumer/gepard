@@ -24,7 +24,7 @@ import Approach
 import Data
 import utils
 from abbrevs import DISpoints
-from constants import Mp, Mp2, OBStoTeX, toTeX
+from consts import Mp, Mp2, OBStoTeX, toTeX
 from results import *
 
 if os.sys.platform == 'win32':

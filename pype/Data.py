@@ -20,7 +20,7 @@ from numpy import pi
 import pandas as pd
 
 import utils
-from constants import Mp, Mp2
+from consts import Mp, Mp2
 
 import logzero
 _lg = logzero.logger

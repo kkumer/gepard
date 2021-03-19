@@ -3,12 +3,13 @@
 #from IPython.Debugger import Tracer; debug_here = Tracer()
 
 import sys
-from math import sqrt, pi
+from math import pi, sqrt
 
-import Data, Model, Approach, utils
-
-from constants import Mp, Mp2
-
+import Approach
+import Data
+import Model
+import utils
+from consts import Mp, Mp2
 from results import *
 
 
@@ -172,12 +173,15 @@ def XSall(id, Q, lam, Ee, Ep, xB, Q2, t, phi):
         sys.exit(1)
     else:
         xstot = [th.Xunp(pt0), 0, 0, 0]
-        #print "BH2  = {}".format(th.TBH2unp(pt0))
-        #print "PreFacBH  = {}".format(th.PreFacBH(pt0))
-        #print "cBH0 = {}".format(th.cBH0unp(pt0))
-        #print "cBH1 = {}".format(th.cBH1unp(pt0))
-        #print "cBH2 = {}".format(th.cBH2unp(pt0))
-        #print "phi = {}".format(pt0.phi)
+        print("BH2  = {}".format(th.TBH2unp(pt0)))
+        print("PreFacBH  = {}".format(th.PreFacBH(pt0)))
+        print("cBH0 = {}".format(th.cBH0unp(pt0)))
+        print("cBH1 = {}".format(th.cBH1unp(pt0)))
+        print("cBH2 = {}".format(th.cBH2unp(pt0)))
+        print("PreFacSigma  = {}".format(th.PreFacSigma(pt0)))
+        print("phi = {}".format(pt0.phi))
+        print("y = {}".format(pt0.y))
+        print("s = {}".format(pt0.s))
         #print "F1 = {}".format(th.m.F1(pt0.t))
         #print "F2 = {}".format(th.m.F2(pt0.t))
         #print "t = {}".format(pt0.t)

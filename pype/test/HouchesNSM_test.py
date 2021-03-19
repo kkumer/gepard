@@ -1,11 +1,17 @@
 
-import shutil, copy, math, sys
-from nose.tools import *
+import copy
+import math
+import shutil
+import sys
+
+import Approach
+import Data
+import Fitter
+import Model
 import numpy as np
-
-import utils, Model, Approach, Data, Fitter
-
-from constants import Mp, Mp2
+import utils
+from consts import Mp, Mp2
+from nose.tools import *
 
 m = Model.ComptonGepard(ansatz='NSMHOU', q02=2.0)
 t = Approach.hotfixedBMK(m)

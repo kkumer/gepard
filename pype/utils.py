@@ -34,7 +34,7 @@ import pandas as pd
 
 import Approach
 import Data
-from constants import Mp, Mp2
+from consts import Mp, Mp2
 
 #from IPython.Debugger import Tracer; debug_here = Tracer()
 

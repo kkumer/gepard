@@ -8,7 +8,7 @@ from scipy.stats import scoreatpercentile
 import pandas as pd
 
 import utils, quadrature, Data
-from constants import *
+from consts import *
 
 
 # FIXME: This looks nonpythonic, see static class variables

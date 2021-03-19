@@ -54,6 +54,10 @@ x4name = Q2
 x4unit = GeV^2
 x4value = column2
 
+x5name = FTn
+x5unit = 1
+x5value = 0
+
 
 
 ### Data

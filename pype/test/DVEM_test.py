@@ -5,7 +5,7 @@ import numpy as np
 
 import utils, Model, Approach, Data, Fitter
 
-from constants import Mp, Mp2
+from consts import Mp, Mp2
 from results import KM10b, dvmppars
 
 # KM10b model
