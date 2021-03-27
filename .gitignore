@@ -7,6 +7,8 @@
 **/my*
 **/*prep/*.f
 **/ex/fit_*.py
+**/.mypy_cache
+**/prof
 
 # Prelim TensorFlow mod by icoric
 **/pype/*_new.py
