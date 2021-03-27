@@ -1,0 +1,11 @@
+# Aux files
+**/*.pyc
+**/my*
+**/.mypy_cache
+**/prof
+
+# Generated documentation
+docs/build/
+
+# Temporarily needed Fortran extension
+gepard/pygepard.so
