@@ -1,13 +1,12 @@
 
 import copy
 
-import numpy as np
-from nose.tools import *
-
 import Approach
 import Data
 import Model
+import numpy as np
 import utils
+from nose.tools import *
 
 data = utils.loaddata('data/ep2epgamma', approach=Approach.hotfixedBMK)  
 
@@ -47,16 +46,16 @@ pt = Data.DummyPoint()
 
 def test_CFF():
     """Calculate CFF H."""
-    pt.Q2 = 8.
+    pt.Q2 = 4.
     pt.t = -0.2
     pt.xi = 0.01
     t.m.g.parint.p = 0
     t.m.g.init()
     print((m.ReH(pt), m.ImH(pt)))
-    assert_almost_equal(m.ImH(pt)/100, 66.5255/100, 4)
-    # assert_almost_equal(m.ImH(pt)/100, 60.1622/100, 4)   # for Q2=4.
-    assert_almost_equal(m.ReH(pt)/100, 26.9984/100, 4)
-    # assert_almost_equal(m.ReH(pt)/100, 18.9540/100, 4)  # for Q2=4.
+    # assert_almost_equal(m.ImH(pt)/100, 66.5255/100, 4)
+    assert_almost_equal(m.ImH(pt)/100, 60.1622/100, 4)   # for Q2=4.
+    # assert_almost_equal(m.ReH(pt)/100, 26.9984/100, 4)
+    assert_almost_equal(m.ReH(pt)/100, 18.9540/100, 4)  # for Q2=4.
 
 test_CFF.gepardsuite = 1
 
