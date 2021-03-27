@@ -20,13 +20,11 @@ Todo:
 # from constants import tolerance2, GeVfm, Mp
 # import dispersion as DR
 
-import importlib
 import sys
 
 from numpy import array
 
-import gepard as g
-from . import pygepard as gfor
+import gepard.pygepard as gfor
 
 sys.path.append('.')
 

@@ -4,7 +4,7 @@ Todo:
     * Refactor and transfer everything from old Model.py
 """
 
-from cmath import exp, log, pi, tan
+from cmath import exp, log, pi
 from typing import List
 
 import numpy as np

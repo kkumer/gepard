@@ -13,7 +13,6 @@ sys.path.append('/home/kkumer/g')
 sys.path.append('/home/kkumer/g/gepard')
 
 
-
 data = g.utils.loaddata('/home/kkumer/gepard/pype/data/gammastarp2gammap',
                         approach=g.theory.BMK)
 
