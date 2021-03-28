@@ -84,15 +84,9 @@ def calc_wce(q2):
         * Totally non-pytonic i.e. non-numpyic, so slow!
 
     """
-    wce = []
-    for sec in range(gfor.npwmax):
-        wcepw = []
-        for k in range(int(gfor.npts)):
-            evola0 = g.evol.evola(gfor.parint.p, gfor.parint.nf,  q2, sec, k)
-            c0 = gfor.wc.wc[5, sec, k, gfor.parint.p, :2]  # CUT-OF NON-SINGLET
-            wcepw.append(np.einsum('i,ij->j', c0, evola0))
-        wce.append(np.array(wcepw))
-    return np.stack(wce)
+    evola0 = g.evolution.evolop(gfor.parint.nf,  q2)
+    c0 = gfor.wc.wc[5, :, :int(gfor.npts), 0, :2]  # CUT-OF NON-SINGLET
+    return np.einsum('ski,skij->skj', c0, evola0)
 
 
 # def _GepardFFs(self, pt, FF='cfff'):

@@ -2,7 +2,7 @@
 
 # Import what's needed into gepard's namespace
 
-import gepard.evol  # noqa: F398
+import gepard.evolution  # noqa: F398
 import gepard.evolc  # noqa: F398
 import gepard.fitter  # noqa: F401
 import gepard.gpdj  # noqa: F401
