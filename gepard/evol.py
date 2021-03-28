@@ -1,96 +1,141 @@
-"""Initialization of evolved Wilson coefficients.
+"""Components of the evolution operator mathcal{E}."""
 
-Todo:
-    Complete docoupling from Fortran
+from cmath import sqrt
+from typing import Tuple
 
-"""
-# import pickle, sys
-#
-# import logzero
-# _lg = logzero.logger
-#
-# from numpy import log, pi, imag, real, sqrt, cos, sin, exp
-# from numpy import ndarray, array, sum, loadtxt
-# import scipy.stats
-# from scipy.special import j0, j1, gamma, beta
-# from scipy.interpolate import SmoothBivariateSpline
-#
-# from quadrature import PVquadrature, bquadrature, rthtquadrature
-# from utils import flatten, hubDictNew, stringcolor
-# from constants import tolerance2, GeVfm, Mp
-# import dispersion as DR
+import numpy as np
 
-import sys
-
-from numpy import array
-
+import gepard as g
 import gepard.pygepard as gfor
 
-sys.path.append('.')
+
+def lambdaf(sec: int, k: int) -> Tuple[complex, complex]:
+    """Eigenvalues of the LO singlet anomalous dimensions matrix.
+
+    Args:
+        sec: index of SO(3) partial wave
+          k: index of point on MB contour
+
+    Returns:
+        two eigenvalues (lam_+, lam_-)
+
+    """
+    # To avoid crossing of the square root cut on the
+    # negative real axis we use trick by Dieter Mueller
+
+    # gam(sec, k, p, flav1, flav2)
+    gam = gfor.gam.gam   # pre-calculated anomalous dimensions
+
+    aux = ((gam[sec, k, 0, 0, 0] - gam[sec, k, 0, 1, 1]) *
+           sqrt(1. + 4.0 * gam[sec, k, 0, 0, 1] * gam[sec, k, 0, 1, 0] /
+                (gam[sec, k, 0, 0, 0] - gam[sec, k, 0, 1, 1])**2))
+
+    lam1 = 0.5 * (gam[sec, k, 0, 0, 0] + gam[sec, k, 0, 1, 1] - aux)
+    lam2 = lam1 + aux
+
+    return lam1, lam2
 
 
-def evol_init(p=0, scheme='MSBAR', nf=4, q02=4.0):
-    """Initialize fortran evolution code."""
-    # Choice for ansatz should be irrelevant since it is provided by Python!
-    # this was in Gepard's GEPARD.INI, which is not needed now
-    # but look at it for documentation of what parameters below are
-    # importlib.reload(gfor)  # hoping for cleanup
-    gfor.parint.speed = 1
-    gfor.parint.acc = 3
-    gfor.parint.p = p
-    gfor.parint.nf = nf
-    gfor.parint.czero = 1
-    gfor.parint.pid = 1   # FIXME: should go away somewhere
+def rnnlof(nf: int, sec: int, k: int) -> Tuple[np.ndarray, np.ndarray]:
+    """Projectors on evolution quark-gluon singlet eigenaxes.
 
-    gfor.astrong.mu02 = 2.5
-    gfor.astrong.asp = array([0.0606, 0.0518, 0.0488])
+    Also, projected NLO mu-independent R(bet*gam1 - gam0)R is returned
 
-    gfor.parflt.q02 = q02
-    gfor.parflt.rf2 = 1.0
-    gfor.parflt.rr2 = 1.0
-    gfor.parflt.rdaf2 = 1.0
-    gfor.parflt.rgpdf2 = 1.0
+    Args:
+         nf: number of active quark flavors
+        sec: index of SO(3) partial wave
+          k: index of point on MB contour
 
-    gfor.mbcont.c = 0.35
-    gfor.mbcont.phi = 1.57079632
-    gfor.mbcont.cnd = -0.25
-    gfor.mbcont.phind = 1.57
+    Returns:
+          pr: Projector pr[a,i,j]
+      r1proj: r1proj[a,b] = sum_ij pr[a,i,j] R1[i,j] pr[b,i,j]
+                 a,b in {+,-};  i,j in {Q, G}
 
-    ansatz = 'TEST'  # Irrelevant since we need only evolved Wilsons and weights!
-    gfor.parchr.ansatz = array([c for c in ansatz + (6-len(ansatz))*' '])  # array(6)
-    gfor.parchr.scheme = array([c for c in scheme + (5-len(scheme))*' '])  # array(5)
+    Todo:
+        * NLO part is not checked at all
 
-    gfor.init()
-    # number of points on MB contour
-    gfor.npts = 2**gfor.parint.acc * 12 / gfor.parint.speed
-    return gfor
+    """
+    # cf. my DIS notes p. 61
+
+    lamp, lamm = lambdaf(sec, k)
+    den = 1. / (lamp - lamm)
+
+    # P+ and P-
+    gam = gfor.gam.gam
+    prp = den * (gam[sec, k, 0, :, :] - lamm * np.identity(2))
+    prm = np.identity(2) - prp
+    pr = np.stack([prp, prm])   # full projector 3D matrix
+
+    inv = 1.0 / g.qcd.beta(0, nf)
+
+    r1 = inv * (gam[sec, k, 1, :, :] -
+                0.5 * inv * g.qcd.beta(1, nf) * gam[sec, k, 0, :, :])
+
+    r1proj = np.einsum('afg,fg,bfg->ab', pr, r1, pr)
+
+    return pr, r1proj
 
 
-# def _GepardFFs(self, pt, FF='cfff'):
-#     """Call gepard routine that calculates CFFs or TFFs."""
-#     for i in self.parameters_index:
-#         gfor.par.par[i-1] = self.parameters[self.parameters_index[i]]
-#
-#     gfor.kinematics.q2 = pt.Q2
-#     gfor.kinematics.xi = pt.xi
-#     gfor.kinematics.del1 = pt.t
-#
-#     gfor.mt.nmts = 1
-#     gfor.mt.mtind = 0
-#     gfor.mts.mts[0] = - pt.t
-#
-#     getattr(gfor, FF)()
-#     gfor.newcall = 0
-#
-# def DISF2(self, pt):
-#     """Call gepard routine that calculates DIS F2."""
-#     for i in self.parameters_index:
-#         gfor.par.par[i-1] = self.parameters[self.parameters_index[i]]
-#     gfor.parint.pid = 0
-#     gfor.kinematics.q2 = pt.Q2
-#     # Note a hack in Fortran gepard where for F2 calculation
-#     # XI should actually be xB, and not xB/2 !
-#     gfor.kinematics.xi = 2*pt.xi/(1.+pt.xi)
-#     gfor.kinematics.del2 = 0
-#     gfor.f2f()
-#     return gfor.f2.f2[gfor.parint.p]
+def erfunc(p: int, nf: int,  q2: float, sec: int, k: int) -> Tuple[complex, np.ndarray]:
+    """Parts of evolution operator dependent on q2.
+
+    Args:
+          p: pQCD order, 0=LO, 1=NLO, ...
+         nf: number of active quark flavors
+         q2: final evolution momentum squared
+        sec: index of SO(3) partial wave
+          k: index of point on MB contour
+
+    Returns:
+          (R, erfunc) where R is ratio of alpha-strongs, and erfunc is
+          array from Eq. (126) of Towards NPB paper.
+          erfunc[a, b], with a,b in [+, -]
+
+    """
+    lamp, lamm = lambdaf(sec, k)
+    b0 = g.qcd.beta(0, nf)
+
+    levi_civita = np.array([[0, 1], [-1, 0]])
+    bll = b0 * np.ones((2, 2)) + (lamp-lamm)*levi_civita
+
+    r20 = gfor.astrong.mu02  # 2.5
+    as0 = gfor.astrong.asp[0]  # 0.0606
+    q02 = gfor.parflt.q02
+
+    asmuf2 = g.qcd.as2pf(p, nf, q2, as0, r20)
+    asq02 = g.qcd.as2pf(p, nf, q02, as0, r20)
+    R = asmuf2/asq02
+
+    er1 = (1. - (1./R)**(bll/b0)) / bll
+
+    return R, er1
+
+
+def evola(p: int, nf: int,  q2: float, sec: int, k: int) -> np.ndarray:
+    """GPD evolution operator terms.
+
+    Args:
+          p: pQCD order, 0=LO, 1=NLO, ...
+         nf: number of active quark flavors
+         q2: final evolution momentum squared
+        sec: index of SO(3) partial wave
+          k: index of point on MB contour
+
+    Returns:
+          Array which is term from Eq. (121) of Towards NPB paper.
+          evola[i, j], with i,j in [Q, G]
+
+    """
+    pr, r1proj = rnnlof(nf, sec, k)
+    R, er1 = erfunc(p, nf,  q2, sec, k)
+    lamp, lamm = lambdaf(sec, k)
+    lam = np.stack([lamp, lamm])   # Should work with this all the time!
+    b0 = g.qcd.beta(0, nf)
+
+    assert p == 0   # Only LO implemented ATM
+
+    Rfact = R**(-lam/b0)
+    evola0ab = np.einsum('aij,ab->abij', pr,  np.identity(2))
+    evola0 = np.einsum('abij,b->ij', evola0ab, Rfact)
+
+    return evola0

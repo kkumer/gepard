@@ -5,7 +5,7 @@ Todo:
 """
 
 from cmath import exp, log, pi
-from typing import List
+from typing import Dict, List
 
 import numpy as np
 from joblib import Parallel, delayed
@@ -144,7 +144,7 @@ class ConformalSpaceGPD(ParameterModel):
             - Move at least evolved Wilson coeffs from Fortran.
 
         """
-        self.gfor = g.evol.evol_init(p, scheme, nf, q02)
+        self.gfor = g.evolc.evol_init(p, scheme, nf, q02)
         self.npts = int(self.gfor.npts)
         self.jpts = self.gfor.npoints.n[0, :self.npts] - 1
         self.wg = self.gfor.points.wg[:self.npts]  # Gauss integration weights
@@ -237,12 +237,11 @@ class MellinBarnesModel(ParameterModel):
         self.phi = gpds.gfor.mbcont.phi
         self.qs = gpds.gfor.qs.qs
         self.gfor = gpds.gfor   # Todo: Should only take MB contour and work with that
-        # index value 5 corresponds to index value 1 of Fortran array(-4:PIDMAX) which 
-        # corresponds to DVCS process ID
-        self.wce = self.gfor.wce.wce[5, :, :, :self.npts, :]
         self.tgj = np.tan(pi*self.jpts/2.)
         self.gpds = gpds
         self.parameters = gpds.parameters
+        # wce[q2] = wce[spw, j, a] - Wilson coeffs evolved; local to model instance
+        self.wce: Dict[float, np.ndarray] = {}
         super().__init__()
 
     def cff(self, xi: float, t: float, q2: float) -> np.ndarray:
@@ -255,15 +254,18 @@ class MellinBarnesModel(ParameterModel):
         # Evaluations depending on model parameters:
         h = self.gpds.gpd_H(xi, t)
         pw_strengths = np.array([[1., 1., 1, 1],
-                 [self.parameters['secs'], self.parameters['secg'], 0, 0],
-                 [self.parameters['this'], self.parameters['thig'], 0, 0]])
-        # This next is to make parallel execution possible:
-        if q2 in self.qs:
-            qind = np.where(self.qs[5, :] == q2)[0][0] + 1
-        else:
+                                 [self.parameters['secs'],
+                                     self.parameters['secg'], 0, 0],
+                                 [self.parameters['this'],
+                                     self.parameters['thig'], 0, 0]])
+        try:
+            wce_ar = self.wce[q2]
+        except KeyError:
+            # calculate it
             self.gfor.kinematics.q2 = q2
-            qind = self.gfor.getqind()     # qind is Fortran index
-        wce = self.wce[:, qind-1, :, :]
+            wce_ar = g.evolc.calc_wce(q2)
+            # memorize it for future
+            self.wce[q2] = wce_ar
         eph = exp(self.phi * 1j)
         cfacj = eph * np.exp((self.jpts + 1) * log(1/xi))  # eph/xi**(j+1)
         # print('pw_strengths[1, 0] = {}'.format(pw_strengths[1, 0]))
@@ -274,7 +276,11 @@ class MellinBarnesModel(ParameterModel):
         #     print('qind, qs = {} -> {}'.format(qind, self.qs[5, :4]))
         #     print('id(wce) = {}'.format(id(wce)))
         # print('h[0, 0] = {}'.format(h[0, 0]))
-        cch = np.einsum('j,sa,sja,ja->j', cfacj, pw_strengths, wce, h)
+        # cch = np.einsum('j,sa,sja,ja->j', cfacj, pw_strengths, wce, h)
+        # Temporary SEC=0 WCE with singlet part only!:
+        # cch = np.einsum('j,ja,ja->j', cfacj, wce_ar, h[:, :2])
+        # Temporary singlet part only!:
+        cch = np.einsum('j,sa,sja,ja->j', cfacj, pw_strengths[:, :2], wce_ar, h[:, :2])
         imh = chargefac * np.dot(self.wg, cch.imag)
         np.multiply(cch, self.tgj, out=cch)
         reh = chargefac * np.dot(self.wg, cch.imag)
