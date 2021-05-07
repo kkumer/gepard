@@ -3,6 +3,7 @@
 **/my*
 **/.mypy_cache
 **/prof
+**/*coverage*
 
 # Generated documentation
 docs/build/

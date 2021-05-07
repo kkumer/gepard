@@ -4,6 +4,17 @@ Maybe one should make sure they stay constant.
 Also, fixed dictionaries.
 """
 
+# QCD parameters
+CF = 4./3.
+CA = 3.0
+TF = 0.5
+
+# Parameters needed for harmonic sums etc.
+EMC = 0.5772156649
+ZETA2 = 1.6449340668
+ZETA3 = 1.2020569032
+ZETA4 = 1.0823232337
+
 Mp = 0.938272013  # proton mass
 Mp2 = Mp ** 2
 alpha = 1.0 / 137.036  # inverse of fine structure constant
