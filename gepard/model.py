@@ -144,13 +144,13 @@ class ConformalSpaceGPD(ParameterModel):
             - Move at least evolved Wilson coeffs from Fortran.
 
         """
-        self.gfor = g.evolc.evol_init(p, scheme, nf, q02)
         npoints, weights = g.quadrature.mellin_barnes()
         self.npts = len(npoints)
         self.npoints = npoints
         self.jpoints = npoints - 1
         self.wg = weights  # Gauss integration weights
-        self.q02 = 4.0
+        self.nf = nf
+        self.q02 = q02
         self.asp = np.array([0.0606, 0.0518, 0.0488])
         self.r20 = 2.5
         # Initial parameters:
@@ -180,7 +180,7 @@ class Test(ConformalSpaceGPD):
         kwargs.setdefault('nf', 3)
         kwargs.setdefault('q02', 1.0)
         super().__init__(**kwargs)
-        # self.gfor.astrong.asp = np.array([0.05, 0.05, 0.05])
+        self.nf = 3
         self.q02 = 1.0
         self.asp = np.array([0.05, 0.05, 0.05])
 
@@ -242,12 +242,10 @@ class MellinBarnesModel(ParameterModel):
         self.npoints = gpds.npoints
         self.jpoints = gpds.jpoints
         self.wg = gpds.wg
-        self.phi = gpds.gfor.mbcont.phi
-        self.qs = gpds.gfor.qs.qs
+        self.nf = gpds.nf
         self.q02 = gpds.q02
         self.asp = gpds.asp
         self.r20 = gpds.r20
-        self.gfor = gpds.gfor   # Todo: Should only take MB contour and work with that
         self.tgj = np.tan(pi*self.jpoints/2.)
         self.gpds = gpds
         self.parameters = gpds.parameters
@@ -257,7 +255,7 @@ class MellinBarnesModel(ParameterModel):
 
     def cff(self, xi: float, t: float, q2: float) -> np.ndarray:
         """Return array(ReH, ImH, ReE, ...) for kinematic point."""
-        if self.gfor.parint.nf == 3:
+        if self.nf == 3:
             chargefac = 2./9.
         else:  # nf = 4
             chargefac = 5./18.
@@ -273,16 +271,16 @@ class MellinBarnesModel(ParameterModel):
             wce_ar = self.wce[q2]
         except KeyError:
             # calculate it
-            self.gfor.kinematics.q2 = q2
-            wce_ar = g.evolc.calc_wce(self.npoints, q2, self.q02, self.asp[0], self.r20)
+            wce_ar = g.evolc.calc_wce(self.npoints, self.nf,
+                                      q2, self.q02, self.asp[0], self.r20)
             # memorize it for future
             self.wce[q2] = wce_ar
-        eph = exp(self.phi * 1j)
+        phij = 1.57079632j
+        eph = exp(phij)
         cfacj = eph * np.exp((self.jpoints + 1) * log(1/xi))  # eph/xi**(j+1)
         # print('pw_strengths[1, 0] = {}'.format(pw_strengths[1, 0]))
         # if t < -0.9:
         #     print('t, q2 = {}, {}'.format(t, q2))
-        #     print('kin_q2 = {}'.format(self.gfor.kinematics.q2))
         #     print('wce[0, 0, 0] = {}'.format(wce[0, 0, 0]))
         #     print('qind, qs = {} -> {}'.format(qind, self.qs[5, :4]))
         #     print('id(wce) = {}'.format(id(wce)))

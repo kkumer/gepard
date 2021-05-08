@@ -20,7 +20,6 @@ Todo:
 import numpy as np
 
 import gepard as g
-import gepard.pygepard as gfor
 
 
 def lambdaf(npoints: np.ndarray, nf: int) -> np.ndarray:
@@ -34,9 +33,6 @@ def lambdaf(npoints: np.ndarray, nf: int) -> np.ndarray:
     # To avoid crossing of the square root cut on the
     # negative real axis we use trick by Dieter Mueller
 
-    # gam(sec, k, p, flav1, flav2)
-    # gam = gfor.gam.gam[:, :int(gfor.npts), :, :, :]   # anomalous dimensions
-    # gam(sec, k, flav1, flav2)
     gam = g.evolc.calc_gam(npoints, nf)   # anomalous dimensions
 
     aux = ((gam[:, :, 0, 0] - gam[:, :, 1, 1]) *
@@ -72,7 +68,6 @@ def rnnlof(npoints, nf) -> np.ndarray:
     den = 1. / (lam[0, :, :] - lam[1, :, :])
 
     # P+ and P-
-    # gam = gfor.gam.gam[:, :int(gfor.npts), :, :, :]   # anomalous dimensions
     gam = g.evolc.calc_gam(npoints, nf)   # anomalous dimensions
     ssm = gam - np.einsum('sk,ij->skij', lam[1, :, :], np.identity(2))
     ssp = gam - np.einsum('sk,ij->skij', lam[0, :, :], np.identity(2))
@@ -105,12 +100,6 @@ def evolop(npoints: np.ndarray, nf: int,  q2: float, q02: float,
             i,j in [Q, G]
 
     """
-    # 1. alpha strong and LO ratio of alphas R
-    # r20 = gfor.astrong.mu02  # 2.5
-    # as0 = gfor.astrong.asp[0]  # 0.0606
-    # q02 = gfor.parflt.q02
-    print(r20, as0, q02)
-
     # FIXME: p=0 hardcoded, all p's should be done simultaneously
     asmuf2 = g.qcd.as2pf(0, nf, q2, as0, r20)
     asq02 = g.qcd.as2pf(0, nf, q02, as0, r20)
