@@ -23,6 +23,7 @@ Todo:
 import sys
 
 import numpy as np
+from scipy.special import loggamma
 
 import gepard as g
 import gepard.pygepard as gfor
@@ -70,23 +71,44 @@ def evol_init(p=0, scheme='MSBAR', nf=4, q02=4.0):
     return gfor
 
 
-def calc_wce(q2):
+def calc_wc(npoints):
+    """Calculate DVCS Wilson coeffs.
+
+    Args:
+       npoints: coordinates of MB contour
+
+    Returns:
+         wc[s,k,j]: s in range(npwmax), k in range(npts), j in [Q,G]
+
+    """
+    # LO only
+    # Shuvaev factor = 2^(J+1) Gamma(5/2+J) / Gamma(3/2) / Gamma(3+J) =
+    #   = 2^N Gamma(3/2+N) / Gamma(3/2) / Gamma(2+N)
+    wc = []
+    for pw_shift in [0, 2, 4]:
+        fshu = (2.0**(npoints + pw_shift)
+                * np.exp(loggamma(1.5 + npoints + pw_shift)
+                         - loggamma(2 + npoints + pw_shift))
+                / 0.886226925452758014)
+        quark = fshu
+        gluon = np.zeros_like(quark)
+        wc.append(np.array((quark, gluon)).transpose())
+    return np.array(wc)
+
+
+def calc_wce(q2, npoints):
     """Calculate evolved Wilson coeffs for given q2.
 
     Args:
-        sec: index of SO(3) partial wave
-         q2: final evolution scale
+            q2: final evolution scale
+       npoints: coordinates of MB contour
 
     Returns:
          wce[s,k,j]: s in range(npwmax), k in range(npts), j in [Q,G]
 
-    Todo:
-        * Totally non-pytonic i.e. non-numpyic, so slow!
-
     """
-    # DVCS WC, FIXME: to be moved somewhere else
     evola0 = g.evolution.evolop(gfor.parint.nf,  q2)
-    c0 = gfor.wc.wc[5, :, :int(gfor.npts), 0, :2]  # CUT-OF NON-SINGLET
+    c0 = calc_wc(npoints)
     return np.einsum('ski,skij->skj', c0, evola0)
 
 

@@ -145,9 +145,11 @@ class ConformalSpaceGPD(ParameterModel):
 
         """
         self.gfor = g.evolc.evol_init(p, scheme, nf, q02)
-        self.npts = int(self.gfor.npts)
-        self.jpts = self.gfor.npoints.n[0, :self.npts] - 1
-        self.wg = self.gfor.points.wg[:self.npts]  # Gauss integration weights
+        npoints, weights = g.quadrature.mellin_barnes()
+        self.npts = len(npoints)
+        self.npoints = npoints
+        self.jpoints = npoints - 1
+        self.wg = weights  # Gauss integration weights
         # Initial parameters:
         self.parameters = {'ns': 2./3. - 0.4,
                            'al0s': 1.1,
@@ -180,7 +182,7 @@ class Test(ConformalSpaceGPD):
     def gpd_H(self, eta: float, t: float) -> np.ndarray:
         """Return (4, npts) array H^a_j for 4 flavors and all j-points."""
         h = []
-        for j in self.jpts:
+        for j in self.jpoints:
             h.append(g.gpdj.test(j, t, self.parameters))
         return np.array(h)
 
@@ -198,14 +200,14 @@ class Fit(ConformalSpaceGPD):
     def gpd_H_single(self, eta: float, t: float) -> np.ndarray:
         """Return (4, npts) array H^a_j for 4 flavors and all j-points."""
         h = []
-        for j in self.jpts:
+        for j in self.jpoints:
             h.append(g.gpdj.fit(j, t, self.parameters))
         return np.array(h)
 
     def gpd_H_para(self, eta: float, t: float) -> np.ndarray:
         """Return (4, npts) array H^a_j for 4 flavors and all j-points."""
         h = Parallel(n_jobs=20)(delayed(g.gpdj.fit)(j, t, self.parameters)
-                                for j in self.jpts)
+                                for j in self.jpoints)
         return np.array(h)
 
     gpd_H = gpd_H_single  # multiprocessing version is actually slower
@@ -232,12 +234,13 @@ class MellinBarnesModel(ParameterModel):
 
         """
         self.npts = gpds.npts
-        self.jpts = gpds.jpts
+        self.npoints = gpds.npoints
+        self.jpoints = gpds.jpoints
         self.wg = gpds.wg
         self.phi = gpds.gfor.mbcont.phi
         self.qs = gpds.gfor.qs.qs
         self.gfor = gpds.gfor   # Todo: Should only take MB contour and work with that
-        self.tgj = np.tan(pi*self.jpts/2.)
+        self.tgj = np.tan(pi*self.jpoints/2.)
         self.gpds = gpds
         self.parameters = gpds.parameters
         # wce[q2] = wce[spw, j, a] - Wilson coeffs evolved; local to model instance
@@ -263,11 +266,11 @@ class MellinBarnesModel(ParameterModel):
         except KeyError:
             # calculate it
             self.gfor.kinematics.q2 = q2
-            wce_ar = g.evolc.calc_wce(q2)
+            wce_ar = g.evolc.calc_wce(q2, self.npoints)
             # memorize it for future
             self.wce[q2] = wce_ar
         eph = exp(self.phi * 1j)
-        cfacj = eph * np.exp((self.jpts + 1) * log(1/xi))  # eph/xi**(j+1)
+        cfacj = eph * np.exp((self.jpoints + 1) * log(1/xi))  # eph/xi**(j+1)
         # print('pw_strengths[1, 0] = {}'.format(pw_strengths[1, 0]))
         # if t < -0.9:
         #     print('t, q2 = {}, {}'.format(t, q2))
