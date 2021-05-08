@@ -1,57 +1,80 @@
-"""Quadrature formulas."""
+"""Quadrature formulas, abscissas and weights."""
 
-from numpy import sum, ones, add, diff, isinf, isscalar, \
-     asarray, real, trapz, arange, empty, ndarray
+from typing import Tuple
 
+import numpy as np
 from scipy.special.orthogonal import p_roots
 
-[roots4, weights4] = p_roots(4)  # roots and weigths for 4-th order quadrature
-roots4 = real(roots4)
+roots4, weights4 = p_roots(4)  # roots and weigths for 4-th order quadrature
 
-[roots5, weights5] = p_roots(5)  # roots and weigths for 5-th order quadrature
-roots5 = real(roots5)
+roots5, weights5 = p_roots(5)
 
-[roots10, weights10] = p_roots(10)  # roots and weigths for 10-th order quadrature
-roots10 = real(roots10)
+roots10, weights10 = p_roots(10)
 
-[roots18, weights18] = p_roots(18)  # roots and weigths for 10-th order quadrature
-roots18 = real(roots18)
+roots18, weights18 = p_roots(18)
 
-[roots35, weights35] = p_roots(35)  # roots and weigths for 35-th order quadrature
-roots35 = real(roots35)
+roots35, weights35 = p_roots(35)
 
-[roots81, weights81] = p_roots(81)  # roots and weigths for 81-th order quadrature
-roots81 = real(roots81)
+roots81, weights81 = p_roots(81)
+
+
+def mellin_barnes(accuracy: int = 3) -> Tuple[np.ndarray, np.ndarray]:
+    """Construct basic MB array.
+
+    Args:
+        accuracy: 2*accuracy points per interval
+
+    Returns:
+        (complex coordinates of MB contour, integration weighths)
+
+    """
+    c = 0.35
+    phij = 1.57079632j
+    roots, weights = p_roots(2**accuracy)
+    division = np.array([0., 0.01, 0.08, 0.15, 0.3, 0.5, 1.0,
+                         1.5, 2.0, 4.0, 6.0, 8.0, 10.0])
+    summ = division[1:] + division[:-1]
+    diff = division[1:] - division[:-1]
+    x = []
+    wg = []
+    dv = 0
+    for dv in range(len(division)-1):
+        x.append((diff[dv]*roots + summ[dv])/2)
+        wg.append(diff[dv]*weights/2)
+        x_array = np.array(x).flatten()
+        wg_array = np.array(wg).flatten()
+    n_array = c + 1 + x_array * np.exp(phij)
+    return n_array, wg_array
 
 def quadSciPy81(func,a,b,args=()):
     """Compute a definite integral using 81-order Gaussian quadrature.
     Adapted from scipy."""
     y = (b-a)*(roots81+1)/2.0 + a
-    return (b-a)/2.0*sum(weights81*func(y,*args),0)
+    return (b-a)/2.0*np.sum(weights81*func(y,*args),0)
 
 def quadSciPy35(func,a,b,args=()):
     """Compute a definite integral using 35-order Gaussian quadrature.
     Adapted from scipy."""
     y = (b-a)*(roots35+1)/2.0 + a
-    return (b-a)/2.0*sum(weights35*func(y,*args),0)
+    return (b-a)/2.0*np.sum(weights35*func(y,*args),0)
 
 def quadSciPy18transposed(func,a,b,args=()):
     """Compute a definite integral using 18-order Gaussian quadrature.
     Adapted from scipy."""
     y = (b-a)*(roots18+1)/2.0 + a
-    return (b-a)/2.0*sum((weights18*func(y,*args)).transpose(),0)
+    return (b-a)/2.0*np.sum((weights18*func(y,*args)).transpose(),0)
 
 def quadSciPy10(func,a,b,args=()):
     """Compute a definite integral using tenth-order Gaussian quadrature.
     Adapted from scipy."""
     y = (b-a)*(roots10+1)/2.0 + a
-    return (b-a)/2.0*sum(weights10*func(y,*args),0)
+    return (b-a)/2.0*np.sum(weights10*func(y,*args),0)
 
 def quadSciPy10transposed(func,a,b,args=()):
     """Compute a definite integral using fifth-order Gaussian quadrature.
     Adapted from scipy."""
     y = (b-a)*(roots10+1)/2.0 + a
-    return (b-a)/2.0*sum((weights10*func(y,*args)).transpose(),0)
+    return (b-a)/2.0*np.sum((weights10*func(y,*args)).transpose(),0)
 
 def quad10(func,a,b,args=()):
     """Compute a definite integral using tenth-order Gaussian quadrature.

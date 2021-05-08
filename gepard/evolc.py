@@ -84,6 +84,7 @@ def calc_wce(q2):
         * Totally non-pytonic i.e. non-numpyic, so slow!
 
     """
+    # DVCS WC, FIXME: to be moved somewhere else
     evola0 = g.evolution.evolop(gfor.parint.nf,  q2)
     c0 = gfor.wc.wc[5, :, :int(gfor.npts), 0, :2]  # CUT-OF NON-SINGLET
     return np.einsum('ski,skij->skj', c0, evola0)
