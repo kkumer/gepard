@@ -114,7 +114,7 @@ def calc_wc(npoints):
     return np.array(wc)
 
 
-def calc_wce(q2, npoints):
+def calc_wce(npoints, q2, q02, as0, r20):
     """Calculate evolved Wilson coeffs for given q2.
 
     Args:
@@ -125,7 +125,7 @@ def calc_wce(q2, npoints):
          wce[s,k,j]: s in range(npwmax), k in range(npts), j in [Q,G]
 
     """
-    evola0 = g.evolution.evolop(npoints, gfor.parint.nf,  q2)
+    evola0 = g.evolution.evolop(npoints, gfor.parint.nf, q2, q02, as0, r20)
     c0 = calc_wc(npoints)
     return np.einsum('ski,skij->skj', c0, evola0)
 

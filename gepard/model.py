@@ -150,6 +150,9 @@ class ConformalSpaceGPD(ParameterModel):
         self.npoints = npoints
         self.jpoints = npoints - 1
         self.wg = weights  # Gauss integration weights
+        self.q02 = 4.0
+        self.asp = np.array([0.0606, 0.0518, 0.0488])
+        self.r20 = 2.5
         # Initial parameters:
         self.parameters = {'ns': 2./3. - 0.4,
                            'al0s': 1.1,
@@ -177,7 +180,9 @@ class Test(ConformalSpaceGPD):
         kwargs.setdefault('nf', 3)
         kwargs.setdefault('q02', 1.0)
         super().__init__(**kwargs)
-        self.gfor.astrong.asp = np.array([0.05, 0.05, 0.05])
+        # self.gfor.astrong.asp = np.array([0.05, 0.05, 0.05])
+        self.q02 = 1.0
+        self.asp = np.array([0.05, 0.05, 0.05])
 
     def gpd_H(self, eta: float, t: float) -> np.ndarray:
         """Return (4, npts) array H^a_j for 4 flavors and all j-points."""
@@ -239,6 +244,9 @@ class MellinBarnesModel(ParameterModel):
         self.wg = gpds.wg
         self.phi = gpds.gfor.mbcont.phi
         self.qs = gpds.gfor.qs.qs
+        self.q02 = gpds.q02
+        self.asp = gpds.asp
+        self.r20 = gpds.r20
         self.gfor = gpds.gfor   # Todo: Should only take MB contour and work with that
         self.tgj = np.tan(pi*self.jpoints/2.)
         self.gpds = gpds
@@ -266,7 +274,7 @@ class MellinBarnesModel(ParameterModel):
         except KeyError:
             # calculate it
             self.gfor.kinematics.q2 = q2
-            wce_ar = g.evolc.calc_wce(q2, self.npoints)
+            wce_ar = g.evolc.calc_wce(self.npoints, q2, self.q02, self.asp[0], self.r20)
             # memorize it for future
             self.wce[q2] = wce_ar
         eph = exp(self.phi * 1j)

@@ -89,7 +89,8 @@ def rnnlof(npoints, nf) -> np.ndarray:
     return pr   # , r1proj
 
 
-def evolop(npoints: np.ndarray, nf: int,  q2: float) -> np.ndarray:
+def evolop(npoints: np.ndarray, nf: int,  q2: float, q02: float,
+           as0: float, r20: float) -> np.ndarray:
     """GPD evolution operator.
 
     Args:
@@ -105,9 +106,10 @@ def evolop(npoints: np.ndarray, nf: int,  q2: float) -> np.ndarray:
 
     """
     # 1. alpha strong and LO ratio of alphas R
-    r20 = gfor.astrong.mu02  # 2.5
-    as0 = gfor.astrong.asp[0]  # 0.0606
-    q02 = gfor.parflt.q02
+    # r20 = gfor.astrong.mu02  # 2.5
+    # as0 = gfor.astrong.asp[0]  # 0.0606
+    # q02 = gfor.parflt.q02
+    print(r20, as0, q02)
 
     # FIXME: p=0 hardcoded, all p's should be done simultaneously
     asmuf2 = g.qcd.as2pf(0, nf, q2, as0, r20)
