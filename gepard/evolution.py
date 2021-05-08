@@ -23,7 +23,7 @@ import gepard as g
 import gepard.pygepard as gfor
 
 
-def lambdaf() -> np.ndarray:
+def lambdaf(npoints: np.ndarray, nf: int) -> np.ndarray:
     """Eigenvalues of the LO singlet anomalous dimensions matrix.
 
     Returns:
@@ -35,17 +35,19 @@ def lambdaf() -> np.ndarray:
     # negative real axis we use trick by Dieter Mueller
 
     # gam(sec, k, p, flav1, flav2)
-    gam = gfor.gam.gam[:, :int(gfor.npts), :, :, :]   # anomalous dimensions
+    # gam = gfor.gam.gam[:, :int(gfor.npts), :, :, :]   # anomalous dimensions
+    # gam(sec, k, flav1, flav2)
+    gam = g.evolc.calc_gam(npoints, nf)   # anomalous dimensions
 
-    aux = ((gam[:, :, 0, 0, 0] - gam[:, :, 0, 1, 1]) *
-           np.sqrt(1. + 4.0 * gam[:, :, 0, 0, 1] * gam[:, :, 0, 1, 0] /
-           (gam[:, :, 0, 0, 0] - gam[:, :, 0, 1, 1])**2))
-    lam1 = 0.5 * (gam[:, :, 0, 0, 0] + gam[:, :, 0, 1, 1] - aux)
+    aux = ((gam[:, :, 0, 0] - gam[:, :, 1, 1]) *
+           np.sqrt(1. + 4.0 * gam[:, :, 0, 1] * gam[:, :, 1, 0] /
+           (gam[:, :, 0, 0] - gam[:, :, 1, 1])**2))
+    lam1 = 0.5 * (gam[:, :, 0, 0] + gam[:, :, 1, 1] - aux)
     lam2 = lam1 + aux
     return np.stack([lam1, lam2])
 
 
-def rnnlof(nf) -> np.ndarray:
+def rnnlof(npoints, nf) -> np.ndarray:
     """Projectors on evolution quark-gluon singlet eigenaxes.
 
     Also, projected NLO mu-independent R(bet*gam1 - gam0)R is implemented
@@ -66,13 +68,14 @@ def rnnlof(nf) -> np.ndarray:
     """
     # cf. my DIS notes p. 61
 
-    lam = lambdaf()
+    lam = lambdaf(npoints, nf)
     den = 1. / (lam[0, :, :] - lam[1, :, :])
 
     # P+ and P-
-    gam = gfor.gam.gam[:, :int(gfor.npts), :, :, :]   # anomalous dimensions
-    ssm = gam[:, :, 0, :, :] - np.einsum('sk,ij->skij', lam[1, :, :], np.identity(2))
-    ssp = gam[:, :, 0, :, :] - np.einsum('sk,ij->skij', lam[0, :, :], np.identity(2))
+    # gam = gfor.gam.gam[:, :int(gfor.npts), :, :, :]   # anomalous dimensions
+    gam = g.evolc.calc_gam(npoints, nf)   # anomalous dimensions
+    ssm = gam - np.einsum('sk,ij->skij', lam[1, :, :], np.identity(2))
+    ssp = gam - np.einsum('sk,ij->skij', lam[0, :, :], np.identity(2))
     prp = np.einsum('sk,skij->skij', den, ssm)
     prm = np.einsum('sk,skij->skij', -den, ssp)
     pr = np.stack([prp, prm], axis=2)
@@ -86,7 +89,7 @@ def rnnlof(nf) -> np.ndarray:
     return pr   # , r1proj
 
 
-def evolop(nf: int,  q2: float) -> np.ndarray:
+def evolop(npoints: np.ndarray, nf: int,  q2: float) -> np.ndarray:
     """GPD evolution operator.
 
     Args:
@@ -112,7 +115,7 @@ def evolop(nf: int,  q2: float) -> np.ndarray:
     R = asmuf2/asq02
 
     # 2. errfunc
-    lam = lambdaf()
+    lam = lambdaf(npoints, nf)
     b0 = g.qcd.beta(0, nf)
     levi_civita = np.array([[0, 1], [-1, 0]])
     bll = np.einsum('sk,ij->skij', lam[0, :, :] - lam[1, :, :], levi_civita)
@@ -120,7 +123,7 @@ def evolop(nf: int,  q2: float) -> np.ndarray:
     # er1 = (np.ones_like(bll) - (1./R)**(bll/b0)) / bll  # NLO
 
     # 3. LO evolution op
-    pr = rnnlof(nf)
+    pr = rnnlof(npoints, nf)
 
     Rfact = R**(-lam/b0)
     evola0ab = np.einsum('skaij,ab->skabij', pr,  np.identity(2))

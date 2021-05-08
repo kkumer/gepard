@@ -71,6 +71,24 @@ def evol_init(p=0, scheme='MSBAR', nf=4, q02=4.0):
     return gfor
 
 
+def calc_gam(npoints, nf):
+    """Calculate (singlet) anomalous dimensions
+
+    Args:
+       npoints: coordinates of MB contour
+            nf: number of active quark flavors
+
+    Returns:
+         gam[s,k,i,j]: s in range(npwmax), k in range(npts), i,j in [Q,G]
+
+    """
+    # LO only
+    gam = []
+    for pw_shift in [0, 2, 4]:
+        gam.append(g.adim.singlet(npoints+pw_shift, 0, nf, 1).transpose(2, 0, 1))
+    return np.array(gam)
+
+
 def calc_wc(npoints):
     """Calculate DVCS Wilson coeffs.
 
@@ -107,7 +125,7 @@ def calc_wce(q2, npoints):
          wce[s,k,j]: s in range(npwmax), k in range(npts), j in [Q,G]
 
     """
-    evola0 = g.evolution.evolop(gfor.parint.nf,  q2)
+    evola0 = g.evolution.evolop(npoints, gfor.parint.nf,  q2)
     c0 = calc_wc(npoints)
     return np.einsum('ski,skij->skj', c0, evola0)
 

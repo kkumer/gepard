@@ -11,7 +11,7 @@ n_test = 1.11 + 1.7j
 
 def test_wgammaNS():
     """Test NS+ at LO."""
-    assert g.adim.NS(n_test, 0, 3, 1) == approx(
+    assert g.adim.non_singlet(n_test, 0, 3, 1) == approx(
             3.663142570252238+4.775593439086258j)
 
 
