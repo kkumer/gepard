@@ -27,6 +27,8 @@ Todo:
 
 from math import log
 
+from gepard.constants import CA, CF, TF
+
 
 def beta(p: int, nf: int) -> float:
     """QCD beta function coefficient.
@@ -43,11 +45,6 @@ def beta(p: int, nf: int) -> float:
         -9.0
 
     """
-    # Colour factors
-
-    CF = 4.0/3.0
-    CA = 3.0
-    TF = 0.5
 
     B00 = 11./3. * CA
     B01 = -4./3. * TF
@@ -63,7 +60,7 @@ def beta(p: int, nf: int) -> float:
     elif p == 3:
         beta = - 29243.0 + 6946.30 * nf - 405.089 * nf**2 - 1.49931 * nf**3
     else:
-        raise ValueError('N^5LO not yet implemented :-)')
+        raise ValueError('NNNNLO not yet implemented :-)')
 
     return beta
 
