@@ -144,15 +144,18 @@ class ConformalSpaceGPD(ParameterModel):
             - Move at least evolved Wilson coeffs from Fortran.
 
         """
+        self.p = p
+        self.scheme = scheme
+        self.nf = nf
+        self.q02 = q02
+        # alpha_strong/(2*pi) at scale r0^2
+        self.asp = np.array([0.0606, 0.0518, 0.0488])
+        self.r20 = 2.5
         npoints, weights = g.quadrature.mellin_barnes()
         self.npts = len(npoints)
         self.npoints = npoints
         self.jpoints = npoints - 1
         self.wg = weights  # Gauss integration weights
-        self.nf = nf
-        self.q02 = q02
-        self.asp = np.array([0.0606, 0.0518, 0.0488])
-        self.r20 = 2.5
         # Initial parameters:
         self.parameters = {'ns': 2./3. - 0.4,
                            'al0s': 1.1,
@@ -183,6 +186,7 @@ class Test(ConformalSpaceGPD):
         self.nf = 3
         self.q02 = 1.0
         self.asp = np.array([0.05, 0.05, 0.05])
+        self.r20 = 2.5
 
     def gpd_H(self, eta: float, t: float) -> np.ndarray:
         """Return (4, npts) array H^a_j for 4 flavors and all j-points."""
@@ -238,17 +242,19 @@ class MellinBarnesModel(ParameterModel):
             for some longer time.)
 
         """
-        self.npts = gpds.npts
-        self.npoints = gpds.npoints
-        self.jpoints = gpds.jpoints
-        self.wg = gpds.wg
+        self.p = gpds.p
+        self.scheme = gpds.scheme
         self.nf = gpds.nf
         self.q02 = gpds.q02
         self.asp = gpds.asp
         self.r20 = gpds.r20
-        self.tgj = np.tan(pi*self.jpoints/2.)
+        self.npts = gpds.npts
+        self.npoints = gpds.npoints
+        self.jpoints = gpds.jpoints
+        self.wg = gpds.wg
         self.gpds = gpds
         self.parameters = gpds.parameters
+        self.tgj = np.tan(pi*self.jpoints/2.)
         # wce[q2] = wce[spw, j, a] - Wilson coeffs evolved; local to model instance
         self.wce: Dict[float, np.ndarray] = {}
         super().__init__()
@@ -271,8 +277,7 @@ class MellinBarnesModel(ParameterModel):
             wce_ar = self.wce[q2]
         except KeyError:
             # calculate it
-            wce_ar = g.evolc.calc_wce(self.npoints, self.nf,
-                                      q2, self.q02, self.asp[0], self.r20)
+            wce_ar = g.evolc.calc_wce(self, q2)
             # memorize it for future
             self.wce[q2] = wce_ar
         phij = 1.57079632j

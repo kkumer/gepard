@@ -23,7 +23,7 @@ Todo:
 import sys
 
 import numpy as np
-from scipy.special import loggamma
+from scipy.special import loggamma  # type: ignore
 
 import gepard as g
 
@@ -31,7 +31,7 @@ sys.path.append('.')
 
 
 def calc_gam(npoints, nf):
-    """Calculate (singlet) anomalous dimensions
+    """Calculate (singlet) anomalous dimensions.
 
     Args:
        npoints: coordinates of MB contour
@@ -73,7 +73,7 @@ def calc_wc(npoints):
     return np.array(wc)
 
 
-def calc_wce(npoints, nf, q2, q02, as0, r20):
+def calc_wce(m, q2: float):
     """Calculate evolved Wilson coeffs for given q2.
 
     Args:
@@ -84,6 +84,9 @@ def calc_wce(npoints, nf, q2, q02, as0, r20):
          wce[s,k,j]: s in range(npwmax), k in range(npts), j in [Q,G]
 
     """
-    evola0 = g.evolution.evolop(npoints, nf, q2, q02, as0, r20)
-    c0 = calc_wc(npoints)
+    # Instead of type hint (which leads to circular import for some reason)
+    if not isinstance(m, g.model.MellinBarnesModel):
+        raise Exception("{} is not of type MellinBarnesModel".format(m))
+    evola0 = g.evolution.evolop(m.npoints, m.nf, q2, m.q02, m.asp[m.p], m.r20)
+    c0 = calc_wc(m.npoints)
     return np.einsum('ski,skij->skj', c0, evola0)
