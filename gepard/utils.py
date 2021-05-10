@@ -22,7 +22,7 @@ import re
 import numpy as np
 
 import gepard as g
-from gepard.constants import Mp, Mp2
+from gepard.constants import Mp2
 
 
 class KinematicsError(Exception):
@@ -30,11 +30,11 @@ class KinematicsError(Exception):
 
 
 def loaddata(datadir='data', approach=False):
-    """Return dictionary {id : `DataSet`, ...}  out of datadir/*dat files.
-    
+    """Return dictionary {id : DataSet, ...}  out of files in datadir.
+
     approach defines conventions for frame, kinematics etc. to which data
     is adapted.
-    
+
     """
     data = {}
     for file in os.listdir(datadir):
@@ -45,6 +45,7 @@ def loaddata(datadir='data', approach=False):
                 [pt.prepare(approach) for pt in dataset]
             data[dataset.id] = dataset
     return data
+
 
 def _complete_xBWQ2(kin):
     """Make trio {xB, W, Q2} complete if two of them are given in 'kin'."""
@@ -58,6 +59,7 @@ def _complete_xBWQ2(kin):
         raise KinematicsError('Exactly two of {xB, W, Q2} should be given.')
     return
 
+
 def _complete_tmt(kin):
     """Make duo {t, tm} complete if one of them is given in 'kin'."""
     if 't' in kin and 'tm' not in kin:
@@ -70,9 +72,10 @@ def _complete_tmt(kin):
         raise KinematicsError('Exactly one of {t, tm} should be given.')
     return
 
+
 def fill_kinematics(kin, old={}):
     """Return complete up-to-date kinematical dictionary.
-    
+
     Complete set of kinematical variables is {xB, t, Q2, W, s, xi, tm, phi}.
     Using standard identities, missing values are calculated, if possible, first
     solely from values given in 'kin', and then, second, using values in 'old',
@@ -129,13 +132,13 @@ def parse(datafile):
 
     `preamble` is dictionary obtained by converting datafile preamble
     items into dictionary items like this:
+
         y1 = BCA from datafile goes into   {'y1' : 'BCA', ...}
 
     `data` is actual numerical grid of experimental data converted 
     into list of lists
-    
-    """
 
+    """
     # [First] parsing the formatted ASCII file
     desc = {}   # description preamble (reference, kinematics, ...)
     data = []   # actual data grid  x1 x2  ... y1 dy1_stat dy1_syst ...
@@ -296,26 +299,27 @@ def listdata(ids, data):
         except KeyError:
             pass
 
+
 def listchis(ths, Q2cut=1., Q2max=1.e3, nsets=10, out='chis'):
     """Compare theories for subsets of data.
-    
-    What is printed out depends on 'out' keyword argument:
-     'chis'  --  chisquares
-    'probs'  --  probabilities of chisquares
-    'pulls'  --  sum((th-exp)/err)/sqrt(size)
 
+    What is printed out depends on 'out' keyword argument:
+    'chis':  chisquares
+    'probs':  probabilities of chisquares
+    'pulls':  sum((th-exp)/err)/sqrt(size)
     """
     if not isinstance(ths, list): ths = [ths]
-    from abbrevs import H1ZEUS, ALUIpts, BCApts, CLASpts, BSDwpoints, BSSwpoints,\
-            AULpts, ALLpts, AUTIpts, CLAS14BSApts, CLAS14TSApts, CLAS14BTSApts,\
-            BSACLAS_KKpoints, UNP5points, ALTGLO5points,\
-            BSACLAS_DMpoints, CLASTSApts,\
-            AUTICSpts, CLASKKpts, AUTDVCSpts, H_AULpts, C_AULpts,\
-            H_BSDwpts, H_BSSw0pts, H_BSSw1pts,\
-            H17_BSDwpts, H17_BSSw0pts, H17_BSSw1pts,\
-            H_BSDpts, H_BSS0pts, H_BSS1pts,\
-            C_BSDwpts, C_BSSw0pts, C_BSSw1pts, H_BSD, H_BSS,\
-            C_BSD, C_BSS, H20_nBSSw0pts, H20_nBSSw1pts
+    from abbrevs import (C_BSD, C_BSS, H1ZEUS, H_BSD, H_BSS, ALLpts,
+                         ALTGLO5points, ALUIpts, AULpts, AUTDVCSpts, AUTICSpts,
+                         AUTIpts, BCApts, BSACLAS_DMpoints, BSACLAS_KKpoints,
+                         BSDwpoints, BSSwpoints, C_AULpts, C_BSDwpts,
+                         C_BSSw0pts, C_BSSw1pts, CLAS14BSApts, CLAS14BTSApts,
+                         CLAS14TSApts, CLASKKpts, CLASpts, CLASTSApts,
+                         H17_BSDwpts, H17_BSSw0pts, H17_BSSw1pts,
+                         H20_nBSSw0pts, H20_nBSSw1pts, H_AULpts, H_BSDpts,
+                         H_BSDwpts, H_BSS0pts, H_BSS1pts, H_BSSw0pts,
+                         H_BSSw1pts, UNP5points)
+
     #exps[0] = ['UNP5points', 'ALTGLO5', 'CLAS', 'CLASDM', 'BSDw', 'BSSw', 'TSA1', 'BTSA', 'TPpoints']
     #ptssets[0] = [UNP5points, ALTGLO5points, data[25], data[8], BSDwpoints, BSSwpoints, TSA1points, BTSApoints, TPpoints]
     sets = {}

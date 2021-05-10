@@ -6,7 +6,7 @@
 import numpy as np
 
 from gepard.constants import CA, CF, TF
-from gepard.harmonic import S1
+from gepard.special import S1
 
 
 def non_singlet(n: complex, p: int, nf: int, prty: int) -> complex:

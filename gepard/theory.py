@@ -91,15 +91,16 @@ class Theory(object):
     def predict(self, pt, error=False, CL=False, **kwargs):
         """Give prediction for DataPoint pt.
 
-        Keyword arguments:
-        error - if available, produce tuple (mean, error)
-        CL - (NNet only) error is not std.dev., but 68% C.L. (mean, errplus, errminus)
-        observable - string. Default is pt.yaxis. It is acceptable also
-                     to pass CFF as observable, e.g., observable = 'ImH'
-        parameters - dictionary which will temporarily update model's one
-        orig_conventions - give prediction using original conventions of
-                           the given DataPoint (e.g. for plotting)
-
+        Args:
+            pt: instance of DataPoint
+            error: if available, produce tuple (mean, error)
+            CL: (NNet only) error is not std.dev.,
+                but 68% C.L. (mean, errplus, errminus)
+            observable: string. Default is pt.yaxis. It is acceptable also
+                        to pass CFF as observable, e.g., observable = 'ImH'
+            parameters: dictionary which will temporarily update model's one
+            orig_conventions: give prediction using original conventions of
+                              the given DataPoint (e.g. for plotting)
         """
         m = self.model
         if 'observable' in kwargs:

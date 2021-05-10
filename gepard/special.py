@@ -1,10 +1,12 @@
 """Special functions of complex arguments.
 
 poch: Pochhammer symbol
+  S1: harmonic sum
 """
 
-# from cmath import exp
-# from scipy.special import loggamma as clngamma
+from scipy.special import psi   # type: ignore
+
+from gepard.constants import EMC
 
 
 def pochhammer(z: complex, m: int) -> complex:
@@ -26,3 +28,11 @@ def pochhammer(z: complex, m: int) -> complex:
     for k in range(1, m):
         p = p * (z + k)
     return p
+
+
+def S1(z: complex) -> complex:
+    """Harmonic sum S_1."""
+
+    S1 = EMC + psi(z+1)
+
+    return S1

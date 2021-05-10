@@ -59,8 +59,7 @@ class DummyPoint(dict):
 
 
 class DataPoint(DummyPoint):
-
-    """Experimental measurement point
+    """Experimental measurement point.
 
     All necessary information about kinematics, is contained in attributes. E.g.
 
@@ -73,10 +72,9 @@ class DataPoint(DummyPoint):
     `err` --  `stat` and `syst` added in quadrature
     `errplus` --  total positive error
     `errplus` --  total negative error
-     ...
 
     Information that is common to all data of a given dataset (i.e.
-    which is contained in a preamble of datafile is accessible 
+    which is contained in a preamble of datafile is accessible
     via `dataset` attribute:
 
     `dataset.yaxis` -- name of observable measured
@@ -84,31 +82,27 @@ class DataPoint(DummyPoint):
     `dataset.collaboration` -- name of experimenatal collaboration
     `dataset.units` -- dictionary with pysical units of variables
     `dataset.newunits` -- dictionary with internal pysical units of variables
-     ...
 
-    For user's and programmer's convenience, these `dataset` attributes 
-    are also inherited by `DataPoint` objects, so 
-        point.dataset.yaxis == point.yaxis 
+    For user's and programmer's convenience, these `dataset` attributes
+    are also inherited by `DataPoint` objects, so `point.dataset.yaxis == point.yaxis`
     (Is this type of inheritance, know also as "aquisition", good idea?)
-
-    """ 
+    """
 
     def __init__(self, gridline, dataset):
-        """Take data gridline, construct `DataPoint` object and append it to dataset
+        """Take data gridline, construct `DataPoint` object and append it to dataset.
 
         `gridline` is a list constructed from one row of data grid in data file.
         It is assumed that data gridline is of the form:
 
-              x1  x2 ....   y1  y1stat y1syst  
+              x1  x2 ....   y1  y1stat y1syst
 
         where y1syst need not be present, or can have one or two values, syst+ and syst-
 
         (Further elements are ignored.)
         `dataset` is container `DataSet` that is to contain this `DataPoint`
         FIXME: this passing of higher-level DataSet as argument sounds wrong!
-                (See comment about aquisition in class docstring.|
+        (See comment about aquisition in class docstring.)
         """
-
         # from https://stackoverflow.com/questions/4984647/
         # we want accessibility via both attributes and dict keys
         super(DataPoint, self).__init__()
@@ -205,11 +199,10 @@ class DataPoint(DummyPoint):
 
 
 class DataSet(list):
-
     """A container for `DataPoint` instances.
 
     Information that is common to all data of a given dataset (i.e.
-    which is contained in a preamble of datafile is accessible 
+    which is contained in a preamble of datafile is accessible
     via attributes:
 
     `yaxis` -- name of observable measured
@@ -217,13 +210,10 @@ class DataSet(list):
     `collaboration` -- name of experimenatal collaboration
     `units` -- dictionary with pysical units of variables
     `newunits` -- dictionary with internal pysical units of variables
-     ...
 
     """
-
     def __init__(self, datapoints=None, datafile=None):
-        """Either take explicit list of `DataPoint`s or get them by parsing datafile."""
-
+        """Either take explicit list of DataPoints or get them by parsing datafile."""
         if datapoints:
             list.__init__(self, datapoints)
         else:

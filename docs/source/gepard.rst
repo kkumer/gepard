@@ -8,44 +8,99 @@ gepard package
        import gepard as g
    
 
-data module
-------------------
+1. Processes
+------------
 
-.. automodule:: gepard.data
+theory module
+^^^^^^^^^^^^^
 
-
-qj module
-----------------
-
-.. automodule:: gepard.qj
+.. automodule:: gepard.theory
 
 
-gpdj module
-----------------
-
-.. automodule:: gepard.gpdj
-
-
-evol module
-----------------
-
-.. automodule:: gepard.evol
-
+2. Models
+---------
 
 model module
-----------------
+^^^^^^^^^^^^
 
 .. automodule:: gepard.model
    :noindex:
 
+gpdj module
+^^^^^^^^^^^
+
+.. automodule:: gepard.gpdj
+
+
+qj module
+^^^^^^^^^
+
+.. automodule:: gepard.qj
+
+
+3. Perturbative QCD
+-------------------
+
+evolc module
+^^^^^^^^^^^^
+
+.. automodule:: gepard.evolc
+
+
+adim module
+^^^^^^^^^^^
+
+.. automodule:: gepard.adim
+
+
+evolution module
+^^^^^^^^^^^^^^^^
+
+.. automodule:: gepard.evolution
+
+
+qcd module
+^^^^^^^^^^
+
+.. automodule:: gepard.qcd
+
+
+4. Fitting
+----------
+
+fitter module
+^^^^^^^^^^^^^
+
+.. automodule:: gepard.fitter
+
+
+5. Utilites
+-----------
+
+data module
+^^^^^^^^^^^
+
+.. automodule:: gepard.data
+
 
 special module
----------------------
+^^^^^^^^^^^^^^
 
 .. automodule:: gepard.special
 
 
+quadrature module
+^^^^^^^^^^^^^^^^^
+
+.. automodule:: gepard.quadrature
+
+utils module
+^^^^^^^^^^^^
+
+.. automodule:: gepard.utils
+
+
 constants module
------------------------
+^^^^^^^^^^^^^^^^
 
 .. automodule:: gepard.constants

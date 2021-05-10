@@ -93,11 +93,11 @@ def evolop(npoints: np.ndarray, nf: int,  q2: float, q02: float,
          q2: final evolution momentum squared
 
     Returns:
-          Array corresponding Eq. (121) of Towards NPB paper.
-          evolop[s, k, i, j]
-            s is index of SO(3) partial wave,
-            k is index of point on MB contour,
-            i,j in [Q, G]
+         Array corresponding Eq. (121) of Towards NPB paper.
+         evolop[s, k, i, j]
+         -  s is index of SO(3) partial wave,
+         -  k is index of point on MB contour,
+         -  i,j in [Q, G]
 
     """
     # FIXME: p=0 hardcoded, all p's should be done simultaneously

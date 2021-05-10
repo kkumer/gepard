@@ -1,11 +1,17 @@
-"""Perturbative QCD functions.
+r"""Perturbative QCD functions.
 
-Coefficients of beta function of QCD up to order alpha_s^5 (N^3LO),
+Coefficients of beta function of QCD up to order :math:`\alpha_s^5` (NNNLO),
 normalized by
 
-     d a_s / d ln mu_r^2  =   BETA0 a_s^2 + BETA1 a_s^3 + ...
+.. math::
 
-with  a_s = alpha_s/(4*pi).
+     \frac{d a_s}{d \ln \mu_r^2}  =   \beta_0 a_s^2 + \beta_1 a_s^3 + \cdots
+
+with
+
+.. math::
+
+    a_s = \frac{\alpha_{s}}{4\pi}.
 
 Beyond NLO the QCD colour factors are hard-wired in this routine,
 and the numerical coefficients are truncated to six digits.
@@ -26,8 +32,8 @@ def beta(p: int, nf: int) -> float:
     """QCD beta function coefficient.
 
     Args:
-        p (int): pQCD order, 0=LO, 1=NLO, ...
-       nf (int): number of active quark flavors
+        p (int): pQCD order, 0=LO, 1=NLO, 2=NNLO
+        nf (int): number of active quark flavors
 
     Returns:
         float: QCD beta function coefficient
@@ -66,11 +72,11 @@ def as2pf(p: int, nf: int,  r2: float, as0: float, r20: float) -> float:
     """QCD beta function coefficient.
 
     Args:
-        p: pQCD order, 0=LO, 1=NLO, ...
-       nf: number of active quark flavors
-       r2: final momentum scale squared
-      as0: initial value for a_strong/(2 Pi)
-      r20: initial momentum scale squared
+        p: pQCD order, 0=LO, 1=NLO, 2=NNLO
+        nf: number of active quark flavors
+        r2: final momentum scale squared
+        as0: initial value for a_strong/(2 Pi)
+        r20: initial momentum scale squared
 
     Returns:
         float: final value for a_strong/(2 Pi)
