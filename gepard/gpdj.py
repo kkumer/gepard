@@ -26,7 +26,7 @@ Todo:
 from cmath import exp
 from typing import Tuple
 
-from scipy.special import loggamma
+from scipy.special import loggamma  # type: ignore
 
 import gepard.qj
 import gepard.special

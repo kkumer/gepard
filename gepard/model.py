@@ -134,15 +134,6 @@ class ConformalSpaceGPD(ParameterModel):
             integration weights. Actual choice and code for GPDs
             is provided by subclasses.
 
-        Warning:
-            Presently, only one instance of this class can be reliably used
-            in a single Python session, since it relies on Fortran extension
-            module common block global state!
-
-        Todo:
-            - Make different Q2's possible
-            - Move at least evolved Wilson coeffs from Fortran.
-
         """
         self.p = p
         self.scheme = scheme
@@ -189,7 +180,7 @@ class Test(ConformalSpaceGPD):
         self.r20 = 2.5
 
     def gpd_H(self, eta: float, t: float) -> np.ndarray:
-        """Return (4, npts) array H^a_j for 4 flavors and all j-points."""
+        """Return (npts, 4) array H_j^a for all j-points and 4 flavors."""
         h = []
         for j in self.jpoints:
             h.append(g.gpdj.test(j, t, self.parameters))
@@ -207,14 +198,14 @@ class Fit(ConformalSpaceGPD):
         super().__init__(**kwargs)
 
     def gpd_H_single(self, eta: float, t: float) -> np.ndarray:
-        """Return (4, npts) array H^a_j for 4 flavors and all j-points."""
+        """Return (npts, 4) array H_j^a for all j-points and 4 flavors."""
         h = []
         for j in self.jpoints:
             h.append(g.gpdj.fit(j, t, self.parameters))
         return np.array(h)
 
     def gpd_H_para(self, eta: float, t: float) -> np.ndarray:
-        """Return (4, npts) array H^a_j for 4 flavors and all j-points."""
+        """Return (npts, 4) array H_j^a for all j-points and 4 flavors."""
         h = Parallel(n_jobs=20)(delayed(g.gpdj.fit)(j, t, self.parameters)
                                 for j in self.jpoints)
         return np.array(h)
@@ -235,12 +226,6 @@ class MellinBarnesModel(ParameterModel):
         Args:
             gpds: provide GPDs as gpds.gpd_H, gpds.gpd_Ht etc.
 
-        Todo:
-            This now simply imports everything from old Fortran
-            extension. We should consider Python-only implementation.
-            (Wilson coeffs and anomalous dimensions can stay Fortran
-            for some longer time.)
-
         """
         self.p = gpds.p
         self.scheme = gpds.scheme
@@ -256,7 +241,8 @@ class MellinBarnesModel(ParameterModel):
         self.parameters = gpds.parameters
         self.tgj = np.tan(pi*self.jpoints/2.)
         # wce[q2] = wce[spw, j, a] - Wilson coeffs evolved; local to model instance
-        self.wce: Dict[float, np.ndarray] = {}
+        self.wce: Dict[float, np.ndarray] = {} # DVCS
+        self.wce_dvmp: Dict[float, np.ndarray] = {} # DVMP
         super().__init__()
 
     def cff(self, xi: float, t: float, q2: float) -> np.ndarray:
@@ -300,3 +286,44 @@ class MellinBarnesModel(ParameterModel):
         reh = chargefac * np.dot(self.wg, cch.imag)
         # FIXME: Only CFF H at the moment.
         return np.array([reh, imh, 0, 0, 0, 0, 0, 0])
+
+    def tff(self, xi: float, t: float, q2: float) -> np.ndarray:
+        """Return array(ReH_rho, ImH_rho, ReE_rho, ...) of DVrhoP transition FFs."""
+        assert self.nf == 4
+
+        astrong = 2 * pi * g.qcd.as2pf(self.p, self.nf,  q2, self.asp[self.p], self.r20)
+
+        # Evaluations depending on model parameters:
+        h_prerot = self.gpds.gpd_H(xi, t)
+        # Flavor rotation matrix: (sea,G,uv,dv) --> (SIG, G, NS+, NS-)
+        # FIXME: should be calculated only once!
+        frot_rho_4 = np.array([[1, 0, 1, 1],
+                               [0, 1, 0, 0],
+                               [3./20., 0, 0, 0],  # [3./20., 0, 5./12., 1./12.],
+                               [0, 0, 0, 0]]) / np.sqrt(2)
+        h = np.einsum('fa,ja->jf', frot_rho_4, h_prerot)
+
+        pw_strengths = np.array([[1., 1., 1, 1],
+                                 [self.parameters['secs'],
+                                     self.parameters['secg'], 0, 0],
+                                 [self.parameters['this'],
+                                     self.parameters['thig'], 0, 0]])
+
+        try:
+            wce_ar_dvmp = self.wce_dvmp[q2]
+        except KeyError:
+            # calculate it
+            wce_ar_dvmp = g.evolc.calc_wce_dvmp(self, q2)
+            # memorize it for future
+            self.wce_dvmp[q2] = wce_ar_dvmp
+        phij = 1.57079632j
+        eph = exp(phij)
+        cfacj = eph * np.exp((self.jpoints + 1) * log(1/xi))  # eph/xi**(j+1)
+        cch = np.einsum('j,sa,sja,ja->j', cfacj, pw_strengths[:, :2],
+                        wce_ar_dvmp, h[:, :2])
+        imh = np.dot(self.wg, cch.imag)
+        np.multiply(cch, self.tgj, out=cch)
+        reh = np.dot(self.wg, cch.imag)
+        # FIXME: Only CFF H at the moment.
+        return (g.constants.CF * g.constants.F_rho * astrong / g.constants.NC
+                / np.sqrt(q2) * np.array([reh, imh, 0, 0, 0, 0, 0, 0]))

@@ -48,11 +48,11 @@ def calc_gam(npoints, nf):
     return np.array(gam)
 
 
-def calc_wc(npoints):
+def calc_wc(m):
     """Calculate DVCS Wilson coeffs.
 
     Args:
-       npoints: coordinates of MB contour
+       m: instance of the model
 
     Returns:
          wc[s,k,j]: s in range(npwmax), k in range(npts), j in [Q,G]
@@ -63,13 +63,38 @@ def calc_wc(npoints):
     #   = 2^N Gamma(3/2+N) / Gamma(3/2) / Gamma(2+N)
     wc = []
     for pw_shift in [0, 2, 4]:
-        fshu = (2.0**(npoints + pw_shift)
-                * np.exp(loggamma(1.5 + npoints + pw_shift)
-                         - loggamma(2 + npoints + pw_shift))
+        fshu = (2.0**(m.npoints + pw_shift)
+                * np.exp(loggamma(1.5 + m.npoints + pw_shift)
+                         - loggamma(2 + m.npoints + pw_shift))
                 / 0.886226925452758014)
         quark = fshu
         gluon = np.zeros_like(quark)
         wc.append(np.array((quark, gluon)).transpose())
+    return np.array(wc)
+
+
+def calc_wc_dvmp(m):
+    """Calculate DVMP Wilson coeffs.
+
+    Args:
+       m: instance of the model
+
+    Returns:
+         wcdvmp[s,k,j]: s in range(npwmax), k in range(npts), j in [Q,G]
+
+    """
+    # LO only
+    # Shuvaev factor = 2^(J+1) Gamma(5/2+J) / Gamma(3/2) / Gamma(3+J) =
+    #   = 2^N Gamma(3/2+N) / Gamma(3/2) / Gamma(2+N)
+    wc = []
+    for pw_shift in [0, 2, 4]:
+        fshu = (2.0**(m.npoints + pw_shift)
+                * np.exp(loggamma(1.5 + m.npoints + pw_shift)
+                         - loggamma(2 + m.npoints + pw_shift))
+                / 0.886226925452758014)
+        sea = 3 * fshu / m.nf
+        gluon = 3 * fshu * 2 / g.constants.CF / (m.npoints + pw_shift + 2)
+        wc.append(np.array((sea, gluon)).transpose())
     return np.array(wc)
 
 
@@ -88,5 +113,24 @@ def calc_wce(m, q2: float):
     if not isinstance(m, g.model.MellinBarnesModel):
         raise Exception("{} is not of type MellinBarnesModel".format(m))
     evola0 = g.evolution.evolop(m.npoints, m.nf, q2, m.q02, m.asp[m.p], m.r20)
-    c0 = calc_wc(m.npoints)
+    c0 = calc_wc(m)
+    return np.einsum('ski,skij->skj', c0, evola0)
+
+
+def calc_wce_dvmp(m, q2: float):
+    """Calculate evolved DVMP Wilson coeffs for given q2.
+
+    Args:
+       q2: final evolution scale
+       npoints: coordinates of MB contour
+
+    Returns:
+         wce_dvmp[s,k,j]: s in range(npwmax), k in range(npts), j in [Q,G]
+
+    """
+    # Instead of type hint (which leads to circular import for some reason)
+    if not isinstance(m, g.model.MellinBarnesModel):
+        raise Exception("{} is not of type MellinBarnesModel".format(m))
+    evola0 = g.evolution.evolop(m.npoints, m.nf, q2, m.q02, m.asp[m.p], m.r20)
+    c0 = calc_wc_dvmp(m)
     return np.einsum('ski,skij->skj', c0, evola0)

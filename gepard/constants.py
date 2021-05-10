@@ -6,8 +6,12 @@ Also, fixed dictionaries.
 
 # QCD parameters
 CF = 4./3.
-CA = 3.0
+CA = 3
 TF = 0.5
+NC = 3
+
+# Meson decay constants
+F_rho = 0.209
 
 # Parameters needed for harmonic sums etc.
 EMC = 0.5772156649

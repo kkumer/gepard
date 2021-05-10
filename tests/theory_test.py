@@ -36,7 +36,6 @@ def test_XDVCSt_noevol():
     assert th.predict(pt) == approx(5608.42804256, rel=1e-3)
 
 
-@mark.devel
 def test_XDVCSt():
     """Calculate LO DVCS partial cross section (+ evolution)."""
     pt = g.data.DummyPoint({'W': 82., 'Q2': 3., 't': -0.5})
@@ -86,7 +85,6 @@ def test_predict():
 #     assert th.chisq_para([data[39][1]]) == approx(0.027310271896327565)
 
 
-@mark.devel
 def test_chisq_Xt():
     """Test chisq Xt calculation."""
     fit_gpd = g.model.Fit()
