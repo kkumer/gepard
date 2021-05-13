@@ -162,6 +162,16 @@ class ConformalSpaceGPD(ParameterModel):
                            'thig': 0.}
         super().__init__()
 
+    def pw_strengths(self):
+        """Strengths of SO(3) partial waves."""
+        # We take maximally three partial waves atm:
+        # pw_strengths = (no. pws x no. flavors)
+        return np.array([[1., 1., 1, 1],
+                         [self.parameters['secs'],
+                             self.parameters['secg'], 0, 0],
+                         [self.parameters['this'],
+                             self.parameters['thig'], 0, 0]])
+
         # gpd_H: np.ndarray    # trying to appease mypy
 
 
@@ -241,8 +251,8 @@ class MellinBarnesModel(ParameterModel):
         self.parameters = gpds.parameters
         self.tgj = np.tan(pi*self.jpoints/2.)
         # wce[q2] = wce[spw, j, a] - Wilson coeffs evolved; local to model instance
-        self.wce: Dict[float, np.ndarray] = {} # DVCS
-        self.wce_dvmp: Dict[float, np.ndarray] = {} # DVMP
+        self.wce: Dict[float, np.ndarray] = {}  # DVCS
+        self.wce_dvmp: Dict[float, np.ndarray] = {}  # DVMP
         super().__init__()
 
     def cff(self, xi: float, t: float, q2: float) -> np.ndarray:
@@ -254,11 +264,6 @@ class MellinBarnesModel(ParameterModel):
 
         # Evaluations depending on model parameters:
         h = self.gpds.gpd_H(xi, t)
-        pw_strengths = np.array([[1., 1., 1, 1],
-                                 [self.parameters['secs'],
-                                     self.parameters['secg'], 0, 0],
-                                 [self.parameters['this'],
-                                     self.parameters['thig'], 0, 0]])
         try:
             wce_ar = self.wce[q2]
         except KeyError:
@@ -269,18 +274,9 @@ class MellinBarnesModel(ParameterModel):
         phij = 1.57079632j
         eph = exp(phij)
         cfacj = eph * np.exp((self.jpoints + 1) * log(1/xi))  # eph/xi**(j+1)
-        # print('pw_strengths[1, 0] = {}'.format(pw_strengths[1, 0]))
-        # if t < -0.9:
-        #     print('t, q2 = {}, {}'.format(t, q2))
-        #     print('wce[0, 0, 0] = {}'.format(wce[0, 0, 0]))
-        #     print('qind, qs = {} -> {}'.format(qind, self.qs[5, :4]))
-        #     print('id(wce) = {}'.format(id(wce)))
-        # print('h[0, 0] = {}'.format(h[0, 0]))
-        # cch = np.einsum('j,sa,sja,ja->j', cfacj, pw_strengths, wce, h)
-        # Temporary SEC=0 WCE with singlet part only!:
-        # cch = np.einsum('j,ja,ja->j', cfacj, wce_ar, h[:, :2])
         # Temporary singlet part only!:
-        cch = np.einsum('j,sa,sja,ja->j', cfacj, pw_strengths[:, :2], wce_ar, h[:, :2])
+        cch = np.einsum('j,sa,sja,ja->j', cfacj,
+                        self.gpds.pw_strengths()[:, :2], wce_ar, h[:, :2])
         imh = chargefac * np.dot(self.wg, cch.imag)
         np.multiply(cch, self.tgj, out=cch)
         reh = chargefac * np.dot(self.wg, cch.imag)
@@ -303,12 +299,6 @@ class MellinBarnesModel(ParameterModel):
                                [0, 0, 0, 0]]) / np.sqrt(2)
         h = np.einsum('fa,ja->jf', frot_rho_4, h_prerot)
 
-        pw_strengths = np.array([[1., 1., 1, 1],
-                                 [self.parameters['secs'],
-                                     self.parameters['secg'], 0, 0],
-                                 [self.parameters['this'],
-                                     self.parameters['thig'], 0, 0]])
-
         try:
             wce_ar_dvmp = self.wce_dvmp[q2]
         except KeyError:
@@ -319,8 +309,8 @@ class MellinBarnesModel(ParameterModel):
         phij = 1.57079632j
         eph = exp(phij)
         cfacj = eph * np.exp((self.jpoints + 1) * log(1/xi))  # eph/xi**(j+1)
-        cch = np.einsum('j,sa,sja,ja->j', cfacj, pw_strengths[:, :2],
-                        wce_ar_dvmp, h[:, :2])
+        cch = np.einsum('j,sa,sja,ja->j', cfacj,
+                        self.gpds.pw_strengths()[:, :2], wce_ar_dvmp, h[:, :2])
         imh = np.dot(self.wg, cch.imag)
         np.multiply(cch, self.tgj, out=cch)
         reh = np.dot(self.wg, cch.imag)
