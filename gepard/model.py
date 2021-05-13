@@ -255,6 +255,25 @@ class MellinBarnesModel(ParameterModel):
         self.wce_dvmp: Dict[float, np.ndarray] = {}  # DVMP
         super().__init__()
 
+    def _mellin_barnes_integral(self, xi, wce, h):
+        """Return Mellin-Barnes integral.
+
+        Integrates convolution of evolved GPDs with Wilson coefs.
+
+        Todo:
+            Only GPD H treated atm.
+        """
+        phij = 1.57079632j
+        eph = exp(phij)
+        cfacj = eph * np.exp((self.jpoints + 1) * log(1/xi))  # eph/xi**(j+1)
+        # Temporary singlet part only!:
+        cch = np.einsum('j,sa,sja,ja->j', cfacj,
+                        self.gpds.pw_strengths()[:, :2], wce, h[:, :2])
+        imh = np.dot(self.wg, cch.imag)
+        np.multiply(cch, self.tgj, out=cch)
+        reh = np.dot(self.wg, cch.imag)
+        return reh, imh
+
     def cff(self, xi: float, t: float, q2: float) -> np.ndarray:
         """Return array(ReH, ImH, ReE, ...) for kinematic point."""
         if self.nf == 3:
@@ -262,8 +281,6 @@ class MellinBarnesModel(ParameterModel):
         else:  # nf = 4
             chargefac = 5./18.
 
-        # Evaluations depending on model parameters:
-        h = self.gpds.gpd_H(xi, t)
         try:
             wce_ar = self.wce[q2]
         except KeyError:
@@ -271,33 +288,15 @@ class MellinBarnesModel(ParameterModel):
             wce_ar = g.evolc.calc_wce(self, q2)
             # memorize it for future
             self.wce[q2] = wce_ar
-        phij = 1.57079632j
-        eph = exp(phij)
-        cfacj = eph * np.exp((self.jpoints + 1) * log(1/xi))  # eph/xi**(j+1)
-        # Temporary singlet part only!:
-        cch = np.einsum('j,sa,sja,ja->j', cfacj,
-                        self.gpds.pw_strengths()[:, :2], wce_ar, h[:, :2])
-        imh = chargefac * np.dot(self.wg, cch.imag)
-        np.multiply(cch, self.tgj, out=cch)
-        reh = chargefac * np.dot(self.wg, cch.imag)
-        # FIXME: Only CFF H at the moment.
-        return np.array([reh, imh, 0, 0, 0, 0, 0, 0])
+        h = self.gpds.gpd_H(xi, t)
+        reh, imh = self._mellin_barnes_integral(xi, wce_ar, h)
+        return chargefac * np.array([reh, imh, 0, 0, 0, 0, 0, 0])
 
     def tff(self, xi: float, t: float, q2: float) -> np.ndarray:
         """Return array(ReH_rho, ImH_rho, ReE_rho, ...) of DVrhoP transition FFs."""
         assert self.nf == 4
 
         astrong = 2 * pi * g.qcd.as2pf(self.p, self.nf,  q2, self.asp[self.p], self.r20)
-
-        # Evaluations depending on model parameters:
-        h_prerot = self.gpds.gpd_H(xi, t)
-        # Flavor rotation matrix: (sea,G,uv,dv) --> (SIG, G, NS+, NS-)
-        # FIXME: should be calculated only once!
-        frot_rho_4 = np.array([[1, 0, 1, 1],
-                               [0, 1, 0, 0],
-                               [3./20., 0, 0, 0],  # [3./20., 0, 5./12., 1./12.],
-                               [0, 0, 0, 0]]) / np.sqrt(2)
-        h = np.einsum('fa,ja->jf', frot_rho_4, h_prerot)
 
         try:
             wce_ar_dvmp = self.wce_dvmp[q2]
@@ -306,14 +305,15 @@ class MellinBarnesModel(ParameterModel):
             wce_ar_dvmp = g.evolc.calc_wce_dvmp(self, q2)
             # memorize it for future
             self.wce_dvmp[q2] = wce_ar_dvmp
-        phij = 1.57079632j
-        eph = exp(phij)
-        cfacj = eph * np.exp((self.jpoints + 1) * log(1/xi))  # eph/xi**(j+1)
-        cch = np.einsum('j,sa,sja,ja->j', cfacj,
-                        self.gpds.pw_strengths()[:, :2], wce_ar_dvmp, h[:, :2])
-        imh = np.dot(self.wg, cch.imag)
-        np.multiply(cch, self.tgj, out=cch)
-        reh = np.dot(self.wg, cch.imag)
-        # FIXME: Only CFF H at the moment.
+        # Evaluations depending on model parameters:
+        h_prerot = self.gpds.gpd_H(xi, t)
+        # Flavor rotation matrix: (sea,G,uv,dv) --> (SIG, G, NS+, NS-)
+        # FIXME: should be calculated only once!
+        frot_rho_4 = np.array([[1, 0, 1, 1],
+                               [0, 1, 0, 0],
+                               [3./20., 0, 5./12., 1./12.],
+                               [0, 0, 0, 0]]) / np.sqrt(2)
+        h = np.einsum('fa,ja->jf', frot_rho_4, h_prerot)
+        reh, imh = self._mellin_barnes_integral(xi, wce_ar_dvmp, h)
         return (g.constants.CF * g.constants.F_rho * astrong / g.constants.NC
                 / np.sqrt(q2) * np.array([reh, imh, 0, 0, 0, 0, 0, 0]))
