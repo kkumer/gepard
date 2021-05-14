@@ -1,0 +1,81 @@
+id = 35
+editor = KK
+editor1 = DM
+# Feb. 2010
+# modified naming scheme
+# combining two files by introducing FTn
+
+# the y1 data are derived from the phi measurement
+# of HALL A data from the experiment (BSS-HALLA-06)
+
+### Experiment
+
+collaboration = HALLA
+process = ep2epgamma
+exptype = fixed target
+year = 2006
+reference =  nucl-ex/0607029
+inspiretex = Camacho:2006qlkIN
+reference2 = DFT analysis with MC error propagation by KK
+
+
+### Scattering Process
+
+frame = Trento
+
+in1particle = em
+in1energy = 5.75
+in1energyunit = GeV
+in1polarizationvector = L
+in1polarization = +1
+
+in2particle = p
+
+out1particle = e
+out2particle = p
+out3particle = gamma
+
+
+### Observable 
+y1long = Re Part of BMK01 Angular Harmonic Coefficients CI and DEL CI
+# related to the Fourier transform of weighted Beam Spin Sum
+y1name = BSSw2C
+y1unit = 1
+y1value = column3
+y1error = column4
+
+
+### x-axes
+
+x1name = xB
+x1unit = 1
+x1value = 0.36
+
+x2name = Q2
+x2unit = GeV^2
+x2value = 2.3
+
+
+x3name = t
+x3unit = GeV^2
+x3value = column1
+
+x4name = FTn
+x4unit = 1
+x4value = column2
+
+
+### Data
+
+#  t     FTn     ReCI       err
+############################################
+## Re(CI + DEL CI)
+-0.17     0      2.57      0.238
+-0.23     0      1.57      0.122
+-0.28     0      0.789     0.117
+-0.33     0      0.162     0.122
+## Re(CI)
+-0.17     1     -0.717     0.17
+-0.23     1     -1.73      0.09
+-0.28     1     -2.05      0.0892
+-0.33     1     -2.42      0.0949

@@ -11,8 +11,6 @@ from gepard.constants import GeV2nb, Mp, Mp2, alpha
 
 NCPU = 23  # how many CPUs to use in parallel
 
-# FIXME: This looks nonpythonic, see static class variables
-errtypes =  ['err', 'errminus', 'errplus', 'errstat', 'errsyst', 'errnorm']
 
 class Theory(object):
     """Class of theory frameworks for calculation of observables.
@@ -277,88 +275,6 @@ class BMK(Theory):
         """ Weight factor removing BH propagators from INT and BH amplitudes.
         It is normalized to int_0^2pi w  2pi as in BMK. """
         return 2.*pi*pt.P1P2 / pt.intP1P2
-
-    def to_conventions(pt):
-        """Transform stuff into BMK conventions."""
-        pt.origval = pt.val  # to remember it for later convenience
-        for errtype in errtypes:
-            if hasattr(pt, errtype):
-                setattr(pt, 'orig'+errtype, getattr(pt,errtype))
-        # C1. azimutal angle phi should be in radians.
-        if 'phi' in pt and hasattr(pt, 'units') and pt.units['phi'][:3]=='deg':
-            pt.phi = pt.phi * pi / 180.
-            pt.newunits['phi'] = 'rad'
-        # C2. phi_{Trento} -> (pi - phi_{BKM})
-        if 'frame' in pt and pt.frame == 'Trento':
-            if 'phi' in pt:
-                pt.phi = pi - pt.phi
-            elif 'FTn' in pt:
-                if pt.FTn == 1 or pt.FTn == 3 or pt.FTn == -2:
-                    pt.val = - pt.val
-        # C3. varphi_{Trento} -> (varphi_{BKM} + pi)
-            if 'varphi' in pt:
-                pt.varphi = pt.varphi - pi
-            elif 'varFTn' in pt:
-                if pt.varFTn == 1 or pt.varFTn == -1:
-                    pt.val = - pt.val
-                else:
-                    raise ValueError('varFTn = %d not allowed. Only +/-1!' % pt.varFTn)
-            pt.newframe = 'BMK'
-        # C4. cross-sections should be in nb
-        if hasattr(pt, 'units') and pt.units[pt.y1name] == 'pb/GeV^4':
-            pt.val = pt.val/1000
-            for errtype in errtypes:
-                if hasattr(pt, errtype):
-                    err = getattr(pt, errtype)
-                    setattr(pt, errtype, err/1000)
-            pt.newunits[pt.y1name] = 'nb/GeV^4'
-
-    to_conventions = staticmethod(to_conventions)
-
-    def from_conventions(pt):
-        """Transform stuff from Approach's conventions into original data's."""
-        # C4. cross-sections should be in nb
-        if hasattr(pt, 'units') and pt.units[pt.y1name] == 'pb/GeV^4':
-            pt.val = pt.val*1000
-            for errtype in errtypes:
-                if hasattr(pt, errtype):
-                    err = getattr(pt, errtype)
-                    setattr(pt, errtype, err*1000)
-        # C2. phi_{BKM} -> (pi - phi_{Trento})
-        if 'frame' in pt and pt.frame == 'Trento':
-            if 'phi' in pt:
-                pt.phi = pi - pt.phi
-            elif 'FTn' in pt:
-                if pt.FTn == 1 or pt.FTn == 3:
-                    pt.val = - pt.val
-        # C3. varphi_{Trento} -> (varphi_{BKM} + pi)
-            if 'varphi' in pt:
-                pt.varphi = pt.varphi + pi
-            elif 'varFTn' in pt:
-                if pt.varFTn == 1 or pt.varFTn == -1:
-                    pt.val = - pt.val
-            pt.newframe = 'Trento'
-        # C1. azimutal angle phi back to degrees
-        if 'phi' in pt and hasattr(pt, 'units') and pt.units['phi'][:3]=='deg':
-            pt.phi = pt.phi / pi * 180.
-        return pt
-    from_conventions = staticmethod(from_conventions)
-
-    def orig_conventions(pt, val):
-        """Like from_conventions, but for the prediction val."""
-        # This doesn't touches pt
-        # C4. cross-sections nb --> pb
-        if hasattr(pt, 'units') and pt.units[pt.y1name] == 'pb/GeV^4':
-            val = val*1000
-        # C2. phi_{BKM} --> (pi - phi_{Trento})
-        if 'frame' in pt and pt.frame == 'Trento' and 'FTn' in pt:
-            if pt.FTn == 1 or pt.FTn == 3 or pt.FTn == -2:
-                val = - val
-        if 'frame' in pt and pt.frame == 'Trento' and 'varFTn' in pt:
-            if pt.varFTn == 1 or pt.varFTn == -1:
-                val = - val
-        return val
-    orig_conventions = staticmethod(orig_conventions)
 
     def prepare(pt):
         """Pre-calculate GPD-independent kinamatical constants and functions."""

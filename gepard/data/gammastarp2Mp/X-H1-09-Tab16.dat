@@ -1,0 +1,80 @@
+id = 77
+editor = DM
+
+## RE : GAMMA* P --> phi P
+## sqrts IN GEV : 300 + 320
+## M(P=4) IN GEV : < 5
+## W : 35.0 - 180.0 GeV
+## x: Q**2 IN GEV**2
+## y: SIG IN NB
+
+### Experiment
+
+collaboration = H1
+process = gammastarp2gammaphi
+exptype = collider
+year = 2010
+reference = arXiv:0910.5831
+inspiretex = Aaron:2009xp
+reference2 = Table 16
+reference3 = JHEP05 (2010) 032
+
+### Scattering Process
+
+sqrtsenergy = 320. # Why?
+sqrtsenergyunit = GeV
+s = 102400.  # 320**2
+
+in1particle = gammastar
+in2particle = p
+
+out1particle = phi
+out2particle = p
+
+
+### Observable 
+
+y1name = X
+y1namelong = t integrated cross section for fixed W=75 GeV
+y1unit = nb
+y1value = column2
+y1errorstatisticplus = column3
+y1errorstatisticminus = column4
+y1errorsystematicplus = column5
+y1errorsystematicminus = column6
+y1errornormalization = 0.047
+
+
+### x-axes
+x1name = Q2
+x1unit = GeV^2
+x1value = column1
+
+x2name = W
+x2unit = GeV
+x2value = 75
+
+x3name = tmmax
+x3unit = GeV^2
+x3value = 0.5
+
+table =
+### Data
+# Q2     X  stat+ stat-  syst+  syst-
+######################################
+2.71  72.6   8.5  -8.5   10.6  -7.6
+3.21  64.5   6.2  -6.2    8.3  -6.
+3.82  46.4   4.5  -4.5    5.2  -3.6
+4.52  35.    4.   -4.     4.1  -3.4
+5.36  25.1   2.7  -2.7    2.6  -1.4
+6.35  18.2   2.   -2.     1.9  -1.5
+7.6   12.6   1.5  -1.5    1.2  -0.7
+9.3    7.04  0.9   -0.9   0.78 -0.52
+12.    5.34  0.63  -0.63  0.56 -0.37
+14.85  2.25  0.38  -0.38  0.3  -0.21
+19.2   1.28  0.24  -0.24  0.17 -0.13
+32.15  0.371 0.076 -0.076 0.04 -0.042
+
+## Q2 dependence of the gamma^star p cross section for elastic phi meson 
+## production for W =75 GeV. The overall normalisation uncertainty of 4.7% is 
+## not included in the systematic errors.

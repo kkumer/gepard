@@ -1,0 +1,83 @@
+id = 72
+editor = DM
+
+### Experiment
+
+collaboration = HERMES
+process = ep2epgamma
+exptype = fixed target
+year = 2012
+reference =  from Morgan Murray, draft_90@hermes.desy.de, J. Burns and M. Murray 
+reference2 = combined 1996-2007 data
+reference3 = arXiv:1203.6287
+inspiretex = Airapetian:2012mq
+
+
+### Scattering Process
+
+frame = Trento
+
+in1particle = ep
+in1energy = 27.6
+in1energyunit = GeV
+in1polarizationvector = L
+in1polarization = +1
+
+in2particle = p
+
+out1particle = ep
+out2particle = p
+out3particle = gamma
+
+
+### Observable 
+# Asymmetry:  A^{sin (-FTn)*phi}_{LU,DVCS} #
+
+y1namelong = Charge Averaged Beam Spin Azimuthal Asymmetry
+y1name = ALUDVCS
+y1unit = 1
+y1value = column5
+y1errorstatistic = column6 
+y1errorsystematic = column7
+
+
+### x-axes
+
+x1name = tm
+x1unit = GeV^2
+x1value = column1
+
+x2name = xB
+x2unit = 1
+x2value = column2
+
+x3name = Q2
+x3unit = GeV^2
+x3value = column3
+
+x4name = FTn
+x4unit = 1
+x4value = column4
+
+
+### Data
+#  -t     x_B     Q2   FTn   asym      stat.     syst. 
+#####################################################
+table =
+####### t-projections #######
+0.031  0.079  2.0  -1  0.0340189296421  0.0257026638788  0.003842 
+0.094  0.102  2.58  -1  -0.0139761005158  0.0335306494447  0.003531 
+0.202  0.117  3.05  -1  0.0240324342137  0.0389113242719  0.006939 
+0.417  0.127  3.77  -1  0.0221763476617  0.0601750100796  0.015324 
+####### xB-projections #######
+0.091  0.054   1.45  -1  0.0156121551849  0.0305909050517  0.003355 
+0.102  0.084   2.17  -1  0.0493114110717  0.0337797776224  0.0043  
+0.127  0.121   3.13  -1  0.0197821051008  0.0380232275454  0.003873 
+0.195   0.2    5.13  -1   -0.0558536160095  0.051668829834  0.01877 
+####### Q2-projections #######
+0.076  0.056   1.25  -1  0.0160397990391  0.034422427995  0.002068  
+0.097  0.078   1.86  -1  0.0407894935887  0.0330353256401  0.00353 
+0.127  0.107  2.83  -1  0.0265940290573  0.036821848595  0.003813   
+0.186  0.171  4.91  -1  -0.0314833038963  0.0406536682599  0.008792 
+
+

@@ -1,0 +1,27 @@
+This directory holds available experimental data
+
+ep2epgamma/ - data for e p --> e p gamma (also known as DVCS)
+gammastarp2gammap/ - data for \gamma^* p --> \gamma p  i.e. true DVCS
+gammastarp2Mp/ - data for \gamma^* p --> meson p  i.e. DVMP
+DIS/  - data for DIS  
+
+Note:
+There should be a unique correspondence between id number of datafile
+(specified at its beginning), and the grid of numbers in that
+file. Thus, 
+
+1) If you do something to numbers, create new file and new ID !
+2) If you just edit information in preamble, you may keep old ID,
+   but if you have doubts, create new file with new ID - there 
+   are plenty of integers available
+
+This makes it much easier to reproduce old results.
+
+Some informal conventions:
+
+- ids beyond ID=1000 are for mock/fake data 
+
+We should also implements something like this:
+
+- ids beyond ID=500 are for derived data (derived from
+  actual data using some contestable theoretical procedure)

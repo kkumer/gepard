@@ -1,0 +1,57 @@
+id = 601
+editor = DM
+
+### Experiment
+
+collaboration = H1
+process = gammastarp2rho0p
+exptype = collider
+year = 2009
+reference = arXiv:0910.5831
+inspiretex = Aaron:2009xp
+reference2 = Table 15
+reference3 = JHEP05 (2010) 032
+
+### Scattering Process
+
+sqrtsenergy = 318
+sqrtsenergyunit = GeV
+
+in1particle = gammastar
+in2particle = p
+
+out1particle = rho0
+out2particle = p
+
+### Observable 
+
+y1name = R
+y1namelong = Q**2 dependence of ration R
+y1unit = 1
+y1value = column2
+y1errorstatisticplus = column3
+y1errorstatisticminus = column4
+y1errorsystematicplus = column5
+y1errorsystematicminus = column6
+
+### x-axes
+x1name = Q2
+x1unit = GeV^2
+x1value = column1
+
+# Following is CRUDE approximation
+# just so that data parsing routine doesn't complain
+x2name = W
+x2unit = GeV
+x2value = 75
+
+table =
+### Data
+# Q2	R	stat+	stat-	syst+	syst-
+#############################################
+ 3.1  1.36  +0.08  -0.08  +0.11  -0.13 
+ 4.8  1.92  +0.16  -0.15  +0.15  -0.12 
+ 7.5  3.65  +0.31  -0.27  +0.41  -0.38 
+12.2  3.6   +0.38  -0.34  +0.39  -0.37 
+23.1  6.52  +1.27  -0.98  +1.23  -0.96 
+

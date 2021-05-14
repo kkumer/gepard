@@ -1,0 +1,63 @@
+id = 602
+editor = MM
+
+## RE : GAMMA* P --> RHO0 P
+## W : 32 - 180 GeV
+
+### Experiment
+
+collaboration = ZEUS
+process = gammastarp2rho0p
+exptype = collider
+year = 2007
+reference = arXiv:0708.1478
+inspiretex = Chekanov:2007zr
+reference2 = Table 7
+reference3 = 1754-0410-1-6
+
+### Scattering Process
+
+sqrtsenergy = ?
+sqrtsenergyunit = GeV
+
+in1particle = gammastar
+in2particle = p
+
+out1particle = rho0
+out2particle = p
+
+### Observable 
+
+y1name = R
+y1namelong = Q**2 dependence of the ratio R
+y1unit = 1
+y1value = column2
+y1errorstatisticplus = column3
+y1errorstatisticminus = column4
+y1errorsystematicplus = column5
+y1errorsystematicminus = column6
+
+### x-axes
+x1name = Q2
+x1unit = GeV^2
+x1value = column1
+
+# Following is CRUDE approximation
+# just so that data parsing routine doesn't complain
+x2name = W
+x2unit = GeV
+x2value = 90
+
+table =
+### Data
+# Q2	R	  stat+	 stat-  syst+ syst-
+#############################################
+ 2.4   1.50  0.05  -0.05   0.20  -0.15 
+ 3.7   2.10  0.08  -0.08   0.18  -0.14 
+ 5.9   2.70  0.14  -0.13   0.26  -0.28 
+ 8.3   3.20  0.20  -0.18   0.25  -0.27 
+12.0   3.50  0.26  -0.24   0.30  -0.26 
+19.5   4.60  0.54  -0.45   0.48  -0.44 
+40.5   6.10  2.75  -1.56   2.15  -0.85 
+
+

@@ -1,0 +1,128 @@
+id = 66
+editor = KK
+
+
+### Experiment
+
+collaboration = HERMES
+process = ep2epgamma
+exptype = fixed target
+year = 2008
+reference = arXiv:0802.2499
+inspiretex = Airapetian:2008aa
+reference2 = Table 1b
+
+
+### Scattering Process 
+# hard ep2epgamma
+
+frame = Trento
+
+in1particle = e+
+in1energy = 27.6
+in1energyunit = GeV
+
+in2particle = p
+in2polarizationvector = T
+in2polarization = +1
+
+out1particle = e+
+out2particle = p
+out3particle = gamma
+
+
+### Observable
+# A^{sin,cos(varphi)}_{UT,I} 
+
+y1name = AUTI
+y1namelong = Charge Difference Transverse Target Spin Asymmetry
+y1unit = 1
+y1value = column6
+y1errorstatistic = column7
+y1errorsystematic = column8
+
+### x-axes
+
+x1name = tm
+x1unit = GeV^2
+x1value = column1
+
+x2name = xB
+x2unit = 1
+x2value = column2
+
+x3name = Q2
+x3unit = GeV^2
+x3value = column3
+
+
+x4name = varFTn
+x4unit = 1
+x4value = column4
+
+x5name = FTn
+x5unit = 1
+x5value = column5
+
+
+### Data
+table =
+# -t    x_B    Q^2  varFTn FTn    asym   stat.  syst.
+######################################################
+
+#  A_{UT,I}^{sin(phi-phi_S)}
+# overall:
+#  0.12   0.09   2.5  -1     0   0.035  0.024  0.024  
+
+0.03   0.08   1.9    -1     0     -0.030  0.031  0.008    
+0.10   0.10   2.5    -1     0      0.022  0.044  0.021     
+0.20   0.11   2.9    -1     0      0.133  0.050  0.025     
+0.42   0.12   3.5    -1     0      0.085  0.082  0.028     
+
+0.10   0.05   1.5    -1     0      0.083  0.051  0.021     
+0.10   0.08   2.2    -1     0      0.037  0.048  0.021    
+0.13   0.12   3.1    -1     0     -0.033  0.048  0.021  
+0.20   0.20   5.0    -1     0      0.048  0.055  0.024   
+
+0.08   0.06   1.2    -1     0      0.117  0.056  0.024   
+0.10   0.08   1.9    -1     0     -0.043  0.046  0.026 
+0.13   0.11   2.8    -1     0      0.066  0.049  0.028 
+0.19   0.17   4.9    -1     0     -0.002  0.049  0.020 
+
+#  A_{UT,I}^{sin(phi-phi_S) cos(phi)}
+# overall:
+#  0.12   0.09   2.5   -1     1   -0.164  0.039  0.023    
+#
+0.03   0.08   1.9    -1     1     -0.152  0.068  0.026     
+0.10   0.10   2.5    -1     1     -0.073  0.068  0.008     
+0.20   0.11   2.9    -1     1     -0.244  0.078  0.028     
+0.42   0.12   3.5    -1     1     -0.294  0.126  0.026     
+                               
+0.10   0.05   1.5    -1     1     -0.166  0.084  0.047     
+0.10   0.08   2.2    -1     1     -0.148  0.078  0.034    
+0.13   0.12   3.1    -1     1     -0.100  0.072  0.020   
+0.20   0.20   5.0    -1     1     -0.182  0.084  0.026   
+                               
+0.08   0.06   1.2    -1     1     -0.174  0.092  0.047   
+0.10   0.08   1.9    -1     1     -0.170  0.073  0.031  
+0.13   0.11   2.8    -1     1     -0.249  0.078  0.025 
+0.19   0.17   4.9    -1     1     -0.059  0.072  0.011  
+
+#  A_{UT,I}^{cos(phi-phi_S) sin(phi)}
+# overall:
+#  0.12   0.09   2.5    1     -1   0.005  0.040  0.015   
+
+0.03   0.08   1.9     1    -1      -0.100  0.069  0.044 
+0.10   0.10   2.5     1    -1       0.054  0.076  0.030  
+0.20   0.11   2.9     1    -1       0.144  0.083  0.020
+0.42   0.12   3.5     1    -1       0.024  0.113  0.029
+                               
+0.10   0.05   1.5     1    -1      -0.034  0.081  0.025 
+0.10   0.08   2.2     1    -1      -0.078  0.080  0.015
+0.13   0.12   3.1     1    -1       0.078  0.073  0.025
+0.20   0.20   5.0     1    -1       0.066  0.088  0.056
+                               
+0.08   0.06   1.2     1    -1      -0.034  0.093  0.018 
+0.10   0.08   1.9     1    -1      -0.036  0.079  0.020
+0.13   0.11   2.8     1    -1       0.028  0.076  0.026
+0.19   0.17   4.9     1    -1       0.056  0.079  0.035

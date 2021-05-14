@@ -1,0 +1,88 @@
+id = 65
+editor = KK
+
+
+### Experiment
+
+collaboration = HERMES
+process = ep2epgamma
+exptype = fixed target
+year = 2008
+reference = arXiv:0802.2499
+inspiretex = Airapetian:2008aa
+reference2 = Table 1a
+
+
+### Scattering Process 
+# hard ep2epgamma
+
+frame = Trento
+
+in1particle = e+
+in1energy = 27.6
+in1energyunit = GeV
+
+in2particle = p
+in2polarizationvector = T
+in2polarization = +1
+
+out1particle = e+
+out2particle = p
+out3particle = gamma
+
+
+### Observable
+# A^{sin(varphi)}_{UT,DVCS} 
+
+y1name = AUTDVCS
+y1namelong = Charge Averaged Transverse Target Spin Asymmetry
+y1unit = 1
+y1value = column4
+y1errorstatistic = column5
+y1errorsystematic = column6
+
+### x-axes
+
+x1name = tm
+x1unit = GeV^2
+x1value = column1
+
+x2name = xB
+x2unit = 1
+x2value = column2
+
+x3name = Q2
+x3unit = GeV^2
+x3value = column3
+
+
+x4name = varFTn
+x4unit = 1
+x4value = -1
+
+x5name = FTn
+x5unit = 1
+x5value = 0
+
+
+### Data
+table =
+# -t    x_B    Q^2         asym   stat.  syst.
+#################################################
+# overall:
+#0.12    0.09    2.5       -0.073  0.024  0.008
+
+0.03    0.08    1.9       -0.070  0.041  0.009  
+0.10    0.10    2.5       -0.067  0.043  0.017  
+0.20    0.11    2.9       -0.066  0.050  0.011  
+0.42    0.12    3.5       -0.153  0.080  0.015  
+
+0.10    0.05    1.5       -0.008  0.051  0.008  
+0.10    0.08    2.2       -0.079  0.049  0.010  
+0.13    0.12    3.1       -0.105  0.047  0.013  
+0.20    0.20    5.0       -0.201  0.058  0.027  
+
+0.08    0.06    1.2        0.044  0.056  0.012  
+0.10    0.08    1.9       -0.080  0.046  0.010  
+0.13    0.11    2.8       -0.113  0.049  0.012  
+0.19    0.17    4.9       -0.143  0.048  0.015  

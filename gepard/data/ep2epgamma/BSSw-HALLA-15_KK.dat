@@ -1,0 +1,93 @@
+id = 116
+editor = KK
+
+# the y1 data are derived from the phi measurement
+# of HALL A data from the experiment (BSS-HALLA-15)
+#
+# Enhancement of c1 harmonic syst err is included
+
+### Experiment
+
+collaboration = HALLA
+process = ep2epgamma
+exptype = fixed target
+year = 2015
+reference =  arXiv:1504.05453
+inspiretex = Defurne:2015kxq
+reference2 = FT analysis with MC error propagation by KK
+
+
+### Scattering Process
+
+frame = BMK
+
+in1particle = em
+in1energy = 5.7572
+in1energyunit = GeV
+in1polarizationvector = L
+in1polarization = +1
+
+in2particle = p
+
+out1particle = e
+out2particle = p
+out3particle = gamma
+
+
+### Observable 
+y1long = Weighted beam spin sum
+y1name = BSSw
+y1unit = nb/GeV^4
+y1value = column5
+y1errorstatistic = column6
+# syst error includes normalization error
+# where possible enhancements of cos(phi) term due
+# to cos(phi) modulation of error is included
+y1errorsystematic = column7
+
+
+### x-axes
+
+x1name = xB
+x1unit = 1
+x1value = column2
+
+x2name = Q2
+x2unit = GeV^2
+x2value = column1
+
+
+x3name = tm 
+x3unit = GeV^2
+x3value = column3
+
+x4name = FTn
+x4unit = 1
+x4value = column4
+
+
+### Data
+table=
+#   Q2     xB     tm  FTn    FTval    FTerr     syst
+#######################################################
+ 1.820  0.343  0.172   0   0.068905  0.000660  0.001907
+ 1.933  0.368  0.232   0   0.042258  0.000555  0.001170
+ 1.964  0.375  0.278   0   0.034412  0.000680  0.000952
+ 1.986  0.379  0.323   0   0.027976  0.000698  0.000774
+ 1.999  0.381  0.371   0   0.024626  0.000859  0.000682
+ 2.218  0.345  0.176   0   0.062456  0.000610  0.001729
+ 2.318  0.363  0.232   0   0.041363  0.000494  0.001145
+ 2.348  0.368  0.279   0   0.031719  0.000505  0.000878
+ 2.360  0.371  0.325   0   0.026016  0.000499  0.000720
+ 2.375  0.373  0.372   0   0.020411  0.000539  0.000565
+ 
+ 1.820  0.343  0.172   1  0.003906  0.000933  0.001542
+ 1.933  0.368  0.232   1  0.010201  0.000770  0.000959
+ 1.964  0.375  0.278   1  0.013047  0.000992  0.000798
+ 1.986  0.379  0.323   1  0.012621  0.001057  0.000659
+ 1.999  0.381  0.371   1  0.012960  0.001368  0.000590
+ 2.218  0.345  0.176   1 -0.001687  0.000849 -0.001397
+ 2.318  0.363  0.232   1  0.005213  0.000709  0.000929
+ 2.348  0.368  0.279   1  0.008828  0.000731  0.000724
+ 2.360  0.371  0.325   1  0.009946  0.000754  0.000604
+ 2.375  0.373  0.372   1  0.007871  0.000799  0.000474

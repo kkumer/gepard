@@ -1,0 +1,81 @@
+id = 54
+editor = DM
+# Sept. 2010
+#taken from figure 6
+# Updated by KK according to CLAS database
+
+
+### Experiment
+
+collaboration = CLAS
+process = ep2epgamma
+exptype = fixed target
+year = 2006
+reference = arXiv:hep-ex/0605012
+inspiretex = Chen:2006na
+
+
+### Scattering Process
+
+frame = Trento
+
+in1particle = e-
+in1energy = 5.7
+in1energyunit = GeV
+
+in2particle = p
+in2polarizationvector = L
+in2polarization = +1
+
+out1particle = e-
+out2particle = p
+out3particle = gamma
+
+
+### Observable 
+# A_{LU}
+
+
+y1name = TSA
+y1namelong = Target Spin Asymmetry
+y1unit = 1
+y1value = column3
+y1error = column4
+# only total error is known
+
+
+
+### x-axes
+
+x1name = xB
+# xi values were given, it was understood that xB= 2xi/(1+xi)
+x1unit = 1
+x1value = column1
+
+x2name = Q2
+x2unit = GeV^2
+x2value = 1.82
+
+x3name = tm
+x3unit = GeV^2
+x3value = column2
+
+x4name = FTn
+x4unit = 1
+x4value = -1
+
+### Data
+table =
+#  CLAS 2006 TSA
+# taken from 
+#  http://clas.sinp.msu.ru/cgi-bin/jlab/db.cgi?eid=92;search=on
+# xB   -t       TSA       error
+############################################
+0.276   0.149   0.1837    0.0731
+0.276   0.247   0.3443    0.08198
+0.276   0.437   0.2387    0.0604
+0.2059  0.31    0.07326   0.0874
+0.2955  0.31    0.2409    0.0608
+0.4033  0.31    0.385     0.0912
+
+

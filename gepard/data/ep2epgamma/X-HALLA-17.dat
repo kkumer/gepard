@@ -1,0 +1,88 @@
+id = 145
+editor = KK
+#Apr. 2020
+
+###Experiment
+
+collaboration = HALLA
+process = ep2epgamma
+exptype = fixed target
+year = 2017
+reference = arXiv:1703.09442
+reference2 = unweighted MC FT by KK
+
+
+### Scattering Process
+
+frame = Trento
+
+in1particle = e-
+in1energyunit = GeV
+
+in2particle = p
+
+out1particle = e-
+out2particle = p
+out3particle = gamma
+
+
+### Observable 
+y1name = XSintphi
+y1namelong = 3-fold Cross Section 
+y1unit = nb/GeV^4
+y1value = column5
+y1error = column6
+
+
+
+
+### x-axes
+
+x1name = in1energy
+x1unit = GeV
+x1value = column1
+
+x2name = tm
+x2unit = GeV^2
+x2value = column4
+
+x3name = xB
+x3unit = 1
+x3value = column3
+
+x4name = Q2
+x4unit = GeV^2
+x4value = column2
+
+x5name = FTn
+x5unit = 1
+x5value = 0
+
+
+
+### Data
+
+#  E    Q2     xB     tm     FTval     FTerr
+#################################################################
+5.550  1.51  0.359  0.180  0.589764  0.010875
+5.550  1.51  0.359  0.237  0.556795  0.011743
+5.550  1.52  0.361  0.298  0.472024  0.013754
+3.355  1.49  0.357  0.177  1.637205  0.033007
+3.355  1.50  0.359  0.236  1.508714  0.038994
+3.355  1.50  0.360  0.296  1.432574  0.193720
+5.550  1.74  0.359  0.183  0.435239  0.004876
+5.550  1.74  0.359  0.242  0.404921  0.004945
+5.550  1.74  0.359  0.302  0.374095  0.004959
+5.550  1.75  0.361  0.363  0.340715  0.005325
+4.455  1.74  0.357  0.181  0.740216  0.009280
+4.455  1.74  0.357  0.240  0.668093  0.009362
+4.455  1.74  0.358  0.301  0.580893  0.009518
+4.455  1.76  0.361  0.363  0.489844  0.009740
+5.550  1.98  0.357  0.182  0.417079  0.005914
+5.550  1.98  0.356  0.242  0.367256  0.005900
+5.550  1.98  0.356  0.302  0.317974  0.005906
+5.550  1.99  0.358  0.363  0.283582  0.005803
+4.455  1.98  0.356  0.182  0.776460  0.011488
+4.455  1.99  0.357  0.242  0.699272  0.011807
+4.455  2.00  0.360  0.304  0.539967  0.014337
+4.455  2.00  0.360  0.364  0.344215  0.011669

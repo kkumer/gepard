@@ -1,0 +1,91 @@
+id = 135
+editor = KK
+
+# the y1 data are derived from the phi measurement
+# of HALL A data from the experiment (BSD-HALLA-17-*)
+
+
+### Experiment
+
+collaboration = HALLA
+process = ep2epgamma
+exptype = fixed target
+year = 2017
+reference =  arXiv:1703.09442
+inspiretex = Defurne:2017paw
+reference2 = FT analysis with MC error propagation by KK
+
+
+### Scattering Process
+
+frame = BMK
+
+in1particle = em
+in1energyunit = GeV
+in1polarizationvector = L
+in1polarization = +1
+
+in2particle = p
+
+out1particle = e
+out2particle = p
+out3particle = gamma
+
+
+### Observable 
+
+y1name = BSDw
+y1long = Weighted beam spin difference
+y1unit = nb/GeV^4
+y1value = column5
+# Stat error by MC propagation 
+y1errorstatistic = column6
+# Normalization error of 4.2% from p. 4 of Hall A paper
+y1errornormalization = 0.042
+
+
+### x-axes
+
+x1name = in1energy
+x1unit = GeV
+x1value = column1
+
+x2name = Q2
+x2unit = GeV^2
+x2value = column2
+
+x3name = xB
+x3unit = 1
+x3value = column3
+
+x4name = tm
+x4unit = GeV^2
+x4value = column4
+
+x5name = FTn
+x5unit = 1
+x5value = -1
+
+
+### Data
+table=
+#  E    Q2     xB     tm     FTval   FTstaterr
+################################################
+5.550  1.51  0.359  0.180  0.009593  0.002316
+5.550  1.51  0.359  0.237  0.010267  0.002261
+5.550  1.52  0.361  0.298  0.009124  0.002605
+3.355  1.49  0.357  0.177  0.007629  0.006289
+3.355  1.50  0.359  0.236  0.014727  0.005029
+3.355  1.50  0.360  0.296  0.011350  0.005039
+5.550  1.74  0.359  0.183  0.006993  0.000973
+5.550  1.74  0.359  0.242  0.008445  0.000909
+5.550  1.74  0.359  0.302  0.006793  0.000899
+5.550  1.75  0.361  0.363  0.004566  0.000980
+4.455  1.74  0.357  0.181  0.011894  0.002040
+4.455  1.74  0.357  0.240  0.010291  0.001696
+4.455  1.74  0.358  0.301  0.009123  0.001585
+4.455  1.76  0.361  0.363  0.004462  0.001462
+5.550  1.98  0.357  0.182  0.009807  0.001473
+5.550  1.98  0.356  0.242  0.009819  0.001270
+5.550  1.98  0.356  0.302  0.006951  0.001141
+5.550  1.99  0.358  0.363  0.004682  0.001079

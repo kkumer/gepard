@@ -25,27 +25,6 @@ import gepard as g
 from gepard.constants import Mp2
 
 
-class KinematicsError(Exception):
-    pass
-
-
-def loaddata(datadir='data', approach=False):
-    """Return dictionary {id : DataSet, ...}  out of files in datadir.
-
-    approach defines conventions for frame, kinematics etc. to which data
-    is adapted.
-
-    """
-    data = {}
-    for file in os.listdir(datadir):
-        if os.path.splitext(file)[1] == ".dat":
-            dataset = g.data.DataSet(datafile=os.path.join(datadir, file))
-            if approach and dataset.process in ['ep2epgamma', 'en2engamma']:
-                [pt.to_conventions(approach) for pt in dataset]
-                [pt.prepare(approach) for pt in dataset]
-            data[dataset.id] = dataset
-    return data
-
 
 def _complete_xBWQ2(kin):
     """Make trio {xB, W, Q2} complete if two of them are given in 'kin'."""
@@ -127,45 +106,6 @@ def fill_kinematics(kin, old={}):
         kin.varphi = old.varphi
     return kin
 
-def parse(datafile):
-    """Parse `datafile` and return tuple (preamble, data).
-
-    `preamble` is dictionary obtained by converting datafile preamble
-    items into dictionary items like this:
-
-        y1 = BCA from datafile goes into   {'y1' : 'BCA', ...}
-
-    `data` is actual numerical grid of experimental data converted 
-    into list of lists
-
-    """
-    # [First] parsing the formatted ASCII file
-    desc = {}   # description preamble (reference, kinematics, ...)
-    data = []   # actual data grid  x1 x2  ... y1 dy1_stat dy1_syst ...
-    dataFile = open(datafile, 'r')
-    dataFileLine = dataFile.readline()
-    while dataFileLine:
-        # remove comments
-        dataFileLine = dataFileLine.split('#')[0]
-        # only lines with '=' (premble) or with numbers only (data grid) are parsed
-        if re.search(r'=', dataFileLine):
-            # converting preamble line into dictionary item
-            desctpl = tuple([s.strip() for s in dataFileLine.split("=")])
-            desc[desctpl[0]] = desctpl[1] 
-        if re.match(r'([ \t]*[-\.\d]+[ \t\r]+)+', dataFileLine):
-            # FIXME: TAB-delimited columns are not handled! Only spaces are OK.
-            snumbers = re.findall(r'[-\.\d]+', dataFileLine)
-            numbers = []
-            for s in snumbers:
-                f = float(s)
-                if (f - int(f)) == 0:  # we have integer
-                    numbers.append(int(f))
-                else:
-                    numbers.append(f)
-            data.append(list(map(float, numbers)))
-        dataFileLine = dataFile.readline()
-
-    return desc, data
 
 def npars(m):
     """Return number of free (not fixed) parameters of MINUIT object m."""
@@ -175,17 +115,6 @@ def npars(m):
         if 'fix_'+key in m.parameters.keys() and not m.parameters['fix_'+key]:
             n += 1
     return n
-
-def str2num(s):
-    """Convert string to number, taking care if it should be int or float.
-    
-    http://mail.python.org/pipermail/tutor/2003-November/026136.html
-    """
-
-    if "." in s:
-        return float(s) 
-    else:
-        return int(s)
 
 
 def prettyprint(all_numbers):

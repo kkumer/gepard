@@ -10,13 +10,25 @@ import copy
 import math
 import os
 import re
+import sys
 
 import gepard as g  # noqa: F401
 from gepard.constants import Mp, Mp2
 
 
+class KinematicsError(Exception):
+    """Exception throwsn when kinematics is unphysical."""
+    pass
+
+
 class DummyPoint(dict):
-    """This is only used for creating simple DataPoint-like objects."""
+    """This is only used for creating simple DataPoint-like objects.
+
+    Todo:
+        DummyPoint has now become more like base class for DataPoint.
+        DummyPoint and DataPoint should be merged into one class.
+
+    """
 
     def __init__(self, init=None):
         """Simple "dummy" data point.
@@ -36,22 +48,21 @@ class DummyPoint(dict):
         self.t = None
         self.Q2 = None
         # -- Process type --
-        self.pid = None
+        self.pid = None   # FIXME: this looks superfluous
         # from https://stackoverflow.com/questions/4984647/
         super(DummyPoint, self).__init__()
         self.__dict__ = self
         if init:
             self.update(init)
 
-    def to_conventions(self, approach):
-        approach.to_conventions(self)
-        return
 
     def prepare(self, approach):
+        """Pre-calculate some kinematics."""
         approach.prepare(self)
         return
 
     def copy(self):
+        """Copy the DataPoint object."""
         # Do we need copy.deepcopy?
         new = copy.copy(self)
         new.__dict__ = new
@@ -107,6 +118,7 @@ class DataPoint(DummyPoint):
         # we want accessibility via both attributes and dict keys
         super(DataPoint, self).__init__()
         self.__dict__ = self
+        self.errtypes = ['err', 'errminus', 'errplus', 'errstat', 'errsyst', 'errnorm']
         # 1. Put reference to container into attribute
         self.dataset = dataset
         # 2. Put data into attributes
@@ -182,7 +194,7 @@ class DataPoint(DummyPoint):
             # alternative:
             # self.err = (self.errplus+self.errminus)/2.
         # 2e. calculate standard kinematical variables
-        g.utils.fill_kinematics(self)
+        DataPoint.fill_kinematics(self)
         # 2f. polarizations
         # Unpolarized in1 particle
         if 'in1polarization' not in self:
@@ -196,6 +208,170 @@ class DataPoint(DummyPoint):
 
     def __repr__(self):
         return "DataPoint: " + self.yaxis + " = " + str(self.val)
+
+    @staticmethod
+    def _complete_xBWQ2(kin):
+        """Make trio {xB, W, Q2} complete if two of them are given in 'kin'."""
+        if 'W' in kin and 'Q2' in kin and 'xB' not in kin:
+            kin.xB = kin.Q2 / (kin.W**2 + kin.Q2 - Mp2)
+        elif 'xB' in kin and 'Q2' in kin and 'W' not in kin:
+            kin.W = math.sqrt(kin.Q2 / kin.xB - kin.Q2 + Mp2)
+        elif 'xB' in kin and 'W' in kin and 'Q2' not in kin:
+            kin.Q2 = kin.xB * (kin.W**2 - Mp2) / (1. - kin.xB)
+        else:
+            raise KinematicsError('Exactly two of {xB, W, Q2} should be given.')
+        return
+
+    @staticmethod
+    def _complete_tmt(kin):
+        """Make duo {t, tm} complete if one of them is given in 'kin'."""
+        if 't' in kin and 'tm' not in kin:
+            assert kin.t <= 0
+            kin.tm = - kin.t
+        elif 'tm' in kin and 't' not in kin:
+            assert kin.tm >= 0
+            kin.t = - kin.tm
+        else:
+            raise KinematicsError('Exactly one of {t, tm} should be given.')
+        return
+
+    @staticmethod
+    def fill_kinematics(kin, old={}):
+        """Return complete up-to-date kinematical dictionary.
+
+        Complete set of kinematical variables is {xB, t, Q2, W, s, xi, tm, phi}.
+        Using standard identities, missing values are calculated, if possible, first
+        solely from values given in 'kin', and then, second, using values in 'old',
+        if provided.
+
+        """
+        kkeys = set(kin.keys())
+        trio = set(['xB', 'W', 'Q2'])
+        if len(trio.intersection(kkeys)) == 3:
+            raise KinematicsError('Overdetermined set {xB, W, Q2} given.')
+        elif len(trio.intersection(kkeys)) == 2:
+            DataPoint._complete_xBWQ2(kin)
+        elif len(trio.intersection(kkeys)) == 1 and old:
+            given = trio.intersection(kkeys).pop()  # one variable given in 'kin'
+            # We treat only the case when one of {xB, Q2} is given and second is
+            # then taken from 'old'
+            if given == 'xB':
+                kin.Q2 = old.Q2
+            elif given == 'Q2':
+                kin.xB = old.xB
+            DataPoint._complete_xBWQ2(kin)
+        else:
+            # We have zero givens, so take all three from 'old'
+            if old:
+                for key in trio:
+                    kin.__setattr__(key, old.__getattribute__(key))
+        # FIXME: xi is just fixed by xB - it cannot be given by user
+        # There are t/Q2 corrections, cf. BMK Eq. (4), but they are 
+        # formally higher twist and it is maybe sensible to DEFINE xi, 
+        # the argument of CFF, as follows:
+        kin.xi = kin.xB / (2. - kin.xB)
+        duo = set(['t', 'tm'])
+        if len(duo.intersection(kkeys)) == 2:
+            raise KinematicsError('Overdetermined set {t, tm=-t} given.')
+        elif len(duo.intersection(kkeys)) == 1:
+            DataPoint._complete_tmt(kin)
+        else:
+            # We have zero givens, so take both from 'old'
+            if old:
+                for key in duo:
+                    kin.__setattr__(key, old.__getattribute__(key))
+        # s is just copied from old, if there is one
+        if old and 's' in old:
+            kin.s = old.s
+        # phi and varphi are copied from old, if possible and necessary
+        if 'phi' not in kin and 'phi' in old:
+            kin.phi = old.phi
+        if 'varphi' not in kin and 'varphi' in old:
+            kin.varphi = old.varphi
+        return kin
+
+    def to_conventions(self):
+        """Transform datapoint into gepard's conventions."""
+        self.origval = self.val  # to remember it for later convenience
+        for errtype in self.errtypes:
+            if hasattr(self, errtype):
+                setattr(self, 'orig'+errtype, getattr(self, errtype))
+        # C1. azimutal angle phi should be in radians.
+        if 'phi' in self and hasattr(self, 'units') and self.units['phi'][:3] == 'deg':
+            self.phi = self.phi * math.pi / 180.
+            self.newunits['phi'] = 'rad'
+        # C2. phi_{Trento} -> (pi - phi_{BKM})
+        if 'frame' in self and self.frame == 'Trento':
+            if 'phi' in self:
+                self.phi = math.pi - self.phi
+            elif 'FTn' in self:
+                if self.FTn == 1 or self.FTn == 3 or self.FTn == -2:
+                    self.val = - self.val
+        # C3. varphi_{Trento} -> (varphi_{BKM} + pi)
+            if 'varphi' in self:
+                self.varphi = self.varphi - math.pi
+            elif 'varFTn' in self:
+                if self.varFTn == 1 or self.varFTn == -1:
+                    self.val = - self.val
+                else:
+                    raise ValueError('varFTn = {} not allowed. Only +/-1!'.format(
+                                     self.varFTn))
+            self.newframe = 'BMK'
+        # C4. cross-sections should be in nb
+        if hasattr(self, 'units') and self.units[self.y1name] == 'pb/GeV^4':
+            self.val = self.val/1000
+            for errtype in self.errtypes:
+                if hasattr(self, errtype):
+                    err = getattr(self, errtype)
+                    setattr(self, errtype, err/1000)
+            self.newunits[self.y1name] = 'nb/GeV^4'
+
+#    to_conventions = staticmethod(to_conventions)
+
+    def from_conventions(self):
+        """Transform stuff from Approach's conventions into original data's."""
+        # C4. cross-sections should be in nb
+        if hasattr(self, 'units') and self.units[self.y1name] == 'pb/GeV^4':
+            self.val = self.val*1000
+            for errtype in self.errtypes:
+                if hasattr(self, errtype):
+                    err = getattr(self, errtype)
+                    setattr(self, errtype, err*1000)
+        # C2. phi_{BKM} -> (pi - phi_{Trento})
+        if 'frame' in self and self.frame == 'Trento':
+            if 'phi' in self:
+                self.phi = math.pi - self.phi
+            elif 'FTn' in self:
+                if self.FTn == 1 or self.FTn == 3:
+                    self.val = - self.val
+        # C3. varphi_{Trento} -> (varphi_{BKM} + pi)
+            if 'varphi' in self:
+                self.varphi = self.varphi + math.pi
+            elif 'varFTn' in self:
+                if self.varFTn == 1 or self.varFTn == -1:
+                    self.val = - self.val
+            self.newframe = 'Trento'
+        # C1. azimutal angle phi back to degrees
+        if 'phi' in self and hasattr(self, 'units') and self.units['phi'][:3] == 'deg':
+            self.phi = self.phi / math.pi * 180.
+
+#     from_conventions = staticmethod(from_conventions)
+
+#     def orig_conventions(self, val):
+#         """Like from_conventions, but for the prediction val."""
+#         # This doesn't touches self
+#         # C4. cross-sections nb --> pb
+#         if hasattr(self, 'units') and self.units[self.y1name] == 'pb/GeV^4':
+#             val = val*1000
+#         # C2. phi_{BKM} --> (pi - phi_{Trento})
+#         if 'frame' in self and self.frame == 'Trento' and 'FTn' in self:
+#             if self.FTn == 1 or self.FTn == 3 or self.FTn == -2:
+#                 val = - val
+#         if 'frame' in self and self.frame == 'Trento' and 'varFTn' in self:
+#             if self.varFTn == 1 or self.varFTn == -1:
+#                 val = - val
+#         return val
+#     orig_conventions = staticmethod(orig_conventions)
 
 
 class DataSet(list):
@@ -219,13 +395,13 @@ class DataSet(list):
         else:
             # we have datafile
             list.__init__(self)
-            preamble, data = g.utils.parse(datafile)
+            preamble, data = self.parse(datafile)
 
             # Create needed attributes before creating `DataPoint`s
             # Preamble stuff goes into attributes
             for key in preamble:
                 try: # try to convert to number everything that is number
-                    setattr(self, key, g.utils.str2num(preamble[key]))
+                    setattr(self, key, DataSet._str2num(preamble[key]))
                 except ValueError: # rest stays as is
                     setattr(self, key, preamble[key])
 
@@ -292,3 +468,80 @@ class DataSet(list):
             raise IndexError("""%s has only %d items and your slice 
                 starts at %d""" % (self, len(self), start))
         return DataSet(self[start:end:None])
+
+    def parse(self, datafile):
+        """Parse `datafile` and return tuple (preamble, data).
+
+        `preamble` is dictionary obtained by converting datafile preamble
+        items into dictionary items like this:
+
+            y1 = BCA from datafile goes into   {'y1' : 'BCA', ...}
+
+        `data` is actual numerical grid of experimental data converted 
+        into list of lists
+
+        """
+        # [First] parsing the formatted ASCII file
+        desc = {}   # description preamble (reference, kinematics, ...)
+        data = []   # actual data grid  x1 x2  ... y1 dy1_stat dy1_syst ...
+        dataFile = open(datafile, 'r')
+        dataFileLine = dataFile.readline()
+        while dataFileLine:
+            # remove comments
+            dataFileLine = dataFileLine.split('#')[0]
+            # only lines with '=' (premble) or with numbers only (data grid) are parsed
+            if re.search(r'=', dataFileLine):
+                # converting preamble line into dictionary item
+                desctpl = tuple([s.strip() for s in dataFileLine.split("=")])
+                desc[desctpl[0]] = desctpl[1]
+            if re.match(r'([ \t]*[-\.\d]+[ \t\r]+)+', dataFileLine):
+                # FIXME: TAB-delimited columns are not handled! Only spaces are OK.
+                snumbers = re.findall(r'[-\.\d]+', dataFileLine)
+                numbers = []
+                for s in snumbers:
+                    f = float(s)
+                    if (f - int(f)) == 0:  # we have integer
+                        numbers.append(int(f))
+                    else:
+                        numbers.append(f)
+                data.append(list(map(float, numbers)))
+            dataFileLine = dataFile.readline()
+
+        return desc, data
+
+    @staticmethod
+    def _str2num(s):
+        """Convert string to number, taking care if it should be int or float.
+        
+        http://mail.python.org/pipermail/tutor/2003-November/026136.html
+        """
+
+        if "." in s:
+            return float(s) 
+        else:
+            return int(s)
+
+
+    @staticmethod
+    def loaddata(datadir='./data'):
+        """Return dictionary {id : DataSet, ...}  out of files in datadir."""
+        data = {}
+        for file in os.listdir(datadir):
+            if os.path.splitext(file)[1] == ".dat":
+                dataset = DataSet(datafile=os.path.join(datadir, file))
+                for pt in dataset:
+                    pt.to_conventions()
+                data[dataset.id] = dataset
+        return data
+
+#    loaddata = staticmethod(loaddata)
+
+
+# FIXME: This is not a proper approach for package, see
+# https://stackoverflow.com/questions/779495/access-data-in-package-subdirectory
+this_dir, this_filename = os.path.split(__file__)
+dset = DataSet.loaddata(datadir=os.path.join(this_dir, 'data', 'ep2epgamma'))
+dset.update(DataSet.loaddata(datadir=os.path.join(this_dir, 'data', 'gammastarp2Mp')))
+dset.update(DataSet.loaddata(datadir=os.path.join(this_dir, 'data', 'gammastarp2gammap')))
+dset.update(DataSet.loaddata(datadir=os.path.join(this_dir, 'data', 'en2engamma')))
+dset.update(DataSet.loaddata(datadir=os.path.join(this_dir, 'data', 'DIS')))

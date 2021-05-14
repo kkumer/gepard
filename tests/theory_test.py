@@ -16,10 +16,10 @@ par_fit = {'ns':  0.152039, 'al0s': 1.15751, 'alps': 0.15, 'ms': 0.478391,
            'al0g': 1.24732, 'alpg': 0.15, 'mg': 0.7, 'secg': -0.81217, 'thig': 0.}
 
 
-data = g.utils.loaddata('/home/kkumer/gepard/pype/data/gammastarp2gammap',
-                        approach=g.theory.BMK)
-HERAtestpts = data[39] + data[45]
-pt6 = data[36][0]
+# data = g.utils.loaddata('/home/kkumer/gepard/pype/data/gammastarp2gammap',
+                        # approach=g.theory.BMK)
+HERAtestpts = g.data.dset[39] + g.data.dset[45]
+pt6 = g.data.dset[36][0]
 
 
 def test_XDVCSt_noevol():
@@ -91,8 +91,8 @@ def test_chisq_Xt():
     m = g.model.MellinBarnesModel(gpds=fit_gpd)
     th = g.theory.BMK(model=m)
     th.m.parameters.update(par_fit)
-    assert th.chisq_single(data[39][2:4]) == approx(1.012533085207716)
-    assert th.chisq_para(data[39][2:4]) == approx(1.012533085207716)
+    assert th.chisq_single(g.data.dset[39][2:4]) == approx(1.012533085207716)
+    assert th.chisq_para(g.data.dset[39][2:4]) == approx(1.012533085207716)
 
 
 def test_chisq_X():
@@ -101,8 +101,8 @@ def test_chisq_X():
     m = g.model.MellinBarnesModel(gpds=fit_gpd)
     th = g.theory.BMK(model=m)
     th.m.parameters.update(par_fit)
-    assert th.chisq_single([data[45][3]]) == approx(0.29405520100706245)
-    assert th.chisq_para([data[45][3]]) == approx(0.29405520100706245)
+    assert th.chisq_single([g.data.dset[45][3]]) == approx(0.29405520100706245)
+    assert th.chisq_para([g.data.dset[45][3]]) == approx(0.29405520100706245)
 
 
 # def test_chisq_aux():
@@ -133,5 +133,5 @@ def test_chisq_XtX():
     m = g.model.MellinBarnesModel(gpds=fit_gpd)
     th = g.theory.BMK(model=m)
     th.m.parameters.update(par_fit)
-    assert th.chisq_single(data[39][2:]+data[45]) == approx(10.47326924258)
+    assert th.chisq_single(g.data.dset[39][2:]+g.data.dset[45]) == approx(10.47326924258)
     # assert th.chisq_para(data[39][2:]+data[45]) == approx(10.47326924258)

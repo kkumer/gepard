@@ -3,9 +3,8 @@
 import os
 import sys
 
-from pytest import approx, mark
-
 import gepard as g
+from pytest import approx, mark
 
 os.environ["OPENBLAS_MAIN_FREE"] = "1"
 
@@ -13,12 +12,12 @@ sys.path.append('/home/kkumer/g')
 sys.path.append('/home/kkumer/g/gepard')
 
 
-data = g.utils.loaddata('/home/kkumer/gepard/pype/data/gammastarp2gammap',
-                        approach=g.theory.BMK)
+# data = g.utils.loaddata('/home/kkumer/gepard/pype/data/gammastarp2gammap',
+#                         approach=g.theory.BMK)
 
-DVCSpoints = data[36] + data[37] + data[38] + data[39] + \
-  data[40] + data[41] + data[42] + data[43] + data[44] + \
-  data[45]
+DVCSpoints = g.data.dset[36] + g.data.dset[37] + g.data.dset[38] + g.data.dset[39] + \
+  g.data.dset[40] + g.data.dset[41] + g.data.dset[42] + g.data.dset[43] + \
+  g.data.dset[44] + g.data.dset[45]
 
 
 def test_gepardfitDVCSnlso3():
@@ -38,8 +37,8 @@ def test_gepardfitDVCSnlso3():
                             'alpg': 0.15,
                             'mg': 0.7})
     # To pre-calculate wce for parallel execution:
-    th.chisq_single(data[39])
-    f = g.fitter.FitterMinuit(data[39], th)
+    th.chisq_single(g.data.dset[39])
+    f = g.fitter.FitterMinuit(g.data.dset[39], th)
     f.fix_parameters('ALL')
     f.release_parameters('ms')
     f.minuit.migrad()

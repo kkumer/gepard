@@ -1,0 +1,98 @@
+id = 86
+editor = KK
+editor1 = DM
+#2014/10/5 
+#kinmetical points are corrected
+#otherwise DM agrees with results
+
+
+### Experiment
+
+collaboration = CLAS_KK
+process = ep2epgamma
+exptype = fixed target
+year = 2014
+reference =  private communication
+reference2 = F.T. by K.K.
+
+
+### Scattering Process
+
+frame = Trento
+
+in1particle = em
+in1energy = 5.932
+in1energyunit = GeV
+
+in2particle = p
+in2polarizationvector = L
+in2polarization = +1
+
+out1particle = em
+out2particle = p
+out3particle = gamma
+
+
+### Observable 
+# A_{UL}
+
+
+y1name = TSA
+y1namelong = Beam Spin Asymmetry
+y1unit = 1
+y1value = column5
+y1error = column6 
+# only statistical error is given to us
+
+
+
+### x-axes
+
+x1name = Q2
+x1unit = GeV^2
+x1value = column2
+
+x2name = xB
+x2unit = 1
+x2value = column1
+
+x3name = tm
+x3unit = GeV^2
+x3value = column3
+
+
+x4name = FTn
+x4unit = 1
+x4value = column4
+
+### Data
+table =
+#
+#  CLAS 2014 TSA
+#
+# xB     Q2     -t     FTn    A_{UL}  stat
+###########################################################
+# First two bins are problematic
+#0.18    1.53   0.23    -1    0.206    0.272
+#0.18    1.53   0.476   -1    0.264    0.335
+0.2473  1.9791  0.1358  -1    0.131    0.0215
+0.2585  2.0477  0.2278  -1    0.174    0.026
+0.2579  1.9433  0.4573  -1    0.175    0.0339
+0.2545  2.3622  0.1378  -1    0.11     0.0328
+0.2648  2.4475  0.2286  -1    0.13     0.0375
+0.2655  2.4579  0.4431  -1    0.0923   0.0459
+0.3372  2.6702  0.2401  -1    0.234    0.0312
+0.3496  2.6655  0.4558  -1    0.235    0.0245
+0.4423  3.3141  0.5068  -1    0.252    0.0492
+#  sin(2\phi)
+#0.18    1.53   0.23    -2    0.0345   0.334
+#0.18    1.53   0.476   -2    0.0654   0.405
+0.2473  1.9791  0.1358  -2   -0.0298   0.0232
+0.2585  2.0477  0.2278  -2   -0.0082   0.0279
+0.2579  1.9433  0.4573  -2   -0.0411   0.0394
+0.2545  2.3622  0.1378  -2   -0.0444   0.0363
+0.2648  2.4475  0.2286  -2    0.0486   0.0394
+0.2655  2.4579  0.4431  -2    0.0597   0.0572
+0.3372  2.6702  0.2401  -2   -0.0503   0.0335
+0.3496  2.6655  0.4558  -2   -0.0521   0.0236
+0.4423  3.3141  0.5068  -2   -0.0477   0.0567
