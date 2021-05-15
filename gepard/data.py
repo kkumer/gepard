@@ -10,7 +10,6 @@ import copy
 import math
 import os
 import re
-import sys
 
 import gepard as g  # noqa: F401
 from gepard.constants import Mp, Mp2
@@ -194,7 +193,7 @@ class DataPoint(DummyPoint):
             # alternative:
             # self.err = (self.errplus+self.errminus)/2.
         # 2e. calculate standard kinematical variables
-        DataPoint.fill_kinematics(self)
+        _fill_kinematics(self)
         # 2f. polarizations
         # Unpolarized in1 particle
         if 'in1polarization' not in self:
@@ -208,87 +207,6 @@ class DataPoint(DummyPoint):
 
     def __repr__(self):
         return "DataPoint: " + self.yaxis + " = " + str(self.val)
-
-    @staticmethod
-    def _complete_xBWQ2(kin):
-        """Make trio {xB, W, Q2} complete if two of them are given in 'kin'."""
-        if 'W' in kin and 'Q2' in kin and 'xB' not in kin:
-            kin.xB = kin.Q2 / (kin.W**2 + kin.Q2 - Mp2)
-        elif 'xB' in kin and 'Q2' in kin and 'W' not in kin:
-            kin.W = math.sqrt(kin.Q2 / kin.xB - kin.Q2 + Mp2)
-        elif 'xB' in kin and 'W' in kin and 'Q2' not in kin:
-            kin.Q2 = kin.xB * (kin.W**2 - Mp2) / (1. - kin.xB)
-        else:
-            raise KinematicsError('Exactly two of {xB, W, Q2} should be given.')
-        return
-
-    @staticmethod
-    def _complete_tmt(kin):
-        """Make duo {t, tm} complete if one of them is given in 'kin'."""
-        if 't' in kin and 'tm' not in kin:
-            assert kin.t <= 0
-            kin.tm = - kin.t
-        elif 'tm' in kin and 't' not in kin:
-            assert kin.tm >= 0
-            kin.t = - kin.tm
-        else:
-            raise KinematicsError('Exactly one of {t, tm} should be given.')
-        return
-
-    @staticmethod
-    def fill_kinematics(kin, old={}):
-        """Return complete up-to-date kinematical dictionary.
-
-        Complete set of kinematical variables is {xB, t, Q2, W, s, xi, tm, phi}.
-        Using standard identities, missing values are calculated, if possible, first
-        solely from values given in 'kin', and then, second, using values in 'old',
-        if provided.
-
-        """
-        kkeys = set(kin.keys())
-        trio = set(['xB', 'W', 'Q2'])
-        if len(trio.intersection(kkeys)) == 3:
-            raise KinematicsError('Overdetermined set {xB, W, Q2} given.')
-        elif len(trio.intersection(kkeys)) == 2:
-            DataPoint._complete_xBWQ2(kin)
-        elif len(trio.intersection(kkeys)) == 1 and old:
-            given = trio.intersection(kkeys).pop()  # one variable given in 'kin'
-            # We treat only the case when one of {xB, Q2} is given and second is
-            # then taken from 'old'
-            if given == 'xB':
-                kin.Q2 = old.Q2
-            elif given == 'Q2':
-                kin.xB = old.xB
-            DataPoint._complete_xBWQ2(kin)
-        else:
-            # We have zero givens, so take all three from 'old'
-            if old:
-                for key in trio:
-                    kin.__setattr__(key, old.__getattribute__(key))
-        # FIXME: xi is just fixed by xB - it cannot be given by user
-        # There are t/Q2 corrections, cf. BMK Eq. (4), but they are 
-        # formally higher twist and it is maybe sensible to DEFINE xi, 
-        # the argument of CFF, as follows:
-        kin.xi = kin.xB / (2. - kin.xB)
-        duo = set(['t', 'tm'])
-        if len(duo.intersection(kkeys)) == 2:
-            raise KinematicsError('Overdetermined set {t, tm=-t} given.')
-        elif len(duo.intersection(kkeys)) == 1:
-            DataPoint._complete_tmt(kin)
-        else:
-            # We have zero givens, so take both from 'old'
-            if old:
-                for key in duo:
-                    kin.__setattr__(key, old.__getattribute__(key))
-        # s is just copied from old, if there is one
-        if old and 's' in old:
-            kin.s = old.s
-        # phi and varphi are copied from old, if possible and necessary
-        if 'phi' not in kin and 'phi' in old:
-            kin.phi = old.phi
-        if 'varphi' not in kin and 'varphi' in old:
-            kin.varphi = old.varphi
-        return kin
 
     def to_conventions(self):
         """Transform datapoint into gepard's conventions."""
@@ -401,7 +319,7 @@ class DataSet(list):
             # Preamble stuff goes into attributes
             for key in preamble:
                 try: # try to convert to number everything that is number
-                    setattr(self, key, DataSet._str2num(preamble[key]))
+                    setattr(self, key, _str2num(preamble[key]))
                 except ValueError: # rest stays as is
                     setattr(self, key, preamble[key])
 
@@ -509,18 +427,6 @@ class DataSet(list):
 
         return desc, data
 
-    @staticmethod
-    def _str2num(s):
-        """Convert string to number, taking care if it should be int or float.
-        
-        http://mail.python.org/pipermail/tutor/2003-November/026136.html
-        """
-
-        if "." in s:
-            return float(s) 
-        else:
-            return int(s)
-
 
     @staticmethod
     def loaddata(datadir='./data'):
@@ -535,6 +441,99 @@ class DataSet(list):
         return data
 
 #    loaddata = staticmethod(loaddata)
+
+
+def _str2num(s):
+    """Convert string to number, taking care if it should be int or float.
+    
+    http://mail.python.org/pipermail/tutor/2003-November/026136.html
+    """
+
+    if "." in s:
+        return float(s) 
+    else:
+        return int(s)
+
+
+def _complete_xBWQ2(kin):
+    """Make trio {xB, W, Q2} complete if two of them are given in 'kin'."""
+    if 'W' in kin and 'Q2' in kin and 'xB' not in kin:
+        kin.xB = kin.Q2 / (kin.W**2 + kin.Q2 - Mp2)
+    elif 'xB' in kin and 'Q2' in kin and 'W' not in kin:
+        kin.W = math.sqrt(kin.Q2 / kin.xB - kin.Q2 + Mp2)
+    elif 'xB' in kin and 'W' in kin and 'Q2' not in kin:
+        kin.Q2 = kin.xB * (kin.W**2 - Mp2) / (1. - kin.xB)
+    else:
+        raise KinematicsError('Exactly two of {xB, W, Q2} should be given.')
+    return
+
+
+def _complete_tmt(kin):
+    """Make duo {t, tm} complete if one of them is given in 'kin'."""
+    if 't' in kin and 'tm' not in kin:
+        assert kin.t <= 0
+        kin.tm = - kin.t
+    elif 'tm' in kin and 't' not in kin:
+        assert kin.tm >= 0
+        kin.t = - kin.tm
+    else:
+        raise KinematicsError('Exactly one of {t, tm} should be given.')
+    return
+
+def _fill_kinematics(kin, old={}):
+    """Return complete up-to-date kinematical dictionary.
+
+    Complete set of kinematical variables is {xB, t, Q2, W, s, xi, tm, phi}.
+    Using standard identities, missing values are calculated, if possible, first
+    solely from values given in 'kin', and then, second, using values in 'old',
+    if provided.
+
+    """
+    kkeys = set(kin.keys())
+    trio = set(['xB', 'W', 'Q2'])
+    if len(trio.intersection(kkeys)) == 3:
+        raise KinematicsError('Overdetermined set {xB, W, Q2} given.')
+    elif len(trio.intersection(kkeys)) == 2:
+        _complete_xBWQ2(kin)
+    elif len(trio.intersection(kkeys)) == 1 and old:
+        given = trio.intersection(kkeys).pop()  # one variable given in 'kin'
+        # We treat only the case when one of {xB, Q2} is given and second is
+        # then taken from 'old'
+        if given == 'xB':
+            kin.Q2 = old.Q2
+        elif given == 'Q2':
+            kin.xB = old.xB
+        _complete_xBWQ2(kin)
+    else:
+        # We have zero givens, so take all three from 'old'
+        if old:
+            for key in trio:
+                kin.__setattr__(key, old.__getattribute__(key))
+    # FIXME: xi is just fixed by xB - it cannot be given by user
+    # There are t/Q2 corrections, cf. BMK Eq. (4), but they are 
+    # formally higher twist and it is maybe sensible to DEFINE xi, 
+    # the argument of CFF, as follows:
+    kin.xi = kin.xB / (2. - kin.xB)
+    duo = set(['t', 'tm'])
+    if len(duo.intersection(kkeys)) == 2:
+        raise KinematicsError('Overdetermined set {t, tm=-t} given.')
+    elif len(duo.intersection(kkeys)) == 1:
+        _complete_tmt(kin)
+    else:
+        # We have zero givens, so take both from 'old'
+        if old:
+            for key in duo:
+                kin.__setattr__(key, old.__getattribute__(key))
+    # s is just copied from old, if there is one
+    if old and 's' in old:
+        kin.s = old.s
+    # phi and varphi are copied from old, if possible and necessary
+    if 'phi' not in kin and 'phi' in old:
+        kin.phi = old.phi
+    if 'varphi' not in kin and 'varphi' in old:
+        kin.varphi = old.varphi
+    return kin
+
 
 
 # FIXME: This is not a proper approach for package, see

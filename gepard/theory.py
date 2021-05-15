@@ -681,12 +681,12 @@ class BMK(Theory):
         # Overriding pt kinematics with those from kwargs
         if 'vars' in kwargs:
             ptvars = g.DummyPoint(init=kwargs['vars'])
-            kin = g.utils.fill_kinematics(ptvars, old=pt)
+            kin = gepard.data._fill_kinematics(ptvars, old=pt)
             BMK.prepare(kin)
         else:
             # just copy everything from pt
             ptempty = g.DummyPoint()
-            kin = g.utils.fill_kinematics(ptempty, old=pt)
+            kin = gepard.data._fill_kinematics(ptempty, old=pt)
             BMK.prepare(kin)
             ## Nothing seems to be gained by the following approach:
             #kin = dict((i, getattr(pt, i)) for i in
