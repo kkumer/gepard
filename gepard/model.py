@@ -115,6 +115,94 @@ class ParameterModel(Model):
                 or not self.parameters_fix[p]]
 
 
+# --- Models for Elastic Form Factors --- #
+
+class ElasticFormFactors(Model):
+    """Dirac and Pauli elastic form factors F_1 and F_2."""
+
+
+class ElasticDipole(ElasticFormFactors):
+    """Dipole approximation from DM's notebook."""
+
+    def F1(self, pt):
+        """Dirac elastic proton form factor - dipole parametrization."""
+        t = pt.t
+        if 'in2particle' in pt and pt.in2particle == 'p':
+            return (1.41 * (1.26 - t))/((0.71 - t)**2 * (3.53 - t))
+        else:
+            print('Neutron dipole elastic FFs are not implemented yet! Use Kelly.')
+
+    def F2(self, pt):
+        """Pauli elastic proton form factor - dipole parametrization."""
+        t = pt.t
+        if 'in2particle' in pt and pt.in2particle == 'p':
+            return 3.2 / ((0.71 - t)**2 * (3.53 - t))
+        else:
+            print('Neutron dipole elastic FFs are not implemented yet! Use Kelly.')
+
+
+class ElasticKelly(ElasticFormFactors):
+    """Kelly's approximation from DM's notebook."""
+
+    def F1(self, pt):
+        """Dirac elastic nucleon form factor - Kelly's parametrization."""
+        if 'in2particle' in pt and pt.in2particle == 'n':
+            return self.nF1(pt.t)
+        else:   # proton is default
+            return self.pF1(pt.t)
+
+    def F2(self, pt):
+        """Dirac elastic nucleon form factor - Kelly's parametrization."""
+        if 'in2particle' in pt and pt.in2particle == 'n':
+            return self.nF2(pt.t)
+        else:   # proton is default
+            return self.pF2(pt.t)
+
+    def pF1(self, t):
+        """Dirac elastic proton form factor - Kelly's parametrization."""
+        return ((1 + 0.06815437285120148*t)/(1 - 3.118062557942468*t +
+                1.0338391956016382*t**2 - 0.5031268669574522*t**3) -
+                (0.7931031653189349*(1 - 0.03407718642560074*t)*t) /
+                (1 - 3.115222792407001*t + 1.520921000705686*t**2 -
+                0.14999913420898098*t**3))/(1 - 0.28397655354667284*t)
+
+    def pF2(self, t):
+        """Pauli elastic proton form factor - Kelly's parametrization."""
+        return (-((1 + 0.06815437285120148*t)/(1 - 3.118062557942468*t +
+                1.0338391956016382*t**2 - 0.5031268669574522*t**3)) +
+                (2.792847351*(1 - 0.03407718642560074*t))/(1 -
+                3.115222792407001*t + 1.520921000705686*t**2 -
+                0.14999913420898098*t**3)) / (1 - 0.28397655354667284*t)
+
+    def nF1(self, t):
+        """Dirac elastic neutron form factor - Kelly's parametrization."""
+        return ((-0.4842637275288574*t)/((1 - 1.4084507042253522*t)**2 *
+                (1 - 0.9345440355820054*t)) +
+                (0.5417644379086957*(1 - 0.6598447281533554*t)*t) /
+                (1 - 4.168632789020339*t + 1.9408278987597791*t**2 -
+                1.9100884849907935*t**3))/(1 - 0.2831951622975774*t)
+
+    def nF2(self, t):
+        """Pauli elastic neutron form factor - Kelly's parametrization."""
+        return ((0.4842637275288574*t)/((1 - 1.4084507042253522*t)**2 *
+                (1 - 0.9345440355820054*t)) - (1.9130427*(1 - 0.6598447281533554*t)) /
+                (1 - 4.168632789020339*t + 1.9408278987597791*t**2 -
+                1.9100884849907935*t**3))/(1 - 0.2831951622975774*t)
+
+
+class ElasticZero(ElasticFormFactors):
+    """Set F1=F2=0 to get just DVCS^2."""
+
+    def F1(self, pt):
+        return 0.
+
+    def F2(self, pt):
+        return 0.
+
+
+# --- Models for GPDs --- #
+
+
 class ConformalSpaceGPD(ParameterModel):
     """Base class of GPD models built in conformal moment space."""
 
@@ -223,12 +311,50 @@ class Fit(ConformalSpaceGPD):
     gpd_H = gpd_H_single  # multiprocessing version is actually slower
 
 
-class MellinBarnesModel(ParameterModel):
-    """Class of models built by Mellin-Barnes integration.
+# --- Models for Compton Form Factors --- #
 
-    Todo:
-        It should most likely NOT inherit from ConformalSpaceModel!
+class ComptonFormFactors(ParameterModel):
+    """Base class for CFFs.
+
+    CFFs are set to be zero here. Actual models are built by subclassing this.
     """
+
+    allCFFs = ['ImH', 'ReH', 'ImE', 'ReE', 'ImHt', 'ReHt', 'ImEt', 'ReEt']
+    allCFFsb = ['ImH', 'ReH', 'ImE', 'ReE', 'ImHt', 'ReHt', 'ImEt', 'ReEb']
+    allCFFeffs = ['ImHeff', 'ReHeff', 'ImEeff', 'ReEeff',
+                  'ImHteff', 'ReHteff', 'ImEteff', 'ReEteff']
+    # allGPDs = []
+
+    def print_CFFs(self, pt, format=None):
+        """Print values of CFFs at given kinematic point."""
+        vals = [getattr(self, cff)(pt) for cff in self.allCFFs]
+        if format == 'mma':
+            s = "{" + 8*"%s -> %f, "
+            s = s[:-2] + "}"
+        else:
+            s = 8*"%4s = %5.2f\n"
+        print(s % g.utils.flatten(tuple(zip(self.allCFFs, vals))))
+
+    # Initial definition of all CFFs. All just return zero.
+    for name in allCFFs:
+        exec('def %s(self, pt): return 0.' % name)
+
+    for name in allCFFeffs:
+        exec('def %s(self, pt): return 0.' % name)
+
+    # Define E-bar as xi*E-tilde
+    def ReEb(self, pt):
+        return (pt.xi)*self.ReEt(pt)
+
+    def is_within_model_kinematics(self, pt):
+        """Check if kinematics is sensible."""
+        return ((1.5 <= pt.Q2 <= 5.) and
+                (pt.tm < min(1., pt.Q2/4)) and
+                (1e-3 < pt.xB < 0.5))
+
+
+class MellinBarnesModel(ParameterModel):
+    """Class of models built by Mellin-Barnes integration."""
 
     def __init__(self, gpds: ConformalSpaceGPD) -> None:
         """Init MellinBarnes class and pre-calculate stuff.
@@ -317,3 +443,220 @@ class MellinBarnesModel(ParameterModel):
         reh, imh = self._mellin_barnes_integral(xi, wce_ar_dvmp, h)
         return (g.constants.CF * g.constants.F_rho * astrong / g.constants.NC
                 / np.sqrt(q2) * np.array([reh, imh, 0, 0, 0, 0, 0, 0]))
+
+
+class ComptonDispersionRelations(ComptonFormFactors):
+    """Use dispersion relations for real parts of CFFs.
+
+    methods: ReH, ReE, ReHt, ReEt, subtraction
+    Subclass should implement ansaetze for ImH, ImE, ImHt, ImEt
+    and subtraction. This class implements just dispersion integrals.
+    """
+
+    def dispargV(self, x, fun, pt):
+        """Integrand of the dispersion integral (vector case).
+
+        fun -- Im(CFF)
+        With variable change x->x^(1/(1-ga))=u in
+        order to tame the singularity at x=0.
+
+        """
+        ga = 0.9  # Nice value obtained by experimentation in Mathematica
+        u = x**(1./(1.-ga))
+        res = u**ga * (fun(pt, u) - fun(pt))
+        return (2.*u) / (pt.xi**2 - u**2) * res / (1.-ga)
+
+    def dispargA(self, x, fun, pt):
+        """ Integrand of the dispersion integral (axial-vector case)
+
+        fun -- Im(CFF)
+        With variable change x->x^(1/(1-ga))=u in
+        order to tame the singularity at x=0.
+
+        """
+        ga = 0.9  # Value same as for V-case (TODO: is this the best choice?)
+        u = x**(1./(1.-ga))
+        res = u**ga * (fun(pt, u) - fun(pt))
+        return (2. * pt.xi) / (pt.xi**2 - u**2) * res / (1.-ga)
+
+    def subtraction(self, pt):
+        return 0  # default
+
+    def ReH(self, pt):
+        """ Real part of CFF H.
+
+        Given by dispersion integral over ImH minus subtraction constant.
+
+        """
+        res = g.quadrature.PVquadrature(self.dispargV, 0, 1, (self.ImH, pt))
+        pvpi = (res + log(pt.xi**2 / (1.-pt.xi**2)) * self.ImH(pt)) / pi
+        # P.V./pi - subtraction constant C/(1-t/MC^2)^2
+        return pvpi - self.subtraction(pt)
+
+    def ReHt(self, pt):
+        """ Real part of CFF Ht.
+
+        Given by dispersion integral over ImHt.
+
+        """
+        res = g.quadrature.PVquadrature(self.dispargA, 0, 1, (self.ImHt, pt))
+        pvpi = (res + log((1.+pt.xi)/(1.-pt.xi)) * self.ImHt(pt))/pi
+        return pvpi   # this is P.V./pi
+
+    def ReE(self, pt):
+        """Real part of CFF E.
+
+        Given by dispersion integral over ImE plus subtraction constant.
+
+        """
+        res = g.quadrature.PVquadrature(self.dispargV, 0, 1, (self.ImE, pt))
+        pvpi = (res + log(pt.xi**2 / (1.-pt.xi**2)) * self.ImE(pt)) / pi
+        # This is same subtraction constant
+        # as for H, but with opposite sign
+        return pvpi + self.subtraction(pt)
+
+    def ReEt(self, pt):
+        """ Real part of CFF Et.
+
+        Given by dispersion integral over ImEt
+
+        """
+        res = g.quadrature.PVquadrature(self.dispargA, 0, 1, (self.ImEt, pt))
+        pvpi = (res + log((1.+pt.xi)/(1.-pt.xi)) * self.ImEt(pt))/pi
+        return pvpi   # this is P.V./pi
+
+
+class PionPole(object):
+    """Various options for pion-pole contribution."""
+
+    def DMfixpole(self, pt):
+        """Fixed pion-pole as used by Dieter."""
+        pole = (2.2390424 * (1. - (1.7*(0.0196 - pt.t))/(1.
+                - pt.t/2.)**2))/((0.0196 - pt.t)*pt.xi)
+        if 'in2particle' in pt and pt.in2particle == 'n':
+            return -pole  # neutron
+        else:
+            return pole  # proton
+
+    def DMfreepole(self, pt):
+        """Free pion-pole as proposed by Dieter."""
+        pole = (self.parameters['rpi'] * 2.16444 / (0.0196 - pt.t) / (1.
+                - pt.t/self.parameters['Mpi']**2)**2 / pt.xi)
+        if 'in2particle' in pt and pt.in2particle == 'n':
+            return -pole  # neutron
+        else:
+            return pole  # proton
+
+
+class ComptonModelDR(ComptonDispersionRelations, PionPole):
+    """Model for CFFs as in arXiv:0904.0458."""
+
+    def __init__(self, **kwargs):
+        # initial values of parameters and limits on their values
+        self.parameters = {'Nsea': 1.5, 'alS': 1.13, 'alpS': 0.15,
+                           'MS': 0.707, 'rS': 1.0,
+                           'bS': 2.0,      'limit_bS': (0.4, 5.0),
+                           'Nv': 1.35,
+                           'alv': 0.43,
+                           'alpv': 0.85,
+                           'Mv': 1.0,     'limit_Mv': (0.4, 1.5),
+                           'rv': 0.5,     'limit_rv': (0., 8.),
+                           'bv': 2.2,     'limit_bv': (0.4, 5.),
+                           'C': 7.0,      'limit_C': (-10., 10.),
+                           'MC': 1.3,     'limit_MC': (0.4, 2.),
+                           'tNv': 0.0,
+                           'tal': 0.43,
+                           'talp': 0.85,
+                           'tMv': 2.7,    'limit_tMv': (0.4, 2.),
+                           'trv': 6.0,    'limit_trv': (0., 8.),
+                           'tbv': 3.0,    'limit_tbv': (0.4, 5.)}
+
+        # order matters to fit.MinuitFitter, so it is defined by:
+        self.parameter_names = ['Nsea', 'alS', 'alpS', 'MS', 'rS', 'bS',
+                                'Nv', 'alv', 'alpv', 'Mv', 'rv', 'bv',
+                                'C', 'MC',
+                                'tNv', 'tal', 'talp',
+                                'tMv', 'trv', 'tbv']
+
+        # now do whatever else is necessary
+        ComptonFormFactors.__init__(self, **kwargs)
+
+    def subtraction(self, pt):
+        return self.parameters['C']/(1.-pt.t/self.parameters['MC']**2)**2
+
+    def ImH(self, pt, xi=0):
+        """Imaginary part of CFF H."""
+        p = self.parameters  # just a shortcut
+        # FIXME: The following solution is not elegant
+        if isinstance(xi, np.ndarray):
+            # function was called with third argument that is xi nd array
+            x = xi
+        elif xi != 0:
+            # function was called with third argument that is xi number
+            x = xi
+        else:
+            # xi should be taken from pt object
+            x = pt.xi
+        t = pt.t
+        twox = 2.*x / (1.+x)
+        onex = (1.-x) / (1.+x)
+        if 'in2particle' in pt and pt.in2particle == 'n':
+            chgfac = (1.*4./9. + 2./9.)  # neutron
+        else:
+            chgfac = (2.*4./9. + 1./9.)  # proton
+        val = (chgfac * p['Nv'] * p['rv'] * twox**(-p['alv']-p['alpv']*t) *
+               onex**p['bv'] / (1. - onex*t/(p['Mv']**2)))
+        sea = ((2./9.) * p['Nsea'] * p['rS'] * twox**(-p['alS']-p['alpS']*t) *
+               onex**p['bS'] / (1. - onex*t/(p['MS']**2))**2)
+        return pi * (val + sea) / (1.+x)
+
+    def ImHt(self, pt, xi=0):
+        """Imaginary part of CFF Ht i.e. tilde{H}."""
+        p = self.parameters  # just a shortcut
+        # FIXME: The following solution is not elegant
+        if isinstance(xi, np.ndarray):
+            # function was called with third argument that is xi nd array
+            x = xi
+        elif xi != 0:
+            # function was called with third argument that is xi number
+            x = xi
+        else:
+            # xi should be taken from pt object
+            x = pt.xi
+        t = pt.t
+        twox = 2.*x / (1.+x)
+        onex = (1.-x) / (1.+x)
+        try:
+            regge = (-p['tal']-p['talp']*t)
+        except KeyError:
+            # Old models take Regge trajectory params from H:
+            regge = (-p['alv']-p['alpv']*t)
+        if 'in2particle' in pt and pt.in2particle == 'n':
+            chgfac = (1.*4./9. + 2./9.)  # neutron
+        else:
+            chgfac = (2.*4./9. + 1./9.)  # proton
+        val = (chgfac * p['tNv'] * p['trv']
+               * twox**regge * onex**p['tbv'] / (1. - onex*t/(p['tMv']**2)))
+        return pi * val / (1.+x)
+
+    def ImE(self, pt, xi=0):
+        """Imaginary part of CFF E."""
+        # Just changing function signature w.r.t. ComptonFormFactors
+        # to make it compatible for dispersion integral
+        return 0
+
+    def ReEt(self, pt):
+        """Instead of disp. rel. use pole formula."""
+        return self.DMfixpole(pt)
+
+
+# For compatibility with old models in database:
+# ComptonModelDRsea = ComptonModelDR
+
+#  --- Complete models ---
+class ModelDR(ComptonModelDR, ElasticDipole):
+    """Complete model as in arXiv:0904.0458.."""
+
+
+class ModelDRKelly(ComptonModelDR, ElasticKelly):
+    """Same, but with Kelly elastic form factors."""

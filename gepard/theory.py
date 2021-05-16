@@ -72,7 +72,7 @@ class Theory(object):
         """Return pull of a single Datapoint."""
         return (self.predict(pt, observable=pt.yaxis) - pt.val) / pt.err
 
-    def chisq_para(self, points: gepard.data.DataSet, asym: bool = False, 
+    def chisq_para(self, points: gepard.data.DataSet, asym: bool = False,
                    **kwargs) -> float:
         """Return total chi-square - parallel version.
 
@@ -680,12 +680,12 @@ class BMK(Theory):
         """
         # Overriding pt kinematics with those from kwargs
         if 'vars' in kwargs:
-            ptvars = g.DummyPoint(init=kwargs['vars'])
+            ptvars = gepard.data.DummyPoint(init=kwargs['vars'])
             kin = gepard.data._fill_kinematics(ptvars, old=pt)
             BMK.prepare(kin)
         else:
             # just copy everything from pt
-            ptempty = g.DummyPoint()
+            ptempty = gepard.data.DummyPoint()
             kin = gepard.data._fill_kinematics(ptempty, old=pt)
             BMK.prepare(kin)
             ## Nothing seems to be gained by the following approach:
