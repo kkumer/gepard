@@ -387,8 +387,10 @@ class MellinBarnesModel(ParameterModel):
         self.wg = gpds.wg
         self.gpds = gpds
         self.parameters = gpds.parameters
+        # Consolidate parameters, both the same and updated from above
+        self.gpds.parameters = self.parameters
         self.tgj = np.tan(pi*self.jpoints/2.)
-        # wce[q2] = wce[spw, j, a] - Wilson coeffs evolved; local to model instance
+        # wce[Q2] = wce[spw, j, a] - Wilson coeffs evolved; local to model instance
         self.wce: Dict[float, np.ndarray] = {}  # DVCS
         self.wce_dvmp: Dict[float, np.ndarray] = {}  # DVMP
         super().__init__()
@@ -412,7 +414,7 @@ class MellinBarnesModel(ParameterModel):
         reh = np.dot(self.wg, cch.imag)
         return reh, imh
 
-    def cff(self, xi: float, t: float, q2: float) -> np.ndarray:
+    def cff(self, xi: float, t: float, Q2: float) -> np.ndarray:
         """Return array(ReH, ImH, ReE, ...) for kinematic point."""
         if self.nf == 3:
             chargefac = 2./9.
@@ -420,12 +422,12 @@ class MellinBarnesModel(ParameterModel):
             chargefac = 5./18.
 
         try:
-            wce_ar = self.wce[q2]
+            wce_ar = self.wce[Q2]
         except KeyError:
             # calculate it
-            wce_ar = g.evolc.calc_wce(self, q2)
+            wce_ar = g.evolc.calc_wce(self, Q2)
             # memorize it for future
-            self.wce[q2] = wce_ar
+            self.wce[Q2] = wce_ar
         h = self.gpds.gpd_H(xi, t)
         reh, imh = self._mellin_barnes_integral(xi, wce_ar, h)
         e = self.gpds.gpd_E(xi, t)
@@ -435,7 +437,7 @@ class MellinBarnesModel(ParameterModel):
     # FIXME: Now fast cludge to get it to work. Code duplication
     #  and superfluous code execution while running
 
-    def ImH(self, xi: float, t: float, q2: float) -> np.ndarray:
+    def ImH(self, pt: g.data.DataPoint) -> np.ndarray:
         """Return Im(CFF H) for kinematic point."""
         if self.nf == 3:
             chargefac = 2./9.
@@ -443,75 +445,78 @@ class MellinBarnesModel(ParameterModel):
             chargefac = 5./18.
 
         try:
-            wce_ar = self.wce[q2]
+            wce_ar = self.wce[pt.Q2]
         except KeyError:
-            wce_ar = g.evolc.calc_wce(self, q2)
-            self.wce[q2] = wce_ar
-        h = self.gpds.gpd_H(xi, t)
-        reh, imh = self._mellin_barnes_integral(xi, wce_ar, h)
+            wce_ar = g.evolc.calc_wce(self, pt.Q2)
+            self.wce[pt.Q2] = wce_ar
+        h = self.gpds.gpd_H(pt.xi, pt.t)
+        reh, imh = self._mellin_barnes_integral(pt.xi, wce_ar, h)
         return chargefac * imh
 
-    def ReH(self, xi: float, t: float, q2: float) -> np.ndarray:
+    def ReH(self, pt: g.data.DataPoint) -> np.ndarray:
         """Return Re(CFF H) for kinematic point."""
+        xi, t, Q2 = pt.xi, pt.t, pt.Q2
         if self.nf == 3:
             chargefac = 2./9.
         else:  # nf = 4
             chargefac = 5./18.
 
         try:
-            wce_ar = self.wce[q2]
+            wce_ar = self.wce[Q2]
         except KeyError:
-            wce_ar = g.evolc.calc_wce(self, q2)
-            self.wce[q2] = wce_ar
+            wce_ar = g.evolc.calc_wce(self, Q2)
+            self.wce[Q2] = wce_ar
         h = self.gpds.gpd_H(xi, t)
         reh, imh = self._mellin_barnes_integral(xi, wce_ar, h)
         return chargefac * reh
 
-    def ImE(self, xi: float, t: float, q2: float) -> np.ndarray:
+    def ImE(self, pt: g.data.DataPoint) -> np.ndarray:
         """Return Im(CFF E) for kinematic point."""
+        xi, t, Q2 = pt.xi, pt.t, pt.Q2
         if self.nf == 3:
             chargefac = 2./9.
         else:  # nf = 4
             chargefac = 5./18.
 
         try:
-            wce_ar = self.wce[q2]
+            wce_ar = self.wce[Q2]
         except KeyError:
-            wce_ar = g.evolc.calc_wce(self, q2)
-            self.wce[q2] = wce_ar
+            wce_ar = g.evolc.calc_wce(self, Q2)
+            self.wce[Q2] = wce_ar
         e = self.gpds.gpd_E(xi, t)
         ree, ime = self._mellin_barnes_integral(xi, wce_ar, e)
         return chargefac * ime
 
-    def ReE(self, xi: float, t: float, q2: float) -> np.ndarray:
+    def ReE(self, pt: g.data.DataPoint) -> np.ndarray:
         """Return Re(CFF E) for kinematic point."""
+        xi, t, Q2 = pt.xi, pt.t, pt.Q2
         if self.nf == 3:
             chargefac = 2./9.
         else:  # nf = 4
             chargefac = 5./18.
 
         try:
-            wce_ar = self.wce[q2]
+            wce_ar = self.wce[Q2]
         except KeyError:
-            wce_ar = g.evolc.calc_wce(self, q2)
-            self.wce[q2] = wce_ar
+            wce_ar = g.evolc.calc_wce(self, Q2)
+            self.wce[Q2] = wce_ar
         e = self.gpds.gpd_E(xi, t)
         ree, ime = self._mellin_barnes_integral(xi, wce_ar, e)
         return chargefac * ree
 
-    def tff(self, xi: float, t: float, q2: float) -> np.ndarray:
+    def tff(self, xi: float, t: float, Q2: float) -> np.ndarray:
         """Return array(ReH_rho, ImH_rho, ReE_rho, ...) of DVrhoP transition FFs."""
         assert self.nf == 4
 
-        astrong = 2 * pi * g.qcd.as2pf(self.p, self.nf,  q2, self.asp[self.p], self.r20)
+        astrong = 2 * pi * g.qcd.as2pf(self.p, self.nf,  Q2, self.asp[self.p], self.r20)
 
         try:
-            wce_ar_dvmp = self.wce_dvmp[q2]
+            wce_ar_dvmp = self.wce_dvmp[Q2]
         except KeyError:
             # calculate it
-            wce_ar_dvmp = g.evolc.calc_wce_dvmp(self, q2)
+            wce_ar_dvmp = g.evolc.calc_wce_dvmp(self, Q2)
             # memorize it for future
-            self.wce_dvmp[q2] = wce_ar_dvmp
+            self.wce_dvmp[Q2] = wce_ar_dvmp
         # Evaluations depending on model parameters:
         h_prerot = self.gpds.gpd_H(xi, t)
         # Flavor rotation matrix: (sea,G,uv,dv) --> (SIG, G, NS+, NS-)
@@ -523,7 +528,7 @@ class MellinBarnesModel(ParameterModel):
         h = np.einsum('fa,ja->jf', frot_rho_4, h_prerot)
         reh, imh = self._mellin_barnes_integral(xi, wce_ar_dvmp, h)
         return (g.constants.CF * g.constants.F_rho * astrong / g.constants.NC
-                / np.sqrt(q2) * np.array([reh, imh, 0, 0, 0, 0, 0, 0]))
+                / np.sqrt(Q2) * np.array([reh, imh, 0, 0, 0, 0, 0, 0]))
 
 
 class ComptonDispersionRelations(ComptonFormFactors):
@@ -533,6 +538,10 @@ class ComptonDispersionRelations(ComptonFormFactors):
     Subclass should implement ansaetze for ImH, ImE, ImHt, ImEt
     and subtraction. This class implements just dispersion integrals.
     """
+
+    def __init__(self) -> None:
+        """Init."""
+        super().__init__()
 
     def dispargV(self, x, fun, pt):
         """Integrand of the dispersion integral (vector case).
@@ -598,7 +607,7 @@ class ComptonDispersionRelations(ComptonFormFactors):
         return pvpi + self.subtraction(pt)
 
     def ReEt(self, pt):
-        """ Real part of CFF Et.
+        """Real part of CFF Et.
 
         Given by dispersion integral over ImEt
 
@@ -634,6 +643,7 @@ class ComptonModelDR(ComptonDispersionRelations, PionPole):
     """Model for CFFs as in arXiv:0904.0458."""
 
     def __init__(self, **kwargs):
+        """Constructor."""
         # initial values of parameters and limits on their values
         self.parameters = {'Nsea': 1.5, 'alS': 1.13, 'alpS': 0.15,
                            'MS': 0.707, 'rS': 1.0,
@@ -654,14 +664,12 @@ class ComptonModelDR(ComptonDispersionRelations, PionPole):
                            'tbv': 3.0,    'limit_tbv': (0.4, 5.)}
 
         # order matters to fit.MinuitFitter, so it is defined by:
-        self.parameter_names = ['Nsea', 'alS', 'alpS', 'MS', 'rS', 'bS',
-                                'Nv', 'alv', 'alpv', 'Mv', 'rv', 'bv',
-                                'C', 'MC',
-                                'tNv', 'tal', 'talp',
-                                'tMv', 'trv', 'tbv']
-
-        # now do whatever else is necessary
-        ComptonFormFactors.__init__(self, **kwargs)
+#         self.parameter_names = ['Nsea', 'alS', 'alpS', 'MS', 'rS', 'bS',
+#                                 'Nv', 'alv', 'alpv', 'Mv', 'rv', 'bv',
+#                                 'C', 'MC',
+#                                 'tNv', 'tal', 'talp',
+#                                 'tMv', 'trv', 'tbv']
+        super().__init__()
 
     def subtraction(self, pt):
         return self.parameters['C']/(1.-pt.t/self.parameters['MC']**2)**2
@@ -731,9 +739,81 @@ class ComptonModelDR(ComptonDispersionRelations, PionPole):
         """Instead of disp. rel. use pole formula."""
         return self.DMfixpole(pt)
 
-
 # For compatibility with old models in database:
 # ComptonModelDRsea = ComptonModelDR
+
+
+class ComptonModelDRPP(ComptonModelDR):
+    """Model for CFFs as in arXiv:0904.0458. + free pion pole."""
+
+    def __init__(self, **kwargs):
+        """Constructor."""
+        # First inhert what's needed
+        ComptonModelDR.__init__(self, **kwargs)
+        # Adding two extra parameters:
+        self.parameters.update({
+             'rpi': 1.0,    'limit_rpi': (-8, 8.),
+             'Mpi': 1.0,    'limit_Mpi': (0.4, 4.)})
+        # self.parameter_names.append('rpi')
+        # self.parameter_names.append('Mpi')
+        # now do whatever else is necessary
+        # ComptonFormFactors.__init__(self, **kwargs)
+
+    def ReEt(self, pt):
+        """Instead of disp. rel. use pole formula."""
+        return self.DMfreepole(pt)
+
+
+class ComptonHybrid(ComptonFormFactors):
+    """This combines MB model for small xB and DR model for valence xB."""
+
+    def __init__(self, instMB: MellinBarnesModel, instDR: ComptonModelDR, **kwargs):
+        """Initializes with one instance of MB model and one of DR model."""
+        self.MB = instMB
+        self.DR = instDR
+        self.DR.parameters['Nsea'] = 0.  # sea comes from Gepard part
+        self.parameters = {**self.MB.parameters, **self.DR.parameters}
+        # Consolidate parameters of all models, base and derived
+        self.MB.parameters = self.parameters
+        self.DR.parameters = self.parameters
+        self.MB.gpds.parameters = self.parameters
+        # self.parameter_names = self.DR.parameter_names + self.Gepard.parameter_names
+
+    def is_within_model_kinematics(self, pt):
+        """Is kinematics of datapoint ok?"""
+        # relaxing xBmin and removing Q2max
+        return ((1.5 <= pt.Q2) and
+                (pt.tm < min(1., pt.Q2/4)) and
+                (1e-5 < pt.xB < 0.65))
+
+    # FIXME: this below looks inconsistent generally for xi != pt.xi !!
+
+    def ImH(self, pt, xi=0):
+        return self.MB.ImH(pt) + self.DR.ImH(pt, xi)
+
+    def ReH(self, pt):
+        return self.MB.ReH(pt) + self.DR.ReH(pt)
+
+    def ImE(self, pt, xi=0):
+        return self.MB.ImE(pt) + self.DR.ImE(pt, xi)
+
+    def ReE(self, pt):
+        return self.MB.ReE(pt) + self.DR.ReE(pt)
+
+    # Tildes are not provided by MB model
+
+    def ImHt(self, pt, xi=0):
+        return self.DR.ImHt(pt, xi)
+
+    def ReHt(self, pt):
+        return self.DR.ReHt(pt)
+
+    def ImEt(self, pt):
+        return self.DR.ImEt(pt)
+
+    def ReEt(self, pt):
+        return self.DR.ReEt(pt)
+
 
 #  --- Complete models ---
 class ModelDR(ComptonModelDR, ElasticDipole):

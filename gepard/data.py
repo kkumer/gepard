@@ -98,6 +98,11 @@ class DataPoint(DummyPoint):
     (Is this type of inheritance, know also as "aquisition", good idea?)
     """
 
+    xB: float
+    Q2: float
+    W: float
+    t: float
+
     def __init__(self, gridline, dataset):
         """Take data gridline, construct `DataPoint` object and append it to dataset.
 
