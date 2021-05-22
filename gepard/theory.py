@@ -84,7 +84,7 @@ class Theory(object):
         chi = sum(p*p for p in allpulls)  # equal to m.fval if minuit fit is done
         return chi
 
-    chisq = chisq_para
+    chisq = chisq_single
 
     def predict(self, pt, error=False, CL=False, **kwargs):
         """Give prediction for DataPoint pt.
