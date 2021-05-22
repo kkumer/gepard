@@ -44,6 +44,22 @@ def test_cff_H_nlso3():
             (26.9984, 66.5255), abs=0.001)
 
 
+def test_cff_H_nlso3_separate():
+    """Test nl-so3 ReH, ImH (LO evolved to multiple Q2)."""
+    fit_gpd = g.model.Fit()
+    m_fit = g.model.MellinBarnesModel(gpds=fit_gpd)
+    m_fit.parameters.update(par_fit)
+    # Q2 can be changed during calls:
+    assert m_fit.ReH(pt0_fit.xi, pt0_fit.t, pt0_fit.Q2) == approx(
+            18.9540, abs=0.001)
+    assert m_fit.ImH(pt0_fit.xi, pt0_fit.t, pt0_fit.Q2) == approx(
+            60.1622, abs=0.001)
+    assert m_fit.ReH(pt_fit.xi, pt_fit.t, pt_fit.Q2) == approx(
+            26.9984, abs=0.001)
+    assert m_fit.ImH(pt_fit.xi, pt_fit.t, pt_fit.Q2) == approx(
+            66.5255, abs=0.001)
+
+
 def test_cff_E_nlso3():
     """Testing nl-so3 (ReE, ImE) (LO evolved to multiple Q2)."""
     fit_gpd = g.model.Fit()
@@ -53,3 +69,18 @@ def test_cff_E_nlso3():
             [13.2678, 42.11355])
     assert m_fit.cff(pt_fit.xi, pt_fit.t, pt_fit.Q2)[2:4] == approx(
             [13.5297, 43.6024], rel=1e-4)
+
+
+def test_cff_E_nlso3_separate():
+    """Testing nl-so3 ReE, ImE (LO evolved to multiple Q2)."""
+    fit_gpd = g.model.Fit()
+    m_fit = g.model.MellinBarnesModel(gpds=fit_gpd)
+    m_fit.parameters.update(par_fit)
+    assert m_fit.ReE(pt0_fit.xi, pt0_fit.t, pt0_fit.Q2) == approx(
+            13.2678)
+    assert m_fit.ImE(pt0_fit.xi, pt0_fit.t, pt0_fit.Q2) == approx(
+            42.11355)
+    assert m_fit.ReE(pt_fit.xi, pt_fit.t, pt_fit.Q2) == approx(
+            13.5297, rel=1e-4)
+    assert m_fit.ImE(pt_fit.xi, pt_fit.t, pt_fit.Q2) == approx(
+            43.6024, rel=1e-4)

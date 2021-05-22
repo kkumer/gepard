@@ -432,6 +432,73 @@ class MellinBarnesModel(ParameterModel):
         ree, ime = self._mellin_barnes_integral(xi, wce_ar, e)
         return chargefac * np.array([reh, imh, ree, ime, 0, 0, 0, 0])
 
+    # FIXME: Now fast cludge to get it to work. Code duplication
+    #  and superfluous code execution while running
+
+    def ImH(self, xi: float, t: float, q2: float) -> np.ndarray:
+        """Return Im(CFF H) for kinematic point."""
+        if self.nf == 3:
+            chargefac = 2./9.
+        else:  # nf = 4
+            chargefac = 5./18.
+
+        try:
+            wce_ar = self.wce[q2]
+        except KeyError:
+            wce_ar = g.evolc.calc_wce(self, q2)
+            self.wce[q2] = wce_ar
+        h = self.gpds.gpd_H(xi, t)
+        reh, imh = self._mellin_barnes_integral(xi, wce_ar, h)
+        return chargefac * imh
+
+    def ReH(self, xi: float, t: float, q2: float) -> np.ndarray:
+        """Return Re(CFF H) for kinematic point."""
+        if self.nf == 3:
+            chargefac = 2./9.
+        else:  # nf = 4
+            chargefac = 5./18.
+
+        try:
+            wce_ar = self.wce[q2]
+        except KeyError:
+            wce_ar = g.evolc.calc_wce(self, q2)
+            self.wce[q2] = wce_ar
+        h = self.gpds.gpd_H(xi, t)
+        reh, imh = self._mellin_barnes_integral(xi, wce_ar, h)
+        return chargefac * reh
+
+    def ImE(self, xi: float, t: float, q2: float) -> np.ndarray:
+        """Return Im(CFF E) for kinematic point."""
+        if self.nf == 3:
+            chargefac = 2./9.
+        else:  # nf = 4
+            chargefac = 5./18.
+
+        try:
+            wce_ar = self.wce[q2]
+        except KeyError:
+            wce_ar = g.evolc.calc_wce(self, q2)
+            self.wce[q2] = wce_ar
+        e = self.gpds.gpd_E(xi, t)
+        ree, ime = self._mellin_barnes_integral(xi, wce_ar, e)
+        return chargefac * ime
+
+    def ReE(self, xi: float, t: float, q2: float) -> np.ndarray:
+        """Return Re(CFF E) for kinematic point."""
+        if self.nf == 3:
+            chargefac = 2./9.
+        else:  # nf = 4
+            chargefac = 5./18.
+
+        try:
+            wce_ar = self.wce[q2]
+        except KeyError:
+            wce_ar = g.evolc.calc_wce(self, q2)
+            self.wce[q2] = wce_ar
+        e = self.gpds.gpd_E(xi, t)
+        ree, ime = self._mellin_barnes_integral(xi, wce_ar, e)
+        return chargefac * ree
+
     def tff(self, xi: float, t: float, q2: float) -> np.ndarray:
         """Return array(ReH_rho, ImH_rho, ReE_rho, ...) of DVrhoP transition FFs."""
         assert self.nf == 4
@@ -481,7 +548,7 @@ class ComptonDispersionRelations(ComptonFormFactors):
         return (2.*u) / (pt.xi**2 - u**2) * res / (1.-ga)
 
     def dispargA(self, x, fun, pt):
-        """ Integrand of the dispersion integral (axial-vector case)
+        """Integrand of the dispersion integral (axial-vector case).
 
         fun -- Im(CFF)
         With variable change x->x^(1/(1-ga))=u in
@@ -494,10 +561,11 @@ class ComptonDispersionRelations(ComptonFormFactors):
         return (2. * pt.xi) / (pt.xi**2 - u**2) * res / (1.-ga)
 
     def subtraction(self, pt):
+        """Subtraction constant."""
         return 0  # default
 
     def ReH(self, pt):
-        """ Real part of CFF H.
+        """Real part of CFF H.
 
         Given by dispersion integral over ImH minus subtraction constant.
 
@@ -508,7 +576,7 @@ class ComptonDispersionRelations(ComptonFormFactors):
         return pvpi - self.subtraction(pt)
 
     def ReHt(self, pt):
-        """ Real part of CFF Ht.
+        """Real part of CFF Ht.
 
         Given by dispersion integral over ImHt.
 
