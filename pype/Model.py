@@ -9,22 +9,21 @@ and parameter values can calculate observables.
 
 
 #from IPython.core.debugger import set_trace
-import pickle, sys
+import pickle
+import sys
 
 import logzero
+
 _lg = logzero.logger
 
-from numpy import log, pi, imag, real, sqrt, cos, sin, exp
-from numpy import ndarray, array, sum, loadtxt
 import scipy.stats
-from scipy.special import j0, j1, gamma, beta
+from numpy import (array, cos, exp, imag, loadtxt, log, ndarray, pi, real, sin,
+                   sqrt, sum)
 from scipy.interpolate import SmoothBivariateSpline
+from scipy.special import beta, gamma, j0, j1
 
-from quadrature import PVquadrature, bquadrature, rthtquadrature
-from utils import flatten, hubDictNew, stringcolor
-from consts import tolerance2, GeVfm, Mp
 import dispersion as DR
-
+import optModel
 import pygepard as g1
 import pygepard2 as g2
 import pygepard3 as g3
@@ -32,7 +31,9 @@ import pygepard4 as g4
 import pygepard5 as g5
 import pygepard6 as g6
 import pygepard7 as g7
-import optModel
+from consts import GeVfm, Mp, tolerance2
+from quadrature import PVquadrature, bquadrature, rthtquadrature
+from utils import flatten, hubDictNew, stringcolor
 
 
 class Model(object):
@@ -1870,6 +1871,8 @@ class ComptonGepard(ComptonFormFactors):
         self.g.parint.p = p
         self.g.parint.nf = 4
         self.g.parint.czero = 1
+
+        self.g.parint.pid = 1  # for DVCS, 0 is for DIS
 
         self.g.astrong.mu02 = 2.5
         self.g.astrong.asp = array([0.0606, 0.0518, 0.0488])
