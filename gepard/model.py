@@ -194,9 +194,11 @@ class ElasticZero(ElasticFormFactors):
     """Set F1=F2=0 to get just DVCS^2."""
 
     def F1(self, pt):
+        """Elastic em Dirac form factor F1 set to zero."""
         return 0.
 
     def F2(self, pt):
+        """Elastic em Pauli form factor F2 set to zero."""
         return 0.
 
 
@@ -242,12 +244,14 @@ class ConformalSpaceGPD(ParameterModel):
                            'ms': 1.1,
                            'secs': 0.,
                            'this': 0.,
+                           'kaps': 0.,
                            'ng': 0.4,
                            'al0g': 1.2,
                            'alpg': 0.25,
                            'mg': 1.2,
                            'secg': 0.,
-                           'thig': 0.}
+                           'thig': 0.,
+                           'kapg': 0.}
         super().__init__()
 
     def pw_strengths(self):
@@ -260,7 +264,13 @@ class ConformalSpaceGPD(ParameterModel):
                          [self.parameters['this'],
                              self.parameters['thig'], 0, 0]])
 
-        # gpd_H: np.ndarray    # trying to appease mypy
+    def gpd_H(self, eta: float, t: float) -> np.ndarray:
+        """Return (npts, 4) array H_j^a for all j-points and 4 flavors."""
+        return np.zeros((self.npts, 4), dtype=complex)
+
+    def gpd_E(self, eta: float, t: float) -> np.ndarray:
+        """Return (npts, 4) array E_j^a for all j-points and 4 flavors."""
+        return np.zeros((self.npts, 4), dtype=complex)
 
 
 class Test(ConformalSpaceGPD):
@@ -309,6 +319,15 @@ class Fit(ConformalSpaceGPD):
         return np.array(h)
 
     gpd_H = gpd_H_single  # multiprocessing version is actually slower
+
+    def gpd_E(self, eta: float, t: float) -> np.ndarray:
+        """Return (npts, 4) array E_j^a for all j-points and 4 flavors."""
+        e = []
+        kappa = np.array([self.parameters['kaps'], self.parameters['kapg'], 0, 0])
+        # FIXME: I'm using H params here, not E!
+        for j in self.jpoints:
+            e.append(g.gpdj.fit(j, t, self.parameters))
+        return kappa * np.array(e)
 
 
 # --- Models for Compton Form Factors --- #
@@ -416,7 +435,9 @@ class MellinBarnesModel(ParameterModel):
             self.wce[q2] = wce_ar
         h = self.gpds.gpd_H(xi, t)
         reh, imh = self._mellin_barnes_integral(xi, wce_ar, h)
-        return chargefac * np.array([reh, imh, 0, 0, 0, 0, 0, 0])
+        e = self.gpds.gpd_E(xi, t)
+        ree, ime = self._mellin_barnes_integral(xi, wce_ar, e)
+        return chargefac * np.array([reh, imh, ree, ime, 0, 0, 0, 0])
 
     def tff(self, xi: float, t: float, q2: float) -> np.ndarray:
         """Return array(ReH_rho, ImH_rho, ReE_rho, ...) of DVrhoP transition FFs."""
