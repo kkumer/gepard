@@ -289,6 +289,7 @@ class Test(ConformalSpaceGPD):
 
     def gpd_H(self, eta: float, t: float) -> np.ndarray:
         """Return (npts, 4) array H_j^a for all j-points and 4 flavors."""
+        # For testing purposes, we use here sub-optimal non-numpy algorithm
         h = []
         for j in self.jpoints:
             h.append(g.gpdj.test(j, t, self.parameters))
@@ -305,29 +306,21 @@ class Fit(ConformalSpaceGPD):
         kwargs.setdefault('q02', 4.0)
         super().__init__(**kwargs)
 
-    def gpd_H_single(self, eta: float, t: float) -> np.ndarray:
+    def gpd_H(self, eta: float, t: float) -> np.ndarray:
         """Return (npts, 4) array H_j^a for all j-points and 4 flavors."""
-        h = []
-        for j in self.jpoints:
-            h.append(g.gpdj.fit(j, t, self.parameters))
-        return np.array(h)
+        return g.gpdj.fit(self.jpoints, t, self.parameters).transpose()
 
     def gpd_H_para(self, eta: float, t: float) -> np.ndarray:
         """Return (npts, 4) array H_j^a for all j-points and 4 flavors."""
+        # This multiprocessing version is actually 2x slower!
         h = Parallel(n_jobs=20)(delayed(g.gpdj.fit)(j, t, self.parameters)
                                 for j in self.jpoints)
         return np.array(h)
 
-    gpd_H = gpd_H_single  # multiprocessing version is actually slower
-
     def gpd_E(self, eta: float, t: float) -> np.ndarray:
         """Return (npts, 4) array E_j^a for all j-points and 4 flavors."""
-        e = []
         kappa = np.array([self.parameters['kaps'], self.parameters['kapg'], 0, 0])
-        # FIXME: I'm using H params here, not E!
-        for j in self.jpoints:
-            e.append(g.gpdj.fit(j, t, self.parameters))
-        return kappa * np.array(e)
+        return kappa * g.gpdj.fit(self.jpoints, t, self.parameters).transpose()
 
 
 # --- Models for Compton Form Factors --- #

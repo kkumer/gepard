@@ -4,12 +4,15 @@ poch: Pochhammer symbol
   S1: harmonic sum
 """
 
-from scipy.special import psi   # type: ignore
+from typing import Union
+
+import numpy as np
+from scipy.special import psi  # type: ignore
 
 from gepard.constants import EMC
 
 
-def pochhammer(z: complex, m: int) -> complex:
+def pochhammer(z: Union[complex, np.ndarray], m: int) -> Union[complex, np.ndarray]:
     """Pochhammer symbol.
 
     Args:
@@ -30,9 +33,7 @@ def pochhammer(z: complex, m: int) -> complex:
     return p
 
 
-def S1(z: complex) -> complex:
+def S1(z: Union[complex, np.ndarray]) -> Union[complex, np.ndarray]:
     """Harmonic sum S_1."""
-
     S1 = EMC + psi(z+1)
-
     return S1

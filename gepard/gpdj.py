@@ -26,6 +26,7 @@ Todo:
 from cmath import exp
 from typing import Tuple
 
+import numpy as np
 from scipy.special import loggamma  # type: ignore
 
 import gepard.qj
@@ -50,11 +51,11 @@ def test(j: complex, t: float, par: dict) -> Tuple[complex, complex, complex, co
     return (singlet, gluon, 0+0j, 0+0j)
 
 
-def fit(j: complex, t: float, par: dict) -> Tuple[complex, complex, complex, complex]:
+def fit(j: np.ndarray, t: float, par: dict) -> np.ndarray:
     """Return default fitting singlet GPD ansatz."""
     par['ng'] = 0.6 - par['ns']  # first sum-rule constraint
     singlet = (gepard.qj.qj(j, t, 9, par['ns'], par['al0s'], par['alps']) *
                gepard.qj.betadip(j, t, par['ms'], 0., 2))
     gluon = (gepard.qj.qj(j, t, 7, par['ng'], par['al0g'], par['alpg']) *
              gepard.qj.betadip(j, t, par['mg'], 0., 2))
-    return (singlet, gluon, 0+0j, 0+0j)
+    return np.array((singlet, gluon, np.zeros_like(gluon), np.zeros_like(gluon)))

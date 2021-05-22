@@ -3,10 +3,13 @@
 FIXME: ptj ModuleType --> DataPoint
 """
 
+import numpy as np
+
 import gepard.special
 
 
-def qj(j: complex, t: float, poch: int, norm: float, al0: float, alp: float) -> complex:
+def qj(j: np.ndarray, t: float, poch: int, norm: float, al0: float,
+        alp: float) -> np.ndarray:
     r"""GPD building block Q_j with reggeized t-dependence.
 
     Args:
@@ -44,7 +47,7 @@ def qj(j: complex, t: float, poch: int, norm: float, al0: float, alp: float) -> 
     return qj
 
 
-def betadip(j: complex, t: float, m02: float, delm2: float, pp: int) -> complex:
+def betadip(j: np.ndarray, t: float, m02: float, delm2: float, pp: int) -> np.ndarray:
     r"""GPD residual dipole t-dependence function beta from Eq. (19) of NPB.
 
     Args:
