@@ -220,7 +220,7 @@ def test_AUTI():
     assert t.AUTI(pttrans) == approx(0.075300023640416394)
 
 
-@mark.skip(reason='model.Gepard not yet transferred.')
+@mark.skip(reason='ansatz EFLEXP not yet transferred.')
 def test_AUTDVCS():
     """Calculate transversal TSA - DVCS part - in BMK Approach and frame."""
     # Gepard model

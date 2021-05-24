@@ -92,7 +92,8 @@ def test_chisq_Xt():
     th = g.theory.BMK(model=m)
     th.m.parameters.update(par_fit)
     assert th.chisq_single(g.data.dset[39][2:4]) == approx(1.012533085207716)
-    assert th.chisq_para(g.data.dset[39][2:4]) == approx(1.012533085207716)
+    # parallelization slows down fast testing
+    # assert th.chisq_para(g.data.dset[39][2:4]) == approx(1.012533085207716)
 
 
 def test_chisq_X():
@@ -102,7 +103,8 @@ def test_chisq_X():
     th = g.theory.BMK(model=m)
     th.m.parameters.update(par_fit)
     assert th.chisq_single([g.data.dset[45][3]]) == approx(0.29405520100706245)
-    assert th.chisq_para([g.data.dset[45][3]]) == approx(0.29405520100706245)
+    # parallelization slows down fast testing
+    # assert th.chisq_para([g.data.dset[45][3]]) == approx(0.29405520100706245)
 
 
 # def test_chisq_aux():

@@ -1,7 +1,7 @@
 """Testing code for GPD models."""
 
 import numpy as np
-from pytest import approx
+from pytest import approx, mark
 
 import gepard as g
 
@@ -65,6 +65,7 @@ def test_ConformalMoment_gpdH_fit():
             np.array([[1.1665696086-0.00161121675988j, 5.59105109-0.0109293227j]]))
 
 
+@mark.slow
 def test_ConformalMoment_gpd_parallel():
     """Test parallel evaluation of GPDs on the Mellin-Barnes contour."""
     fit_gpd = g.model.Fit()
