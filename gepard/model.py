@@ -822,3 +822,8 @@ class ModelDR(ComptonModelDR, ElasticDipole):
 
 class ModelDRKelly(ComptonModelDR, ElasticKelly):
     """Same, but with Kelly elastic form factors."""
+
+
+class HybridDipole(ComptonHybrid, ElasticDipole):
+    """Complete hybrid model."""
+

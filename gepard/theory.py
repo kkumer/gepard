@@ -21,7 +21,7 @@ class Theory(object):
     so theory object finally contains complete algorithm for calculation of
     specific observable.
 
-    Implemented subclasses are (FIXME: not yet transfered):
+    Implemented subclasses are:
 
      - BMK - From Belitsky, Mueller and Kirchner arXiv:hep-ph/0112108
      - hotfixedBMK  - simple valence xB region improvement by Dieter
@@ -35,8 +35,8 @@ class Theory(object):
         self.model = model
         self.m = self.model  # shortcut
         self.name = model.name
-        self.texname = model.texname
-        self.description = model.description
+        # self.texname = model.texname
+        # self.description = model.description
 
     def chisq_single(self, points: gepard.data.DataSet, asym: bool = False,
                      **kwargs) -> float:
@@ -817,7 +817,13 @@ class BMK(Theory):
         """Partial DVCS cross section w.r.t. Mandelstam t."""
 
         eps2 = 4. * pt.xB**2 * Mp2 / pt.Q2
-        ReH, ImH, ReE, ImE, ReHt, ImHt, ReEt, ImEt = self.m.cff(pt.xi, pt.t, pt.Q2)
+        try:
+            ReH, ImH, ReE, ImE, ReHt, ImHt, ReEt, ImEt = self.m.cff(pt.xi, pt.t, pt.Q2)
+        except AttributeError:
+            ReH = self.m.ReH(pt)
+            ImH = self.m.ImH(pt)
+            ReE = self.m.ReE(pt)
+            ImE = self.m.ImE(pt)
         # if pt.t < -0.9:
         #     print('t, Q2:  ReH, ImH = {:.2} {}: {:.3}, {:5.1f} '.format(pt.t, pt.Q2, ReH, ImH))
         res = 65.14079453579676 * (pt.xB**2 / pt.Q2**2 / (1-pt.xB) / (2-pt.xB)**2 /
