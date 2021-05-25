@@ -1130,7 +1130,7 @@ class BMK(Theory):
         else:
             raise ValueError('[%s] has neither azimuthal angle phi\
  nor harmonic FTn == -1 defined!' % pt)
-            return  res / pi
+        return res / pi
 
     def BSAnew(self, pt, **kwargs):
         """Calculate beam spin asymmetry (BSA) or its harmonics."""

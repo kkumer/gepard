@@ -4,7 +4,7 @@ Todo:
     * Refactor and transfer everything from old Model.py
 """
 
-from cmath import exp, log, pi
+from math import exp, log, pi
 from typing import Dict, List
 
 import numpy as np
@@ -404,7 +404,7 @@ class MellinBarnesModel(ParameterModel):
             Only GPD H treated atm.
         """
         phij = 1.57079632j
-        eph = exp(phij)
+        eph = np.exp(phij)
         cfacj = eph * np.exp((self.jpoints + 1) * log(1/xi))  # eph/xi**(j+1)
         # Temporary singlet part only!:
         cch = np.einsum('j,sa,sja,ja->j', cfacj,
@@ -825,5 +825,9 @@ class ModelDRKelly(ComptonModelDR, ElasticKelly):
 
 
 class HybridDipole(ComptonHybrid, ElasticDipole):
+    """Complete hybrid model."""
+
+
+class HybridKelly(ComptonHybrid, ElasticKelly):
     """Complete hybrid model."""
 
