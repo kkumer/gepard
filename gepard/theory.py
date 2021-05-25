@@ -182,9 +182,9 @@ class Theory(object):
         if kwargs.pop('orig_conventions', False):
             # express result in conventions of original datapoint
             try:
-                result = (self.orig_conventions(pt, result[0]),) + result[1:]
+                result = (pt.orig_conventions(result[0]),) + result[1:]
             except (IndexError, TypeError):
-                result = self.orig_conventions(pt, result)
+                result = pt.orig_conventions(result)
         return result
 
 

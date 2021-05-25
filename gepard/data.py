@@ -211,6 +211,7 @@ class DataPoint(DummyPoint):
         return
 
     def __repr__(self):
+        """Printing something useful."""
         return "DataPoint: " + self.yaxis + " = " + str(self.val)
 
     def to_conventions(self):
@@ -249,8 +250,6 @@ class DataPoint(DummyPoint):
                     setattr(self, errtype, err/1000)
             self.newunits[self.y1name] = 'nb/GeV^4'
 
-#    to_conventions = staticmethod(to_conventions)
-
     def from_conventions(self):
         """Transform stuff from Approach's conventions into original data's."""
         # C4. cross-sections should be in nb
@@ -278,23 +277,20 @@ class DataPoint(DummyPoint):
         if 'phi' in self and hasattr(self, 'units') and self.units['phi'][:3] == 'deg':
             self.phi = self.phi / math.pi * 180.
 
-#     from_conventions = staticmethod(from_conventions)
-
-#     def orig_conventions(self, val):
-#         """Like from_conventions, but for the prediction val."""
-#         # This doesn't touches self
-#         # C4. cross-sections nb --> pb
-#         if hasattr(self, 'units') and self.units[self.y1name] == 'pb/GeV^4':
-#             val = val*1000
-#         # C2. phi_{BKM} --> (pi - phi_{Trento})
-#         if 'frame' in self and self.frame == 'Trento' and 'FTn' in self:
-#             if self.FTn == 1 or self.FTn == 3 or self.FTn == -2:
-#                 val = - val
-#         if 'frame' in self and self.frame == 'Trento' and 'varFTn' in self:
-#             if self.varFTn == 1 or self.varFTn == -1:
-#                 val = - val
-#         return val
-#     orig_conventions = staticmethod(orig_conventions)
+    def orig_conventions(self, val):
+        """Like from_conventions, but for the prediction val."""
+        # This doesn't touches self
+        # C4. cross-sections nb --> pb
+        if hasattr(self, 'units') and self.units[self.y1name] == 'pb/GeV^4':
+            val = val*1000
+        # C2. phi_{BKM} --> (pi - phi_{Trento})
+        if 'frame' in self and self.frame == 'Trento' and 'FTn' in self:
+            if self.FTn == 1 or self.FTn == 3 or self.FTn == -2:
+                val = - val
+        if 'frame' in self and self.frame == 'Trento' and 'varFTn' in self:
+            if self.varFTn == 1 or self.varFTn == -1:
+                val = - val
+        return val
 
 
 class DataSet(list):
@@ -484,6 +480,7 @@ def _complete_tmt(kin):
     else:
         raise KinematicsError('Exactly one of {t, tm} should be given.')
     return
+
 
 def _fill_kinematics(kin, old={}):
     """Return complete up-to-date kinematical dictionary.
