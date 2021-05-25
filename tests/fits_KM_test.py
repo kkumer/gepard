@@ -133,7 +133,7 @@ def test_KM10():
     assert chisq == approx(135.7650869105709)
 
 
-@mark.skip('KM10 not yet transferred')
+@mark.skip('KM10a not yet transferred')
 def test_KM10a():
     """Test model: KM10a."""
     th = db['KM10a']
@@ -144,7 +144,7 @@ def test_KM10a():
     assert chisq == approx(129.18281370844684)
 
 
-@mark.skip('KM10 not yet transferred')
+@mark.skip('KM10b not yet transferred')
 def test_KM10b():
     """Test model: KM10b."""
     th = db['KM10b']
@@ -153,7 +153,7 @@ def test_KM10b():
     assert chisq == approx(115.54198973827977)
 
 
-@mark.skip('KM10 not yet transferred')
+@mark.skip('KMM12 not yet transferred')
 def test_KMM12():
     """Test model: KMM12."""
     th = db['KMM12']

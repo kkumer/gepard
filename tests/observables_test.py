@@ -124,37 +124,37 @@ def test_Xunp4():
     assert ar[1] == approx(0.68881435298587579)
 
 
-@mark.skip(reason='BM10 not yet transferred.')
 def test_XunpBM10():
     """Calculate unpolarized cross section Xunp in BM10 Approach."""
     mBM10 = g.model.ModelDR()
     mBM10.parameters.update(par_DMepsGLO1)
     tBM10 = g.theory.BM10(mBM10)
+    tBM10.prepare(pt1)
     assert tBM10.PreFacSigma(pt1)*tBM10.TBH2unp(pt1) == approx(0.01502937358336803)
     assert tBM10.PreFacSigma(pt1)*tBM10.TDVCS2unp(pt1) == approx(0.012565093106990456)
     assert tBM10.PreFacSigma(pt1)*tBM10.TINTunp(pt1) == approx(0.0011255158978939425)
     assert tBM10.Xunp(pt1) == approx(0.028719982588252427)
 
 
-@mark.skip(reason='theory.BM10 not yet transferred.')
 def test_XLP():
     """Calculate long. polarized cross section XLP in BM10 Approach."""
     mBM10 = g.model.ModelDR()
     mBM10.parameters.update(par_DMepsGLO1)
     tBM10 = g.theory.BM10(mBM10)
+    tBM10.prepare(pt1)
     assert tBM10.PreFacSigma(pt1)*tBM10.TBH2LP(pt1) == approx(0.009495908777414035)
     assert tBM10.PreFacSigma(pt1)*tBM10.TDVCS2LP(pt1) == approx(-0.0032470111398419628)
     assert tBM10.PreFacSigma(pt1)*tBM10.TINTLP(pt1) == approx(0.0085102074298275109)
     assert tBM10.XLP(pt1) == approx(0.014759105067399584)
 
 
-@mark.skip(reason='some bug with precalculation of pt.y')
 def test_XTP():
     """Calculate transv. polarized cross section XTP in BMK Approach."""
     pt1.varphi = 1.
     m = g.model.ModelDR()
     m.parameters.update(par_DMGLO1)
     t = g.theory.hotfixedBMK(m)
+    t.prepare(pt1)
     assert t.PreFacSigma(pt1)*t.TBH2TP(pt1) == approx(0.0021662047872426475)
     assert t.PreFacSigma(pt1)*t.TDVCS2TP(pt1) == approx(-0.0021305191589529025)
     assert t.PreFacSigma(pt1)*t.TINTTP(pt1) == approx(-0.0098483713204748375)
@@ -170,7 +170,6 @@ def test_BSA():
     assert t.ALUI(pt0) == approx(0.1819945876282851)
 
 
-@mark.skip(reason='theory.BM10 not yet transferred.')
 def test_TSA():
     """Calculate longitudinal TSA in BM10 Approach."""
     mBM10 = g.model.ModelDR()
@@ -179,7 +178,6 @@ def test_TSA():
     assert tBM10.TSA(ptt) == approx(-0.47969623208934847)
 
 
-@mark.skip(reason='theory.BM10 not yet transferred.')
 def test_BTSA():
     """Calculate longitudinal BTSA in BM10 Approach."""
     mBM10 = g.model.ModelDR()
