@@ -15,6 +15,18 @@ import gepard as g  # noqa: F401
 from gepard.constants import Mp, Mp2
 
 
+def loaddata(datadir='./data'):
+    """Return dictionary {id : DataSet, ...}  out of files in datadir."""
+    data = {}
+    for file in os.listdir(datadir):
+        if os.path.splitext(file)[1] == ".dat":
+            dataset = DataSet(datafile=os.path.join(datadir, file))
+            for pt in dataset:
+                pt.to_conventions()
+            data[dataset.id] = dataset
+    return data
+
+
 class KinematicsError(Exception):
     """Exception throwsn when kinematics is unphysical."""
     pass
@@ -55,9 +67,9 @@ class DummyPoint(dict):
             self.update(init)
 
 
-    def prepare(self, approach):
+    def prepare(self):
         """Pre-calculate some kinematics."""
-        approach.prepare(self)
+        g.theory.prepare(self)
         return
 
     def copy(self):
@@ -429,20 +441,6 @@ class DataSet(list):
         return desc, data
 
 
-    @staticmethod
-    def loaddata(datadir='./data'):
-        """Return dictionary {id : DataSet, ...}  out of files in datadir."""
-        data = {}
-        for file in os.listdir(datadir):
-            if os.path.splitext(file)[1] == ".dat":
-                dataset = DataSet(datafile=os.path.join(datadir, file))
-                for pt in dataset:
-                    pt.to_conventions()
-                data[dataset.id] = dataset
-        return data
-
-#    loaddata = staticmethod(loaddata)
-
 
 def _str2num(s):
     """Convert string to number, taking care if it should be int or float.
@@ -537,12 +535,11 @@ def _fill_kinematics(kin, old={}):
     return kin
 
 
-
 # FIXME: This is not a proper approach for package, see
 # https://stackoverflow.com/questions/779495/access-data-in-package-subdirectory
 this_dir, this_filename = os.path.split(__file__)
-dset = DataSet.loaddata(datadir=os.path.join(this_dir, 'data', 'ep2epgamma'))
-dset.update(DataSet.loaddata(datadir=os.path.join(this_dir, 'data', 'gammastarp2Mp')))
-dset.update(DataSet.loaddata(datadir=os.path.join(this_dir, 'data', 'gammastarp2gammap')))
-dset.update(DataSet.loaddata(datadir=os.path.join(this_dir, 'data', 'en2engamma')))
-dset.update(DataSet.loaddata(datadir=os.path.join(this_dir, 'data', 'DIS')))
+dset = loaddata(datadir=os.path.join(this_dir, 'data', 'ep2epgamma'))
+dset.update(loaddata(datadir=os.path.join(this_dir, 'data', 'gammastarp2Mp')))
+dset.update(loaddata(datadir=os.path.join(this_dir, 'data', 'gammastarp2gammap')))
+dset.update(loaddata(datadir=os.path.join(this_dir, 'data', 'en2engamma')))
+dset.update(loaddata(datadir=os.path.join(this_dir, 'data', 'DIS')))

@@ -1,10 +1,12 @@
 """Definitions of models.
 
-Todo:
-    * Refactor and transfer everything from old Model.py
+Models of "soft" hadronic structure functions:
+    * Elastic electromagnetic form factors
+    * Generalized parton distribution functions (GPDs)
+    * Compton form factors (for DVCS)
 """
 
-from math import exp, log, pi
+from math import log, pi
 from typing import Dict, List
 
 import numpy as np
@@ -16,23 +18,26 @@ import gepard as g
 class Model(object):
     """Base class for all models.
 
-    Instance of Model Python class specifies structure of relevant
-    hadrons so that observables can be calculated.  Methods provided are
-    typically GPDs, CFFs, elastic FFs, DVMP transition TFFs, DAs, etc.
+    Instance of this class specifies structure of relevant hadrons.
+    Methods provided are typically GPDs, CFFs, elastic FFs,
+    DVMP transition TFFs, DAs, etc.
     Main subclasses are:
 
-     - ParameterModel which depends on parameters (some of which can be
+     - ParameterModel which depends on real parameters (some of which can be
        provided by minimization routine in the fitting procedure).
      - NeuralModel where structure functions are represented as neural nets
-     - NumericModel where values of structure functions are represented as
+       (not yet implemented)
+     - GridModel where values of structure functions are represented as
        grids of numbers, which may be interpolated
+       (not yet implemented)
+    These are then further subclassed to model actual structure functions.
     """
     def __init__(self, name: str = None, texname: str = None,
                  description: str = None) -> None:
         """Init Model class.
 
         Args:
-            name: short model name (used as model database)
+            name: short unique model name
             texname: TeX model name for (e.g. for plot annotation)
             description: longer description of the model
 

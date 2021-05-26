@@ -11,6 +11,106 @@ from gepard.constants import GeV2nb, Mp, Mp2, alpha
 
 NCPU = 23  # how many CPUs to use in parallel
 
+# --- General kinematics --- #
+
+def tmin(Q2: float, xB: float, eps2: float) -> float:
+    """Minimal momentum transfer. BMK Eq. (31)."""
+    return -Q2 * ( 2. * (1.-xB)*(1. - sqrt(1.+eps2)) + eps2 ) / (
+            4. * xB * (1.-xB) + eps2 )
+
+def tmax(Q2: float, xB: float, eps2: float) -> float:
+    """Maximal momentum transfer."""
+    return -Q2 * ( 2. * (1.-xB)*(1. + sqrt(1.+eps2)) + eps2 ) / (
+            4. * xB * (1.-xB) + eps2 )
+
+def xBmin(s: float, Q2: float) -> float:
+    """Constrained by xB=Q2/(s-Mp^2)/yMax, with 1-yMax+yMax^2*eps2/4=0."""
+    yMax = 1 + Mp2*Q2/(s-Mp2)**2
+    return Q2 / (s-Mp2) / yMax
+
+def K2(Q2: float, xB: float, t: float, y: float, eps2: float) -> float:
+    """BMK Eq. (30)."""
+    tm = tmin(Q2, xB, eps2)
+    brace = sqrt(1.+eps2) + (4. * xB * (1.-xB) + eps2 ) / (
+            4. * (1.-xB) ) * (t - tm) / Q2
+    return -(t/Q2) * (1.-xB) * (1.-y-y*y*eps2/4.) * (
+            1. - tm / t ) * brace
+
+def J(Q2: float, xB: float, t: float, y: float, eps2: float) -> float:
+    """BMK below Eq. (32)."""
+    return (1.-y-y*eps2/2.) * (1. + t/Q2) - (1.-xB)*(2.-y)*t/Q2
+
+def is_within_phase_space(pt: gepard.data.DataPoint):
+    """Is pt kinematics within allowed phase space?"""
+    return (pt.xB > xBmin(pt.s, pt.Q2) and pt.t < tmin(pt.Q2, pt.xB, pt.eps2))
+
+def r(Q2: float, xB: float, t: float, y: float, eps2: float) -> float:
+    """DM's fitting notes, below Eq. (13)"""
+    K = sqrt(K2(Q2, xB, t, y, eps2))
+    brace = (2.-y)**2 * K / (1.-y) + (1./K)*(t/Q2)*(1.-y)*(2.-xB)
+    return - (2.-y) / (2.-2.*y+y**2) * brace
+
+def P1P2(pt: gepard.data.DataPoint) -> float:
+    """ Product of Bethe-Heitler propagators, BMK Eq(32)."""
+    P1 = - ( J(pt.Q2, pt.xB, pt.t, pt.y, pt.eps2) + 2. *
+            sqrt(K2(pt.Q2, pt.xB, pt.t, pt.y, pt.eps2)) * cos(pt.phi) ) / (
+                    pt.y * (1. + pt.eps2) )
+    P2 = 1. + pt.t / pt.Q2  - P1
+    return P1 * P2
+
+def anintP1P2(pt: gepard.data.DataPoint) -> float:
+    """ Analitical integral of BH propagators"""
+    xB, Q2, t, y, eps2, K2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2, pt.K2
+    brace = ( (1 - y - (1+eps2/2.) * y**2 * eps2/2.) * (1. + t/Q2)**2 +
+              2.*K2 - (1.-xB)*(2.-y)**2 * (1. + xB*t/Q2) * t/Q2 )
+    return -2. * pi * brace / (1+eps2)**2 / y**2
+
+def weight_BH(pt: gepard.data.DataPoint) -> float:
+    """ Weight factor removing BH propagators from INT and BH amplitudes.
+    It is normalized to int_0^2pi w  2pi as in BMK. """
+    return 2.*pi*pt.P1P2 / pt.intP1P2
+
+def prepare(pt: gepard.data.DataPoint) -> None:
+    """Pre-calculate GPD-independent kinamatical constants and functions."""
+    if not hasattr(pt, "s"):
+        #This is for variable beam energy;  code duplication
+        if pt.process in ['ep2epgamma', 'en2engamma']:
+            if pt.exptype == 'fixed target':
+                pt.s = 2 * Mp * pt.in1energy + Mp2
+            elif pt.exptype == 'collider':
+                pt.s = 2 * pt.in1energy * (pt.in2energy + math.sqrt(
+                    pt.in2energy**2 - Mp2)) + Mp2
+            else:
+                pass # FIXME: raise error
+        else:
+            pass # FIXME: should I raise error here?
+    pt.y = (pt.W**2 + pt.Q2 - Mp2) / (pt.s - Mp2)
+    pt.eps = 2. * pt.xB * Mp / sqrt(pt.Q2)
+    pt.eps2 = pt.eps**2
+    if 't' in pt:
+        pt.J = J(pt.Q2, pt.xB, pt.t, pt.y, pt.eps2)
+        pt.K2 = K2(pt.Q2, pt.xB, pt.t, pt.y, pt.eps2)
+        pt.K = sqrt(pt.K2)
+        pt.tK2 = pt.K2*pt.Q2/(1-pt.y-pt.eps2*pt.y**2/4.)
+        pt.tK = sqrt(pt.tK2)
+        pt.r = r(pt.Q2, pt.xB, pt.t, pt.y, pt.eps2)
+        # Needed for BMP higher-twist stuff:
+        pt.chi0 = sqrt(2.*pt.Q2)*pt.tK/sqrt(1+pt.eps2)/(pt.Q2+pt.t)
+        pt.chi = (pt.Q2-pt.t+2.*pt.xB*pt.t)/sqrt(1+pt.eps2)/(pt.Q2+pt.t) - 1.
+        # First option is numerical, second is analytical and faster
+        #pt.intP1P2 = g.quadrature.Hquadrature(lambda phi: P1P2(pt, phi), 0, 2.0*pi)
+        pt.intP1P2 = anintP1P2(pt)
+    if 'phi' in pt:
+        pt.P1P2 = P1P2(pt)
+
+def long2trans(pt: gepard.data.DataPoint) -> float:
+    """ Ratio of longitudinal to transverse photon flux 1304.0077 Eq. (2.9) """
+    return (1.-pt.y-pt.eps2*pt.y**2/4.)/(1-pt.y+pt.y**2/2+pt.eps2*pt.y**2/4.)
+
+def HandFlux(pt: gepard.data.DataPoint) -> float:
+    """ Virtual photon flux (Hand convention) 1304.0077 Eq. (2.9) """
+    return (alpha/2./pi)*(pt.y**2/(1.-self.long2trans(pt)))*(1-pt.xB)/pt.xB/pt.Q2
+
 
 class Theory(object):
     """Class of theory frameworks for calculation of observables.
@@ -191,68 +291,6 @@ class Theory(object):
 class BMK(Theory):
     """Implementation of formulas from hep-ph/0112108  (BMK)"""
 
-    ### Kinematics ###
-    # (implemented as static and class methods)
-
-    def tmin(Q2, xB, eps2):
-        """BMK Eq. (31)"""
-        return -Q2 * ( 2. * (1.-xB)*(1. - sqrt(1.+eps2)) + eps2 ) / (
-                4. * xB * (1.-xB) + eps2 )
-    tmin = staticmethod(tmin)
-
-    def tmax(Q2, xB, eps2):
-        return -Q2 * ( 2. * (1.-xB)*(1. + sqrt(1.+eps2)) + eps2 ) / (
-                4. * xB * (1.-xB) + eps2 )
-    tmax = staticmethod(tmax)
-
-    def xBmin(s, Q2):
-        """Constrained by xB=Q2/(s-Mp^2)/yMax, with 1-yMax+yMax^2*eps2/4=0."""
-        yMax = 1 + Mp2*Q2/(s-Mp2)**2
-        return Q2 / (s-Mp2) / yMax
-    xBmin = staticmethod(xBmin)
-
-    def K2(Q2, xB, t, y, eps2):
-        """BMK Eq. (30)"""
-        tm = BMK.tmin(Q2, xB, eps2)
-        brace = sqrt(1.+eps2) + (4. * xB * (1.-xB) + eps2 ) / (
-                4. * (1.-xB) ) * (t - tm) / Q2
-        return -(t/Q2) * (1.-xB) * (1.-y-y*y*eps2/4.) * (
-                1. - tm / t ) * brace
-    K2 = staticmethod(K2)
-
-    def J(Q2, xB, t, y, eps2):
-        """BMK below Eq. (32)"""
-        return (1.-y-y*eps2/2.) * (1. + t/Q2) - (1.-xB)*(2.-y)*t/Q2
-    J = staticmethod(J)
-
-    @staticmethod
-    def is_within_phase_space(pt):
-        """Is pt kinematics within allowed phase space?"""
-        return (pt.xB > BMK.xBmin(pt.s, pt.Q2) and pt.t < BMK.tmin(pt.Q2, pt.xB, pt.eps2))
-
-    def r(Q2, xB, t, y, eps2):
-        """DM's fitting notes, below Eq. (13)"""
-        K = sqrt(BMK.K2(Q2, xB, t, y, eps2))
-        brace = (2.-y)**2 * K / (1.-y) + (1./K)*(t/Q2)*(1.-y)*(2.-xB)
-        return - (2.-y) / (2.-2.*y+y**2) * brace
-    r = staticmethod(r)
-
-    def P1P2(pt):
-        """ Product of Bethe-Heitler propagators, Eq(32) """
-        P1 = - ( BMK.J(pt.Q2, pt.xB, pt.t, pt.y, pt.eps2) + 2. *
-                sqrt(BMK.K2(pt.Q2, pt.xB, pt.t, pt.y, pt.eps2)) * cos(pt.phi) ) / (
-                        pt.y * (1. + pt.eps2) )
-        P2 = 1. + pt.t / pt.Q2  - P1
-        return P1 * P2
-    P1P2 = staticmethod(P1P2)
-
-    def anintP1P2(pt):
-        """ Analitical integral of  P1 P2  """
-        xB, Q2, t, y, eps2, K2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2, pt.K2
-        brace = ( (1 - y - (1+eps2/2.) * y**2 * eps2/2.) * (1. + t/Q2)**2 +
-                  2.*K2 - (1.-xB)*(2.-y)**2 * (1. + xB*t/Q2) * t/Q2 )
-        return -2. * pi * brace / (1+eps2)**2 / y**2
-    anintP1P2 = staticmethod(anintP1P2)
 
     def PreFacSigma(self, pt):
         """ Prefactor of 4-fold xs. Take prefactor in Eq(22) times 2pi because of proton Phi integration
@@ -271,55 +309,6 @@ class BMK(Theory):
         """ Prefactor from Eq. (27), without e^6 """
         return 1./(pt.xB * pt.y**3 * pt.t * pt.P1P2)
 
-    def w(self, pt):
-        """ Weight factor removing BH propagators from INT and BH amplitudes.
-        It is normalized to int_0^2pi w  2pi as in BMK. """
-        return 2.*pi*pt.P1P2 / pt.intP1P2
-
-    def prepare(pt):
-        """Pre-calculate GPD-independent kinamatical constants and functions."""
-        if not hasattr(pt, "s"):
-            #This is for variable beam energy;  code duplication
-            if pt.process in ['ep2epgamma', 'en2engamma']:
-                if pt.exptype == 'fixed target':
-                    pt.s = 2 * Mp * pt.in1energy + Mp2
-                elif pt.exptype == 'collider':
-                    pt.s = 2 * pt.in1energy * (pt.in2energy + math.sqrt(
-                        pt.in2energy**2 - Mp2)) + Mp2
-                else:
-                    pass # FIXME: raise error
-            else:
-                pass # FIXME: should I raise error here?
-        pt.y = (pt.W**2 + pt.Q2 - Mp2) / (pt.s - Mp2)
-        pt.eps = 2. * pt.xB * Mp / sqrt(pt.Q2)
-        pt.eps2 = pt.eps**2
-        if 't' in pt:
-            pt.J = BMK.J(pt.Q2, pt.xB, pt.t, pt.y, pt.eps2)
-            pt.K2 = BMK.K2(pt.Q2, pt.xB, pt.t, pt.y, pt.eps2)
-            pt.K = sqrt(pt.K2)
-            pt.tK2 = pt.K2*pt.Q2/(1-pt.y-pt.eps2*pt.y**2/4.)
-            pt.tK = sqrt(pt.tK2)
-            pt.r = BMK.r(pt.Q2, pt.xB, pt.t, pt.y, pt.eps2)
-            # Needed for BMP higher-twist stuff:
-            pt.chi0 = sqrt(2.*pt.Q2)*pt.tK/sqrt(1+pt.eps2)/(pt.Q2+pt.t)
-            pt.chi = (pt.Q2-pt.t+2.*pt.xB*pt.t)/sqrt(1+pt.eps2)/(pt.Q2+pt.t) - 1.
-            # First option is numerical, second is analytical and faster
-            #pt.intP1P2 = g.quadrature.Hquadrature(lambda phi: P1P2(pt, phi), 0, 2.0*pi)
-            pt.intP1P2 = BMK.anintP1P2(pt)
-        if 'phi' in pt:
-            pt.P1P2 = BMK.P1P2(pt)
-    prepare = staticmethod(prepare)
-
-    ### Some kinematical functions which are not in BKM paper but are convenient
-    ### to define here
-
-    def long2trans(self, pt):
-        """ Ratio of longitudinal to transverse photon flux 1304.0077 Eq. (2.9) """
-        return (1.-pt.y-pt.eps2*pt.y**2/4.)/(1-pt.y+pt.y**2/2+pt.eps2*pt.y**2/4.)
-
-    def HandFlux(self, pt):
-        """ Virtual photon flux (Hand convention) 1304.0077 Eq. (2.9) """
-        return (alpha/2./pi)*(pt.y**2/(1.-self.long2trans(pt)))*(1-pt.xB)/pt.xB/pt.Q2
 
     ################################################
     #                                              #
@@ -682,16 +671,15 @@ class BMK(Theory):
         if 'vars' in kwargs:
             ptvars = gepard.data.DummyPoint(init=kwargs['vars'])
             kin = gepard.data._fill_kinematics(ptvars, old=pt)
-            BMK.prepare(kin)
         else:
             # just copy everything from pt
             ptempty = gepard.data.DummyPoint()
             kin = gepard.data._fill_kinematics(ptempty, old=pt)
-            BMK.prepare(kin)
             ## Nothing seems to be gained by the following approach:
             #kin = dict((i, getattr(pt, i)) for i in
             #        ['xB', 'Q2', 'W', 's', 't', 'mt', 'phi', 'in1charge',
             #            'in1polarization', 'in2particle'])
+        kin.prepare()
 
         # Copy non-kinematical info
         for atr in ['in1charge', 'in1polarization', 'in2polarization', 'in2particle']:
@@ -712,7 +700,7 @@ class BMK(Theory):
 
         # Weighting the integrand by BH propagators
         if 'weighted' in kwargs and kwargs['weighted']:
-            wgh = self.w(kin)
+            wgh = weight_BH(kin)
         else:
             wgh = 1
 
@@ -1276,7 +1264,7 @@ class hotfixedBMK(BMK):
                 # OLD INCORRECT: (1. + eps2)**2*((8.*pt.K*(2. - y)*y)/(1. + eps2))*
                 # CORRECT: ((8.*pt.K*(2. - y)*y)/(1. + eps2))*
                 ((8.*pt.K*(2. - y)*y)/(1. + eps2))*
-         (1. + ((t - self.tmin(Q2, xB, eps2))*(1. - xB + 0.5*(-1. + sqrt(1. + eps2))))/
+         (1. + ((t - tmin(Q2, xB, eps2))*(1. - xB + 0.5*(-1. + sqrt(1. + eps2))))/
            (Q2*(1. + eps2)))
          )
 
@@ -2053,7 +2041,7 @@ class BM10ex(hotfixedBMK):
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
         return ( (8*pt.K*t*(2 - y)*y*(2*(1 - xB) +
        sqrt(1 + eps2))*
-      (1 - ((t - self.tmin(Q2, xB, eps2))*(1 + (1 - eps2)/sqrt(1 + eps2) -
+      (1 - ((t - tmin(Q2, xB, eps2))*(1 + (1 - eps2)/sqrt(1 + eps2) -
           2*xB*(1 + (4*(1 - xB))/sqrt(1 + eps2))))/
         (2*pt.Q2*(2*(1 - xB) + sqrt(1 + eps2))))*
       pt.in1polarization)/(pt.Q2*(1 + eps2)**2)
@@ -2094,7 +2082,7 @@ class BM10ex(hotfixedBMK):
         return (
     (8*(2 - y)*((pt.tK2*(2 - y)**2*(-1 + sqrt(1 + eps2)))/
         (2*pt.Q2*(1 + eps2)) +
-       (t*(t - self.tmin(Q2, xB, eps2))*xB*(1 - y - (y**2*eps2)/4)*
+       (t*(t - tmin(Q2, xB, eps2))*xB*(1 - y - (y**2*eps2)/4)*
          (1 - xB + eps2/(2*xB) + (1 - sqrt(1 + eps2))/2))/
         (pt.Q2**2*sqrt(1 + eps2))))/
      (1 + eps2)**(3/2.)
@@ -2170,7 +2158,7 @@ class BM10ex(hotfixedBMK):
 
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
         return ( (8*sqrt(2)*sqrt(1 - y - (y**2*eps2)/4)*
-      (((t - self.tmin(Q2, xB, eps2))*(2 - y)**2*(1 - xB + ((t - self.tmin(Q2, xB, eps2))*((1 - xB)*xB +
+      (((t - tmin(Q2, xB, eps2))*(2 - y)**2*(1 - xB + ((t - tmin(Q2, xB, eps2))*((1 - xB)*xB +
              eps2/4))/(pt.Q2*sqrt(1 + eps2))))/
         pt.Q2 + ((1 - (t*(1 - 2*xB))/pt.Q2)*
          (1 - y - (y**2*eps2)/4)*(eps2 -
@@ -2244,7 +2232,7 @@ class BM10ex(hotfixedBMK):
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
         return ( (8*(2 - y)*(1 - y - (y**2*eps2)/4)*
       ((2*pt.tK2*eps2)/(pt.Q2*(1 + eps2 +
-          sqrt(1 + eps2))) + (t*(t - self.tmin(Q2, xB, eps2))*xB*
+          sqrt(1 + eps2))) + (t*(t - tmin(Q2, xB, eps2))*xB*
          (1 - xB + eps2/(2*xB) + (1 - sqrt(1 + eps2))/2))/
         pt.Q2**2))/(1 + eps2)**2
     )
@@ -2270,7 +2258,7 @@ class BM10ex(hotfixedBMK):
 
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
         return (
-    (-4*t*(2 - y)*(((t - self.tmin(Q2, xB, eps2))*(1 - y - (y**2*eps2)/4)*
+    (-4*t*(2 - y)*(((t - tmin(Q2, xB, eps2))*(1 - y - (y**2*eps2)/4)*
          (-2*xB**2 + eps2 + xB*(3 - sqrt(1 + eps2))))/
         pt.Q2 + (pt.tK2*(-4 + 2*xB*(-2 + y)**2 + 4*y +
           y**2*(-1 + sqrt(1 + eps2) + eps2*
@@ -2308,7 +2296,7 @@ class BM10ex(hotfixedBMK):
       (-((pt.tK2*(1 - 2*xB))/(pt.Q2*(1 + eps2))) +
        ((1 - xB)*(2*xB**2 - eps2 - xB*(3 + sqrt(1 + eps2))))/
         (4*(1 - xB)*xB + eps2) -
-       ((t - self.tmin(Q2, xB, eps2))*(-2*xB**2 + eps2 +
+       ((t - tmin(Q2, xB, eps2))*(-2*xB**2 + eps2 +
           xB*(3 + sqrt(1 + eps2))))/(4*pt.Q2*
          sqrt(1 + eps2))))/(pt.Q2*
       (1 + eps2)**(3/2.))
@@ -2322,7 +2310,7 @@ class BM10ex(hotfixedBMK):
 
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
         return ( (16*pt.K*t*(1 - y - (y**2*eps2)/4)*
-      (1 - xB + ((t - self.tmin(Q2, xB, eps2))*((1 - xB)*xB + eps2/4))/
+      (1 - xB + ((t - tmin(Q2, xB, eps2))*((1 - xB)*xB + eps2/4))/
         (pt.Q2*sqrt(1 + eps2))))/
      (pt.Q2*(1 + eps2)**2)
     )
@@ -2365,7 +2353,7 @@ class BM10ex(hotfixedBMK):
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
         return ( (8*sqrt(2)*pt.K*t*(2 - y)*
       sqrt(1 - y - (y**2*eps2)/4)*(1 - xB +
-       (2*(t - self.tmin(Q2, xB, eps2))*((1 - xB)*xB + eps2/4))/(pt.Q2*
+       (2*(t - tmin(Q2, xB, eps2))*((1 - xB)*xB + eps2/4))/(pt.Q2*
          sqrt(1 + eps2))))/(pt.Q2*(1 + eps2)**2)
     )
 
@@ -2407,9 +2395,9 @@ class BM10ex(hotfixedBMK):
         return (
     (-16*pt.K*t*((1 - y - (y**2*eps2)/4)*
         (1 - (t*(1 - 2*xB))/pt.Q2 +
-         ((t - self.tmin(Q2, xB, eps2))*(4*(1 - xB)*xB + eps2))/(4*pt.Q2*
+         ((t - tmin(Q2, xB, eps2))*(4*(1 - xB)*xB + eps2))/(4*pt.Q2*
            sqrt(1 + eps2))) - (2 - y)**2*(1 - xB/2 +
-         ((t - self.tmin(Q2, xB, eps2))*(4*(1 - xB)*xB + eps2))/(2*pt.Q2*
+         ((t - tmin(Q2, xB, eps2))*(4*(1 - xB)*xB + eps2))/(2*pt.Q2*
            sqrt(1 + eps2)) + ((1 - t/pt.Q2)*
            (1 - 2*xB + sqrt(1 + eps2)))/4)))/
      (pt.Q2*(1 + eps2)**2)
@@ -2424,7 +2412,7 @@ class BM10ex(hotfixedBMK):
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
         return ( (4*t*(2 - y)*(1 - y - (y**2*eps2)/4)*
       ((4*pt.tK2*(1 - 2*xB))/(pt.Q2*sqrt(1 + eps2)) -
-       ((t - self.tmin(Q2, xB, eps2))*xB*(3 - 2*xB + eps2/xB - sqrt(1 + eps2)))/
+       ((t - tmin(Q2, xB, eps2))*xB*(3 - 2*xB + eps2/xB - sqrt(1 + eps2)))/
         pt.Q2))/(pt.Q2*(1 + eps2)**2)
     )
 
@@ -2435,7 +2423,7 @@ class BM10ex(hotfixedBMK):
 
 
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
-        return ( (16*pt.K*t*(t - self.tmin(Q2, xB, eps2))*((1 - xB)*xB + eps2/4)*
+        return ( (16*pt.K*t*(t - tmin(Q2, xB, eps2))*((1 - xB)*xB + eps2/4)*
       (1 - y - (y**2*eps2)/4))/(pt.Q2**2*
       (1 + eps2)**(5/2.))
     )
@@ -2576,7 +2564,7 @@ class BM10ex(hotfixedBMK):
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
         return (
     (16*pt.K*t*xB*((2 - y)**2*(1 - (t*(1 - 2*xB))/pt.Q2) +
-       ((t - self.tmin(Q2, xB, eps2))*(1 - y - (y**2*eps2)/4)*(1 - 2*xB +
+       ((t - tmin(Q2, xB, eps2))*(1 - y - (y**2*eps2)/4)*(1 - 2*xB +
           sqrt(1 + eps2)))/(2*pt.Q2)))/
      (pt.Q2*(1 + eps2)**(5/2.))
     )
@@ -2590,7 +2578,7 @@ class BM10ex(hotfixedBMK):
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
         return ( (8*t*xB*(2 - y)*(1 - y - (y**2*eps2)/4)*
       ((4*pt.tK2)/(pt.Q2*sqrt(1 + eps2)) +
-       ((t - self.tmin(Q2, xB, eps2))*(1 + t/pt.Q2)*(1 - 2*xB +
+       ((t - tmin(Q2, xB, eps2))*(1 + t/pt.Q2)*(1 - 2*xB +
           sqrt(1 + eps2)))/(2*pt.Q2)))/
      (pt.Q2*(1 + eps2)**2)
     )
@@ -2720,7 +2708,7 @@ class BM10ex(hotfixedBMK):
        (1 - y - (y**2*eps2)/4))/(1 + eps2)**(5/2.))*
      ((2*pt.tK2)/(pt.Q2*sqrt(1 + eps2)) +
       ((1 + sqrt(1 + eps2) - 2*xB)/2)*(1 + sqrt(1 + eps2) +
-        (xB*t)/pt.Q2)*((t - self.tmin(Q2, xB, eps2))/pt.Q2))
+        (xB*t)/pt.Q2)*((t - tmin(Q2, xB, eps2))/pt.Q2))
     )
 
     SINT['LP', (1, 1), (2)] = SINTLP112
@@ -2734,7 +2722,7 @@ class BM10ex(hotfixedBMK):
     ((-8*pt.K*(1 - y - (y**2*eps2)/4))/
       (1 + eps2)**3)*((1 + sqrt(1 + eps2) - 2*xB)/
       (2*(sqrt(1 + eps2) + 1)))*eps2*
-     ((t - self.tmin(Q2, xB, eps2))/pt.Q2)
+     ((t - tmin(Q2, xB, eps2))/pt.Q2)
     )
 
     SINT['LP', (1, 1), (3)] = SINTLP113
@@ -2841,7 +2829,7 @@ class BM10ex(hotfixedBMK):
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
         return ( (8*t*xB*(2 - y)*(1 - y - (y**2*eps2)/4)*
       ((2*pt.tK2)/pt.Q2 -
-       ((t - self.tmin(Q2, xB, eps2))*(1 - (t*(1 - 2*xB))/pt.Q2)*
+       ((t - tmin(Q2, xB, eps2))*(1 - (t*(1 - 2*xB))/pt.Q2)*
          (1 - 2*xB + sqrt(1 + eps2)))/(2*pt.Q2))
       )/(pt.Q2*(1 + eps2)**3)
     )
@@ -2853,7 +2841,7 @@ class BM10ex(hotfixedBMK):
 
 
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
-        return ( (-8*pt.K*t*(t - self.tmin(Q2, xB, eps2))*xB*
+        return ( (-8*pt.K*t*(t - tmin(Q2, xB, eps2))*xB*
       (1 - y - (y**2*eps2)/4)*(1 - 2*xB + sqrt(1 + eps2))
       )/(pt.Q2**2*(1 + eps2)**3)
     )
@@ -2900,7 +2888,7 @@ class BM10ex(hotfixedBMK):
 
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
         return ( (-16*pt.K*t*(1 - y - (y**2*eps2)/4)*
-      (1 - xB + ((t - self.tmin(Q2, xB, eps2))*((1 - xB)*xB + eps2/4))/
+      (1 - xB + ((t - tmin(Q2, xB, eps2))*((1 - xB)*xB + eps2/4))/
         (pt.Q2*sqrt(1 + eps2))))/
      (pt.Q2*(1 + eps2)**(5/2.))
     )
@@ -2949,7 +2937,7 @@ class BM10ex(hotfixedBMK):
 
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
         return ( (8*pt.K*t*(2 - 2*y + y**2 + (y**2*eps2)/2)*
-       (1 - ((t - self.tmin(Q2, xB, eps2))*(1 - 2*xB)*(1 - 2*xB + sqrt(1 + eps2)))/
+       (1 - ((t - tmin(Q2, xB, eps2))*(1 - 2*xB)*(1 - 2*xB + sqrt(1 + eps2)))/
          (2*pt.Q2*(1 + eps2))))/
       (pt.Q2*(1 + eps2)**2) +
      (32*pt.K*t*(1 - y - (y**2*eps2)/4)*(1 + (5*eps2)/8 -
@@ -2969,7 +2957,7 @@ class BM10ex(hotfixedBMK):
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
         return ( (4*t*(2 - y)*(1 - y - (y**2*eps2)/4)*
       ((4*pt.tK2*(1 - 2*xB))/(pt.Q2*sqrt(1 + eps2)) -
-       ((t - self.tmin(Q2, xB, eps2))*(-2*xB**2 + eps2 +
+       ((t - tmin(Q2, xB, eps2))*(-2*xB**2 + eps2 +
           xB*(3 - sqrt(1 + eps2))))/pt.Q2)
       )/(pt.Q2*(1 + eps2)**(5/2.))
     )
@@ -2981,7 +2969,7 @@ class BM10ex(hotfixedBMK):
 
 
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
-        return ( (16*pt.K*t*(t - self.tmin(Q2, xB, eps2))*((1 - xB)*xB + eps2/4)*
+        return ( (16*pt.K*t*(t - tmin(Q2, xB, eps2))*((1 - xB)*xB + eps2/4)*
       (1 - y - (y**2*eps2)/4))/
      (pt.Q2**2*(1 + eps2)**3)
     )
@@ -3065,7 +3053,7 @@ class BM10ex(hotfixedBMK):
 
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
         return (
-    (8*pt.K*(2 - y)*y*(1 + ((t - self.tmin(Q2, xB, eps2))*(1 - xB + (-1 + sqrt(1 + eps2))/
+    (8*pt.K*(2 - y)*y*(1 + ((t - tmin(Q2, xB, eps2))*(1 - xB + (-1 + sqrt(1 + eps2))/
            2))/(pt.Q2*(1 + eps2)))*pt.in1polarization)/
      (1 + eps2)
     )
@@ -3077,9 +3065,9 @@ class BM10ex(hotfixedBMK):
 
 
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
-        return ( (-4*(t - self.tmin(Q2, xB, eps2))*y*(1 - y - (y**2*eps2)/4)*
+        return ( (-4*(t - tmin(Q2, xB, eps2))*y*(1 - y - (y**2*eps2)/4)*
       (1 - 2*xB + sqrt(1 + eps2))*
-      (-((t - self.tmin(Q2, xB, eps2))*(2*xB + eps2))/(2*pt.Q2*
+      (-((t - tmin(Q2, xB, eps2))*(2*xB + eps2))/(2*pt.Q2*
          sqrt(1 + eps2)) + (eps2 -
          xB*(-1 + sqrt(1 + eps2)))/(1 - 2*xB +
          sqrt(1 + eps2)))*pt.in1polarization)/(pt.Q2*
@@ -3178,7 +3166,7 @@ class BM10ex(hotfixedBMK):
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
         return ( ((8*pt.in1polarization*pt.K*(2 - y)*y)/(1 + eps2))*
      (t/pt.Q2)*(1 - (1 - 2*xB)*((1 + sqrt(1 + eps2) -
-         2*xB)/(2*(1 + eps2)))*((t - self.tmin(Q2, xB, eps2))/pt.Q2))
+         2*xB)/(2*(1 + eps2)))*((t - tmin(Q2, xB, eps2))/pt.Q2))
     )
 
     SINT['unpA', (1, 1), (1)] = SINTunpA111
@@ -3190,7 +3178,7 @@ class BM10ex(hotfixedBMK):
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
         return (
     (-((16*pt.in1polarization*(1 - y - (y**2*eps2)/4)*y)/(1 + eps2)**2))*
-     (t/pt.Q2)*((t - self.tmin(Q2, xB, eps2))/pt.Q2)*
+     (t/pt.Q2)*((t - tmin(Q2, xB, eps2))/pt.Q2)*
      (1 - xB/2 + (3*eps2)/4)*((1 + sqrt(1 + eps2) - 2*xB)/2)*
      (1 + ((4*(1 - xB)*xB + eps2)/(4 - 2*xB + 3*eps2))*
        (t/pt.Q2))
