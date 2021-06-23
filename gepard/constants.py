@@ -4,6 +4,8 @@ Maybe one should make sure they stay constant.
 Also, fixed dictionaries.
 """
 
+from scipy.special import zeta
+
 # QCD parameters
 CF = 4./3.
 CA = 3
@@ -14,10 +16,9 @@ NC = 3
 F_rho = 0.209
 
 # Parameters needed for harmonic sums etc.
-EMC = 0.5772156649
-ZETA2 = 1.6449340668
-ZETA3 = 1.2020569032
-ZETA4 = 1.0823232337
+ZETA2 = zeta(2)
+ZETA3 = zeta(3)
+ZETA4 = zeta(4)
 
 Mp = 0.938272013  # proton mass
 Mp2 = Mp ** 2
