@@ -21,11 +21,6 @@ def pochhammer(z: Union[complex, np.ndarray], m: int) -> Union[complex, np.ndarr
 
     Returns:
         complex: pochhammer(z,m)
-
-    Examples:
-        >>> pochhammer(3.7+2j, 3)
-        (42.723000000000006+122.54j)
-
     """
     p = z
     for k in range(1, m):

@@ -536,6 +536,18 @@ class MellinBarnesModel(ParameterModel):
                 / np.sqrt(Q2) * np.array([reh, imh, 0, 0, 0, 0, 0, 0]))
 
 
+    def ImHrho(self, pt: g.data.DataPoint) -> np.ndarray:
+        """Return Im(TFF H) for kinematic point."""
+        tffs = self.tff(pt.xi, pt.t, pt.Q2)
+        return tffs[1]
+
+
+    def ReHrho(self, pt: g.data.DataPoint) -> np.ndarray:
+        """Return Re(TFF H) for kinematic point."""
+        tffs = self.tff(pt.xi, pt.t, pt.Q2)
+        return tffs[0]
+
+
 class ComptonDispersionRelations(ComptonFormFactors):
     """Use dispersion relations for real parts of CFFs.
 

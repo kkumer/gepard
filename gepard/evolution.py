@@ -54,7 +54,7 @@ def rnnlof(npoints, nf) -> np.ndarray:
           k: index of point on MB contour
 
     Returns:
-          pr: Projector pr[a,i,j]
+          pr: Projector pr[sec, k, a, i, j]
       r1proj (not yet): r1proj[a,b] = sum_ij pr[a,i,j] R1[i,j] pr[b,i,j]
                  a,b in {+,-};  i,j in {Q, G}
 
