@@ -11,7 +11,7 @@ par_dvmp = {'ns':  0.152, 'al0s': 1.158, 'alps': 0.15, 'ms': 0.446,
 def test_gepardTFFs():
     """Calculate LO DVMP TFFs for rho production at input scale."""
     xB = 1e-4
-    pt = g.data.DummyPoint({'Q2': 4., 't': 0, 'xi': xB/2., 'xB': xB})
+    pt = g.data.DataPoint({'Q2': 4., 't': 0, 'xi': xB/2., 'xB': xB})
     g.utils.fill_kinematics(pt)
     # generic LO model from big DVMP draft
     fit_gpd = g.model.Fit()

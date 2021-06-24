@@ -7,12 +7,12 @@ md = g.model.ElasticDipole()  # dipole FFs
 m = g.model.ElasticKelly()  # Kelly's FFs
 
 # proton
-pt = g.data.DummyPoint(init={'in2particle': 'p', 'Q2': 4., 't': 0., 'xB': 0.1})
-pt1 = g.data.DummyPoint(init={'in2particle': 'p', 'Q2': 4., 't': -1., 'xB': 0.1})
+pt = g.data.DataPoint(init={'in2particle': 'p', 'Q2': 4., 't': 0., 'xB': 0.1})
+pt1 = g.data.DataPoint(init={'in2particle': 'p', 'Q2': 4., 't': -1., 'xB': 0.1})
 
 # neutron
-npt = g.data.DummyPoint(init={'in2particle': 'n', 'Q2': 4., 't': 0., 'xB': 0.1})
-npt1 = g.data.DummyPoint(init={'in2particle': 'n', 'Q2': 4., 't': -1., 'xB': 0.1})
+npt = g.data.DataPoint(init={'in2particle': 'n', 'Q2': 4., 't': 0., 'xB': 0.1})
+npt1 = g.data.DataPoint(init={'in2particle': 'n', 'Q2': 4., 't': -1., 'xB': 0.1})
 
 mup = 2.7928473
 mun = -1.913043

@@ -154,18 +154,18 @@ class ElasticKelly(ElasticFormFactors):
     def F1(self, pt):
         """Dirac elastic nucleon form factor - Kelly's parametrization."""
         if 'in2particle' in pt and pt.in2particle == 'n':
-            return self.nF1(pt.t)
+            return self._nF1(pt.t)
         else:   # proton is default
-            return self.pF1(pt.t)
+            return self._pF1(pt.t)
 
     def F2(self, pt):
         """Dirac elastic nucleon form factor - Kelly's parametrization."""
         if 'in2particle' in pt and pt.in2particle == 'n':
-            return self.nF2(pt.t)
+            return self._nF2(pt.t)
         else:   # proton is default
-            return self.pF2(pt.t)
+            return self._pF2(pt.t)
 
-    def pF1(self, t):
+    def _pF1(self, t):
         """Dirac elastic proton form factor - Kelly's parametrization."""
         return ((1 + 0.06815437285120148*t)/(1 - 3.118062557942468*t +
                 1.0338391956016382*t**2 - 0.5031268669574522*t**3) -
@@ -173,7 +173,7 @@ class ElasticKelly(ElasticFormFactors):
                 (1 - 3.115222792407001*t + 1.520921000705686*t**2 -
                 0.14999913420898098*t**3))/(1 - 0.28397655354667284*t)
 
-    def pF2(self, t):
+    def _pF2(self, t):
         """Pauli elastic proton form factor - Kelly's parametrization."""
         return (-((1 + 0.06815437285120148*t)/(1 - 3.118062557942468*t +
                 1.0338391956016382*t**2 - 0.5031268669574522*t**3)) +
@@ -181,7 +181,7 @@ class ElasticKelly(ElasticFormFactors):
                 3.115222792407001*t + 1.520921000705686*t**2 -
                 0.14999913420898098*t**3)) / (1 - 0.28397655354667284*t)
 
-    def nF1(self, t):
+    def _nF1(self, t):
         """Dirac elastic neutron form factor - Kelly's parametrization."""
         return ((-0.4842637275288574*t)/((1 - 1.4084507042253522*t)**2 *
                 (1 - 0.9345440355820054*t)) +
@@ -189,7 +189,7 @@ class ElasticKelly(ElasticFormFactors):
                 (1 - 4.168632789020339*t + 1.9408278987597791*t**2 -
                 1.9100884849907935*t**3))/(1 - 0.2831951622975774*t)
 
-    def nF2(self, t):
+    def _nF2(self, t):
         """Pauli elastic neutron form factor - Kelly's parametrization."""
         return ((0.4842637275288574*t)/((1 - 1.4084507042253522*t)**2 *
                 (1 - 0.9345440355820054*t)) - (1.9130427*(1 - 0.6598447281533554*t)) /
@@ -444,7 +444,7 @@ class MellinBarnesModel(ParameterModel):
     # FIXME: Now fast cludge to get it to work. Code duplication
     #  and superfluous code execution while running
 
-    def ImH(self, pt: g.data.DataPoint) -> np.ndarray:
+    def ImH(self, pt: g.data.DataPoint) -> float:
         """Return Im(CFF H) for kinematic point."""
         if self.nf == 3:
             chargefac = 2./9.
@@ -460,7 +460,7 @@ class MellinBarnesModel(ParameterModel):
         reh, imh = self._mellin_barnes_integral(pt.xi, wce_ar, h)
         return chargefac * imh
 
-    def ReH(self, pt: g.data.DataPoint) -> np.ndarray:
+    def ReH(self, pt: g.data.DataPoint) -> float:
         """Return Re(CFF H) for kinematic point."""
         xi, t, Q2 = pt.xi, pt.t, pt.Q2
         if self.nf == 3:
@@ -477,7 +477,7 @@ class MellinBarnesModel(ParameterModel):
         reh, imh = self._mellin_barnes_integral(xi, wce_ar, h)
         return chargefac * reh
 
-    def ImE(self, pt: g.data.DataPoint) -> np.ndarray:
+    def ImE(self, pt: g.data.DataPoint) -> float:
         """Return Im(CFF E) for kinematic point."""
         xi, t, Q2 = pt.xi, pt.t, pt.Q2
         if self.nf == 3:
@@ -494,7 +494,7 @@ class MellinBarnesModel(ParameterModel):
         ree, ime = self._mellin_barnes_integral(xi, wce_ar, e)
         return chargefac * ime
 
-    def ReE(self, pt: g.data.DataPoint) -> np.ndarray:
+    def ReE(self, pt: g.data.DataPoint) -> float:
         """Return Re(CFF E) for kinematic point."""
         xi, t, Q2 = pt.xi, pt.t, pt.Q2
         if self.nf == 3:

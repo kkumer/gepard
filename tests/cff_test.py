@@ -35,11 +35,11 @@ par_KM15 = {'tMv': 3.992860161655587, 'rS': 1.0, 'alv': 0.43, 'tal': 0.43,
             'kaps': 0.0, 'kapg': 0.0}
 
 
-pt_test = g.data.DummyPoint({'W': 82., 'Q2': 1., 't': 0.})
+pt_test = g.data.DataPoint({'W': 82., 'Q2': 1., 't': 0.})
 pt_test.xi = pt_test.Q2 / (2.0 * pt_test.W * pt_test.W + pt_test.Q2)
 
-pt0_fit = g.data.DummyPoint({'xi': 0.01, 'Q2': 4., 't': -0.2})  # noevol
-pt_fit = g.data.DummyPoint({'xi': 0.01, 'Q2': 8., 't': -0.2})  # evol
+pt0_fit = g.data.DataPoint({'xi': 0.01, 'Q2': 4., 't': -0.2})  # noevol
+pt_fit = g.data.DataPoint({'xi': 0.01, 'Q2': 8., 't': -0.2})  # evol
 
 
 def test_cff_H_noevol():

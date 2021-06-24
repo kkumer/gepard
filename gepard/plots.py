@@ -180,7 +180,7 @@ def panel(ax, points=None, lines=None, bands=None, xaxis=None, xs=None,
         # via xaxis and kins)
         pts = []
         for x in xs:
-            pt = g.data.DummyPoint(init=kins)
+            pt = g.data.DataPoint(init=kins)
             setattr(pt, xaxis, x)
             # workaround for imperfect fill_kinematics
             if hasattr(pt, 'xi'):

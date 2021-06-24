@@ -251,11 +251,11 @@ class DVCS(Theory):
         """
         # Overriding pt kinematics with those from kwargs
         if 'vars' in kwargs:
-            ptvars = gepard.data.DummyPoint(init=kwargs['vars'])
+            ptvars = gepard.data.DataPoint(init=kwargs['vars'])
             kin = gepard.data._fill_kinematics(ptvars, old=pt)
         else:
             # just copy everything from pt
-            ptempty = gepard.data.DummyPoint()
+            ptempty = gepard.data.DataPoint()
             kin = gepard.data._fill_kinematics(ptempty, old=pt)
             ## Nothing seems to be gained by the following approach:
             #kin = dict((i, getattr(pt, i)) for i in

@@ -1,6 +1,5 @@
 """Classes for representing experimental data.
 
-DummyPoint -- class for points which have just few relevant attributes
 DataPoint -- class for points representing experimental measurements
 DataSet   -- container for DataPoint instances
 
@@ -32,55 +31,7 @@ class KinematicsError(Exception):
     pass
 
 
-class DummyPoint(dict):
-    """This is only used for creating simple DataPoint-like objects.
-
-    Todo:
-        DummyPoint has now become more like base class for DataPoint.
-        DummyPoint and DataPoint should be merged into one class.
-
-    """
-
-    def __init__(self, init=None):
-        """Simple "dummy" data point.
-
-        Args:
-            init (dict): initial attributes.
-
-        Examples:
-            >>> pt = g.DummyPoint({'xB': 0.1, 't': -0.2, 'Q2': 4.0})
-
-        """
-        # Just list allowed attributes to help mypy:
-        # -- Kinematics --
-        self.xB = None
-        self.xi = None
-        self.j = None
-        self.t = None
-        self.Q2 = None
-        # -- Process type --
-        self.pid = None   # FIXME: this looks superfluous
-        # from https://stackoverflow.com/questions/4984647/
-        super(DummyPoint, self).__init__()
-        self.__dict__ = self
-        if init:
-            self.update(init)
-
-
-    def prepare(self):
-        """Pre-calculate some kinematics."""
-        g.theory.prepare(self)
-        return
-
-    def copy(self):
-        """Copy the DataPoint object."""
-        # Do we need copy.deepcopy?
-        new = copy.copy(self)
-        new.__dict__ = new
-        return new
-
-
-class DataPoint(DummyPoint):
+class DataPoint(dict):
     """Experimental measurement point.
 
     All necessary information about kinematics, is contained in attributes. E.g.
@@ -107,7 +58,6 @@ class DataPoint(DummyPoint):
 
     For user's and programmer's convenience, these `dataset` attributes
     are also inherited by `DataPoint` objects, so `point.dataset.yaxis == point.yaxis`
-    (Is this type of inheritance, know also as "aquisition", good idea?)
     """
 
     xB: float
@@ -115,8 +65,43 @@ class DataPoint(DummyPoint):
     W: float
     t: float
 
-    def __init__(self, gridline, dataset):
-        """Take data gridline, construct `DataPoint` object and append it to dataset.
+    def __init__(self, init=None):
+        """Simple initialization with dict of kinematic values.
+
+        Args:
+            init (dict): initial attributes.
+
+        Examples:
+            >>> pt = g.DataPoint({'xB': 0.1, 't': -0.2, 'Q2': 4.0})
+
+        """
+        # Just list allowed attributes to help mypy:
+        # -- Kinematics --
+        self.xB = None
+        self.xi = None
+        self.j = None
+        self.t = None
+        self.Q2 = None
+        # from https://stackoverflow.com/questions/4984647/
+        super(DataPoint, self).__init__()
+        self.__dict__ = self
+        if init:
+            self.update(init)
+
+    def prepare(self):
+        """Pre-calculate some kinematics."""
+        g.theory.prepare(self)
+        return
+
+    def copy(self):
+        """Copy the DataPoint object."""
+        # Do we need copy.deepcopy?
+        new = copy.copy(self)
+        new.__dict__ = new
+        return new
+
+    def update_from_grid(self, gridline, dataset):
+        """Take data gridline, and update point atributes.
 
         `gridline` is a list constructed from one row of data grid in data file.
         It is assumed that data gridline is of the form:
@@ -145,14 +130,14 @@ class DataPoint(DummyPoint):
             nameindex = int(name[1:].split('name')[0])  # = 1, 0, 2, ...
             xname = getattr(self, name)  # = 't', 'xB', ...
             xval = getattr(self, 'x' + str(nameindex) + 'value')  # =  0.1
-            if isinstance(xval, float) or isinstance(xval, int): 
+            if isinstance(xval, float) or isinstance(xval, int):
                 # we have global instead of grid value
                 setattr(self, xname, xval)    # pt.xB = 0.1, pt.FTn = 1, ...
-            else: 
-                # take value from the grid 
+            else:
+                # take value from the grid
                 columnindex = int(xval.split('column')[1])-1  # = 1, 0, 2, ...
                 setattr(self, xname, gridline[columnindex])  # pt.xB = gridline[1]
-        # 2c. y-axis 
+        # 2c. y-axis
         self.val = gridline[int(self.y1value.split('column')[1])-1]
         # 2d. y-axis errors
         if 'y1error' in self:  # we are given total error already
@@ -178,23 +163,23 @@ class DataPoint(DummyPoint):
             if 'y1errorstatistic' in self:
                 es = gridline[int(self.y1errorstatistic.split('column')[1])-1]**2
                 varstat += es
-                varsym  += es
+                varsym += es
             if 'y1errorstatisticplus' in self:
                 ep = gridline[int(self.y1errorstatisticplus.split('column')[1])-1]**2
                 em = gridline[int(self.y1errorstatisticminus.split('column')[1])-1]**2
                 varstat += max(ep, em)
-                varplus  += ep
+                varplus += ep
                 varminus += em
             # 2. systematic error
             if 'y1errorsystematic' in self:
                 es = gridline[int(self.y1errorsystematic.split('column')[1])-1]**2
                 varsyst += es
-                varsym  += es
+                varsym += es
             if 'y1errorsystematicplus' in self:
                 ep = gridline[int(self.y1errorsystematicplus.split('column')[1])-1]**2
                 em = gridline[int(self.y1errorsystematicminus.split('column')[1])-1]**2
                 varsyst += max(ep, em)
-                varplus  += ep
+                varplus += ep
                 varminus += em
         # 3. normalization error (specified as percentage)
             if 'y1errornormalization' in self:
@@ -217,7 +202,7 @@ class DataPoint(DummyPoint):
             self.in1polarization = 0
         # For transversaly polarized target set, if needed and
         # if not already set, by default take dominant sine-varphi harmonic
-        if ('in2polarizationvector' in self and self.in2polarizationvector == 'T' and 
+        if ('in2polarizationvector' in self and self.in2polarizationvector == 'T' and
                 'varFTn' not in self):
             self.varFTn = -1
         return
@@ -331,15 +316,15 @@ class DataSet(list):
             # Create needed attributes before creating `DataPoint`s
             # Preamble stuff goes into attributes
             for key in preamble:
-                try: # try to convert to number everything that is number
+                try:  # try to convert to number everything that is number
                     setattr(self, key, _str2num(preamble[key]))
-                except ValueError: # rest stays as is
+                except ValueError:  # rest stays as is
                     setattr(self, key, preamble[key])
 
-            #  Extracting names of x-axes variables 
+            #  Extracting names of x-axes variables
             #  xnames = ['x1name', 'x2name', ...], not necessarily sorted!
             #  xaxes = ['t', 'xB', ...]
-            self.xnames = [key for key in preamble if re.match('^x\dname$', key)]
+            self.xnames = [key for key in preamble if re.match(r'^x\dname$', key)]
             self.xaxes = [preamble[key] for key in self.xnames]
 
             # Good to have:
@@ -347,15 +332,16 @@ class DataSet(list):
             self.filename = os.path.split(datafile)[-1]
             # Following dictionary will contain units for everything
             # i.e.  {'phi' : 'degrees', 't' : 'GeV^2', ...}
-            self.units = dict((preamble[key], preamble[key[:2]+'unit']) for key in self.xnames)
+            self.units = dict((preamble[key], preamble[key[:2]+'unit'])
+                              for key in self.xnames)
             self.units[self.yaxis] = preamble['y1unit']
             # Following dictionary will have units which are changed so that match
             # units used for internal theoretical formulas
             self.newunits = {}
             # charge of first particle FIXME: just electron treated
-            if self.in1particle == 'e+' or self.in1particle == 'ep':    # positron
+            if self.in1particle in ['e+', 'ep']:    # positron
                 self.in1charge = +1
-            elif self.in1particle == 'e' or self.in1particle == 'e-' or self.in1particle == 'em':
+            elif self.in1particle in ['e', 'e-', 'em']:
                 self.in1charge = -1
             # Mandelstam s, if specified
             try:
@@ -366,27 +352,34 @@ class DataSet(list):
                         self.s = 2 * self.in1energy * (self.in2energy + math.sqrt(
                             self.in2energy**2 - Mp2)) + Mp2
                     else:
-                        pass # FIXME: raise error
+                        pass  # FIXME: raise error
             except AttributeError:
                 pass
                 # _lg.debug('Variable beam energy dataset in {}'.format(datafile))
 
             for gridline in data:
-                self.append(DataPoint(gridline, self))
-    
+                pt = DataPoint()
+                pt.update_from_grid(gridline, self)
+                self.append(pt)
+
     def __add__(self, rhs):
-        """http://stackoverflow.com/questions/8180014/how-to-subclass-python-list-without-type-problems"""
-        return DataSet(datapoints=list.__add__(self,rhs))
+        """Add datasets.
+
+        http://stackoverflow.com/questions/8180014/how-to-subclass-python-list-without-type-problems.
+        """
+        return DataSet(datapoints=list.__add__(self, rhs))
 
     def __repr__(self):
+        """Pretty-print dataset."""
         return 'DataSet with {} points'.format(len(self))
 
     def __getitem__(self, key):
+        """Get an element of dataset i.e. datapoint."""
         # From https://stackoverflow.com/questions/2936863/
         if isinstance(key, slice):
             lst = [self[k] for k in range(*key.indices(len(self)))]
             tmp = DataSet(lst)
-            tmp.__dict__ = self.__dict__.copy() # transfer the attributes
+            tmp.__dict__ = self.__dict__.copy()  # transfer the attributes
             return tmp
         elif isinstance(key, int):
             return list.__getitem__(self, key)
@@ -394,9 +387,10 @@ class DataSet(list):
             raise TypeError("Invalid argument type.")
 
     def __getslice__(self, start, end):
+        """Get a range of elements."""
         # This is called by [:], while [::] calls __getitem__()
         if start >= len(self):
-            raise IndexError("""%s has only %d items and your slice 
+            raise IndexError("""%s has only %d items and your slice
                 starts at %d""" % (self, len(self), start))
         return DataSet(self[start:end:None])
 
@@ -408,7 +402,7 @@ class DataSet(list):
 
             y1 = BCA from datafile goes into   {'y1' : 'BCA', ...}
 
-        `data` is actual numerical grid of experimental data converted 
+        `data` is actual numerical grid of experimental data converted
         into list of lists
 
         """
@@ -441,15 +435,13 @@ class DataSet(list):
         return desc, data
 
 
-
 def _str2num(s):
     """Convert string to number, taking care if it should be int or float.
-    
+
     http://mail.python.org/pipermail/tutor/2003-November/026136.html
     """
-
     if "." in s:
-        return float(s) 
+        return float(s)
     else:
         return int(s)
 
@@ -510,8 +502,8 @@ def _fill_kinematics(kin, old={}):
             for key in trio:
                 kin.__setattr__(key, old.__getattribute__(key))
     # FIXME: xi is just fixed by xB - it cannot be given by user
-    # There are t/Q2 corrections, cf. BMK Eq. (4), but they are 
-    # formally higher twist and it is maybe sensible to DEFINE xi, 
+    # There are t/Q2 corrections, cf. BMK Eq. (4), but they are
+    # formally higher twist and it is maybe sensible to DEFINE xi,
     # the argument of CFF, as follows:
     kin.xi = kin.xB / (2. - kin.xB)
     duo = set(['t', 'tm'])

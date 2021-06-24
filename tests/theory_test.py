@@ -24,7 +24,7 @@ pt6 = g.data.dset[36][0]
 
 def test_XDVCSt_noevol():
     """Calculate LO DVCS partial cross section (no evolution)."""
-    pt = g.data.DummyPoint({'W': 82., 'Q2': 1., 't': 0.})
+    pt = g.data.DataPoint({'W': 82., 'Q2': 1., 't': 0.})
     pt.xi = pt.Q2 / (2.0 * pt.W * pt.W + pt.Q2)
     pt.xB = 2*pt.xi/(1.+pt.xi)
     pt.yaxis = 'X'
@@ -38,7 +38,7 @@ def test_XDVCSt_noevol():
 
 def test_XDVCSt():
     """Calculate LO DVCS partial cross section (+ evolution)."""
-    pt = g.data.DummyPoint({'W': 82., 'Q2': 3., 't': -0.5})
+    pt = g.data.DataPoint({'W': 82., 'Q2': 3., 't': -0.5})
     pt.xi = pt.Q2 / (2.0 * pt.W * pt.W + pt.Q2)
     pt.xB = 2*pt.xi/(1.+pt.xi)
     pt.yaxis = 'X'
@@ -53,7 +53,7 @@ def test_XDVCSt():
 
 def test_XDVCS():
     """Calculate LO DVCS total cross section (+ evolution)."""
-    pt = g.data.DummyPoint({'W': 82., 'Q2': 3.})
+    pt = g.data.DataPoint({'W': 82., 'Q2': 3.})
     pt.xi = pt.Q2 / (2.0 * pt.W * pt.W + pt.Q2)
     pt.xB = 2*pt.xi/(1.+pt.xi)
     pt.yaxis = 'X'

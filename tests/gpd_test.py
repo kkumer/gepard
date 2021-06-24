@@ -10,7 +10,7 @@ t_test = -0.1
 xi_test = 0.001
 Q2_test = 4.
 
-pt0 = g.DummyPoint({'xi': xi_test, 't': t_test, 'Q2': Q2_test})
+pt0 = g.DataPoint({'xi': xi_test, 't': t_test, 'Q2': Q2_test})
 pt0.xB = 2.*pt0.xi/(1.+pt0.xi)
 
 par_test = {'ns': 2./3. - 0.4, 'al0s': 1.1, 'alps': 0.25, 'ms': 1.1,
