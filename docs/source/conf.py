@@ -24,7 +24,7 @@ sys.path.insert(0, os.path.abspath('../..'))
 # -- Project information -----------------------------------------------------
 
 project = 'gepard'
-copyright = '2020, Krešimir Kumerički'
+copyright = '2021, Krešimir Kumerički'
 author = 'Krešimir Kumerički'
 
 # The full version, including alpha/beta/rc tags

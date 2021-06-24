@@ -21,14 +21,6 @@ class Theory(object):
     `gepard.model.Model`) for structure functions such as CFFs and elastic FFs,
     so theory object finally contains complete algorithm for calculation of
     specific observable.
-
-    Implemented subclasses are:
-
-     - BMK - From Belitsky, Mueller and Kirchner arXiv:hep-ph/0112108
-     - hotfixedBMK  - simple valence xB region improvement by Dieter
-     - BM10ex
-     - BM10 - Belitsky, Mueller and Ji
-     - BM10tw2 - BM10 with higher twists set to zero
     """
 
     def __init__(self, model: gepard.model.Model) -> None:
@@ -186,6 +178,42 @@ class Theory(object):
         return result
 
 
+    def _Xt4int(self, t, pt):
+        """Same as _XDVCSt/_Xrhot but with additional variable t
+        to facilitate integration over it.
+
+        """
+        aux = []
+        for t_single in t:
+            pt.t = t_single
+            if hasattr(pt, 'process') and pt.process == 'gammastarp2rho0p':
+                res = self._Xrhot(pt)
+            else:
+                res = self._XDVCSt(pt)
+            del pt.t
+            aux.append(res)
+        return array(aux)
+
+
+    def X(self, pt):
+        """Total DVCS or DVMP cross section. """
+        if 't' in pt or 'tm' in pt:
+            # partial XS w.r.t momentum transfer t
+            if hasattr(pt, 'process') and pt.process == 'gammastarp2rho0p':
+                return self._Xrhot(pt)
+            else:
+                return self._XDVCSt(pt)
+
+        else:
+            # total XS
+            if 'tmmax' in pt:
+                tmmax = pt.tmmax
+            else:
+                tmmax = 1.  # default -t cuttoff in GeV^2
+            res = gepard.quadrature.tquadrature(lambda t: self._Xt4int(t, pt), -tmmax, 0)
+            return res
+
+
 class DVCS(Theory):
     """DVCS observables base class.
 
@@ -197,8 +225,14 @@ class DVCS(Theory):
     - TBH2LP, TINTLP, TDVCS2LP  (for longitudinally polarized target)
     - TBH2TP, TINTTP, TDVCS2TP  (for transversally polarized target)
 
-    """
+    Implemented subclasses are:
 
+     - BMK - From Belitsky, Mueller and Kirchner arXiv:hep-ph/0112108
+     - hotfixedBMK  - simple valence xB region improvement by Dieter
+     - BM10ex
+     - BM10 - Belitsky, Mueller and Ji
+     - BM10tw2 - BM10 with higher twists set to zero
+    """
 
     def PreFacSigma(self, pt):
         """ Prefactor of 4-fold XS. 
@@ -308,22 +342,16 @@ class DVCS(Theory):
         pt.in2polarizationvector = 'T'
         pt.in2polarization = 1
         pol = kwargs.copy()
-        pol.update({'flip':'in2polarization'})
+        pol.update({'flip': 'in2polarization'})
         o =  self.XS(pt, **kwargs)
         f =  self.XS(pt, **pol)
         return (o-f)/2.
 
-    def F2(self, pt):
-        """DIS F2 form factor."""
-
-        res = self.m.DISF2(pt)
-        return res
-
-
     def _XDVCStApprox(self, pt):
         """Partial DVCS cross section w.r.t. Mandelstam t.
-         Approx. formula used in NPB10 paper."""
 
+        Approx. formula used in NPB10 paper.
+        """
         W2 = pt.W * pt.W
         # Simplified formula used also in Fortran gepard code
         ReH, ImH, ReE, ImE, ReHt, ImHt, ReEt, ImEt = self.m.cff(pt.xi, pt.t, pt.Q2)
@@ -331,19 +359,6 @@ class DVCS(Theory):
                 (ImH**2 + ReH**2)
                 - pt.t/(4.*Mp2)*(ReE**2 + ImE**2)) / (
             (W2 + pt.Q2) * (2.0 * W2 + pt.Q2)**2 )
-        return res
-
-
-    def _XrhotApprox(self, pt):
-        """Partial DVrhoP cross section w.r.t. Mandelstam t.
-
-        Approximate formula valid for small xB.
-
-        """
-
-        # 4 * pi**2 * alpha_em * GeV2nb = 112175.5
-        res = 112175.5 * pt.xB**2 * (
-                self.m.ImHrho(pt)**2 + self.m.ReHrho(pt)**2) / pt.Q2**2
         return res
 
 
@@ -369,42 +384,6 @@ class DVCS(Theory):
 
     # _XDVCSt = _XDVCStApprox
     _XDVCSt = _XDVCStEx
-    _Xrhot = _XrhotApprox
-
-    def _Xt4int(self, t, pt):
-        """Same as _XDVCSt/_Xrhot but with additional variable t
-        to facilitate integration over it.
-
-        """
-        aux = []
-        for t_single in t:
-            pt.t = t_single
-            if hasattr(pt, 'process') and pt.process == 'gammastarp2rho0p':
-                res = self._Xrhot(pt)
-            else:
-                res = self._XDVCSt(pt)
-            del pt.t
-            aux.append(res)
-        return array(aux)
-
-
-    def X(self, pt):
-        """Total DVCS or DVMP cross section. """
-        if 't' in pt or 'tm' in pt:
-            # partial XS w.r.t momentum transfer t
-            if hasattr(pt, 'process') and pt.process == 'gammastarp2rho0p':
-                return self._Xrhot(pt)
-            else:
-                return self._XDVCSt(pt)
-
-        else:
-            # total XS
-            if 'tmmax' in pt:
-                tmmax = pt.tmmax
-            else:
-                tmmax = 1.  # default -t cuttoff in GeV^2
-            res = gepard.quadrature.tquadrature(lambda t: self._Xt4int(t, pt), -tmmax, 0)
-            return res
 
 
 ## General assymetries
@@ -3537,3 +3516,28 @@ class BM10tw2(BM10):
     def sINT2LP(self, pt): return 0
     def sINT3LP(self, pt): return 0
 
+
+class DVMP(Theory):
+    """DVMP observables
+
+    Implements cross-section for electroproduction of meson.
+    """
+
+    def _XrhotApprox(self, pt):
+        """Partial DVrhoP cross section w.r.t. Mandelstam t.
+
+        Approximate formula valid for small xB.
+
+        """
+
+        # 4 * pi**2 * alpha_em * GeV2nb = 112175.5
+        res = 112175.5 * pt.xB**2 * (
+                self.m.ImHrho(pt)**2 + self.m.ReHrho(pt)**2) / pt.Q2**2
+        return res
+
+
+    _Xrhot = _XrhotApprox
+
+
+class Default(BMK, DVMP):
+    """Default DVCS+DVMP class."""

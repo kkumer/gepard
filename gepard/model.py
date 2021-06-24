@@ -30,7 +30,9 @@ class Model(object):
      - GridModel where values of structure functions are represented as
        grids of numbers, which may be interpolated
        (not yet implemented)
+
     These are then further subclassed to model actual structure functions.
+
     """
     def __init__(self, name: str = None, texname: str = None,
                  description: str = None) -> None:
@@ -535,12 +537,10 @@ class MellinBarnesModel(ParameterModel):
         return (g.constants.CF * g.constants.F_rho * astrong / g.constants.NC
                 / np.sqrt(Q2) * np.array([reh, imh, 0, 0, 0, 0, 0, 0]))
 
-
     def ImHrho(self, pt: g.data.DataPoint) -> np.ndarray:
         """Return Im(TFF H) for kinematic point."""
         tffs = self.tff(pt.xi, pt.t, pt.Q2)
         return tffs[1]
-
 
     def ReHrho(self, pt: g.data.DataPoint) -> np.ndarray:
         """Return Re(TFF H) for kinematic point."""

@@ -2,7 +2,7 @@
 
 poch: Pochhammer symbol
 dpsi: polygamma function
-  Sn: harmonic sums
+Sn: harmonic sums
 """
 
 from math import factorial, log
