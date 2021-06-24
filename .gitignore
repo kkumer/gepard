@@ -4,6 +4,7 @@
 **/.mypy_cache
 **/prof
 **/*coverage*
+**/.hypothesis*
 
 # Generated documentation
 docs/build/

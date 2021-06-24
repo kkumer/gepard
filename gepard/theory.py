@@ -341,6 +341,7 @@ class DVCS(Theory):
 
         """
 
+        # 4 * pi**2 * alpha_em * GeV2nb = 112175.5
         res = 112175.5 * pt.xB**2 * (
                 self.m.ImHrho(pt)**2 + self.m.ReHrho(pt)**2) / pt.Q2**2
         return res

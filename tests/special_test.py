@@ -52,4 +52,4 @@ def test_SB3():
     """Test function from Eq. (4.44e) of arXiv:1310.5394."""
     # The number is from fortran-gepard, not Mathematica
     assert g.special.SB3(z_test) == approx(
-           0.00106358734374320529-0.00111600322992239098j , rel=1.e-5)
+           0.00106358734374320529-0.00111600322992239098j, rel=1.e-5)
