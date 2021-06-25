@@ -252,21 +252,25 @@ class DVCS(Theory):
         # Overriding pt kinematics with those from kwargs
         if 'vars' in kwargs:
             ptvars = gepard.data.DataPoint(init=kwargs['vars'])
-            kin = gepard.data._fill_kinematics(ptvars, old=pt)
+            gepard.data._fill_kinematics(ptvars, old=pt)
+            kin = ptvars
         else:
             # just copy everything from pt
             ptempty = gepard.data.DataPoint()
-            kin = gepard.data._fill_kinematics(ptempty, old=pt)
-            ## Nothing seems to be gained by the following approach:
-            #kin = dict((i, getattr(pt, i)) for i in
+            gepard.data._fill_kinematics(ptempty, old=pt)
+            kin = ptempty
+            # Nothing seems to be gained by the following approach:
+            # kin = dict((i, getattr(pt, i)) for i in
             #        ['xB', 'Q2', 'W', 's', 't', 'mt', 'phi', 'in1charge',
             #            'in1polarization', 'in2particle'])
-        kin.prepare()
 
         # Copy non-kinematical info
-        for atr in ['in1charge', 'in1polarization', 'in2polarization', 'in2particle']:
+        for atr in ['in1charge', 'in1polarization', 'in2polarization', 'in2particle',
+                    'process', 'exptype', 'in1energy', 'in2energy', 'yaxis']:
             if atr in pt:
                 setattr(kin, atr, getattr(pt, atr))
+
+        kin.prepare()
 
         # For efficient calculation of XS with unpolarized beam
         if 'zeropolarized' in kwargs and kwargs['zeropolarized']:

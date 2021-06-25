@@ -17,13 +17,11 @@ describe_data -- List observables in dataset.
 
 import fnmatch
 import os
-import re
 
 import numpy as np
 
 import gepard as g
 from gepard.constants import Mp2
-
 
 
 def _complete_xBWQ2(kin):
@@ -35,7 +33,7 @@ def _complete_xBWQ2(kin):
     elif 'xB' in kin and 'W' in kin and 'Q2' not in kin:
         kin.Q2 = kin.xB * (kin.W**2 - Mp2) / (1. - kin.xB)
     else:
-        raise KinematicsError('Exactly two of {xB, W, Q2} should be given.')
+        raise g.data.KinematicsError('Exactly two of {xB, W, Q2} should be given.')
     return
 
 
@@ -48,7 +46,7 @@ def _complete_tmt(kin):
         assert kin.tm >= 0
         kin.t = - kin.tm
     else:
-        raise KinematicsError('Exactly one of {t, tm} should be given.')
+        raise g.data.KinematicsError('Exactly one of {t, tm} should be given.')
     return
 
 
@@ -64,7 +62,7 @@ def fill_kinematics(kin, old={}):
     kkeys = set(kin.keys())
     trio = set(['xB', 'W', 'Q2'])
     if len(trio.intersection(kkeys)) == 3:
-        raise KinematicsError('Overdetermined set {xB, W, Q2} given.')
+        raise g.data.KinematicsError('Overdetermined set {xB, W, Q2} given.')
     elif len(trio.intersection(kkeys)) == 2:
         _complete_xBWQ2(kin)
     elif len(trio.intersection(kkeys)) == 1 and old:
@@ -88,7 +86,7 @@ def fill_kinematics(kin, old={}):
     kin.xi = kin.xB / (2. - kin.xB)
     duo = set(['t', 'tm'])
     if len(duo.intersection(kkeys)) == 2:
-        raise KinematicsError('Overdetermined set {t, tm=-t} given.')
+        raise g.data.KinematicsError('Overdetermined set {t, tm=-t} given.')
     elif len(duo.intersection(kkeys)) == 1:
         _complete_tmt(kin)
     else:

@@ -87,9 +87,11 @@ class DataPoint(dict):
         self.__dict__ = self
         if init:
             self.update(init)
+        # calculate other determined kinematic variables:
+        _fill_kinematics(self)
 
     def prepare(self):
-        """Pre-calculate some kinematics."""
+        """Pre-calculate some functions of kinematics."""
         g.theory.prepare(self)
         return
 
@@ -505,7 +507,8 @@ def _fill_kinematics(kin, old={}):
     # There are t/Q2 corrections, cf. BMK Eq. (4), but they are
     # formally higher twist and it is maybe sensible to DEFINE xi,
     # the argument of CFF, as follows:
-    kin.xi = kin.xB / (2. - kin.xB)
+    if 'xB' in kin:
+        kin.xi = kin.xB / (2. - kin.xB)
     duo = set(['t', 'tm'])
     if len(duo.intersection(kkeys)) == 2:
         raise KinematicsError('Overdetermined set {t, tm=-t} given.')
@@ -524,7 +527,6 @@ def _fill_kinematics(kin, old={}):
         kin.phi = old.phi
     if 'varphi' not in kin and 'varphi' in old:
         kin.varphi = old.varphi
-    return kin
 
 
 # FIXME: This is not a proper approach for package, see
