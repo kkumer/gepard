@@ -7,10 +7,11 @@ Also, fixed dictionaries.
 from scipy.special import zeta
 
 # QCD parameters
-CF = 4./3.
-CA = 3
-TF = 0.5
 NC = 3
+CF = (NC**2 - 1) / (2 * NC)
+CA = NC
+CG = CF - CA/2
+TF = 0.5
 
 # Meson decay constants
 F_rho = 0.209

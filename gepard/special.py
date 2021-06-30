@@ -12,6 +12,11 @@ import numpy as np
 from scipy.special import psi, zeta  # type: ignore
 
 
+def parity(n: int) -> int:
+    """Parity of n, i. e. (-1)^n."""
+    return 1 - 2 * (n % 2)
+
+
 def pochhammer(z: Union[complex, np.ndarray], m: int) -> Union[complex, np.ndarray]:
     """Pochhammer symbol.
 

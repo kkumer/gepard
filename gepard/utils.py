@@ -211,7 +211,7 @@ def listdb(db):
         print("%-22s  |  %s" % (key, db[key].description))
     #print "\n WARNING: gepard models are now likely broken. Reinitialize them!"
 
-def listdata(ids, data):
+def list_data(ids, data):
     """List basic info about datasets specified by id numbers."""
     if not isinstance(ids, list): ids = [ids]
     for id in ids:
@@ -440,5 +440,3 @@ def describe_data(pts):
     assert cc == tot
     print(45*'-')
     print("TOTAL = {}".format(tot))
-    return tot
-

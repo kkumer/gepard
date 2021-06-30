@@ -396,6 +396,12 @@ class MellinBarnesModel(ParameterModel):
         self.parameters = gpds.parameters
         # Consolidate parameters, both the same and updated from above
         self.gpds.parameters = self.parameters
+        # scales
+        self.rr2 = 1     # ratio of Q2/renorm. scale squared
+        self.rf2 = 1     # ratio of Q2/GPD fact. scale sq. (for DVCS)
+        self.rgpdf2 = 1  # ratio of Q2/GPD fact. scale sq. (for DVMP)
+        self.rdaf2 = 1   # ratio of Q2/DA fact. scale sq. (for DVMP)
+        #
         self.tgj = np.tan(pi*self.jpoints/2.)
         # wce[Q2] = wce[spw, j, a] - Wilson coeffs evolved; local to model instance
         self.wce: Dict[float, np.ndarray] = {}  # DVCS
