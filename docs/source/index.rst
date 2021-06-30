@@ -1,11 +1,27 @@
 .. gepard code documentation master file
 
-Gepard --- code for the analysis of 3D quark and gluon distribution in nucleon
-==============================================================================
+
+.. image:: media/Gepard_logo.png
+      :width: 200px
+      :align: left
+      :alt: Gepard logo
+
+
+Tool for studying the 3D quark and gluon distributions in the nucleon
+=====================================================================
+
+.. meta::
+      :description lang=en: Intro to Gepard
+
 
 .. toctree::
    :maxdepth: 2
 
-   about
+   quickstart
+   advanced
+   developer
    gepard
    todo
+   about
+
+

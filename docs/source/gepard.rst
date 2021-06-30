@@ -1,6 +1,10 @@
 gepard package
 ==============
 
+This is a **comprehensive** documentation of the code for power users.
+It is automatically generated from documentation strings embedded
+in the code itself.
+
 .. note::
    For all code examples it is assumed that gepard package 
    is first imported as::
