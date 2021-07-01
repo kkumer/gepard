@@ -56,38 +56,12 @@ def _fshu(j: np.ndarray) -> np.ndarray:
                               - loggamma(3 + j) - loggamma(3/2)))
 
 
-def calc_wc(m, process):
-    """Calculate DVCS or DVMP Wilson coeffs.
-
-    Args:
-       m: instance of the model
-       process: 'DVCS' or 'DVMP'
-
-    Returns:
-         wc[s,k,j]: s in range(npwmax), k in range(npts), j in [Q,G]
-
-    """
-    wc = []
-    for pw_shift in [0, 2, 4]:
-        fshu = _fshu(m.jpoints + pw_shift)
-        if process == 'DVCS':
-            quark = fshu
-            gluon = np.zeros_like(quark)
-        elif process == 'DVMP':
-            quark = 3 * fshu / m.nf
-            gluon = 3 * fshu * 2 / g.constants.CF / (m.jpoints + pw_shift + 3)
-        else:
-            raise Exception('{} is not DVCS or DVMP!'.format(process))
-        wc.append(np.array((quark, gluon)).transpose())
-    return np.array(wc)
-
-
 def calc_wce(m, q2: float, process: str):
     """Calculate evolved Wilson coeffs for given q2.
 
     Args:
-            q2: final evolution scale
-             m: instance of the model
+       q2: final evolution scale
+       m: instance of the model
        process: 'DVCS' or 'DVMP'
 
     Returns:
@@ -97,6 +71,22 @@ def calc_wce(m, q2: float, process: str):
     # Instead of type hint (which leads to circular import for some reason)
     if not isinstance(m, g.model.MellinBarnesModel):
         raise Exception("{} is not of type MellinBarnesModel".format(m))
+    # LO 
+    wc = []
+    for pw_shift in [0, 2, 4]:
+        j = m.jpoints + pw_shift
+        fshu = _fshu(j)
+        if process == 'DVCS':
+            quark = fshu
+            gluon = np.zeros_like(quark)
+        elif process == 'DVMP':
+            if False == 1:
+                q1, ps1, g1 = g.c1dvmp.c1dvmp(m, 1, j, 0)
+            quark = 3 * fshu / m.nf
+            gluon = 3 * fshu * 2 / g.constants.CF / (j + 3)
+        else:
+            raise Exception('{} is not DVCS or DVMP!'.format(process))
+        wc.append(np.array((quark, gluon)).transpose())
+    c0 = wc
     evola0 = g.evolution.evolop(m.npoints, m.nf, q2, m.q02, m.asp[m.p], m.r20)
-    c0 = calc_wc(m, process)
     return np.einsum('ski,skij->skj', c0, evola0)
