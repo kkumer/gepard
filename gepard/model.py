@@ -438,7 +438,7 @@ class MellinBarnesModel(ParameterModel):
             wce_ar = self.wce[Q2]
         except KeyError:
             # calculate it
-            wce_ar = g.evolc.calc_wce(self, Q2)
+            wce_ar = g.evolc.calc_wce(self, Q2, 'DVCS')
             # memorize it for future
             self.wce[Q2] = wce_ar
         h = self.gpds.gpd_H(xi, t)
@@ -460,7 +460,7 @@ class MellinBarnesModel(ParameterModel):
         try:
             wce_ar = self.wce[pt.Q2]
         except KeyError:
-            wce_ar = g.evolc.calc_wce(self, pt.Q2)
+            wce_ar = g.evolc.calc_wce(self, pt.Q2, 'DVCS')
             self.wce[pt.Q2] = wce_ar
         h = self.gpds.gpd_H(pt.xi, pt.t)
         reh, imh = self._mellin_barnes_integral(pt.xi, wce_ar, h)
@@ -477,7 +477,7 @@ class MellinBarnesModel(ParameterModel):
         try:
             wce_ar = self.wce[Q2]
         except KeyError:
-            wce_ar = g.evolc.calc_wce(self, Q2)
+            wce_ar = g.evolc.calc_wce(self, Q2, 'DVCS')
             self.wce[Q2] = wce_ar
         h = self.gpds.gpd_H(xi, t)
         reh, imh = self._mellin_barnes_integral(xi, wce_ar, h)
@@ -494,7 +494,7 @@ class MellinBarnesModel(ParameterModel):
         try:
             wce_ar = self.wce[Q2]
         except KeyError:
-            wce_ar = g.evolc.calc_wce(self, Q2)
+            wce_ar = g.evolc.calc_wce(self, Q2, 'DVCS')
             self.wce[Q2] = wce_ar
         e = self.gpds.gpd_E(xi, t)
         ree, ime = self._mellin_barnes_integral(xi, wce_ar, e)
@@ -511,7 +511,7 @@ class MellinBarnesModel(ParameterModel):
         try:
             wce_ar = self.wce[Q2]
         except KeyError:
-            wce_ar = g.evolc.calc_wce(self, Q2)
+            wce_ar = g.evolc.calc_wce(self, Q2, 'DVCS')
             self.wce[Q2] = wce_ar
         e = self.gpds.gpd_E(xi, t)
         ree, ime = self._mellin_barnes_integral(xi, wce_ar, e)
@@ -527,7 +527,7 @@ class MellinBarnesModel(ParameterModel):
             wce_ar_dvmp = self.wce_dvmp[Q2]
         except KeyError:
             # calculate it
-            wce_ar_dvmp = g.evolc.calc_wce_dvmp(self, Q2)
+            wce_ar_dvmp = g.evolc.calc_wce(self, Q2, 'DVMP')
             # memorize it for future
             self.wce_dvmp[Q2] = wce_ar_dvmp
         # Evaluations depending on model parameters:

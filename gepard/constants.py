@@ -4,7 +4,7 @@ Maybe one should make sure they stay constant.
 Also, fixed dictionaries.
 """
 
-from scipy.special import zeta
+from scipy.special import zeta  # type: ignore
 
 # QCD parameters
 NC = 3
