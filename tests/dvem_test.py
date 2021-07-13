@@ -69,18 +69,22 @@ def test_c1_NLO():
     assert aux[2] == approx(35.2725+34.0699j,  rel=1e-5)
 
 
-@mark.skip('NLO not yet fully implemented')
+@mark.skip('NLO fails - needs careful check')
 def test_dvem_TFFs_NLO():
     """Calculate NLO DVMP TFFs for rho production at input scale."""
     xB = 1e-4
     pt = g.data.DataPoint({'Q2': 4., 't': 0, 'xB': xB})
-    fit_gpd = g.model.Fit()
-    m = g.model.MellinBarnesModel(gpds=fit_gpd, p=1)
+    fit_gpd = g.model.Fit(p=1)
+    m = g.model.MellinBarnesModel(gpds=fit_gpd)
     m.parameters.update(par_dvmp)
     th = g.theory.BMK(m)
-    re, im =  (tnlo.m.ReHrho(pt), tnlo.m.ImHrho(pt))
+    re, im =  (th.m.ReHrho(pt), th.m.ImHrho(pt))
     tffs = th.m.tff(pt.xi, pt.t, pt.Q2)
     reh, imh = tffs[0], tffs[1]
+    # following agrees with gepard-fortran ...
+    # assert reh == approx(5410.6143, rel=1e-5)
+    # assert imh == approx(22869.412, rel=1e-5)
+    # which for unknown reason regressed from situation:
     # following agrees with DM to best than percent
     assert reh == approx(5328.3678, rel=1e-3)
     assert imh == approx(22676.063, rel=1e-3)

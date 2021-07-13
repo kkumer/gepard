@@ -398,8 +398,7 @@ class MellinBarnesModel(ParameterModel):
         self.gpds.parameters = self.parameters
         # scales
         self.rr2 = 1     # ratio of Q2/renorm. scale squared
-        self.rf2 = 1     # ratio of Q2/GPD fact. scale sq. (for DVCS)
-        self.rgpdf2 = 1  # ratio of Q2/GPD fact. scale sq. (for DVMP)
+        self.rf2 = 1     # ratio of Q2/GPD fact. scale sq.
         self.rdaf2 = 1   # ratio of Q2/DA fact. scale sq. (for DVMP)
         #
         self.tgj = np.tan(pi*self.jpoints/2.)

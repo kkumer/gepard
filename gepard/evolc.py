@@ -65,28 +65,47 @@ def calc_wce(m, q2: float, process: str):
        process: 'DVCS' or 'DVMP'
 
     Returns:
-         wce[s,k,j]: s in range(npwmax), k in range(npts), j in [Q,G]
+         wce[s,k,f]: s in range(npwmax), k in range(npts), f in [Q,G]
 
     """
     # Instead of type hint (which leads to circular import for some reason)
     if not isinstance(m, g.model.MellinBarnesModel):
         raise Exception("{} is not of type MellinBarnesModel".format(m))
+    one = np.ones_like(m.jpoints)
+    zero = np.zeros_like(m.jpoints)
     # LO 
     wc = []
     for pw_shift in [0, 2, 4]:
         j = m.jpoints + pw_shift
         fshu = _fshu(j)
         if process == 'DVCS':
-            quark = fshu
-            gluon = np.zeros_like(quark)
+            quark_norm = fshu
+            gluon_norm = fshu
+            q0, g0 = (one, zero)   # LO Q and G
+            q1, g1 = (zero, zero)  # NLO if only LO is asked for (m.p=0)
+            if m.p == 1:
+                q1, g1 = (zero, zero)  # FIXME: to be entered later!!
         elif process == 'DVMP':
-            if False == 1:
-                q1, ps1, g1 = g.c1dvmp.c1dvmp(m, 1, j, 0)
-            quark = 3 * fshu / m.nf
-            gluon = 3 * fshu * 2 / g.constants.CF / (j + 3)
+            # Normalizations. Factor 3 is from normalization of DA, so not NC
+            # See p. 37, 39 of "Towards DVMP" paper. Eq. (3.62c)
+            quark_norm = 3 * fshu
+            gluon_norm = 3 * fshu * 2 / g.constants.CF / (j + 3)
+            # Normalizations are chosen so that LO is normalized to:
+            q0, g0 = (one/m.nf, one)   # LO Q and G
+            q1, g1 = (zero, zero)      # NLO if only LO is asked for (m.p=0)
+            if m.p == 1:
+                qp1, ps1, g1 = g.c1dvmp.c1dvmp(m, 1, j, 0)
+                q1 = qp1/m.nf + ps1
         else:
             raise Exception('{} is not DVCS or DVMP!'.format(process))
-        wc.append(np.array((quark, gluon)).transpose())
-    c0 = wc
-    evola0 = g.evolution.evolop(m.npoints, m.nf, q2, m.q02, m.asp[m.p], m.r20)
-    return np.einsum('ski,skij->skj', c0, evola0)
+        c_quark = quark_norm * np.stack([q0, q1])
+        c_gluon = gluon_norm * np.stack([g0, g1])
+        wc.append(np.stack((c_quark, c_gluon)).transpose())
+    wc = np.array(wc)
+    evola = g.evolution.evolop(m.npoints, m.nf, q2, m.q02, m.asp[m.p], m.r20)
+    # p_mat: matrix that combines (LO, NLO) evolution operator and Wilson coeffs
+    # while canceling NNLO term NLO*NLO:
+    asmur2 = g.qcd.as2pf(0, m.nf, q2/m.rr2, m.asp[m.p], m.r20)
+    asmuf2 = g.qcd.as2pf(0, m.nf, q2/m.rf2, m.asp[m.p], m.r20)
+    p_mat = np.array([[1, asmuf2], [asmur2, 0]])
+    return np.einsum('skpi,pq,skqij->skj', wc, p_mat, evola)

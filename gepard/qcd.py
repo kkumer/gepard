@@ -64,6 +64,8 @@ def beta(p: int, nf: int) -> float:
 
     return beta
 
+def _fbeta1(a: float, nf: int) -> float:
+    return a**2 * (beta(0, nf) + a * beta(1, nf))
 
 def as2pf(p: int, nf: int,  r2: float, as0: float, r20: float) -> float:
     """QCD beta function coefficient.
@@ -85,14 +87,23 @@ def as2pf(p: int, nf: int,  r2: float, as0: float, r20: float) -> float:
     """
     # a below is as defined in 4pi expansion and is returned to
     # 2pi expansion convention just before return
-
-    if p != 0:
-        raise ValueError('Only LO implemented!')
+    NASTPS = 20
 
     a = 0.5 * as0
     lrrat = log(r2/r20)
+    dlr = lrrat / NASTPS
 
-    a = 0.5 * as0 / (1. - 0.5 * beta(0, nf) * as0 * lrrat)
+    if p == 0:
+        a = 0.5 * as0 / (1. - 0.5 * beta(0, nf) * as0 * lrrat)
+    elif p == 1:
+        for k in range(1, NASTPS+1):
+            xk0 = dlr * _fbeta1(a, nf)
+            xk1 = dlr * _fbeta1(a + 0.5 * xk0, nf)
+            xk2 = dlr * _fbeta1(a + 0.5 * xk1, nf)
+            xk3 = dlr * _fbeta1(a + xk2, nf)
+            a = a + (xk0 + 2 * xk1 + 2 * xk2 + xk3) / 6
+    else:
+        raise ValueError('Only LO and NLO implemented!')
 
     # Return to .../(2pi)  expansion
     a = 2 * a

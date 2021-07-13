@@ -94,10 +94,11 @@ def evolop(npoints: np.ndarray, nf: int,  q2: float, q02: float,
 
     Returns:
          Array corresponding Eq. (121) of Towards NPB paper.
-         evolop[s, k, i, j]
+         evolop[s, k, p, i, j]
          -  s is index of SO(3) partial wave,
          -  k is index of point on MB contour,
-         -  i,j in [Q, G]
+         -  p is pQCD order (0=LO, 1=NLO)
+         -  i, j in [Q, G]
 
     """
     # FIXME: p=0 hardcoded, all p's should be done simultaneously
@@ -120,4 +121,8 @@ def evolop(npoints: np.ndarray, nf: int,  q2: float, q02: float,
     evola0ab = np.einsum('skaij,ab->skabij', pr,  np.identity(2))
     evola0 = np.einsum('skabij,bsk->skij', evola0ab, Rfact)
 
-    return evola0
+    evola1 = np.zeros_like(evola0)   # temp NLO operator is zero
+
+    evola = np.stack((evola0, evola1), axis=2)
+
+    return evola

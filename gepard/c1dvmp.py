@@ -14,9 +14,9 @@ SB3 = g.special.SB3
 
 def c1dvmp(m, sgntr: int, j: complex, k: int) -> Tuple[complex, complex, complex]:
     """NLO DVMP hard scattering coefficients."""
-    LRGPDF2 = math.log(m.rgpdf2)
-    LRDAF2 = math.log(m.rdaf2)
     LRR2 = math.log(m.rr2)
+    LRGPDF2 = math.log(m.rf2)
+    LRDAF2 = math.log(m.rdaf2)
     b0 = g.qcd.beta(0, m.nf)
 
     ptyk = g.special.parity(k)
