@@ -94,6 +94,24 @@ def S4(z: Union[complex, np.ndarray]) -> Union[complex, np.ndarray]:
     return zeta(4) - dpsi(z+1, 3) / 6
 
 
+def delS2(z: Union[complex, np.ndarray]) -> Union[complex, np.ndarray]:
+    """Harmonic sum S_2 difference.
+
+    Equal to delS2((z+1)/2) From Eq. (4.13) of 1310.5394.
+    Note halving of the argument.
+    """
+    return S2(z) - S2(z - 1/2)
+
+
+def deldelS2(j: Union[complex, np.ndarray], k: int) -> Union[complex, np.ndarray]:
+    """Diference of harmonic sum S_2 differences.
+
+    Equal to delS2((j+1)/2, (k+1)/2) From Eq. (4.38) of 1310.5394.
+    Note halving of the argument.
+    """
+    return (delS2(j) - delS2(k)) / (4*(j-k)*(2*j+2*k+1))
+
+
 def Sm1(z: Union[complex, np.ndarray], k: int) -> Union[complex, np.ndarray]:
     """Aux fun. FIXME: not tested."""
     return - log(2) + 0.5 * (1-2*(k % 2)) * (psi((z+2)/2) - psi((z+1)/2))

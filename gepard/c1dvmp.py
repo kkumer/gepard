@@ -5,6 +5,7 @@ from typing import Tuple
 
 import gepard as g
 
+poch = g.special.pochhammer
 S1 = g.special.S1
 S2 = g.special.S2
 S3 = g.special.S3
@@ -19,6 +20,9 @@ def c1dvmp(m, sgntr: int, j: complex, k: int) -> Tuple[complex, complex, complex
     b0 = g.qcd.beta(0, m.nf)
 
     ptyk = g.special.parity(k)
+
+    # FIXME: positive parity hard-wired here
+    gamGQ = g.adim.singlet(j+1, 0, m.nf, 1)[1, 0]
 
     # Spliced from Mathematica:
 
@@ -96,15 +100,21 @@ def c1dvmp(m, sgntr: int, j: complex, k: int) -> Tuple[complex, complex, complex
 
     #  ... pure singlet quark part starting at NLO
 
-    MCPS1 = (-2.*(0.5+1/((1.+j)*(2.+j))+1/((1.+k)*(2.+k))))/((1
-       +j)*(2.+j))-(2.*(2.+(1.+j)*(2.+j))*(-1.-LRGPDF2+2.*S1(1
-       +j)+2.*S1(1.+k)))/(j*(1.+j)*(2.+j)*(3.+j))+(0.5*k*(1.+k
-       )*(2.+k)*(3.+k)*((0.25*(S2(0.5*(1.+j))-S2(-0.5+0.5*(1. +
-       j))+S2(-0.5+0.5*k)-S2(0.5*k)))/((0.5*(1.+j)-0.5*k)*(2. +
-       j+k))-(0.25*(S2(0.5*(1.+j))-S2(-0.5+0.5*(1.+j))-S2(0.5
-       *(2.+k))+S2(-0.5+0.5*(2.+k))))/((0.5*(1.+j)+0.5*(-2.-k))
-       *(4.+j+k))))/(3.+2.*k)
+    # MCPS1 = (-2.*(0.5+1/((1.+j)*(2.+j))+1/((1.+k)*(2.+k))))/((1
+       # +j)*(2.+j))-(2.*(2.+(1.+j)*(2.+j))*(-1.-LRGPDF2+2.*S1(1
+       # +j)+2.*S1(1.+k)))/(j*(1.+j)*(2.+j)*(3.+j))+(0.5*k*(1.+k
+       # )*(2.+k)*(3.+k)*((0.25*(S2(0.5*(1.+j))-S2(-0.5+0.5*(1. +
+       # j))+S2(-0.5+0.5*k)-S2(0.5*k)))/((0.5*(1.+j)-0.5*k)*(2. +
+       # j+k))-(0.25*(S2(0.5*(1.+j))-S2(-0.5+0.5*(1.+j))-S2(0.5
+       # *(2.+k))+S2(-0.5+0.5*(2.+k))))/((0.5*(1.+j)+0.5*(-2.-k))
+       # *(4.+j+k))))/(3.+2.*k)
 
+    # The commented-out code above may be slightly faster.
+    MCPS1 = (-LRGPDF2+2*S1(j+1)+2*S1(k+1)-1)*gamGQ/(j+
+             3)/g.constants.CF - (1/2 + 1/poch(j+1, 2) +
+             1/poch(k+1, 2))*2/poch(j+1,2) + poch(k,4)*(
+             g.special.deldelS2((j+1)/2, k/2) -
+             g.special.deldelS2((j+1)/2, (k+2)/2)) / 2 / (2*k+3)
 
     #  ... gluon part
 
