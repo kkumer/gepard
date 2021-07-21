@@ -66,7 +66,10 @@ def test_c1_NLO():
     # "pure singlet" part
     assert aux[1] == approx(-0.496221+3.85004j, rel=1e-5)
     # gluon part
-    assert aux[2] == approx(35.2725+34.0699j,  rel=1e-5)
+    # DM's notebook value is a permil away ...
+    # assert aux[2] == approx(35.2725+34.0699j,  rel=1e-5)
+    # ... from formula from "Towards DVMP" paper:
+    assert aux[2] == approx(35.2818+34.0699j, rel=1e-5)
 
 
 @mark.skip('NLO fails - needs careful check')
