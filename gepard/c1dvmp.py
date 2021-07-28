@@ -4,14 +4,7 @@ import math
 from typing import Tuple
 
 import gepard as g
-
-poch = g.special.pochhammer
-S1 = g.special.S1
-S2 = g.special.S2
-S3 = g.special.S3
-SB3 = g.special.SB3
-delS2 = g.special.delS2
-deldelS2 = g.special.deldelS2
+from gepard.special import poch, S1, S2, S3, SB3, delS2, deldelS2, parity
 
 
 def c1dvmp(m, sgntr: int, j: complex, k: int) -> Tuple[complex, complex, complex]:
@@ -21,10 +14,9 @@ def c1dvmp(m, sgntr: int, j: complex, k: int) -> Tuple[complex, complex, complex
     LRDAF2 = math.log(m.rdaf2)
     b0 = g.qcd.beta(0, m.nf)
 
-    ptyk = g.special.parity(k)
+    ptyk = parity(k)
 
-    # FIXME: positive parity hard-wired here
-    gamGQ = g.adim.singlet(j+1, 0, m.nf, 1)[1, 0]
+    gamGQ = g.adim.singlet_LO(j+1, m.nf, ptyk)[1, 0]
 
     gamGGCA = 4*S1(j+1) - 12/j/(j+3) + 4/(j+1)/(j+2)
     gamQQCF = 4*S1(k+1) - 3 - 2/poch(k+1, 2)
@@ -53,7 +45,7 @@ def c1dvmp(m, sgntr: int, j: complex, k: int) -> Tuple[complex, complex, complex
         SUMANDB = (0.125*(1.+2.*LI)*(S2(0.5*(1.+j))-S2(-0.5+0.5*(
            1.+j))+S2(-0.5+0.5*LI)-S2(0.5*LI)))/((0.5*(1.+j)-0.5*LI)*(2.+j+LI))
         SUMB += SUMANDB
-        SUMA += g.special.parity(LI)*SUMANDB
+        SUMA += parity(LI)*SUMANDB
 
     DELc1aGJK = (-2.*ptyk)/((1.+j)*(2.+j)*(1.+k)*(2.+k))+(0.5
        *(-1.+(1.+j)*(2.+j))*(-2.+(1.+k)*(2.+k)*(S2(0.5*(1.+k)) -

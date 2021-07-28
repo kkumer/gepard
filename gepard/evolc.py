@@ -44,7 +44,7 @@ def calc_gam(npoints, nf):
     # LO only
     gam = []
     for pw_shift in [0, 2, 4]:
-        gam.append(g.adim.singlet(npoints+pw_shift, 0, nf, 1).transpose(2, 0, 1))
+        gam.append(g.adim.singlet_LO(npoints+pw_shift, nf, 1).transpose(2, 0, 1))
     return np.array(gam)
 
 
@@ -73,7 +73,7 @@ def calc_wce(m, q2: float, process: str):
         raise Exception("{} is not of type MellinBarnesModel".format(m))
     one = np.ones_like(m.jpoints)
     zero = np.zeros_like(m.jpoints)
-    # LO 
+    # LO
     wc = []
     for pw_shift in [0, 2, 4]:
         j = m.jpoints + pw_shift

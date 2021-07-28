@@ -32,6 +32,8 @@ def pochhammer(z: Union[complex, np.ndarray], m: int) -> Union[complex, np.ndarr
         p = p * (z + k)
     return p
 
+poch = pochhammer
+
 
 def dpsi_one(z: complex, m: int) -> complex:
     """Polygamma - m'th derivative of Euler gamma at z."""
@@ -94,6 +96,17 @@ def S4(z: Union[complex, np.ndarray]) -> Union[complex, np.ndarray]:
     return zeta(4) - dpsi(z+1, 3) / 6
 
 
+def S2_prime(z: Union[complex, np.ndarray], prty: int) -> Union[complex, np.ndarray]:
+    """Curci et al Eq. (5.25)."""
+    # note this is related to delS2
+    return (1+prty)*S2(z)/2 + (1-prty)*S2(z-1/2)/2
+
+
+def S3_prime(z: Union[complex, np.ndarray], prty: int) -> Union[complex, np.ndarray]:
+    """Curci et al Eq. (5.25)."""
+    return (1+prty)*S3(z)/2 + (1-prty)*S3(z-1/2)/2
+
+
 def delS2(z: Union[complex, np.ndarray]) -> Union[complex, np.ndarray]:
     """Harmonic sum S_2 difference.
 
@@ -143,3 +156,9 @@ def SB3(j: Union[complex, np.ndarray]) -> Union[complex, np.ndarray]:
     return 0.5*S1(j)*(-S2(-0.5+0.5*j)+S2(0.5*j))+0.125*(-S3(
              - 0.5 + 0.5 * j) + S3(0.5 * j)) - 2 * (0.8224670334241131 * (-S1(0.5 *
                                         (-1 + j)) + S1(0.5 * j)) - MellinF2(1 + j))
+
+
+def S2_tilde(n: Union[complex, np.ndarray], prty: int) -> Union[complex, np.ndarray]:
+    """Eq. (30) of  Bluemlein and Kurth, hep-ph/9708388."""
+    G = psi((n+1)/2) - psi(n/2)
+    return -(5/8)*zeta(3) + prty*(S1(n)/n**2 - (zeta(2)/2)*G + MellinF2(n))

@@ -15,9 +15,6 @@ par_fit = {'ns':  0.152039, 'al0s': 1.15751, 'alps': 0.15, 'ms': 0.478391,
            'secs': -0.15152, 'this': 0.,  # 'ng': 0.4,  # provided by ns
            'al0g': 1.24732, 'alpg': 0.15, 'mg': 0.7, 'secg': -0.81217, 'thig': 0.}
 
-
-# data = g.utils.loaddata('/home/kkumer/gepard/pype/data/gammastarp2gammap',
-                        # approach=g.theory.BMK)
 HERAtestpts = g.data.dset[39] + g.data.dset[45]
 pt6 = g.data.dset[36][0]
 
@@ -64,6 +61,24 @@ def test_XDVCS():
     # Comparison to old pure-Fortran 'src/test/test.F':
     # Have to decrease precision due to slightly different formula
     assert th.predict(pt) == approx(105.18391660404916, rel=1e-3)
+
+
+@mark.skip('NLO DVCS not yet implemented.')
+def test_XDVCS_NLO():
+    """Calculate NLO DVCS cross section (+ evolution)."""
+    pt = g.data.DataPoint({'W': 55., 'Q2': 3., 't': 0.})
+    pt.xi = pt.Q2 / (2.0 * pt.W * pt.W + pt.Q2)
+    pt.xB = 2*pt.xi/(1.+pt.xi)
+    pt.yaxis = 'X'
+    test_gpd = g.model.Test(p=1)
+    m = g.model.MellinBarnesModel(gpds=test_gpd)
+    m.parameters.update(par_test)
+    th = g.theory.hotfixedBMK(m)
+    assert th.predict(pt) == approx(32.29728102, rel=1e-5)
+    # To get complete agreement with Fortran take
+    # (slower) tquadrature = quadSciPy10 and:
+    # set pt.W=3.5  and use XDVCStApprox and
+    # assert_almost_equal(aux, 6.8612469682766850, 5)
 
 
 def test_predict():

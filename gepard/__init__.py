@@ -3,6 +3,7 @@
 # Import what's needed into gepard's namespace
 
 import gepard.adim  # noqa: F401
+import gepard.c1dvcs  # noqa: F401
 import gepard.c1dvmp  # noqa: F401
 import gepard.evolution  # noqa: F398
 import gepard.evolc  # noqa: F398
