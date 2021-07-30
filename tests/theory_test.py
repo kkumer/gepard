@@ -63,7 +63,7 @@ def test_XDVCS():
     assert th.predict(pt) == approx(105.18391660404916, rel=1e-3)
 
 
-@mark.skip('NLO DVCS not yet implemented.')
+# @mark.skip('NLO DVCS not yet implemented.')
 def test_XDVCS_NLO():
     """Calculate NLO DVCS cross section (+ evolution)."""
     pt = g.data.DataPoint({'W': 55., 'Q2': 3., 't': 0.})

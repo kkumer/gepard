@@ -15,7 +15,7 @@ def c1_F2(n: complex, nf: int) -> np.ndarray:
     NSM = NSP
     Q = NSP
     G = nf*(n**(-2)+4/(1+n)-4/(2+n)-((1+S1(n))*(2+n+n**2))/(n*(1+n)*(2+n)))
-    return np.array((Q, G, NSP, NSM))
+    return np.array((Q, G, NSP, NSM)).transpose()
 
 
 def c1_FL(n: complex, nf: int) -> np.ndarray:
@@ -24,7 +24,7 @@ def c1_FL(n: complex, nf: int) -> np.ndarray:
     NSM = NSP
     Q = NSP
     G = (4*nf)/((1+n)*(2+n))
-    return np.array((Q, G, NSP, NSM))
+    return np.array((Q, G, NSP, NSM)).transpose()
 
 
 def c1_F1(n: complex, nf: int) -> np.ndarray:
@@ -86,5 +86,5 @@ def C1(m, j: np.ndarray, process: str) -> np.ndarray:
         c1 = c1_F1(j+1, m.nf)
     else:
         raise Exception('Process {} is neither DVCS nor DIS!'.format(process))
-    return c1 + shift1(m, j, process)*np.einsum('i,ij->j', c0,
-                                                block(j+1, m.nf)[0, :, :])/2
+    return c1 + np.einsum('k,i,kij->kj', shift1(m, j, process), c0,
+                          block(j+1, m.nf)[:, 0, :, :])/2

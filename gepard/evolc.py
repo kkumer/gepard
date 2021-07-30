@@ -89,7 +89,8 @@ def calc_wce(m, q2: float, process: str):
             q0, g0 = (one, zero)   # LO Q and G
             q1, g1 = (zero, zero)  # NLO if only LO is asked for (m.p=0)
             if m.p == 1:
-                q1, g1 = g.c1dvcs.C1(m, j, process)[:2]  # take only singlet atm
+                # take only singlet part atm:
+                q1, g1 = g.c1dvcs.C1(m, j, process)[:, :2].transpose()
         elif process == 'DVMP':
             # Normalizations. Factor 3 is from normalization of DA, so not NC
             # See p. 37, 39 of "Towards DVMP" paper. Eq. (3.62c)
