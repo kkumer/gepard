@@ -78,13 +78,17 @@ def calc_wce(m, q2: float, process: str):
     for pw_shift in [0, 2, 4]:
         j = m.jpoints + pw_shift
         fshu = _fshu(j)
-        if process == 'DVCS':
-            quark_norm = fshu
-            gluon_norm = fshu
+        if process in ['DVCS', 'DIS']:
+            if process == 'DVCS':
+                quark_norm = fshu
+                gluon_norm = fshu
+            else:  # DIS
+                quark_norm = one
+                gluon_norm = one
             q0, g0 = (one, zero)   # LO Q and G
             q1, g1 = (zero, zero)  # NLO if only LO is asked for (m.p=0)
             if m.p == 1:
-                q1, g1 = (zero, zero)  # FIXME: to be entered later!!
+                q1, g1 = g.c1dvcs.C1(m, j, process)[:2]  # take only singlet atm
         elif process == 'DVMP':
             # Normalizations. Factor 3 is from normalization of DA, so not NC
             # See p. 37, 39 of "Towards DVMP" paper. Eq. (3.62c)
