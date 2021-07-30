@@ -10,27 +10,12 @@ n_test = 1.11 + 1.7j
 
 # Numbers are from MMA adacf.m
 
-# Commented-out tests are superfluous. adim_block tests everything.
-# def test_adim_NS():
-#     """Test NS(+/-) an. dim. at LO and NLO."""
-#     assert g.adim.non_singlet(n_test, 3, 1) == approx(
-#             np.array([3.66314 +4.77559j, 23.0105 +18.9183j]), 6)
-#     assert g.adim.non_singlet(n_test, 3, -1) == approx(
-#             np.array([3.66314 +4.77559j, 23.0185 +18.8685j]), 6)
-#
-#
-# def test_adim_singlet():
-#     """Test singlet an. dim. at LO and NLO."""
-#     assert g.adim.singlet(n_test, 3, 1) == approx(np.array([
-#             [[3.66314+4.77559j, -1.13792+1.3199j],
-#              [0.467652+1.54209j, 10.4322 +12.8949j]],
-#             [[24.2238 +17.5493j,  4.38729 +9.94242j],
-#             [-2.90091+14.6529j, 29.6072 +53.1367j]]]), 6)
-
 
 def test_adim_block():
     """Test block an. dim. at LO and NLO."""
-    assert g.adim.block(n_test, 3) == approx(np.array([
+    res = g.adim.block(n_test, 3)
+    assert res.shape == (1, 2, 4, 4)
+    assert res[0, :, :, :] == approx(np.array([
             # LO
             [[3.66314+4.77559j, -1.13792+1.3199j, 0, 0],
              [0.467652+1.54209j, 10.4322+12.8949j, 0, 0],

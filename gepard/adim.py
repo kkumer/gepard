@@ -127,7 +127,6 @@ def singlet_NLO(n: complex, nf: int, prty: int=1) -> np.ndarray:
                 n)*n*(1+n)*(2+n))-4*S3(n/2)+32*(S1(n)/n**2-0.625*zeta(3)+MellinF2(n) -
                     0.5*zeta(2)*(-psi(n/2)+psi((1+n)/2)))))
 
-
     return np.array([[qq1, qg1], 
                      [gq1, gg1]])
 
@@ -140,22 +139,33 @@ def block(n: complex, nf: int) -> np.ndarray:
         nf (int): number of active quark flavors
 
     Returns:
-        2x4x4 array (LO, NLO) where each is in turn
-        4x4 complex matrix ((QQ, QG,   0,   0),
-                            (GQ, GG,   0,   0),
-                            ( 0,  0, NS+,   0),
-                            ( 0,  0,   0, NS-))
+        block[k, p, i, j]
+         -  k is index if n is array, otherwise 0
+         -  p is pQCD order (0=LO, 1=NLO)
+         -  i, j in [Q, G, NS+, NS-], forming
+            4x4 complex matrix ((QQ, QG,   0,   0),
+                                (GQ, GG,   0,   0),
+                                ( 0,  0, NS+,   0),
+                                ( 0,  0,   0, NS-))
     """
-    lo_SI = singlet_LO(n, nf)
-    lo_NS = non_singlet_LO(n, nf)
+    lo_SI = np.atleast_3d(singlet_LO(n, nf)).transpose((2, 0, 1))
+    lo_NS = np.atleast_3d(non_singlet_LO(n, nf)).transpose((1, 2, 0))
 
-    nlo_SI = singlet_NLO(n, nf)
-    nlo_plus_NS = non_singlet_NLO(n, nf, prty=1)
-    nlo_minus_NS = non_singlet_NLO(n, nf, prty=-1)
+    nlo_SI = np.atleast_3d(singlet_NLO(n, nf)).transpose((2, 0, 1))
+    nlo_plus_NS = np.atleast_3d(non_singlet_NLO(n, nf, prty=1)).transpose((1, 2, 0))
+    nlo_minus_NS = np.atleast_3d(non_singlet_NLO(n, nf, prty=-1)).transpose((1, 2, 0))
 
-    return np.block([
-                     [[lo_SI, np.zeros((2, 2))],
-                      [np.zeros((2, 2)), np.diagflat([lo_NS, lo_NS])]],
-                     # NLO
-                     [[nlo_SI, np.zeros((2, 2))],
-                      [np.zeros((2, 2)), np.diagflat([nlo_plus_NS, nlo_minus_NS])]]]) 
+    zero_SI = np.zeros_like(lo_SI)
+    zero_NS = np.zeros_like(lo_NS)
+
+    lo_NS_block = np.block([[lo_NS, zero_NS],
+                            [zero_NS, lo_NS]])
+    lo_block = np.block([[lo_SI, zero_SI],
+                         [zero_SI, lo_NS_block]])
+
+    nlo_NS_block = np.block([[nlo_plus_NS, zero_NS],
+                            [zero_NS, nlo_minus_NS]])
+    nlo_block = np.block([[nlo_SI, zero_SI],
+                         [zero_SI, nlo_NS_block]])
+
+    return np.stack([lo_block, nlo_block], axis=1)
