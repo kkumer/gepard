@@ -31,7 +31,7 @@ sys.path.append('.')
 
 
 def calc_gam(npoints, nf):
-    """Calculate (singlet) anomalous dimensions.
+    """Calculate LO singlet anomalous dimensions matrix on MB contour.
 
     Args:
        npoints: coordinates of MB contour
@@ -74,9 +74,10 @@ def calc_wce(m, q2: float, process: str):
     one = np.ones_like(m.jpoints)
     zero = np.zeros_like(m.jpoints)
     # LO
-    wc = []
+    wce = []
     for pw_shift in [0, 2, 4]:
         j = m.jpoints + pw_shift
+        # 1. Wilson coefficient a.k.a. hard-scattering amplitude
         fshu = _fshu(j)
         if process in ['DVCS', 'DIS']:
             if process == 'DVCS':
@@ -104,12 +105,14 @@ def calc_wce(m, q2: float, process: str):
             raise Exception('{} is not DVCS or DVMP!'.format(process))
         c_quark = quark_norm * np.stack([q0, q1])
         c_gluon = gluon_norm * np.stack([g0, g1])
-        wc.append(np.stack((c_quark, c_gluon)).transpose())
-    wc = np.array(wc)
-    evola = g.evolution.evolop(m.npoints, m.nf, q2, m.q02, m.asp[m.p], m.r20)
-    # p_mat: matrix that combines (LO, NLO) evolution operator and Wilson coeffs
-    # while canceling NNLO term NLO*NLO:
-    asmur2 = g.qcd.as2pf(0, m.nf, q2/m.rr2, m.asp[m.p], m.r20)
-    asmuf2 = g.qcd.as2pf(0, m.nf, q2/m.rf2, m.asp[m.p], m.r20)
-    p_mat = np.array([[1, asmuf2], [asmur2, 0]])
-    return np.einsum('skpi,pq,skqij->skj', wc, p_mat, evola)
+        wc = np.stack((c_quark, c_gluon)).transpose()
+        # 2. evolution operator
+        evola = g.evolution.evolop(m, j, q2)
+        # p_mat: matrix that combines (LO, NLO) evolution operator and Wilson coeffs
+        # while canceling NNLO term NLO*NLO:
+        asmur2 = g.qcd.as2pf(0, m.nf, q2/m.rr2, m.asp[m.p], m.r20)
+        asmuf2 = g.qcd.as2pf(0, m.nf, q2/m.rf2, m.asp[m.p], m.r20)
+        p_mat = np.array([[1, asmuf2], [asmur2, 0]])
+        # 3. evolved Wilson coeff.
+        wce.append(np.einsum('kpi,pq,kqij->kj', wc, p_mat, evola))
+    return np.stack(wce, axis=0)  # stack PWs

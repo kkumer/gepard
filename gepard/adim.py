@@ -1,5 +1,10 @@
-"""QCD anomalous dimensions."""
+"""QCD anomalous dimensions.
 
+Note:
+    Functions in this module have as first argument Mellin moment
+    n=j+1, where j is conformal moment used everywhere else.
+    Thus, they should always be called as f(j+1, ...).
+"""
 # from cmath import exp
 # from scipy.special import loggamma as clngamma
 
@@ -19,7 +24,6 @@ def non_singlet_LO(n: complex, nf: int, prty: int=1) -> complex:
         prty (int): 1 for NS^{+}, -1 for NS^{-}, irrelevant at LO
 
     """
-
     return CF*(-3.0-2.0/(n*(1.0+n))+4.0*S1(n))
 
 
