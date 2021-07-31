@@ -45,7 +45,7 @@ def shift1(m, j: np.ndarray, process: str) -> np.ndarray:
     if process == 'DIS':
         s1 = - LRF2*np.ones_like(j)
     elif process == 'DVCS':    # Eq. (88a)
-        s1 = S1(j+3/1) - S1(j+2) + 2*math.log(2) - LRF2
+        s1 = S1(j+3/2) - S1(j+2) + 2*math.log(2) - LRF2
     else:
         raise Exception('Process {} is neither DVCS nor DIS!'.format(process))
     return s1

@@ -65,8 +65,7 @@ def calc_wc(m, j, process: str):
        process: 'DIS, 'DVCS' or 'DVMP'
 
     Returns:
-         wc[k,f]: k in range(npts), f in [Q,G]
-
+         wc[k, p, f]: k in range(npts), p in [LO, NLO], f in [Q,G]
     """
     # Instead of type hint (which leads to circular import for some reason)
     if not isinstance(m, g.model.MellinBarnesModel):
@@ -126,8 +125,8 @@ def calc_wce(m, q2: float, process: str):
         evola = g.evolution.evolop(m, j, q2)
         # p_mat: matrix that combines (LO, NLO) evolution operator and Wilson coeffs
         # while canceling NNLO term NLO*NLO:
-        asmur2 = g.qcd.as2pf(0, m.nf, q2/m.rr2, m.asp[m.p], m.r20)
-        asmuf2 = g.qcd.as2pf(0, m.nf, q2/m.rf2, m.asp[m.p], m.r20)
+        asmur2 = g.qcd.as2pf(m.p, m.nf, q2/m.rr2, m.asp[m.p], m.r20)
+        asmuf2 = g.qcd.as2pf(m.p, m.nf, q2/m.rf2, m.asp[m.p], m.r20)
         p_mat = np.array([[1, asmuf2], [asmur2, 0]])
         # 3. evolved Wilson coeff.
         wce.append(np.einsum('kpi,pq,kqij->kj', wc, p_mat, evola))
