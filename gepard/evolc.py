@@ -56,8 +56,56 @@ def _fshu(j: np.ndarray) -> np.ndarray:
                               - loggamma(3 + j) - loggamma(3/2)))
 
 
+def calc_wc(m, j, process: str):
+    """Calculate Wilson coeffs for given q2.
+
+    Args:
+       m: instance of the model
+       j: MB contour point(s) (overrides m.jpoints)
+       process: 'DIS, 'DVCS' or 'DVMP'
+
+    Returns:
+         wc[k,f]: k in range(npts), f in [Q,G]
+
+    """
+    # Instead of type hint (which leads to circular import for some reason)
+    if not isinstance(m, g.model.MellinBarnesModel):
+        raise Exception("{} is not of type MellinBarnesModel".format(m))
+    one = np.ones_like(m.jpoints)
+    zero = np.zeros_like(m.jpoints)
+    fshu = _fshu(j)
+    if process in ['DVCS', 'DIS']:
+        if process == 'DVCS':
+            quark_norm = fshu
+            gluon_norm = fshu
+        else:  # DIS
+            quark_norm = one
+            gluon_norm = one
+        q0, g0 = (one, zero)   # LO Q and G
+        q1, g1 = (zero, zero)  # NLO if only LO is asked for (m.p=0)
+        if m.p == 1:
+            # take only singlet part atm:
+            q1, g1 = g.c1dvcs.C1(m, j, process)[:, :2].transpose()
+    elif process == 'DVMP':
+        # Normalizations. Factor 3 is from normalization of DA, so not NC
+        # See p. 37, 39 of "Towards DVMP" paper. Eq. (3.62c)
+        quark_norm = 3 * fshu
+        gluon_norm = 3 * fshu * 2 / g.constants.CF / (j + 3)
+        # Normalizations are chosen so that LO is normalized to:
+        q0, g0 = (one/m.nf, one)   # LO Q and G
+        q1, g1 = (zero, zero)      # NLO if only LO is asked for (m.p=0)
+        if m.p == 1:
+            qp1, ps1, g1 = g.c1dvmp.c1dvmp(m, 1, j, 0)
+            q1 = qp1/m.nf + ps1
+    else:
+        raise Exception('{} is not DIS, DVCS or DVMP!'.format(process))
+    c_quark = quark_norm * np.stack([q0, q1])
+    c_gluon = gluon_norm * np.stack([g0, g1])
+    return np.stack((c_quark, c_gluon)).transpose()
+
+
 def calc_wce(m, q2: float, process: str):
-    """Calculate evolved Wilson coeffs for given q2.
+    """Calculate evolved Wilson coeffs for given q2, for all PWs.
 
     Args:
        q2: final evolution scale
@@ -66,48 +114,15 @@ def calc_wce(m, q2: float, process: str):
 
     Returns:
          wce[s,k,f]: s in range(npwmax), k in range(npts), f in [Q,G]
-
     """
     # Instead of type hint (which leads to circular import for some reason)
     if not isinstance(m, g.model.MellinBarnesModel):
         raise Exception("{} is not of type MellinBarnesModel".format(m))
-    one = np.ones_like(m.jpoints)
-    zero = np.zeros_like(m.jpoints)
-    # LO
     wce = []
     for pw_shift in [0, 2, 4]:
         j = m.jpoints + pw_shift
-        # 1. Wilson coefficient a.k.a. hard-scattering amplitude
-        fshu = _fshu(j)
-        if process in ['DVCS', 'DIS']:
-            if process == 'DVCS':
-                quark_norm = fshu
-                gluon_norm = fshu
-            else:  # DIS
-                quark_norm = one
-                gluon_norm = one
-            q0, g0 = (one, zero)   # LO Q and G
-            q1, g1 = (zero, zero)  # NLO if only LO is asked for (m.p=0)
-            if m.p == 1:
-                # take only singlet part atm:
-                q1, g1 = g.c1dvcs.C1(m, j, process)[:, :2].transpose()
-        elif process == 'DVMP':
-            # Normalizations. Factor 3 is from normalization of DA, so not NC
-            # See p. 37, 39 of "Towards DVMP" paper. Eq. (3.62c)
-            quark_norm = 3 * fshu
-            gluon_norm = 3 * fshu * 2 / g.constants.CF / (j + 3)
-            # Normalizations are chosen so that LO is normalized to:
-            q0, g0 = (one/m.nf, one)   # LO Q and G
-            q1, g1 = (zero, zero)      # NLO if only LO is asked for (m.p=0)
-            if m.p == 1:
-                qp1, ps1, g1 = g.c1dvmp.c1dvmp(m, 1, j, 0)
-                q1 = qp1/m.nf + ps1
-        else:
-            raise Exception('{} is not DVCS or DVMP!'.format(process))
-        c_quark = quark_norm * np.stack([q0, q1])
-        c_gluon = gluon_norm * np.stack([g0, g1])
-        wc = np.stack((c_quark, c_gluon)).transpose()
-        # 2. evolution operator
+        wc = calc_wc(m, j, process)
+        # evolution operator
         evola = g.evolution.evolop(m, j, q2)
         # p_mat: matrix that combines (LO, NLO) evolution operator and Wilson coeffs
         # while canceling NNLO term NLO*NLO:
