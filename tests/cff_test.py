@@ -79,7 +79,7 @@ def test_wce_NLO():
     m_test.parameters.update(par_test)
     assert g.evolc.calc_wce(m_test, 3.0, 'DVCS')[0, 0, :] == approx(
             np.array([1.6127545996599677+0.00014769567470216j,
-                      -0.09044960485326564-0.00003265190306802j]), rel=1.e-4)
+                      -0.09044960485326564-0.00003265190306802j]), rel=1.e-10)
 
 
 def test_cff_H_noevol():

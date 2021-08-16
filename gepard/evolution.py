@@ -67,8 +67,8 @@ def rnnlof(m, j) -> Tuple[np.ndarray, np.ndarray]:
 
     lam = lambdaf(m, j)
     den = 1. / (lam[0, :] - lam[1, :])
-    gam0 = g.adim.singlet_LO(j+1, m.nf).transpose((2, 0, 1))  # LO singlet anomalous dimensions
-    gam1 = g.adim.singlet_NLO(j+1, m.nf).transpose((2, 0, 1))  # NLO singlet anomalous dimensions
+    gam0 = g.adim.singlet_LO(j+1, m.nf).transpose((2, 0, 1))  # LO singlet an. dim.
+    gam1 = g.adim.singlet_NLO(j+1, m.nf).transpose((2, 0, 1))  # NLO singlet an. dim.
 
     # P+ and P-
     ssm = gam0 - np.einsum('k,ij->kij', lam[1, :], np.identity(2))
@@ -77,11 +77,11 @@ def rnnlof(m, j) -> Tuple[np.ndarray, np.ndarray]:
     prm = np.einsum('k,kij->kij', -den, ssp)
     pr = np.stack([prp, prm], axis=1)
 
-
     # NLO
     inv = 1.0 / g.qcd.beta(0, m.nf)
-    r1 = inv * (gam1 -
-                0.5 * inv * g.qcd.beta(1, m.nf) * gam0)
+    # Cf. Eq. (124), but defined with opposite sign
+    # and with additional 1/b0, as in gepard-fortran
+    r1 = inv * (gam1 - 0.5 * inv * g.qcd.beta(1, m.nf) * gam0)
     r1proj = np.einsum('kaim,kmn,kbnj->kabij', pr, r1, pr)
 
     return pr, r1proj
@@ -118,6 +118,7 @@ def evolop(m, j, q2: float) -> np.ndarray:
     bll = b0 * np.ones_like(bll) + bll
 
     er1 = (np.ones_like(bll) - (1./R)**(bll/b0)) / bll  # Eq. (126)
+    er1 = b0 * er1   # as defined in gepard-fortran
 
     # 3. projectors
     pr, r1proj = rnnlof(m, j)
@@ -127,7 +128,8 @@ def evolop(m, j, q2: float) -> np.ndarray:
     evola0 = np.einsum('kabij,bk->kij', evola0ab, Rfact)
 
     if m.p == 1:
-        evola1ab = np.einsum('kij,kabij->kabij', er1, r1proj)  # Eq. (124)
+        # Cf. eq. (124), but with opposite sign, as in gepard-fortran
+        evola1ab = - np.einsum('kab,kabij->kabij', er1, r1proj)
         evola1 = np.einsum('kabij,bk->kij', evola1ab, Rfact)
     else:
         evola1 = np.zeros_like(evola0)
