@@ -48,6 +48,32 @@ def test_XDVCSt():
     assert th._XDVCStApprox(pt) == approx(15.633422291049154)
 
 
+def test_XDVCSt_NLO():
+    """Calculate NLO DVCS partial cross section (no evolution)."""
+    pt = g.data.DataPoint({'W': 82., 'Q2': 1., 't': 0.})
+    pt.xi = pt.Q2 / (2.0 * pt.W * pt.W + pt.Q2)
+    pt.xB = 2*pt.xi/(1.+pt.xi)
+    pt.yaxis = 'X'
+    test_gpd = g.model.Test(p=1)
+    m = g.model.MellinBarnesModel(gpds=test_gpd)
+    m.parameters.update(par_test)
+    th = g.theory.hotfixedBMK(m)
+    assert th._XDVCStEx(pt) == approx(821.0062045181508)
+
+
+def test_XDVCSt_NLOevol():
+    """Calculate NLO DVCS partial cross section (+ evolution)."""
+    pt = g.data.DataPoint({'W': 82., 'Q2': 8., 't': 0.})
+    pt.xi = pt.Q2 / (2.0 * pt.W * pt.W + pt.Q2)
+    pt.xB = 2*pt.xi/(1.+pt.xi)
+    pt.yaxis = 'X'
+    test_gpd = g.model.Test(p=1)
+    m = g.model.MellinBarnesModel(gpds=test_gpd)
+    m.parameters.update(par_test)
+    th = g.theory.hotfixedBMK(m)
+    assert th._XDVCStEx(pt) == approx(90.76770897337423)
+
+
 def test_XDVCS():
     """Calculate LO DVCS total cross section (+ evolution)."""
     pt = g.data.DataPoint({'W': 82., 'Q2': 3.})
@@ -63,7 +89,7 @@ def test_XDVCS():
     assert th.predict(pt) == approx(105.18391660404916, rel=1e-3)
 
 
-# @mark.skip('NLO DVCS not yet implemented.')
+@mark.skip('total xs still wrong.')
 def test_XDVCS_NLO():
     """Calculate NLO DVCS cross section (+ evolution)."""
     pt = g.data.DataPoint({'W': 55., 'Q2': 3., 't': 0.})
