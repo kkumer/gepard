@@ -73,6 +73,22 @@ par_KM10 = {'tMv': 0.88386035557556641, 'rS': 1.0, 'rpi': 3.5355742996824659,
             'secg': -2.787206139384161, 'thig': 0.89633675296304127,
             'kaps': 0.0, 'kapg': 0.0}
 
+par_KM10b = {'tMv': 0.8, 'rS': 1.0, 'rpi': 4.0201, 'alv': 0.43, 'Nsea': 0.0,
+             'Nv': 1.35, 'rv': 0.8081, 'Mpi': 1.5369, 'alS': 1.13, 'alpS': 0.15,
+             'C': 5.4259, 'tNv': 0.6, 'bS': 2.0, 'bv': 0.7706, 'Mv': 0.8,
+             'tbv': 1.0, 'alpv': 0.85, 'MC': 1.3305, 'MS': 0.707, 'trv': 3.2931,
+             'EAL0G': 1.1, 'ESECS': 0.0, 'EDELM2S': 0.0, 'EPS': 2.0, 'ETHIS': 0.0,
+             'ESECG': 0.0, 'EPG': 2.0, 'EDELM2G': 0.0, 'PS': 2.0, 'EALPG': 0.15,
+             'EKAPG': 0.0, 'ESKEWG': 0.0, 'M02S': 0.49754317018981614,
+             'EALPS': 0.15, 'EKAPS': 0.0, 'DELB': 0.0, 'ESKEWS': 0.0, 'SKEWS': 0.0,
+             'ETHIG': 0.0, 'EM02G': 0.7, 'EAL0S': 1.0, 'DELM2S': 0.0, 'EM02S': 1.0,
+             'SKEWG': 0.0, 'PG': 2.0, 'DELM2G': 0.0, 'ns': 0.15203911208796006,
+             'al0s': 1.1575060246398083, 'alps': 0.15, 'al0g': 1.247316701070471,
+             'secs': -0.4600511871918772, 'this': 0.09351798951979662,
+             'alpg': 0.15, 'mg': 0.7, 'secg': -2.5151319493485427,
+             'ms': 0.49754317018981614,
+             'thig': 0.8915757559175185, 'kaps': 0.0, 'kapg': 0.0}
+
 par_KM15 = {'tMv': 3.992860161655587, 'rS': 1.0, 'alv': 0.43, 'tal': 0.43,
             'Mpi': 3.999999852084612, 'Nv': 1.35, 'MS': 0.707, 'rv': 0.918393047884448,
             'Nsea': 0.0, 'alS': 1.13, 'rpi': 2.6463144464701536,  'alpS': 0.15,
@@ -95,6 +111,7 @@ par_KM15 = {'tMv': 3.992860161655587, 'rS': 1.0, 'alv': 0.43, 'tal': 0.43,
             'al0g': 1.247316701070471, 'alpg': 0.15, 'mg': 0.7,
             'secg': -2.990809378821039, 'thig': 0.9052207712570559,
             'kaps': 0.0, 'kapg': 0.0}
+
 
 def test_KM09a():
     """Test model: KM09a."""
@@ -144,12 +161,17 @@ def test_KM10a():
     assert chisq == approx(129.18281370844684)
 
 
-@mark.skip('KM10b not yet transferred')
+@mark.slow
 def test_KM10b():
     """Test model: KM10b."""
-    th = db['KM10b']
-    pts = DVCSpoints+GLOpoints+data[30]
-    chisq = th.chisq(pts)[0]
+    fit_gpd = g.model.Fit()
+    mMB = g.model.MellinBarnesModel(gpds=fit_gpd)
+    mDR = g.model.ComptonModelDRPP()
+    m = g.model.HybridKelly(mMB, mDR)
+    m.parameters.update(par_KM10b)
+    th = g.theory.BM10(m)
+    pts = DVCSpoints+GLOpoints+g.data.dset[30]
+    chisq = th.chisq(pts)
     assert chisq == approx(115.54198973827977)
 
 
