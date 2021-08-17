@@ -191,6 +191,7 @@ class Theory(object):
             else:
                 res = self._XDVCSt(pt)
             del pt.t
+            # print("t = {}  =>  dsig/dt = {}".format(t_single, res))
             aux.append(res)
         return array(aux)
 

@@ -89,10 +89,10 @@ def test_XDVCS():
     assert th.predict(pt) == approx(105.18391660404916, rel=1e-3)
 
 
-@mark.skip('total xs still wrong.')
+# @mark.skip('total xs still wrong.')
 def test_XDVCS_NLO():
     """Calculate NLO DVCS cross section (+ evolution)."""
-    pt = g.data.DataPoint({'W': 55., 'Q2': 3., 't': 0.})
+    pt = g.data.DataPoint({'W': 55., 'Q2': 3.})
     pt.xi = pt.Q2 / (2.0 * pt.W * pt.W + pt.Q2)
     pt.xB = 2*pt.xi/(1.+pt.xi)
     pt.yaxis = 'X'
