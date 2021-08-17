@@ -19,6 +19,17 @@ HERAtestpts = g.data.dset[39] + g.data.dset[45]
 pt6 = g.data.dset[36][0]
 
 
+def test_F2_NLO():
+    """Test NLO DIS F2 evaluation."""
+    fit_gpd = g.model.Fit(p=1)
+    m = g.model.MellinBarnesModel(gpds=fit_gpd)
+    th = g.theory.BMK(model=m)
+    th.m.parameters.update({'ns': 0.15, 'al0s': 1., 'alps': 0.15, 'ms': 1.,
+                            'secs': 0., 'al0g': 1.1, 'alpg': 0.15, 'mg': 0.7})
+    f2 = th.F2(g.data.dset[201][0])
+    assert f2 == approx(0.4220514008395502)
+
+
 def test_XDVCSt_noevol():
     """Calculate LO DVCS partial cross section (no evolution)."""
     pt = g.data.DataPoint({'W': 82., 'Q2': 1., 't': 0.})

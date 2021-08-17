@@ -390,6 +390,9 @@ class DVCS(Theory):
     # _XDVCSt = _XDVCStApprox
     _XDVCSt = _XDVCStEx
 
+    def F2(self, pt):
+        """Return DIS F2."""
+        return self.m.F2(pt)
 
 ## General assymetries
 ## TODO: Lot of code duplication here - this should be united in one clever function

@@ -6,18 +6,49 @@ import sys
 import gepard as g
 from pytest import approx, mark
 
-os.environ["OPENBLAS_MAIN_FREE"] = "1"
-
-sys.path.append('/home/kkumer/g')
-sys.path.append('/home/kkumer/g/gepard')
+# The following is not resulting in paralelization
+# os.environ["OPENBLAS_MAIN_FREE"] = "1"
 
 
-# data = g.utils.loaddata('/home/kkumer/gepard/pype/data/gammastarp2gammap',
-#                         approach=g.theory.BMK)
+DVCSpoints = g.data.dset[36]
+for id in range(37, 46):
+    DVCSpoints += g.data.dset[id]
 
-DVCSpoints = g.data.dset[36] + g.data.dset[37] + g.data.dset[38] + g.data.dset[39] + \
-  g.data.dset[40] + g.data.dset[41] + g.data.dset[42] + g.data.dset[43] + \
-  g.data.dset[44] + g.data.dset[45]
+DISpoints = g.data.dset[201]
+for id in range(202, 213):
+    DISpoints += g.data.dset[id]
+
+
+@mark.slow
+def test_fit_DIS_LO():
+    """Test LO fitting to HERA DIS F2 data."""
+    fit_gpd = g.model.Fit(p=0)
+    m = g.model.MellinBarnesModel(gpds=fit_gpd)
+    th = g.theory.BMK(model=m)
+    th.m.parameters.update({'ns': 0.15, 'al0s': 1., 'alps': 0.15, 'ms': 1.,
+                            'secs': 0., 'al0g': 1.1, 'alpg': 0.15, 'mg': 0.7})
+    f = g.fitter.FitterMinuit(DISpoints, th)
+    f.fix_parameters('ALL')
+    f.release_parameters('ns', 'al0s', 'al0g')
+    f.minuit.migrad()
+    assert f.minuit.fval == approx(49.731197679982)
+    assert th.m.parameters['al0s'] == approx(1.1575179114289278)
+
+
+@mark.slow
+def test_fit_DIS_NLO():
+    """Test NLO fitting to HERA DIS F2 data."""
+    fit_gpd = g.model.Fit(p=1)
+    m = g.model.MellinBarnesModel(gpds=fit_gpd)
+    th = g.theory.BMK(model=m)
+    th.m.parameters.update({'ns': 0.15, 'al0s': 1., 'alps': 0.15, 'ms': 1.,
+                            'secs': 0., 'al0g': 1.1, 'alpg': 0.15, 'mg': 0.7})
+    f = g.fitter.FitterMinuit(DISpoints, th)
+    f.fix_parameters('ALL')
+    f.release_parameters('ns', 'al0s', 'al0g')
+    f.minuit.migrad()
+    assert f.minuit.fval == approx(71.6184113449641)
+    assert th.m.parameters['al0s'] == approx(1.1283626215013125)
 
 
 def test_gepardfitDVCSnlso3():

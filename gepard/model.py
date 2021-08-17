@@ -405,6 +405,7 @@ class MellinBarnesModel(ParameterModel):
         # wce[Q2] = wce[spw, j, a] - Wilson coeffs evolved; local to model instance
         self.wce: Dict[float, np.ndarray] = {}  # DVCS
         self.wce_dvmp: Dict[float, np.ndarray] = {}  # DVMP
+        self.wce_dis: Dict[float, np.ndarray] = {}  # DIS
         super().__init__()
 
     def _mellin_barnes_integral(self, xi, wce, h):
@@ -425,6 +426,16 @@ class MellinBarnesModel(ParameterModel):
         np.multiply(cch, self.tgj, out=cch)
         reh = np.dot(self.wg, cch.imag)
         return reh, imh
+
+    def _dis_mellin_barnes_integral(self, xi, wce, h):
+        """Return Mellin-Barnes integral relevant for DIS."""
+        phij = 1.57079632j
+        eph = np.exp(phij)
+        cfacj = eph * np.exp((self.jpoints) * log(1/xi))  # eph/xi**j
+        # Temporary singlet part only!:
+        cch = np.einsum('j,ja,ja->j', cfacj, wce, h[:, :2])
+        mb_int = np.dot(self.wg, cch.imag)
+        return mb_int
 
     def cff(self, xi: float, t: float, Q2: float) -> np.ndarray:
         """Return array(ReH, ImH, ReE, ...) for kinematic point."""
@@ -551,6 +562,26 @@ class MellinBarnesModel(ParameterModel):
         """Return Re(TFF H) for kinematic point."""
         tffs = self.tff(pt.xi, pt.t, pt.Q2)
         return tffs[0]
+
+    def F2(self, pt: g.data.DataPoint) -> float:
+        """Return DIS F2 for kinematic point."""
+        if self.nf == 3:
+            chargefac = 2./9.
+        else:  # nf = 4
+            chargefac = 5./18.
+
+        try:
+            wce_ar_dis = self.wce_dis[pt.Q2]
+        except KeyError:
+            # calculate it, first PW is the only relevant one
+            wce_ar_dis = g.evolc.calc_wce(self, pt.Q2, 'DIS')[0, :, :]
+            # memorize it for future
+            self.wce_dis[pt.Q2] = wce_ar_dis
+        pdf = self.gpds.gpd_H(0, 0)  # forward limit
+        # print('pdf = {}'.format(pdf[0, :2]))
+        # print('wce = {}'.format(wce_ar_dis[0, :2]))
+        mb_int = self._dis_mellin_barnes_integral(pt.xB, wce_ar_dis, pdf)
+        return chargefac * mb_int / np.pi
 
 
 class ComptonDispersionRelations(ComptonFormFactors):
