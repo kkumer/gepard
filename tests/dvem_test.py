@@ -8,7 +8,7 @@ par_dvmp = {'ns':  0.152, 'al0s': 1.158, 'alps': 0.15, 'ms': 0.446,
             'al0g': 1.247, 'alpg': 0.15, 'mg': 0.7, 'secg': -2.309, 'thig': 0.812}
 
 
-def test_dvem_TFFs_LO():
+def test_dvmp_TFFs_LO():
     """Calculate LO DVMP TFFs for rho production at input scale."""
     xB = 1e-4
     pt = g.data.DataPoint({'Q2': 4., 't': 0, 'xB': xB})
@@ -20,8 +20,8 @@ def test_dvem_TFFs_LO():
     tffs = th.m.tff(pt.xi, pt.t, pt.Q2)
     reh, imh = tffs[0], tffs[1]
     # following agrees with DM to best than percent
-    assert imh == approx(12395.53, rel=1e-3)
-    assert reh == approx(4766.8993, rel=1e-3)
+    assert imh == approx(12395.53, rel=1e-7)
+    assert reh == approx(4766.8993, rel=1e-7)
 
 
 @mark.skip('KM10b not yet implemented')
@@ -67,13 +67,12 @@ def test_c1_NLO():
     assert aux[1] == approx(-0.496221+3.85004j, rel=1e-5)
     # gluon part
     # DM's notebook value is a permil away ...
-    # assert aux[2] == approx(35.2725+34.0699j,  rel=1e-5)
+    assert aux[2] == approx(35.2725+34.0699j,  rel=1e-5)
     # ... from formula from "Towards DVMP" paper:
-    assert aux[2] == approx(35.2818+34.0699j, rel=1e-5)
+    # assert aux[2] == approx(35.2818+34.0699j, rel=1e-5)
 
 
-# @mark.skip('NLO fails - needs careful check')
-def test_dvem_TFFs_NLO():
+def test_dvmp_TFFs_NLO():
     """Calculate NLO DVMP TFFs for rho production at input scale."""
     xB = 1e-4
     pt = g.data.DataPoint({'Q2': 4., 't': 0, 'xB': xB})
@@ -85,9 +84,24 @@ def test_dvem_TFFs_NLO():
     tffs = th.m.tff(pt.xi, pt.t, pt.Q2)
     reh, imh = tffs[0], tffs[1]
     # following agrees with gepard-fortran ...
-    # assert reh == approx(5410.6143, rel=1e-5)
-    # assert imh == approx(22869.412, rel=1e-5)
+    assert reh == approx(5410.6143, rel=1e-5)
+
+
+def test_dvmp_TFFs_NLO():
+    """Calculate NLO DVMP TFFs for rho production at input scale."""
+    xB = 1e-4
+    pt = g.data.DataPoint({'Q2': 4., 't': 0, 'xB': xB})
+    fit_gpd = g.model.Fit(p=1)
+    m = g.model.MellinBarnesModel(gpds=fit_gpd)
+    m.parameters.update(par_dvmp)
+    th = g.theory.BMK(m)
+    re, im =  (th.m.ReHrho(pt), th.m.ImHrho(pt))
+    tffs = th.m.tff(pt.xi, pt.t, pt.Q2)
+    reh, imh = tffs[0], tffs[1]
+    # following agrees with gepard-fortran ...
+    assert reh == approx(5410.6143, rel=1e-5)
+    assert imh == approx(22869.412, rel=1e-5)
     # which for unknown reason regressed from situation:
     # following agrees with DM to best than percent
     # assert reh == approx(5328.3678, rel=1e-3)
-    assert imh == approx(22676.063, rel=1e-3)
+    # assert imh == approx(22676.063, rel=1e-3)

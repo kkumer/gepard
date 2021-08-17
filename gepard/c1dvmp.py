@@ -4,7 +4,7 @@ import math
 from typing import Tuple
 
 import gepard as g
-from gepard.special import poch, S1, S2, S3, SB3, delS2, deldelS2, parity
+from gepard.special import S1, S2, S3, SB3, deldelS2, delS2, parity, poch
 
 
 def c1dvmp(m, sgntr: int, j: complex, k: int) -> Tuple[complex, complex, complex]:
@@ -136,22 +136,29 @@ def c1dvmp(m, sgntr: int, j: complex, k: int) -> Tuple[complex, complex, complex
              (k+2)/2))/(2*(2*k+3)))*poch(k+1,2)*(poch(k+1,2)+2)/4
              -(poch(k+1,2)+2)/(2*poch(j+1,2)*poch(k+1,2)))
 
-    MCG1CF = ((-LRDAF2+S1(j+1)+S1(k+1)-3/4-
-            1/(2*poch(k+1,2))-1/poch(j+1,2))*gamQQCF/2+
-            (-LRGPDF2+3*S1(j+1)-1/2+(2*S1(j+1)-
-             1)/poch(k+1,2)-1/poch(j+1,2))*(j+3)/2*gamQGNF/2
-            -(35-(poch(k+1,2)+2)*delS2((k+1)/2)-
-             4/poch(k+1,2)**2)/8+((poch(k+1,2)+2)*S1(j+
-                 1)/poch(k+1,2)+1)/poch(j+1,2) + DELC1FG)
+    # NOTE: There is an unresolved discrepancy in the next term! In the
+    # Eq. (4.53b) of Towards DVMP paper term -4/poch(k+1,2)^2
+    # in the second row, should have the opposite sign to agree
+    # with the expression in Dieter's notebook!
+
+    # MCG1CF_new = ((-LRDAF2+S1(j+1)+S1(k+1)-3/4-
+            # 1/(2*poch(k+1,2))-1/poch(j+1,2))*gamQQCF/2+
+            # (-LRGPDF2+3*S1(j+1)-1/2+(2*S1(j+1)-
+             # 1)/poch(k+1,2)-1/poch(j+1,2))*(j+3)/2*gamQGNF/2
+            # -(35-(poch(k+1,2)+2)*delS2((k+1)/2) -   # this sign ?!
+             # 4/poch(k+1,2)**2)/8+((poch(k+1,2)+2)*S1(j+
+                 # 1)/poch(k+1,2)+1)/poch(j+1,2) + DELC1FG)
 
     # From DM's notebook:
-    # MCG1CF_DM = ((-LRDAF2+S1(j+1)+S1(k+1)-3/4-
-            # 1/(2*poch(k+1,2))-1/poch(j+1,2))*gamQQCF/2+
-            # (-LRGPDF2+3*S1(j+1)-3/2+2/poch(k+1,2)-
-                # 1/poch(j+1,2))*(j+3)/2*gamQGNF/2
-            # -(39-(poch(k+1,2)+2)*delS2((k+1)/2))/8-
-            # (S1(j+1)-3/2-3/poch(j+1,2)+1/(2*poch(k+1,2)))/poch(k+1,2)+
-            # S1(j+1)/(j+1)/(j+2) + DELC1FG)
+    MCG1CF_DM = ((-LRDAF2+S1(j+1)+S1(k+1)-3/4-
+            1/(2*poch(k+1,2))-1/poch(j+1,2))*gamQQCF/2+
+            (-LRGPDF2+3*S1(j+1)-3/2+2/poch(k+1,2)-
+                1/poch(j+1,2))*(j+3)/2*gamQGNF/2
+            -(39-(poch(k+1,2)+2)*delS2((k+1)/2))/8-
+            (S1(j+1)-3/2-3/poch(j+1,2) +  # this sign ?!
+            1/(2*poch(k+1,2)))/poch(k+1,2) + S1(j+1)/poch(j+1,2) + DELC1FG)
+
+    MCG1CF = MCG1CF_DM
 
     # MCG1CA = 1.572467033424113-(4.+10.*(1.+j)*(2.+j))/((1.+j) **
        # 2*(2.+j)**2)-(3.*(-6.+2.*S1(1.+j)+S1(1.+k)))/(j*(3.+j)) \
