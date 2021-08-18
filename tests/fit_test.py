@@ -1,8 +1,5 @@
 """Testing code for MINUIT fitting."""
 
-import os
-import sys
-
 import gepard as g
 from pytest import approx, mark
 
@@ -10,11 +7,11 @@ from pytest import approx, mark
 # os.environ["OPENBLAS_MAIN_FREE"] = "1"
 
 
-DVCSpoints = g.data.dset[36]
+DVCSpoints = g.data.dset[36].copy()
 for id in range(37, 46):
     DVCSpoints += g.data.dset[id]
 
-DISpoints = g.data.dset[201]
+DISpoints = g.data.dset[201].copy()
 for id in range(202, 213):
     DISpoints += g.data.dset[id]
 
@@ -51,7 +48,7 @@ def test_fit_DIS_NLO():
     assert th.m.parameters['al0s'] == approx(1.1283626215013125)
 
 
-def test_gepardfitDVCSnlso3():
+def test_gepardfitDVCSnlso3_short():
     """Test fitting nl-so3 model to HERA DVCS data.
 
     This is reduced faster version of old test below.
