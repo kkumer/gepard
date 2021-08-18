@@ -24,35 +24,37 @@ pt_fit = g.data.DataPoint({'xi': 0.01, 'Q2': 8., 't': -0.2})  # evol
 def test_lambda():
     """Test LO singlet an. dim. eigenvalues."""
     fit_gpd = g.model.Fit()
-    m_fit = g.model.MellinBarnesModel(gpds=fit_gpd)
-    m_fit.parameters.update(par_fit)
+    m = g.model.MellinBarnesModel(gpds=fit_gpd)
+    m.parameters.update(par_fit)
     # leading PW
-    assert g.evolution.lambdaf(fit_gpd, fit_gpd.jpoints)[:, 0] == approx(
+    gam0 = g.adim.singlet_LO(m.jpoints+1, m.nf).transpose((2, 0, 1))
+    assert g.evolution.lambdaf(gam0)[:, 0] == approx(
            np.array([-22.79064075+0.01967868j, 3.56546819+0.00069647j]))
     # nl PW
-    assert g.evolution.lambdaf(fit_gpd, fit_gpd.jpoints+2)[:, 0] == approx(
+    gam0 = g.adim.singlet_LO(m.jpoints+3, m.nf).transpose((2, 0, 1))
+    assert g.evolution.lambdaf(gam0)[:, 0] == approx(
            np.array([13.07805098+0.00080784j, 5.78554055+0.00036216j]))
 
 
-def test_rnnlof_LO():
+def test_projectors_LO():
     """Test LO singlet eigen projectors."""
     fit_gpd = g.model.Fit()
-    m_fit = g.model.MellinBarnesModel(gpds=fit_gpd)
-    m_fit.parameters.update(par_fit)
-    # leading PW
-    pr, r1proj = g.evolution.rnnlof(fit_gpd, fit_gpd.jpoints)
+    m = g.model.MellinBarnesModel(gpds=fit_gpd)
+    m.parameters.update(par_fit)
+    gam0 = g.adim.singlet_LO(m.jpoints+1, m.nf).transpose((2, 0, 1))
+    lam, pr = g.evolution.projectors(gam0)
     assert pr[0, 0, :, :] == approx(
            np.array([[0.07529713+5.20367327e-05j, 0.14772791+8.44139525e-05j],
                      [0.47132239+2.98800251e-05j, 0.92470287-5.20367327e-05j]]))
 
 
-def test_rnnlof_NLO():
-    """Test NLO singlet eigen projectors."""
+def test_rnlof():
+    """Test projected NLO mu-indep part of evol.op."""
     test_gpd = g.model.Test(p=1)
-    m_test = g.model.MellinBarnesModel(gpds=test_gpd)
-    m_test.parameters.update(par_test)
+    m = g.model.MellinBarnesModel(gpds=test_gpd)
+    m.parameters.update(par_test)
     # leading PW
-    pr, r1proj = g.evolution.rnnlof(m_test, m_test.jpoints)
+    lam, pr, r1proj = g.evolution.rnlof(m, m.jpoints)
     assert pr[0, 0, :, :] == approx(
            np.array([[5.68471073518716855e-02+3.94946205837689893e-05j,
                       0.11226596856752971+6.51645223463349292e-05j],
