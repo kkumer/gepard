@@ -98,6 +98,18 @@ def rnlof(m, j) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     return lam, pr, r1proj
 
 
+def erfunc(m, lamj, lamk, R) -> np.ndarray:
+    """Mu-dep. part of NLO evolution operator. Eq. (126)."""
+    b0 = g.qcd.beta(0, m.nf)
+    levi_civita = np.array([[0, 1], [-1, 0]])
+    bll = np.einsum('k,ij->kij', lamj[0, :] - lamk[1, :], levi_civita)
+    bll = b0 * np.ones_like(bll) + bll
+
+    er1 = (np.ones_like(bll) - (1./R)**(bll/b0)) / bll  # Eq. (126)
+    er1 = b0 * er1   # as defined in gepard-fortran
+    return er1
+
+
 def evolop(m, j, q2: float) -> np.ndarray:
     """GPD evolution operator.
 
@@ -126,12 +138,7 @@ def evolop(m, j, q2: float) -> np.ndarray:
 
     # 2. LO errfunc
     b0 = g.qcd.beta(0, m.nf)
-    levi_civita = np.array([[0, 1], [-1, 0]])
-    bll = np.einsum('k,ij->kij', lam[0, :] - lam[1, :], levi_civita)
-    bll = b0 * np.ones_like(bll) + bll
-
-    er1 = (np.ones_like(bll) - (1./R)**(bll/b0)) / bll  # Eq. (126)
-    er1 = b0 * er1   # as defined in gepard-fortran
+    er1 = erfunc(m, lam, lam, R)
 
     Rfact = R**(-lam/b0)  # LO evolution (alpha(mu)/alpha(mu0))^(-gamma/beta0)
     evola0ab = np.einsum('kaij,ab->kabij', pr,  np.identity(2))

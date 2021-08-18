@@ -67,7 +67,7 @@ def test_rnlof():
                       -0.25405852938085760+2.83493819853415738e-05j]]))
 
 
-def test_evol_LO():
+def test_evolop_LO():
     """Test LO evolution operator."""
     test_gpd = g.model.Test(p=0)
     m_test = g.model.MellinBarnesModel(gpds=test_gpd)
@@ -79,7 +79,7 @@ def test_evol_LO():
                       1.9346770097724764-1.15955006729918713e-03j]]))
 
 
-def test_evol_NLO():
+def test_evolop_NLO():
     """Test NLO evolution operator."""
     test_gpd = g.model.Test(p=1)
     m_test = g.model.MellinBarnesModel(gpds=test_gpd)
