@@ -37,10 +37,10 @@ def lambdaf(gam0) -> np.ndarray:
     """
     # To avoid crossing of the square root cut on the
     # negative real axis we use trick by Dieter Mueller
-    aux = ((gam0[:, 0, 0] - gam0[:, 1, 1]) *
-           np.sqrt(1. + 4.0 * gam0[:, 0, 1] * gam0[:, 1, 0] /
-                   (gam0[:, 0, 0] - gam0[:, 1, 1])**2))
-    lam1 = 0.5 * (gam0[:, 0, 0] + gam0[:, 1, 1] - aux)
+    aux = ((gam0[..., 0, 0] - gam0[..., 1, 1]) *
+           np.sqrt(1. + 4.0 * gam0[..., 0, 1] * gam0[..., 1, 0] /
+                   (gam0[..., 0, 0] - gam0[..., 1, 1])**2))
+    lam1 = 0.5 * (gam0[..., 0, 0] + gam0[..., 1, 1] - aux)
     lam2 = lam1 + aux
     return np.stack([lam1, lam2])
 
@@ -61,13 +61,13 @@ def projectors(gam0) -> Tuple[np.ndarray, np.ndarray]:
 
     """
     lam = lambdaf(gam0)
-    den = 1. / (lam[0, :] - lam[1, :])
+    den = 1. / (lam[0, ...] - lam[1, ...])
 
     # P+ and P-
-    ssm = gam0 - np.einsum('k,ij->kij', lam[1, :], np.identity(2))
-    ssp = gam0 - np.einsum('k,ij->kij', lam[0, :], np.identity(2))
-    prp = np.einsum('k,kij->kij', den, ssm)
-    prm = np.einsum('k,kij->kij', -den, ssp)
+    ssm = gam0 - np.einsum('...,ij->...ij', lam[1, ...], np.identity(2))
+    ssp = gam0 - np.einsum('...,ij->...ij', lam[0, ...], np.identity(2))
+    prp = np.einsum('...,...ij->...ij', den, ssm)
+    prm = np.einsum('...,...ij->...ij', -den, ssp)
     pr = np.stack([prp, prm], axis=1)
     return lam, pr
 
