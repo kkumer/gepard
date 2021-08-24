@@ -12,6 +12,19 @@ par_fit = {'ns':  0.152039, 'al0s': 1.15751, 'alps': 0.15, 'ms': 0.478391,
            'al0g': 1.24732, 'alpg': 0.15, 'mg': 0.7, 'secg': -0.81217, 'thig': 0.,
            'kaps': 0.7, 'kapg': -0.2}
 
+MP = 0.938272 # proton mass
+par_bp = {'ns': 0, 'al0s': 1.1, 'alps': 0.15,
+             'ms': (2*MP)**2, 'delms': MP**2, 'pows': 3,
+             'ng': 0.5, 'al0g': 1.0, 'alpg': 0.15,
+             'mg': (2*MP)**2, 'delmg': MP**2, 'powg': 2,
+             'nu': 2.0, 'al0u': 0.5, 'alpu': 1.0,
+             'mu': (2*MP)**2, 'delmu': MP**2, 'powu': 1,
+             'nd': 1.0, 'al0d': 0.5, 'alpd': 1.0,
+             'md': (2*MP)**2, 'delmd': MP**2, 'powd': 1}
+
+#  'hard' ansatz:
+par_bp_hard = {'ng': 0.4, 'al0g': 1.1 + 0.05, 'ns': 2./3. - 0.4}
+
 par_KM15 = {'tMv': 3.992860161655587, 'rS': 1.0, 'alv': 0.43, 'tal': 0.43,
             'Mpi': 3.999999852084612, 'Nv': 1.35, 'rv': 0.918393047884448,
             'Nsea': 0.0, 'alS': 1.13, 'rpi': 2.6463144464701536, 'alpS': 0.15,
@@ -41,6 +54,8 @@ pt_test.xi = pt_test.Q2 / (2.0 * pt_test.W * pt_test.W + pt_test.Q2)
 
 pt0_fit = g.data.DataPoint({'xi': 0.01, 'Q2': 4., 't': -0.2})  # noevol
 pt_fit = g.data.DataPoint({'xi': 0.01, 'Q2': 8., 't': -0.2})  # evol
+
+pt_evol = g.data.DataPoint({'xi': 1.e-5, 'Q2': 25., 't': -0.25})  # evol
 
 
 def test_wc_LO():
@@ -89,6 +104,27 @@ def test_cff_H_noevol():
     m_test.parameters.update(par_test)
     assert m_test.cff(pt_test.xi, pt_test.t, pt_test.Q2)[:2] == approx(
             [9839.566, 61614.9])
+
+
+def test_cff_radMSBAR_LOevol():
+    """Singlet LO CFF H evolved"""
+    gpd_bp = g.model.FitBP(p=0)
+    m = g.model.MellinBarnesModel(gpds=gpd_bp)
+    m.parameters.update(par_bp)
+    m.parameters.update(par_bp_hard)
+    assert m.cff(pt_evol.xi, pt_evol.t, pt_evol.Q2)[:2] == approx(
+            [251460.03959908773, 1015357.1865059549])
+
+
+@mark.skip('not yet')
+def test_cff_radMSBAR_NLOevol():
+    """Singlet NLO MSBAR CFF H evolved"""
+    gpd_bp = g.model.FitBP(p=1)
+    m = g.model.MellinBarnesModel(gpds=gpd_bp)
+    m.parameters.update(par_bp)
+    m.parameters.update(par_bp_hard)
+    assert m.cff(pt_evol.xi, pt_evol.t, pt_evol.Q2)[:2] == approx(
+            [142867.21556625995, 653095.26655367797/1e5])
 
 
 def test_cff_H_nlso3():

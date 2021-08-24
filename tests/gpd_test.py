@@ -1,12 +1,12 @@
 """Testing code for GPD models."""
 
+import gepard as g
 import numpy as np
 from pytest import approx, mark
 
-import gepard as g
-
 j_test = 0.5+0.3j
 t_test = -0.1
+tb_test = -0.25
 xi_test = 0.001
 Q2_test = 4.
 
@@ -20,6 +20,18 @@ par_fit = {'ns':  0.152039, 'al0s': 1.15751, 'alps': 0.15, 'ms': 0.478391,
            'secs': -0.15152, 'this': 0.,  # 'ng': 0.4,  # provided by ns
            'al0g': 1.24732, 'alpg': 0.15, 'mg': 0.7, 'secg': -0.81217, 'thig': 0.}
 
+MP = 0.938272 # proton mass
+par_bp = {'ns': 0, 'al0s': 1.1, 'alps': 0.15, 
+             'ms': (2*MP)**2, 'delms': MP**2, 'pows': 3,
+             'ng': 0.5, 'al0g': 1.0, 'alpg': 0.15,
+             'mg': (2*MP)**2, 'delmg': MP**2, 'powg': 2,
+             'nu': 2.0, 'al0u': 0.5, 'alpu': 1.0,
+             'mu': (2*MP)**2, 'delmu': MP**2, 'powu': 1,
+             'nd': 1.0, 'al0d': 0.5, 'alpd': 1.0,
+             'md': (2*MP)**2, 'delmd': MP**2, 'powd': 1}
+
+#  'hard' ansatz:
+par_bp_hard = {'ng': 0.4, 'al0g': 1.1 + 0.05, 'ns': 2./3. - 0.4}
 #  -- Testing actual ansatze i.e. shapes of functions at single j-point
 
 
@@ -45,6 +57,14 @@ def test_gpdj_fit():
                             (0.14952730665086755-1.5915106823348937j),
                             0j, 0j))
 
+
+def test_gpdj_fitbp():
+    """Test singlet GPD from hep-ph/0703179 - hard gluons."""
+    par_bp.update(par_bp_hard)
+    assert g.gpdj.fitbp(j_test, tb_test, par_bp) == approx((
+                             (0.8252585606460219-1.20745720388647j),
+                             (0.48405328160880784-1.2858277230367638j),
+                             0j, 0j))
 
 # -- Testing complete GPDs on MB contour
 

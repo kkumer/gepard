@@ -102,12 +102,70 @@ def erfunc(m, lamj, lamk, R) -> np.ndarray:
     """Mu-dep. part of NLO evolution operator. Eq. (126)."""
     b0 = g.qcd.beta(0, m.nf)
     levi_civita = np.array([[0, 1], [-1, 0]])
-    bll = np.einsum('k,ij->kij', lamj[0, :] - lamk[1, :], levi_civita)
+    bll = np.einsum('...,ij->...ij', lamj[0, ...] - lamk[1, ...], levi_civita)
     bll = b0 * np.ones_like(bll) + bll
 
     er1 = (np.ones_like(bll) - (1./R)**(bll/b0)) / bll  # Eq. (126)
     er1 = b0 * er1   # as defined in gepard-fortran
     return er1
+
+
+def cb1(m, q2, zn, zk):
+    """Non-diagonal part of NLO evol op.
+
+    Args:
+          m: instance of the model
+          q2: evolution point
+          zn: non-diagonal evolution Mellin-Barnes integration point (array)
+          zk: COPE Mellin-Barnes integration point (not array! - FIXME)
+
+    Returns:
+         B_jk: non-diagonal part of evol. op. from Eq. (140)
+
+    Note:
+         It's multiplied by GAMMA(3/2) GAMMA(K+3) / (2^(K+1) GAMMA(K+5/2))
+         so it's ready to be combined with diagonally evolved C_K = 1 + ...
+         where in the end everything will be multiplied by
+        (2^(K+1) GAMMA(K+5/2))  / ( GAMMA(3/2) GAMMA(K+3) )
+
+    """
+    asmuf2 = g.qcd.as2pf(m.p, m.nf, q2, m.asp[m.p], m.r20)
+    asq02 = g.qcd.as2pf(m.p, m.nf, m.q02, m.asp[m.p], m.r20)
+    R = asmuf2/asq02
+    b0 = g.qcd.beta(0, m.nf)
+    gamn = g.adim.singlet_LO(zn, m.nf).transpose((2, 0, 1))
+    gamk = g.adim.singlet_LO(zk, m.nf)
+    lamn, pn = g.evolution.projectors(gamn)
+    lamk, pk = g.evolution.projectors(gamk)
+    er1 = g.evolution.erfunc(m, lamn, lamk, R)
+    AAA = (g.special.S1((zn+zk+2)/2) -
+           g.special.S1((zn-zk-2)/2) +
+           2*g.special.S1(zn-zk-1) -
+           g.special.S1(zn+1))
+    # GOD = "G Over D" = g_jk / d_jk
+    GOD_11 = 2 * g.constants.CF * (2*AAA +
+            (AAA - g.special.S1(zn+1))*(zn-zk)*(zn+zk +
+                                      3)/(zk+1)/(zk+2))
+    nzero = np.zeros_like(GOD_11)
+    GOD_12 = nzero
+    GOD_21 = 2*g.constants.CF*(zn-zk)*(zn+zk+3)/zn/(zk+1)/(zk+2)
+    GOD_22 = 2 * g.constants.CA * (2*AAA + (AAA - g.special.S1(zn +
+         1)) * (g.special.poch(zn, 4) / g.special.poch(zk, 4) -
+                1) + 2 * (zn-zk) * (zn+zk +
+            3) / g.special.poch(zk, 4)) * zk / zn
+    god = np.array([[GOD_11, GOD_12], [GOD_21, GOD_22]])
+    dm_22 = zk/zn
+    dm_11 = np.ones_like(dm_22)
+    dm_12 = np.zeros_like(dm_22)
+    dm = np.array([[dm_11, dm_12], [dm_12, dm_22]])
+    proj_DM = np.einsum('naif,fgn,bgj->nabij', pn, dm, pk)
+    proj_GOD = np.einsum('naif,fgn,bgj->nabij', pn, god, pk)
+    fac = (zk+1)*(zk+2)*(2*zn+3)/(zn+1)/(zn+2)/(zn-zk)/(zn+zk+3)
+    cb1 = np.einsum('n,nab,nabij,b->nij', fac,
+                    er1*np.subtract.outer(lamn.transpose(), lamk),
+                    (b0 - lamk)*proj_DM + proj_GOD,
+                    R**(-lamk/b0)) / b0
+    return cb1
 
 
 def evolop(m, j, q2: float) -> np.ndarray:
@@ -148,6 +206,22 @@ def evolop(m, j, q2: float) -> np.ndarray:
         # Cf. eq. (124), but with opposite sign, as in gepard-fortran
         evola1ab = - np.einsum('kab,kabij->kabij', er1, r1proj)
         evola1 = np.einsum('kabij,bk->kij', evola1ab, Rfact)
+        if m.scheme == 'msbar':
+            # FIXME: find a way to do it array-wise i.e. get rid of j_single
+            nd = []
+            for j_single in j:
+                znd, wgnd = g.quadrature.nd_mellin_barnes()
+                ndphij = 1.57j
+                ephnd = np.exp(ndphij)
+                tginv = ephnd/np.tan(np.pi*znd/2)
+                tginvc = ephnd.conjugate()/np.tan(np.pi*znd.conjugate()/2)
+                cb1f = cb1(m, q2, j_single + znd + 2, j_single)
+                cb1fc = cb1(m, q2, j_single + znd.conjugate() + 2, j_single)
+                ndint = np.einsum('n,nij,n->ij', wgnd, cb1f, tginv)
+                ndint -= np.einsum('n,nij,n->ij', wgnd, cb1fc, tginvc)
+                ndint = ndint * 0.25j
+                nd.append(ndint)
+            evola1 += np.array(nd)
     else:
         evola1 = np.zeros_like(evola0)
 

@@ -59,3 +59,16 @@ def fit(j: np.ndarray, t: float, par: dict) -> np.ndarray:
     gluon = (gepard.qj.qj(j, t, 7, par['ng'], par['al0g'], par['alpg']) *
              gepard.qj.betadip(j, t, par['mg'], 0., 2))
     return np.array((singlet, gluon, np.zeros_like(gluon), np.zeros_like(gluon)))
+
+
+def fitbp(j: np.ndarray, t: float, par: dict) -> np.ndarray:
+    """GPD ansatz from paper hep-ph/0703179."""
+    up = (gepard.qj.qj(j, t, 4, par['nu'], par['al0u'], par['alpu'], val=1) *
+               gepard.qj.betadip(j, t, par['mu'], par['delmu'], par['powu']))
+    down = (gepard.qj.qj(j, t, 4, par['nd'], par['al0d'], par['alpd'], val=1) *
+               gepard.qj.betadip(j, t, par['md'], par['delmd'], par['powd']))
+    singlet = (gepard.qj.qj(j, t, 8, par['ns'], par['al0s'], par['alps']) *
+               gepard.qj.betadip(j, t, par['ms'], par['delms'], par['pows']))
+    gluon = (gepard.qj.qj(j, t, 6, par['ng'], par['al0g'], par['alpg']) *
+             gepard.qj.betadip(j, t, par['mg'], par['delmg'], par['powg']))
+    return np.array((singlet+up+down, gluon, np.zeros_like(gluon), np.zeros_like(gluon)))

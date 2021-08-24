@@ -9,7 +9,7 @@ import gepard.special
 
 
 def qj(j: np.ndarray, t: float, poch: int, norm: float, al0: float,
-        alp: float) -> np.ndarray:
+        alp: float, val: int = 0) -> np.ndarray:
     r"""GPD building block Q_j with reggeized t-dependence.
 
     Args:
@@ -18,6 +18,7 @@ def qj(j: np.ndarray, t: float, poch: int, norm: float, al0: float,
         poch: pochhammer (beta?)
         al0: Regge intercept
         alp: Regge slope
+        val: 0 for sea, 1 for valence partons
 
     Returns:
         conformal moment of GPD with Reggeized t-dependence,
@@ -39,7 +40,7 @@ def qj(j: np.ndarray, t: float, poch: int, norm: float, al0: float,
     alpt = al0 + alp * t
     qj = (
         norm
-        * gepard.special.pochhammer(2 - al0, poch)
+        * gepard.special.pochhammer(2 - val - al0, poch)
         / gepard.special.pochhammer(1 - al0 + j, poch)
         * (1 + j - al0)
         / (1 + j - alpt)

@@ -18,10 +18,12 @@ roots35, weights35 = p_roots(35)
 roots81, weights81 = p_roots(81)
 
 
-def mellin_barnes(accuracy: int = 3) -> Tuple[np.ndarray, np.ndarray]:
+def mellin_barnes(c, phi, accuracy: int = 3) -> Tuple[np.ndarray, np.ndarray]:
     """Construct basic MB array.
 
     Args:
+        c: point of crossing the real axis
+        phi: angle with the real axis
         accuracy: 2*accuracy points per interval
 
     Returns:
@@ -29,7 +31,7 @@ def mellin_barnes(accuracy: int = 3) -> Tuple[np.ndarray, np.ndarray]:
 
     """
     c = 0.35
-    phij = 1.57079632j
+    phij = phi*1j
     roots, weights = p_roots(2**accuracy)
     division = np.array([0., 0.01, 0.08, 0.15, 0.3, 0.5, 1.0,
                          1.5, 2.0, 4.0, 6.0, 8.0, 10.0])

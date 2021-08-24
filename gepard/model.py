@@ -216,7 +216,9 @@ class ConformalSpaceGPD(ParameterModel):
     """Base class of GPD models built in conformal moment space."""
 
     def __init__(self, p: int = 0, scheme: str = 'MSBAR', nf: int = 4,
-                 q02: float = 4.0) -> None:
+            q02: float = 4.0, r20: float = 2.5,
+            asp: np.array = np.array([0.0606, 0.0518, 0.0488]),
+            c: float = 0.35, phi: float = 1.57079632) -> None:
         """Init and pre-calculate stuff.
 
         Args:
@@ -224,6 +226,10 @@ class ConformalSpaceGPD(ParameterModel):
             scheme: pQCD scheme  (MSBAR or CSBAR)
             nf: number of active quark flavors
             q02: Initial Q0^2 for pQCD evolution.
+            r20: Initial mu0^2 for alpha_strong definition.
+            asp: alpha_strong/(2*pi) at scale r20 for (LO, NLO, NNLO)
+            c: intersection of Mellin-Barnes curve with real axis
+            phi: angle of Mellin-Barnes curve with real axis
 
         Notes:
             This just takes care of initialization of Mellin-Barnes
@@ -236,10 +242,11 @@ class ConformalSpaceGPD(ParameterModel):
         self.scheme = scheme
         self.nf = nf
         self.q02 = q02
-        # alpha_strong/(2*pi) at scale r0^2
-        self.asp = np.array([0.0606, 0.0518, 0.0488])
-        self.r20 = 2.5
-        npoints, weights = g.quadrature.mellin_barnes()
+        self.r20 = r20
+        self.asp = asp
+        self.c = c
+        self.phi = phi
+        npoints, weights = g.quadrature.mellin_barnes(self.c, self.phi)
         self.npts = len(npoints)
         self.npoints = npoints
         self.jpoints = npoints - 1
@@ -300,6 +307,28 @@ class Test(ConformalSpaceGPD):
         h = []
         for j in self.jpoints:
             h.append(g.gpdj.test(j, t, self.parameters))
+        return np.array(h)
+
+
+class FitBP(ConformalSpaceGPD):
+    """GPD ansatz from paper hep-ph/0703179."""
+
+    def __init__(self, **kwargs) -> None:
+        """See parent `ConformalSpaceGPD` class for docs."""
+        kwargs.setdefault('scheme', 'MSBAR')
+        kwargs.setdefault('nf', 4)
+        kwargs.setdefault('q02', 2.5)
+        kwargs.setdefault('asp', np.array([0.05, 0.05, 0.05]))
+        kwargs.setdefault('r20', 2.5)
+        kwargs.setdefault('phi', 1.9)
+        super().__init__(**kwargs)
+
+    def gpd_H(self, eta: float, t: float) -> np.ndarray:
+        """Return (npts, 4) array H_j^a for all j-points and 4 flavors."""
+        # For testing purposes, we use here sub-optimal non-numpy algorithm
+        h = []
+        for j in self.jpoints:
+            h.append(g.gpdj.fitbp(j, t, self.parameters))
         return np.array(h)
 
 
@@ -391,6 +420,8 @@ class MellinBarnesModel(ParameterModel):
         self.npts = gpds.npts
         self.npoints = gpds.npoints
         self.jpoints = gpds.jpoints
+        self.c = gpds.c
+        self.phi = gpds.phi
         self.wg = gpds.wg
         self.gpds = gpds
         self.parameters = gpds.parameters
@@ -416,8 +447,7 @@ class MellinBarnesModel(ParameterModel):
         Todo:
             Only GPD H treated atm.
         """
-        phij = 1.57079632j
-        eph = np.exp(phij)
+        eph = np.exp(self.phi*1j)
         cfacj = eph * np.exp((self.jpoints + 1) * log(1/xi))  # eph/xi**(j+1)
         # Temporary singlet part only!:
         cch = np.einsum('j,sa,sja,ja->j', cfacj,
@@ -429,8 +459,7 @@ class MellinBarnesModel(ParameterModel):
 
     def _dis_mellin_barnes_integral(self, xi, wce, h):
         """Return Mellin-Barnes integral relevant for DIS."""
-        phij = 1.57079632j
-        eph = np.exp(phij)
+        eph = np.exp(self.phi*1j)
         cfacj = eph * np.exp((self.jpoints) * log(1/xi))  # eph/xi**j
         # Temporary singlet part only!:
         cch = np.einsum('j,ja,ja->j', cfacj, wce, h[:, :2])
