@@ -109,7 +109,7 @@ def calc_wce(m, q2: float, process: str):
     Args:
        q2: final evolution scale
        m: instance of the model
-       process: 'DVCS' or 'DVMP'
+       process: 'DIS, 'DVCS' or 'DVMP'
 
     Returns:
          wce[s,k,f]: s in range(npwmax), k in range(npts), f in [Q,G]
@@ -122,7 +122,7 @@ def calc_wce(m, q2: float, process: str):
         j = m.jpoints + pw_shift
         wc = calc_wc(m, j, process)
         # evolution operator
-        evola = g.evolution.evolop(m, j, q2)
+        evola = g.evolution.evolop(m, j, q2, process)
         # p_mat: matrix that combines (LO, NLO) evolution operator and Wilson coeffs
         # while canceling NNLO term NLO*NLO:
         asmur2 = g.qcd.as2pf(m.p, m.nf, q2/m.rr2, m.asp[m.p], m.r20)

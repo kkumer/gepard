@@ -2,7 +2,7 @@
 
 import gepard as g
 import numpy as np
-from pytest import approx, mark
+from pytest import approx
 
 par_test = {'ns': 2./3. - 0.4, 'al0s': 1.1, 'alps': 0.25, 'ms': 1.1,
             'ng': 0.4, 'al0g': 1.2, 'alpg': 0.25, 'mg': 1.2}
@@ -12,15 +12,15 @@ par_fit = {'ns':  0.152039, 'al0s': 1.15751, 'alps': 0.15, 'ms': 0.478391,
            'al0g': 1.24732, 'alpg': 0.15, 'mg': 0.7, 'secg': -0.81217, 'thig': 0.,
            'kaps': 0.7, 'kapg': -0.2}
 
-MP = 0.938272 # proton mass
+MP = 0.938272  # proton mass
 par_bp = {'ns': 0, 'al0s': 1.1, 'alps': 0.15,
-             'ms': (2*MP)**2, 'delms': MP**2, 'pows': 3,
-             'ng': 0.5, 'al0g': 1.0, 'alpg': 0.15,
-             'mg': (2*MP)**2, 'delmg': MP**2, 'powg': 2,
-             'nu': 2.0, 'al0u': 0.5, 'alpu': 1.0,
-             'mu': (2*MP)**2, 'delmu': MP**2, 'powu': 1,
-             'nd': 1.0, 'al0d': 0.5, 'alpd': 1.0,
-             'md': (2*MP)**2, 'delmd': MP**2, 'powd': 1}
+          'ms': (2*MP)**2, 'delms': MP**2, 'pows': 3,
+          'ng': 0.5, 'al0g': 1.0, 'alpg': 0.15,
+          'mg': (2*MP)**2, 'delmg': MP**2, 'powg': 2,
+          'nu': 2.0, 'al0u': 0.5, 'alpu': 1.0,
+          'mu': (2*MP)**2, 'delmu': MP**2, 'powu': 1,
+          'nd': 1.0, 'al0d': 0.5, 'alpd': 1.0,
+          'md': (2*MP)**2, 'delmd': MP**2, 'powd': 1}
 
 #  'hard' ansatz:
 par_bp_hard = {'ng': 0.4, 'al0g': 1.1 + 0.05, 'ns': 2./3. - 0.4}
@@ -107,7 +107,7 @@ def test_cff_H_noevol():
 
 
 def test_cff_radMSBAR_LOevol():
-    """Singlet LO CFF H evolved"""
+    """Singlet LO CFF H evolved."""
     gpd_bp = g.model.FitBP(p=0)
     m = g.model.MellinBarnesModel(gpds=gpd_bp)
     m.parameters.update(par_bp)
@@ -116,15 +116,18 @@ def test_cff_radMSBAR_LOevol():
             [251460.03959908773, 1015357.1865059549])
 
 
-@mark.skip('not yet')
 def test_cff_radMSBAR_NLOevol():
-    """Singlet NLO MSBAR CFF H evolved"""
+    """Singlet NLO MSBAR CFF H evolved."""
     gpd_bp = g.model.FitBP(p=1)
     m = g.model.MellinBarnesModel(gpds=gpd_bp)
     m.parameters.update(par_bp)
     m.parameters.update(par_bp_hard)
+    # Result of wrong ND-evolution fortran-gepard code
+    # assert m.cff(pt_evol.xi, pt_evol.t, pt_evol.Q2)[:2] == approx(
+    #         [142867.21556625995, 653095.26655367797/1e5])
+    # Result after correcting ND-evolution fortran-gepard code
     assert m.cff(pt_evol.xi, pt_evol.t, pt_evol.Q2)[:2] == approx(
-            [142867.21556625995, 653095.26655367797/1e5])
+            [156576.80414343436, 686720.2142542489], rel=1.e-5)
 
 
 def test_cff_H_nlso3():

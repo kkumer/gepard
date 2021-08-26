@@ -215,7 +215,7 @@ class ElasticZero(ElasticFormFactors):
 class ConformalSpaceGPD(ParameterModel):
     """Base class of GPD models built in conformal moment space."""
 
-    def __init__(self, p: int = 0, scheme: str = 'MSBAR', nf: int = 4,
+    def __init__(self, p: int = 0, scheme: str = 'msbar', nf: int = 4,
             q02: float = 4.0, r20: float = 2.5,
             asp: np.array = np.array([0.0606, 0.0518, 0.0488]),
             c: float = 0.35, phi: float = 1.57079632) -> None:
@@ -223,7 +223,7 @@ class ConformalSpaceGPD(ParameterModel):
 
         Args:
             p: pQCD order (0 = LO, 1 = NLO, 2 = NNLO)
-            scheme: pQCD scheme  (MSBAR or CSBAR)
+            scheme: pQCD scheme  (msbar or csbar)
             nf: number of active quark flavors
             q02: Initial Q0^2 for pQCD evolution.
             r20: Initial mu0^2 for alpha_strong definition.
@@ -292,7 +292,7 @@ class Test(ConformalSpaceGPD):
 
     def __init__(self, **kwargs) -> None:
         """See parent `ConformalSpaceGPD` class for docs."""
-        kwargs.setdefault('scheme', 'CSBAR')
+        kwargs.setdefault('scheme', 'csbar')
         kwargs.setdefault('nf', 3)
         kwargs.setdefault('q02', 1.0)
         super().__init__(**kwargs)
@@ -315,7 +315,7 @@ class FitBP(ConformalSpaceGPD):
 
     def __init__(self, **kwargs) -> None:
         """See parent `ConformalSpaceGPD` class for docs."""
-        kwargs.setdefault('scheme', 'MSBAR')
+        kwargs.setdefault('scheme', 'msbar')
         kwargs.setdefault('nf', 4)
         kwargs.setdefault('q02', 2.5)
         kwargs.setdefault('asp', np.array([0.05, 0.05, 0.05]))
@@ -337,7 +337,7 @@ class Fit(ConformalSpaceGPD):
 
     def __init__(self, **kwargs) -> None:
         """See parent `ConformalSpaceGPD` class for docs."""
-        kwargs.setdefault('scheme', 'MSBAR')
+        kwargs.setdefault('scheme', 'msbar')
         kwargs.setdefault('nf', 4)
         kwargs.setdefault('q02', 4.0)
         super().__init__(**kwargs)

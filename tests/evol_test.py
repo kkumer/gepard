@@ -72,7 +72,8 @@ def test_evolop_LO():
     test_gpd = g.model.Test(p=0)
     m_test = g.model.MellinBarnesModel(gpds=test_gpd)
     m_test.parameters.update(par_test)
-    assert g.evolution.evolop(m_test, m_test.jpoints, 3.0)[0, 0, :, :] == approx(
+    assert g.evolution.evolop(m_test, m_test.jpoints, 3.0,
+                              'DVCS')[0, 0, :, :] == approx(
            np.array([[0.97360574083605833-4.26361786894205834e-05j,
                       0.12173639863278003-5.99655383745874504e-05j],
                      [0.51786249629889658-5.18175412363711162e-04j,
@@ -85,13 +86,15 @@ def test_evolop_NLO():
     m_test = g.model.MellinBarnesModel(gpds=test_gpd)
     m_test.parameters.update(par_test)
     # LO part (but with NLO alpha_strong)
-    assert g.evolution.evolop(m_test, m_test.jpoints, 3.0)[0, 0, :, :] == approx(
+    assert g.evolution.evolop(m_test, m_test.jpoints, 3.0,
+                              'DVCS')[0, 0, :, :] == approx(
            np.array([[0.97506856774185890-6.13627841862173179e-05j,
                       0.16175930125082716-9.38626466680329819e-05j],
                      [0.68811853114565436-7.48865910115848387e-04j,
                       2.2521082168110360-1.65744690707721643e-03j]]))
     # NLO part
-    assert g.evolution.evolop(m_test, m_test.jpoints, 3.0)[0, 1, :, :] == approx(
+    assert g.evolution.evolop(m_test, m_test.jpoints, 3.0,
+                              'DVCS')[0, 1, :, :] == approx(
            np.array([[1.3209647413503760-2.00187561001276184e-03j,
                       3.0958151106827598-4.13038076850684704e-03j],
                      [-2.7796825098769098+5.59500993233383315e-03j,

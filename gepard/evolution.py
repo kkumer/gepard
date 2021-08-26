@@ -12,8 +12,7 @@ Notes:
 
 Todo:
     * Implement non-singlet
-    * Implement NLO and NNLO
-    * Implement MSBAR scheme
+    * Array indices ordering is a bit of a mess
 
 """
 
@@ -68,7 +67,8 @@ def projectors(gam0) -> Tuple[np.ndarray, np.ndarray]:
     ssp = gam0 - np.einsum('...,ij->...ij', lam[0, ...], np.identity(2))
     prp = np.einsum('...,...ij->...ij', den, ssm)
     prm = np.einsum('...,...ij->...ij', -den, ssp)
-    pr = np.stack([prp, prm], axis=1)
+    # We insert a-axis before i,j-axes, i.e. on -3rd place
+    pr = np.stack([prp, prm], axis=-3)
     return lam, pr
 
 
@@ -110,6 +110,18 @@ def erfunc(m, lamj, lamk, R) -> np.ndarray:
     return er1
 
 
+def erfunc_nd(m, lamj, lamk, R) -> np.ndarray:
+    """Mu-dep. part of NLO evolution operator. Eq. (126)."""
+    assert lamk.shape == (2,)  # FIX THIS
+    b0 = g.qcd.beta(0, m.nf)
+    bll = np.subtract.outer(lamj.transpose(), lamk)
+    bll = b0 * np.ones_like(bll) + bll
+
+    er1 = (np.ones_like(bll) - (1./R)**(bll/b0)) / bll  # Eq. (126)
+    er1 = b0 * er1   # as defined in gepard-fortran
+    return er1
+
+
 def cb1(m, q2, zn, zk):
     """Non-diagonal part of NLO evol op.
 
@@ -133,11 +145,11 @@ def cb1(m, q2, zn, zk):
     asq02 = g.qcd.as2pf(m.p, m.nf, m.q02, m.asp[m.p], m.r20)
     R = asmuf2/asq02
     b0 = g.qcd.beta(0, m.nf)
-    gamn = g.adim.singlet_LO(zn, m.nf).transpose((2, 0, 1))
-    gamk = g.adim.singlet_LO(zk, m.nf)
+    gamn = g.adim.singlet_LO(zn+1, m.nf).transpose((2, 0, 1))
+    gamk = g.adim.singlet_LO(zk+1, m.nf)
     lamn, pn = g.evolution.projectors(gamn)
     lamk, pk = g.evolution.projectors(gamk)
-    er1 = g.evolution.erfunc(m, lamn, lamk, R)
+    er1 = g.evolution.erfunc_nd(m, lamn, lamk, R)
     AAA = (g.special.S1((zn+zk+2)/2) -
            g.special.S1((zn-zk-2)/2) +
            2*g.special.S1(zn-zk-1) -
@@ -161,20 +173,22 @@ def cb1(m, q2, zn, zk):
     proj_DM = np.einsum('naif,fgn,bgj->nabij', pn, dm, pk)
     proj_GOD = np.einsum('naif,fgn,bgj->nabij', pn, god, pk)
     fac = (zk+1)*(zk+2)*(2*zn+3)/(zn+1)/(zn+2)/(zn-zk)/(zn+zk+3)
+    bet_proj_DM = np.einsum('b,nabij->nabij', b0-lamk, proj_DM)
     cb1 = np.einsum('n,nab,nabij,b->nij', fac,
                     er1*np.subtract.outer(lamn.transpose(), lamk),
-                    (b0 - lamk)*proj_DM + proj_GOD,
+                    bet_proj_DM + proj_GOD,
                     R**(-lamk/b0)) / b0
     return cb1
 
 
-def evolop(m, j, q2: float) -> np.ndarray:
+def evolop(m, j, q2: float, process: str) -> np.ndarray:
     """GPD evolution operator.
 
     Args:
          m: instance of the model
          j: MB contour points (overrides m.jpoints)
          q2: final evolution momentum squared
+         process: DIS, DVCS or DVMP
 
     Returns:
          Array corresponding Eq. (121) of Towards NPB paper.
@@ -206,7 +220,8 @@ def evolop(m, j, q2: float) -> np.ndarray:
         # Cf. eq. (124), but with opposite sign, as in gepard-fortran
         evola1ab = - np.einsum('kab,kabij->kabij', er1, r1proj)
         evola1 = np.einsum('kabij,bk->kij', evola1ab, Rfact)
-        if m.scheme == 'msbar':
+        # adding non-diagonal evolution when needed or asked for
+        if ((process == 'DVMP') or (process == 'DVCS' and m.scheme == 'msbar')):
             # FIXME: find a way to do it array-wise i.e. get rid of j_single
             nd = []
             for j_single in j:
