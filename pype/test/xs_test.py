@@ -28,6 +28,8 @@ def test_xs6_KMM12():
     bsa = (xs_p - xs_m)/(xs_m + xs_p)
     assert_almost_equal(bsa, 0.0182284460395)
 
+test_xs6_KMM12.newfeature = 1   # proc.communicate is broken
+
 def test_xs7_KM15():
     """xs test model no. 7: KM15"""
     argsp = ['xs.py', '7', '-1', '+1'] + kin
@@ -37,3 +39,6 @@ def test_xs7_KM15():
     exit_code = proc.wait()
     phi, xs_p, xs_cos_p, xs_sin_p, xs_LP_p = np.fromstring(out, sep=' ')
     assert_almost_equal(xs_p, 0.075842911815713385)
+
+test_xs7_KM15.newfeature = 1   # proc.communicate is broken
+

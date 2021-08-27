@@ -1,11 +1,16 @@
 
-import shutil, copy, math
-from nose.tools import *
+import copy
+import math
+import shutil
+
+import Approach
+import Data
+import Fitter
+import Model
 import numpy as np
-
-import utils, Model, Approach, Data, Fitter
-
+import utils
 from consts import Mp, Mp2
+from nose.tools import *
 
 m = Model.ComptonGepard(ansatz='TEST', scheme='CSBAR')
 t = Approach.hotfixedBMK(m)
@@ -52,6 +57,30 @@ def test_gepardXDVCSt():
     assert_almost_equal(aux, 5608.42804256, 2)
 
 test_gepardXDVCSt.gepardsuite = 1
+
+def test_gepardXDVCSt_NLO():
+    """Calculate NLO DVCS partial cross section using gepard (no evolution)."""
+    pt.W = 82.
+    pt.Q2 = 1.
+    pt.t = 0.0
+    pt.xi = pt.Q2 / ( 2.0 * pt.W * pt.W + pt.Q2)
+    pt.xB = 2*pt.xi/(1.+pt.xi)
+    t.m.g.parint.p = 1
+    t.m.g.init()
+    aux = t.X(pt)
+    assert_almost_equal(aux, 821.0062045181508)
+
+def test_gepardXDVCSt_NLOevol():
+    """Calculate NLO DVCS partial cross section using gepard (+ evolution)."""
+    pt.W = 82.
+    pt.Q2 = 8.
+    pt.t = 0.0
+    pt.xi = pt.Q2 / ( 2.0 * pt.W * pt.W + pt.Q2)
+    pt.xB = 2*pt.xi/(1.+pt.xi)
+    t.m.g.parint.p = 1
+    t.m.g.init()
+    aux = t.X(pt)
+    assert_almost_equal(aux, 90.76770897337423)
 
 def test_gepardXDVCSevol():
     """Calculate NLO DVCS cross section using gepard (+evolution)."""

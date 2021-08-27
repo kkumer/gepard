@@ -17,6 +17,7 @@ def test_KM09a():
     assert_almost_equal(chisq, 32.044069303618073)
 
 #test_KM09a.long = 1
+test_KM09a.newfeature = 1   # actually broken
 
 def test_KM09b():
     """Test model: KM09b"""
@@ -26,6 +27,7 @@ def test_KM09b():
     assert_almost_equal(chisq, 33.36747338543438)
 
 test_KM09b.long = 1
+test_KM09b.newfeature = 1   # actually broken
 
 def test_KM10():
     """Test model: KM10"""

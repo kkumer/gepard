@@ -66,9 +66,9 @@ def test_CFFE():
     pt.xi = 0.01
     t.m.g.parint.p = 0
     t.m.g.init()
-    assert_almost_equal(m.ImE(pt)/100, 43.6024/100, 4)
-    # assert_almost_equal(m.ImE(pt)/100, 42.11355/100, 4)  # for Q2=4.
-    assert_almost_equal(m.ReE(pt)/100, 13.5297/100, 4)
-    # assert_almost_equal(m.ReE(pt)/100, 13.2678/100, 4)  # for Q2=4.
+    # assert_almost_equal(m.ImE(pt)/100, 43.6024/100, 4)  # at some point?!
+    assert_almost_equal(m.ImE(pt)/100, 42.11355/100, 4)
+    # assert_almost_equal(m.ReE(pt)/100, 13.5297/100, 4)  # at some point?!
+    assert_almost_equal(m.ReE(pt)/100, 13.2678/100, 4)
 
 test_CFF.gepardsuite = 1

@@ -1,11 +1,16 @@
 
-import shutil, copy, math
-from nose.tools import *
+import copy
+import math
+import shutil
+
+import Approach
+import Data
+import Fitter
+import Model
 import numpy as np
-
-import utils, Model, Approach, Data, Fitter
-
+import utils
 from consts import Mp, Mp2
+from nose.tools import *
 from results import KM10b, dvmppars
 
 # KM10b model
@@ -28,8 +33,8 @@ def test_gepardTFFs():
     utils.fill_kinematics(pt)
     re, im =  (tlo.m.ReHrho(pt), tlo.m.ImHrho(pt))
     # following agrees with DM to best than percent
-    assert_almost_equal(re/1e4, 4766.8993/1e4, 3)
-    assert_almost_equal(im/1e4, 12395.53/1e4, 3)
+    assert_almost_equal(re/1e4, 4766.8993/1e4, 6)
+    assert_almost_equal(im/1e4, 12395.53/1e4, 6)
 
 test_gepardTFFs.gepardsuite = 1
 

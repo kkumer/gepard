@@ -2,14 +2,15 @@
 
 import copy
 
-from numpy import sin, cos, pi, sqrt, array, linspace, ndarray, transpose
+import pandas as pd
+from numpy import array, cos, linspace, ndarray, pi, sin, sqrt, transpose
 from scipy.special import gammainc
 from scipy.stats import scoreatpercentile
-import pandas as pd
 
-import utils, quadrature, Data
+import Data
+import quadrature
+import utils
 from consts import *
-
 
 # FIXME: This looks nonpythonic, see static class variables
 errtypes =  ['err', 'errminus', 'errplus', 'errstat', 'errsyst', 'errnorm']
@@ -987,7 +988,6 @@ class BMK(Approach):
             else:
                 res = self._XDVCSt(pt)
             del pt.t
-            #if debug == 2: print "t = %s  =>  dsig/dt = %s" % (t_single, res)
             aux.append(res)
         return array(aux)
 
@@ -1268,7 +1268,7 @@ class BMK(Approach):
         else:
             raise ValueError('[%s] has neither azimuthal angle phi\
  nor harmonic FTn == -1 defined!' % pt)
-            return  res / pi
+        return res / pi
 
     def BSAnew(self, pt, **kwargs):
         """Calculate beam spin asymmetry (BSA) or its harmonics."""

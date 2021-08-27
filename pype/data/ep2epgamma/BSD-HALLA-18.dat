@@ -8,7 +8,7 @@ collaboration = HALLA
 process = ep2epgamma
 exptype = fixed target
 year = 2018
-#reference =  doi:10.1038/s41567-019-0774-3
+reference =  F. Georges, PhD thesis
 inspiretex = Georges:2018kyi
 reference2 = Table 1.1
 

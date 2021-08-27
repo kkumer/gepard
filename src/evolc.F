@@ -182,7 +182,6 @@ C
         WCE(PID, SEC, QIND, K, 1) = CEV(1)
         WCE(PID, SEC, QIND, K, 2) = CEV(2)
 
-
  123  CONTINUE
 
       RETURN
