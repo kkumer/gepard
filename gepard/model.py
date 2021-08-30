@@ -468,11 +468,19 @@ class MellinBarnesModel(ParameterModel):
 
     def cff(self, pt: g.data.DataPoint) -> np.ndarray:
         """Return array(ReH, ImH, ReE, ...) for kinematic point."""
+        # squared charge factors:
         if self.nf == 3:
-            chargefac = 2./9.
+            qs = 2/9
+            qns = 1/9
         else:  # nf = 4
-            chargefac = 5./18.
-
+            qs = 5/18
+            qns = 1/6
+        # Flavor rotation matrix: (sea,G,uv,dv) --> (SIG, G, NS+, NS-)
+        # FIXME: should be calculated only once!
+        frot_dvcs = np.array([[qs, 0, qs, qs],
+                              [0, qs, 0, 0],
+                              [-qns/5, 0, 0, qns],
+                              [0, 0, 0, 0]])
         try:
             wce_ar = self.wce[pt.Q2]
         except KeyError:
@@ -480,11 +488,14 @@ class MellinBarnesModel(ParameterModel):
             wce_ar = g.evolc.calc_wce(self, pt.Q2, 'DVCS')
             # memorize it for future
             self.wce[pt.Q2] = wce_ar
-        h = self.gpds.gpd_H(pt.xi, pt.t)
+        # Evaluations depending on model parameters:
+        h_prerot = self.gpds.gpd_H(pt.xi, pt.t)
+        h = np.einsum('fa,ja->jf', frot_dvcs, h_prerot)
         reh, imh = self._mellin_barnes_integral(pt.xi, wce_ar, h)
-        e = self.gpds.gpd_E(pt.xi, pt.t)
+        e_prerot = self.gpds.gpd_E(pt.xi, pt.t)
+        e = np.einsum('fa,ja->jf', frot_dvcs, e_prerot)
         ree, ime = self._mellin_barnes_integral(pt.xi, wce_ar, e)
-        return chargefac * np.array([reh, imh, ree, ime, 0, 0, 0, 0])
+        return np.array([reh, imh, ree, ime, 0, 0, 0, 0])
 
     def ImH(self, pt: g.data.DataPoint) -> float:
         """Return Im(CFF H) for kinematic point."""

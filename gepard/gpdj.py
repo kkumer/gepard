@@ -71,4 +71,4 @@ def fitbp(j: np.ndarray, t: float, par: dict) -> np.ndarray:
            gepard.qj.betadip(j, t, par['ms'], par['delms'], par['pows']))
     gluon = (gepard.qj.qj(j, t, 6, par['ng'], par['al0g'], par['alpg']) *
              gepard.qj.betadip(j, t, par['mg'], par['delmg'], par['powg']))
-    return np.array((sea+uv+dv, gluon, uv, dv))
+    return np.array((sea, gluon, uv, dv))
