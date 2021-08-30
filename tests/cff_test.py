@@ -2,7 +2,7 @@
 
 import gepard as g
 import numpy as np
-from pytest import approx
+from pytest import approx, mark
 
 par_test = {'ns': 2./3. - 0.4, 'al0s': 1.1, 'alps': 0.25, 'ms': 1.1,
             'ng': 0.4, 'al0g': 1.2, 'alpg': 0.25, 'mg': 1.2}
@@ -55,7 +55,9 @@ pt_test.xi = pt_test.Q2 / (2.0 * pt_test.W * pt_test.W + pt_test.Q2)
 pt0_fit = g.data.DataPoint({'xi': 0.01, 'Q2': 4., 't': -0.2})  # noevol
 pt_fit = g.data.DataPoint({'xi': 0.01, 'Q2': 8., 't': -0.2})  # evol
 
+pt_bp = g.data.DataPoint({'xi': 1.e-5, 'Q2': 2.5, 't': -0.25})  # noevol
 pt_evol = g.data.DataPoint({'xi': 1.e-5, 'Q2': 25., 't': -0.25})  # evol
+pt_evolNS = g.data.DataPoint({'xi': 0.01, 'Q2': 10., 't': -0.25})  # evol
 
 
 def test_wc_LO():
@@ -102,8 +104,50 @@ def test_cff_H_noevol():
     test_gpd = g.model.Test()
     m_test = g.model.MellinBarnesModel(gpds=test_gpd)
     m_test.parameters.update(par_test)
-    assert m_test.cff(pt_test.xi, pt_test.t, pt_test.Q2)[:2] == approx(
+    assert m_test.cff(pt_test)[:2] == approx(
             [9839.566, 61614.9])
+
+
+def test_cff_radLO():
+    """Singlet LO CFF H (no evol)."""
+    gpd_bp = g.model.FitBP(p=0)
+    m = g.model.MellinBarnesModel(gpds=gpd_bp)
+    m.parameters.update(par_bp)
+    m.parameters.update(par_bp_hard)
+    assert m.cff(pt_bp)[:2] == approx(
+            [39544.823112887607, 402367.23596533033])
+
+
+def test_cff_radNLO():
+    """Singlet NLO CFF H (no evol)."""
+    gpd_bp = g.model.FitBP(p=1, scheme='csbar')
+    m = g.model.MellinBarnesModel(gpds=gpd_bp)
+    m.parameters.update(par_bp)
+    m.parameters.update(par_bp_hard)
+    assert m.cff(pt_bp)[:2] == approx(
+            [5747.0424614455933, 201256.45352582674])
+
+
+@mark.skip('NS not implemented yet.')
+def test_cff_radLONS():
+    """Non-singlet LO CFF H (evol)."""
+    gpd_bp = g.model.FitBP(p=0)
+    m = g.model.MellinBarnesModel(gpds=gpd_bp)
+    m.parameters.update(par_bp)
+    m.parameters['ns'] = 0
+    assert m.cff(pt_evolNS)[:2] == approx(
+            [-3.3434664508535783, 3.274603763172275])
+
+
+@mark.skip('NS not implemented yet.')
+def test_cff_radNLONS():
+    """Non-singlet NLO CFF H (evol)."""
+    gpd_bp = g.model.FitBP(p=1)
+    m = g.model.MellinBarnesModel(gpds=gpd_bp)
+    m.parameters.update(par_bp)
+    m.parameters['ns'] = 0
+    assert m.cff(pt_evolNS)[:2] == approx(
+            [-2.8809502819615411, 3.096381114053143])
 
 
 def test_cff_radMSBAR_LOevol():
@@ -112,7 +156,7 @@ def test_cff_radMSBAR_LOevol():
     m = g.model.MellinBarnesModel(gpds=gpd_bp)
     m.parameters.update(par_bp)
     m.parameters.update(par_bp_hard)
-    assert m.cff(pt_evol.xi, pt_evol.t, pt_evol.Q2)[:2] == approx(
+    assert m.cff(pt_evol)[:2] == approx(
             [251460.03959908773, 1015357.1865059549])
 
 
@@ -123,10 +167,10 @@ def test_cff_radMSBAR_NLOevol():
     m.parameters.update(par_bp)
     m.parameters.update(par_bp_hard)
     # Result of wrong ND-evolution fortran-gepard code
-    # assert m.cff(pt_evol.xi, pt_evol.t, pt_evol.Q2)[:2] == approx(
+    # assert m.cff(pt_evol)[:2] == approx(
     #         [142867.21556625995, 653095.26655367797/1e5])
     # Result after correcting ND-evolution fortran-gepard code
-    assert m.cff(pt_evol.xi, pt_evol.t, pt_evol.Q2)[:2] == approx(
+    assert m.cff(pt_evol)[:2] == approx(
             [156576.80414343436, 686720.2142542489], rel=1.e-5)
 
 
@@ -136,9 +180,9 @@ def test_cff_H_nlso3():
     m_fit = g.model.MellinBarnesModel(gpds=fit_gpd)
     m_fit.parameters.update(par_fit)
     # Q2 can be changed during calls:
-    assert m_fit.cff(pt0_fit.xi, pt0_fit.t, pt0_fit.Q2)[:2] == approx(
+    assert m_fit.cff(pt0_fit)[:2] == approx(
             [18.9540, 60.1622], abs=0.001)
-    assert m_fit.cff(pt_fit.xi, pt_fit.t, pt_fit.Q2)[:2] == approx(
+    assert m_fit.cff(pt_fit)[:2] == approx(
             (26.9984, 66.5255), abs=0.001)
 
 
@@ -163,9 +207,9 @@ def test_cff_E_nlso3():
     fit_gpd = g.model.Fit()
     m_fit = g.model.MellinBarnesModel(gpds=fit_gpd)
     m_fit.parameters.update(par_fit)
-    assert m_fit.cff(pt0_fit.xi, pt0_fit.t, pt0_fit.Q2)[2:4] == approx(
+    assert m_fit.cff(pt0_fit)[2:4] == approx(
             [13.2678, 42.11355])
-    assert m_fit.cff(pt_fit.xi, pt_fit.t, pt_fit.Q2)[2:4] == approx(
+    assert m_fit.cff(pt_fit)[2:4] == approx(
             [13.5297, 43.6024], rel=1e-4)
 
 
@@ -191,7 +235,7 @@ def test_cff_E_nlso3_separate():
     # m_fit.parameters.update(par_KM15)
     # # Q2 can be changed during calls:
     # assert m_fit.ImH(pt0_fit) == approx(66.90122688611703)
-    # assert m_fit.cff(pt_fit.xi, pt_fit.t, pt_fit.Q2)[1] == approx(
+    # assert m_fit.cff(pt_fit)[1] == approx(
             # 66.90122688611703)
 
 

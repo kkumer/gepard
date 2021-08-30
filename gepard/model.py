@@ -466,7 +466,7 @@ class MellinBarnesModel(ParameterModel):
         mb_int = np.dot(self.wg, cch.imag)
         return mb_int
 
-    def cff(self, xi: float, t: float, Q2: float) -> np.ndarray:
+    def cff(self, pt: g.data.DataPoint) -> np.ndarray:
         """Return array(ReH, ImH, ReE, ...) for kinematic point."""
         if self.nf == 3:
             chargefac = 2./9.
@@ -474,16 +474,16 @@ class MellinBarnesModel(ParameterModel):
             chargefac = 5./18.
 
         try:
-            wce_ar = self.wce[Q2]
+            wce_ar = self.wce[pt.Q2]
         except KeyError:
             # calculate it
-            wce_ar = g.evolc.calc_wce(self, Q2, 'DVCS')
+            wce_ar = g.evolc.calc_wce(self, pt.Q2, 'DVCS')
             # memorize it for future
-            self.wce[Q2] = wce_ar
-        h = self.gpds.gpd_H(xi, t)
-        reh, imh = self._mellin_barnes_integral(xi, wce_ar, h)
-        e = self.gpds.gpd_E(xi, t)
-        ree, ime = self._mellin_barnes_integral(xi, wce_ar, e)
+            self.wce[pt.Q2] = wce_ar
+        h = self.gpds.gpd_H(pt.xi, pt.t)
+        reh, imh = self._mellin_barnes_integral(pt.xi, wce_ar, h)
+        e = self.gpds.gpd_E(pt.xi, pt.t)
+        ree, ime = self._mellin_barnes_integral(pt.xi, wce_ar, e)
         return chargefac * np.array([reh, imh, ree, ime, 0, 0, 0, 0])
 
     # FIXME: Now fast cludge to get it to work. Code duplication

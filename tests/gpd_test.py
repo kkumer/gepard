@@ -61,10 +61,9 @@ def test_gpdj_fit():
 def test_gpdj_fitbp():
     """Test singlet GPD from hep-ph/0703179 - hard gluons."""
     par_bp.update(par_bp_hard)
-    assert g.gpdj.fitbp(j_test, tb_test, par_bp) == approx((
+    assert g.gpdj.fitbp(j_test, tb_test, par_bp)[:2] == approx((
                              (0.8252585606460219-1.20745720388647j),
-                             (0.48405328160880784-1.2858277230367638j),
-                             0j, 0j))
+                             (0.48405328160880784-1.2858277230367638j)))
 
 # -- Testing complete GPDs on MB contour
 

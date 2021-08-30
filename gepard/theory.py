@@ -359,7 +359,7 @@ class DVCS(Theory):
         """
         W2 = pt.W * pt.W
         # Simplified formula used also in Fortran gepard code
-        ReH, ImH, ReE, ImE, ReHt, ImHt, ReEt, ImEt = self.m.cff(pt.xi, pt.t, pt.Q2)
+        ReH, ImH, ReE, ImE, ReHt, ImHt, ReEt, ImEt = self.m.cff(pt)
         res = 260.5633976788416 * W2 * (
                 (ImH**2 + ReH**2)
                 - pt.t/(4.*Mp2)*(ReE**2 + ImE**2)) / (
@@ -372,7 +372,7 @@ class DVCS(Theory):
 
         eps2 = 4. * pt.xB**2 * Mp2 / pt.Q2
         try:
-            ReH, ImH, ReE, ImE, ReHt, ImHt, ReEt, ImEt = self.m.cff(pt.xi, pt.t, pt.Q2)
+            ReH, ImH, ReE, ImE, ReHt, ImHt, ReEt, ImEt = self.m.cff(pt)
         except AttributeError:
             ReH = self.m.ReH(pt)
             ImH = self.m.ImH(pt)
