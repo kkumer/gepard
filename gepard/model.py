@@ -486,75 +486,21 @@ class MellinBarnesModel(ParameterModel):
         ree, ime = self._mellin_barnes_integral(pt.xi, wce_ar, e)
         return chargefac * np.array([reh, imh, ree, ime, 0, 0, 0, 0])
 
-    # FIXME: Now fast cludge to get it to work. Code duplication
-    #  and superfluous code execution while running
-
     def ImH(self, pt: g.data.DataPoint) -> float:
         """Return Im(CFF H) for kinematic point."""
-        if self.nf == 3:
-            chargefac = 2./9.
-        else:  # nf = 4
-            chargefac = 5./18.
-
-        try:
-            wce_ar = self.wce[pt.Q2]
-        except KeyError:
-            wce_ar = g.evolc.calc_wce(self, pt.Q2, 'DVCS')
-            self.wce[pt.Q2] = wce_ar
-        h = self.gpds.gpd_H(pt.xi, pt.t)
-        reh, imh = self._mellin_barnes_integral(pt.xi, wce_ar, h)
-        return chargefac * imh
+        return self.cff(pt)[1]
 
     def ReH(self, pt: g.data.DataPoint) -> float:
         """Return Re(CFF H) for kinematic point."""
-        xi, t, Q2 = pt.xi, pt.t, pt.Q2
-        if self.nf == 3:
-            chargefac = 2./9.
-        else:  # nf = 4
-            chargefac = 5./18.
-
-        try:
-            wce_ar = self.wce[Q2]
-        except KeyError:
-            wce_ar = g.evolc.calc_wce(self, Q2, 'DVCS')
-            self.wce[Q2] = wce_ar
-        h = self.gpds.gpd_H(xi, t)
-        reh, imh = self._mellin_barnes_integral(xi, wce_ar, h)
-        return chargefac * reh
+        return self.cff(pt)[0]
 
     def ImE(self, pt: g.data.DataPoint) -> float:
         """Return Im(CFF E) for kinematic point."""
-        xi, t, Q2 = pt.xi, pt.t, pt.Q2
-        if self.nf == 3:
-            chargefac = 2./9.
-        else:  # nf = 4
-            chargefac = 5./18.
-
-        try:
-            wce_ar = self.wce[Q2]
-        except KeyError:
-            wce_ar = g.evolc.calc_wce(self, Q2, 'DVCS')
-            self.wce[Q2] = wce_ar
-        e = self.gpds.gpd_E(xi, t)
-        ree, ime = self._mellin_barnes_integral(xi, wce_ar, e)
-        return chargefac * ime
+        return self.cff(pt)[3]
 
     def ReE(self, pt: g.data.DataPoint) -> float:
         """Return Re(CFF E) for kinematic point."""
-        xi, t, Q2 = pt.xi, pt.t, pt.Q2
-        if self.nf == 3:
-            chargefac = 2./9.
-        else:  # nf = 4
-            chargefac = 5./18.
-
-        try:
-            wce_ar = self.wce[Q2]
-        except KeyError:
-            wce_ar = g.evolc.calc_wce(self, Q2, 'DVCS')
-            self.wce[Q2] = wce_ar
-        e = self.gpds.gpd_E(xi, t)
-        ree, ime = self._mellin_barnes_integral(xi, wce_ar, e)
-        return chargefac * ree
+        return self.cff(pt)[2]
 
     def tff(self, xi: float, t: float, Q2: float) -> np.ndarray:
         """Return array(ReH_rho, ImH_rho, ReE_rho, ...) of DVrhoP transition FFs."""
