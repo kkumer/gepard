@@ -70,6 +70,9 @@ def test_c1_NLO():
     fit_gpd = g.model.Fit()
     m = g.model.MellinBarnesModel(gpds=fit_gpd)
     m.parameters.update(par_dvmp)
+    # to get agreement with these old numbers:
+    m.corr_c1dvmp_one = 0
+    m.corr_c1dvmp_sgn = -1
     # c1dvmp(model, sgntr, j, k)
     aux = g.c1dvmp.c1dvmp(m, 1, (0.5+1.j), 2)
     # comparing to DM's DVEM-c1_forKreso.nb
@@ -91,6 +94,9 @@ def test_dvmp_TFFs_NLO():
     fit_gpd = g.model.Fit(p=1)
     m = g.model.MellinBarnesModel(gpds=fit_gpd)
     m.parameters.update(par_dvmp)
+    # to get agreement with these old numbers:
+    m.corr_c1dvmp_one = 0
+    m.corr_c1dvmp_sgn = -1
     tffs = m.tff(pt.xi, pt.t, pt.Q2)
     reh, imh = tffs[0], tffs[1]
     # following agrees with gepard-fortran ...

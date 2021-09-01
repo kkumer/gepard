@@ -437,6 +437,14 @@ class MellinBarnesModel(ParameterModel):
         self.wce: Dict[float, np.ndarray] = {}  # DVCS
         self.wce_dvmp: Dict[float, np.ndarray] = {}  # DVMP
         self.wce_dis: Dict[float, np.ndarray] = {}  # DIS
+        # correction factors for NLO expressions
+        # needed to be able to have some tests w.r.t. old wrong notebooks
+        # 1. correction introduced below Eq. (20) of 1612.01937. Set 
+        #  to zero to get agreement with older results
+        self.corr_c1dvmp_one = 1
+        # 2. correction to get results from "Towards DVMP" paper.
+        #  Set to -1 to get agreement with Dieter's notebook.
+        self.corr_c1dvmp_sgn = 1
         super().__init__()
 
     def _mellin_barnes_integral(self, xi, wce, h):
