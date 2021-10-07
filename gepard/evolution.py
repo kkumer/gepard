@@ -221,7 +221,8 @@ def evolop(m, j, q2: float, process: str) -> np.ndarray:
         evola1ab = - np.einsum('kab,kabij->kabij', er1, r1proj)
         evola1 = np.einsum('kabij,bk->kij', evola1ab, Rfact)
         # adding non-diagonal evolution when needed or asked for
-        if ((process == 'DVMP') or (process == 'DVCS' and m.scheme == 'msbar')):
+        # if ((process == 'DVMP') or (process == 'DVCS' and m.scheme == 'msbar')):
+        if ((process != 'DIS') and (m.scheme == 'msbar')):
             # FIXME: find a way to do it array-wise i.e. get rid of j_single
             nd = []
             for j_single in j:

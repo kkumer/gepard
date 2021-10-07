@@ -1,6 +1,5 @@
 """Implementation of fitting algorithms."""
 
-import warnings
 
 from iminuit import Minuit
 
@@ -8,11 +7,11 @@ import gepard.data
 import gepard.theory
 
 
-
 class Fitter(object):
     """Superclass for fitting procedures/algorithms."""
 
     def __init__(self, **kwargs) -> None:
+        """FIXME: fitpoints and theory should maybe be named kwargs."""
         for key in kwargs:
             setattr(self, key, kwargs[key])
 
@@ -20,29 +19,31 @@ class Fitter(object):
 class FitterMinuit(Fitter):
     """Fits using iminuit Python frontend to MINUIT2 C++ library."""
 
-    def __init__(self, fitpoints: gepard.data.DataSet, theory: gepard.theory.Theory, **kwargs) -> None:
+    def __init__(self, fitpoints: gepard.data.DataSet,
+                 theory: gepard.theory.Theory, **kwargs) -> None:
+        """Set what is fitted to what and how."""
         self.fitpoints = fitpoints
         self.theory = theory
-        self.printMode = 0
+        init_vals = [v for v in self.theory.model.parameters.values()]
+        names = [k for k in self.theory.model.parameters.keys()]
 
         def fcn(p):
             """Cost function for minimization - chi-square."""
             # Update model parameters.
             # FIXME: This relies on Python>3.7 where dicts are ordered!!
+            #  It's OK, one just needs to specify Python version dependency
             self.theory.m.parameters.update(zip(self.theory.m.parameters.keys(), p))
             chisq = self.theory.chisq(self.fitpoints)
             return chisq
 
-        self.minuit = Minuit(fcn, use_array_call=True, errordef=1, pedantic=False,
-                        forced_parameters=[*theory.model.parameters], 
-                        **theory.model.parameters)
-                        # **theory.m.parameters_fix, **theory.m.parameters_limit)
-        for key in kwargs:
-            setattr(self.minuit, key, kwargs[key])
+        fcn.errordef = Minuit.LEAST_SQUARES
+
+        self.minuit = Minuit(fcn, init_vals, name=names)
+        self.minuit.print_level = 2
         Fitter.__init__(self, **kwargs)
 
-
     def fit(self):
+        """Start fitting."""
         self.minuit.migrad()
         if self.printMode > 0:
             print("ncalls = \n", self.minuit.ncalls)
