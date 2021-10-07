@@ -11,7 +11,6 @@ class Fitter(object):
     """Superclass for fitting procedures/algorithms."""
 
     def __init__(self, **kwargs) -> None:
-        """FIXME: fitpoints and theory should maybe be named kwargs."""
         for key in kwargs:
             setattr(self, key, kwargs[key])
 
@@ -24,8 +23,8 @@ class FitterMinuit(Fitter):
         """Set what is fitted to what and how."""
         self.fitpoints = fitpoints
         self.theory = theory
-        init_vals = [v for v in self.theory.model.parameters.values()]
-        names = [k for k in self.theory.model.parameters.keys()]
+        init_vals = [v for v in self.theory.m.parameters.values()]
+        names = [k for k in self.theory.m.parameters.keys()]
 
         def fcn(p):
             """Cost function for minimization - chi-square."""
@@ -39,6 +38,8 @@ class FitterMinuit(Fitter):
         fcn.errordef = Minuit.LEAST_SQUARES
 
         self.minuit = Minuit(fcn, init_vals, name=names)
+        for k, v in self.theory.m.parameters_limits.items():
+            self.minuit.limits[k] = v
         self.minuit.print_level = 2
         Fitter.__init__(self, **kwargs)
 
@@ -70,6 +71,13 @@ class FitterMinuit(Fitter):
         self.theory.model.release_parameters(*args)
         for par in args:
             self.minuit.fixed[par] = False
+
+    def limit_parameters(self, dct):
+        """limit_parameters({'p1': (lo, hi), ...}."""
+
+        self.theory.model.parameters_limits.update(dct)
+        for k, v in dct.items():
+            self.minuit.limits[k] = v
 
     def print_parameters(self):
         for par in self.theory.model.parameters:

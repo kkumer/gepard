@@ -97,6 +97,8 @@ def test_gepardfitDVCSnlso3_long():
     f = g.fitter.FitterMinuit(DVCSpoints, th)
     f.fix_parameters('ALL')
     f.release_parameters('ms', 'secs', 'secg')
+    print(th.m.parameters_limits)
+    print(f.minuit.limits)
     f.minuit.migrad()
     assert th.chisq(f.fitpoints) == approx(95.92, rel=1.e-2)
     assert th.m.parameters['ms'] == approx(0.47839, rel=1e-2)

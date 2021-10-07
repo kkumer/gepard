@@ -59,12 +59,12 @@ class ParameterModel(Model):
         parameters: dict {'par0': float, ...}. Actual value of parameter.
         parameters_fix: dict {'par0': bool, ...}. Is parameter value
             fixed? Considered False if non-existent.
-        parameters_limit: dict {'par0: (float, float), ...}. Range for
+        parameters_limits: dict {'par0: (float, float), ...}. Range for
             fitting. Considered (-inf, inf) if non-existent.
     """
     parameters: dict = {}
     parameters_fix: dict = {}
-    parameters_limit: dict = {}
+    parameters_limits: dict = {}
 
     def __init__(self) -> None:
         """Init and pre-calculate stuff."""
@@ -693,22 +693,17 @@ class ComptonModelDR(ComptonDispersionRelations, PionPole):
         """Constructor."""
         # initial values of parameters and limits on their values
         self.parameters = {'Nsea': 1.5, 'alS': 1.13, 'alpS': 0.15,
-                           'MS': 0.707, 'rS': 1.0,
-                           'bS': 2.0,      'limit_bS': (0.4, 5.0),
-                           'Nv': 1.35,
-                           'alv': 0.43,
-                           'alpv': 0.85,
-                           'Mv': 1.0,     'limit_Mv': (0.4, 1.5),
-                           'rv': 0.5,     'limit_rv': (0., 8.),
-                           'bv': 2.2,     'limit_bv': (0.4, 5.),
-                           'C': 7.0,      'limit_C': (-10., 10.),
-                           'MC': 1.3,     'limit_MC': (0.4, 2.),
-                           'tNv': 0.0,
-                           'tal': 0.43,
-                           'talp': 0.85,
-                           'tMv': 2.7,    'limit_tMv': (0.4, 2.),
-                           'trv': 6.0,    'limit_trv': (0., 8.),
-                           'tbv': 3.0,    'limit_tbv': (0.4, 5.)}
+                           'MS': 0.707, 'rS': 1.0, 'bS': 2.0,
+                           'Nv': 1.35, 'alv': 0.43, 'alpv': 0.85,
+                           'Mv': 1.0, 'rv': 0.5, 'bv': 2.2,
+                           'C': 7.0, 'MC': 1.3,
+                           'tNv': 0.0, 'tal': 0.43, 'talp': 0.85,
+                           'tMv': 2.7, 'trv': 6.0, 'tbv': 3.0}
+
+        self.parameters_limits = {'bS': (0.4, 5.0),
+                                  'Mv': (0.4, 1.5), 'rv': (0., 8.), 'bv': (0.4, 5.),
+                                  'C': (-10., 10.), 'MC': (0.4, 2.),
+                                  'tMv': (0.4, 2.), 'trv': (0., 8.), 'tbv': (0.4, 5.)}
 
         # order matters to fit.MinuitFitter, so it is defined by:
 #         self.parameter_names = ['Nsea', 'alS', 'alpS', 'MS', 'rS', 'bS',
@@ -719,6 +714,7 @@ class ComptonModelDR(ComptonDispersionRelations, PionPole):
         super().__init__()
 
     def subtraction(self, pt):
+        """Dispersion relations subtraction constant."""
         return self.parameters['C']/(1.-pt.t/self.parameters['MC']**2)**2
 
     def ImH(self, pt, xi=0):
