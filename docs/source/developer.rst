@@ -46,7 +46,8 @@ Speed-benchmarking the code
 
 
 This took about 15 seconds on my machine on old hybrid Fortran/Python gepard with paralelization. 
-It takes about 23 seconds now on the pure Python code, without paralelization!
+At some point, it took about 23 seconds on the pure Python code, without paralelization!
+Then it grew to 29 seconds, I think after introducing general flavor structre with matrices.
 
 
 Code style

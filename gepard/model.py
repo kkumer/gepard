@@ -266,6 +266,27 @@ class ConformalSpaceGPD(ParameterModel):
                            'secg': 0.,
                            'thig': 0.,
                            'kapg': 0.}
+        # Flavor rotation matrix. It transforms GPDs
+        # from flavor basis to evolution basis.
+        # Evolution basis is always 4-dim (SIG, G, NS+, NS-)
+        # Default flavor basis is (sea,G,uv,dv) but user is
+        # free to use more complicated flavor structure of model
+        # Default is appropriate for DVCS.
+        # For definitions of sea-like and valence-like GPDs see npb07
+        R = 0.5  # ratio sbar/ubar
+        self.frot = np.array([[1, 0, 1, 1],
+                              [0, 1, 0, 0],
+                              [-R/(2+R), 0, 1, -1],
+                              [0, 0, 0, 0]])
+        # squared DVCS charge factors
+        # This might belong to CFF code
+        if self.nf == 3:
+            qs = 2/9
+            qns = 1/9
+        else:  # nf = 4
+            qs = 5/18
+            qns = 1/6
+        self.dvcs_charges = (qs, qs, qns, qns)
         super().__init__()
 
     def pw_strengths(self):
@@ -423,6 +444,8 @@ class MellinBarnesModel(ParameterModel):
         self.c = gpds.c
         self.phi = gpds.phi
         self.wg = gpds.wg
+        self.frot = gpds.frot
+        self.dvcs_charges = gpds.dvcs_charges
         self.gpds = gpds
         self.parameters = gpds.parameters
         # Consolidate parameters, both the same and updated from above
@@ -476,19 +499,6 @@ class MellinBarnesModel(ParameterModel):
 
     def cff(self, pt: g.data.DataPoint) -> np.ndarray:
         """Return array(ReH, ImH, ReE, ...) for kinematic point."""
-        # squared charge factors:
-        if self.nf == 3:
-            qs = 2/9
-            qns = 1/9
-        else:  # nf = 4
-            qs = 5/18
-            qns = 1/6
-        # Flavor rotation matrix: (sea,G,uv,dv) --> (SIG, G, NS+, NS-)
-        # FIXME: should be calculated only once!
-        frot_dvcs = np.array([[qs, 0, qs, qs],
-                              [0, qs, 0, 0],
-                              [-qns/5, 0, 0, qns],
-                              [0, 0, 0, 0]])
         try:
             wce_ar = self.wce[pt.Q2]
         except KeyError:
@@ -498,28 +508,28 @@ class MellinBarnesModel(ParameterModel):
             self.wce[pt.Q2] = wce_ar
         # Evaluations depending on model parameters:
         h_prerot = self.gpds.gpd_H(pt.xi, pt.t)
-        h = np.einsum('fa,ja->jf', frot_dvcs, h_prerot)
+        h = np.einsum('f,fa,ja->jf', self.dvcs_charges, self.frot, h_prerot)
         reh, imh = self._mellin_barnes_integral(pt.xi, wce_ar, h)
         e_prerot = self.gpds.gpd_E(pt.xi, pt.t)
-        e = np.einsum('fa,ja->jf', frot_dvcs, e_prerot)
+        e = np.einsum('f,fa,ja->jf', self.dvcs_charges, self.frot, e_prerot)
         ree, ime = self._mellin_barnes_integral(pt.xi, wce_ar, e)
         return np.array([reh, imh, ree, ime, 0, 0, 0, 0])
-
-    def ImH(self, pt: g.data.DataPoint) -> float:
-        """Return Im(CFF H) for kinematic point."""
-        return self.cff(pt)[1]
 
     def ReH(self, pt: g.data.DataPoint) -> float:
         """Return Re(CFF H) for kinematic point."""
         return self.cff(pt)[0]
 
-    def ImE(self, pt: g.data.DataPoint) -> float:
-        """Return Im(CFF E) for kinematic point."""
-        return self.cff(pt)[3]
+    def ImH(self, pt: g.data.DataPoint) -> float:
+        """Return Im(CFF H) for kinematic point."""
+        return self.cff(pt)[1]
 
     def ReE(self, pt: g.data.DataPoint) -> float:
         """Return Re(CFF E) for kinematic point."""
         return self.cff(pt)[2]
+
+    def ImE(self, pt: g.data.DataPoint) -> float:
+        """Return Im(CFF E) for kinematic point."""
+        return self.cff(pt)[3]
 
     def tff(self, xi: float, t: float, Q2: float) -> np.ndarray:
         """Return array(ReH_rho, ImH_rho, ReE_rho, ...) of DVrhoP transition FFs."""

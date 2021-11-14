@@ -9,15 +9,16 @@ import gepard.special
 
 
 def qj(j: np.ndarray, t: float, poch: int, norm: float, al0: float,
-        alp: float, val: int = 0) -> np.ndarray:
+        alp: float, alpf: float = 0, val: int = 0) -> np.ndarray:
     r"""GPD building block Q_j with reggeized t-dependence.
 
     Args:
         j: complex conformal moment
         t: momentum transfer
-        poch: pochhammer (beta?)
+        poch: pochhammer (beta+1)
         al0: Regge intercept
-        alp: Regge slope
+        alp: Regge slope (leading pole)
+        alpf: Regge slope (full)
         val: 0 for sea, 1 for valence partons
 
     Returns:
@@ -28,19 +29,34 @@ def qj(j: np.ndarray, t: float, poch: int, norm: float, al0: float,
         (5.668107685...-4.002820...j)
 
     Notes:
-        From Eq. (40) or (41) of arXiv:0904.0458
-        but without residual beta(t) from Eq. (19):
+        There are two implementations of Regge t dependence, one uses
+        `alpf` :math:`\alpha'` parameter (`alp` should be set to zero)
+
+        .. math::
+
+            Q_j = N \frac{B(1-\alpha(t)+j, \beta+1)}{B(2-\alpha_0, \beta+1)}
+
+        This is then equal to Eq. (41) of arXiv:hep-ph/0605237
+        without residual :math:`F(\Delta^2)`.
+
+        The default uses `alp` parameter, and expression is
+        from Eq. (40) or (41) of arXiv:0904.0458, which takes into account
+        only the leading pole:
 
         .. math::
 
             Q_j = N \frac{B(1-\alpha_0+j, \beta+1)}{B(2-\alpha_0, \beta+1)}
                   \frac{1+j-\alpha_0}{1+j-\alpha(t)}
 
+        and is again defined without residual beta(t) from Eq. (19).
+
+
     """
+    assert alp*alpf == 0   # only one version of alpha' can be used
     alpt = al0 + alp * t
     qj = (
         norm
-        * gepard.special.pochhammer(2 - val - al0, poch)
+        * gepard.special.pochhammer(2 - val - al0 - alpf * t, poch)
         / gepard.special.pochhammer(1 - al0 + j, poch)
         * (1 + j - al0)
         / (1 + j - alpt)

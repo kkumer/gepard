@@ -2,13 +2,15 @@
 
 Returns:
    Numpy array evol[p, k, j]  where flavor index j takes values
+   in the evolution basis:
    (1) -- singlet quark
    (2) -- gluon
    (3) -- NS(+)
    (4) -- NS(-)  (not tested!)
 
 Notes:
-   Careful: GPD models may have u_v and d_v at slots 3 and 4.
+   GPD models may be defined in different basis and should
+   provide appropriate transformation matrix
 
 Todo:
     * Implement non-singlet
