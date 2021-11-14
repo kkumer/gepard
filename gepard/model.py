@@ -276,8 +276,8 @@ class ConformalSpaceGPD(ParameterModel):
         R = 0.5  # ratio sbar/ubar
         self.frot = np.array([[1, 0, 1, 1],
                               [0, 1, 0, 0],
-                              [-R/(2+R), 0, 1, -1],
                               [0, 0, 0, 0]])
+                              # [-R/(2+R), 0, 1, -1]])
         # squared DVCS charge factors
         # This might belong to CFF code
         if self.nf == 3:
@@ -286,18 +286,19 @@ class ConformalSpaceGPD(ParameterModel):
         else:  # nf = 4
             qs = 5/18
             qns = 1/6
-        self.dvcs_charges = (qs, qs, qns, qns)
+        self.dvcs_charges = (qs, qs, qns)
         super().__init__()
 
     def pw_strengths(self):
         """Strengths of SO(3) partial waves."""
         # We take maximally three partial waves atm:
         # pw_strengths = (no. pws x no. flavors)
-        return np.array([[1., 1., 1, 1],
+        # flavors are (Q, G, NSP)
+        return np.array([[1., 1., 1],
                          [self.parameters['secs'],
-                             self.parameters['secg'], 0, 0],
+                             self.parameters['secg'], 0],
                          [self.parameters['this'],
-                             self.parameters['thig'], 0, 0]])
+                             self.parameters['thig'], 0]])
 
     def gpd_H(self, eta: float, t: float) -> np.ndarray:
         """Return (npts, 4) array H_j^a for all j-points and 4 flavors."""
@@ -482,7 +483,7 @@ class MellinBarnesModel(ParameterModel):
         cfacj = eph * np.exp((self.jpoints + 1) * log(1/xi))  # eph/xi**(j+1)
         # Temporary singlet part only!:
         cch = np.einsum('j,sa,sja,ja->j', cfacj,
-                        self.gpds.pw_strengths()[:, :2], wce[:, :, :2], h[:, :2])
+                        self.gpds.pw_strengths(), wce, h)
         imh = np.dot(self.wg, cch.imag)
         np.multiply(cch, self.tgj, out=cch)
         reh = np.dot(self.wg, cch.imag)
@@ -493,7 +494,7 @@ class MellinBarnesModel(ParameterModel):
         eph = np.exp(self.phi*1j)
         cfacj = eph * np.exp((self.jpoints) * log(1/xi))  # eph/xi**j
         # Temporary singlet part only!:
-        cch = np.einsum('j,ja,ja->j', cfacj, wce[:, :2], h[:, :2])
+        cch = np.einsum('j,ja,ja->j', cfacj, wce, h)
         mb_int = np.dot(self.wg, cch.imag)
         return mb_int
 
@@ -547,11 +548,11 @@ class MellinBarnesModel(ParameterModel):
         # Evaluations depending on model parameters:
         h_prerot = self.gpds.gpd_H(xi, t)
         # Flavor rotation matrix: (sea,G,uv,dv) --> (SIG, G, NS+, NS-)
-        # FIXME: should be calculated only once!
+        # FIXME: should be constructed only once!
         frot_rho_4 = np.array([[1, 0, 1, 1],
                                [0, 1, 0, 0],
-                               [3./20., 0, 5./12., 1./12.],
-                               [0, 0, 0, 0]]) / np.sqrt(2)
+                               [0., 0, 0., 0.]]) / np.sqrt(2)
+                               # [3./20., 0, 5./12., 1./12.]]) / np.sqrt(2)
         h = np.einsum('fa,ja->jf', frot_rho_4, h_prerot)
         reh, imh = self._mellin_barnes_integral(xi, wce_ar_dvmp, h)
         return (g.constants.CF * g.constants.F_rho * astrong / g.constants.NC
@@ -581,7 +582,13 @@ class MellinBarnesModel(ParameterModel):
             wce_ar_dis = g.evolc.calc_wce(self, pt.Q2, 'DIS')[0, :, :]
             # memorize it for future
             self.wce_dis[pt.Q2] = wce_ar_dis
-        pdf = self.gpds.gpd_H(0, 0)  # forward limit
+        pdf_prerot = self.gpds.gpd_H(0, 0)  # forward limit
+        # Flavor rotation matrix: (sea,G,uv,dv) --> (SIG, G, NS+, NS-)
+        # FIXME: should be constructed only once!
+        frot_pdf = np.array([[1, 0, 0, 0],
+                             [0, 1, 0, 0],
+                             [0., 0, 0., 0.]])
+        pdf = np.einsum('fa,ja->jf', frot_pdf, pdf_prerot)
         # print('pdf = {}'.format(pdf[0, :2]))
         # print('wce = {}'.format(wce_ar_dis[0, :2]))
         mb_int = self._dis_mellin_barnes_integral(pt.xB, wce_ar_dis, pdf)
