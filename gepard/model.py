@@ -482,7 +482,7 @@ class MellinBarnesModel(ParameterModel):
         cfacj = eph * np.exp((self.jpoints + 1) * log(1/xi))  # eph/xi**(j+1)
         # Temporary singlet part only!:
         cch = np.einsum('j,sa,sja,ja->j', cfacj,
-                        self.gpds.pw_strengths()[:, :2], wce, h[:, :2])
+                        self.gpds.pw_strengths()[:, :2], wce[:, :, :2], h[:, :2])
         imh = np.dot(self.wg, cch.imag)
         np.multiply(cch, self.tgj, out=cch)
         reh = np.dot(self.wg, cch.imag)
@@ -493,7 +493,7 @@ class MellinBarnesModel(ParameterModel):
         eph = np.exp(self.phi*1j)
         cfacj = eph * np.exp((self.jpoints) * log(1/xi))  # eph/xi**j
         # Temporary singlet part only!:
-        cch = np.einsum('j,ja,ja->j', cfacj, wce, h[:, :2])
+        cch = np.einsum('j,ja,ja->j', cfacj, wce[:, :2], h[:, :2])
         mb_int = np.dot(self.wg, cch.imag)
         return mb_int
 

@@ -65,7 +65,7 @@ def calc_wc(m, j, process: str):
        process: 'DIS, 'DVCS' or 'DVMP'
 
     Returns:
-         wc[k, p, f]: k in range(npts), p in [LO, NLO], f in [Q,G]
+         wc[k, p, f]: k in range(npts), p in [LO, NLO], f in [Q,G,NSP]
     """
     # Instead of type hint (which leads to circular import for some reason)
     if not isinstance(m, g.model.MellinBarnesModel):
@@ -80,27 +80,30 @@ def calc_wc(m, j, process: str):
         else:  # DIS
             quark_norm = one
             gluon_norm = one
-        q0, g0 = (one, zero)   # LO Q and G
-        q1, g1 = (zero, zero)  # NLO if only LO is asked for (m.p=0)
+        q0, g0, nsp0 = (one, zero, one)   # LO Q, G, NSP
+        q1, g1, nsp1 = (zero, zero, zero)  # NLO if only LO is asked for (m.p=0)
         if m.p == 1:
-            # take only singlet part atm:
-            q1, g1 = g.c1dvcs.C1(m, j, process)[:, :2].transpose()
+            # don't take NSM part atm:
+            q1, g1, nsp1 = g.c1dvcs.C1(m, j, process)[:, :3].transpose()
     elif process == 'DVMP':
         # Normalizations. Factor 3 is from normalization of DA, so not NC
         # See p. 37, 39 of "Towards DVMP" paper. Eq. (3.62c)
         quark_norm = 3 * fshu
         gluon_norm = 3 * fshu * 2 / g.constants.CF / (j + 3)
         # Normalizations are chosen so that LO is normalized to:
-        q0, g0 = (one/m.nf, one)   # LO Q and G
-        q1, g1 = (zero, zero)      # NLO if only LO is asked for (m.p=0)
+        # FIXME: NSP normalizations for DVMP not checked yet
+        q0, g0, nsp0 = (one/m.nf, one, one)   # LO Q, G, NSP
+        q1, g1, nsp1 = (zero, zero, zero)      # NLO if only LO is asked for (m.p=0)
         if m.p == 1:
             qp1, ps1, g1 = g.c1dvmp.c1dvmp(m, 1, j, 0)
             q1 = qp1/m.nf + ps1
+            nsp1 = qp1
     else:
         raise Exception('{} is not DIS, DVCS or DVMP!'.format(process))
     c_quark = quark_norm * np.stack([q0, q1])
     c_gluon = gluon_norm * np.stack([g0, g1])
-    return np.stack((c_quark, c_gluon)).transpose()
+    c_nsp = quark_norm * np.stack([nsp0, nsp1])
+    return np.stack((c_quark, c_gluon, c_nsp)).transpose()
 
 
 def calc_wce(m, q2: float, process: str):
@@ -112,7 +115,7 @@ def calc_wce(m, q2: float, process: str):
        process: 'DIS, 'DVCS' or 'DVMP'
 
     Returns:
-         wce[s,k,f]: s in range(npwmax), k in range(npts), f in [Q,G]
+         wce[s,k,j]: s in range(npwmax), k in range(npts), j in [Q,G,NSP]
     """
     # Instead of type hint (which leads to circular import for some reason)
     if not isinstance(m, g.model.MellinBarnesModel):
@@ -121,8 +124,14 @@ def calc_wce(m, q2: float, process: str):
     for pw_shift in [0, 2, 4]:
         j = m.jpoints + pw_shift
         wc = calc_wc(m, j, process)
-        # evolution operator
-        evola = g.evolution.evolop(m, j, q2, process)
+        # evolution operators
+        evola_si = g.evolution.evolop(m, j, q2, process)     # 2x2
+        evola_ns = g.evolution.evolopns(m, j, q2, process)   # 1x1, NSP
+        zero_right = np.zeros((evola_ns.shape[0], 2, 2, 1))
+        zero_down = np.zeros((evola_ns.shape[0], 2, 1, 2))
+        evola_ns = evola_ns.reshape((evola_ns.shape[0], 2, 1, 1))
+        evola = np.block([[evola_si, zero_right],               # 3x3
+                          [zero_down, evola_ns]])
         # p_mat: matrix that combines (LO, NLO) evolution operator and Wilson coeffs
         # while canceling NNLO term NLO*NLO:
         asmur2 = g.qcd.as2pf(m.p, m.nf, q2/m.rr2, m.asp[m.p], m.r20)

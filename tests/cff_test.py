@@ -84,7 +84,7 @@ def test_wce_LO():
     test_gpd = g.model.Test(p=0)
     m_test = g.model.MellinBarnesModel(gpds=test_gpd)
     m_test.parameters.update(par_test)
-    assert g.evolc.calc_wce(m_test, 3.0, 'DVCS')[0, 0, :] == approx(
+    assert g.evolc.calc_wce(m_test, 3.0, 'DVCS')[0, 0, :2] == approx(
             np.array([1.7328455630029231+0.00009701899018317j,
                       0.21666921098074668-0.0000851087087619j]), rel=1.e-12)
 
@@ -94,7 +94,7 @@ def test_wce_NLO():
     test_gpd = g.model.Test(p=1)
     m_test = g.model.MellinBarnesModel(gpds=test_gpd)
     m_test.parameters.update(par_test)
-    assert g.evolc.calc_wce(m_test, 3.0, 'DVCS')[0, 0, :] == approx(
+    assert g.evolc.calc_wce(m_test, 3.0, 'DVCS')[0, 0, :2] == approx(
             np.array([1.6127545996599677+0.00014769567470216j,
                       -0.09044960485326564-0.00003265190306802j]), rel=1.e-10)
 

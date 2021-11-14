@@ -100,6 +100,26 @@ def rnlof(m, j) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     return lam, pr, r1proj
 
 
+def rnlonsf(m, j, prty) -> np.ndarray:
+    """Returns NLO mu-independent part of evolution operator.
+
+    Args:
+          m: instance of the model
+          j: MB contour points (overrides m.jpoints)
+       prty: 1 for NS^{+}, -1 for NS^{-}
+
+    Returns:
+         r1: beta/gama ratio from Eq. (117)
+    """
+    # cf. my DIS notes p. 61
+    gam0 = g.adim.non_singlet_LO(j+1, m.nf, prty)   # LO non-singlet an. dim.
+    gam1 = g.adim.non_singlet_NLO(j+1, m.nf, prty)  # NLO non-singlet an. dim.
+    inv = 1.0 / g.qcd.beta(0, m.nf)
+    # Cf. Eq. (117), but defined with opposite sign as in gepard-fortran
+    r1 = inv * (gam1 - 0.5 * inv * g.qcd.beta(1, m.nf) * gam0)
+    return gam0, r1
+
+
 def erfunc(m, lamj, lamk, R) -> np.ndarray:
     """Mu-dep. part of NLO evolution operator. Eq. (126)."""
     b0 = g.qcd.beta(0, m.nf)
@@ -124,7 +144,7 @@ def erfunc_nd(m, lamj, lamk, R) -> np.ndarray:
     return er1
 
 
-def cb1(m, q2, zn, zk):
+def cb1(m, q2, zn, zk, NS=False):
     """Non-diagonal part of NLO evol op.
 
     Args:
@@ -147,11 +167,6 @@ def cb1(m, q2, zn, zk):
     asq02 = g.qcd.as2pf(m.p, m.nf, m.q02, m.asp[m.p], m.r20)
     R = asmuf2/asq02
     b0 = g.qcd.beta(0, m.nf)
-    gamn = g.adim.singlet_LO(zn+1, m.nf).transpose((2, 0, 1))
-    gamk = g.adim.singlet_LO(zk+1, m.nf)
-    lamn, pn = g.evolution.projectors(gamn)
-    lamk, pk = g.evolution.projectors(gamk)
-    er1 = g.evolution.erfunc_nd(m, lamn, lamk, R)
     AAA = (g.special.S1((zn+zk+2)/2) -
            g.special.S1((zn-zk-2)/2) +
            2*g.special.S1(zn-zk-1) -
@@ -172,14 +187,26 @@ def cb1(m, q2, zn, zk):
     dm_11 = np.ones_like(dm_22)
     dm_12 = np.zeros_like(dm_22)
     dm = np.array([[dm_11, dm_12], [dm_12, dm_22]])
-    proj_DM = np.einsum('naif,fgn,bgj->nabij', pn, dm, pk)
-    proj_GOD = np.einsum('naif,fgn,bgj->nabij', pn, god, pk)
     fac = (zk+1)*(zk+2)*(2*zn+3)/(zn+1)/(zn+2)/(zn-zk)/(zn+zk+3)
-    bet_proj_DM = np.einsum('b,nabij->nabij', b0-lamk, proj_DM)
-    cb1 = np.einsum('n,nab,nabij,b->nij', fac,
-                    er1*np.subtract.outer(lamn.transpose(), lamk),
-                    bet_proj_DM + proj_GOD,
-                    R**(-lamk/b0)) / b0
+    if NS:
+        gamn = g.adim.non_singlet_LO(zn+1, m.nf)
+        gamk = g.adim.non_singlet_LO(zk+1, m.nf)
+        r1 = (1 - (1/R)**((b0 + gamn - gamk)/b0)) / (b0+gamn-gamk)
+        cb1 = r1 * (gamn-gamk) * (b0 - gamk + GOD_11) * R**(-gamk/b0)
+        cb1 = fac * cb1
+    else:
+        gamn = g.adim.singlet_LO(zn+1, m.nf).transpose((2, 0, 1))
+        gamk = g.adim.singlet_LO(zk+1, m.nf)
+        lamn, pn = g.evolution.projectors(gamn)
+        lamk, pk = g.evolution.projectors(gamk)
+        proj_DM = np.einsum('naif,fgn,bgj->nabij', pn, dm, pk)
+        proj_GOD = np.einsum('naif,fgn,bgj->nabij', pn, god, pk)
+        er1 = g.evolution.erfunc_nd(m, lamn, lamk, R)
+        bet_proj_DM = np.einsum('b,nabij->nabij', b0-lamk, proj_DM)
+        cb1 = np.einsum('n,nab,nabij,b->nij', fac,
+                        er1*np.subtract.outer(lamn.transpose(), lamk),
+                        bet_proj_DM + proj_GOD,
+                        R**(-lamk/b0)) / b0
     return cb1
 
 
@@ -193,7 +220,7 @@ def evolop(m, j, q2: float, process: str) -> np.ndarray:
          process: DIS, DVCS or DVMP
 
     Returns:
-         Array corresponding Eq. (121) of Towards NPB paper.
+         Array corresponding Eq. (121) of Towards DVCS paper.
          evolop[k, p, i, j]
          -  k is index of point on MB contour,
          -  p is pQCD order (0=LO, 1=NLO)
@@ -210,7 +237,7 @@ def evolop(m, j, q2: float, process: str) -> np.ndarray:
     # 2. egeinvalues, projectors, projected mu-indep. part
     lam, pr, r1proj = rnlof(m, j)
 
-    # 2. LO errfunc
+    # 3. LO errfunc
     b0 = g.qcd.beta(0, m.nf)
     er1 = erfunc(m, lam, lam, R)
 
@@ -237,6 +264,70 @@ def evolop(m, j, q2: float, process: str) -> np.ndarray:
                 cb1fc = cb1(m, q2, j_single + znd.conjugate() + 2, j_single)
                 ndint = np.einsum('n,nij,n->ij', wgnd, cb1f, tginv)
                 ndint -= np.einsum('n,nij,n->ij', wgnd, cb1fc, tginvc)
+                ndint = ndint * 0.25j
+                nd.append(ndint)
+            evola1 += np.array(nd)
+    else:
+        evola1 = np.zeros_like(evola0)
+
+    evola = np.stack((evola0, evola1), axis=1)
+
+    return evola
+
+
+def evolopns(m, j, q2: float, process: str) -> np.ndarray:
+    """GPD evolution operator (NSP case only atm).
+
+    Args:
+         m: instance of the model
+         j: MB contour points (overrides m.jpoints)
+         q2: final evolution momentum squared
+         process: DIS, DVCS or DVMP
+
+    Returns:
+         Array corresponding Eq. (116) of Towards DVCS paper.
+         evolopns[k, p]
+         -  k is index of point on MB contour,
+         -  p is pQCD order (0=LO, 1=NLO)
+
+    Notes:
+        FIXME: code duplication, should be merged with evolop function
+    """
+    # 1. Alpha-strong ratio.
+    # When m.p=1 (NLO), LO part of the evolution operator
+    # will still be multiplied by ratio of alpha_strongs
+    # evaluated at NLO, as it should.
+    asmuf2 = g.qcd.as2pf(m.p, m.nf, q2, m.asp[m.p], m.r20)
+    asq02 = g.qcd.as2pf(m.p, m.nf, m.q02, m.asp[m.p], m.r20)
+    R = asmuf2/asq02
+
+    # 2. mu-indep. part
+    gam0, r1 = rnlonsf(m, j, 1)   # prty=1 fixed
+
+    # 2. LO errfunc
+    b0 = g.qcd.beta(0, m.nf)
+    aux1 = - (1 - 1 / R) * r1  # Cf. eq. (117), but with opposite sign
+    aux0 = np.ones_like(aux1)
+
+    evola0 = aux0 * R**(-gam0/b0)  # LO evolution (alpha(mu)/alpha(mu0))^(-gamma/beta0)
+
+    if m.p == 1:
+        evola1 = aux1 * R**(-gam0/b0)
+        # adding non-diagonal evolution when needed or asked for
+        # if ((process == 'DVMP') or (process == 'DVCS' and m.scheme == 'msbar')):
+        if ((process != 'DIS') and (m.scheme == 'msbar')):
+            # FIXME: find a way to do it array-wise i.e. get rid of j_single
+            nd = []
+            for j_single in j:
+                znd, wgnd = g.quadrature.nd_mellin_barnes()
+                ndphij = 1.57j
+                ephnd = np.exp(ndphij)
+                tginv = ephnd/np.tan(np.pi*znd/2)
+                tginvc = ephnd.conjugate()/np.tan(np.pi*znd.conjugate()/2)
+                cb1f = cb1(m, q2, j_single + znd + 2, j_single, NS=True)
+                cb1fc = cb1(m, q2, j_single + znd.conjugate() + 2, j_single, NS=True)
+                ndint = np.sum(wgnd * cb1f * tginv)
+                ndint -= np.sum(wgnd * cb1fc * tginvc)
                 ndint = ndint * 0.25j
                 nd.append(ndint)
             evola1 += np.array(nd)
