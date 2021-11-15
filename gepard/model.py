@@ -271,13 +271,11 @@ class ConformalSpaceGPD(ParameterModel):
         # Evolution basis is always 4-dim (SIG, G, NS+, NS-)
         # Default flavor basis is (sea,G,uv,dv) but user is
         # free to use more complicated flavor structure of model
-        # Default is appropriate for DVCS.
-        # For definitions of sea-like and valence-like GPDs see npb07
-        R = 0.5  # ratio sbar/ubar
+        # Default is appropriate for low-x DVCS, with singlet-only contribution.
+        # For definitions of sea-like and valence-like GPDs, sea, uv, dv see npb07
         self.frot = np.array([[1, 0, 1, 1],
                               [0, 1, 0, 0],
                               [0, 0, 0, 0]])
-                              # [-R/(2+R), 0, 1, -1]])
         # squared DVCS charge factors
         # This might belong to CFF code
         if self.nf == 3:
