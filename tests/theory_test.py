@@ -8,12 +8,12 @@ from pytest import approx, mark
 sys.path.append('/home/kkumer/g')
 sys.path.append('/home/kkumer/g/gepard')
 
-par_test = {'ns': 2./3. - 0.4, 'al0s': 1.1, 'alps': 0.25, 'ms': 1.1,
-            'ng': 0.4, 'al0g': 1.2, 'alpg': 0.25, 'mg': 1.2}
+par_test = {'ns': 2./3. - 0.4, 'al0s': 1.1, 'alps': 0.25, 'ms2': 1.1**2,
+            'ng': 0.4, 'al0g': 1.2, 'alpg': 0.25, 'mg2': 1.2**2}
 
-par_fit = {'ns':  0.152039, 'al0s': 1.15751, 'alps': 0.15, 'ms': 0.478391,
+par_fit = {'ns':  0.152039, 'al0s': 1.15751, 'alps': 0.15, 'ms2': 0.478391,
            'secs': -0.15152, 'this': 0.,  # 'ng': 0.4,  # provided by ns
-           'al0g': 1.24732, 'alpg': 0.15, 'mg': 0.7, 'secg': -0.81217, 'thig': 0.}
+           'al0g': 1.24732, 'alpg': 0.15, 'mg2': 0.7, 'secg': -0.81217, 'thig': 0.}
 
 HERAtestpts = g.data.dset[39] + g.data.dset[45]
 pt6 = g.data.dset[36][0]
@@ -24,8 +24,8 @@ def test_F2_NLO():
     fit_gpd = g.model.Fit(p=1)
     m = g.model.MellinBarnesModel(gpds=fit_gpd)
     th = g.theory.BMK(model=m)
-    th.m.parameters.update({'ns': 0.15, 'al0s': 1., 'alps': 0.15, 'ms': 1.,
-                            'secs': 0., 'al0g': 1.1, 'alpg': 0.15, 'mg': 0.7})
+    th.m.parameters.update({'ns': 0.15, 'al0s': 1., 'alps': 0.15, 'ms2': 1.,
+                            'secs': 0., 'al0g': 1.1, 'alpg': 0.15, 'mg2': 0.7})
     f2 = th.F2(g.data.dset[201][0])
     assert f2 == approx(0.4220514008395502)
 

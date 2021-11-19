@@ -13,22 +13,22 @@ Q2_test = 4.
 pt0 = g.DataPoint({'xi': xi_test, 't': t_test, 'Q2': Q2_test})
 pt0.xB = 2.*pt0.xi/(1.+pt0.xi)
 
-par_test = {'ns': 2./3. - 0.4, 'al0s': 1.1, 'alps': 0.25, 'ms': 1.1,
-            'ng': 0.4, 'al0g': 1.2, 'alpg': 0.25, 'mg': 1.2}
+par_test = {'ns': 2./3. - 0.4, 'al0s': 1.1, 'alps': 0.25, 'ms2': 1.1**2,
+            'ng': 0.4, 'al0g': 1.2, 'alpg': 0.25, 'mg2': 1.2**2}
 
-par_fit = {'ns':  0.152039, 'al0s': 1.15751, 'alps': 0.15, 'ms': 0.478391,
+par_fit = {'ns':  0.152039, 'al0s': 1.15751, 'alps': 0.15, 'ms2': 0.478391,
            'secs': -0.15152, 'this': 0.,  # 'ng': 0.4,  # provided by ns
-           'al0g': 1.24732, 'alpg': 0.15, 'mg': 0.7, 'secg': -0.81217, 'thig': 0.}
+           'al0g': 1.24732, 'alpg': 0.15, 'mg2': 0.7, 'secg': -0.81217, 'thig': 0.}
 
-MP = 0.938272 # proton mass
-par_bp = {'ns': 0, 'al0s': 1.1, 'alps': 0.15, 
-             'ms': (2*MP)**2, 'delms': MP**2, 'pows': 3,
-             'ng': 0.5, 'al0g': 1.0, 'alpg': 0.15,
-             'mg': (2*MP)**2, 'delmg': MP**2, 'powg': 2,
-             'nu': 2.0, 'al0u': 0.5, 'alpu': 1.0,
-             'mu': (2*MP)**2, 'delmu': MP**2, 'powu': 1,
-             'nd': 1.0, 'al0d': 0.5, 'alpd': 1.0,
-             'md': (2*MP)**2, 'delmd': MP**2, 'powd': 1}
+MP = 0.938272  # proton mass
+par_bp = {'ns': 0, 'al0s': 1.1, 'alps': 0.15,
+          'ms2': (2*MP)**2, 'delms2': MP**2, 'pows': 3,
+          'ng': 0.5, 'al0g': 1.0, 'alpg': 0.15,
+          'mg2': (2*MP)**2, 'delmg2': MP**2, 'powg': 2,
+          'nu': 2.0, 'al0u': 0.5, 'alpu': 1.0,
+          'mu2': (2*MP)**2, 'delmu2': MP**2, 'powu': 1,
+          'nd': 1.0, 'al0d': 0.5, 'alpd': 1.0,
+          'md2': (2*MP)**2, 'delmd2': MP**2, 'powd': 1}
 
 #  'hard' ansatz:
 par_bp_hard = {'ng': 0.4, 'al0g': 1.1 + 0.05, 'ns': 2./3. - 0.4}

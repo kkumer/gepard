@@ -269,24 +269,29 @@ class ConformalSpaceGPD(ParameterModel):
         self.parameters = {'ns': 2./3. - 0.4,
                            'al0s': 1.1,
                            'alps': 0.25,
-                           'ms': 1.1,
+                           'ms2': 1.1,
                            'secs': 0.,
                            'this': 0.,
                            'kaps': 0.,
                            'ng': 0.4,
                            'al0g': 1.2,
                            'alpg': 0.25,
-                           'mg': 1.2,
+                           'mg2': 1.2,
                            'secg': 0.,
                            'thig': 0.,
                            'kapg': 0.}
-        # Flavor rotation matrix. It transforms GPDs
-        # from flavor basis to evolution basis.
-        # Evolution basis is always 4-dim (SIG, G, NS+, NS-)
-        # Default flavor basis is (sea,G,uv,dv) but user is
-        # free to use more complicated flavor structure of model
-        # Default is appropriate for low-x DVCS, with singlet-only contribution.
-        # For definitions of sea-like and valence-like GPDs, sea, uv, dv see npb07
+        # Flavor rotation matrix.
+        # ----------------------
+        # It transforms GPDs from flavor basis to evolution basis.
+        # By default, evolution basis is 3-dim (SIG, G, NS+)
+        # (NS- is not completely implemented yet)
+        # while default flavor basis is (sea,G,uv,dv).
+        # User is free to use more complicated flavor structure of model
+        #
+        # Default matrix that follows is appropriate for low-x DVCS, 
+        # with singlet-only contribution.
+        # For definitions of sea-like and valence-like GPDs, sea, uv, dv
+        # see hep-ph/0703179
         self.frot = np.array([[1, 0, 1, 1],
                               [0, 1, 0, 0],
                               [0, 0, 0, 0]])

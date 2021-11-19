@@ -13,8 +13,8 @@ Returns:
    (4) -- d_valence
 
 Notes:
-   Careful: Old Fortran Gepard used slots 3 and 4 for
-   NS+ and NS- evolution types.
+   Valence means "valence-like GPD". See hep-ph/0703179
+   for description.
 
 Todo:
     * Add implementation of parameters
@@ -42,10 +42,10 @@ def toy(j: complex, *args) -> Tuple[complex, complex, complex, complex]:
 
 def test(j: complex, t: float, par: dict) -> Tuple[complex, complex, complex, complex]:
     """Return simple testing singlet GPD ansatz."""
-    singlet = par['ns'] / (1 - t/par['ms']**2)**3 / gepard.special.pochhammer(
+    singlet = par['ns'] / (1 - t/par['ms2'])**3 / gepard.special.pochhammer(
           1.0 - par['al0s'] - par['alps']*t + j, 8) * gepard.special.pochhammer(
           2.0 - par['al0s'], 8)
-    gluon = par['ng'] / (1 - t/par['mg']**2)**3 / gepard.special.pochhammer(
+    gluon = par['ng'] / (1 - t/par['mg2'])**3 / gepard.special.pochhammer(
           1.0 - par['al0g'] - par['alpg']*t + j, 6) * gepard.special.pochhammer(
           2.0 - par['al0g'], 6)
     return (singlet, gluon, 0+0j, 0+0j)
@@ -55,20 +55,20 @@ def fit(j: np.ndarray, t: float, par: dict) -> np.ndarray:
     """Return default fitting singlet GPD ansatz."""
     par['ng'] = 0.6 - par['ns']  # first sum-rule constraint
     singlet = (gepard.qj.qj(j, t, 9, par['ns'], par['al0s'], par['alps']) *
-               gepard.qj.betadip(j, t, par['ms'], 0., 2))
+               gepard.qj.betadip(j, t, par['ms2'], 0., 2))
     gluon = (gepard.qj.qj(j, t, 7, par['ng'], par['al0g'], par['alpg']) *
-             gepard.qj.betadip(j, t, par['mg'], 0., 2))
+             gepard.qj.betadip(j, t, par['mg2'], 0., 2))
     return np.array((singlet, gluon, np.zeros_like(gluon), np.zeros_like(gluon)))
 
 
 def fitbp(j: np.ndarray, t: float, par: dict) -> np.ndarray:
     """GPD ansatz from paper hep-ph/0703179."""
     uv = (gepard.qj.qj(j, t, 4, par['nu'], par['al0u'], par['alpu'], val=1) *
-          gepard.qj.betadip(j, t, par['mu'], par['delmu'], par['powu']))
+          gepard.qj.betadip(j, t, par['mu2'], par['delmu2'], par['powu']))
     dv = (gepard.qj.qj(j, t, 4, par['nd'], par['al0d'], par['alpd'], val=1) *
-          gepard.qj.betadip(j, t, par['md'], par['delmd'], par['powd']))
+          gepard.qj.betadip(j, t, par['md2'], par['delmd2'], par['powd']))
     sea = (gepard.qj.qj(j, t, 8, par['ns'], par['al0s'], par['alps']) *
-           gepard.qj.betadip(j, t, par['ms'], par['delms'], par['pows']))
+           gepard.qj.betadip(j, t, par['ms2'], par['delms2'], par['pows']))
     gluon = (gepard.qj.qj(j, t, 6, par['ng'], par['al0g'], par['alpg']) *
-             gepard.qj.betadip(j, t, par['mg'], par['delmg'], par['powg']))
+             gepard.qj.betadip(j, t, par['mg2'], par['delmg2'], par['powg']))
     return np.array((sea, gluon, uv, dv))

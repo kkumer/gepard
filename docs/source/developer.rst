@@ -56,3 +56,11 @@ Code style
 I use flake8, pydocstyle and mypy Python linters for the actual code.
 
 For docstrings, stick to google conventions.
+
+Fixed global parameters, like proton mass ``Mp``, or QCD constants ``Nc``, ``CF``, 
+etc.  can be capitalized, but for model parameters we consistently use small initial
+letter.
+
+If variable corresponds to a squared quantity, like mass squared ``Mp2``, 
+this is signfied by ``2`` at the *very end* of the variable name. Not somewhere
+in the middle, and not by ``sq``.

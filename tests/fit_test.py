@@ -22,8 +22,8 @@ def test_fit_DIS_LO():
     fit_gpd = g.model.Fit(p=0)
     m = g.model.MellinBarnesModel(gpds=fit_gpd)
     th = g.theory.BMK(model=m)
-    th.m.parameters.update({'ns': 0.15, 'al0s': 1., 'alps': 0.15, 'ms': 1.,
-                            'secs': 0., 'al0g': 1.1, 'alpg': 0.15, 'mg': 0.7})
+    th.m.parameters.update({'ns': 0.15, 'al0s': 1., 'alps': 0.15, 'ms2': 1.,
+                            'secs': 0., 'al0g': 1.1, 'alpg': 0.15, 'mg2': 0.7})
     f = g.fitter.FitterMinuit(DISpoints, th)
     f.fix_parameters('ALL')
     f.release_parameters('ns', 'al0s', 'al0g')
@@ -38,8 +38,8 @@ def test_fit_DIS_NLO():
     fit_gpd = g.model.Fit(p=1)
     m = g.model.MellinBarnesModel(gpds=fit_gpd)
     th = g.theory.BMK(model=m)
-    th.m.parameters.update({'ns': 0.15, 'al0s': 1., 'alps': 0.15, 'ms': 1.,
-                            'secs': 0., 'al0g': 1.1, 'alpg': 0.15, 'mg': 0.7})
+    th.m.parameters.update({'ns': 0.15, 'al0s': 1., 'alps': 0.15, 'ms2': 1.,
+                            'secs': 0., 'al0g': 1.1, 'alpg': 0.15, 'mg2': 0.7})
     f = g.fitter.FitterMinuit(DISpoints, th)
     f.fix_parameters('ALL')
     f.release_parameters('ns', 'al0s', 'al0g')
@@ -59,16 +59,16 @@ def test_gepardfitDVCSnlso3_short():
     th.m.parameters.update({'ns': 0.15203911208796006,
                             'al0s': 1.1575060246398083,
                             'alps': 0.15,
-                            'ms': 1.,
+                            'ms2': 1.,
                             'secs': 0.,
                             'al0g': 1.247316701070471,
                             'alpg': 0.15,
-                            'mg': 0.7})
+                            'mg2': 0.7})
     # To pre-calculate wce for parallel execution:
     th.chisq_single(g.data.dset[39])
     f = g.fitter.FitterMinuit(g.data.dset[39], th)
     f.fix_parameters('ALL')
-    f.release_parameters('ms')
+    f.release_parameters('ms2')
     f.minuit.migrad()
     assert f.minuit.fval == approx(19.69615, rel=1.e-2)
 
@@ -87,20 +87,20 @@ def test_gepardfitDVCSnlso3_long():
     th.m.parameters.update({'ns': 0.15203911208796006,
                             'al0s': 1.1575060246398083,
                             'alps': 0.15,
-                            'ms': 1.,
+                            'ms2': 1.,
                             'secs': 0.,
                             'al0g': 1.247316701070471,
                             'alpg': 0.15,
-                            'mg': 0.7})
+                            'mg2': 0.7})
     # To pre-calculate wce for parallel execution:
     th.chisq_single(DVCSpoints)
     f = g.fitter.FitterMinuit(DVCSpoints, th)
     f.fix_parameters('ALL')
-    f.release_parameters('ms', 'secs', 'secg')
+    f.release_parameters('ms2', 'secs', 'secg')
     print(th.m.parameters_limits)
     print(f.minuit.limits)
     f.minuit.migrad()
     assert th.chisq(f.fitpoints) == approx(95.92, rel=1.e-2)
-    assert th.m.parameters['ms'] == approx(0.47839, rel=1e-2)
+    assert th.m.parameters['ms2'] == approx(0.47839, rel=1e-2)
     assert th.m.parameters['secs'] == approx(-0.15152, rel=1e-2)
     assert th.m.parameters['secg'] == approx(-0.81216, rel=1e-2)
