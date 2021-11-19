@@ -1,0 +1,58 @@
+id = 24
+editor = KK
+
+
+### Experiment
+
+collaboration = ZEUS
+process = gammastarp2gammap
+exptype = collider
+year = 2003
+reference = hep-ex/0305028
+inspiretex = Chekanov:2003ya
+reference2 = Table 2
+reference3 = Phys. Lett. B573 (2003) 46-62
+
+### Scattering Process
+
+in1particle = gammastar
+in2particle = p
+
+out1particle = gamma
+out2particle = p
+
+# positron data
+
+### Observable 
+
+y1name = X
+y1namelong = DVCS cross section
+y1unit = nb
+y1value = column2
+y1errorstatistic = column3
+y1errorsystematicplus = column4
+y1errorsystematicminus = column5
+
+
+### x-axes
+x1name = Q2
+x1unit = GeV^2
+x1value = 9.6
+
+x2name = W
+x2unit = GeV
+x2value = column1
+
+
+# W  sig   stat   syst+   syst-
+###############################
+45   2.19   0.24  0.11   0.14
+55   2.96   0.28  0.13   0.18
+65   3.62   0.36  0.18   0.23
+75   3.88   0.42  0.18   0.26
+85   3.59   0.45  0.18   0.25
+95   3.29   0.55  0.21   0.20
+105   6.24  0.77  0.31   0.49
+115   4.86   0.76  0.39   0.44
+125   4.69   0.82  0.32   0.36
+135   5.55   0.99  0.91   0.30
