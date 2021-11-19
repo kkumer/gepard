@@ -40,17 +40,13 @@ class FitterMinuit(Fitter):
         self.minuit = Minuit(fcn, init_vals, name=names)
         for k, v in self.theory.m.parameters_limits.items():
             self.minuit.limits[k] = v
-        self.minuit.print_level = 2
         Fitter.__init__(self, **kwargs)
 
     def fit(self):
         """Start fitting."""
         self.minuit.migrad()
-        if self.printMode > 0:
-            print("ncalls = \n", self.minuit.ncalls)
-            self.theory.print_chisq(self.fitpoints)
-        # Set/update covariance matrix of model:
-        self.theory.model.covariance = self.minuit.covariance
+        self.theory.model.parameters_errors = self.minuit.errors.to_dict()
+        self.theory.model.covariance = self.minuit.covariance.to_table()
 
     def fix_parameters(self, *args):
         """fix_parameters('p1', 'p2', ...)."""

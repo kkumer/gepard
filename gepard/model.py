@@ -6,10 +6,11 @@ Models of "soft" hadronic structure functions:
     * Compton form factors (for DVCS)
 """
 
-from math import log, pi
+from math import log, pi, sqrt
 from typing import Dict, List
 
 import numpy as np
+import scipy.stats
 from joblib import Parallel, delayed
 
 import gepard as g
@@ -121,8 +122,21 @@ class ParameterModel(Model):
         return [p for p in self.parameters if p not in self.parameters_fix
                 or not self.parameters_fix[p]]
 
+    def print_parameters_errors(self, pvalues=False, ndof=0):
+        """Print fitting parameters and their errors."""
+        tolerance2 = 1   # sqrt(2*Npoints)/1.65^2 according to GJV/MRST
+        for p in self.free_parameters():
+            val = self.parameters[p]
+            # err = sqrt(tolerance2)*sqrt(self.covariance[p,p])
+            err = sqrt(tolerance2)*self.parameters_errors[p]
+            if pvalues:
+                pval = 2*(1.-scipy.stats.t.cdf(abs(val/err), ndof))
+                print('%5s = %8.3f +- %5.3f  (p = %.3g)' % (p, val, err, pval))
+            else:
+                print('%5s = %8.3f +- %5.3f' % (p, val, err))
 
 # --- Models for Elastic Form Factors --- #
+
 
 class ElasticFormFactors(Model):
     """Dirac and Pauli elastic form factors F_1 and F_2."""
@@ -343,13 +357,18 @@ class FitBP(ConformalSpaceGPD):
         kwargs.setdefault('phi', 1.9)
         super().__init__(**kwargs)
 
-    def gpd_H(self, eta: float, t: float) -> np.ndarray:
+    def gpd_H_nopy(self, eta: float, t: float) -> np.ndarray:
         """Return (npts, 4) array H_j^a for all j-points and 4 flavors."""
         # For testing purposes, we use here sub-optimal non-numpy algorithm
         h = []
         for j in self.jpoints:
             h.append(g.gpdj.fitbp(j, t, self.parameters))
         return np.array(h)
+
+    def gpd_H(self, eta: float, t: float) -> np.ndarray:
+        """Return (npts, 4) array H_j^a for all j-points and 4 flavors."""
+        # For testing purposes, we use here sub-optimal non-numpy algorithm
+        return g.gpdj.fitbp(self.jpoints, t, self.parameters).transpose()
 
 
 class Fit(ConformalSpaceGPD):

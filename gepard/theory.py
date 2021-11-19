@@ -49,8 +49,7 @@ class Theory(object):
            """
         allpulls = []
         for pt in points:
-            diff = (self.predict(pt, observable=pt.yaxis, **kwargs) 
-                          - pt.val)
+            diff = (self.predict(pt, observable=pt.yaxis, **kwargs) - pt.val)
             if asym:
                 if diff > 0:
                     allpulls.append(diff/pt.errplus)
