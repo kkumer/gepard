@@ -50,7 +50,7 @@ def test_projectors_LO():
 
 def test_rnlof():
     """Test projected NLO mu-indep part of evol.op."""
-    test_gpd = g.model.Test(p=1)
+    test_gpd = g.model.TestGPD(p=1)
     m = g.model.MellinBarnesModel(gpds=test_gpd)
     m.parameters.update(par_test)
     # leading PW
@@ -69,7 +69,7 @@ def test_rnlof():
 
 def test_evolop_LO():
     """Test LO evolution operator."""
-    test_gpd = g.model.Test(p=0)
+    test_gpd = g.model.TestGPD(p=0)
     m_test = g.model.MellinBarnesModel(gpds=test_gpd)
     m_test.parameters.update(par_test)
     assert g.evolution.evolop(m_test, m_test.jpoints, 3.0,
@@ -82,7 +82,7 @@ def test_evolop_LO():
 
 def test_evolop_NLO():
     """Test NLO evolution operator."""
-    test_gpd = g.model.Test(p=1)
+    test_gpd = g.model.TestGPD(p=1)
     m_test = g.model.MellinBarnesModel(gpds=test_gpd)
     m_test.parameters.update(par_test)
     # LO part (but with NLO alpha_strong)

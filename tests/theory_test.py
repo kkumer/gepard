@@ -36,7 +36,7 @@ def test_XDVCSt_noevol():
     pt.xi = pt.Q2 / (2.0 * pt.W * pt.W + pt.Q2)
     pt.xB = 2*pt.xi/(1.+pt.xi)
     pt.yaxis = 'X'
-    test_gpd = g.model.Test()
+    test_gpd = g.model.TestGPD()
     m = g.model.MellinBarnesModel(gpds=test_gpd)
     m.parameters.update(par_test)
     th = g.theory.hotfixedBMK(m)
@@ -50,7 +50,7 @@ def test_XDVCSt():
     pt.xi = pt.Q2 / (2.0 * pt.W * pt.W + pt.Q2)
     pt.xB = 2*pt.xi/(1.+pt.xi)
     pt.yaxis = 'X'
-    test_gpd = g.model.Test()
+    test_gpd = g.model.TestGPD()
     m = g.model.MellinBarnesModel(gpds=test_gpd)
     m.parameters.update(par_test)
     th = g.theory.hotfixedBMK(m)
@@ -65,7 +65,7 @@ def test_XDVCSt_NLO():
     pt.xi = pt.Q2 / (2.0 * pt.W * pt.W + pt.Q2)
     pt.xB = 2*pt.xi/(1.+pt.xi)
     pt.yaxis = 'X'
-    test_gpd = g.model.Test(p=1)
+    test_gpd = g.model.TestGPD(p=1)
     m = g.model.MellinBarnesModel(gpds=test_gpd)
     m.parameters.update(par_test)
     th = g.theory.hotfixedBMK(m)
@@ -78,7 +78,7 @@ def test_XDVCSt_NLOevol():
     pt.xi = pt.Q2 / (2.0 * pt.W * pt.W + pt.Q2)
     pt.xB = 2*pt.xi/(1.+pt.xi)
     pt.yaxis = 'X'
-    test_gpd = g.model.Test(p=1)
+    test_gpd = g.model.TestGPD(p=1)
     m = g.model.MellinBarnesModel(gpds=test_gpd)
     m.parameters.update(par_test)
     th = g.theory.hotfixedBMK(m)
@@ -91,7 +91,7 @@ def test_XDVCS():
     pt.xi = pt.Q2 / (2.0 * pt.W * pt.W + pt.Q2)
     pt.xB = 2*pt.xi/(1.+pt.xi)
     pt.yaxis = 'X'
-    test_gpd = g.model.Test()
+    test_gpd = g.model.TestGPD()
     m = g.model.MellinBarnesModel(gpds=test_gpd)
     m.parameters.update(par_test)
     th = g.theory.hotfixedBMK(m)
@@ -106,7 +106,7 @@ def test_XDVCS_NLO():
     pt.xi = pt.Q2 / (2.0 * pt.W * pt.W + pt.Q2)
     pt.xB = 2*pt.xi/(1.+pt.xi)
     pt.yaxis = 'X'
-    test_gpd = g.model.Test(p=1)
+    test_gpd = g.model.TestGPD(p=1)
     m = g.model.MellinBarnesModel(gpds=test_gpd)
     m.parameters.update(par_test)
     th = g.theory.hotfixedBMK(m)

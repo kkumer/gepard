@@ -71,7 +71,7 @@ def test_gpdj_ansatz07():
 
 def test_ConformalMoment_gpdH_test():
     """Test ConformalMoment GPD class with testing GPD H."""
-    test_gpd = g.model.Test()
+    test_gpd = g.model.TestGPD()
     test_gpd.parameters.update(par_test)
     assert test_gpd.gpd_H(0.1, -0.2)[:1, :2] == approx(
             np.array([[1.65552601-0.00182673j, 3.1300559-0.00436946j]]))

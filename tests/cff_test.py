@@ -72,7 +72,7 @@ class gpd_model(g.model.ConformalSpaceGPD):
 
 def test_wc_LO():
     """Test LO DVCS Wilson coef."""
-    test_gpd = g.model.Test(p=0)
+    test_gpd = g.model.TestGPD(p=0)
     m_test = g.model.MellinBarnesModel(gpds=test_gpd)
     m_test.parameters.update(par_test)
     assert g.evolc.calc_wc(m_test, m_test.jpoints, 'DVCS')[0, 0, :2] == approx(
@@ -81,7 +81,7 @@ def test_wc_LO():
 
 def test_wc_NLO():
     """Test NLO DVCS Wilson coef."""
-    test_gpd = g.model.Test(p=1)
+    test_gpd = g.model.TestGPD(p=1)
     m_test = g.model.MellinBarnesModel(gpds=test_gpd)
     m_test.parameters.update(par_test)
     assert g.evolc.calc_wc(m_test, m_test.jpoints, 'DVCS')[0, 1, :2] == approx(
@@ -91,7 +91,7 @@ def test_wc_NLO():
 
 def test_wce_LO():
     """Test LO DVCS evolved Wilson coef."""
-    test_gpd = g.model.Test(p=0)
+    test_gpd = g.model.TestGPD(p=0)
     m_test = g.model.MellinBarnesModel(gpds=test_gpd)
     m_test.parameters.update(par_test)
     assert g.evolc.calc_wce(m_test, 3.0, 'DVCS')[0, 0, :2] == approx(
@@ -101,7 +101,7 @@ def test_wce_LO():
 
 def test_wce_NLO():
     """Test NLO DVCS evolved Wilson coef."""
-    test_gpd = g.model.Test(p=1)
+    test_gpd = g.model.TestGPD(p=1)
     m_test = g.model.MellinBarnesModel(gpds=test_gpd)
     m_test.parameters.update(par_test)
     assert g.evolc.calc_wce(m_test, 3.0, 'DVCS')[0, 0, :2] == approx(
@@ -111,7 +111,7 @@ def test_wce_NLO():
 
 def test_cff_H_noevol():
     """Test testing (ReH, ImH) (no evolution)."""
-    test_gpd = g.model.Test()
+    test_gpd = g.model.TestGPD()
     m_test = g.model.MellinBarnesModel(gpds=test_gpd)
     m_test.parameters.update(par_test)
     assert m_test.cff(pt_test)[:2] == approx(

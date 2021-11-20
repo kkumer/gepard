@@ -326,7 +326,7 @@ class ConformalSpaceGPD(ParameterModel):
         return np.zeros((self.npts, 4), dtype=complex)
 
 
-class Test(ConformalSpaceGPD):
+class TestGPD(ConformalSpaceGPD):
     """Simple testing ansatz for GPDs."""
 
     def __init__(self, **kwargs) -> None:
