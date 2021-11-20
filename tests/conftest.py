@@ -1,4 +1,5 @@
 # conftest.py
+"""Setting up pytest."""
 
 import pytest
 

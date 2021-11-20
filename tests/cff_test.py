@@ -12,19 +12,6 @@ par_fit = {'ns':  0.152039, 'al0s': 1.15751, 'alps': 0.15, 'ms2': 0.478391,
            'al0g': 1.24732, 'alpg': 0.15, 'mg2': 0.7, 'secg': -0.81217, 'thig': 0.,
            'kaps': 0.7, 'kapg': -0.2}
 
-MP = 0.938272  # proton mass
-par_bp = {'ns': 0, 'al0s': 1.1, 'alps': 0.15,
-          'ms2': (2*MP)**2, 'delms2': MP**2, 'pows': 3,
-          'ng': 0.5, 'al0g': 1.0, 'alpg': 0.15,
-          'mg2': (2*MP)**2, 'delmg2': MP**2, 'powg': 2,
-          'nu': 2.0, 'al0u': 0.5, 'alpu': 1.0,
-          'mu2': (2*MP)**2, 'delmu2': MP**2, 'powu': 1,
-          'nd': 1.0, 'al0d': 0.5, 'alpd': 1.0,
-          'md2': (2*MP)**2, 'delmd2': MP**2, 'powd': 1}
-
-#  'hard' ansatz:
-par_bp_hard = {'ng': 0.4, 'al0g': 1.1 + 0.05, 'ns': 2./3. - 0.4}
-
 par_KM15 = {'tMv': 3.992860161655587, 'rS': 1.0, 'alv': 0.43, 'tal': 0.43,
             'Mpi': 3.999999852084612, 'Nv': 1.35, 'rv': 0.918393047884448,
             'Nsea': 0.0, 'alS': 1.13, 'rpi': 2.6463144464701536, 'alpS': 0.15,
@@ -58,6 +45,67 @@ pt_fit = g.data.DataPoint({'xi': 0.01, 'Q2': 8., 't': -0.2})  # evol
 pt_bp = g.data.DataPoint({'xi': 1.e-5, 'Q2': 2.5, 't': -0.25})  # noevol
 pt_evol = g.data.DataPoint({'xi': 1.e-5, 'Q2': 25., 't': -0.25})  # evol
 pt_evolNS = g.data.DataPoint({'xi': 0.01, 'Q2': 10., 't': -0.25})  # evol
+
+
+def ansatz07(j: np.ndarray, t: float, type: str) -> np.ndarray:
+    """GPD ansatz from hep-ph/0703179 - singlet and nonsinglet part."""
+    # a.k.a. 'FITBP' ansatz from Fortran Gepard
+    par = {'al0s': 1.1, 'alps': 0.15, 'alpg': 0.15,
+           'nu': 2, 'nd': 1, 'al0v': 0.5, 'alpv': 1}
+    if type[:4] == 'hard':
+        par['ng'] = 0.4
+        par['al0g'] = par['al0s'] + 0.05
+        if type[-2:] == 'NS':
+            par['nsea'] = 4/15
+        else:
+            par['nsea'] = 2/3 - par['ng']
+    elif type[:4] == 'soft':
+        par['ng'] = 0.3
+        par['al0g'] = par['al0s'] - 0.2
+        if type[-2:] == 'NS':
+            par['nsea'] = 0
+        else:
+            par['nsea'] = 2/3 - par['ng']
+    pochs = 8
+    pochg = 6
+    pochv = 4
+    mjt = 1 - t / (g.constants.Mp2*(4+j))
+    uv = g.qj.qj(j, t, pochv, par['nu'], par['al0v'],
+                 alpf=0, alp=par['alpv'], val=1)
+    uv = uv / mjt
+    dv = g.qj.qj(j, t, pochv, par['nd'], par['al0v'],
+                 alpf=0, alp=par['alpv'], val=1)
+    dv = dv / mjt
+    sea = g.qj.qj(j, t, pochs, par['nsea'], par['al0s'],
+                  alpf=0, alp=par['alps'])
+    sea = sea / mjt**3
+    gluon = g.qj.qj(j, t, pochg, par['ng'], par['al0g'],
+                    alpf=0, alp=par['alpg'])
+    gluon = gluon / mjt**2
+    return np.array((sea, gluon, uv, dv))
+
+
+class gpd_model(g.model.ConformalSpaceGPD):
+    """GPD model from the paper - singlet and nonsinglet part."""
+
+    def __init__(self, type, **kwargs) -> None:
+        """Defaults from old Fortran's GEPARD.INI."""
+        kwargs.setdefault('p', 1)
+        kwargs.setdefault('scheme', 'csbar')
+        kwargs.setdefault('nf', 4)
+        kwargs.setdefault('q02', 2.5)
+        kwargs.setdefault('asp', np.array([0.05, 0.05, 0.05]))
+        kwargs.setdefault('phi', 1.9)
+        self.type = type
+        super().__init__(**kwargs)
+        R = 0.5  # ratio sbar/ubar
+        self.frot = np.array([[1, 0, 1, 1],
+                              [0, 1, 0, 0],
+                              [-R/(2+R), 0, 1, -1]])
+
+    def gpd_H(self, eta: float, t: float) -> np.ndarray:
+        """GPD H from hep-ph/0703179."""
+        return ansatz07(self.jpoints, t, self.type).transpose()
 
 
 def test_wc_LO():
@@ -110,62 +158,82 @@ def test_cff_H_noevol():
 
 def test_cff_radLO():
     """Singlet LO CFF H (no evol)."""
-    gpd_bp = g.model.FitBP(p=0)
-    m = g.model.MellinBarnesModel(gpds=gpd_bp)
-    m.parameters.update(par_bp)
-    m.parameters.update(par_bp_hard)
+    gpds = gpd_model('hard', p=0, scheme='csbar')
+    m = g.model.MellinBarnesModel(gpds=gpds)
+    qs = 5/18  # for nf=4
+    m.dvcs_charges = (qs, qs, 0)  # select only singlet part of CFF
     assert m.cff(pt_bp)[:2] == approx(
             [39544.823112887607, 402367.23596533033])
 
 
 def test_cff_radNLO():
     """Singlet NLO CFF H (no evol)."""
-    gpd_bp = g.model.FitBP(p=1, scheme='csbar')
-    m = g.model.MellinBarnesModel(gpds=gpd_bp)
-    m.parameters.update(par_bp)
-    m.parameters.update(par_bp_hard)
+    gpds = gpd_model('hard', p=1, scheme='csbar')
+    m = g.model.MellinBarnesModel(gpds=gpds)
+    qs = 5/18  # for nf=4
+    m.dvcs_charges = (qs, qs, 0)  # select only singlet part of CFF
     assert m.cff(pt_bp)[:2] == approx(
             [5747.0424614455933, 201256.45352582674])
 
 
-@mark.skip('NS not implemented yet.')
-def test_cff_radLONS():
+def test_cff_radLO_evol_NS():
     """Non-singlet LO CFF H (evol)."""
-    gpd_bp = g.model.FitBP(p=0)
-    m = g.model.MellinBarnesModel(gpds=gpd_bp)
-    m.parameters.update(par_bp)
-    m.parameters['ns'] = 0
+    gpds = gpd_model('hardNS', p=0, scheme='csbar')
+    m = g.model.MellinBarnesModel(gpds=gpds)
+    qns = 1/6  # for nf=4
+    m.dvcs_charges = (0, 0, qns)  # select only NS part of CFF
     assert m.cff(pt_evolNS)[:2] == approx(
-            [-3.3434664508535783, 3.274603763172275])
+            [-9.554282705911017, -25.83697714227015])
 
 
-@mark.skip('NS not implemented yet.')
-def test_cff_radNLONS():
-    """Non-singlet NLO CFF H (evol)."""
-    gpd_bp = g.model.FitBP(p=1)
-    m = g.model.MellinBarnesModel(gpds=gpd_bp)
-    m.parameters.update(par_bp)
-    m.parameters['ns'] = 0
+def test_cff_radNLO_CSBARevol_NS():
+    """Non-singlet NLO CFF H (CSBAR evol)."""
+    gpds = gpd_model('hardNS', p=1, scheme='csbar')
+    m = g.model.MellinBarnesModel(gpds=gpds)
+    qns = 1/6  # for nf=4
+    m.dvcs_charges = (0, 0, qns)  # select only NS part of CFF
     assert m.cff(pt_evolNS)[:2] == approx(
-            [-2.8809502819615411, 3.096381114053143])
+            [-8.666225662660972, -24.309344967448652])
 
 
-def test_cff_radMSBAR_LOevol():
+@mark.slow
+def test_cff_radNLO_MSBARevol_NS():
+    """Non-singlet NLO CFF H (CSBAR evol)."""
+    gpds = gpd_model('hardNS', p=1, scheme='msbar')
+    m = g.model.MellinBarnesModel(gpds=gpds)
+    qns = 1/6  # for nf=4
+    m.dvcs_charges = (0, 0, qns)  # select only NS part of CFF
+    assert m.cff(pt_evolNS)[:2] == approx(
+            [-8.26592013777189, -22.86536625486948])
+
+
+def test_cff_rad_LOevol():
     """Singlet LO CFF H evolved."""
-    gpd_bp = g.model.FitBP(p=0)
-    m = g.model.MellinBarnesModel(gpds=gpd_bp)
-    m.parameters.update(par_bp)
-    m.parameters.update(par_bp_hard)
+    gpds = gpd_model('hard', p=0, scheme='csbar')
+    m = g.model.MellinBarnesModel(gpds=gpds)
+    qs = 5/18  # for nf=4
+    m.dvcs_charges = (qs, qs, 0)  # select only singlet part of CFF
     assert m.cff(pt_evol)[:2] == approx(
             [251460.03959908773, 1015357.1865059549])
 
 
-def test_cff_radMSBAR_NLOevol():
+def test_cff_radNLO_CSBAR_evol():
+    """Singlet NLO CSBAR CFF H evolved."""
+    gpds = gpd_model('hard', p=1, scheme='csbar')
+    m = g.model.MellinBarnesModel(gpds=gpds)
+    qs = 5/18  # for nf=4
+    m.dvcs_charges = (qs, qs, 0)  # select only singlet part of CFF
+    assert m.cff(pt_evol)[:2] == approx(
+            [162468.6375694127, 729219.8768488609])
+
+
+@mark.slow
+def test_cff_radNLO_MSBAR_evol():
     """Singlet NLO MSBAR CFF H evolved."""
-    gpd_bp = g.model.FitBP(p=1)
-    m = g.model.MellinBarnesModel(gpds=gpd_bp)
-    m.parameters.update(par_bp)
-    m.parameters.update(par_bp_hard)
+    gpds = gpd_model('hard', p=1, scheme='msbar')
+    m = g.model.MellinBarnesModel(gpds=gpds)
+    qs = 5/18  # for nf=4
+    m.dvcs_charges = (qs, qs, 0)  # select only singlet part of CFF
     # Result of wrong ND-evolution fortran-gepard code
     # assert m.cff(pt_evol)[:2] == approx(
     #         [142867.21556625995, 653095.26655367797/1e5])

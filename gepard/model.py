@@ -349,33 +349,6 @@ class Test(ConformalSpaceGPD):
         return np.array(h)
 
 
-class FitBP(ConformalSpaceGPD):
-    """GPD ansatz from paper hep-ph/0703179."""
-
-    def __init__(self, **kwargs) -> None:
-        """See parent `ConformalSpaceGPD` class for docs."""
-        kwargs.setdefault('scheme', 'msbar')
-        kwargs.setdefault('nf', 4)
-        kwargs.setdefault('q02', 2.5)
-        kwargs.setdefault('asp', np.array([0.05, 0.05, 0.05]))
-        kwargs.setdefault('r20', 2.5)
-        kwargs.setdefault('phi', 1.9)
-        super().__init__(**kwargs)
-
-    def gpd_H_nopy(self, eta: float, t: float) -> np.ndarray:
-        """Return (npts, 4) array H_j^a for all j-points and 4 flavors."""
-        # For testing purposes, we use here sub-optimal non-numpy algorithm
-        h = []
-        for j in self.jpoints:
-            h.append(g.gpdj.fitbp(j, t, self.parameters))
-        return np.array(h)
-
-    def gpd_H(self, eta: float, t: float) -> np.ndarray:
-        """Return (npts, 4) array H_j^a for all j-points and 4 flavors."""
-        # For testing purposes, we use here sub-optimal non-numpy algorithm
-        return g.gpdj.fitbp(self.jpoints, t, self.parameters).transpose()
-
-
 class Fit(ConformalSpaceGPD):
     """Singlet fitting ansatz for GPDs with three SO(3) partial waves."""
 
