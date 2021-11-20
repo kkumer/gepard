@@ -21,7 +21,7 @@ pt6 = g.data.dset[36][0]
 
 def test_F2_NLO():
     """Test NLO DIS F2 evaluation."""
-    fit_gpd = g.model.Fit(p=1)
+    fit_gpd = g.model.PWNormGPD(p=1)
     m = g.model.MellinBarnesModel(gpds=fit_gpd)
     th = g.theory.BMK(model=m)
     th.m.parameters.update({'ns': 0.15, 'al0s': 1., 'alps': 0.15, 'ms2': 1.,
@@ -119,7 +119,7 @@ def test_XDVCS_NLO():
 
 def test_predict():
     """Test theory predict."""
-    fit_gpd = g.model.Fit()
+    fit_gpd = g.model.PWNormGPD()
     m = g.model.MellinBarnesModel(gpds=fit_gpd)
     th = g.theory.BMK(model=m)
     th.m.parameters.update(par_fit)
@@ -128,7 +128,7 @@ def test_predict():
 # @mark.devel
 # def test_chisq():
 #     """Test chisq calculation."""
-#     fit_gpd = g.model.Fit()
+#     fit_gpd = g.model.PWNormGPD()
 #     m = g.model.MellinBarnesModel(gpds=fit_gpd)
 #     th = g.theory.BMK(model=m)
 #     th.m.parameters.update(par_fit)
@@ -138,7 +138,7 @@ def test_predict():
 
 def test_chisq_Xt():
     """Test chisq Xt calculation."""
-    fit_gpd = g.model.Fit()
+    fit_gpd = g.model.PWNormGPD()
     m = g.model.MellinBarnesModel(gpds=fit_gpd)
     th = g.theory.BMK(model=m)
     th.m.parameters.update(par_fit)
@@ -149,7 +149,7 @@ def test_chisq_Xt():
 
 def test_chisq_X():
     """Test chisq total X calculation."""
-    fit_gpd = g.model.Fit()
+    fit_gpd = g.model.PWNormGPD()
     m = g.model.MellinBarnesModel(gpds=fit_gpd)
     th = g.theory.BMK(model=m)
     th.m.parameters.update(par_fit)
@@ -160,7 +160,7 @@ def test_chisq_X():
 
 # def test_chisq_aux():
 #     """Test chisq total X calculation."""
-#     fit_gpd = g.model.Fit()
+#     fit_gpd = g.model.PWNormGPD()
 #     m = g.model.MellinBarnesModel(gpds=fit_gpd)
 #     th = g.theory.BMK(model=m)
 #     th.m.parameters.update(par_fit)
@@ -182,7 +182,7 @@ def test_chisq_X():
 
 def test_chisq_XtX():
     """Test chisq Xt+X calculation."""
-    fit_gpd = g.model.Fit()
+    fit_gpd = g.model.PWNormGPD()
     m = g.model.MellinBarnesModel(gpds=fit_gpd)
     th = g.theory.BMK(model=m)
     th.m.parameters.update(par_fit)

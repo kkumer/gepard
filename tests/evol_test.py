@@ -23,7 +23,7 @@ pt_fit = g.data.DataPoint({'xi': 0.01, 'Q2': 8., 't': -0.2})  # evol
 
 def test_lambda():
     """Test LO singlet an. dim. eigenvalues."""
-    fit_gpd = g.model.Fit()
+    fit_gpd = g.model.PWNormGPD()
     m = g.model.MellinBarnesModel(gpds=fit_gpd)
     m.parameters.update(par_fit)
     # leading PW
@@ -38,7 +38,7 @@ def test_lambda():
 
 def test_projectors_LO():
     """Test LO singlet eigen projectors."""
-    fit_gpd = g.model.Fit()
+    fit_gpd = g.model.PWNormGPD()
     m = g.model.MellinBarnesModel(gpds=fit_gpd)
     m.parameters.update(par_fit)
     gam0 = g.adim.singlet_LO(m.jpoints+1, m.nf).transpose((2, 0, 1))

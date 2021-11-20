@@ -52,16 +52,16 @@ def test_gpdj_test():
 
 def test_gpdj_fit():
     """Test fitting nl-SO(3) singlet GPD."""
-    assert g.gpdj.fit(j_test, t_test, par_fit) == approx((
+    assert g.gpdj.singlet_ng_constrained(j_test, t_test, par_fit) == approx((
                             (0.0952245874481982-0.5039416636123855j),
                             (0.14952730665086755-1.5915106823348937j),
                             0j, 0j))
 
 
-def test_gpdj_fitbp():
+def test_gpdj_ansatz07():
     """Test singlet GPD from hep-ph/0703179 - hard gluons."""
     par_bp.update(par_bp_hard)
-    sea,G,uv,dv = g.gpdj.fitbp(j_test, tb_test, par_bp)
+    sea, G, uv, dv = g.gpdj.ansatz07(j_test, tb_test, par_bp)
     assert (sea+uv+dv, G) == approx((
                              (0.8252585606460219-1.20745720388647j),
                              (0.48405328160880784-1.2858277230367638j)))
@@ -79,7 +79,7 @@ def test_ConformalMoment_gpdH_test():
 
 def test_ConformalMoment_gpdH_fit():
     """Test ConformalMoment GPD class with testing GPD H."""
-    fit_gpd = g.model.Fit()
+    fit_gpd = g.model.PWNormGPD()
     fit_gpd.parameters.update(par_fit)
     assert fit_gpd.gpd_H(0.1, -0.2)[:1, :2] == approx(
             np.array([[1.1665696086-0.00161121675988j, 5.59105109-0.0109293227j]]))
@@ -88,7 +88,7 @@ def test_ConformalMoment_gpdH_fit():
 @mark.slow
 def test_ConformalMoment_gpd_parallel():
     """Test parallel evaluation of GPDs on the Mellin-Barnes contour."""
-    fit_gpd = g.model.Fit()
+    fit_gpd = g.model.PWNormGPD()
     fit_gpd.parameters.update(par_fit)
     assert fit_gpd.gpd_H_para(0.1, -0.2)[:1, :2] == approx(
             np.array([[1.1665696086-0.00161121675988j, 5.59105109-0.0109293227j]]))

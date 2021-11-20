@@ -135,7 +135,7 @@ def test_KM09b():
 @mark.slow
 def test_KM10():
     """Test model: KM10."""
-    fit_gpd = g.model.Fit()
+    fit_gpd = g.model.PWNormGPD()
     mMB = g.model.MellinBarnesModel(gpds=fit_gpd)
     mDR = g.model.ComptonModelDRPP()
     m = g.model.HybridDipole(mMB, mDR)
@@ -164,7 +164,7 @@ def test_KM10a():
 @mark.slow
 def test_KM10b():
     """Test model: KM10b."""
-    fit_gpd = g.model.Fit()
+    fit_gpd = g.model.PWNormGPD()
     mMB = g.model.MellinBarnesModel(gpds=fit_gpd)
     mDR = g.model.ComptonModelDRPP()
     m = g.model.HybridKelly(mMB, mDR)
@@ -190,7 +190,7 @@ def test_KMM12():
 @mark.slow
 def test_KM15():
     """Test model: KM15."""
-    fit_gpd = g.model.Fit()
+    fit_gpd = g.model.PWNormGPD()
     mMB = g.model.MellinBarnesModel(gpds=fit_gpd)
     mDR = g.model.ComptonModelDRPP()
     m = g.model.HybridKelly(mMB, mDR)

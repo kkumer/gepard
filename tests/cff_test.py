@@ -47,44 +47,6 @@ pt_evol = g.data.DataPoint({'xi': 1.e-5, 'Q2': 25., 't': -0.25})  # evol
 pt_evolNS = g.data.DataPoint({'xi': 0.01, 'Q2': 10., 't': -0.25})  # evol
 
 
-def ansatz07(j: np.ndarray, t: float, type: str) -> np.ndarray:
-    """GPD ansatz from hep-ph/0703179 - singlet and nonsinglet part."""
-    # a.k.a. 'FITBP' ansatz from Fortran Gepard
-    par = {'al0s': 1.1, 'alps': 0.15, 'alpg': 0.15,
-           'nu': 2, 'nd': 1, 'al0v': 0.5, 'alpv': 1}
-    if type[:4] == 'hard':
-        par['ng'] = 0.4
-        par['al0g'] = par['al0s'] + 0.05
-        if type[-2:] == 'NS':
-            par['nsea'] = 4/15
-        else:
-            par['nsea'] = 2/3 - par['ng']
-    elif type[:4] == 'soft':
-        par['ng'] = 0.3
-        par['al0g'] = par['al0s'] - 0.2
-        if type[-2:] == 'NS':
-            par['nsea'] = 0
-        else:
-            par['nsea'] = 2/3 - par['ng']
-    pochs = 8
-    pochg = 6
-    pochv = 4
-    mjt = 1 - t / (g.constants.Mp2*(4+j))
-    uv = g.qj.qj(j, t, pochv, par['nu'], par['al0v'],
-                 alpf=0, alp=par['alpv'], val=1)
-    uv = uv / mjt
-    dv = g.qj.qj(j, t, pochv, par['nd'], par['al0v'],
-                 alpf=0, alp=par['alpv'], val=1)
-    dv = dv / mjt
-    sea = g.qj.qj(j, t, pochs, par['nsea'], par['al0s'],
-                  alpf=0, alp=par['alps'])
-    sea = sea / mjt**3
-    gluon = g.qj.qj(j, t, pochg, par['ng'], par['al0g'],
-                    alpf=0, alp=par['alpg'])
-    gluon = gluon / mjt**2
-    return np.array((sea, gluon, uv, dv))
-
-
 class gpd_model(g.model.ConformalSpaceGPD):
     """GPD model from the paper - singlet and nonsinglet part."""
 
@@ -105,7 +67,7 @@ class gpd_model(g.model.ConformalSpaceGPD):
 
     def gpd_H(self, eta: float, t: float) -> np.ndarray:
         """GPD H from hep-ph/0703179."""
-        return ansatz07(self.jpoints, t, self.type).transpose()
+        return g.gpdj.ansatz07_fixed(self.jpoints, t, self.type).transpose()
 
 
 def test_wc_LO():
@@ -244,7 +206,7 @@ def test_cff_radNLO_MSBAR_evol():
 
 def test_cff_H_nlso3():
     """Test nl-so3 (ReH, ImH) (LO evolved to multiple Q2)."""
-    fit_gpd = g.model.Fit()
+    fit_gpd = g.model.PWNormGPD()
     m_fit = g.model.MellinBarnesModel(gpds=fit_gpd)
     m_fit.parameters.update(par_fit)
     # Q2 can be changed during calls:
@@ -256,7 +218,7 @@ def test_cff_H_nlso3():
 
 def test_cff_H_nlso3_separate():
     """Test nl-so3 ReH, ImH (LO evolved to multiple Q2)."""
-    fit_gpd = g.model.Fit()
+    fit_gpd = g.model.PWNormGPD()
     m_fit = g.model.MellinBarnesModel(gpds=fit_gpd)
     m_fit.parameters.update(par_fit)
     # Q2 can be changed during calls:
@@ -272,7 +234,7 @@ def test_cff_H_nlso3_separate():
 
 def test_cff_E_nlso3():
     """Testing nl-so3 (ReE, ImE) (LO evolved to multiple Q2)."""
-    fit_gpd = g.model.Fit()
+    fit_gpd = g.model.PWNormGPD()
     m_fit = g.model.MellinBarnesModel(gpds=fit_gpd)
     m_fit.parameters.update(par_fit)
     assert m_fit.cff(pt0_fit)[2:4] == approx(
@@ -283,7 +245,7 @@ def test_cff_E_nlso3():
 
 def test_cff_E_nlso3_separate():
     """Testing nl-so3 ReE, ImE (LO evolved to multiple Q2)."""
-    fit_gpd = g.model.Fit()
+    fit_gpd = g.model.PWNormGPD()
     m_fit = g.model.MellinBarnesModel(gpds=fit_gpd)
     m_fit.parameters.update(par_fit)
     assert m_fit.ReE(pt0_fit) == approx(
@@ -298,7 +260,7 @@ def test_cff_E_nlso3_separate():
 
 # def test_cff_H_KM15():
     # """Test of MB part of KM15 - temp.."""
-    # fit_gpd = g.model.Fit()
+    # fit_gpd = g.model.PWNormGPD()
     # m_fit = g.model.MellinBarnesModel(gpds=fit_gpd)
     # m_fit.parameters.update(par_KM15)
     # # Q2 can be changed during calls:
@@ -309,7 +271,7 @@ def test_cff_E_nlso3_separate():
 
 def test_KM15_cffs():
     """Test CFFs of KM15 model fit."""
-    fit_gpd = g.model.Fit()
+    fit_gpd = g.model.PWNormGPD()
     mMB = g.model.MellinBarnesModel(gpds=fit_gpd)
     mDR = g.model.ComptonModelDRPP()
     m = g.model.ComptonHybrid(mMB, mDR)

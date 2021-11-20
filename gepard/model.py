@@ -288,7 +288,7 @@ class ConformalSpaceGPD(ParameterModel):
         # while default flavor basis is (sea,G,uv,dv).
         # User is free to use more complicated flavor structure of model
         #
-        # Default matrix that follows is appropriate for low-x DVCS, 
+        # Default matrix that follows is appropriate for low-x DVCS,
         # with singlet-only contribution.
         # For definitions of sea-like and valence-like GPDs, sea, uv, dv
         # see hep-ph/0703179
@@ -349,8 +349,15 @@ class Test(ConformalSpaceGPD):
         return np.array(h)
 
 
-class Fit(ConformalSpaceGPD):
-    """Singlet fitting ansatz for GPDs with three SO(3) partial waves."""
+class PWNormGPD(ConformalSpaceGPD):
+    """Singlet-only model for GPDs with three SO(3) partial waves.
+
+    Notes:
+        Subleading PWs are proportional to the leading one, and
+        only their norms are fitting parameters. Norms of second
+        PWs is given by parameers 'secs' (quarks) and 'secg' gluons,
+        and norm of third PWs is given by 'this' and 'thig'.
+    """
 
     def __init__(self, **kwargs) -> None:
         """See parent `ConformalSpaceGPD` class for docs."""
@@ -361,19 +368,22 @@ class Fit(ConformalSpaceGPD):
 
     def gpd_H(self, eta: float, t: float) -> np.ndarray:
         """Return (npts, 4) array H_j^a for all j-points and 4 flavors."""
-        return g.gpdj.fit(self.jpoints, t, self.parameters).transpose()
+        return g.gpdj.singlet_ng_constrained(self.jpoints,
+                                             t, self.parameters).transpose()
 
     def gpd_H_para(self, eta: float, t: float) -> np.ndarray:
         """Return (npts, 4) array H_j^a for all j-points and 4 flavors."""
         # This multiprocessing version is actually 2x slower!
-        h = Parallel(n_jobs=20)(delayed(g.gpdj.fit)(j, t, self.parameters)
+        h = Parallel(n_jobs=20)(delayed(g.gpdj.singlet_ng_constrained)(j, t,
+                                                                       self.parameters)
                                 for j in self.jpoints)
         return np.array(h)
 
     def gpd_E(self, eta: float, t: float) -> np.ndarray:
         """Return (npts, 4) array E_j^a for all j-points and 4 flavors."""
         kappa = np.array([self.parameters['kaps'], self.parameters['kapg'], 0, 0])
-        return kappa * g.gpdj.fit(self.jpoints, t, self.parameters).transpose()
+        return kappa * g.gpdj.singlet_ng_constrained(self.jpoints, t,
+                                                     self.parameters).transpose()
 
 
 # --- Models for Compton Form Factors --- #
