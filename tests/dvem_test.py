@@ -87,6 +87,7 @@ def test_c1_NLO():
     # assert aux[2] == approx(35.2818+34.0699j, rel=1e-5)
 
 
+@mark.slow
 def test_dvmp_TFFs_NLO():
     """Calculate NLO DVMP TFFs for rho production at input scale."""
     xB = 1e-4
