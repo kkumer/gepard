@@ -7,6 +7,21 @@ We are not there yet, but any new code must have corresponding test.
 
 Do not commit code which doesn't pass thorough testing below!!
 
+Installing package locally
+--------------------------
+
+To be able to see the effects of localy modified package code
+you should install it by issuing
+
+.. code-block:: bash
+
+   pip install -e .
+
+in the directory where ``setup.py`` resides.
+This will install the package in your local Python's site-packages,
+but only as a link to the gepard ``src`` dir, so any changes
+to sources will be immediately visible.
+
 
 Testing and benchmarking
 ------------------------

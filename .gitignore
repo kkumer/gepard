@@ -5,6 +5,11 @@
 **/prof
 **/*coverage*
 **/.hypothesis*
+**/.eggs
+**/*egg-info
+
+# Prototype package
+gproto
 
 # Generated documentation
 docs/build/
