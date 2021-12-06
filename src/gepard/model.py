@@ -13,7 +13,16 @@ import numpy as np
 import scipy.stats
 from joblib import Parallel, delayed
 
-import gepard as g
+from .constants import CF, NC, F_rho
+from .data import DataPoint
+from .evolc import calc_wce
+from .gpdj import singlet_ng_constrained, test
+from .qcd import as2pf
+from .quadrature import PVquadrature, mellin_barnes
+from .utils import flatten
+
+# import gepard as g
+
 
 
 class Model(object):
@@ -260,7 +269,7 @@ class ConformalSpaceGPD(ParameterModel):
         self.asp = asp
         self.c = c
         self.phi = phi
-        npoints, weights = g.quadrature.mellin_barnes(self.c, self.phi)
+        npoints, weights = mellin_barnes(self.c, self.phi)
         self.npts = len(npoints)
         self.npoints = npoints
         self.jpoints = npoints - 1
@@ -345,7 +354,7 @@ class TestGPD(ConformalSpaceGPD):
         # For testing purposes, we use here sub-optimal non-numpy algorithm
         h = []
         for j in self.jpoints:
-            h.append(g.gpdj.test(j, t, self.parameters))
+            h.append(test(j, t, self.parameters))
         return np.array(h)
 
 
@@ -368,13 +377,13 @@ class PWNormGPD(ConformalSpaceGPD):
 
     def gpd_H(self, eta: float, t: float) -> np.ndarray:
         """Return (npts, 4) array H_j^a for all j-points and 4 flavors."""
-        return g.gpdj.singlet_ng_constrained(self.jpoints,
+        return singlet_ng_constrained(self.jpoints,
                                              t, self.parameters).transpose()
 
     def gpd_H_para(self, eta: float, t: float) -> np.ndarray:
         """Return (npts, 4) array H_j^a for all j-points and 4 flavors."""
         # This multiprocessing version is actually 2x slower!
-        h = Parallel(n_jobs=20)(delayed(g.gpdj.singlet_ng_constrained)(j, t,
+        h = Parallel(n_jobs=20)(delayed(singlet_ng_constrained)(j, t,
                                                                        self.parameters)
                                 for j in self.jpoints)
         return np.array(h)
@@ -382,7 +391,7 @@ class PWNormGPD(ConformalSpaceGPD):
     def gpd_E(self, eta: float, t: float) -> np.ndarray:
         """Return (npts, 4) array E_j^a for all j-points and 4 flavors."""
         kappa = np.array([self.parameters['kaps'], self.parameters['kapg'], 0, 0])
-        return kappa * g.gpdj.singlet_ng_constrained(self.jpoints, t,
+        return kappa * singlet_ng_constrained(self.jpoints, t,
                                                      self.parameters).transpose()
 
 
@@ -408,7 +417,7 @@ class ComptonFormFactors(ParameterModel):
             s = s[:-2] + "}"
         else:
             s = 8*"%4s = %5.2f\n"
-        print(s % g.utils.flatten(tuple(zip(self.allCFFs, vals))))
+        print(s % flatten(tuple(zip(self.allCFFs, vals))))
 
     # Initial definition of all CFFs. All just return zero.
     for name in allCFFs:
@@ -497,13 +506,13 @@ class MellinBarnesModel(ParameterModel):
         mb_int = np.dot(self.wg, cch.imag)
         return mb_int
 
-    def cff(self, pt: g.data.DataPoint) -> np.ndarray:
+    def cff(self, pt: DataPoint) -> np.ndarray:
         """Return array(ReH, ImH, ReE, ...) for kinematic point."""
         try:
             wce_ar = self.wce[pt.Q2]
         except KeyError:
             # calculate it
-            wce_ar = g.evolc.calc_wce(self, pt.Q2, 'DVCS')
+            wce_ar = calc_wce(self, pt.Q2, 'DVCS')
             # memorize it for future
             self.wce[pt.Q2] = wce_ar
         # Evaluations depending on model parameters:
@@ -515,19 +524,19 @@ class MellinBarnesModel(ParameterModel):
         ree, ime = self._mellin_barnes_integral(pt.xi, wce_ar, e)
         return np.array([reh, imh, ree, ime, 0, 0, 0, 0])
 
-    def ReH(self, pt: g.data.DataPoint) -> float:
+    def ReH(self, pt: DataPoint) -> float:
         """Return Re(CFF H) for kinematic point."""
         return self.cff(pt)[0]
 
-    def ImH(self, pt: g.data.DataPoint) -> float:
+    def ImH(self, pt: DataPoint) -> float:
         """Return Im(CFF H) for kinematic point."""
         return self.cff(pt)[1]
 
-    def ReE(self, pt: g.data.DataPoint) -> float:
+    def ReE(self, pt: DataPoint) -> float:
         """Return Re(CFF E) for kinematic point."""
         return self.cff(pt)[2]
 
-    def ImE(self, pt: g.data.DataPoint) -> float:
+    def ImE(self, pt: DataPoint) -> float:
         """Return Im(CFF E) for kinematic point."""
         return self.cff(pt)[3]
 
@@ -535,13 +544,13 @@ class MellinBarnesModel(ParameterModel):
         """Return array(ReH_rho, ImH_rho, ReE_rho, ...) of DVrhoP transition FFs."""
         assert self.nf == 4
 
-        astrong = 2 * pi * g.qcd.as2pf(self.p, self.nf,  Q2, self.asp[self.p], self.r20)
+        astrong = 2 * pi * as2pf(self.p, self.nf,  Q2, self.asp[self.p], self.r20)
 
         try:
             wce_ar_dvmp = self.wce_dvmp[Q2]
         except KeyError:
             # calculate it
-            wce_ar_dvmp = g.evolc.calc_wce(self, Q2, 'DVMP')
+            wce_ar_dvmp = calc_wce(self, Q2, 'DVMP')
             # memorize it for future
             self.wce_dvmp[Q2] = wce_ar_dvmp
         # Evaluations depending on model parameters:
@@ -554,20 +563,20 @@ class MellinBarnesModel(ParameterModel):
                                # [3./20., 0, 5./12., 1./12.]]) / np.sqrt(2)
         h = np.einsum('fa,ja->jf', frot_rho_4, h_prerot)
         reh, imh = self._mellin_barnes_integral(xi, wce_ar_dvmp, h)
-        return (g.constants.CF * g.constants.F_rho * astrong / g.constants.NC
+        return (CF * F_rho * astrong / NC
                 / np.sqrt(Q2) * np.array([reh, imh, 0, 0, 0, 0, 0, 0]))
 
-    def ImHrho(self, pt: g.data.DataPoint) -> np.ndarray:
+    def ImHrho(self, pt: DataPoint) -> np.ndarray:
         """Return Im(TFF H) for kinematic point."""
         tffs = self.tff(pt.xi, pt.t, pt.Q2)
         return tffs[1]
 
-    def ReHrho(self, pt: g.data.DataPoint) -> np.ndarray:
+    def ReHrho(self, pt: DataPoint) -> np.ndarray:
         """Return Re(TFF H) for kinematic point."""
         tffs = self.tff(pt.xi, pt.t, pt.Q2)
         return tffs[0]
 
-    def F2(self, pt: g.data.DataPoint) -> float:
+    def F2(self, pt: DataPoint) -> float:
         """Return DIS F2 for kinematic point."""
         if self.nf == 3:
             chargefac = 2./9.
@@ -578,7 +587,7 @@ class MellinBarnesModel(ParameterModel):
             wce_ar_dis = self.wce_dis[pt.Q2]
         except KeyError:
             # calculate it, first PW is the only relevant one
-            wce_ar_dis = g.evolc.calc_wce(self, pt.Q2, 'DIS')[0, :, :]
+            wce_ar_dis = calc_wce(self, pt.Q2, 'DIS')[0, :, :]
             # memorize it for future
             self.wce_dis[pt.Q2] = wce_ar_dis
         pdf_prerot = self.gpds.gpd_H(0, 0)  # forward limit
@@ -642,7 +651,7 @@ class ComptonDispersionRelations(ComptonFormFactors):
         Given by dispersion integral over ImH minus subtraction constant.
 
         """
-        res = g.quadrature.PVquadrature(self.dispargV, 0, 1, (self.ImH, pt))
+        res = PVquadrature(self.dispargV, 0, 1, (self.ImH, pt))
         pvpi = (res + log(pt.xi**2 / (1.-pt.xi**2)) * self.ImH(pt)) / pi
         # P.V./pi - subtraction constant C/(1-t/MC^2)^2
         return pvpi - self.subtraction(pt)
@@ -653,7 +662,7 @@ class ComptonDispersionRelations(ComptonFormFactors):
         Given by dispersion integral over ImHt.
 
         """
-        res = g.quadrature.PVquadrature(self.dispargA, 0, 1, (self.ImHt, pt))
+        res = PVquadrature(self.dispargA, 0, 1, (self.ImHt, pt))
         pvpi = (res + log((1.+pt.xi)/(1.-pt.xi)) * self.ImHt(pt))/pi
         return pvpi   # this is P.V./pi
 
@@ -663,7 +672,7 @@ class ComptonDispersionRelations(ComptonFormFactors):
         Given by dispersion integral over ImE plus subtraction constant.
 
         """
-        res = g.quadrature.PVquadrature(self.dispargV, 0, 1, (self.ImE, pt))
+        res = PVquadrature(self.dispargV, 0, 1, (self.ImE, pt))
         pvpi = (res + log(pt.xi**2 / (1.-pt.xi**2)) * self.ImE(pt)) / pi
         # This is same subtraction constant
         # as for H, but with opposite sign
@@ -675,7 +684,7 @@ class ComptonDispersionRelations(ComptonFormFactors):
         Given by dispersion integral over ImEt
 
         """
-        res = g.quadrature.PVquadrature(self.dispargA, 0, 1, (self.ImEt, pt))
+        res = PVquadrature(self.dispargA, 0, 1, (self.ImEt, pt))
         pvpi = (res + log((1.+pt.xi)/(1.-pt.xi)) * self.ImEt(pt))/pi
         return pvpi   # this is P.V./pi
 

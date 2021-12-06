@@ -7,6 +7,7 @@
 **/.hypothesis*
 **/.eggs
 **/*egg-info
+**/.tox
 
 # Prototype package
 gproto

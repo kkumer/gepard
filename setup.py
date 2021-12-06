@@ -22,9 +22,8 @@ setup(
     version='0.9.8',
     license='LGPL',
     description='Python package for studying the 3D quark and gluon distributions.',
-    long_description='{}\n{}'.format(
-        re.compile('^.. start-badges.*^.. end-badges', re.M | re.S).sub('', read('README.md')),
-        re.sub(':[a-z]+:`~?(.*?)`', r'``\1``', read('CHANGELOG.rst'))
+    long_description='{}'.format(
+        re.compile('^.. start-badges.*^.. end-badges', re.M | re.S).sub('', read('README.md'))
     ),
     author='Krešimir Kumerički',
     author_email='kkumer@phy.hr',

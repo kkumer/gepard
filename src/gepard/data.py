@@ -9,17 +9,27 @@ import copy
 import math
 import os
 import re
+from importlib import resources
 
-import gepard as g  # noqa: F401
-from gepard.constants import Mp, Mp2
+import gepard as g
+import gepard.datasets.DIS
+import gepard.datasets.en2engamma
+import gepard.datasets.ep2epgamma
+import gepard.datasets.gammastarp2gammap
+import gepard.datasets.gammastarp2Mp
+
+from .constants import Mp, Mp2
+
+# from .theory import prepare
 
 
-def loaddata(datadir='./data'):
-    """Return dictionary {id : DataSet, ...}  out of files in datadir."""
+def loaddata(resource):
+    """Return dictionary {id : DataSet, ...}  out of files in resource package."""
     data = {}
-    for file in os.listdir(datadir):
-        if os.path.splitext(file)[1] == ".dat":
-            dataset = DataSet(datafile=os.path.join(datadir, file))
+    files = resources.files(resource).iterdir()
+    for file in files:
+        if file.suffix == '.dat':
+            dataset = DataSet(datafile=file.read_text())
             for pt in dataset:
                 pt.to_conventions()
             data[dataset.id] = dataset
@@ -396,8 +406,8 @@ class DataSet(list):
                 starts at %d""" % (self, len(self), start))
         return DataSet(self[start:end:None])
 
-    def parse(self, datafile):
-        """Parse `datafile` and return tuple (preamble, data).
+    def parse(self, dataFile):
+        """Parse `dataresource` string and return tuple (preamble, data).
 
         `preamble` is dictionary obtained by converting datafile preamble
         items into dictionary items like this:
@@ -411,9 +421,7 @@ class DataSet(list):
         # [First] parsing the formatted ASCII file
         desc = {}   # description preamble (reference, kinematics, ...)
         data = []   # actual data grid  x1 x2  ... y1 dy1_stat dy1_syst ...
-        dataFile = open(datafile, 'r')
-        dataFileLine = dataFile.readline()
-        while dataFileLine:
+        for dataFileLine in dataFile.splitlines():
             # remove comments
             dataFileLine = dataFileLine.split('#')[0]
             # only lines with '=' (premble) or with numbers only (data grid) are parsed
@@ -432,7 +440,6 @@ class DataSet(list):
                     else:
                         numbers.append(f)
                 data.append(list(map(float, numbers)))
-            dataFileLine = dataFile.readline()
 
         return desc, data
 
@@ -529,11 +536,8 @@ def _fill_kinematics(kin, old={}):
         kin.varphi = old.varphi
 
 
-# FIXME: This is not a proper approach for package, see
-# https://stackoverflow.com/questions/779495/access-data-in-package-subdirectory
-this_dir, this_filename = os.path.split(__file__)
-dset = loaddata(datadir=os.path.join(this_dir, 'data', 'ep2epgamma'))
-dset.update(loaddata(datadir=os.path.join(this_dir, 'data', 'gammastarp2Mp')))
-dset.update(loaddata(datadir=os.path.join(this_dir, 'data', 'gammastarp2gammap')))
-dset.update(loaddata(datadir=os.path.join(this_dir, 'data', 'en2engamma')))
-dset.update(loaddata(datadir=os.path.join(this_dir, 'data', 'DIS')))
+dset = loaddata(gepard.datasets.ep2epgamma)
+dset.update(loaddata(gepard.datasets.gammastarp2Mp))
+dset.update(loaddata(gepard.datasets.gammastarp2gammap))
+dset.update(loaddata(gepard.datasets.en2engamma))
+dset.update(loaddata(gepard.datasets.DIS))
