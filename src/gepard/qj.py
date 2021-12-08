@@ -5,7 +5,7 @@ FIXME: ptj ModuleType --> DataPoint
 
 import numpy as np
 
-import gepard.special
+from . import special
 
 
 def qj(j: np.ndarray, t: float, poch: int, norm: float, al0: float,
@@ -56,8 +56,8 @@ def qj(j: np.ndarray, t: float, poch: int, norm: float, al0: float,
     alpt = al0 + alp * t
     qj = (
         norm
-        * gepard.special.pochhammer(2 - val - al0 - alpf * t, poch)
-        / gepard.special.pochhammer(1 - al0 + j, poch)
+        * special.pochhammer(2 - val - al0 - alpf * t, poch)
+        / special.pochhammer(1 - al0 + j, poch)
         * (1 + j - al0)
         / (1 + j - alpt)
     )

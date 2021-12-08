@@ -29,8 +29,7 @@ from typing import Tuple
 import numpy as np
 from scipy.special import loggamma  # type: ignore
 
-import gepard.qj
-import gepard.special
+from . import constants, qj, special
 
 
 def toy(j: complex, *args) -> Tuple[complex, complex, complex, complex]:
@@ -42,11 +41,11 @@ def toy(j: complex, *args) -> Tuple[complex, complex, complex, complex]:
 
 def test(j: complex, t: float, par: dict) -> Tuple[complex, complex, complex, complex]:
     """Return simple testing singlet GPD ansatz."""
-    singlet = par['ns'] / (1 - t/par['ms2'])**3 / gepard.special.pochhammer(
-          1.0 - par['al0s'] - par['alps']*t + j, 8) * gepard.special.pochhammer(
+    singlet = par['ns'] / (1 - t/par['ms2'])**3 / special.pochhammer(
+          1.0 - par['al0s'] - par['alps']*t + j, 8) * special.pochhammer(
           2.0 - par['al0s'], 8)
-    gluon = par['ng'] / (1 - t/par['mg2'])**3 / gepard.special.pochhammer(
-          1.0 - par['al0g'] - par['alpg']*t + j, 6) * gepard.special.pochhammer(
+    gluon = par['ng'] / (1 - t/par['mg2'])**3 / special.pochhammer(
+          1.0 - par['al0g'] - par['alpg']*t + j, 6) * special.pochhammer(
           2.0 - par['al0g'], 6)
     return (singlet, gluon, 0+0j, 0+0j)
 
@@ -58,23 +57,23 @@ def singlet_ng_constrained(j: np.ndarray, t: float, par: dict) -> np.ndarray:
         This ansatz is used for all published KM fits, for sea parton part.
     """
     par['ng'] = 0.6 - par['ns']  # first sum-rule constraint
-    singlet = (gepard.qj.qj(j, t, 9, par['ns'], par['al0s'], par['alps']) *
-               gepard.qj.betadip(j, t, par['ms2'], 0., 2))
-    gluon = (gepard.qj.qj(j, t, 7, par['ng'], par['al0g'], par['alpg']) *
-             gepard.qj.betadip(j, t, par['mg2'], 0., 2))
+    singlet = (qj.qj(j, t, 9, par['ns'], par['al0s'], par['alps']) *
+               qj.betadip(j, t, par['ms2'], 0., 2))
+    gluon = (qj.qj(j, t, 7, par['ng'], par['al0g'], par['alpg']) *
+             qj.betadip(j, t, par['mg2'], 0., 2))
     return np.array((singlet, gluon, np.zeros_like(gluon), np.zeros_like(gluon)))
 
 
 def ansatz07(j: np.ndarray, t: float, par: dict) -> np.ndarray:
     """GPD ansatz from paper hep-ph/0703179."""
-    uv = (gepard.qj.qj(j, t, 4, par['nu'], par['al0u'], par['alpu'], val=1) *
-          gepard.qj.betadip(j, t, par['mu2'], par['delmu2'], par['powu']))
-    dv = (gepard.qj.qj(j, t, 4, par['nd'], par['al0d'], par['alpd'], val=1) *
-          gepard.qj.betadip(j, t, par['md2'], par['delmd2'], par['powd']))
-    sea = (gepard.qj.qj(j, t, 8, par['ns'], par['al0s'], par['alps']) *
-           gepard.qj.betadip(j, t, par['ms2'], par['delms2'], par['pows']))
-    gluon = (gepard.qj.qj(j, t, 6, par['ng'], par['al0g'], par['alpg']) *
-             gepard.qj.betadip(j, t, par['mg2'], par['delmg2'], par['powg']))
+    uv = (qj.qj(j, t, 4, par['nu'], par['al0u'], par['alpu'], val=1) *
+          qj.betadip(j, t, par['mu2'], par['delmu2'], par['powu']))
+    dv = (qj.qj(j, t, 4, par['nd'], par['al0d'], par['alpd'], val=1) *
+          qj.betadip(j, t, par['md2'], par['delmd2'], par['powd']))
+    sea = (qj.qj(j, t, 8, par['ns'], par['al0s'], par['alps']) *
+           qj.betadip(j, t, par['ms2'], par['delms2'], par['pows']))
+    gluon = (qj.qj(j, t, 6, par['ng'], par['al0g'], par['alpg']) *
+             qj.betadip(j, t, par['mg2'], par['delmg2'], par['powg']))
     return np.array((sea, gluon, uv, dv))
 
 
@@ -109,17 +108,17 @@ def ansatz07_fixed(j: np.ndarray, t: float, type: str) -> np.ndarray:
     pochs = 8
     pochg = 6
     pochv = 4
-    mjt = 1 - t / (gepard.constants.Mp2*(4+j))
-    uv = gepard.qj.qj(j, t, pochv, par['nu'], par['al0v'],
+    mjt = 1 - t / (constants.Mp2*(4+j))
+    uv = qj.qj(j, t, pochv, par['nu'], par['al0v'],
                       alpf=0, alp=par['alpv'], val=1)
     uv = uv / mjt
-    dv = gepard.qj.qj(j, t, pochv, par['nd'], par['al0v'],
+    dv = qj.qj(j, t, pochv, par['nd'], par['al0v'],
                       alpf=0, alp=par['alpv'], val=1)
     dv = dv / mjt
-    sea = gepard.qj.qj(j, t, pochs, par['nsea'], par['al0s'],
+    sea = qj.qj(j, t, pochs, par['nsea'], par['al0s'],
                        alpf=0, alp=par['alps'])
     sea = sea / mjt**3
-    gluon = gepard.qj.qj(j, t, pochg, par['ng'], par['al0g'],
+    gluon = qj.qj(j, t, pochg, par['ng'], par['al0g'],
                          alpf=0, alp=par['alpg'])
     gluon = gluon / mjt**2
     return np.array((sea, gluon, uv, dv))

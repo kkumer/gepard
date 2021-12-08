@@ -27,7 +27,7 @@ Todo:
 
 from math import log
 
-from gepard.constants import CA, CF, TF
+from . import constants
 
 
 def beta(p: int, nf: int) -> float:
@@ -46,10 +46,10 @@ def beta(p: int, nf: int) -> float:
 
     """
 
-    B00 = 11./3. * CA
-    B01 = -4./3. * TF
-    B10 = 34./3. * CA**2
-    B11 = -20./3. * CA*TF - 4. * CF*TF
+    B00 = 11./3. * constants.CA
+    B01 = -4./3. * constants.TF
+    B10 = 34./3. * constants.CA**2
+    B11 = -20./3. * constants.CA*constants.TF - 4. * constants.CF*constants.TF
 
     if p == 0:
         beta = - B00 - B01 * nf

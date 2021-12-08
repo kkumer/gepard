@@ -22,7 +22,7 @@ from typing import Tuple
 
 import numpy as np
 
-import gepard as g
+from . import adim, constants, evolution, qcd, quadrature, special
 
 
 def lambdaf(gam0) -> np.ndarray:
@@ -88,13 +88,13 @@ def rnlof(m, j) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
                  a,b in {+,-};  i,j in {Q, G}
     """
     # cf. my DIS notes p. 61
-    gam0 = g.adim.singlet_LO(j+1, m.nf).transpose((2, 0, 1))  # LO singlet an. dim.
-    gam1 = g.adim.singlet_NLO(j+1, m.nf).transpose((2, 0, 1))  # NLO singlet an. dim.
+    gam0 = adim.singlet_LO(j+1, m.nf).transpose((2, 0, 1))  # LO singlet an. dim.
+    gam1 = adim.singlet_NLO(j+1, m.nf).transpose((2, 0, 1))  # NLO singlet an. dim.
     lam, pr = projectors(gam0)
-    inv = 1.0 / g.qcd.beta(0, m.nf)
+    inv = 1.0 / qcd.beta(0, m.nf)
     # Cf. Eq. (124), but defined with opposite sign
     # and with additional 1/b0, as in gepard-fortran
-    r1 = inv * (gam1 - 0.5 * inv * g.qcd.beta(1, m.nf) * gam0)
+    r1 = inv * (gam1 - 0.5 * inv * qcd.beta(1, m.nf) * gam0)
     r1proj = np.einsum('kaim,kmn,kbnj->kabij', pr, r1, pr)
 
     return lam, pr, r1proj
@@ -112,17 +112,17 @@ def rnlonsf(m, j, prty) -> np.ndarray:
          r1: beta/gama ratio from Eq. (117)
     """
     # cf. my DIS notes p. 61
-    gam0 = g.adim.non_singlet_LO(j+1, m.nf, prty)   # LO non-singlet an. dim.
-    gam1 = g.adim.non_singlet_NLO(j+1, m.nf, prty)  # NLO non-singlet an. dim.
-    inv = 1.0 / g.qcd.beta(0, m.nf)
+    gam0 = adim.non_singlet_LO(j+1, m.nf, prty)   # LO non-singlet an. dim.
+    gam1 = adim.non_singlet_NLO(j+1, m.nf, prty)  # NLO non-singlet an. dim.
+    inv = 1.0 / qcd.beta(0, m.nf)
     # Cf. Eq. (117), but defined with opposite sign as in gepard-fortran
-    r1 = inv * (gam1 - 0.5 * inv * g.qcd.beta(1, m.nf) * gam0)
+    r1 = inv * (gam1 - 0.5 * inv * qcd.beta(1, m.nf) * gam0)
     return gam0, r1
 
 
 def erfunc(m, lamj, lamk, R) -> np.ndarray:
     """Mu-dep. part of NLO evolution operator. Eq. (126)."""
-    b0 = g.qcd.beta(0, m.nf)
+    b0 = qcd.beta(0, m.nf)
     levi_civita = np.array([[0, 1], [-1, 0]])
     bll = np.einsum('...,ij->...ij', lamj[0, ...] - lamk[1, ...], levi_civita)
     bll = b0 * np.ones_like(bll) + bll
@@ -135,7 +135,7 @@ def erfunc(m, lamj, lamk, R) -> np.ndarray:
 def erfunc_nd(m, lamj, lamk, R) -> np.ndarray:
     """Mu-dep. part of NLO evolution operator. Eq. (126)."""
     assert lamk.shape == (2,)  # FIX THIS
-    b0 = g.qcd.beta(0, m.nf)
+    b0 = qcd.beta(0, m.nf)
     bll = np.subtract.outer(lamj.transpose(), lamk)
     bll = b0 * np.ones_like(bll) + bll
 
@@ -163,25 +163,25 @@ def cb1(m, q2, zn, zk, NS=False):
         (2^(K+1) GAMMA(K+5/2))  / ( GAMMA(3/2) GAMMA(K+3) )
 
     """
-    asmuf2 = g.qcd.as2pf(m.p, m.nf, q2, m.asp[m.p], m.r20)
-    asq02 = g.qcd.as2pf(m.p, m.nf, m.q02, m.asp[m.p], m.r20)
+    asmuf2 = qcd.as2pf(m.p, m.nf, q2, m.asp[m.p], m.r20)
+    asq02 = qcd.as2pf(m.p, m.nf, m.q02, m.asp[m.p], m.r20)
     R = asmuf2/asq02
-    b0 = g.qcd.beta(0, m.nf)
-    AAA = (g.special.S1((zn+zk+2)/2) -
-           g.special.S1((zn-zk-2)/2) +
-           2*g.special.S1(zn-zk-1) -
-           g.special.S1(zn+1))
+    b0 = qcd.beta(0, m.nf)
+    AAA = (special.S1((zn+zk+2)/2) -
+           special.S1((zn-zk-2)/2) +
+           2*special.S1(zn-zk-1) -
+           special.S1(zn+1))
     # GOD = "G Over D" = g_jk / d_jk
-    GOD_11 = 2 * g.constants.CF * (2*AAA +
-            (AAA - g.special.S1(zn+1))*(zn-zk)*(zn+zk +
+    GOD_11 = 2 * constants.CF * (2*AAA +
+            (AAA - special.S1(zn+1))*(zn-zk)*(zn+zk +
                                       3)/(zk+1)/(zk+2))
     nzero = np.zeros_like(GOD_11)
     GOD_12 = nzero
-    GOD_21 = 2*g.constants.CF*(zn-zk)*(zn+zk+3)/zn/(zk+1)/(zk+2)
-    GOD_22 = 2 * g.constants.CA * (2*AAA + (AAA - g.special.S1(zn +
-         1)) * (g.special.poch(zn, 4) / g.special.poch(zk, 4) -
+    GOD_21 = 2*constants.CF*(zn-zk)*(zn+zk+3)/zn/(zk+1)/(zk+2)
+    GOD_22 = 2 * constants.CA * (2*AAA + (AAA - special.S1(zn +
+         1)) * (special.poch(zn, 4) / special.poch(zk, 4) -
                 1) + 2 * (zn-zk) * (zn+zk +
-            3) / g.special.poch(zk, 4)) * zk / zn
+            3) / special.poch(zk, 4)) * zk / zn
     god = np.array([[GOD_11, GOD_12], [GOD_21, GOD_22]])
     dm_22 = zk/zn
     dm_11 = np.ones_like(dm_22)
@@ -189,19 +189,19 @@ def cb1(m, q2, zn, zk, NS=False):
     dm = np.array([[dm_11, dm_12], [dm_12, dm_22]])
     fac = (zk+1)*(zk+2)*(2*zn+3)/(zn+1)/(zn+2)/(zn-zk)/(zn+zk+3)
     if NS:
-        gamn = g.adim.non_singlet_LO(zn+1, m.nf)
-        gamk = g.adim.non_singlet_LO(zk+1, m.nf)
+        gamn = adim.non_singlet_LO(zn+1, m.nf)
+        gamk = adim.non_singlet_LO(zk+1, m.nf)
         r1 = (1 - (1/R)**((b0 + gamn - gamk)/b0)) / (b0+gamn-gamk)
         cb1 = r1 * (gamn-gamk) * (b0 - gamk + GOD_11) * R**(-gamk/b0)
         cb1 = fac * cb1
     else:
-        gamn = g.adim.singlet_LO(zn+1, m.nf).transpose((2, 0, 1))
-        gamk = g.adim.singlet_LO(zk+1, m.nf)
-        lamn, pn = g.evolution.projectors(gamn)
-        lamk, pk = g.evolution.projectors(gamk)
+        gamn = adim.singlet_LO(zn+1, m.nf).transpose((2, 0, 1))
+        gamk = adim.singlet_LO(zk+1, m.nf)
+        lamn, pn = evolution.projectors(gamn)
+        lamk, pk = evolution.projectors(gamk)
         proj_DM = np.einsum('naif,fgn,bgj->nabij', pn, dm, pk)
         proj_GOD = np.einsum('naif,fgn,bgj->nabij', pn, god, pk)
-        er1 = g.evolution.erfunc_nd(m, lamn, lamk, R)
+        er1 = evolution.erfunc_nd(m, lamn, lamk, R)
         bet_proj_DM = np.einsum('b,nabij->nabij', b0-lamk, proj_DM)
         cb1 = np.einsum('n,nab,nabij,b->nij', fac,
                         er1*np.subtract.outer(lamn.transpose(), lamk),
@@ -230,15 +230,15 @@ def evolop(m, j, q2: float, process: str) -> np.ndarray:
     # When m.p=1 (NLO), LO part of the evolution operator
     # will still be multiplied by ratio of alpha_strongs
     # evaluated at NLO, as it should.
-    asmuf2 = g.qcd.as2pf(m.p, m.nf, q2, m.asp[m.p], m.r20)
-    asq02 = g.qcd.as2pf(m.p, m.nf, m.q02, m.asp[m.p], m.r20)
+    asmuf2 = qcd.as2pf(m.p, m.nf, q2, m.asp[m.p], m.r20)
+    asq02 = qcd.as2pf(m.p, m.nf, m.q02, m.asp[m.p], m.r20)
     R = asmuf2/asq02
 
     # 2. egeinvalues, projectors, projected mu-indep. part
     lam, pr, r1proj = rnlof(m, j)
 
     # 3. LO errfunc
-    b0 = g.qcd.beta(0, m.nf)
+    b0 = qcd.beta(0, m.nf)
     er1 = erfunc(m, lam, lam, R)
 
     Rfact = R**(-lam/b0)  # LO evolution (alpha(mu)/alpha(mu0))^(-gamma/beta0)
@@ -255,7 +255,7 @@ def evolop(m, j, q2: float, process: str) -> np.ndarray:
             # FIXME: find a way to do it array-wise i.e. get rid of j_single
             nd = []
             for j_single in j:
-                znd, wgnd = g.quadrature.nd_mellin_barnes()
+                znd, wgnd = quadrature.nd_mellin_barnes()
                 ndphij = 1.57j
                 ephnd = np.exp(ndphij)
                 tginv = ephnd/np.tan(np.pi*znd/2)
@@ -297,15 +297,15 @@ def evolopns(m, j, q2: float, process: str) -> np.ndarray:
     # When m.p=1 (NLO), LO part of the evolution operator
     # will still be multiplied by ratio of alpha_strongs
     # evaluated at NLO, as it should.
-    asmuf2 = g.qcd.as2pf(m.p, m.nf, q2, m.asp[m.p], m.r20)
-    asq02 = g.qcd.as2pf(m.p, m.nf, m.q02, m.asp[m.p], m.r20)
+    asmuf2 = qcd.as2pf(m.p, m.nf, q2, m.asp[m.p], m.r20)
+    asq02 = qcd.as2pf(m.p, m.nf, m.q02, m.asp[m.p], m.r20)
     R = asmuf2/asq02
 
     # 2. mu-indep. part
     gam0, r1 = rnlonsf(m, j, 1)   # prty=1 fixed
 
     # 2. LO errfunc
-    b0 = g.qcd.beta(0, m.nf)
+    b0 = qcd.beta(0, m.nf)
     aux1 = - (1 - 1 / R) * r1  # Cf. eq. (117), but with opposite sign
     aux0 = np.ones_like(aux1)
 
@@ -319,7 +319,7 @@ def evolopns(m, j, q2: float, process: str) -> np.ndarray:
             # FIXME: find a way to do it array-wise i.e. get rid of j_single
             nd = []
             for j_single in j:
-                znd, wgnd = g.quadrature.nd_mellin_barnes()
+                znd, wgnd = quadrature.nd_mellin_barnes()
                 ndphij = 1.57j
                 ephnd = np.exp(ndphij)
                 tginv = ephnd/np.tan(np.pi*znd/2)

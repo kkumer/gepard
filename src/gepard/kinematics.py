@@ -4,9 +4,9 @@ from __future__ import annotations
 
 from numpy import cos, pi, sqrt
 
+from . import data
 from gepard.constants import Mp, Mp2, alpha
 
-from . import data
 
 
 def tmin(Q2: float, xB: float, eps2: float) -> float:

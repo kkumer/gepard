@@ -1,33 +1,12 @@
 """Initialization of evolved Wilson coefficients.
 
-Todo:
-    Complete docoupling from Fortran
-
 """
-# import pickle, sys
-#
-# import logzero
-# _lg = logzero.logger
-#
-# from numpy import log, pi, imag, real, sqrt, cos, sin, exp
-# from numpy import ndarray, array, sum, loadtxt
-# import scipy.stats
-# from scipy.special import j0, j1, gamma, beta
-# from scipy.interpolate import SmoothBivariateSpline
-#
-# from quadrature import PVquadrature, bquadrature, rthtquadrature
-# from utils import flatten, hubDictNew, stringcolor
-# from constants import tolerance2, GeVfm, Mp
-# import dispersion as DR
-
 import sys
 
 import numpy as np
 from scipy.special import loggamma  # type: ignore
 
-import gepard as g
-
-sys.path.append('.')
+from . import adim, c1dvcs, c1dvmp, constants, evolution, qcd
 
 
 def calc_gam(npoints, nf):
@@ -44,7 +23,7 @@ def calc_gam(npoints, nf):
     # LO only
     gam = []
     for pw_shift in [0, 2, 4]:
-        gam.append(g.adim.singlet_LO(npoints+pw_shift, nf, 1).transpose(2, 0, 1))
+        gam.append(adim.singlet_LO(npoints+pw_shift, nf, 1).transpose(2, 0, 1))
     return np.array(gam)
 
 
@@ -67,9 +46,6 @@ def calc_wc(m, j, process: str):
     Returns:
          wc[k, p, f]: k in range(npts), p in [LO, NLO], f in [Q,G,NSP]
     """
-    # Instead of type hint (which leads to circular import for some reason)
-    if not isinstance(m, g.model.MellinBarnesModel):
-        raise Exception("{} is not of type MellinBarnesModel".format(m))
     one = np.ones_like(m.jpoints)
     zero = np.zeros_like(m.jpoints)
     fshu = _fshu(j)
@@ -84,18 +60,18 @@ def calc_wc(m, j, process: str):
         q1, g1, nsp1 = (zero, zero, zero)  # NLO if only LO is asked for (m.p=0)
         if m.p == 1:
             # don't take NSM part atm:
-            q1, g1, nsp1 = g.c1dvcs.C1(m, j, process)[:, :3].transpose()
+            q1, g1, nsp1 = c1dvcs.C1(m, j, process)[:, :3].transpose()
     elif process == 'DVMP':
         # Normalizations. Factor 3 is from normalization of DA, so not NC
         # See p. 37, 39 of "Towards DVMP" paper. Eq. (3.62c)
         quark_norm = 3 * fshu
-        gluon_norm = 3 * fshu * 2 / g.constants.CF / (j + 3)
+        gluon_norm = 3 * fshu * 2 / constants.CF / (j + 3)
         # Normalizations are chosen so that LO is normalized to:
         # FIXME: NSP normalizations for DVMP not checked yet
         q0, g0, nsp0 = (one/m.nf, one, one)   # LO Q, G, NSP
         q1, g1, nsp1 = (zero, zero, zero)      # NLO if only LO is asked for (m.p=0)
         if m.p == 1:
-            qp1, ps1, g1 = g.c1dvmp.c1dvmp(m, 1, j, 0)
+            qp1, ps1, g1 = c1dvmp.c1dvmp(m, 1, j, 0)
             q1 = qp1/m.nf + ps1
             nsp1 = qp1
     else:
@@ -117,16 +93,13 @@ def calc_wce(m, q2: float, process: str):
     Returns:
          wce[s,k,j]: s in range(npwmax), k in range(npts), j in [Q,G,NSP]
     """
-    # Instead of type hint (which leads to circular import for some reason)
-    if not isinstance(m, g.model.MellinBarnesModel):
-        raise Exception("{} is not of type MellinBarnesModel".format(m))
     wce = []
     for pw_shift in [0, 2, 4]:
         j = m.jpoints + pw_shift
         wc = calc_wc(m, j, process)
         # evolution operators
-        evola_si = g.evolution.evolop(m, j, q2, process)     # 2x2
-        evola_ns = g.evolution.evolopns(m, j, q2, process)   # 1x1, NSP
+        evola_si = evolution.evolop(m, j, q2, process)     # 2x2
+        evola_ns = evolution.evolopns(m, j, q2, process)   # 1x1, NSP
         zero_right = np.zeros((evola_ns.shape[0], 2, 2, 1))
         zero_down = np.zeros((evola_ns.shape[0], 2, 1, 2))
         evola_ns = evola_ns.reshape((evola_ns.shape[0], 2, 1, 1))
@@ -134,8 +107,8 @@ def calc_wce(m, q2: float, process: str):
                           [zero_down, evola_ns]])
         # p_mat: matrix that combines (LO, NLO) evolution operator and Wilson coeffs
         # while canceling NNLO term NLO*NLO:
-        asmur2 = g.qcd.as2pf(m.p, m.nf, q2/m.rr2, m.asp[m.p], m.r20)
-        asmuf2 = g.qcd.as2pf(m.p, m.nf, q2/m.rf2, m.asp[m.p], m.r20)
+        asmur2 = qcd.as2pf(m.p, m.nf, q2/m.rr2, m.asp[m.p], m.r20)
+        asmuf2 = qcd.as2pf(m.p, m.nf, q2/m.rf2, m.asp[m.p], m.r20)
         p_mat = np.array([[1, asmuf2], [asmur2, 0]])
         # 3. evolved Wilson coeff.
         wce.append(np.einsum('kpi,pq,kqij->kj', wc, p_mat, evola))

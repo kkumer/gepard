@@ -20,20 +20,19 @@ import os
 
 import numpy as np
 
-import gepard as g
-from gepard.constants import Mp2
+from . import constants, data
 
 
 def _complete_xBWQ2(kin):
     """Make trio {xB, W, Q2} complete if two of them are given in 'kin'."""
     if 'W' in kin and 'Q2' in kin and 'xB' not in kin:
-        kin.xB = kin.Q2 / (kin.W**2 + kin.Q2 - Mp2)
+        kin.xB = kin.Q2 / (kin.W**2 + kin.Q2 - constants.Mp2)
     elif 'xB' in kin and 'Q2' in kin and 'W' not in kin:
-        kin.W = np.sqrt(kin.Q2 / kin.xB - kin.Q2 + Mp2)
+        kin.W = np.sqrt(kin.Q2 / kin.xB - kin.Q2 + constants.Mp2)
     elif 'xB' in kin and 'W' in kin and 'Q2' not in kin:
-        kin.Q2 = kin.xB * (kin.W**2 - Mp2) / (1. - kin.xB)
+        kin.Q2 = kin.xB * (kin.W**2 - constants.Mp2) / (1. - kin.xB)
     else:
-        raise g.data.KinematicsError('Exactly two of {xB, W, Q2} should be given.')
+        raise data.KinematicsError('Exactly two of {xB, W, Q2} should be given.')
     return
 
 
@@ -46,7 +45,7 @@ def _complete_tmt(kin):
         assert kin.tm >= 0
         kin.t = - kin.tm
     else:
-        raise g.data.KinematicsError('Exactly one of {t, tm} should be given.')
+        raise data.KinematicsError('Exactly one of {t, tm} should be given.')
     return
 
 
@@ -62,7 +61,7 @@ def fill_kinematics(kin, old={}):
     kkeys = set(kin.keys())
     trio = set(['xB', 'W', 'Q2'])
     if len(trio.intersection(kkeys)) == 3:
-        raise g.data.KinematicsError('Overdetermined set {xB, W, Q2} given.')
+        raise data.KinematicsError('Overdetermined set {xB, W, Q2} given.')
     elif len(trio.intersection(kkeys)) == 2:
         _complete_xBWQ2(kin)
     elif len(trio.intersection(kkeys)) == 1 and old:
@@ -86,7 +85,7 @@ def fill_kinematics(kin, old={}):
     kin.xi = kin.xB / (2. - kin.xB)
     duo = set(['t', 'tm'])
     if len(duo.intersection(kkeys)) == 2:
-        raise g.data.KinematicsError('Overdetermined set {t, tm=-t} given.')
+        raise data.KinematicsError('Overdetermined set {t, tm=-t} given.')
     elif len(duo.intersection(kkeys)) == 1:
         _complete_tmt(kin)
     else:
@@ -199,7 +198,7 @@ def select(dataset, criteria=[], logic='AND'):
             if ok:
                 selected.append(pt)
     # convert list to DataSet instance
-    tmp = g.data.DataSet(selected)
+    tmp = data.DataSet(selected)
     tmp.__dict__ = dataset.__dict__.copy() # transfer the attributes
     return tmp
 

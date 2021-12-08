@@ -1,8 +1,9 @@
-"""Classes for representing experimental data.
+"""Representation of experimental data.
 
 DataPoint -- class for points representing experimental measurements
 DataSet   -- container for DataPoint instances
 
+dset -- dictionary with public datasets
 """
 
 import copy
@@ -11,7 +12,6 @@ import math
 import os
 import re
 
-# from . import theory
 from . import kinematics
 from .constants import Mp, Mp2
 from .datasets import (DIS, en2engamma, ep2epgamma, gammastarp2gammap,

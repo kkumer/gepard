@@ -3,8 +3,7 @@
 
 from iminuit import Minuit
 
-import gepard.data
-import gepard.theory
+from . import data, theory
 
 
 class Fitter(object):
@@ -18,8 +17,8 @@ class Fitter(object):
 class FitterMinuit(Fitter):
     """Fits using iminuit Python frontend to MINUIT2 C++ library."""
 
-    def __init__(self, fitpoints: gepard.data.DataSet,
-                 theory: gepard.theory.Theory, **kwargs) -> None:
+    def __init__(self, fitpoints: data.DataSet,
+                 theory: theory.Theory, **kwargs) -> None:
         """Set what is fitted to what and how."""
         self.fitpoints = fitpoints
         self.theory = theory

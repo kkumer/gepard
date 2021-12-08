@@ -4,7 +4,7 @@ import math
 
 import numpy as np
 
-from .adim import block
+from . import adim
 from .constants import CF
 from .special import S1, S2
 
@@ -79,10 +79,10 @@ def C1(m, j: np.ndarray, process: str) -> np.ndarray:
 
     if ((process == 'DIS') or (m.scheme == 'csbar')):
         shift = np.einsum('k,i,kij->kj', shift1(m, j, process), c0,
-                          block(j+1, m.nf)[:, 0, :, :])/2
+                          adim.block(j+1, m.nf)[:, 0, :, :])/2
     elif m.scheme == 'msbar':
         shift = - np.einsum('i,kij->kj', c0,
-                            block(j+1, m.nf)[:, 0, :, :])*math.log(m.rf2)/2
+                            adim.block(j+1, m.nf)[:, 0, :, :])*math.log(m.rf2)/2
     else:
         raise Exception('Scheme {} is neither msbar nor csbar!'.format(m.scheme))
 

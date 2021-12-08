@@ -4,12 +4,9 @@
 from numpy import array, cos, linspace, ndarray, pi, sin, sqrt, transpose
 from scipy.stats import scoreatpercentile
 
-import gepard.model
-import gepard.quadrature
-from gepard.constants import GeV2nb, Mp, Mp2, alpha
-from gepard.kinematics import *
-
-from .data import DataPoint, DataSet, _fill_kinematics
+from . import data, model, quadrature
+from .constants import GeV2nb, Mp, Mp2, alpha
+from .kinematics import K2, tmin, weight_BH
 
 NCPU = 23  # how many CPUs to use in parallel
 
@@ -19,12 +16,12 @@ class Theory(object):
 
     This is a base class and subclasses implement various observables as
     methods. Instances are instantiated with specific model (instance of
-    `gepard.model.Model`) for structure functions such as CFFs and elastic FFs,
+    `model.Model`) for structure functions such as CFFs and elastic FFs,
     so theory object finally contains complete algorithm for calculation of
     specific observable.
     """
 
-    def __init__(self, model: gepard.model.Model) -> None:
+    def __init__(self, model: model.Model) -> None:
         """Construct theory framework with specific model."""
         self.model = model
         self.m = self.model  # shortcut
@@ -32,7 +29,7 @@ class Theory(object):
         # self.texname = model.texname
         # self.description = model.description
 
-    def chisq_single(self, points: DataSet, asym: bool = False,
+    def chisq_single(self, points: data.DataSet, asym: bool = False,
                      **kwargs) -> float:
         """Return total chi-square.
 
@@ -61,7 +58,7 @@ class Theory(object):
         chi = sum(p*p for p in allpulls)  # equal to m.fval if minuit fit is done
         return chi
 
-    def pull(self, pt: DataPoint):
+    def pull(self, pt: data.DataPoint):
         """Return pull of a single Datapoint."""
         return (self.predict(pt, observable=pt.yaxis) - pt.val) / pt.err
 
@@ -211,7 +208,7 @@ class Theory(object):
                 tmmax = pt.tmmax
             else:
                 tmmax = 1.  # default -t cuttoff in GeV^2
-            res = gepard.quadrature.tquadrature(lambda t: self._Xt4int(t, pt), -tmmax, 0)
+            res = quadrature.tquadrature(lambda t: self._Xt4int(t, pt), -tmmax, 0)
             return res
 
 
@@ -252,13 +249,13 @@ class DVCS(Theory):
         """
         # Overriding pt kinematics with those from kwargs
         if 'vars' in kwargs:
-            ptvars = DataPoint(init=kwargs['vars'])
-            _fill_kinematics(ptvars, old=pt)
+            ptvars = data.DataPoint(init=kwargs['vars'])
+            data._fill_kinematics(ptvars, old=pt)
             kin = ptvars
         else:
             # just copy everything from pt
-            ptempty = DataPoint()
-            _fill_kinematics(ptempty, old=pt)
+            ptempty = data.DataPoint()
+            data._fill_kinematics(ptempty, old=pt)
             kin = ptempty
             # Nothing seems to be gained by the following approach:
             # kin = dict((i, getattr(pt, i)) for i in
@@ -407,13 +404,13 @@ class DVCS(Theory):
             return fun(pt, **kwargs)
         elif 'FTn' in pt:
             if pt.FTn < 0:
-                res = gepard.quadrature.Hquadrature(lambda phi:
+                res = quadrature.Hquadrature(lambda phi:
                         fun(pt, vars={'phi':phi}, **kwargs) * sin(-pt.FTn*phi), 0, 2*pi)
             elif pt.FTn > 0:
-                res = gepard.quadrature.Hquadrature(lambda phi:
+                res = quadrature.Hquadrature(lambda phi:
                         fun(pt, vars={'phi':phi}, **kwargs) * cos(pt.FTn*phi), 0, 2*pi)
             elif pt.FTn == 0:
-                res = gepard.quadrature.Hquadrature(lambda phi:
+                res = quadrature.Hquadrature(lambda phi:
                         fun(pt, vars={'phi':phi}, **kwargs), 0, 2*pi)/2.
             else:
                 raise ValueError('FTn = % is weird!' % str(pt.FTn))
@@ -646,7 +643,7 @@ class DVCS(Theory):
         if 'phi' in pt:
             return self._BSA(pt, **kwargs)
         elif 'FTn' in pt and pt.FTn == -1:
-            res = gepard.quadrature.Hquadrature(lambda phi:
+            res = quadrature.Hquadrature(lambda phi:
                     self._BSA(pt, vars={'phi':phi}) * sin(phi), 0, 2*pi)
         else:
             raise ValueError('[%s] has neither azimuthal angle phi\
@@ -733,9 +730,9 @@ class DVCS(Theory):
 
     def XwA(self, pt):
         """Ratio of first two cos harmonics of w-weighted cross section. In BMK, not Trento??"""
-        b0 = gepard.quadrature.Hquadrature(lambda phi: self.BSS(pt, vars={'phi':phi}, weighted=True),
+        b0 = quadrature.Hquadrature(lambda phi: self.BSS(pt, vars={'phi':phi}, weighted=True),
                 0, 2.0*pi) / (2.0*pi)
-        b1 = gepard.quadrature.Hquadrature(lambda phi: self.BSS(pt, vars={'phi':phi}, weighted=True) * cos(phi),
+        b1 = quadrature.Hquadrature(lambda phi: self.BSS(pt, vars={'phi':phi}, weighted=True) * cos(phi),
                 0, 2.0*pi) / pi
         return b1/b0
 
