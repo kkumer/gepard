@@ -4,11 +4,12 @@
 from numpy import array, cos, linspace, ndarray, pi, sin, sqrt, transpose
 from scipy.stats import scoreatpercentile
 
-import gepard.data
 import gepard.model
 import gepard.quadrature
 from gepard.constants import GeV2nb, Mp, Mp2, alpha
 from gepard.kinematics import *
+
+from .data import DataPoint, DataSet, _fill_kinematics
 
 NCPU = 23  # how many CPUs to use in parallel
 
@@ -31,7 +32,7 @@ class Theory(object):
         # self.texname = model.texname
         # self.description = model.description
 
-    def chisq_single(self, points: gepard.data.DataSet, asym: bool = False,
+    def chisq_single(self, points: DataSet, asym: bool = False,
                      **kwargs) -> float:
         """Return total chi-square.
 
@@ -60,11 +61,11 @@ class Theory(object):
         chi = sum(p*p for p in allpulls)  # equal to m.fval if minuit fit is done
         return chi
 
-    def pull(self, pt: gepard.data.DataPoint):
+    def pull(self, pt: DataPoint):
         """Return pull of a single Datapoint."""
         return (self.predict(pt, observable=pt.yaxis) - pt.val) / pt.err
 
-#     def chisq_para(self, points: gepard.data.DataSet, asym: bool = False,
+#     def chisq_para(self, points: DataSet, asym: bool = False,
 #                    **kwargs) -> float:
 #         """Return total chi-square - parallel version.
 # 
@@ -251,13 +252,13 @@ class DVCS(Theory):
         """
         # Overriding pt kinematics with those from kwargs
         if 'vars' in kwargs:
-            ptvars = gepard.data.DataPoint(init=kwargs['vars'])
-            gepard.data._fill_kinematics(ptvars, old=pt)
+            ptvars = DataPoint(init=kwargs['vars'])
+            _fill_kinematics(ptvars, old=pt)
             kin = ptvars
         else:
             # just copy everything from pt
-            ptempty = gepard.data.DataPoint()
-            gepard.data._fill_kinematics(ptempty, old=pt)
+            ptempty = DataPoint()
+            _fill_kinematics(ptempty, old=pt)
             kin = ptempty
             # Nothing seems to be gained by the following approach:
             # kin = dict((i, getattr(pt, i)) for i in

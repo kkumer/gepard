@@ -10,9 +10,9 @@ Note:
 
 import numpy as np
 
-from gepard.constants import CA, CF, CG, TF
-from gepard.special import (S1, S2, S3, MellinF2, S2_prime, S2_tilde, S3_prime,
-                            poch, psi, zeta)
+from .constants import CA, CF, CG, TF
+from .special import (S1, S2, S3, MellinF2, S2_prime, S2_tilde, S3_prime, poch,
+                      psi, zeta)
 
 
 def non_singlet_LO(n: complex, nf: int, prty: int=1) -> complex:

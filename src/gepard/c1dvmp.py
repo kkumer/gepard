@@ -3,8 +3,8 @@
 import math
 from typing import Tuple
 
-import gepard as g
-from gepard.special import S1, S2, S3, SB3, deldelS2, delS2, parity, poch
+from . import adim, constants, qcd
+from .special import S1, S2, S3, SB3, deldelS2, delS2, parity, poch
 
 
 def c1dvmp(m, sgntr: int, j: complex, k: int) -> Tuple[complex, complex, complex]:
@@ -12,11 +12,11 @@ def c1dvmp(m, sgntr: int, j: complex, k: int) -> Tuple[complex, complex, complex
     LRR2 = math.log(m.rr2)
     LRGPDF2 = math.log(m.rf2)
     LRDAF2 = math.log(m.rdaf2)
-    b0 = g.qcd.beta(0, m.nf)
+    b0 = qcd.beta(0, m.nf)
 
     ptyk = parity(k)
 
-    gamGQ = g.adim.singlet_LO(j+1, m.nf, ptyk)[1, 0]
+    gamGQ = adim.singlet_LO(j+1, m.nf, ptyk)[1, 0]
 
     gamGGCA = 4*S1(j+1) - 12/j/(j+3) + 4/(j+1)/(j+2)
     gamQQCF = 4*S1(k+1) - 3 - 2/poch(k+1, 2)
@@ -58,7 +58,7 @@ def c1dvmp(m, sgntr: int, j: complex, k: int) -> Tuple[complex, complex, complex
        *(3.+j+k))+(0.25*(3.+k)*(2.+(2.+k)**2)*(S2(0.5*(1.+j)) -
        S2(-0.5+0.5*(1.+j))-S2(0.5*(2.+k))+S2(-0.5+0.5*(2.+k)))
        )/((0.5*(1.+j)+0.5*(-2.-k))*(4.+j+k)*(3.+2.*k)*(4.+(1.+k)
-       *(2.+k))))*ptyk+2.*(j-k)*(3.+j+k)*(-SUMA-g.constants.ZETA3+S3(1.+j
+       *(2.+k))))*ptyk+2.*(j-k)*(3.+j+k)*(-SUMA-constants.ZETA3+S3(1.+j
        )+(0.125*(1.+k)*(S2(0.5*(1.+j))-S2(-0.5+0.5*(1.+j))-S2
        (0.5*(1.+k))+S2(-0.5+0.5*(1.+k)))*ptyk)/((0.5*(1.+j)+0.5
        *(-1.-k))*(3.+j+k)))
@@ -86,13 +86,13 @@ def c1dvmp(m, sgntr: int, j: complex, k: int) -> Tuple[complex, complex, complex
        ptyk))/((1.+k)**2*(2.+k)**2)+(-(1/((1.+j)*(2.+j))) +
        2*S1(1.+j))*(1.+ptyk-0.5*(1.+k)*(2.+k)*(-S2(0.5*k) +
        S2(0.5*(1.+k)))*ptyk)+2.*(1.+j)*(2.+j)*((-0.5*(-1.+(1.+j)*(
-       2.+j)))/((1.+j)**2*(2.+j)**2)+g.constants.ZETA3-(0.5*sgntr*(-S2(0.5 *
+       2.+j)))/((1.+j)**2*(2.+j)**2)+constants.ZETA3-(0.5*sgntr*(-S2(0.5 *
        j)+S2(0.5*(1.+j))))/((1.+j)*(2.+j))-S3(1.+j)-sgntr*SB3(
        1+j))+2.*(1.+k)*(2.+k)*((-0.5*(-1.+(1.+k)*(2.+k)))/((1. +
-       k)**2*(2.+k)**2)+g.constants.ZETA3-S3(1.+k)+(0.5*(-S2(0.5*k) +
+       k)**2*(2.+k)**2)+constants.ZETA3-S3(1.+k)+(0.5*(-S2(0.5*k) +
            S2(0.5*(1.+k)))*ptyk)/((1.+k)*(2.+k))+ptyk*SB3(1+k))
 
-    MCQ1 = g.constants.CF * MCQ1CF + g.constants.CG * MCQ1CG + b0 * MCQ1BET0
+    MCQ1 = constants.CF * MCQ1CF + constants.CG * MCQ1CG + b0 * MCQ1BET0
 
 
     #  ... pure singlet quark part starting at NLO
@@ -109,7 +109,7 @@ def c1dvmp(m, sgntr: int, j: complex, k: int) -> Tuple[complex, complex, complex
     # The commented-out code above may be slightly faster.
     # Here correction from 1612.01937 is implemented
     MCPS1 = (-LRGPDF2-m.corr_c1dvmp_one+2*S1(j+1)+2*S1(k+1)-1)*gamGQ/(j+
-             3)/g.constants.CF - (1/2 + 1/poch(j+1, 2) +
+             3)/constants.CF - (1/2 + 1/poch(j+1, 2) +
              1/poch(k+1, 2))*2/poch(j+1,2) + poch(k,4)*(
              deldelS2((j+1)/2, k/2) -
              deldelS2((j+1)/2, (k+2)/2)) / 2 / (2*k+3)
@@ -185,12 +185,12 @@ def c1dvmp(m, sgntr: int, j: complex, k: int) -> Tuple[complex, complex, complex
     MCG1CA = ((-LRGPDF2+S1(j+1)+3*S1(k+1)/2+1/2 +
               1/poch(j+1,2))*gamGGCA/2 -
               3*(2*S1(j+1)+S1(k+1)-6)/(j*(j+3)) +
-              (8+4*g.constants.ZETA2-poch(k+1,2)*delS2((k+1)/2))/8 -
+              (8+4*constants.ZETA2-poch(k+1,2)*delS2((k+1)/2))/8 -
               delS2((j+1)/2)/2-(10*poch(j+1,2)+4)/(poch(j+1,2)**2) +
               DELC1AG)
 
     MCG1BET0 = -0.5*LRGPDF2+0.5*LRR2
 
-    MCG1 = g.constants.CF * MCG1CF + g.constants.CA * MCG1CA + b0 * MCG1BET0
+    MCG1 = constants.CF * MCG1CF + constants.CA * MCG1CA + b0 * MCG1BET0
 
     return (MCQ1, MCPS1, MCG1)

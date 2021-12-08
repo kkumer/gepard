@@ -1,9 +1,12 @@
 """General kinematics."""
 
+from __future__ import annotations
+
 from numpy import cos, pi, sqrt
 
-import gepard.data
 from gepard.constants import Mp, Mp2, alpha
+
+from . import data
 
 
 def tmin(Q2: float, xB: float, eps2: float) -> float:
@@ -33,7 +36,7 @@ def J(Q2: float, xB: float, t: float, y: float, eps2: float) -> float:
     """BMK below Eq. (32)."""
     return (1.-y-y*eps2/2.) * (1. + t/Q2) - (1.-xB)*(2.-y)*t/Q2
 
-def is_within_phase_space(pt: gepard.data.DataPoint):
+def is_within_phase_space(pt: data.DataPoint):
     """Is pt kinematics within allowed phase space?"""
     return (pt.xB > xBmin(pt.s, pt.Q2) and pt.t < tmin(pt.Q2, pt.xB, pt.eps2))
 
@@ -43,7 +46,7 @@ def r(Q2: float, xB: float, t: float, y: float, eps2: float) -> float:
     brace = (2.-y)**2 * K / (1.-y) + (1./K)*(t/Q2)*(1.-y)*(2.-xB)
     return - (2.-y) / (2.-2.*y+y**2) * brace
 
-def P1P2(pt: gepard.data.DataPoint) -> float:
+def P1P2(pt: data.DataPoint) -> float:
     """ Product of Bethe-Heitler propagators, BMK Eq(32)."""
     P1 = - ( J(pt.Q2, pt.xB, pt.t, pt.y, pt.eps2) + 2. *
             sqrt(K2(pt.Q2, pt.xB, pt.t, pt.y, pt.eps2)) * cos(pt.phi) ) / (
@@ -51,19 +54,19 @@ def P1P2(pt: gepard.data.DataPoint) -> float:
     P2 = 1. + pt.t / pt.Q2  - P1
     return P1 * P2
 
-def anintP1P2(pt: gepard.data.DataPoint) -> float:
+def anintP1P2(pt: data.DataPoint) -> float:
     """ Analitical integral of BH propagators"""
     xB, Q2, t, y, eps2, K2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2, pt.K2
     brace = ( (1 - y - (1+eps2/2.) * y**2 * eps2/2.) * (1. + t/Q2)**2 +
               2.*K2 - (1.-xB)*(2.-y)**2 * (1. + xB*t/Q2) * t/Q2 )
     return -2. * pi * brace / (1+eps2)**2 / y**2
 
-def weight_BH(pt: gepard.data.DataPoint) -> float:
+def weight_BH(pt: data.DataPoint) -> float:
     """ Weight factor removing BH propagators from INT and BH amplitudes.
     It is normalized to int_0^2pi w  2pi as in BMK. """
     return 2.*pi*pt.P1P2 / pt.intP1P2
 
-def prepare(pt: gepard.data.DataPoint) -> None:
+def prepare(pt: data.DataPoint) -> None:
     """Pre-calculate GPD-independent kinamatical constants and functions."""
     if not hasattr(pt, "s"):
         #This is for variable beam energy;  code duplication
@@ -96,10 +99,10 @@ def prepare(pt: gepard.data.DataPoint) -> None:
     if 'phi' in pt:
         pt.P1P2 = P1P2(pt)
 
-def long2trans(pt: gepard.data.DataPoint) -> float:
+def long2trans(pt: data.DataPoint) -> float:
     """ Ratio of longitudinal to transverse photon flux 1304.0077 Eq. (2.9) """
     return (1.-pt.y-pt.eps2*pt.y**2/4.)/(1-pt.y+pt.y**2/2+pt.eps2*pt.y**2/4.)
 
-def HandFlux(pt: gepard.data.DataPoint) -> float:
+def HandFlux(pt: data.DataPoint) -> float:
     """ Virtual photon flux (Hand convention) 1304.0077 Eq. (2.9) """
     return (alpha/2./pi)*(pt.y**2/(1.-self.long2trans(pt)))*(1-pt.xB)/pt.xB/pt.Q2

@@ -6,27 +6,22 @@ DataSet   -- container for DataPoint instances
 """
 
 import copy
+import importlib.resources
 import math
 import os
 import re
-from importlib import resources
 
-import gepard as g
-import gepard.datasets.DIS
-import gepard.datasets.en2engamma
-import gepard.datasets.ep2epgamma
-import gepard.datasets.gammastarp2gammap
-import gepard.datasets.gammastarp2Mp
-
+# from . import theory
+from . import kinematics
 from .constants import Mp, Mp2
-
-# from .theory import prepare
+from .datasets import (DIS, en2engamma, ep2epgamma, gammastarp2gammap,
+                       gammastarp2Mp)
 
 
 def loaddata(resource):
     """Return dictionary {id : DataSet, ...}  out of files in resource package."""
     data = {}
-    files = resources.files(resource).iterdir()
+    files = importlib.resources.files(resource).iterdir()
     for file in files:
         if file.suffix == '.dat':
             dataset = DataSet(datafile=file.read_text())
@@ -102,7 +97,7 @@ class DataPoint(dict):
 
     def prepare(self):
         """Pre-calculate some functions of kinematics."""
-        g.theory.prepare(self)
+        kinematics.prepare(self)
         return
 
     def copy(self):
@@ -535,9 +530,9 @@ def _fill_kinematics(kin, old={}):
     if 'varphi' not in kin and 'varphi' in old:
         kin.varphi = old.varphi
 
-
-dset = loaddata(gepard.datasets.ep2epgamma)
-dset.update(loaddata(gepard.datasets.gammastarp2Mp))
-dset.update(loaddata(gepard.datasets.gammastarp2gammap))
-dset.update(loaddata(gepard.datasets.en2engamma))
-dset.update(loaddata(gepard.datasets.DIS))
+# Load all public datasets and make them globaly available
+dset = loaddata(ep2epgamma)
+dset.update(loaddata(gammastarp2Mp))
+dset.update(loaddata(gammastarp2gammap))
+dset.update(loaddata(en2engamma))
+dset.update(loaddata(DIS))

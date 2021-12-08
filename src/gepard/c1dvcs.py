@@ -4,9 +4,9 @@ import math
 
 import numpy as np
 
-from gepard.adim import block
-from gepard.constants import CF
-from gepard.special import S1, S2
+from .adim import block
+from .constants import CF
+from .special import S1, S2
 
 
 def c1_F2(n: complex, nf: int) -> np.ndarray:

@@ -24,7 +24,7 @@ ZETA4 = zeta(4)
 Mp = 0.938272013  # proton mass
 Mp2 = Mp ** 2
 alpha = 1.0 / 137.036  # inverse of fine structure constant
-# WolframAlpha: (hbar^2 c^2 / GeV^2)  in nanobarns
+# (hbar^2 c^2 / GeV^2)  in nanobarns
 GeV2nb = 389379.0
 GeVfm = 0.197327
 
