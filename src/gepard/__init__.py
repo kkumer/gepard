@@ -19,5 +19,5 @@ import gepard.theory  # noqa: F401
 import gepard.utils  # noqa: F401
 
 from .constants import Mp, Mp2  # noqa: F401
-from .data import DataPoint, DataSet  # noqa: F401
+from .data import DataPoint, DataSet, dset  # noqa: F401
 from .model import ConformalSpaceGPD, MellinBarnesModel  # noqa: F401

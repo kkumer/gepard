@@ -11,7 +11,7 @@ from typing import Dict, List
 
 import numpy as np
 import scipy.stats
-from joblib import Parallel, delayed
+# from joblib import Parallel, delayed
 
 from .constants import CF, NC, F_rho
 from .data import DataPoint
@@ -380,13 +380,13 @@ class PWNormGPD(ConformalSpaceGPD):
         return singlet_ng_constrained(self.jpoints,
                                              t, self.parameters).transpose()
 
-    def gpd_H_para(self, eta: float, t: float) -> np.ndarray:
-        """Return (npts, 4) array H_j^a for all j-points and 4 flavors."""
-        # This multiprocessing version is actually 2x slower!
-        h = Parallel(n_jobs=20)(delayed(singlet_ng_constrained)(j, t,
-                                                                       self.parameters)
-                                for j in self.jpoints)
-        return np.array(h)
+#     def gpd_H_para(self, eta: float, t: float) -> np.ndarray:
+#         """Return (npts, 4) array H_j^a for all j-points and 4 flavors."""
+#         # This multiprocessing version is actually 2x slower!
+#         h = Parallel(n_jobs=20)(delayed(singlet_ng_constrained)(j, t,
+#                                                                        self.parameters)
+#                                 for j in self.jpoints)
+#         return np.array(h)
 
     def gpd_E(self, eta: float, t: float) -> np.ndarray:
         """Return (npts, 4) array E_j^a for all j-points and 4 flavors."""

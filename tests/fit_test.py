@@ -6,16 +6,6 @@ from pytest import approx, mark
 # The following is not resulting in paralelization
 # os.environ["OPENBLAS_MAIN_FREE"] = "1"
 
-
-DVCSpoints = g.data.dset[36].copy()
-for id in range(37, 46):
-    DVCSpoints += g.data.dset[id]
-
-DISpoints = g.data.dset[201].copy()
-for id in range(202, 213):
-    DISpoints += g.data.dset[id]
-
-
 @mark.slow
 def test_fit_DIS_LO():
     """Test LO fitting to HERA DIS F2 data."""
@@ -24,6 +14,9 @@ def test_fit_DIS_LO():
     th = g.theory.BMK(model=m)
     th.m.parameters.update({'ns': 0.15, 'al0s': 1., 'alps': 0.15, 'ms2': 1.,
                             'secs': 0., 'al0g': 1.1, 'alpg': 0.15, 'mg2': 0.7})
+    DISpoints = g.dset[201].copy()
+    for id in range(202, 213):
+        DISpoints += g.dset[id]
     f = g.fitter.FitterMinuit(DISpoints, th)
     f.fix_parameters('ALL')
     f.release_parameters('ns', 'al0s', 'al0g')
@@ -40,6 +33,9 @@ def test_fit_DIS_NLO():
     th = g.theory.BMK(model=m)
     th.m.parameters.update({'ns': 0.15, 'al0s': 1., 'alps': 0.15, 'ms2': 1.,
                             'secs': 0., 'al0g': 1.1, 'alpg': 0.15, 'mg2': 0.7})
+    DISpoints = g.dset[201].copy()
+    for id in range(202, 213):
+        DISpoints += g.dset[id]
     f = g.fitter.FitterMinuit(DISpoints, th)
     f.fix_parameters('ALL')
     f.release_parameters('ns', 'al0s', 'al0g')
@@ -65,8 +61,8 @@ def test_gepardfitDVCSnlso3_short():
                             'alpg': 0.15,
                             'mg2': 0.7})
     # To pre-calculate wce for parallel execution:
-    th.chisq_single(g.data.dset[39])
-    f = g.fitter.FitterMinuit(g.data.dset[39], th)
+    th.chisq_single(g.dset[39])
+    f = g.fitter.FitterMinuit(g.dset[39], th)
     f.fix_parameters('ALL')
     f.release_parameters('ms2')
     f.minuit.migrad()
@@ -93,6 +89,9 @@ def test_gepardfitDVCSnlso3_long():
                             'alpg': 0.15,
                             'mg2': 0.7})
     # To pre-calculate wce for parallel execution:
+    DVCSpoints = g.dset[36].copy()
+    for id in range(37, 46):
+        DVCSpoints += g.dset[id]
     th.chisq_single(DVCSpoints)
     f = g.fitter.FitterMinuit(DVCSpoints, th)
     f.fix_parameters('ALL')

@@ -1,6 +1,6 @@
 """Definition of theory frameworks."""
 
-from joblib import Parallel, delayed
+# from joblib import Parallel, delayed
 from numpy import array, cos, linspace, ndarray, pi, sin, sqrt, transpose
 from scipy.stats import scoreatpercentile
 
@@ -64,17 +64,17 @@ class Theory(object):
         """Return pull of a single Datapoint."""
         return (self.predict(pt, observable=pt.yaxis) - pt.val) / pt.err
 
-    def chisq_para(self, points: gepard.data.DataSet, asym: bool = False,
-                   **kwargs) -> float:
-        """Return total chi-square - parallel version.
-
-        Warning:
-            Cannot be used until underlying global Fortran variables can change
-            during session. (Like different kinematics of data points.)
-        """
-        allpulls = Parallel(n_jobs=NCPU)(delayed(self.pull)(pt) for pt in points)
-        chi = sum(p*p for p in allpulls)  # equal to m.fval if minuit fit is done
-        return chi
+#     def chisq_para(self, points: gepard.data.DataSet, asym: bool = False,
+#                    **kwargs) -> float:
+#         """Return total chi-square - parallel version.
+# 
+#         Warning:
+#             Cannot be used until underlying global Fortran variables can change
+#             during session. (Like different kinematics of data points.)
+#         """
+#         allpulls = Parallel(n_jobs=NCPU)(delayed(self.pull)(pt) for pt in points)
+#         chi = sum(p*p for p in allpulls)  # equal to m.fval if minuit fit is done
+#         return chi
 
     chisq = chisq_single
 

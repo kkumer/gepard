@@ -15,8 +15,6 @@ par_fit = {'ns':  0.152039, 'al0s': 1.15751, 'alps': 0.15, 'ms2': 0.478391,
            'secs': -0.15152, 'this': 0.,  # 'ng': 0.4,  # provided by ns
            'al0g': 1.24732, 'alpg': 0.15, 'mg2': 0.7, 'secg': -0.81217, 'thig': 0.}
 
-HERAtestpts = g.data.dset[39] + g.data.dset[45]
-pt6 = g.data.dset[36][0]
 
 
 def test_F2_NLO():
@@ -123,6 +121,7 @@ def test_predict():
     m = g.model.MellinBarnesModel(gpds=fit_gpd)
     th = g.theory.BMK(model=m)
     th.m.parameters.update(par_fit)
+    pt6 = g.data.dset[36][0]
     assert th.predict(pt6) == approx(12.69069206084793)
 
 # @mark.devel
