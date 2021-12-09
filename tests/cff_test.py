@@ -1,8 +1,9 @@
 """Testing code for CFFs."""
 
-import gepard as g
 import numpy as np
 from pytest import approx, mark
+
+import gepard as g
 
 par_test = {'ns': 2./3. - 0.4, 'al0s': 1.1, 'alps': 0.25, 'ms2': 1.1**2,
             'ng': 0.4, 'al0g': 1.2, 'alpg': 0.25, 'mg2': 1.2**2}
@@ -42,12 +43,13 @@ pt_test.xi = pt_test.Q2 / (2.0 * pt_test.W * pt_test.W + pt_test.Q2)
 pt0_fit = g.data.DataPoint({'xi': 0.01, 'Q2': 4., 't': -0.2})  # noevol
 pt_fit = g.data.DataPoint({'xi': 0.01, 'Q2': 8., 't': -0.2})  # evol
 
-pt_bp = g.data.DataPoint({'xi': 1.e-5, 'Q2': 2.5, 't': -0.25})  # noevol
-pt_evol = g.data.DataPoint({'xi': 1.e-5, 'Q2': 25., 't': -0.25})  # evol
-pt_evolNS = g.data.DataPoint({'xi': 0.01, 'Q2': 10., 't': -0.25})  # evol
+# DataPoint should be in gepard namespace as well:
+pt_bp = g.DataPoint({'xi': 1.e-5, 'Q2': 2.5, 't': -0.25})  # noevol
+pt_evol = g.DataPoint({'xi': 1.e-5, 'Q2': 25., 't': -0.25})  # evol
+pt_evolNS = g.DataPoint({'xi': 0.01, 'Q2': 10., 't': -0.25})  # evol
 
 
-class gpd_model(g.model.ConformalSpaceGPD):
+class gpd_model(g.gpd.ConformalSpaceGPD):
     """GPD model from the paper - singlet and nonsinglet part."""
 
     def __init__(self, type, **kwargs) -> None:
@@ -67,13 +69,13 @@ class gpd_model(g.model.ConformalSpaceGPD):
 
     def gpd_H(self, eta: float, t: float) -> np.ndarray:
         """GPD H from hep-ph/0703179."""
-        return g.gpdj.ansatz07_fixed(self.jpoints, t, self.type).transpose()
+        return g.gpd.ansatz07_fixed(self.jpoints, t, self.type).transpose()
 
 
 def test_wc_LO():
     """Test LO DVCS Wilson coef."""
-    test_gpd = g.model.TestGPD(p=0)
-    m_test = g.model.MellinBarnesModel(gpds=test_gpd)
+    test_gpd = g.gpd.TestGPD(p=0)
+    m_test = g.cff.MellinBarnesCFF(gpds=test_gpd)
     m_test.parameters.update(par_test)
     assert g.wilson.calc_wc(m_test, m_test.jpoints, 'DVCS')[0, 0, :2] == approx(
             np.array([1.7798226558761627+0.00017759121554287j, 0+0j]))
@@ -81,8 +83,8 @@ def test_wc_LO():
 
 def test_wc_NLO():
     """Test NLO DVCS Wilson coef."""
-    test_gpd = g.model.TestGPD(p=1)
-    m_test = g.model.MellinBarnesModel(gpds=test_gpd)
+    test_gpd = g.gpd.TestGPD(p=1)
+    m_test = g.cff.MellinBarnesCFF(gpds=test_gpd)
     m_test.parameters.update(par_test)
     assert g.wilson.calc_wc(m_test, m_test.jpoints, 'DVCS')[0, 1, :2] == approx(
             np.array([-0.88174829594212023+0.00093822077679447j,
@@ -91,8 +93,8 @@ def test_wc_NLO():
 
 def test_wce_LO():
     """Test LO DVCS evolved Wilson coef."""
-    test_gpd = g.model.TestGPD(p=0)
-    m_test = g.model.MellinBarnesModel(gpds=test_gpd)
+    test_gpd = g.gpd.TestGPD(p=0)
+    m_test = g.cff.MellinBarnesCFF(gpds=test_gpd)
     m_test.parameters.update(par_test)
     assert g.wilson.calc_wce(m_test, 3.0, 'DVCS')[0, 0, :2] == approx(
             np.array([1.7328455630029231+0.00009701899018317j,
@@ -101,8 +103,8 @@ def test_wce_LO():
 
 def test_wce_NLO():
     """Test NLO DVCS evolved Wilson coef."""
-    test_gpd = g.model.TestGPD(p=1)
-    m_test = g.model.MellinBarnesModel(gpds=test_gpd)
+    test_gpd = g.gpd.TestGPD(p=1)
+    m_test = g.cff.MellinBarnesCFF(gpds=test_gpd)
     m_test.parameters.update(par_test)
     assert g.wilson.calc_wce(m_test, 3.0, 'DVCS')[0, 0, :2] == approx(
             np.array([1.6127545996599677+0.00014769567470216j,
@@ -111,8 +113,8 @@ def test_wce_NLO():
 
 def test_cff_H_noevol():
     """Test testing (ReH, ImH) (no evolution)."""
-    test_gpd = g.model.TestGPD()
-    m_test = g.model.MellinBarnesModel(gpds=test_gpd)
+    test_gpd = g.gpd.TestGPD()
+    m_test = g.cff.MellinBarnesCFF(gpds=test_gpd)
     m_test.parameters.update(par_test)
     assert m_test.cff(pt_test)[:2] == approx(
             [9839.566, 61614.9])
@@ -121,7 +123,7 @@ def test_cff_H_noevol():
 def test_cff_radLO():
     """Singlet LO CFF H (no evol)."""
     gpds = gpd_model('hard', p=0, scheme='csbar')
-    m = g.model.MellinBarnesModel(gpds=gpds)
+    m = g.cff.MellinBarnesCFF(gpds=gpds)
     qs = 5/18  # for nf=4
     m.dvcs_charges = (qs, qs, 0)  # select only singlet part of CFF
     assert m.cff(pt_bp)[:2] == approx(
@@ -131,7 +133,7 @@ def test_cff_radLO():
 def test_cff_radNLO():
     """Singlet NLO CFF H (no evol)."""
     gpds = gpd_model('hard', p=1, scheme='csbar')
-    m = g.model.MellinBarnesModel(gpds=gpds)
+    m = g.cff.MellinBarnesCFF(gpds=gpds)
     qs = 5/18  # for nf=4
     m.dvcs_charges = (qs, qs, 0)  # select only singlet part of CFF
     assert m.cff(pt_bp)[:2] == approx(
@@ -141,7 +143,7 @@ def test_cff_radNLO():
 def test_cff_radLO_evol_NS():
     """Non-singlet LO CFF H (evol)."""
     gpds = gpd_model('hardNS', p=0, scheme='csbar')
-    m = g.model.MellinBarnesModel(gpds=gpds)
+    m = g.cff.MellinBarnesCFF(gpds=gpds)
     qns = 1/6  # for nf=4
     m.dvcs_charges = (0, 0, qns)  # select only NS part of CFF
     assert m.cff(pt_evolNS)[:2] == approx(
@@ -151,7 +153,7 @@ def test_cff_radLO_evol_NS():
 def test_cff_radNLO_CSBARevol_NS():
     """Non-singlet NLO CFF H (CSBAR evol)."""
     gpds = gpd_model('hardNS', p=1, scheme='csbar')
-    m = g.model.MellinBarnesModel(gpds=gpds)
+    m = g.cff.MellinBarnesCFF(gpds=gpds)
     qns = 1/6  # for nf=4
     m.dvcs_charges = (0, 0, qns)  # select only NS part of CFF
     assert m.cff(pt_evolNS)[:2] == approx(
@@ -162,7 +164,7 @@ def test_cff_radNLO_CSBARevol_NS():
 def test_cff_radNLO_MSBARevol_NS():
     """Non-singlet NLO CFF H (CSBAR evol)."""
     gpds = gpd_model('hardNS', p=1, scheme='msbar')
-    m = g.model.MellinBarnesModel(gpds=gpds)
+    m = g.cff.MellinBarnesCFF(gpds=gpds)
     qns = 1/6  # for nf=4
     m.dvcs_charges = (0, 0, qns)  # select only NS part of CFF
     assert m.cff(pt_evolNS)[:2] == approx(
@@ -172,7 +174,7 @@ def test_cff_radNLO_MSBARevol_NS():
 def test_cff_rad_LOevol():
     """Singlet LO CFF H evolved."""
     gpds = gpd_model('hard', p=0, scheme='csbar')
-    m = g.model.MellinBarnesModel(gpds=gpds)
+    m = g.cff.MellinBarnesCFF(gpds=gpds)
     qs = 5/18  # for nf=4
     m.dvcs_charges = (qs, qs, 0)  # select only singlet part of CFF
     assert m.cff(pt_evol)[:2] == approx(
@@ -182,7 +184,7 @@ def test_cff_rad_LOevol():
 def test_cff_radNLO_CSBAR_evol():
     """Singlet NLO CSBAR CFF H evolved."""
     gpds = gpd_model('hard', p=1, scheme='csbar')
-    m = g.model.MellinBarnesModel(gpds=gpds)
+    m = g.cff.MellinBarnesCFF(gpds=gpds)
     qs = 5/18  # for nf=4
     m.dvcs_charges = (qs, qs, 0)  # select only singlet part of CFF
     assert m.cff(pt_evol)[:2] == approx(
@@ -193,7 +195,7 @@ def test_cff_radNLO_CSBAR_evol():
 def test_cff_radNLO_MSBAR_evol():
     """Singlet NLO MSBAR CFF H evolved."""
     gpds = gpd_model('hard', p=1, scheme='msbar')
-    m = g.model.MellinBarnesModel(gpds=gpds)
+    m = g.cff.MellinBarnesCFF(gpds=gpds)
     qs = 5/18  # for nf=4
     m.dvcs_charges = (qs, qs, 0)  # select only singlet part of CFF
     # Result of wrong ND-evolution fortran-gepard code
@@ -206,8 +208,8 @@ def test_cff_radNLO_MSBAR_evol():
 
 def test_cff_H_nlso3():
     """Test nl-so3 (ReH, ImH) (LO evolved to multiple Q2)."""
-    fit_gpd = g.model.PWNormGPD()
-    m_fit = g.model.MellinBarnesModel(gpds=fit_gpd)
+    fit_gpd = g.gpd.PWNormGPD()
+    m_fit = g.cff.MellinBarnesCFF(gpds=fit_gpd)
     m_fit.parameters.update(par_fit)
     # Q2 can be changed during calls:
     assert m_fit.cff(pt0_fit)[:2] == approx(
@@ -218,8 +220,8 @@ def test_cff_H_nlso3():
 
 def test_cff_H_nlso3_separate():
     """Test nl-so3 ReH, ImH (LO evolved to multiple Q2)."""
-    fit_gpd = g.model.PWNormGPD()
-    m_fit = g.model.MellinBarnesModel(gpds=fit_gpd)
+    fit_gpd = g.gpd.PWNormGPD()
+    m_fit = g.cff.MellinBarnesCFF(gpds=fit_gpd)
     m_fit.parameters.update(par_fit)
     # Q2 can be changed during calls:
     assert m_fit.ReH(pt0_fit) == approx(
@@ -234,8 +236,8 @@ def test_cff_H_nlso3_separate():
 
 def test_cff_E_nlso3():
     """Testing nl-so3 (ReE, ImE) (LO evolved to multiple Q2)."""
-    fit_gpd = g.model.PWNormGPD()
-    m_fit = g.model.MellinBarnesModel(gpds=fit_gpd)
+    fit_gpd = g.gpd.PWNormGPD()
+    m_fit = g.cff.MellinBarnesCFF(gpds=fit_gpd)
     m_fit.parameters.update(par_fit)
     assert m_fit.cff(pt0_fit)[2:4] == approx(
             [13.2678, 42.11355])
@@ -245,8 +247,8 @@ def test_cff_E_nlso3():
 
 def test_cff_E_nlso3_separate():
     """Testing nl-so3 ReE, ImE (LO evolved to multiple Q2)."""
-    fit_gpd = g.model.PWNormGPD()
-    m_fit = g.model.MellinBarnesModel(gpds=fit_gpd)
+    fit_gpd = g.gpd.PWNormGPD()
+    m_fit = g.cff.MellinBarnesCFF(gpds=fit_gpd)
     m_fit.parameters.update(par_fit)
     assert m_fit.ReE(pt0_fit) == approx(
             13.2678)
@@ -260,8 +262,8 @@ def test_cff_E_nlso3_separate():
 
 # def test_cff_H_KM15():
     # """Test of MB part of KM15 - temp.."""
-    # fit_gpd = g.model.PWNormGPD()
-    # m_fit = g.model.MellinBarnesModel(gpds=fit_gpd)
+    # fit_gpd = g.gpd.PWNormGPD()
+    # m_fit = g.cff.MellinBarnesCFF(gpds=fit_gpd)
     # m_fit.parameters.update(par_KM15)
     # # Q2 can be changed during calls:
     # assert m_fit.ImH(pt0_fit) == approx(66.90122688611703)
@@ -271,10 +273,10 @@ def test_cff_E_nlso3_separate():
 
 def test_KM15_cffs():
     """Test CFFs of KM15 model fit."""
-    fit_gpd = g.model.PWNormGPD()
-    mMB = g.model.MellinBarnesModel(gpds=fit_gpd)
-    mDR = g.model.ComptonModelDRPP()
-    m = g.model.ComptonHybrid(mMB, mDR)
+    fit_gpd = g.gpd.PWNormGPD()
+    mMB = g.cff.MellinBarnesCFF(gpds=fit_gpd)
+    mDR = g.cff.ComptonModelDRPP()
+    m = g.cff.ComptonHybrid(mMB, mDR)
     m.parameters.update(par_KM15)
     assert m.ImH(pt0_fit) == approx(
             70.3619128283078)

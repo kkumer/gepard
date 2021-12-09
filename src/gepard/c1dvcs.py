@@ -50,7 +50,7 @@ def shift1(m, j: np.ndarray, process: str) -> np.ndarray:
     """Calculate NLO shift coeff s_1.
 
     Args:
-       m: instance of g.model.MellinBarnesModel
+       m: instance of g.cff.MellinBarnes
        j: MB contour points
        process: 'DVCS' or 'DIS'
 
@@ -69,7 +69,7 @@ def C1(m, j: np.ndarray, process: str) -> np.ndarray:
     """Calculate NLO Wilson coeff C_1 for DVCS or DIS.
 
     Args:
-       m: instance of g.model.MellinBarnesModel
+       m: instance of g.cff.MellinBarnes
        j: MB contour points
        process: 'DVCS' or 'DIS'
 

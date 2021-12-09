@@ -64,7 +64,7 @@ ptwd = g.data.dset[55][0]
 
 def test_CFF():
     """Calculate CFF H."""
-    m = g.model.ModelDR()
+    m = g.cff.ModelDR()
     m.parameters.update(par_DMGLO1)
 
     assert m.ImH(pt0) == approx(17.67971592396648)
@@ -73,7 +73,7 @@ def test_CFF():
 
 def test_CFF2():
     """Calculate CFF H."""
-    mBM10 = g.model.ModelDR()
+    mBM10 = g.cff.ModelDR()
     mBM10.parameters.update(par_DMepsGLO1)
 
     assert mBM10.ImH(pt1) == approx(1.3213158482535692)
@@ -82,7 +82,7 @@ def test_CFF2():
 
 def test_Xunp():
     """Calculate basic cross section Xunp."""
-    m = g.model.ModelDR()
+    m = g.cff.ModelDR()
     m.parameters.update(par_DMGLO1)
     t = g.theory.hotfixedBMK(m)
     assert t.Xunp(pt0, vars={'phi': 1.}) == approx(1.8872666478756337)
@@ -94,7 +94,7 @@ def test_Xunp():
 
 def test_Xunp2():
     """Any kinematic variable can be in vars."""
-    m = g.model.ModelDR()
+    m = g.cff.ModelDR()
     m.parameters.update(par_DMGLO1)
     t = g.theory.hotfixedBMK(m)
     assert t.Xunp(pt0,
@@ -104,7 +104,7 @@ def test_Xunp2():
 @mark.skip(reason='Feature not implemented.')
 def test_Xunp3():
     """A ndarray of Q2 could be in vars."""
-    m = g.model.ModelDR()
+    m = g.cff.ModelDR()
     m.parameters.update(par_DMGLO1)
     t = g.theory.hotfixedBMK(m)
     ar = t.Xunp(pt0, vars={'phi': 1, 'Q2': np.array([2.3, 2.5])})
@@ -116,7 +116,7 @@ def test_Xunp3():
 @mark.skip(reason='Feature not implemented.')
 def test_Xunp4():
     """New feature: ndarray of any kinematical variable could be in vars."""
-    m = g.model.ModelDR()
+    m = g.cff.ModelDR()
     m.parameters.update(par_DMGLO1)
     t = g.theory.hotfixedBMK(m)
     ar = t.Xunp(pt0, vars={'phi': 1, 'xB': np.array([0.07, 0.11])})
@@ -126,7 +126,7 @@ def test_Xunp4():
 
 def test_XunpBM10():
     """Calculate unpolarized cross section Xunp in BM10 Approach."""
-    mBM10 = g.model.ModelDR()
+    mBM10 = g.cff.ModelDR()
     mBM10.parameters.update(par_DMepsGLO1)
     tBM10 = g.theory.BM10(mBM10)
     pt1.prepare()
@@ -138,7 +138,7 @@ def test_XunpBM10():
 
 def test_XLP():
     """Calculate long. polarized cross section XLP in BM10 Approach."""
-    mBM10 = g.model.ModelDR()
+    mBM10 = g.cff.ModelDR()
     mBM10.parameters.update(par_DMepsGLO1)
     tBM10 = g.theory.BM10(mBM10)
     pt1.prepare()
@@ -151,7 +151,7 @@ def test_XLP():
 def test_XTP():
     """Calculate transv. polarized cross section XTP in BMK Approach."""
     pt1.varphi = 1.
-    m = g.model.ModelDR()
+    m = g.cff.ModelDR()
     m.parameters.update(par_DMGLO1)
     t = g.theory.hotfixedBMK(m)
     pt1.prepare()
@@ -163,7 +163,7 @@ def test_XTP():
 
 def test_BSA():
     """Calculate BSA in BMK Approach."""
-    m = g.model.ModelDR()
+    m = g.cff.ModelDR()
     m.parameters.update(par_DMGLO1)
     t = g.theory.hotfixedBMK(m)
     assert t.BSA(pt0) == approx(0.1845304070958366)
@@ -172,7 +172,7 @@ def test_BSA():
 
 def test_TSA():
     """Calculate longitudinal TSA in BM10 Approach."""
-    mBM10 = g.model.ModelDR()
+    mBM10 = g.cff.ModelDR()
     mBM10.parameters.update(par_DMepsGLO1)
     tBM10 = g.theory.BM10(mBM10)
     assert tBM10.TSA(ptt) == approx(-0.47969623208934847)
@@ -180,7 +180,7 @@ def test_TSA():
 
 def test_BTSA():
     """Calculate longitudinal BTSA in BM10 Approach."""
-    mBM10 = g.model.ModelDR()
+    mBM10 = g.cff.ModelDR()
     mBM10.parameters.update(par_DMepsGLO1)
     tBM10 = g.theory.BM10(mBM10)
     assert tBM10.BTSA(ptb) == approx(0.25592806446362842)
@@ -188,7 +188,7 @@ def test_BTSA():
 
 def test_TTSA():
     """Calculate transversal TSA in BMK Approach and frame."""
-    m = g.model.ModelDR()
+    m = g.cff.ModelDR()
     m.parameters.update(par_DMGLO1)
     t = g.theory.hotfixedBMK(m)
     assert t.TSA(pttrans) == approx(0.080468284490077271)
@@ -196,7 +196,7 @@ def test_TTSA():
 
 def test_BSSw():
     """Calculate weighted BSS."""
-    m = g.model.ModelDR()
+    m = g.cff.ModelDR()
     m.parameters.update(par_DMGLO1)
     t = g.theory.hotfixedBMK(m)
     assert t.BSSw(ptw) == approx(0.056334042569159554)
@@ -204,7 +204,7 @@ def test_BSSw():
 
 def test_BSDw():
     """Calculate weighted BSD."""
-    m = g.model.ModelDR()
+    m = g.cff.ModelDR()
     m.parameters.update(par_DMGLO1)
     t = g.theory.hotfixedBMK(m)
     assert t.BSDw(ptwd)*1e3 == approx(8.91853141911449)
@@ -212,7 +212,7 @@ def test_BSDw():
 
 def test_AUTI():
     """Calculate transversal TSA - INT part - in BMK Approach and frame."""
-    m = g.model.ModelDR()
+    m = g.cff.ModelDR()
     m.parameters.update(par_DMGLO1)
     t = g.theory.hotfixedBMK(m)
     assert t.AUTI(pttrans) == approx(0.075300023640416394)
@@ -222,7 +222,7 @@ def test_AUTI():
 def test_AUTDVCS():
     """Calculate transversal TSA - DVCS part - in BMK Approach and frame."""
     # Gepard model
-    mGepard = g.model.Gepard(ansatz='EFLEXP')
+    mGepard = g.cff.Gepard(ansatz='EFLEXP')
     mGepard.parameters.update(par_DM12)
     th = g.theory.BMK(mGepard)
     pttrans.varFTn = -1

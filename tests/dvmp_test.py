@@ -29,8 +29,8 @@ def test_dvmp_TFFs_LO():
     xB = 1e-4
     pt = g.data.DataPoint({'Q2': 4., 't': 0, 'xB': xB})
     # generic LO model from big DVMP draft
-    fit_gpd = g.model.PWNormGPD()
-    m = g.model.MellinBarnesModel(gpds=fit_gpd)
+    fit_gpd = g.gpd.PWNormGPD()
+    m = g.cff.MellinBarnesCFF(gpds=fit_gpd)
     m.parameters.update(par_dvmp)
     tffs = m.tff(pt.xi, pt.t, pt.Q2)
     reh, imh = tffs[0], tffs[1]
@@ -42,8 +42,8 @@ def test_dvmp_TFFs_LO():
 def test_gepardTFFsEvol():
     """Calculate LO DVMP TFFs for rho production + evolution."""
     pt = g.data.DataPoint({'Q2': 6.6, 'W': 75., 't': -0.025})
-    fit_gpd = g.model.PWNormGPD()
-    m = g.model.MellinBarnesModel(gpds=fit_gpd)
+    fit_gpd = g.gpd.PWNormGPD()
+    m = g.cff.MellinBarnesCFF(gpds=fit_gpd)
     m.parameters.update(par_KM10b)
     tffs = m.tff(pt.xi, pt.t, pt.Q2)
     reh, imh = tffs[0], tffs[1]
@@ -55,8 +55,8 @@ def test_gepardXrhot():
     """Calculate LO DVMP cross section d sigma / dt"""
     pt = g.data.DataPoint({'Q2': 6.6, 'W': 75., 't': -0.025,
                            'process': 'gammastarp2rho0p'})
-    fit_gpd = g.model.PWNormGPD()
-    m = g.model.MellinBarnesModel(gpds=fit_gpd)
+    fit_gpd = g.gpd.PWNormGPD()
+    m = g.cff.MellinBarnesCFF(gpds=fit_gpd)
     m.parameters.update(par_KM10b)
     th = g.theory.DVMP(m)
     assert th.X(pt) == approx(1212.62165, rel=1.e-2)
@@ -67,8 +67,8 @@ def test_c1_NLO():
     xB = 1e-4
     pt = g.data.DataPoint({'Q2': 4., 't': 0, 'xB': xB})
     # generic LO model from big DVMP draft
-    fit_gpd = g.model.PWNormGPD()
-    m = g.model.MellinBarnesModel(gpds=fit_gpd)
+    fit_gpd = g.gpd.PWNormGPD()
+    m = g.cff.MellinBarnesCFF(gpds=fit_gpd)
     m.parameters.update(par_dvmp)
     # to get agreement with these old numbers:
     m.corr_c1dvmp_one = 0
@@ -92,8 +92,8 @@ def test_dvmp_TFFs_NLO():
     """Calculate NLO DVMP TFFs for rho production at input scale."""
     xB = 1e-4
     pt = g.data.DataPoint({'Q2': 4., 't': 0, 'xB': xB})
-    fit_gpd = g.model.PWNormGPD(p=1)
-    m = g.model.MellinBarnesModel(gpds=fit_gpd)
+    fit_gpd = g.gpd.PWNormGPD(p=1)
+    m = g.cff.MellinBarnesCFF(gpds=fit_gpd)
     m.parameters.update(par_dvmp)
     # to get agreement with these old numbers:
     m.corr_c1dvmp_one = 0

@@ -9,8 +9,8 @@ from pytest import approx, mark
 @mark.slow
 def test_fit_DIS_LO():
     """Test LO fitting to HERA DIS F2 data."""
-    fit_gpd = g.model.PWNormGPD(p=0)
-    m = g.model.MellinBarnesModel(gpds=fit_gpd)
+    fit_gpd = g.gpd.PWNormGPD(p=0)
+    m = g.cff.MellinBarnesCFF(gpds=fit_gpd)
     th = g.theory.BMK(model=m)
     th.m.parameters.update({'ns': 0.15, 'al0s': 1., 'alps': 0.15, 'ms2': 1.,
                             'secs': 0., 'al0g': 1.1, 'alpg': 0.15, 'mg2': 0.7})
@@ -28,8 +28,8 @@ def test_fit_DIS_LO():
 @mark.slow
 def test_fit_DIS_NLO():
     """Test NLO fitting to HERA DIS F2 data."""
-    fit_gpd = g.model.PWNormGPD(p=1)
-    m = g.model.MellinBarnesModel(gpds=fit_gpd)
+    fit_gpd = g.gpd.PWNormGPD(p=1)
+    m = g.cff.MellinBarnesCFF(gpds=fit_gpd)
     th = g.theory.BMK(model=m)
     th.m.parameters.update({'ns': 0.15, 'al0s': 1., 'alps': 0.15, 'ms2': 1.,
                             'secs': 0., 'al0g': 1.1, 'alpg': 0.15, 'mg2': 0.7})
@@ -49,8 +49,8 @@ def test_gepardfitDVCSnlso3_short():
 
     This is reduced faster version of old test below.
     """
-    fit_gpd = g.model.PWNormGPD()
-    m = g.model.MellinBarnesModel(gpds=fit_gpd)
+    fit_gpd = g.gpd.PWNormGPD()
+    m = g.cff.MellinBarnesCFF(gpds=fit_gpd)
     th = g.theory.BMK(model=m)
     th.m.parameters.update({'ns': 0.15203911208796006,
                             'al0s': 1.1575060246398083,
@@ -77,8 +77,8 @@ def test_gepardfitDVCSnlso3_long():
     'fit dvcs dvcs dvcs' or
     smallx-final.nb, section 1-[nlo]-LO.
     """
-    fit_gpd = g.model.PWNormGPD()
-    m = g.model.MellinBarnesModel(gpds=fit_gpd)
+    fit_gpd = g.gpd.PWNormGPD()
+    m = g.cff.MellinBarnesCFF(gpds=fit_gpd)
     th = g.theory.BMK(model=m)
     th.m.parameters.update({'ns': 0.15203911208796006,
                             'al0s': 1.1575060246398083,

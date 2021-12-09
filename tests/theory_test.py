@@ -19,8 +19,8 @@ par_fit = {'ns':  0.152039, 'al0s': 1.15751, 'alps': 0.15, 'ms2': 0.478391,
 
 def test_F2_NLO():
     """Test NLO DIS F2 evaluation."""
-    fit_gpd = g.model.PWNormGPD(p=1)
-    m = g.model.MellinBarnesModel(gpds=fit_gpd)
+    fit_gpd = g.gpd.PWNormGPD(p=1)
+    m = g.cff.MellinBarnesCFF(gpds=fit_gpd)
     th = g.theory.BMK(model=m)
     th.m.parameters.update({'ns': 0.15, 'al0s': 1., 'alps': 0.15, 'ms2': 1.,
                             'secs': 0., 'al0g': 1.1, 'alpg': 0.15, 'mg2': 0.7})
@@ -34,8 +34,8 @@ def test_XDVCSt_noevol():
     pt.xi = pt.Q2 / (2.0 * pt.W * pt.W + pt.Q2)
     pt.xB = 2*pt.xi/(1.+pt.xi)
     pt.yaxis = 'X'
-    test_gpd = g.model.TestGPD()
-    m = g.model.MellinBarnesModel(gpds=test_gpd)
+    test_gpd = g.gpd.TestGPD()
+    m = g.cff.MellinBarnesCFF(gpds=test_gpd)
     m.parameters.update(par_test)
     th = g.theory.hotfixedBMK(m)
     # Have to decrease precision due to slightly different formula
@@ -48,8 +48,8 @@ def test_XDVCSt():
     pt.xi = pt.Q2 / (2.0 * pt.W * pt.W + pt.Q2)
     pt.xB = 2*pt.xi/(1.+pt.xi)
     pt.yaxis = 'X'
-    test_gpd = g.model.TestGPD()
-    m = g.model.MellinBarnesModel(gpds=test_gpd)
+    test_gpd = g.gpd.TestGPD()
+    m = g.cff.MellinBarnesCFF(gpds=test_gpd)
     m.parameters.update(par_test)
     th = g.theory.hotfixedBMK(m)
     # Comparison to old pure-Fortran 'src/test/test.F':
@@ -63,8 +63,8 @@ def test_XDVCSt_NLO():
     pt.xi = pt.Q2 / (2.0 * pt.W * pt.W + pt.Q2)
     pt.xB = 2*pt.xi/(1.+pt.xi)
     pt.yaxis = 'X'
-    test_gpd = g.model.TestGPD(p=1)
-    m = g.model.MellinBarnesModel(gpds=test_gpd)
+    test_gpd = g.gpd.TestGPD(p=1)
+    m = g.cff.MellinBarnesCFF(gpds=test_gpd)
     m.parameters.update(par_test)
     th = g.theory.hotfixedBMK(m)
     assert th._XDVCStEx(pt) == approx(821.0062045181508)
@@ -76,8 +76,8 @@ def test_XDVCSt_NLOevol():
     pt.xi = pt.Q2 / (2.0 * pt.W * pt.W + pt.Q2)
     pt.xB = 2*pt.xi/(1.+pt.xi)
     pt.yaxis = 'X'
-    test_gpd = g.model.TestGPD(p=1)
-    m = g.model.MellinBarnesModel(gpds=test_gpd)
+    test_gpd = g.gpd.TestGPD(p=1)
+    m = g.cff.MellinBarnesCFF(gpds=test_gpd)
     m.parameters.update(par_test)
     th = g.theory.hotfixedBMK(m)
     assert th._XDVCStEx(pt) == approx(90.76770897337423)
@@ -89,8 +89,8 @@ def test_XDVCS():
     pt.xi = pt.Q2 / (2.0 * pt.W * pt.W + pt.Q2)
     pt.xB = 2*pt.xi/(1.+pt.xi)
     pt.yaxis = 'X'
-    test_gpd = g.model.TestGPD()
-    m = g.model.MellinBarnesModel(gpds=test_gpd)
+    test_gpd = g.gpd.TestGPD()
+    m = g.cff.MellinBarnesCFF(gpds=test_gpd)
     m.parameters.update(par_test)
     th = g.theory.hotfixedBMK(m)
     # Comparison to old pure-Fortran 'src/test/test.F':
@@ -104,8 +104,8 @@ def test_XDVCS_NLO():
     pt.xi = pt.Q2 / (2.0 * pt.W * pt.W + pt.Q2)
     pt.xB = 2*pt.xi/(1.+pt.xi)
     pt.yaxis = 'X'
-    test_gpd = g.model.TestGPD(p=1)
-    m = g.model.MellinBarnesModel(gpds=test_gpd)
+    test_gpd = g.gpd.TestGPD(p=1)
+    m = g.cff.MellinBarnesCFF(gpds=test_gpd)
     m.parameters.update(par_test)
     th = g.theory.hotfixedBMK(m)
     assert th.predict(pt) == approx(32.29728102, rel=1e-5)
@@ -117,8 +117,8 @@ def test_XDVCS_NLO():
 
 def test_predict():
     """Test theory predict."""
-    fit_gpd = g.model.PWNormGPD()
-    m = g.model.MellinBarnesModel(gpds=fit_gpd)
+    fit_gpd = g.gpd.PWNormGPD()
+    m = g.cff.MellinBarnesCFF(gpds=fit_gpd)
     th = g.theory.BMK(model=m)
     th.m.parameters.update(par_fit)
     pt6 = g.data.dset[36][0]
@@ -127,8 +127,8 @@ def test_predict():
 # @mark.devel
 # def test_chisq():
 #     """Test chisq calculation."""
-#     fit_gpd = g.model.PWNormGPD()
-#     m = g.model.MellinBarnesModel(gpds=fit_gpd)
+#     fit_gpd = g.gpd.PWNormGPD()
+#     m = g.cff.MellinBarnesCFF(gpds=fit_gpd)
 #     th = g.theory.BMK(model=m)
 #     th.m.parameters.update(par_fit)
 #     assert th.chisq_single([data[39][1]]) == approx(0.027310271896327565)
@@ -137,8 +137,8 @@ def test_predict():
 
 def test_chisq_Xt():
     """Test chisq Xt calculation."""
-    fit_gpd = g.model.PWNormGPD()
-    m = g.model.MellinBarnesModel(gpds=fit_gpd)
+    fit_gpd = g.gpd.PWNormGPD()
+    m = g.cff.MellinBarnesCFF(gpds=fit_gpd)
     th = g.theory.BMK(model=m)
     th.m.parameters.update(par_fit)
     assert th.chisq_single(g.data.dset[39][2:4]) == approx(1.012533085207716)
@@ -148,8 +148,8 @@ def test_chisq_Xt():
 
 def test_chisq_X():
     """Test chisq total X calculation."""
-    fit_gpd = g.model.PWNormGPD()
-    m = g.model.MellinBarnesModel(gpds=fit_gpd)
+    fit_gpd = g.gpd.PWNormGPD()
+    m = g.cff.MellinBarnesCFF(gpds=fit_gpd)
     th = g.theory.BMK(model=m)
     th.m.parameters.update(par_fit)
     assert th.chisq_single([g.data.dset[45][3]]) == approx(0.29405520100706245)
@@ -159,8 +159,8 @@ def test_chisq_X():
 
 # def test_chisq_aux():
 #     """Test chisq total X calculation."""
-#     fit_gpd = g.model.PWNormGPD()
-#     m = g.model.MellinBarnesModel(gpds=fit_gpd)
+#     fit_gpd = g.gpd.PWNormGPD()
+#     m = g.cff.MellinBarnesCFF(gpds=fit_gpd)
 #     th = g.theory.BMK(model=m)
 #     th.m.parameters.update(par_fit)
 #     # assert th.chisq_single(data[45][3:5]) == approx(0.29860340473733393)
@@ -181,8 +181,8 @@ def test_chisq_X():
 
 def test_chisq_XtX():
     """Test chisq Xt+X calculation."""
-    fit_gpd = g.model.PWNormGPD()
-    m = g.model.MellinBarnesModel(gpds=fit_gpd)
+    fit_gpd = g.gpd.PWNormGPD()
+    m = g.cff.MellinBarnesCFF(gpds=fit_gpd)
     th = g.theory.BMK(model=m)
     th.m.parameters.update(par_fit)
     assert th.chisq_single(g.data.dset[39][2:]+g.data.dset[45]) == approx(10.47326924258)

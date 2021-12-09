@@ -115,7 +115,7 @@ par_KM15 = {'tMv': 3.992860161655587, 'rS': 1.0, 'alv': 0.43, 'tal': 0.43,
 
 def test_KM09a():
     """Test model: KM09a."""
-    m = g.model.ModelDR()
+    m = g.cff.ModelDR()
     m.parameters.update(par_KM09a)
     th = g.theory.hotfixedBMK(m)
     chisq = th.chisq(GLOpoints)
@@ -124,7 +124,7 @@ def test_KM09a():
 
 def test_KM09b():
     """Test model: KM09b."""
-    m = g.model.ModelDR()
+    m = g.cff.ModelDR()
     m.parameters.update(par_KM09b)
     th = g.theory.hotfixedBMK(m)
     pts = GLOpoints + g.data.dset[30]
@@ -135,10 +135,10 @@ def test_KM09b():
 @mark.slow
 def test_KM10():
     """Test model: KM10."""
-    fit_gpd = g.model.PWNormGPD()
-    mMB = g.model.MellinBarnesModel(gpds=fit_gpd)
-    mDR = g.model.ComptonModelDRPP()
-    m = g.model.HybridDipole(mMB, mDR)
+    fit_gpd = g.gpd.PWNormGPD()
+    mMB = g.cff.MellinBarnesCFF(gpds=fit_gpd)
+    mDR = g.cff.ComptonModelDRPP()
+    m = g.cff.HybridDipole(mMB, mDR)
     m.parameters.update(par_KM10)
     th = g.theory.BM10(m)
     pts = H1ZEUSpoints + UNP5points
@@ -164,10 +164,10 @@ def test_KM10a():
 @mark.slow
 def test_KM10b():
     """Test model: KM10b."""
-    fit_gpd = g.model.PWNormGPD()
-    mMB = g.model.MellinBarnesModel(gpds=fit_gpd)
-    mDR = g.model.ComptonModelDRPP()
-    m = g.model.HybridKelly(mMB, mDR)
+    fit_gpd = g.gpd.PWNormGPD()
+    mMB = g.cff.MellinBarnesCFF(gpds=fit_gpd)
+    mDR = g.cff.ComptonModelDRPP()
+    m = g.cff.HybridKelly(mMB, mDR)
     m.parameters.update(par_KM10b)
     th = g.theory.BM10(m)
     pts = DVCSpoints+GLOpoints+g.data.dset[30]
@@ -190,10 +190,10 @@ def test_KMM12():
 @mark.slow
 def test_KM15():
     """Test model: KM15."""
-    fit_gpd = g.model.PWNormGPD()
-    mMB = g.model.MellinBarnesModel(gpds=fit_gpd)
-    mDR = g.model.ComptonModelDRPP()
-    m = g.model.HybridKelly(mMB, mDR)
+    fit_gpd = g.gpd.PWNormGPD()
+    mMB = g.cff.MellinBarnesCFF(gpds=fit_gpd)
+    mDR = g.cff.ComptonModelDRPP()
+    m = g.cff.HybridKelly(mMB, mDR)
     m.parameters.update(par_KM15)
     th = g.theory.BM10tw2(m)
     pts = GLO15b

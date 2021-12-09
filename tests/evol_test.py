@@ -23,8 +23,8 @@ pt_fit = g.data.DataPoint({'xi': 0.01, 'Q2': 8., 't': -0.2})  # evol
 
 def test_lambda():
     """Test LO singlet an. dim. eigenvalues."""
-    fit_gpd = g.model.PWNormGPD()
-    m = g.model.MellinBarnesModel(gpds=fit_gpd)
+    fit_gpd = g.gpd.PWNormGPD()
+    m = g.cff.MellinBarnesCFF(gpds=fit_gpd)
     m.parameters.update(par_fit)
     # leading PW
     gam0 = g.adim.singlet_LO(m.jpoints+1, m.nf).transpose((2, 0, 1))
@@ -38,8 +38,8 @@ def test_lambda():
 
 def test_projectors_LO():
     """Test LO singlet eigen projectors."""
-    fit_gpd = g.model.PWNormGPD()
-    m = g.model.MellinBarnesModel(gpds=fit_gpd)
+    fit_gpd = g.gpd.PWNormGPD()
+    m = g.cff.MellinBarnesCFF(gpds=fit_gpd)
     m.parameters.update(par_fit)
     gam0 = g.adim.singlet_LO(m.jpoints+1, m.nf).transpose((2, 0, 1))
     lam, pr = g.evolution.projectors(gam0)
@@ -50,8 +50,8 @@ def test_projectors_LO():
 
 def test_rnlof():
     """Test projected NLO mu-indep part of evol.op."""
-    test_gpd = g.model.TestGPD(p=1)
-    m = g.model.MellinBarnesModel(gpds=test_gpd)
+    test_gpd = g.gpd.TestGPD(p=1)
+    m = g.cff.MellinBarnesCFF(gpds=test_gpd)
     m.parameters.update(par_test)
     # leading PW
     lam, pr, r1proj = g.evolution.rnlof(m, m.jpoints)
@@ -69,8 +69,8 @@ def test_rnlof():
 
 def test_evolop_LO():
     """Test LO evolution operator."""
-    test_gpd = g.model.TestGPD(p=0)
-    m_test = g.model.MellinBarnesModel(gpds=test_gpd)
+    test_gpd = g.gpd.TestGPD(p=0)
+    m_test = g.cff.MellinBarnesCFF(gpds=test_gpd)
     m_test.parameters.update(par_test)
     assert g.evolution.evolop(m_test, m_test.jpoints, 3.0,
                               'DVCS')[0, 0, :, :] == approx(
@@ -82,8 +82,8 @@ def test_evolop_LO():
 
 def test_evolop_NLO():
     """Test NLO evolution operator."""
-    test_gpd = g.model.TestGPD(p=1)
-    m_test = g.model.MellinBarnesModel(gpds=test_gpd)
+    test_gpd = g.gpd.TestGPD(p=1)
+    m_test = g.cff.MellinBarnesCFF(gpds=test_gpd)
     m_test.parameters.update(par_test)
     # LO part (but with NLO alpha_strong)
     assert g.evolution.evolop(m_test, m_test.jpoints, 3.0,
