@@ -20,9 +20,6 @@ QCD coupling alpha strong is obtained by integrating the evolution
 equation for a fixed number of massless flavours  NF.  Except at
 leading order (LO), result is obtained using a fourth-order
 Runge-Kutta integration.
-
-Todo:
-    * Implement alpha strong running beyond LO
 """
 
 from math import log
@@ -85,8 +82,8 @@ def as2pf(p: int, nf: int,  r2: float, as0: float, r20: float) -> float:
         0.15497879500975464
 
     """
-    # a below is as defined in 4pi expansion and is returned to
-    # 2pi expansion convention just before return
+    # a below is as defined in 1/4pi expansion and is returned to
+    # 1/2pi expansion convention just before return
     NASTPS = 20
 
     a = 0.5 * as0

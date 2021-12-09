@@ -1,4 +1,4 @@
-"""NLO DVMP hard scattering coefficients."""
+"""NLO part of DVMP hard scattering (Wilson) coefficients."""
 
 import math
 from typing import Tuple

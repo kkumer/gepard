@@ -1,4 +1,4 @@
-"""NLO DVCS Wilson coefficients for vector case."""
+"""NLO part of DVCS hard scattering (Wilson) coefficients."""
 
 import math
 

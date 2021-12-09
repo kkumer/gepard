@@ -1,6 +1,5 @@
 """Building blocks for GPD models.
 
-FIXME: ptj ModuleType --> DataPoint
 """
 
 import numpy as np

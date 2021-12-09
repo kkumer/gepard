@@ -13,7 +13,6 @@ Notes:
    provide appropriate transformation matrix
 
 Todo:
-    * Implement non-singlet
     * Array indices ordering is a bit of a mess
 
 """

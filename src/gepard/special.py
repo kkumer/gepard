@@ -162,30 +162,3 @@ def S2_tilde(n: Union[complex, np.ndarray], prty: int) -> Union[complex, np.ndar
     """Eq. (30) of  Bluemlein and Kurth, hep-ph/9708388."""
     G = psi((n+1)/2) - psi(n/2)
     return -(5/8)*zeta(3) + prty*(S1(n)/n**2 - (zeta(2)/2)*G + MellinF2(n))
-
-
-def deriv(func, x, h, nevals):
-    """Derivative using Ridders-Neville algorithm."""
-    # Adapted from Press et al., Numerical Recipes 
-    # in a blind, non-pythonic way
-    con = 1.4  # scale decrease per step
-    safe = 2   # return when error is safe worse than the best so far
-    big = 1.e3
-    hh = h
-    a = np.zeros((nevals+1, nevals+1))
-    a[1, 1] = (func(x+hh) - func(x-hh))/(2*hh)
-    err = big
-    for i in range(2, nevals+1):
-        hh = hh / con
-        a[1, i] = (func(x+hh) - func(x-hh))/(2*hh)
-        fac = con**2
-        for j in range(2, i+1):
-            a[j, i] = (a[j-1, i]*fac - a[j-1, i-1])/(fac-1)
-            fac = con**2 * fac
-            errt = max(abs(a[j, i]-a[j-1, i]),
-                       abs(a[j, i]-a[j-1, i-1]))
-            if (errt <= err):
-                err = errt
-                drv = a[j, i]
-        if abs(a[i, i]-a[i-1, i-1]) >= safe*err:
-            return drv, err

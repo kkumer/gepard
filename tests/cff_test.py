@@ -75,7 +75,7 @@ def test_wc_LO():
     test_gpd = g.model.TestGPD(p=0)
     m_test = g.model.MellinBarnesModel(gpds=test_gpd)
     m_test.parameters.update(par_test)
-    assert g.evolc.calc_wc(m_test, m_test.jpoints, 'DVCS')[0, 0, :2] == approx(
+    assert g.wilson.calc_wc(m_test, m_test.jpoints, 'DVCS')[0, 0, :2] == approx(
             np.array([1.7798226558761627+0.00017759121554287j, 0+0j]))
 
 
@@ -84,7 +84,7 @@ def test_wc_NLO():
     test_gpd = g.model.TestGPD(p=1)
     m_test = g.model.MellinBarnesModel(gpds=test_gpd)
     m_test.parameters.update(par_test)
-    assert g.evolc.calc_wc(m_test, m_test.jpoints, 'DVCS')[0, 1, :2] == approx(
+    assert g.wilson.calc_wc(m_test, m_test.jpoints, 'DVCS')[0, 1, :2] == approx(
             np.array([-0.88174829594212023+0.00093822077679447j,
                       -5.9050162592671382-0.00044618938685837j]))
 
@@ -94,7 +94,7 @@ def test_wce_LO():
     test_gpd = g.model.TestGPD(p=0)
     m_test = g.model.MellinBarnesModel(gpds=test_gpd)
     m_test.parameters.update(par_test)
-    assert g.evolc.calc_wce(m_test, 3.0, 'DVCS')[0, 0, :2] == approx(
+    assert g.wilson.calc_wce(m_test, 3.0, 'DVCS')[0, 0, :2] == approx(
             np.array([1.7328455630029231+0.00009701899018317j,
                       0.21666921098074668-0.0000851087087619j]), rel=1.e-12)
 
@@ -104,7 +104,7 @@ def test_wce_NLO():
     test_gpd = g.model.TestGPD(p=1)
     m_test = g.model.MellinBarnesModel(gpds=test_gpd)
     m_test.parameters.update(par_test)
-    assert g.evolc.calc_wce(m_test, 3.0, 'DVCS')[0, 0, :2] == approx(
+    assert g.wilson.calc_wce(m_test, 3.0, 'DVCS')[0, 0, :2] == approx(
             np.array([1.6127545996599677+0.00014769567470216j,
                       -0.09044960485326564-0.00003265190306802j]), rel=1.e-10)
 

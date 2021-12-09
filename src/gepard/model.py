@@ -13,7 +13,7 @@ from typing import Dict, List
 import numpy as np
 import scipy.stats
 
-from . import constants, data, evolc, gpdj, qcd, quadrature, utils
+from . import constants, data, wilson, gpdj, qcd, quadrature, utils
 
 # from joblib import Parallel, delayed
 
@@ -504,7 +504,7 @@ class MellinBarnesModel(ParameterModel):
             wce_ar = self.wce[pt.Q2]
         except KeyError:
             # calculate it
-            wce_ar = evolc.calc_wce(self, pt.Q2, 'DVCS')
+            wce_ar = wilson.calc_wce(self, pt.Q2, 'DVCS')
             # memorize it for future
             self.wce[pt.Q2] = wce_ar
         # Evaluations depending on model parameters:
@@ -542,7 +542,7 @@ class MellinBarnesModel(ParameterModel):
             wce_ar_dvmp = self.wce_dvmp[Q2]
         except KeyError:
             # calculate it
-            wce_ar_dvmp = evolc.calc_wce(self, Q2, 'DVMP')
+            wce_ar_dvmp = wilson.calc_wce(self, Q2, 'DVMP')
             # memorize it for future
             self.wce_dvmp[Q2] = wce_ar_dvmp
         # Evaluations depending on model parameters:
@@ -579,7 +579,7 @@ class MellinBarnesModel(ParameterModel):
             wce_ar_dis = self.wce_dis[pt.Q2]
         except KeyError:
             # calculate it, first PW is the only relevant one
-            wce_ar_dis = evolc.calc_wce(self, pt.Q2, 'DIS')[0, :, :]
+            wce_ar_dis = wilson.calc_wce(self, pt.Q2, 'DIS')[0, :, :]
             # memorize it for future
             self.wce_dis[pt.Q2] = wce_ar_dis
         pdf_prerot = self.gpds.gpd_H(0, 0)  # forward limit
