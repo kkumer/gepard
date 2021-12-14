@@ -2,7 +2,7 @@
 
 import gepard as g
 import numpy as np
-from pytest import approx, mark
+from pytest import approx, fixture, mark
 
 par_DMGLO1 = {'Nsea': 1.5, 'alS': 1.13,  'alpS': 0.15,  'MS': 0.707107, 'rS': 1.0,
               'bS': 2.00203, 'Nv': 1.35, 'alv': 0.43, 'alpv': 0.85, 'Mv': 1.01097,
@@ -62,160 +62,132 @@ ptw = g.data.dset[56][0]
 ptwd = g.data.dset[55][0]
 
 
-def test_CFF():
+class BMK(g.cff.ModelDR, g.theory.hotfixedBMK):
+	pass
+
+
+class BM10(g.cff.ModelDR, g.theory.BM10):
+	pass
+
+
+@fixture
+def th_BMK():
+    th = BMK()
+    th.parameters.update(par_DMGLO1)
+    return th
+
+@fixture
+def th_BM10():
+    th = BM10()
+    th.parameters.update(par_DMepsGLO1)
+    return th
+
+def test_CFF(th_BMK):
     """Calculate CFF H."""
-    m = g.cff.ModelDR()
-    m.parameters.update(par_DMGLO1)
-
-    assert m.ImH(pt0) == approx(17.67971592396648)
-    assert m.ReH(pt0) == approx(-2.4699741916859592)
+    assert th_BMK.ImH(pt0) == approx(17.67971592396648)
+    assert th_BMK.ReH(pt0) == approx(-2.4699741916859592)
 
 
-def test_CFF2():
+def test_CFF2(th_BM10):
     """Calculate CFF H."""
-    mBM10 = g.cff.ModelDR()
-    mBM10.parameters.update(par_DMepsGLO1)
-
-    assert mBM10.ImH(pt1) == approx(1.3213158482535692)
-    assert mBM10.ReH(pt1) == approx(-3.8889361918326872)
+    assert th_BM10.ImH(pt1) == approx(1.3213158482535692)
+    assert th_BM10.ReH(pt1) == approx(-3.8889361918326872)
 
 
-def test_Xunp():
+def test_Xunp(th_BMK):
     """Calculate basic cross section Xunp."""
-    m = g.cff.ModelDR()
-    m.parameters.update(par_DMGLO1)
-    t = g.theory.hotfixedBMK(m)
-    assert t.Xunp(pt0, vars={'phi': 1.}) == approx(1.8872666478756337)
-    ar = t.Xunp(pt0, vars={'phi': np.array([0.3, 1.1])})
+    assert th_BMK.Xunp(pt0, vars={'phi': 1.}) == approx(1.8872666478756337)
+    ar = th_BMK.Xunp(pt0, vars={'phi': np.array([0.3, 1.1])})
     assert isinstance(ar, np.ndarray)
     assert ar[0] == approx(1.4413231946120821)
     assert ar[1] == approx(1.9763350136864286)
 
 
-def test_Xunp2():
+def test_Xunp2(th_BMK):
     """Any kinematic variable can be in vars."""
-    m = g.cff.ModelDR()
-    m.parameters.update(par_DMGLO1)
-    t = g.theory.hotfixedBMK(m)
-    assert t.Xunp(pt0,
+    assert th_BMK.Xunp(pt0,
                   vars={'phi': 1., 'xB': 0.07}) == approx(3.0168274215074025)
 
 
 @mark.skip(reason='Feature not implemented.')
-def test_Xunp3():
+def test_Xunp3(th_BMK):
     """A ndarray of Q2 could be in vars."""
-    m = g.cff.ModelDR()
-    m.parameters.update(par_DMGLO1)
-    t = g.theory.hotfixedBMK(m)
-    ar = t.Xunp(pt0, vars={'phi': 1, 'Q2': np.array([2.3, 2.5])})
+    ar = th_BMK.Xunp(pt0, vars={'phi': 1, 'Q2': np.array([2.3, 2.5])})
     assert isinstance(ar, np.ndarray)
     assert ar[0] == approx(1.9769930014185824)
     assert ar[1] == approx(2.0929323473733308)
 
 
 @mark.skip(reason='Feature not implemented.')
-def test_Xunp4():
+def test_Xunp4(th_BMK):
     """New feature: ndarray of any kinematical variable could be in vars."""
-    m = g.cff.ModelDR()
-    m.parameters.update(par_DMGLO1)
-    t = g.theory.hotfixedBMK(m)
-    ar = t.Xunp(pt0, vars={'phi': 1, 'xB': np.array([0.07, 0.11])})
+    ar = th_BMK.Xunp(pt0, vars={'phi': 1, 'xB': np.array([0.07, 0.11])})
     assert isinstance(ar, np.ndarray)
     assert ar[1] == approx(0.68881435298587579)
 
 
-def test_XunpBM10():
+def test_XunpBM10(th_BM10):
     """Calculate unpolarized cross section Xunp in BM10 Approach."""
-    mBM10 = g.cff.ModelDR()
-    mBM10.parameters.update(par_DMepsGLO1)
-    tBM10 = g.theory.BM10(mBM10)
     pt1.prepare()
-    assert tBM10.PreFacSigma(pt1)*tBM10.TBH2unp(pt1) == approx(0.01502937358336803)
-    assert tBM10.PreFacSigma(pt1)*tBM10.TDVCS2unp(pt1) == approx(0.012565093106990456)
-    assert tBM10.PreFacSigma(pt1)*tBM10.TINTunp(pt1) == approx(0.0011255158978939425)
-    assert tBM10.Xunp(pt1) == approx(0.028719982588252427)
+    assert th_BM10.PreFacSigma(pt1)*th_BM10.TBH2unp(pt1) == approx(0.01502937358336803)
+    assert th_BM10.PreFacSigma(pt1)*th_BM10.TDVCS2unp(pt1) == approx(0.012565093106990456)
+    assert th_BM10.PreFacSigma(pt1)*th_BM10.TINTunp(pt1) == approx(0.0011255158978939425)
+    assert th_BM10.Xunp(pt1) == approx(0.028719982588252427)
 
 
-def test_XLP():
+def test_XLP(th_BM10):
     """Calculate long. polarized cross section XLP in BM10 Approach."""
-    mBM10 = g.cff.ModelDR()
-    mBM10.parameters.update(par_DMepsGLO1)
-    tBM10 = g.theory.BM10(mBM10)
     pt1.prepare()
-    assert tBM10.PreFacSigma(pt1)*tBM10.TBH2LP(pt1) == approx(0.009495908777414035)
-    assert tBM10.PreFacSigma(pt1)*tBM10.TDVCS2LP(pt1) == approx(-0.0032470111398419628)
-    assert tBM10.PreFacSigma(pt1)*tBM10.TINTLP(pt1) == approx(0.0085102074298275109)
-    assert tBM10.XLP(pt1) == approx(0.014759105067399584)
+    assert th_BM10.PreFacSigma(pt1)*th_BM10.TBH2LP(pt1) == approx(0.009495908777414035)
+    assert th_BM10.PreFacSigma(pt1)*th_BM10.TDVCS2LP(pt1) == approx(-0.0032470111398419628)
+    assert th_BM10.PreFacSigma(pt1)*th_BM10.TINTLP(pt1) == approx(0.0085102074298275109)
+    assert th_BM10.XLP(pt1) == approx(0.014759105067399584)
 
 
-def test_XTP():
+def test_XTP(th_BMK):
     """Calculate transv. polarized cross section XTP in BMK Approach."""
     pt1.varphi = 1.
-    m = g.cff.ModelDR()
-    m.parameters.update(par_DMGLO1)
-    t = g.theory.hotfixedBMK(m)
     pt1.prepare()
-    assert t.PreFacSigma(pt1)*t.TBH2TP(pt1) == approx(0.0021662047872426475)
-    assert t.PreFacSigma(pt1)*t.TDVCS2TP(pt1) == approx(-0.0021305191589529025)
-    assert t.PreFacSigma(pt1)*t.TINTTP(pt1) == approx(-0.0098483713204748375)
-    assert t.XTP(pt1) == approx(-0.009812685692185092)
+    assert th_BMK.PreFacSigma(pt1)*th_BMK.TBH2TP(pt1) == approx(0.0021662047872426475)
+    assert th_BMK.PreFacSigma(pt1)*th_BMK.TDVCS2TP(pt1) == approx(-0.0021305191589529025)
+    assert th_BMK.PreFacSigma(pt1)*th_BMK.TINTTP(pt1) == approx(-0.0098483713204748375)
+    assert th_BMK.XTP(pt1) == approx(-0.009812685692185092)
 
 
-def test_BSA():
+def test_BSA(th_BMK):
     """Calculate BSA in BMK Approach."""
-    m = g.cff.ModelDR()
-    m.parameters.update(par_DMGLO1)
-    t = g.theory.hotfixedBMK(m)
-    assert t.BSA(pt0) == approx(0.1845304070958366)
-    assert t.ALUI(pt0) == approx(0.1819945876282851)
+    assert th_BMK.BSA(pt0) == approx(0.1845304070958366)
+    assert th_BMK.ALUI(pt0) == approx(0.1819945876282851)
 
 
-def test_TSA():
+def test_TSA(th_BM10):
     """Calculate longitudinal TSA in BM10 Approach."""
-    mBM10 = g.cff.ModelDR()
-    mBM10.parameters.update(par_DMepsGLO1)
-    tBM10 = g.theory.BM10(mBM10)
-    assert tBM10.TSA(ptt) == approx(-0.47969623208934847)
+    assert th_BM10.TSA(ptt) == approx(-0.47969623208934847)
 
 
-def test_BTSA():
+def test_BTSA(th_BM10):
     """Calculate longitudinal BTSA in BM10 Approach."""
-    mBM10 = g.cff.ModelDR()
-    mBM10.parameters.update(par_DMepsGLO1)
-    tBM10 = g.theory.BM10(mBM10)
-    assert tBM10.BTSA(ptb) == approx(0.25592806446362842)
+    assert th_BM10.BTSA(ptb) == approx(0.25592806446362842)
 
 
-def test_TTSA():
+def test_TTSA(th_BMK):
     """Calculate transversal TSA in BMK Approach and frame."""
-    m = g.cff.ModelDR()
-    m.parameters.update(par_DMGLO1)
-    t = g.theory.hotfixedBMK(m)
-    assert t.TSA(pttrans) == approx(0.080468284490077271)
+    assert th_BMK.TSA(pttrans) == approx(0.080468284490077271)
 
 
-def test_BSSw():
+def test_BSSw(th_BMK):
     """Calculate weighted BSS."""
-    m = g.cff.ModelDR()
-    m.parameters.update(par_DMGLO1)
-    t = g.theory.hotfixedBMK(m)
-    assert t.BSSw(ptw) == approx(0.056334042569159554)
+    assert th_BMK.BSSw(ptw) == approx(0.056334042569159554)
 
 
-def test_BSDw():
+def test_BSDw(th_BMK):
     """Calculate weighted BSD."""
-    m = g.cff.ModelDR()
-    m.parameters.update(par_DMGLO1)
-    t = g.theory.hotfixedBMK(m)
-    assert t.BSDw(ptwd)*1e3 == approx(8.91853141911449)
+    assert th_BMK.BSDw(ptwd)*1e3 == approx(8.91853141911449)
 
 
-def test_AUTI():
+def test_AUTI(th_BMK):
     """Calculate transversal TSA - INT part - in BMK Approach and frame."""
-    m = g.cff.ModelDR()
-    m.parameters.update(par_DMGLO1)
-    t = g.theory.hotfixedBMK(m)
-    assert t.AUTI(pttrans) == approx(0.075300023640416394)
+    assert th_BMK.AUTI(pttrans) == approx(0.075300023640416394)
 
 
 @mark.skip(reason='ansatz EFLEXP not yet transferred.')

@@ -4,7 +4,7 @@
 from numpy import array, cos, linspace, ndarray, pi, sin, sqrt, transpose
 from scipy.stats import scoreatpercentile
 
-from . import data, model, quadrature
+from . import cff, data, eff, gpd, model, quadrature
 from .constants import GeV2nb, Mp, Mp2, alpha
 from .kinematics import K2, tmin, weight_BH
 
@@ -21,13 +21,18 @@ class Theory(object):
     specific observable.
     """
 
-    def __init__(self, model: model.Model) -> None:
+    def __init__(self, **kwargs) -> None:
         """Construct theory framework with specific model."""
-        self.model = model
-        self.m = self.model  # shortcut
-        self.name = model.name
+        self.model = self       # to make old .m code work
+        self.m = self       # to make old .m code work
+        print('g.theory.Theory init done')
+        # self.name = model.name
         # self.texname = model.texname
         # self.description = model.description
+        #
+        # We do NOT call super().__init__ here because object class will
+        # not accapt **kwargs. This means that Theory has to be the last
+        # class in mro.
 
     def chisq_single(self, points: data.DataSet, asym: bool = False,
                      **kwargs) -> float:
@@ -90,7 +95,6 @@ class Theory(object):
             orig_conventions: give prediction using original conventions of
                               the given DataPoint (e.g. for plotting)
         """
-        m = self.model
         if 'observable' in kwargs:
             obs = kwargs['observable']
         else:
@@ -98,12 +102,12 @@ class Theory(object):
 
         if 'parameters' in kwargs:
             old = m.parameters.copy()
-            m.parameters.update(kwargs['parameters'])
+            self.parameters.update(kwargs['parameters'])
         #elif isinstance(m, Model.ComptonNeuralNets):
         #    # It is not training (which always uses 'parameters'), and
         #    # we are not asked for particular net (call would again come
         #    # with 'parameters'), so we want mean of all nets
-        #    m.parameters['nnet'] = 'ALL'
+        #    self.parameters['nnet'] = 'ALL'
         #    result = getattr(self, obs)(pt)
         #    if error:
         #        return (result.mean(), result.std())
@@ -122,22 +126,22 @@ class Theory(object):
         if error:
             try:
                 # We now do standard propagation of error from m to observable
-                pars = [p for p in m.parameters if not m.parameters_fix['p']]
+                pars = [p for p in self.parameters if not self.parameters_fix['p']]
                 var = 0
                 dfdp = {}
                 for p in pars:
                     # calculating dfdp = derivative of observable w.r.t. parameter:
-                    h=sqrt(m.covariance[p,p])
-                    mem = m.parameters[p]
-                    m.parameters[p] = mem+h/2.
+                    h=sqrt(self.covariance[p,p])
+                    mem = self.parameters[p]
+                    self.parameters[p] = mem+h/2.
                     up = fun(pt)
-                    m.parameters[p] = mem-h/2.
+                    self.parameters[p] = mem-h/2.
                     down = fun(pt)
-                    m.parameters[p] = mem
+                    self.parameters[p] = mem
                     dfdp[p] = (up-down)/h
                 for p1 in pars:
                     for p2 in pars:
-                        var += dfdp[p1]*m.covariance[p1,p2]*dfdp[p2]
+                        var += dfdp[p1]*self.covariance[p1,p2]*dfdp[p2]
                 result = (fun(pt), sqrt(var))
             except KeyError:
                 # we have neural net
@@ -164,7 +168,7 @@ class Theory(object):
 
         if 'parameters' in kwargs:
             # restore old values
-            self.model.parameters.update(old)
+            self.parameters.update(old)
 
         if kwargs.pop('orig_conventions', False):
             # express result in conventions of original datapoint
@@ -369,7 +373,8 @@ class DVCS(Theory):
 
         eps2 = 4. * pt.xB**2 * Mp2 / pt.Q2
         try:
-            ReH, ImH, ReE, ImE, ReHt, ImHt, ReEt, ImEt = self.m.cff(pt)
+            # fails always. have to fix hybrid model before this works
+            ReH, ImH, ReE, ImE, ReHt, ImHt, ReEt, ImEt = self.m.cff_nonexistent(pt)
         except AttributeError:
             ReH = self.m.ReH(pt)
             ImH = self.m.ImH(pt)
@@ -386,10 +391,6 @@ class DVCS(Theory):
 
     # _XDVCSt = _XDVCStApprox
     _XDVCSt = _XDVCStEx
-
-    def F2(self, pt):
-        """Return DIS F2."""
-        return self.m.F2(pt)
 
 ## General assymetries
 ## TODO: Lot of code duplication here - this should be united in one clever function
@@ -3544,5 +3545,5 @@ class DVMP(Theory):
     _Xrhot = _XrhotApprox
 
 
-class Default(BMK, DVMP):
-    """Default DVCS+DVMP class."""
+# class Default(eff.ElasticKelly, gpd.PWNormGPD, cff.MellinBarnesCFF, BM10tw2, DVMP):
+    # """Default DVCS+DVMP class."""

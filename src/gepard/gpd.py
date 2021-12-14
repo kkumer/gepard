@@ -204,10 +204,7 @@ def ansatz07_fixed(j: np.ndarray, t: float, type: str) -> np.ndarray:
 class ConformalSpaceGPD(model.ParameterModel):
     """Base class of GPD models built in conformal moment space."""
 
-    def __init__(self, p: int = 0, scheme: str = 'msbar', nf: int = 4,
-            q02: float = 4.0, r20: float = 2.5,
-            asp: np.array = np.array([0.0606, 0.0518, 0.0488]),
-            c: float = 0.35, phi: float = 1.57079632) -> None:
+    def __init__(self, **kwargs) -> None:
         """Init and pre-calculate stuff.
 
         Args:
@@ -227,14 +224,14 @@ class ConformalSpaceGPD(model.ParameterModel):
             is provided by subclasses.
 
         """
-        self.p = p
-        self.scheme = scheme
-        self.nf = nf
-        self.q02 = q02
-        self.r20 = r20
-        self.asp = asp
-        self.c = c
-        self.phi = phi
+        self.p = kwargs.setdefault('p', 0)
+        self.scheme = kwargs.setdefault('scheme', 'msbar')
+        self.nf = kwargs.setdefault('nf', 4)
+        self.q02 = kwargs.setdefault('q02', 4.0)
+        self.r20 = kwargs.setdefault('r20', 2.5)
+        self.asp = kwargs.setdefault('asp', np.array([0.0606, 0.0518, 0.0488]))
+        self.c = kwargs.setdefault('c', 0.35)
+        self.phi = kwargs.setdefault('phi', 1.57079632)
         npoints, weights = quadrature.mellin_barnes(self.c, self.phi)
         self.npts = len(npoints)
         self.npoints = npoints
@@ -279,7 +276,8 @@ class ConformalSpaceGPD(model.ParameterModel):
             qs = 5/18
             qns = 1/6
         self.dvcs_charges = (qs, qs, qns)
-        super().__init__()
+        print('ConformalSpaceGPD init done.')
+        super().__init__(**kwargs)
 
     def pw_strengths(self):
         """Strengths of SO(3) partial waves."""
@@ -309,11 +307,10 @@ class TestGPD(ConformalSpaceGPD):
         kwargs.setdefault('scheme', 'csbar')
         kwargs.setdefault('nf', 3)
         kwargs.setdefault('q02', 1.0)
+        kwargs.setdefault('r20', 2.5)
+        kwargs.setdefault('asp', np.array([0.05, 0.05, 0.05]))
+        print('TestGPD init done.')
         super().__init__(**kwargs)
-        self.nf = 3
-        self.q02 = 1.0
-        self.asp = np.array([0.05, 0.05, 0.05])
-        self.r20 = 2.5
 
     def gpd_H(self, eta: float, t: float) -> np.ndarray:
         """Return (npts, 4) array H_j^a for all j-points and 4 flavors."""
@@ -339,6 +336,7 @@ class PWNormGPD(ConformalSpaceGPD):
         kwargs.setdefault('scheme', 'msbar')
         kwargs.setdefault('nf', 4)
         kwargs.setdefault('q02', 4.0)
+        print('PWNormGPD init done.')
         super().__init__(**kwargs)
 
     def gpd_H(self, eta: float, t: float) -> np.ndarray:

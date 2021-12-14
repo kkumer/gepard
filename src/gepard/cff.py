@@ -25,6 +25,10 @@ class ComptonFormFactors(model.ParameterModel):
                   'ImHteff', 'ReHteff', 'ImEteff', 'ReEteff']
     # allGPDs = []
 
+    def __init__(self, **kwargs):
+        print('cff.ComptonFormFactors init done')
+        super().__init__(**kwargs)
+
     def print_CFFs(self, pt, format=None):
         """Print values of CFFs at given kinematic point."""
         vals = [getattr(self, cff)(pt) for cff in self.allCFFs]
@@ -56,31 +60,10 @@ class ComptonFormFactors(model.ParameterModel):
 class MellinBarnesCFF(ComptonFormFactors):
     """Class of models built by Mellin-Barnes integration."""
 
-    def __init__(self, gpds: gpd.ConformalSpaceGPD) -> None:
+    def __init__(self, **kwargs) -> None:
         """Init MellinBarnes class and pre-calculate stuff.
 
-        Args:
-            gpds: provide GPDs as gpds.gpd_H, gpds.gpd_Ht etc.
-
         """
-        self.p = gpds.p
-        self.scheme = gpds.scheme
-        self.nf = gpds.nf
-        self.q02 = gpds.q02
-        self.asp = gpds.asp
-        self.r20 = gpds.r20
-        self.npts = gpds.npts
-        self.npoints = gpds.npoints
-        self.jpoints = gpds.jpoints
-        self.c = gpds.c
-        self.phi = gpds.phi
-        self.wg = gpds.wg
-        self.frot = gpds.frot
-        self.dvcs_charges = gpds.dvcs_charges
-        self.gpds = gpds
-        self.parameters = gpds.parameters
-        # Consolidate parameters, both the same and updated from above
-        self.gpds.parameters = self.parameters
         # scales
         self.rr2 = 1     # ratio of Q2/renorm. scale squared
         self.rf2 = 1     # ratio of Q2/GPD fact. scale sq.
@@ -99,7 +82,8 @@ class MellinBarnesCFF(ComptonFormFactors):
         # 2. correction to get results from "Towards DVMP" paper.
         #  Set to -1 to get agreement with Dieter's notebook.
         self.corr_c1dvmp_sgn = 1
-        super().__init__()
+        print('cff.MellinBarnesCFF init done')
+        super().__init__(**kwargs)
 
     def _mellin_barnes_integral(self, xi, wce, gpd):
         """Return convolution of evolved Wilson coefs and GPDs."""
@@ -107,7 +91,7 @@ class MellinBarnesCFF(ComptonFormFactors):
         cfacj = eph * np.exp((self.jpoints + 1) * log(1/xi))  # eph/xi**(j+1)
         # Temporary singlet part only!:
         cch = np.einsum('j,sa,sja,ja->j', cfacj,
-                        self.gpds.pw_strengths(), wce, gpd)
+                        self.pw_strengths(), wce, gpd)
         imh = np.dot(self.wg, cch.imag)
         np.multiply(cch, self.tgj, out=cch)
         reh = np.dot(self.wg, cch.imag)
@@ -132,10 +116,10 @@ class MellinBarnesCFF(ComptonFormFactors):
             # memorize it for future
             self.wce[pt.Q2] = wce_ar
         # Evaluations depending on model parameters:
-        h_prerot = self.gpds.gpd_H(pt.xi, pt.t)
+        h_prerot = self.gpd_H(pt.xi, pt.t)
         h = np.einsum('f,fa,ja->jf', self.dvcs_charges, self.frot, h_prerot)
         reh, imh = self._mellin_barnes_integral(pt.xi, wce_ar, h)
-        e_prerot = self.gpds.gpd_E(pt.xi, pt.t)
+        e_prerot = self.gpd_E(pt.xi, pt.t)
         e = np.einsum('f,fa,ja->jf', self.dvcs_charges, self.frot, e_prerot)
         ree, ime = self._mellin_barnes_integral(pt.xi, wce_ar, e)
         return np.array([reh, imh, ree, ime, 0, 0, 0, 0])
@@ -170,7 +154,7 @@ class MellinBarnesCFF(ComptonFormFactors):
             # memorize it for future
             self.wce_dvmp[Q2] = wce_ar_dvmp
         # Evaluations depending on model parameters:
-        h_prerot = self.gpds.gpd_H(xi, t)
+        h_prerot = self.gpd_H(xi, t)
         # Flavor rotation matrix: (sea,G,uv,dv) --> (SIG, G, NS+, NS-)
         # FIXME: should be constructed only once!
         frot_rho_4 = np.array([[1, 0, 1, 1],
@@ -206,7 +190,7 @@ class MellinBarnesCFF(ComptonFormFactors):
             wce_ar_dis = wilson.calc_wce(self, pt.Q2, 'DIS')[0, :, :]
             # memorize it for future
             self.wce_dis[pt.Q2] = wce_ar_dis
-        pdf_prerot = self.gpds.gpd_H(0, 0)  # forward limit
+        pdf_prerot = self.gpd_H(0, 0)  # forward limit
         # Flavor rotation matrix: (sea,G,uv,dv) --> (SIG, G, NS+, NS-)
         # FIXME: should be constructed only once!
         frot_pdf = np.array([[1, 0, 0, 0],
@@ -227,9 +211,9 @@ class ComptonDispersionRelations(ComptonFormFactors):
     and subtraction. This class implements just dispersion integrals.
     """
 
-    def __init__(self) -> None:
+    def __init__(self, **kwargs) -> None:
         """Init."""
-        super().__init__()
+        super().__init__(**kwargs)
 
     def dispargV(self, x, fun, pt):
         """Integrand of the dispersion integral (vector case).
@@ -241,7 +225,10 @@ class ComptonDispersionRelations(ComptonFormFactors):
         """
         ga = 0.9  # Nice value obtained by experimentation in Mathematica
         u = x**(1./(1.-ga))
-        res = u**ga * (fun(pt, u) - fun(pt))
+        if hasattr(fun, '__self__'):
+            res = u**ga * (fun(pt, u) - fun(pt))
+        else:  # unbound method
+            res = u**ga * (fun(self, pt, u) - fun(self, pt))
         return (2.*u) / (pt.xi**2 - u**2) * res / (1.-ga)
 
     def dispargA(self, x, fun, pt):
@@ -254,55 +241,66 @@ class ComptonDispersionRelations(ComptonFormFactors):
         """
         ga = 0.9  # Value same as for V-case (TODO: is this the best choice?)
         u = x**(1./(1.-ga))
-        res = u**ga * (fun(pt, u) - fun(pt))
+        if hasattr(fun, '__self__'):
+            res = u**ga * (fun(pt, u) - fun(pt))
+        else:  # unbound method
+            res = u**ga * (fun(self, pt, u) - fun(self, pt))
         return (2. * pt.xi) / (pt.xi**2 - u**2) * res / (1.-ga)
 
     def subtraction(self, pt):
         """Subtraction constant."""
         return 0  # default
 
-    def ReH(self, pt):
-        """Real part of CFF H.
+    def _ReV(self, pt, imfun, subsign):
+        """Real part of vector CFFs H and E.
 
-        Given by dispersion integral over ImH minus subtraction constant.
+        Given by dispersion integral over imfun minus/plus subtraction constant.
 
         """
-        res = quadrature.PVquadrature(self.dispargV, 0, 1, (self.ImH, pt))
-        pvpi = (res + log(pt.xi**2 / (1.-pt.xi**2)) * self.ImH(pt)) / pi
+        res = quadrature.PVquadrature(self.dispargV, 0, 1, (imfun, pt))
+        if hasattr(imfun, '__self__'):
+            pvpi = (res + log(pt.xi**2 / (1.-pt.xi**2)) * imfun(pt)) / pi
+        else:
+            pvpi = (res + log(pt.xi**2 / (1.-pt.xi**2)) * imfun(self, pt)) / pi
         # P.V./pi - subtraction constant C/(1-t/MC^2)^2
-        return pvpi - self.subtraction(pt)
+        return pvpi + subsign * self.subtraction(pt)
 
-    def ReHt(self, pt):
-        """Real part of CFF Ht.
+    def _ReA(self, pt, imfun):
+        """Real part of axial vector CFFs Ht and Et.
 
-        Given by dispersion integral over ImHt.
+        Given by dispersion integral over imfun.
 
         """
-        res = quadrature.PVquadrature(self.dispargA, 0, 1, (self.ImHt, pt))
-        pvpi = (res + log((1.+pt.xi)/(1.-pt.xi)) * self.ImHt(pt))/pi
+        res = quadrature.PVquadrature(self.dispargA, 0, 1, (imfun, pt))
+        if hasattr(imfun, '__self__'):
+            pvpi = (res + log((1.+pt.xi)/(1.-pt.xi)) * imfun(pt))/pi
+        else:  # unbound method
+            pvpi = (res + log((1.+pt.xi)/(1.-pt.xi)) * imfun(self, pt))/pi
         return pvpi   # this is P.V./pi
 
-    def ReE(self, pt):
-        """Real part of CFF E.
+    def ReH(self, pt, imfun=None):
+        """Real part of CFF H."""
+        if imfun is None:
+            imfun = self.ImH
+        return self._ReV(pt, imfun, -1)
 
-        Given by dispersion integral over ImE plus subtraction constant.
+    def ReE(self, pt, imfun=None):
+        """Real part of CFF E."""
+        if imfun is None:
+            imfun = self.ImE
+        return self._ReV(pt, imfun, +1)
 
-        """
-        res = quadrature.PVquadrature(self.dispargV, 0, 1, (self.ImE, pt))
-        pvpi = (res + log(pt.xi**2 / (1.-pt.xi**2)) * self.ImE(pt)) / pi
-        # This is same subtraction constant
-        # as for H, but with opposite sign
-        return pvpi + self.subtraction(pt)
+    def ReHt(self, pt, imfun=None):
+        """Real part of CFF Ht."""
+        if imfun is None:
+            imfun = self.ImHt
+        return self._ReA(pt, imfun)
 
-    def ReEt(self, pt):
-        """Real part of CFF Et.
-
-        Given by dispersion integral over ImEt
-
-        """
-        res = quadrature.PVquadrature(self.dispargA, 0, 1, (self.ImEt, pt))
-        pvpi = (res + log((1.+pt.xi)/(1.-pt.xi)) * self.ImEt(pt))/pi
-        return pvpi   # this is P.V./pi
+    def ReEt(self, pt, imfun=None):
+        """Real part of CFF Et."""
+        if imfun is None:
+            imfun = self.ImEt
+        return self._ReA(pt, imfun)
 
 
 class PionPole(object):
@@ -352,7 +350,7 @@ class ComptonModelDR(ComptonDispersionRelations, PionPole):
 #                                 'C', 'MC',
 #                                 'tNv', 'tal', 'talp',
 #                                 'tMv', 'trv', 'tbv']
-        super().__init__()
+        super().__init__(**kwargs)
 
     def subtraction(self, pt):
         """Dispersion relations subtraction constant."""
@@ -432,36 +430,22 @@ class ComptonModelDRPP(ComptonModelDR):
 
     def __init__(self, **kwargs):
         """Constructor."""
-        # First inhert what's needed
-        ComptonModelDR.__init__(self, **kwargs)
         # Adding two extra parameters:
-        self.parameters.update({
-             'rpi': 1.0,    'limit_rpi': (-8, 8.),
-             'Mpi': 1.0,    'limit_Mpi': (0.4, 4.)})
-        # self.parameter_names.append('rpi')
-        # self.parameter_names.append('Mpi')
-        # now do whatever else is necessary
-        # ComptonFormFactors.__init__(self, **kwargs)
+        self.parameters.update({'rpi': 1.0,  'Mpi': 1.0})
+
+        self.parameters_limits.update({
+             'rpi': (-8, 8.),
+             'Mpi': (0.4, 4.)})
+        super().__init__(**kwargs)
 
     def ReEt(self, pt):
         """Instead of disp. rel. use pole formula."""
         return self.DMfreepole(pt)
 
 
-class ComptonHybrid(ComptonFormFactors):
+class ComptonHybrid(MellinBarnesCFF, ComptonModelDR, ComptonFormFactors):
     """This combines MB model for small xB and DR model for valence xB."""
 
-    def __init__(self, instMB: MellinBarnesCFF, instDR: ComptonModelDR, **kwargs):
-        """Initializes with one instance of MB model and one of DR model."""
-        self.MB = instMB
-        self.DR = instDR
-        self.DR.parameters['Nsea'] = 0.  # sea comes from Gepard part
-        self.parameters = {**self.MB.parameters, **self.DR.parameters}
-        # Consolidate parameters of all models, base and derived
-        self.MB.parameters = self.parameters
-        self.DR.parameters = self.parameters
-        self.MB.gpds.parameters = self.parameters
-        # self.parameter_names = self.DR.parameter_names + self.Gepard.parameter_names
 
     def is_within_model_kinematics(self, pt):
         """Is kinematics of datapoint ok?"""
@@ -473,31 +457,47 @@ class ComptonHybrid(ComptonFormFactors):
     # FIXME: this below looks inconsistent generally for xi != pt.xi !!
 
     def ImH(self, pt, xi=0):
-        return self.MB.ImH(pt) + self.DR.ImH(pt, xi)
+        return MellinBarnesCFF.ImH(self, pt) + ComptonModelDR.ImH(self, pt, xi)
 
     def ReH(self, pt):
-        return self.MB.ReH(pt) + self.DR.ReH(pt)
+        return MellinBarnesCFF.ReH(self, pt) + ComptonModelDR.ReH(self, pt, imfun=ComptonModelDR.ImH)
 
     def ImE(self, pt, xi=0):
-        return self.MB.ImE(pt) + self.DR.ImE(pt, xi)
+        return MellinBarnesCFF.ImE(self, pt) + ComptonModelDR.ImE(self, pt, xi)
 
     def ReE(self, pt):
-        return self.MB.ReE(pt) + self.DR.ReE(pt)
+        return MellinBarnesCFF.ReE(self, pt) + ComptonModelDR.ReE(self, pt, imfun=ComptonModelDR.ImE)
 
     # Tildes are not provided by MB model
 
     def ImHt(self, pt, xi=0):
-        return self.DR.ImHt(pt, xi)
+        return ComptonModelDR.ImHt(self, pt, xi)
 
     def ReHt(self, pt):
-        return self.DR.ReHt(pt)
+        return ComptonModelDR.ReHt(self, pt, imfun=ComptonModelDR.ImHt)
 
     def ImEt(self, pt):
-        return self.DR.ImEt(pt)
+        return ComptonModelDR.ImEt(self, pt)
 
     def ReEt(self, pt):
-        return self.DR.ReEt(pt)
+        """Instead of disp. rel. use fixed pion pole formula."""
+        return self.DMfixpole(pt)
 
+
+class ComptonHybridPP(ComptonHybrid):
+    """This combines MB model for small xB and DRPP model for valence xB."""
+
+
+    def is_within_model_kinematics(self, pt):
+        """Is kinematics of datapoint ok?"""
+        # relaxing xBmin and removing Q2max
+        return ((1.5 <= pt.Q2) and
+                (pt.tm < min(1., pt.Q2/4)) and
+                (1e-5 < pt.xB < 0.65))
+
+    def ReEt(self, pt):
+        """Instead of disp. rel. use free pion pole formula."""
+        return self.DMfreepole(pt)
 
 
 #  --- Complete models ---

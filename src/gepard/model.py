@@ -6,7 +6,10 @@
 """
 from __future__ import annotations
 
-class Model(object):
+from . import theory
+
+
+class Model(theory.Theory):
     """Base class for all models.
 
     Instance of this class specifies structure of relevant hadrons.
@@ -26,7 +29,7 @@ class Model(object):
 
     """
     def __init__(self, name: str = None, texname: str = None,
-                 description: str = None) -> None:
+                 description: str = None, **kwargs) -> None:
         """Init Model class.
 
         Args:
@@ -41,6 +44,7 @@ class Model(object):
         else:
             self.texname = texname
         self.description = 'N/A'
+        super().__init__(**kwargs)
 
 
 class ParameterModel(Model):
@@ -57,9 +61,21 @@ class ParameterModel(Model):
     parameters_fix: dict = {}
     parameters_limits: dict = {}
 
-    def __init__(self) -> None:
+    def __init__(self, **kwargs) -> None:
         """Init and pre-calculate stuff."""
-        super().__init__()
+        print('ParameterModel init done')
+        super().__init__(**kwargs)
+
+
+    def add_parameters(self, newpars: dict):
+        """Append newpars to parameters."""
+        # Create parameters dict if it doesn't exist yet
+        try:
+            self.parameters
+        except AttributeError:
+            self.parameters = {}
+        self.parameters.update(newpars)
+
 
     def release_parameters(self, *pars: str):
         """Release parameters for fitting.

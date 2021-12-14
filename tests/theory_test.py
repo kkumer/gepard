@@ -3,7 +3,7 @@
 import sys
 
 import gepard as g
-from pytest import approx, mark
+from pytest import approx, fixture, mark
 
 sys.path.append('/home/kkumer/g')
 sys.path.append('/home/kkumer/g/gepard')
@@ -16,143 +16,136 @@ par_fit = {'ns':  0.152039, 'al0s': 1.15751, 'alps': 0.15, 'ms2': 0.478391,
            'al0g': 1.24732, 'alpg': 0.15, 'mg2': 0.7, 'secg': -0.81217, 'thig': 0.}
 
 
+class MyTest(g.gpd.PWNormGPD, g.cff.MellinBarnesCFF, g.theory.BMK):
+    pass
 
-def test_F2_NLO():
-    """Test NLO DIS F2 evaluation."""
-    fit_gpd = g.gpd.PWNormGPD(p=1)
-    m = g.cff.MellinBarnesCFF(gpds=fit_gpd)
-    th = g.theory.BMK(model=m)
-    th.m.parameters.update({'ns': 0.15, 'al0s': 1., 'alps': 0.15, 'ms2': 1.,
+class MyTest2(g.gpd.TestGPD, g.cff.MellinBarnesCFF, g.theory.hotfixedBMK):
+    pass
+
+@fixture
+def th_dis():
+    th = MyTest(p=1)
+    th.parameters.update({'ns': 0.15, 'al0s': 1., 'alps': 0.15, 'ms2': 1.,
                             'secs': 0., 'al0g': 1.1, 'alpg': 0.15, 'mg2': 0.7})
-    f2 = th.F2(g.data.dset[201][0])
+    return th
+
+@fixture
+def thx():
+    th = MyTest(p=0)
+    th.parameters.update(par_fit)
+    return th
+
+@fixture
+def th():
+    th = MyTest(p=1)
+    th.parameters.update(par_fit)
+    return th
+
+@fixture
+def th_lo():
+    th = MyTest2(p=0)
+    th.parameters.update(par_test)
+    return th
+
+@fixture
+def th_nlo():
+    th = MyTest2(p=1)
+    th.parameters.update(par_test)
+    return th
+
+
+
+def test_F2_NLO(th_dis):
+    """Test NLO DIS F2 evaluation."""
+    f2 = th_dis.F2(g.data.dset[201][0])
     assert f2 == approx(0.4220514008395502)
 
 
-def test_XDVCSt_noevol():
+def test_XDVCSt_noevol(th_lo):
     """Calculate LO DVCS partial cross section (no evolution)."""
     pt = g.data.DataPoint({'W': 82., 'Q2': 1., 't': 0.})
     pt.xi = pt.Q2 / (2.0 * pt.W * pt.W + pt.Q2)
     pt.xB = 2*pt.xi/(1.+pt.xi)
     pt.yaxis = 'X'
-    test_gpd = g.gpd.TestGPD()
-    m = g.cff.MellinBarnesCFF(gpds=test_gpd)
-    m.parameters.update(par_test)
-    th = g.theory.hotfixedBMK(m)
     # Have to decrease precision due to slightly different formula
-    assert th.predict(pt) == approx(5608.42804256, rel=1e-3)
+    assert th_lo.predict(pt) == approx(5608.42804256, rel=1e-3)
 
 
-def test_XDVCSt():
+def test_XDVCSt(th_lo):
     """Calculate LO DVCS partial cross section (+ evolution)."""
     pt = g.data.DataPoint({'W': 82., 'Q2': 3., 't': -0.5})
     pt.xi = pt.Q2 / (2.0 * pt.W * pt.W + pt.Q2)
     pt.xB = 2*pt.xi/(1.+pt.xi)
     pt.yaxis = 'X'
-    test_gpd = g.gpd.TestGPD()
-    m = g.cff.MellinBarnesCFF(gpds=test_gpd)
-    m.parameters.update(par_test)
-    th = g.theory.hotfixedBMK(m)
     # Comparison to old pure-Fortran 'src/test/test.F':
     # assert th._XDVCStApprox(pt) == approx(900.11627295345193)  # for t=0
-    assert th._XDVCStApprox(pt) == approx(15.633422291049154)
+    assert th_lo._XDVCStApprox(pt) == approx(15.633422291049154)
 
 
-def test_XDVCSt_NLO():
+def test_XDVCSt_NLO(th_nlo):
     """Calculate NLO DVCS partial cross section (no evolution)."""
     pt = g.data.DataPoint({'W': 82., 'Q2': 1., 't': 0.})
     pt.xi = pt.Q2 / (2.0 * pt.W * pt.W + pt.Q2)
     pt.xB = 2*pt.xi/(1.+pt.xi)
     pt.yaxis = 'X'
-    test_gpd = g.gpd.TestGPD(p=1)
-    m = g.cff.MellinBarnesCFF(gpds=test_gpd)
-    m.parameters.update(par_test)
-    th = g.theory.hotfixedBMK(m)
-    assert th._XDVCStEx(pt) == approx(821.0062045181508)
+    assert th_nlo._XDVCStEx(pt) == approx(821.0062045181508)
 
 
-def test_XDVCSt_NLOevol():
+def test_XDVCSt_NLOevol(th_nlo):
     """Calculate NLO DVCS partial cross section (+ evolution)."""
     pt = g.data.DataPoint({'W': 82., 'Q2': 8., 't': 0.})
     pt.xi = pt.Q2 / (2.0 * pt.W * pt.W + pt.Q2)
     pt.xB = 2*pt.xi/(1.+pt.xi)
     pt.yaxis = 'X'
-    test_gpd = g.gpd.TestGPD(p=1)
-    m = g.cff.MellinBarnesCFF(gpds=test_gpd)
-    m.parameters.update(par_test)
-    th = g.theory.hotfixedBMK(m)
-    assert th._XDVCStEx(pt) == approx(90.76770897337423)
+    assert th_nlo._XDVCStEx(pt) == approx(90.76770897337423)
 
 
-def test_XDVCS():
+def test_XDVCS(th_lo):
     """Calculate LO DVCS total cross section (+ evolution)."""
     pt = g.data.DataPoint({'W': 82., 'Q2': 3.})
     pt.xi = pt.Q2 / (2.0 * pt.W * pt.W + pt.Q2)
     pt.xB = 2*pt.xi/(1.+pt.xi)
     pt.yaxis = 'X'
-    test_gpd = g.gpd.TestGPD()
-    m = g.cff.MellinBarnesCFF(gpds=test_gpd)
-    m.parameters.update(par_test)
-    th = g.theory.hotfixedBMK(m)
     # Comparison to old pure-Fortran 'src/test/test.F':
     # Have to decrease precision due to slightly different formula
-    assert th.predict(pt) == approx(105.18391660404916, rel=1e-3)
+    assert th_lo.predict(pt) == approx(105.18391660404916, rel=1e-3)
 
 
-def test_XDVCS_NLO():
+def test_XDVCS_NLO(th_nlo):
     """Calculate NLO DVCS cross section (+ evolution)."""
     pt = g.data.DataPoint({'W': 55., 'Q2': 3.})
     pt.xi = pt.Q2 / (2.0 * pt.W * pt.W + pt.Q2)
     pt.xB = 2*pt.xi/(1.+pt.xi)
     pt.yaxis = 'X'
-    test_gpd = g.gpd.TestGPD(p=1)
-    m = g.cff.MellinBarnesCFF(gpds=test_gpd)
-    m.parameters.update(par_test)
-    th = g.theory.hotfixedBMK(m)
-    assert th.predict(pt) == approx(32.29728102, rel=1e-5)
+    assert th_nlo.predict(pt) == approx(32.29728102, rel=1e-5)
     # To get complete agreement with Fortran take
     # (slower) tquadrature = quadSciPy10 and:
     # set pt.W=3.5  and use XDVCStApprox and
     # assert_almost_equal(aux, 6.8612469682766850, 5)
 
 
-def test_predict():
+def test_predict(thx):
     """Test theory predict."""
-    fit_gpd = g.gpd.PWNormGPD()
-    m = g.cff.MellinBarnesCFF(gpds=fit_gpd)
-    th = g.theory.BMK(model=m)
-    th.m.parameters.update(par_fit)
     pt6 = g.data.dset[36][0]
-    assert th.predict(pt6) == approx(12.69069206084793)
+    assert thx.predict(pt6) == approx(12.69069206084793)
 
 # @mark.devel
 # def test_chisq():
 #     """Test chisq calculation."""
-#     fit_gpd = g.gpd.PWNormGPD()
-#     m = g.cff.MellinBarnesCFF(gpds=fit_gpd)
-#     th = g.theory.BMK(model=m)
-#     th.m.parameters.update(par_fit)
 #     assert th.chisq_single([data[39][1]]) == approx(0.027310271896327565)
 #     assert th.chisq_para([data[39][1]]) == approx(0.027310271896327565)
 
 
-def test_chisq_Xt():
+def test_chisq_Xt(thx):
     """Test chisq Xt calculation."""
-    fit_gpd = g.gpd.PWNormGPD()
-    m = g.cff.MellinBarnesCFF(gpds=fit_gpd)
-    th = g.theory.BMK(model=m)
-    th.m.parameters.update(par_fit)
-    assert th.chisq_single(g.data.dset[39][2:4]) == approx(1.012533085207716)
+    assert thx.chisq_single(g.data.dset[39][2:4]) == approx(1.012533085207716)
     # parallelization slows down fast testing
     # assert th.chisq_para(g.data.dset[39][2:4]) == approx(1.012533085207716)
 
 
-def test_chisq_X():
+def test_chisq_X(thx):
     """Test chisq total X calculation."""
-    fit_gpd = g.gpd.PWNormGPD()
-    m = g.cff.MellinBarnesCFF(gpds=fit_gpd)
-    th = g.theory.BMK(model=m)
-    th.m.parameters.update(par_fit)
-    assert th.chisq_single([g.data.dset[45][3]]) == approx(0.29405520100706245)
+    assert thx.chisq_single([g.data.dset[45][3]]) == approx(0.29405520100706245)
     # parallelization slows down fast testing
     # assert th.chisq_para([g.data.dset[45][3]]) == approx(0.29405520100706245)
 
@@ -179,11 +172,7 @@ def test_chisq_X():
 #     assert th.chisq_para(data[39][2:]+data[45]) == approx(10.4732692425849)
 
 
-def test_chisq_XtX():
+def test_chisq_XtX(thx):
     """Test chisq Xt+X calculation."""
-    fit_gpd = g.gpd.PWNormGPD()
-    m = g.cff.MellinBarnesCFF(gpds=fit_gpd)
-    th = g.theory.BMK(model=m)
-    th.m.parameters.update(par_fit)
-    assert th.chisq_single(g.data.dset[39][2:]+g.data.dset[45]) == approx(10.47326924258)
+    assert thx.chisq_single(g.data.dset[39][2:]+g.data.dset[45]) == approx(10.47326924258)
     # assert th.chisq_para(data[39][2:]+data[45]) == approx(10.47326924258)
