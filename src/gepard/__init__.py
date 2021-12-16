@@ -6,6 +6,7 @@ import gepard.adim  # noqa: F401
 import gepard.c1dvcs  # noqa: F401
 import gepard.c1dvmp  # noqa: F401
 import gepard.cff  # noqa: F398
+import gepard.dis  # noqa: F398
 import gepard.dvcs  # noqa: F398
 import gepard.dvmp  # noqa: F398
 import gepard.eff  # noqa: F398

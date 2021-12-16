@@ -201,19 +201,65 @@ def ansatz07_fixed(j: np.ndarray, t: float, type: str) -> np.ndarray:
 # ---- Full GPD models  (for all j-points) ----
 
 
-class ConformalSpaceGPD(model.ParameterModel):
-    """Base class of GPD models built in conformal moment space."""
-
+class GPD(model.ParameterModel):
+    """Base class of all GPD models."""
     def __init__(self, **kwargs) -> None:
-        """Init and pre-calculate stuff.
+        """Init GPD object.
 
         Args:
             p: pQCD order (0 = LO, 1 = NLO, 2 = NNLO)
             scheme: pQCD scheme  (msbar or csbar)
             nf: number of active quark flavors
-            q02: Initial Q0^2 for pQCD evolution.
+            q02: Initial Q0^2 for GPD evolution.
             r20: Initial mu0^2 for alpha_strong definition.
             asp: alpha_strong/(2*pi) at scale r20 for (LO, NLO, NNLO)
+
+        """
+        self.p = kwargs.setdefault('p', 0)
+        self.scheme = kwargs.setdefault('scheme', 'msbar')
+        self.nf = kwargs.setdefault('nf', 4)
+        self.q02 = kwargs.setdefault('q02', 4.0)
+        self.r20 = kwargs.setdefault('r20', 2.5)
+        self.asp = kwargs.setdefault('asp', np.array([0.0606, 0.0518, 0.0488]))
+        # scales
+        self.rr2 = 1     # ratio of Q2/renorm. scale squared
+        self.rf2 = 1     # ratio of Q2/GPD fact. scale sq.
+        self.rdaf2 = 1   # ratio of Q2/DA fact. scale sq. (for DVMP)
+        #
+        # Flavor rotation matrix.
+        # ----------------------
+        # It transforms GPDs from flavor basis to evolution basis.
+        # By default, evolution basis is 3-dim (SIG, G, NS+)
+        # (NS- is not completely implemented yet)
+        # while default flavor basis is (sea,G,uv,dv).
+        # User is free to use more complicated flavor structure of model
+        #
+        # Default matrix that follows is appropriate for low-x DVCS,
+        # with singlet-only contribution.
+        # For definitions of sea-like and valence-like GPDs, sea, uv, dv
+        # see hep-ph/0703179
+        self.frot = np.array([[1, 0, 1, 1],
+                              [0, 1, 0, 0],
+                              [0, 0, 0, 0]])
+        # For DIS PDFs:
+        self.frot_pdf = np.array([[1, 0, 0, 0],
+                                  [0, 1, 0, 0],
+                                  [0, 0, 0, 0]])
+        # For DVMP
+        self.frot_rho_4 = np.array([[1, 0, 1, 1],
+                                    [0, 1, 0, 0],
+                                    [0., 0, 0., 0.]]) / np.sqrt(2)
+                               # [3./20., 0, 5./12., 1./12.]]) / np.sqrt(2)
+        super().__init__(**kwargs)
+
+
+class ConformalSpaceGPD(GPD):
+    """Base class of GPD models built in conformal moment space."""
+
+    def __init__(self, **kwargs) -> None:
+        """Init ConformalSpaceGPD object.
+
+        Args:
             c: intersection of Mellin-Barnes curve with real axis
             phi: angle of Mellin-Barnes curve with real axis
 
@@ -224,12 +270,6 @@ class ConformalSpaceGPD(model.ParameterModel):
             is provided by subclasses.
 
         """
-        self.p = kwargs.setdefault('p', 0)
-        self.scheme = kwargs.setdefault('scheme', 'msbar')
-        self.nf = kwargs.setdefault('nf', 4)
-        self.q02 = kwargs.setdefault('q02', 4.0)
-        self.r20 = kwargs.setdefault('r20', 2.5)
-        self.asp = kwargs.setdefault('asp', np.array([0.0606, 0.0518, 0.0488]))
         self.c = kwargs.setdefault('c', 0.35)
         self.phi = kwargs.setdefault('phi', 1.57079632)
         npoints, weights = quadrature.mellin_barnes(self.c, self.phi)
@@ -252,30 +292,6 @@ class ConformalSpaceGPD(model.ParameterModel):
                            'secg': 0.,
                            'thig': 0.,
                            'kapg': 0.}
-        # Flavor rotation matrix.
-        # ----------------------
-        # It transforms GPDs from flavor basis to evolution basis.
-        # By default, evolution basis is 3-dim (SIG, G, NS+)
-        # (NS- is not completely implemented yet)
-        # while default flavor basis is (sea,G,uv,dv).
-        # User is free to use more complicated flavor structure of model
-        #
-        # Default matrix that follows is appropriate for low-x DVCS,
-        # with singlet-only contribution.
-        # For definitions of sea-like and valence-like GPDs, sea, uv, dv
-        # see hep-ph/0703179
-        self.frot = np.array([[1, 0, 1, 1],
-                              [0, 1, 0, 0],
-                              [0, 0, 0, 0]])
-        # squared DVCS charge factors
-        # This might belong to CFF code
-        if self.nf == 3:
-            qs = 2/9
-            qns = 1/9
-        else:  # nf = 4
-            qs = 5/18
-            qns = 1/6
-        self.dvcs_charges = (qs, qs, qns)
         super().__init__(**kwargs)
 
     def pw_strengths(self):
@@ -302,7 +318,7 @@ class TestGPD(ConformalSpaceGPD):
     """Simple testing ansatz for GPDs."""
 
     def __init__(self, **kwargs) -> None:
-        """See parent `ConformalSpaceGPD` class for docs."""
+        """Init TestGPD object."""
         kwargs.setdefault('scheme', 'csbar')
         kwargs.setdefault('nf', 3)
         kwargs.setdefault('q02', 1.0)
@@ -327,13 +343,12 @@ class PWNormGPD(ConformalSpaceGPD):
         only their norms are fitting parameters. Norms of second
         PWs is given by parameers 'secs' (quarks) and 'secg' gluons,
         and norm of third PWs is given by 'this' and 'thig'.
+
+        This is used for modelling sea partons in KM10-KM20 models.
     """
 
     def __init__(self, **kwargs) -> None:
         """See parent `ConformalSpaceGPD` class for docs."""
-        kwargs.setdefault('scheme', 'msbar')
-        kwargs.setdefault('nf', 4)
-        kwargs.setdefault('q02', 4.0)
         super().__init__(**kwargs)
 
     def gpd_H(self, eta: float, t: float) -> np.ndarray:

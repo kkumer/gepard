@@ -19,12 +19,15 @@ par_fit = {'ns':  0.152039, 'al0s': 1.15751, 'alps': 0.15, 'ms2': 0.478391,
 class MyTest(g.gpd.PWNormGPD, g.cff.MellinBarnesCFF, g.dvcs.BMK):
     pass
 
+class MyTestDIS(g.gpd.PWNormGPD, g.dis.DISFormFactors):
+    pass
+
 class MyTest2(g.gpd.TestGPD, g.cff.MellinBarnesCFF, g.dvcs.hotfixedBMK):
     pass
 
 @fixture
 def th_dis():
-    th = MyTest(p=1)
+    th = MyTestDIS(p=1)
     th.parameters.update({'ns': 0.15, 'al0s': 1., 'alps': 0.15, 'ms2': 1.,
                             'secs': 0., 'al0g': 1.1, 'alpg': 0.15, 'mg2': 0.7})
     return th

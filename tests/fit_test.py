@@ -9,16 +9,20 @@ from pytest import approx, fixture, mark
 class FitTest(g.gpd.PWNormGPD, g.cff.MellinBarnesCFF, g.dvcs.BMK):
     pass
 
+class FitTestDIS(g.gpd.PWNormGPD, g.dis.DISFormFactors):
+    pass
+
+
 @fixture
 def th_dis_lo():
-    th = FitTest(p=0)
+    th = FitTestDIS(p=0)
     th.m.parameters.update({'ns': 0.15, 'al0s': 1., 'alps': 0.15, 'ms2': 1.,
                             'secs': 0., 'al0g': 1.1, 'alpg': 0.15, 'mg2': 0.7})
     return th
 
 @fixture
 def th_dis_nlo():
-    th = FitTest(p=1)
+    th = FitTestDIS(p=1)
     th.m.parameters.update({'ns': 0.15, 'al0s': 1., 'alps': 0.15, 'ms2': 1.,
                             'secs': 0., 'al0g': 1.1, 'alpg': 0.15, 'mg2': 0.7})
     return th

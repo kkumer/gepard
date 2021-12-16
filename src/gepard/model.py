@@ -28,22 +28,8 @@ class Model(theory.Theory):
     These are then further subclassed to model actual structure functions.
 
     """
-    def __init__(self, name: str = None, texname: str = None,
-                 description: str = None, **kwargs) -> None:
-        """Init Model class.
-
-        Args:
-            name: short unique model name
-            texname: TeX model name for (e.g. for plot annotation)
-            description: longer description of the model
-
-        """
-        self.name = 'N/A'
-        if not texname:
-            self.texname = name
-        else:
-            self.texname = texname
-        self.description = 'N/A'
+    def __init__(self, **kwargs) -> None:
+        """Init Model object."""
         super().__init__(**kwargs)
 
 
@@ -62,7 +48,8 @@ class ParameterModel(Model):
     parameters_limits: dict = {}
 
     def __init__(self, **kwargs) -> None:
-        """Init and pre-calculate stuff."""
+        """Init ParameterModel object."""
+        print('ParameterModel init done')
         super().__init__(**kwargs)
 
 

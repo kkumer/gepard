@@ -9,7 +9,7 @@ from typing import Dict, List
 import numpy as np
 import scipy.stats
 
-from . import constants, data, eff, gpd, model, qcd, quadrature, utils, wilson
+from . import constants, data, eff, gpd, mellin, model, qcd, quadrature, utils, wilson
 
 # from joblib import Parallel, delayed
 
@@ -26,6 +26,14 @@ class ComptonFormFactors(model.ParameterModel):
     # allGPDs = []
 
     def __init__(self, **kwargs):
+        # squared DVCS charge factors
+        if self.nf == 3:
+            qs = 2/9
+            qns = 1/9
+        else:  # nf = 4
+            qs = 5/18
+            qns = 1/6
+        self.dvcs_charges = (qs, qs, qns)
         super().__init__(**kwargs)
 
     def print_CFFs(self, pt, format=None):
@@ -56,53 +64,19 @@ class ComptonFormFactors(model.ParameterModel):
                 (1e-3 < pt.xB < 0.5))
 
 
-class MellinBarnesCFF(ComptonFormFactors):
+class MellinBarnesCFF(ComptonFormFactors, mellin.MellinBarnes):
     """Class of models built by Mellin-Barnes integration."""
 
     def __init__(self, **kwargs) -> None:
         """Init MellinBarnes class and pre-calculate stuff.
 
         """
-        # scales
-        self.rr2 = 1     # ratio of Q2/renorm. scale squared
-        self.rf2 = 1     # ratio of Q2/GPD fact. scale sq.
-        self.rdaf2 = 1   # ratio of Q2/DA fact. scale sq. (for DVMP)
         #
         self.tgj = np.tan(pi*self.jpoints/2.)
         # wce[Q2] = wce[spw, j, a] - Wilson coeffs evolved; local to model instance
-        self.wce: Dict[float, np.ndarray] = {}  # DVCS
-        self.wce_dvmp: Dict[float, np.ndarray] = {}  # DVMP
-        self.wce_dis: Dict[float, np.ndarray] = {}  # DIS
-        # correction factors for NLO expressions
-        # needed to be able to have some tests w.r.t. old wrong notebooks
-        # 1. correction introduced below Eq. (20) of 1612.01937. Set 
-        #  to zero to get agreement with older results
-        self.corr_c1dvmp_one = 1
-        # 2. correction to get results from "Towards DVMP" paper.
-        #  Set to -1 to get agreement with Dieter's notebook.
-        self.corr_c1dvmp_sgn = 1
+        self.wce: Dict[float, np.ndarray] = {}  # DVCS Wilson coefs.
+        mellin.MellinBarnes.__init__(self, **kwargs)
         super().__init__(**kwargs)
-
-    def _mellin_barnes_integral(self, xi, wce, gpd):
-        """Return convolution of evolved Wilson coefs and GPDs."""
-        eph = np.exp(self.phi*1j)
-        cfacj = eph * np.exp((self.jpoints + 1) * log(1/xi))  # eph/xi**(j+1)
-        # Temporary singlet part only!:
-        cch = np.einsum('j,sa,sja,ja->j', cfacj,
-                        self.pw_strengths(), wce, gpd)
-        imh = np.dot(self.wg, cch.imag)
-        np.multiply(cch, self.tgj, out=cch)
-        reh = np.dot(self.wg, cch.imag)
-        return reh, imh
-
-    def _dis_mellin_barnes_integral(self, xi, wce, pdf):
-        """Return convolution of evolved Wilson coefs and PDFs."""
-        eph = np.exp(self.phi*1j)
-        cfacj = eph * np.exp((self.jpoints) * log(1/xi))  # eph/xi**j
-        # Temporary singlet part only!:
-        cch = np.einsum('j,ja,ja->j', cfacj, wce, pdf)
-        mb_int = np.dot(self.wg, cch.imag)
-        return mb_int
 
     def cff(self, pt: data.DataPoint) -> np.ndarray:
         """Return array(ReH, ImH, ReE, ...) for kinematic point."""
@@ -137,67 +111,6 @@ class MellinBarnesCFF(ComptonFormFactors):
     def ImE(self, pt: data.DataPoint) -> float:
         """Return Im(CFF E) for kinematic point."""
         return self.cff(pt)[3]
-
-    def tff(self, xi: float, t: float, Q2: float) -> np.ndarray:
-        """Return array(ReH_rho, ImH_rho, ReE_rho, ...) of DVrhoP transition FFs."""
-        assert self.nf == 4
-
-        astrong = 2 * pi * qcd.as2pf(self.p, self.nf,  Q2, self.asp[self.p], self.r20)
-
-        try:
-            wce_ar_dvmp = self.wce_dvmp[Q2]
-        except KeyError:
-            # calculate it
-            wce_ar_dvmp = wilson.calc_wce(self, Q2, 'DVMP')
-            # memorize it for future
-            self.wce_dvmp[Q2] = wce_ar_dvmp
-        # Evaluations depending on model parameters:
-        h_prerot = self.gpd_H(xi, t)
-        # Flavor rotation matrix: (sea,G,uv,dv) --> (SIG, G, NS+, NS-)
-        # FIXME: should be constructed only once!
-        frot_rho_4 = np.array([[1, 0, 1, 1],
-                               [0, 1, 0, 0],
-                               [0., 0, 0., 0.]]) / np.sqrt(2)
-                               # [3./20., 0, 5./12., 1./12.]]) / np.sqrt(2)
-        h = np.einsum('fa,ja->jf', frot_rho_4, h_prerot)
-        reh, imh = self._mellin_barnes_integral(xi, wce_ar_dvmp, h)
-        return (constants.CF * constants.F_rho * astrong / constants.NC
-                / np.sqrt(Q2) * np.array([reh, imh, 0, 0, 0, 0, 0, 0]))
-
-    def ImHrho(self, pt: data.DataPoint) -> np.ndarray:
-        """Return Im(TFF H) for kinematic point."""
-        tffs = self.tff(pt.xi, pt.t, pt.Q2)
-        return tffs[1]
-
-    def ReHrho(self, pt: data.DataPoint) -> np.ndarray:
-        """Return Re(TFF H) for kinematic point."""
-        tffs = self.tff(pt.xi, pt.t, pt.Q2)
-        return tffs[0]
-
-    def F2(self, pt: data.DataPoint) -> float:
-        """Return DIS F2 for kinematic point."""
-        if self.nf == 3:
-            chargefac = 2./9.
-        else:  # nf = 4
-            chargefac = 5./18.
-
-        try:
-            wce_ar_dis = self.wce_dis[pt.Q2]
-        except KeyError:
-            # calculate it, first PW is the only relevant one
-            wce_ar_dis = wilson.calc_wce(self, pt.Q2, 'DIS')[0, :, :]
-            # memorize it for future
-            self.wce_dis[pt.Q2] = wce_ar_dis
-        pdf_prerot = self.gpd_H(0, 0)  # forward limit
-        # Flavor rotation matrix: (sea,G,uv,dv) --> (SIG, G, NS+, NS-)
-        # FIXME: should be constructed only once!
-        frot_pdf = np.array([[1, 0, 0, 0],
-                             [0, 1, 0, 0],
-                             [0., 0, 0., 0.]])
-        pdf = np.einsum('fa,ja->jf', frot_pdf, pdf_prerot)
-        mb_int = self._dis_mellin_barnes_integral(pt.xB, wce_ar_dis, pdf)
-        return chargefac * mb_int / np.pi
-
 
 class ComptonDispersionRelations(ComptonFormFactors):
     """Use dispersion relations for real parts of CFFs.
@@ -325,7 +238,13 @@ class ComptonModelDR(ComptonDispersionRelations, PionPole):
     """Model for CFFs as in arXiv:0904.0458."""
 
     def __init__(self, **kwargs):
-        """Constructor."""
+        """Init ComptonModelDR object.
+
+        Args:
+            nf: number of active quark flavors
+
+        """
+        self.nf = kwargs.setdefault('nf', 4)
         # initial values of parameters and limits on their values
         self.parameters = {'Nsea': 1.5, 'alS': 1.13, 'alpS': 0.15,
                            'MS': 0.707, 'rS': 1.0, 'bS': 2.0,

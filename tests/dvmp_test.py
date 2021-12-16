@@ -23,7 +23,7 @@ par_KM10b = {'tMv': 0.8, 'rS': 1.0, 'rpi': 4.0201, 'alv': 0.43, 'Nsea': 0.0,
              'ms2': 0.49754317018981614,
              'thig': 0.8915757559175185, 'kaps': 0.0, 'kapg': 0.0}
 
-class MyTheory(g.gpd.PWNormGPD, g.cff.MellinBarnesCFF, g.dvmp.DVMP):
+class MyTheory(g.gpd.PWNormGPD, g.dvmp.MellinBarnesTFF, g.dvmp.DVMP):
     pass
 
 @fixture

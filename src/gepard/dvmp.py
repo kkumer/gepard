@@ -1,6 +1,9 @@
 """Deeply Virtual Meson Production (DVMP) observables."""
 
-from . import theory
+from math import log, pi
+import numpy as np
+
+from . import constants, data, mellin, model, qcd, theory, wilson
 
 class DVMP(theory.Theory):
     """DVMP observables
@@ -22,3 +25,53 @@ class DVMP(theory.Theory):
 
 
     _Xrhot = _XrhotApprox
+
+
+class MellinBarnesTFF(model.ParameterModel, mellin.MellinBarnes):
+    """DVMP Transition Form Factors modelled as Mellin-Barnes integral."""
+
+    def __init__(self, **kwargs):
+        self.wce_dvmp: Dict[float, np.ndarray] = {}
+        # correction factors for NLO expressions
+        # needed to be able to have some tests w.r.t. old wrong notebooks
+        # 1. correction introduced below Eq. (20) of 1612.01937. Set 
+        #  to zero to get agreement with older results
+        self.corr_c1dvmp_one = 1
+        # 2. correction to get results from "Towards DVMP" paper.
+        #  Set to -1 to get agreement with Dieter's notebook.
+        self.corr_c1dvmp_sgn = 1
+        print('TFF init done.')
+        mellin.MellinBarnes.__init__(self, **kwargs)
+        super().__init__(**kwargs)
+
+    def tff(self, xi: float, t: float, Q2: float) -> np.ndarray:
+        """Return array(ReH_rho, ImH_rho, ReE_rho, ...) of DVrhoP transition FFs."""
+        assert self.nf == 4
+
+        astrong = 2 * pi * qcd.as2pf(self.p, self.nf,  Q2, self.asp[self.p], self.r20)
+
+        try:
+            wce_ar_dvmp = self.wce_dvmp[Q2]
+        except KeyError:
+            # calculate it
+            wce_ar_dvmp = wilson.calc_wce(self, Q2, 'DVMP')
+            # memorize it for future
+            self.wce_dvmp[Q2] = wce_ar_dvmp
+        # Evaluations depending on model parameters:
+        h_prerot = self.gpd_H(xi, t)
+        h = np.einsum('fa,ja->jf', self.frot_rho_4, h_prerot)
+        reh, imh = self._mellin_barnes_integral(xi, wce_ar_dvmp, h)
+        return (constants.CF * constants.F_rho * astrong / constants.NC
+                / np.sqrt(Q2) * np.array([reh, imh, 0, 0, 0, 0, 0, 0]))
+
+    def ImHrho(self, pt: data.DataPoint) -> np.ndarray:
+        """Return Im(TFF H) for kinematic point."""
+        tffs = self.tff(pt.xi, pt.t, pt.Q2)
+        return tffs[1]
+
+    def ReHrho(self, pt: data.DataPoint) -> np.ndarray:
+        """Return Re(TFF H) for kinematic point."""
+        tffs = self.tff(pt.xi, pt.t, pt.Q2)
+        return tffs[0]
+
+

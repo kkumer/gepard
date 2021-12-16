@@ -18,13 +18,19 @@ class Theory(object):
     """
 
     def __init__(self, **kwargs) -> None:
-        """Construct theory framework with specific model."""
+        """This init is guaranteed to run.
+
+        Args:
+            name: short unique model name
+            texname: TeX model name for (e.g. for plot annotation)
+            description: longer description of the model
+        """
+        self.name = kwargs.setdefault('name', 'N/A')
+        self.texname = kwargs.setdefault('texname', self.name)
+        self.description = kwargs.setdefault('description', 'N/A')
         self.model = self       # to make old .m code work
         self.m = self       # to make old .m code work
-        # self.name = model.name
-        # self.texname = model.texname
-        # self.description = model.description
-        #
+        print('theory.Theory init done.')
         # We do NOT call super().__init__ here because object class will
         # not accapt **kwargs. This means that Theory has to be the last
         # class in mro.
