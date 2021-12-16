@@ -112,7 +112,7 @@ par_KM15 = {'tMv': 3.992860161655587, 'rS': 1.0, 'alv': 0.43, 'tal': 0.43,
             'secg': -2.990809378821039, 'thig': 0.9052207712570559,
             'kaps': 0.0, 'kapg': 0.0}
 
-class KM09(g.cff.ModelDR, g.dvcs.hotfixedBMK):
+class KM09(g.eff.ElasticDipole, g.cff.ComptonModelDR, g.dvcs.hotfixedBMK):
     pass
 
 @fixture

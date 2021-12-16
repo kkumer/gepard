@@ -413,21 +413,3 @@ class ComptonHybridPP(ComptonHybrid):
     def ReEt(self, pt):
         """Instead of disp. rel. use free pion pole formula."""
         return self.DMfreepole(pt)
-
-
-#  --- Complete models ---
-class ModelDR(ComptonModelDR, eff.ElasticDipole):
-    """Complete model as in arXiv:0904.0458.."""
-
-
-class ModelDRKelly(ComptonModelDR, eff.ElasticKelly):
-    """Same, but with Kelly elastic form factors."""
-
-
-class HybridDipole(ComptonHybrid, eff.ElasticDipole):
-    """Complete hybrid model."""
-
-
-class HybridKelly(ComptonHybrid, eff.ElasticKelly):
-    """Complete hybrid model."""
-

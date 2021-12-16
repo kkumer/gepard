@@ -62,11 +62,11 @@ ptw = g.data.dset[56][0]
 ptwd = g.data.dset[55][0]
 
 
-class BMK(g.cff.ModelDR, g.dvcs.hotfixedBMK):
+class BMK(g.eff.ElasticDipole, g.cff.ComptonModelDR, g.dvcs.hotfixedBMK):
 	pass
 
 
-class BM10(g.cff.ModelDR, g.dvcs.BM10):
+class BM10(g.eff.ElasticDipole, g.cff.ComptonModelDR, g.dvcs.BM10):
 	pass
 
 
