@@ -23,7 +23,7 @@ par_KM10b = {'tMv': 0.8, 'rS': 1.0, 'rpi': 4.0201, 'alv': 0.43, 'Nsea': 0.0,
              'ms2': 0.49754317018981614,
              'thig': 0.8915757559175185, 'kaps': 0.0, 'kapg': 0.0}
 
-class MyTheory(g.gpd.PWNormGPD, g.cff.MellinBarnesCFF, g.theory.DVMP):
+class MyTheory(g.gpd.PWNormGPD, g.cff.MellinBarnesCFF, g.dvmp.DVMP):
     pass
 
 @fixture
@@ -74,7 +74,6 @@ def test_gepardXrhot(th_KM10b):
     """Calculate LO DVMP cross section d sigma / dt"""
     pt = g.data.DataPoint({'Q2': 6.6, 'W': 75., 't': -0.025,
                            'process': 'gammastarp2rho0p'})
-    #th = g.theory.DVMP(m)
     assert th_KM10b.X(pt) == approx(1212.62165, rel=1.e-2)
 
 

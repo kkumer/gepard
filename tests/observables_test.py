@@ -62,11 +62,11 @@ ptw = g.data.dset[56][0]
 ptwd = g.data.dset[55][0]
 
 
-class BMK(g.cff.ModelDR, g.theory.hotfixedBMK):
+class BMK(g.cff.ModelDR, g.dvcs.hotfixedBMK):
 	pass
 
 
-class BM10(g.cff.ModelDR, g.theory.BM10):
+class BM10(g.cff.ModelDR, g.dvcs.BM10):
 	pass
 
 
@@ -196,6 +196,6 @@ def test_AUTDVCS():
     # Gepard model
     mGepard = g.cff.Gepard(ansatz='EFLEXP')
     mGepard.parameters.update(par_DM12)
-    th = g.theory.BMK(mGepard)
+    th = g.dvcs.BMK(mGepard)
     pttrans.varFTn = -1
     assert th.AUTDVCS(pttrans)*1e3 == approx(-1.5171462298928092)

@@ -6,7 +6,7 @@ from pytest import approx, fixture, mark
 # The following is not resulting in paralelization
 # os.environ["OPENBLAS_MAIN_FREE"] = "1"
 
-class FitTest(g.gpd.PWNormGPD, g.cff.MellinBarnesCFF, g.theory.BMK):
+class FitTest(g.gpd.PWNormGPD, g.cff.MellinBarnesCFF, g.dvcs.BMK):
     pass
 
 @fixture

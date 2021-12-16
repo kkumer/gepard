@@ -16,10 +16,10 @@ par_fit = {'ns':  0.152039, 'al0s': 1.15751, 'alps': 0.15, 'ms2': 0.478391,
            'al0g': 1.24732, 'alpg': 0.15, 'mg2': 0.7, 'secg': -0.81217, 'thig': 0.}
 
 
-class MyTest(g.gpd.PWNormGPD, g.cff.MellinBarnesCFF, g.theory.BMK):
+class MyTest(g.gpd.PWNormGPD, g.cff.MellinBarnesCFF, g.dvcs.BMK):
     pass
 
-class MyTest2(g.gpd.TestGPD, g.cff.MellinBarnesCFF, g.theory.hotfixedBMK):
+class MyTest2(g.gpd.TestGPD, g.cff.MellinBarnesCFF, g.dvcs.hotfixedBMK):
     pass
 
 @fixture
@@ -154,7 +154,7 @@ def test_chisq_X(thx):
 #     """Test chisq total X calculation."""
 #     fit_gpd = g.gpd.PWNormGPD()
 #     m = g.cff.MellinBarnesCFF(gpds=fit_gpd)
-#     th = g.theory.BMK(model=m)
+#     th = g.dvcs.BMK(model=m)
 #     th.m.parameters.update(par_fit)
 #     # assert th.chisq_single(data[45][3:5]) == approx(0.29860340473733393)
 #     # assert th.chisq_para(data[45][3:5]) == approx(0.29860340473733393)
