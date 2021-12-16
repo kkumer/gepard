@@ -25,7 +25,6 @@ class Theory(object):
         """Construct theory framework with specific model."""
         self.model = self       # to make old .m code work
         self.m = self       # to make old .m code work
-        print('g.theory.Theory init done')
         # self.name = model.name
         # self.texname = model.texname
         # self.description = model.description
@@ -192,7 +191,6 @@ class Theory(object):
             else:
                 res = self._XDVCSt(pt)
             del pt.t
-            # print("t = {}  =>  dsig/dt = {}".format(t_single, res))
             aux.append(res)
         return array(aux)
 
@@ -372,16 +370,14 @@ class DVCS(Theory):
         """Partial DVCS cross section w.r.t. Mandelstam t."""
 
         eps2 = 4. * pt.xB**2 * Mp2 / pt.Q2
-        try:
-            # fails always. have to fix hybrid model before this works
-            ReH, ImH, ReE, ImE, ReHt, ImHt, ReEt, ImEt = self.m.cff_nonexistent(pt)
-        except AttributeError:
+        if cff.ComptonHybrid in self.__class__.mro():
+            # For hybrid models we cannot ask for cff() since self gets misinterpreted
             ReH = self.m.ReH(pt)
             ImH = self.m.ImH(pt)
             ReE = self.m.ReE(pt)
             ImE = self.m.ImE(pt)
-        # if pt.t < -0.9:
-        #     print('t, Q2:  ReH, ImH = {:.2} {}: {:.3}, {:5.1f} '.format(pt.t, pt.Q2, ReH, ImH))
+        else:
+            ReH, ImH, ReE, ImE, ReHt, ImHt, ReEt, ImEt = self.m.cff(pt)
         res = 65.14079453579676 * (pt.xB**2 / pt.Q2**2 / (1-pt.xB) / (2-pt.xB)**2 /
                 sqrt(1 + eps2) * (
                     4 * (1 - pt.xB) * (ImH**2 + ReH**2)

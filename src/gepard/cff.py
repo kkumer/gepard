@@ -26,7 +26,6 @@ class ComptonFormFactors(model.ParameterModel):
     # allGPDs = []
 
     def __init__(self, **kwargs):
-        print('cff.ComptonFormFactors init done')
         super().__init__(**kwargs)
 
     def print_CFFs(self, pt, format=None):
@@ -82,7 +81,6 @@ class MellinBarnesCFF(ComptonFormFactors):
         # 2. correction to get results from "Towards DVMP" paper.
         #  Set to -1 to get agreement with Dieter's notebook.
         self.corr_c1dvmp_sgn = 1
-        print('cff.MellinBarnesCFF init done')
         super().__init__(**kwargs)
 
     def _mellin_barnes_integral(self, xi, wce, gpd):
@@ -197,8 +195,6 @@ class MellinBarnesCFF(ComptonFormFactors):
                              [0, 1, 0, 0],
                              [0., 0, 0., 0.]])
         pdf = np.einsum('fa,ja->jf', frot_pdf, pdf_prerot)
-        # print('pdf = {}'.format(pdf[0, :2]))
-        # print('wce = {}'.format(wce_ar_dis[0, :2]))
         mb_int = self._dis_mellin_barnes_integral(pt.xB, wce_ar_dis, pdf)
         return chargefac * mb_int / np.pi
 

@@ -276,7 +276,6 @@ class ConformalSpaceGPD(model.ParameterModel):
             qs = 5/18
             qns = 1/6
         self.dvcs_charges = (qs, qs, qns)
-        print('ConformalSpaceGPD init done.')
         super().__init__(**kwargs)
 
     def pw_strengths(self):
@@ -309,7 +308,6 @@ class TestGPD(ConformalSpaceGPD):
         kwargs.setdefault('q02', 1.0)
         kwargs.setdefault('r20', 2.5)
         kwargs.setdefault('asp', np.array([0.05, 0.05, 0.05]))
-        print('TestGPD init done.')
         super().__init__(**kwargs)
 
     def gpd_H(self, eta: float, t: float) -> np.ndarray:
@@ -336,7 +334,6 @@ class PWNormGPD(ConformalSpaceGPD):
         kwargs.setdefault('scheme', 'msbar')
         kwargs.setdefault('nf', 4)
         kwargs.setdefault('q02', 4.0)
-        print('PWNormGPD init done.')
         super().__init__(**kwargs)
 
     def gpd_H(self, eta: float, t: float) -> np.ndarray:

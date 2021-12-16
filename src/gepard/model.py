@@ -63,7 +63,6 @@ class ParameterModel(Model):
 
     def __init__(self, **kwargs) -> None:
         """Init and pre-calculate stuff."""
-        print('ParameterModel init done')
         super().__init__(**kwargs)
 
 
