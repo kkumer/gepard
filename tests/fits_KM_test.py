@@ -112,7 +112,7 @@ par_KM15 = {'tMv': 3.992860161655587, 'rS': 1.0, 'alv': 0.43, 'tal': 0.43,
             'secg': -2.990809378821039, 'thig': 0.9052207712570559,
             'kaps': 0.0, 'kapg': 0.0}
 
-class KM09(g.eff.ElasticDipole, g.cff.ComptonModelDR, g.dvcs.hotfixedBMK):
+class KM09(g.eff.DipoleEFF, g.cff.DispersionFixedPoleCFF, g.dvcs.hotfixedBMK):
     pass
 
 @fixture
@@ -120,10 +120,10 @@ def th_KM09():
     th = KM09()
     return th
 
-class KM10(g.eff.ElasticDipole, g.gpd.PWNormGPD, g.cff.ComptonHybridPP, g.dvcs.BM10):
+class KM10(g.eff.DipoleEFF, g.gpd.PWNormGPD, g.cff.HybridFreePoleCFF, g.dvcs.BM10):
 	pass
 
-class KM10b(g.eff.ElasticKelly, g.gpd.PWNormGPD, g.cff.ComptonHybridPP, g.dvcs.BM10):
+class KM10b(g.eff.KellyEFF, g.gpd.PWNormGPD, g.cff.HybridFreePoleCFF, g.dvcs.BM10):
 	pass
 
 @fixture
@@ -136,7 +136,7 @@ def th_KM10b():
     th = KM10b()
     return th
 
-class KM15(g.eff.ElasticKelly, g.gpd.PWNormGPD, g.cff.ComptonHybridPP, g.dvcs.BM10tw2):
+class KM15(g.eff.KellyEFF, g.gpd.PWNormGPD, g.cff.HybridFreePoleCFF, g.dvcs.BM10tw2):
     pass
 
 @fixture

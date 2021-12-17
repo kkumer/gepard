@@ -95,7 +95,7 @@ class CFFTest3(g.gpd.PWNormGPD, g.cff.MellinBarnesCFF):
 	pass
 
 
-class CFFTest4(g.gpd.PWNormGPD, g.cff.ComptonHybrid):
+class CFFTest4(g.gpd.PWNormGPD, g.cff.HybridFixedPoleCFF):
 	pass
 
 

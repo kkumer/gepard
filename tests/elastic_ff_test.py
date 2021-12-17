@@ -4,8 +4,8 @@ from pytest import approx
 
 import gepard as g
 
-md = g.eff.ElasticDipole()  # dipole FFs
-m = g.eff.ElasticKelly()  # Kelly's FFs
+md = g.eff.DipoleEFF()  # dipole FFs
+m = g.eff.KellyEFF()  # Kelly's FFs
 
 # proton
 pt = g.DataPoint(init={'in2particle': 'p', 'Q2': 4., 't': 0., 'xB': 0.1})

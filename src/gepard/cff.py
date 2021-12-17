@@ -13,7 +13,7 @@ from . import constants, data, eff, gpd, mellin, model, qcd, quadrature, utils, 
 
 # from joblib import Parallel, delayed
 
-class ComptonFormFactors(model.ParameterModel):
+class CFF(model.ParameterModel):
     """Base class for CFFs.
 
     CFFs are set to be zero here. Actual models are built by subclassing this.
@@ -64,7 +64,7 @@ class ComptonFormFactors(model.ParameterModel):
                 (1e-3 < pt.xB < 0.5))
 
 
-class MellinBarnesCFF(ComptonFormFactors, mellin.MellinBarnes):
+class MellinBarnesCFF(CFF, mellin.MellinBarnes):
     """Class of models built by Mellin-Barnes integration."""
 
     def __init__(self, **kwargs) -> None:
@@ -112,7 +112,7 @@ class MellinBarnesCFF(ComptonFormFactors, mellin.MellinBarnes):
         """Return Im(CFF E) for kinematic point."""
         return self.cff(pt)[3]
 
-class ComptonDispersionRelations(ComptonFormFactors):
+class DispersionCFF(CFF):
     """Use dispersion relations for real parts of CFFs.
 
     methods: ReH, ReE, ReHt, ReEt, subtraction
@@ -234,11 +234,11 @@ class PionPole(object):
             return pole  # proton
 
 
-class ComptonModelDR(ComptonDispersionRelations, PionPole):
+class DispersionFixedPoleCFF(DispersionCFF, PionPole):
     """Model for CFFs as in arXiv:0904.0458."""
 
     def __init__(self, **kwargs):
-        """Init ComptonModelDR object.
+        """Init DispersionFixedPoleCFF object.
 
         Args:
             nf: number of active quark flavors
@@ -328,7 +328,7 @@ class ComptonModelDR(ComptonDispersionRelations, PionPole):
 
     def ImE(self, pt, xi=0):
         """Imaginary part of CFF E."""
-        # Just changing function signature w.r.t. ComptonFormFactors
+        # Just changing function signature w.r.t. CFF
         # to make it compatible for dispersion integral
         return 0
 
@@ -336,11 +336,8 @@ class ComptonModelDR(ComptonDispersionRelations, PionPole):
         """Instead of disp. rel. use pole formula."""
         return self.DMfixpole(pt)
 
-# For compatibility with old models in database:
-# ComptonModelDRsea = ComptonModelDR
 
-
-class ComptonModelDRPP(ComptonModelDR):
+class DispersionFreePoleCFF(DispersionFixedPoleCFF):
     """Model for CFFs as in arXiv:0904.0458. + free pion pole."""
 
     def __init__(self, **kwargs):
@@ -358,7 +355,7 @@ class ComptonModelDRPP(ComptonModelDR):
         return self.DMfreepole(pt)
 
 
-class ComptonHybrid(MellinBarnesCFF, ComptonModelDR, ComptonFormFactors):
+class HybridCFF(MellinBarnesCFF, DispersionFixedPoleCFF, CFF):
     """This combines MB model for small xB and DR model for valence xB."""
 
 
@@ -372,43 +369,42 @@ class ComptonHybrid(MellinBarnesCFF, ComptonModelDR, ComptonFormFactors):
     # FIXME: this below looks inconsistent generally for xi != pt.xi !!
 
     def ImH(self, pt, xi=0):
-        return MellinBarnesCFF.ImH(self, pt) + ComptonModelDR.ImH(self, pt, xi)
+        return MellinBarnesCFF.ImH(self, pt) + DispersionFixedPoleCFF.ImH(self, pt, xi)
 
     def ReH(self, pt):
-        return MellinBarnesCFF.ReH(self, pt) + ComptonModelDR.ReH(self, pt, imfun=ComptonModelDR.ImH)
+        return MellinBarnesCFF.ReH(self, pt) + DispersionFixedPoleCFF.ReH(self, pt, imfun=DispersionFixedPoleCFF.ImH)
 
     def ImE(self, pt, xi=0):
-        return MellinBarnesCFF.ImE(self, pt) + ComptonModelDR.ImE(self, pt, xi)
+        return MellinBarnesCFF.ImE(self, pt) + DispersionFixedPoleCFF.ImE(self, pt, xi)
 
     def ReE(self, pt):
-        return MellinBarnesCFF.ReE(self, pt) + ComptonModelDR.ReE(self, pt, imfun=ComptonModelDR.ImE)
+        return MellinBarnesCFF.ReE(self, pt) + DispersionFixedPoleCFF.ReE(self, pt, imfun=DispersionFixedPoleCFF.ImE)
 
-    # Tildes are not provided by MB model
+    # Tildes are not yet provided by MellinBarnesCFF model
 
     def ImHt(self, pt, xi=0):
-        return ComptonModelDR.ImHt(self, pt, xi)
+        return DispersionFixedPoleCFF.ImHt(self, pt, xi)
 
     def ReHt(self, pt):
-        return ComptonModelDR.ReHt(self, pt, imfun=ComptonModelDR.ImHt)
+        return DispersionFixedPoleCFF.ReHt(self, pt, imfun=DispersionFixedPoleCFF.ImHt)
 
     def ImEt(self, pt):
-        return ComptonModelDR.ImEt(self, pt)
+        return DispersionFixedPoleCFF.ImEt(self, pt)
+
+    def ReEt(self, pt):
+        """Provided by subclasses."""
+        return 0
+
+class HybridFixedPoleCFF(HybridCFF):
+    """HybridCFF model with fixed pion pole model for ReEt."""
 
     def ReEt(self, pt):
         """Instead of disp. rel. use fixed pion pole formula."""
         return self.DMfixpole(pt)
 
 
-class ComptonHybridPP(ComptonHybrid):
-    """This combines MB model for small xB and DRPP model for valence xB."""
-
-
-    def is_within_model_kinematics(self, pt):
-        """Is kinematics of datapoint ok?"""
-        # relaxing xBmin and removing Q2max
-        return ((1.5 <= pt.Q2) and
-                (pt.tm < min(1., pt.Q2/4)) and
-                (1e-5 < pt.xB < 0.65))
+class HybridFreePoleCFF(HybridCFF):
+    """HybridCFF model with free pion pole model for ReEt."""
 
     def ReEt(self, pt):
         """Instead of disp. rel. use free pion pole formula."""

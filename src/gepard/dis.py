@@ -5,8 +5,8 @@ import numpy as np
 
 from . import data, mellin, model, wilson
 
-class DISFormFactors(model.ParameterModel, mellin.MellinBarnes):
-    """Deep Inelastic Scattering (DIS) Form Factors."""
+class DIS(model.ParameterModel, mellin.MellinBarnes):
+    """Deep Inelastic Scattering (DIS) - form factors only."""
 
     def __init__(self, **kwargs):
         # squared DIS charge factors

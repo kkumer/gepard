@@ -19,7 +19,7 @@ par_fit = {'ns':  0.152039, 'al0s': 1.15751, 'alps': 0.15, 'ms2': 0.478391,
 class MyTest(g.gpd.PWNormGPD, g.cff.MellinBarnesCFF, g.dvcs.BMK):
     pass
 
-class MyTestDIS(g.gpd.PWNormGPD, g.dis.DISFormFactors):
+class MyTestDIS(g.gpd.PWNormGPD, g.dis.DIS):
     pass
 
 class MyTest2(g.gpd.TestGPD, g.cff.MellinBarnesCFF, g.dvcs.hotfixedBMK):

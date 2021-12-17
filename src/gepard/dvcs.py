@@ -1,5 +1,10 @@
 """Deeply Virtual Compton Scattering (DVCS) observables."""
 
+# Unlike DVMP and DIS, DVCS theory is separated into three files
+#  dvcs.py  -  cross-section and derived observables
+#   bmk.py  -  BMK formulas for interference, DVCS-squared and BH-squared terms
+#   cff.py  -  models for Compton Form Factors
+
 from numpy import cos, pi, sin, sqrt
 
 from . import cff, data, quadrature, theory
@@ -163,7 +168,7 @@ class DVCS(theory.Theory):
         """Partial DVCS cross section w.r.t. Mandelstam t."""
 
         eps2 = 4. * pt.xB**2 * Mp2 / pt.Q2
-        if cff.ComptonHybrid in self.__class__.mro():
+        if cff.HybridCFF in self.__class__.mro():
             # For hybrid models we cannot ask for cff() since self gets misinterpreted
             ReH = self.m.ReH(pt)
             ImH = self.m.ImH(pt)

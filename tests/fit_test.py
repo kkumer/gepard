@@ -9,7 +9,7 @@ from pytest import approx, fixture, mark
 class FitTest(g.gpd.PWNormGPD, g.cff.MellinBarnesCFF, g.dvcs.BMK):
     pass
 
-class FitTestDIS(g.gpd.PWNormGPD, g.dis.DISFormFactors):
+class FitTestDIS(g.gpd.PWNormGPD, g.dis.DIS):
     pass
 
 

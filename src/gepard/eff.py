@@ -1,11 +1,11 @@
-# --- Models for Elastic Form Factors --- #
+# --- Models for Elastic (Electromagnetic) Form Factors --- #
 
 
-class ElasticFormFactors(object):
-    """Dirac and Pauli elastic form factors F_1 and F_2."""
+class EFF(object):
+    """Dirac and Pauli elastic (electromagnetic) form factors F_1 and F_2."""
 
 
-class ElasticDipole(ElasticFormFactors):
+class DipoleEFF(EFF):
     """Dipole approximation from DM's notebook."""
 
     def F1(self, pt):
@@ -25,7 +25,7 @@ class ElasticDipole(ElasticFormFactors):
             print('Neutron dipole elastic FFs are not implemented yet! Use Kelly.')
 
 
-class ElasticKelly(ElasticFormFactors):
+class KellyEFF(EFF):
     """Kelly's approximation from DM's notebook."""
 
     def F1(self, pt):
@@ -74,7 +74,7 @@ class ElasticKelly(ElasticFormFactors):
                 1.9100884849907935*t**3))/(1 - 0.2831951622975774*t)
 
 
-class ElasticZero(ElasticFormFactors):
+class ZeroEFF(EFF):
     """Set F1=F2=0 to get just DVCS^2."""
 
     def F1(self, pt):
