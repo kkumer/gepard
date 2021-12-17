@@ -2,17 +2,14 @@
 Quickstart
 ##########
 
-To use Gepard it is essential to understand the four main code objects:
+To use Gepard it is essential to understand the three main code objects:
 
 #. ``DataPoint`` contains information about kinematics and, possibly,
    about particular measurement perfomed at that kinematics
 
-#. ``Model`` contains information about hadronic structure, i. e., GPDs
-   and elastic form factors.
-
-#. ``Theory``, when combined with a particular model, 
-   contains information on how to calculate observables for
-   given data point.
+#. ``Theory``, contains information on how to calculate observables for
+   given data point, which includes information about hadronic structure,
+   i. e., GPDs and electromagnetic form factors
 
 #. ``Fitter`` contains information on how to fit model to the set of
    data points.
@@ -27,17 +24,16 @@ DataPoint
 ---------
 
 Instance of ``DataPoint`` can be constructed from the scratch, by passing
-information as a Python dictionary:
+kinematics information as a Python dictionary:
 
 .. code-block:: python
 
-   >>> import sys
-   >>> sys.path.append('/home/kkumer/ps')
    >>> import gepard as g
    >>> pt = g.DataPoint({'xB': 0.348, 't': -0.3, 'Q2': 3., 'phi': 0.3})
 
 
-Information about some experimental measurement can be added:
+Information about some experimental measurement, performed at a
+given kinematic point, can be added:
 
 .. code-block:: python
 
@@ -74,3 +70,39 @@ convenience, many datasets come with Gepard and are available as
 documented in section :ref:`Working with datasets<datasets>`.
 
 
+Theory
+------
+
+For convenience, several ``theory`` objects are immediately available to the user
+who just wants to calculate observables. For example, ``KM15`` model can be loaded
+like this
+
+.. code-block:: python
+
+   >>> from gepard.fits import th_KM15
+
+and then used to calculate theory prediction for a given datapoint
+
+.. code-block:: python
+
+   >>> th_KM15.predict(pt)
+   0.023449564143725125
+
+This will calculate observable specified in ``yaxis`` attribute of ``pt``.
+User can also calculate other observables, like beam charge asymmetry
+
+.. code-block:: python
+
+   >>> th_KM15.BCA(pt)
+   0.07397084871687629
+
+All implemented observables are listed :ref:`here<observables>`.
+
+
+Furthermore, values of Compton Form Factors are available, for
+example :math:`\mathfrak{Im}\mathcal{H}`
+
+.. code-block:: python
+
+   >>> th_KM15.ImH(pt)
+   2.807544271408012

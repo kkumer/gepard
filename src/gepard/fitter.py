@@ -14,7 +14,7 @@ class Fitter(object):
             setattr(self, key, kwargs[key])
 
 
-class FitterMinuit(Fitter):
+class MinuitFitter(Fitter):
     """Fits using iminuit Python frontend to MINUIT2 C++ library."""
 
     def __init__(self, fitpoints: data.DataSet,

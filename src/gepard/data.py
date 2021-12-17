@@ -216,14 +216,19 @@ class DataPoint(dict):
 
     def __repr__(self):
         """Printing something useful."""
-        return "DataPoint: " + self.yaxis + " = " + str(self.val)
+        try:
+            return "DataPoint: " + self.yaxis + " = " + str(self.val)
+        except AttributeError:
+            return "DataPoint"
 
     def to_conventions(self):
         """Transform datapoint into gepard's conventions."""
-        self.origval = self.val  # to remember it for later convenience
-        for errtype in self.errtypes:
-            if hasattr(self, errtype):
-                setattr(self, 'orig'+errtype, getattr(self, errtype))
+        if hasattr(self, 'val'):
+            self.origval = self.val  # to remember it for later convenience
+        if hasattr(self, 'errtypes'):
+            for errtype in self.errtypes:
+                if hasattr(self, errtype):
+                    setattr(self, 'orig'+errtype, getattr(self, errtype))
         # C1. azimutal angle phi should be in radians.
         if 'phi' in self and hasattr(self, 'units') and self.units['phi'][:3] == 'deg':
             self.phi = self.phi * math.pi / 180.

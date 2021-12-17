@@ -46,7 +46,7 @@ def test_fit_DIS_LO(th_dis_lo):
     DISpoints = g.dset[201].copy()
     for id in range(202, 213):
         DISpoints += g.dset[id]
-    f = g.fitter.FitterMinuit(DISpoints, th_dis_lo)
+    f = g.fitter.MinuitFitter(DISpoints, th_dis_lo)
     f.fix_parameters('ALL')
     f.release_parameters('ns', 'al0s', 'al0g')
     f.minuit.migrad()
@@ -60,7 +60,7 @@ def test_fit_DIS_NLO(th_dis_nlo):
     DISpoints = g.dset[201].copy()
     for id in range(202, 213):
         DISpoints += g.dset[id]
-    f = g.fitter.FitterMinuit(DISpoints, th_dis_nlo)
+    f = g.fitter.MinuitFitter(DISpoints, th_dis_nlo)
     f.fix_parameters('ALL')
     f.release_parameters('ns', 'al0s', 'al0g')
     f.minuit.migrad()
@@ -75,7 +75,7 @@ def test_gepardfitDVCSnlso3_short(th):
     """
     # To pre-calculate wce for parallel execution:
     th.chisq_single(g.dset[39])
-    f = g.fitter.FitterMinuit(g.dset[39], th)
+    f = g.fitter.MinuitFitter(g.dset[39], th)
     f.fix_parameters('ALL')
     f.release_parameters('ms2')
     f.minuit.migrad()
@@ -95,7 +95,7 @@ def test_gepardfitDVCSnlso3_long(th):
     for id in range(37, 46):
         DVCSpoints += g.dset[id]
     th.chisq_single(DVCSpoints)
-    f = g.fitter.FitterMinuit(DVCSpoints, th)
+    f = g.fitter.MinuitFitter(DVCSpoints, th)
     f.fix_parameters('ALL')
     f.release_parameters('ms2', 'secs', 'secg')
     print(th.m.parameters_limits)

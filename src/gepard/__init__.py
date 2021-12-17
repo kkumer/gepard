@@ -12,7 +12,7 @@ from .dis import DIS
 from .dvcs import DVCS, BM10, BMK, BM10ex, BM10tw2, hotfixedBMK
 from .dvmp import DVMP, MellinBarnesTFF
 from .eff import ZeroEFF, DipoleEFF, KellyEFF
-from .fitter import FitterMinuit
+from .fitter import MinuitFitter
 from .gpd import GPD, ConformalSpaceGPD, TestGPD, PWNormGPD
 from .kinematics import tmin, tmax, weight_BH, prepare
 from .qcd import beta, as2pf

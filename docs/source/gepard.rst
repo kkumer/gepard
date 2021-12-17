@@ -12,17 +12,13 @@ in the code itself.
        import gepard as g
    
 
-1. Processes
-------------
+1. Theory framework
+-------------------
 
 theory module
 ^^^^^^^^^^^^^
 
 .. automodule:: gepard.theory
-
-
-2. Models
----------
 
 model module
 ^^^^^^^^^^^^
@@ -30,25 +26,24 @@ model module
 .. automodule:: gepard.model
    :noindex:
 
-gpdj module
+dvcs module
 ^^^^^^^^^^^
 
-.. automodule:: gepard.gpdj
+.. automodule:: gepard.dvcs
+
+cff module
+^^^^^^^^^^
+
+.. automodule:: gepard.cff
+
+gpd module
+^^^^^^^^^^^
+
+.. automodule:: gepard.gpd
 
 
-qj module
-^^^^^^^^^
-
-.. automodule:: gepard.qj
-
-
-3. Perturbative QCD
+2. Perturbative QCD
 -------------------
-
-evolc module
-^^^^^^^^^^^^
-
-.. automodule:: gepard.evolc
 
 
 adim module
@@ -57,19 +52,25 @@ adim module
 .. automodule:: gepard.adim
 
 
-evolution module
-^^^^^^^^^^^^^^^^
-
-.. automodule:: gepard.evolution
-
-
 qcd module
 ^^^^^^^^^^
 
 .. automodule:: gepard.qcd
 
 
-4. Fitting
+evolution module
+^^^^^^^^^^^^^^^^
+
+.. automodule:: gepard.evolution
+
+wilson module
+^^^^^^^^^^^^^
+
+.. automodule:: gepard.wilson
+
+
+
+3. Fitting
 ----------
 
 fitter module
@@ -78,7 +79,8 @@ fitter module
 .. automodule:: gepard.fitter
 
 
-5. Utilites
+
+4. Utilites
 -----------
 
 data module

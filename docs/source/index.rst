@@ -19,6 +19,7 @@ Tool for studying the 3D quark and gluon distributions in the nucleon
 
    quickstart
    advanced
+   datasets
    developer
    gepard
    todo

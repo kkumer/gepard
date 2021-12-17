@@ -28,7 +28,7 @@ copyright = '2021, Krešimir Kumerički'
 author = 'Krešimir Kumerički'
 
 # The full version, including alpha/beta/rc tags
-release = '0.5.0'
+release = '0.9.8'
 
 
 # -- General configuration ---------------------------------------------------
@@ -40,6 +40,7 @@ extensions = [
         'sphinx.ext.autodoc',    # Include doc from Python docstrings
         'sphinx.ext.napoleon',   # Pre-process NumPy/Google-style docstrings
         'sphinx.ext.todo',       # Aggregate TODO's from documentation
+        'matplotlib.sphinxext.plot_directive',       # For inline plots
         # 'sphinx.ext.doctest',  # Use nosetest --with-doctest instead
 ]
 
