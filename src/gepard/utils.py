@@ -177,12 +177,12 @@ def listdb(db):
         print("%-22s  |  %s" % (key, db[key].description))
     #print "\n WARNING: gepard models are now likely broken. Reinitialize them!"
 
-def list_data(ids, data):
+def list_data(ids):
     """List basic info about datasets specified by id numbers."""
     if not isinstance(ids, list): ids = [ids]
     for id in ids:
         try:
-            dt = data[id]
+            dt = data.dset[id]
             ref = dt.reference.replace('arXiv:', '').replace('hep-ex', '').replace('nucl-ex', '').replace('from Morgan Murray, draft_90@hermes.desy.de, J. Burns and M. Murray', 'Morgan M.').replace('v1', '').replace('F. Ellinghaus, QCD02', 'Frank E.').replace('PRELIMINARY', 'prelim.').strip('[]/ ')
             try:
                 ref2 = dt.reference2

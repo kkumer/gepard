@@ -82,7 +82,7 @@ Working with datasets
 
 .. code-block:: python
 
-   >>> g.list_data(list(range(47, 54)), g.dset)
+   >>> g.list_data(list(range(47, 54)))
    [ 47]     ZEUS   6         X  0812.2517 Table 1
    [ 48]     ZEUS   6         X  0812.2517 Table 2
    [ 49]     ZEUS   8         X  0812.2517 Table 3

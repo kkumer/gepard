@@ -52,6 +52,7 @@ par_KM09a = {'tMv': 0.8, 'rS': 1.0, 'alv': 0.43, 'Nv': 1.35,
              'MC': 0.5002, 'MS': 0.7071067811865476, 'bS': 3.0879, 'trv': 0.0}
 th_KM09a.parameters.update(par_KM09a)
 th_KM09a.name = 'KM09a'
+pts_KM09a = GLOpoints
 
 th_KM09b = KM09()
 par_KM09b = {'tMv': 0.8, 'rS': 1.0, 'alv': 0.43, 'Nv': 1.35, 'rv': 1.1064, 'NS': 1.5,
@@ -60,6 +61,7 @@ par_KM09b = {'tMv': 0.8, 'rS': 1.0, 'alv': 0.43, 'Nv': 1.35, 'rv': 1.1064, 'NS':
              'bS': 4.5845, 'trv': 4.8966}
 th_KM09b.parameters.update(par_KM09b)
 th_KM09b.name = 'KM09b'
+pts_KM09b = GLOpoints + data.dset[30]
 
 
 class KM10(eff.DipoleEFF, gpd.PWNormGPD, cff.HybridFreePoleCFF, dvcs.BM10):
@@ -87,6 +89,7 @@ par_KM10 = {'tMv': 0.88386035557556641, 'rS': 1.0, 'rpi': 3.5355742996824659,
             'kaps': 0.0, 'kapg': 0.0}
 th_KM10.parameters.update(par_KM10)
 th_KM10.name = 'KM10'
+pts_KM10 = H1ZEUSpoints + UNP5points
 
 
 class KM10b(eff.KellyEFF, gpd.PWNormGPD, cff.HybridFreePoleCFF, dvcs.BM10):
@@ -110,6 +113,7 @@ par_KM10b = {'tMv': 0.8, 'rS': 1.0, 'rpi': 4.0201, 'alv': 0.43, 'Nsea': 0.0,
              'thig': 0.8915757559175185, 'kaps': 0.0, 'kapg': 0.0}
 th_KM10b.parameters.update(par_KM10b)
 th_KM10b.name = 'KM10b'
+pts_KM10b = DVCSpoints+GLOpoints+data.dset[30]
 
 
 class KM15(eff.KellyEFF, gpd.PWNormGPD, cff.HybridFreePoleCFF, dvcs.BM10tw2):
@@ -140,3 +144,4 @@ par_KM15 = {'tMv': 3.992860161655587, 'rS': 1.0, 'alv': 0.43, 'tal': 0.43,
             'kaps': 0.0, 'kapg': 0.0}
 th_KM15.parameters.update(par_KM15)
 th_KM15.name = 'KM15'
+pts_KM15 = GLO15b
