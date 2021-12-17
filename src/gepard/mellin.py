@@ -10,7 +10,7 @@ class MellinBarnes(object):
     def __init__(self, **kwargs) -> None:
         """Init base MellinBarnes object."""
         self.tgj = np.tan(pi*self.jpoints/2)
-        print('MellinBarnes init done.')
+        # print('MellinBarnes init done.')
 
     def _mellin_barnes_integral(self, xi, wce, gpd):
         """Return convolution of evolved Wilson coefs and GPDs."""

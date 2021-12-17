@@ -49,7 +49,7 @@ class ParameterModel(Model):
 
     def __init__(self, **kwargs) -> None:
         """Init ParameterModel object."""
-        print('ParameterModel init done')
+        # print('ParameterModel init done')
         super().__init__(**kwargs)
 
 

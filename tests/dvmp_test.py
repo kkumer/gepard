@@ -1,27 +1,13 @@
 """Tests for DVEM."""
 
 import gepard as g
+from gepard.fits import par_KM10b
 from pytest import approx, fixture, mark
 
 par_dvmp = {'ns':  0.152, 'al0s': 1.158, 'alps': 0.15, 'ms2': 0.446,
             'secs': -0.442, 'this': 0.089,  # 'ng': 0.5,  # provided by ns
             'al0g': 1.247, 'alpg': 0.15, 'mg2': 0.7, 'secg': -2.309, 'thig': 0.812}
 
-par_KM10b = {'tMv': 0.8, 'rS': 1.0, 'rpi': 4.0201, 'alv': 0.43, 'Nsea': 0.0,
-             'Nv': 1.35, 'rv': 0.8081, 'Mpi': 1.5369, 'alS': 1.13, 'alpS': 0.15,
-             'C': 5.4259, 'tNv': 0.6, 'bS': 2.0, 'bv': 0.7706, 'Mv': 0.8,
-             'tbv': 1.0, 'alpv': 0.85, 'MC': 1.3305, 'MS': 0.707, 'trv': 3.2931,
-             'EAL0G': 1.1, 'ESECS': 0.0, 'EDELM2S': 0.0, 'EPS': 2.0, 'ETHIS': 0.0,
-             'ESECG': 0.0, 'EPG': 2.0, 'EDELM2G': 0.0, 'PS': 2.0, 'EALPG': 0.15,
-             'EKAPG': 0.0, 'ESKEWG': 0.0, 'M02S': 0.49754317018981614,
-             'EALPS': 0.15, 'EKAPS': 0.0, 'DELB': 0.0, 'ESKEWS': 0.0, 'SKEWS': 0.0,
-             'ETHIG': 0.0, 'EM02G': 0.7, 'EAL0S': 1.0, 'DELM2S': 0.0, 'EM02S': 1.0,
-             'SKEWG': 0.0, 'PG': 2.0, 'DELM2G': 0.0, 'ns': 0.15203911208796006,
-             'al0s': 1.1575060246398083, 'alps': 0.15, 'al0g': 1.247316701070471,
-             'secs': -0.4600511871918772, 'this': 0.09351798951979662,
-             'alpg': 0.15, 'mg2': 0.7, 'secg': -2.5151319493485427,
-             'ms2': 0.49754317018981614,
-             'thig': 0.8915757559175185, 'kaps': 0.0, 'kapg': 0.0}
 
 class MyTheory(g.gpd.PWNormGPD, g.dvmp.MellinBarnesTFF, g.dvmp.DVMP):
     pass

@@ -2,6 +2,7 @@
 
 import gepard as g
 import numpy as np
+from gepard.fits import par_KM15
 from pytest import approx, fixture, mark
 
 par_test = {'ns': 2./3. - 0.4, 'al0s': 1.1, 'alps': 0.25, 'ms2': 1.1**2,
@@ -11,30 +12,6 @@ par_fit = {'ns':  0.152039, 'al0s': 1.15751, 'alps': 0.15, 'ms2': 0.478391,
            'secs': -0.15152, 'this': 0.,  # 'ng': 0.4,  # provided by ns
            'al0g': 1.24732, 'alpg': 0.15, 'mg2': 0.7, 'secg': -0.81217, 'thig': 0.,
            'kaps': 0.7, 'kapg': -0.2}
-
-par_KM15 = {'tMv': 3.992860161655587, 'rS': 1.0, 'alv': 0.43, 'tal': 0.43,
-            'Mpi': 3.999999852084612, 'Nv': 1.35, 'rv': 0.918393047884448,
-            'Nsea': 0.0, 'alS': 1.13, 'rpi': 2.6463144464701536, 'alpS': 0.15,
-            'C': 2.7678681812890016, 'tNv': 0.6, 'bS': 2.0, 'tbv': 0.4000000003259146,
-            'bv': 0.40000206775282354, 'Mv': 0.7892078914770488, 'alpv': 0.85,
-            'talp': 0.85, 'MC': 1.2040519863464496, 'trv': 0.881085721967267,
-            'EPS': 2.0, 'EPG': 2.0, 'EM02G': 0.7, 'EDELM2S': 0.0,
-            'SKEWG': 0.0, 'SKEWS': 0.0, 'PS': 2.0, 'EALPG': 0.15, 'M02D': 1.0,
-            'EALPS': 0.15, 'M02S': 0.4818827240886959, 'PG': 2.0, 'EDELM2G': 0.0,
-            'AL0D': 0.5, 'DELM2S': 0.0, 'DELM2G': 0.0, 'EAL0G': 1.1, 'EAL0S': 1.0,
-            'KAPG': 0.0, 'ND': 1.0, 'NG': 0.5, 'SECS': 1.0707825621025808,
-            'ESKEWG': 0.0, 'ETHIG': 0.0, 'ESECS': 0.0, 'ETHIS': 0.0, 'ESECG': 0.0,
-            'ESKEWS': 0.0, 'DELB': 0.0, 'EM02S': 1.0, 'ALPD': 1.0,
-            # This is duplicated, consolidate please
-            'MS': 0.4818827240886959,
-            # These are renamed already:
-            'ns':  0.15203911208796006, 'al0s': 1.1575060246398083, 'alps': 0.15,
-            'ms2': 0.4818827240886959, 'secs': 1.0707825621025808,
-            'this': -0.36618269477432946,
-            'al0g': 1.247316701070471, 'alpg': 0.15, 'mg2': 0.7,
-            'secg': -2.990809378821039, 'thig': 0.9052207712570559,
-            'kaps': 0.0, 'kapg': 0.0}
-
 
 pt_test = g.data.DataPoint({'W': 82., 'Q2': 1., 't': 0.})
 pt_test.xi = pt_test.Q2 / (2.0 * pt_test.W * pt_test.W + pt_test.Q2)
@@ -276,5 +253,5 @@ def test_KM15_cffs():
     m.parameters.update(par_KM15)
     assert m.ImH(pt0_fit) == approx(
             70.3619128283078)
-    assert m.ReH(pt0_fit) == approx(                                                                                                                                         
-            7.764977856195072) 
+    assert m.ReH(pt0_fit) == approx(
+            7.764977856195072)

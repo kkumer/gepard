@@ -30,7 +30,7 @@ class Theory(object):
         self.description = kwargs.setdefault('description', 'N/A')
         self.model = self       # to make old .m code work
         self.m = self       # to make old .m code work
-        print('theory.Theory init done.')
+        # print('theory.Theory init done.')
         # We do NOT call super().__init__ here because object class will
         # not accapt **kwargs. This means that Theory has to be the last
         # class in mro.
