@@ -17,6 +17,7 @@ Tool for studying the 3D quark and gluon distributions in the nucleon
 .. toctree::
    :maxdepth: 2
 
+   install
    quickstart
    advanced
    datasets

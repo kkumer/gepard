@@ -9,24 +9,23 @@ Modelling GPDs in momentum fraction or conformal moment space, perturbative QCD 
 
 ## Installation
 
-Just clone the git repository. Note that presently you need Fortran extension `pygepard.so`
-in the package directory. 
-You can obtain it from the author for the Linux `x86_64` architecture or compile it 
-yourself using `master` branch.
+Just clone the git repository and then
 
-There is no Python `setup.py` yet, so you need to add the package directory
-to your Python path, see below.
+```
+cd gepard
+pip install -e .
+```
+
 
 ## Using
 
+In Python, or, better, Jupyter,
+
 ```
-import sys
-sys.path.append('<path to package dir>')
 import gepard as g
 ```
 
-For least-squares fitting you need Minuit python package. Tested with iminuit-1 (version 2 
-will *not* work).
+For least-squares fitting you need Minuit python package iminuit version 2.
 
 See `tests` subdir for examples of use.
 
@@ -37,8 +36,9 @@ and in `docs` subdir.
 
 ## Developing
 
-Before pushing anything to github master `pytest` *must* run without errors,
+Before pushing anything to github master `pytest -q --runslow` *must* run without errors,
 or commit message should indicate that code is not clean.
+
 We aim for 100% documented, type-hinted code that passes `flake8`, 
 `pydocstyle` (Google doc conventions) and `mypy` linters, but this
 is not presently strictly required for commits.
@@ -46,4 +46,4 @@ is not presently strictly required for commits.
 
 ## License
 
-GPL, once gepard becomes public.
+GPL, I guess, or LGPL, once gepard becomes public.
