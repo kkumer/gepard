@@ -38,13 +38,16 @@ class ParameterModel(Model):
 
     Attributes:
         parameters: dict {'par0': float, ...}. Actual value of parameter.
-        parameters_fix: dict {'par0': bool, ...}. Is parameter value
-            fixed? Considered False if non-existent.
-        parameters_limits: dict {'par0: (float, float), ...}. Range for
-            fitting. Considered (-inf, inf) if non-existent.
+        parameters_fixed: dict {'par0': bool, ...}. Is parameter value
+            fixed? Considered False if non-existent. Once Fitter object
+            is created, user should manipulate this dict only via Fitter methods.
+        parameters_limits: dict {'par0: (float, float), ...}. Allowed range
+            for fitting. Considered (-inf, inf) if non-existent. Once Fitter object
+            is created, user should manipulate this dict only via Fitter methods.
+
     """
     parameters: dict = {}
-    parameters_fix: dict = {}
+    parameters_fixed: dict = {}
     parameters_limits: dict = {}
 
     def __init__(self, **kwargs) -> None:
@@ -63,56 +66,50 @@ class ParameterModel(Model):
         self.parameters.update(newpars)
 
 
-    def release_parameters(self, *pars: str):
+    def _release_parameters(self, *pars: str):
         """Release parameters for fitting.
 
         Args:
             *pars: Names of parameters to be released
 
         Notes:
-            If allowed parameter ranges have to be changed from default, user needs
-            to modify parameters dictionary directly.
-
-        Todo:
-            Note that relasing and fixing parameters for model instance is sensible
-            only before creating Fitter instance! Afterwards, one has to fix and release
-            params both for Fitter and for model.
+            User should relase and fix parameters using methods of Fitter instance.
+            This then calls this private ParameterModel method.
 
         """
         for par in pars:
             if par not in self.parameters:
                 raise ValueError('Parameter {} is not defined in model {}'.format(
                         par, self))
-            self.parameters_fix[par] = False
+            self.parameters_fixed[par] = False
 
-    def fix_parameters(self, *pars: str):
+    def _fix_parameters(self, *pars: str):
         """Fix parameters so they are not fitting variables.
 
         Args:
             *pars: Names of parameters to be fixed. If first name is 'ALL'
                 then fix all parameters.
 
-        Todo:
-            Note that relasing and fixing parameters for model instance is sensible
-            only before creating Fitter instance! Afterwards, one has to fix and release
-            params both for Fitter and for model.
+        Notes:
+            User should relase and fix parameters using methods of Fitter instance.
+            This then calls this private ParameterModel method.
 
         """
         if pars[0] == 'ALL':
             # fix 'em all
             for par in self.parameters:
-                self.parameters_fix[par] = True
+                self.parameters_fixed[par] = True
         else:
             for par in pars:
                 if par not in self.parameters:
                     raise ValueError('Parameter {} is not defined in model {}'.format(
                             par, self))
-                self.parameters_fix[par] = True
+                self.parameters_fixed[par] = True
 
     def free_parameters(self) -> List[str]:
         """Return list of names of free fitting parameters."""
-        return [p for p in self.parameters if p not in self.parameters_fix
-                or not self.parameters_fix[p]]
+        return [p for p in self.parameters if p not in self.parameters_fixed
+                or not self.parameters_fixed[p]]
 
     def print_parameters_errors(self, pvalues=False, ndof=0):
         """Print fitting parameters and their errors."""
