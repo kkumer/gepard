@@ -46,12 +46,13 @@ class ParameterModel(Model):
             is created, user should manipulate this dict only via Fitter methods.
 
     """
-    parameters: dict = {}
-    parameters_fixed: dict = {}
-    parameters_limits: dict = {}
-
     def __init__(self, **kwargs) -> None:
         """Init ParameterModel object."""
+        # If subclases don't create these dicts, this is the
+        # last chance. They have to exist.
+        for d in ['parameters', 'parameters_fixed', 'parameters_limits']:
+            if not hasattr(self, d):
+                setattr(self, d, {})
         # print('ParameterModel init done')
         super().__init__(**kwargs)
 
@@ -61,9 +62,11 @@ class ParameterModel(Model):
         # Create parameters dict if it doesn't exist yet
         try:
             self.parameters
+            print('id(self.parameters) = {}'.format(id(self.parameters)))
         except AttributeError:
             self.parameters = {}
         self.parameters.update(newpars)
+        print('end id(self.parameters) = {}'.format(id(self.parameters)))
 
 
     def _release_parameters(self, *pars: str):

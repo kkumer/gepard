@@ -59,6 +59,14 @@ def test_KMM12():
     assert chisq == approx(123.53321520926985)
 
 
+@mark.skip('AFKM12 not yet transferred')
+def test_AFKM12():
+    """Test model: AFKM12."""
+    pts = H1ZEUS
+    chisq = th_AFKM12.chisq(pts)[0]
+    assert chisq == approx(34.07240718424209)
+
+
 @mark.slow
 def test_KM15():
     """Test model: KM15."""

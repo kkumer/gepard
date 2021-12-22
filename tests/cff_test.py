@@ -69,7 +69,10 @@ class CFFTest2(gpd_model, g.cff.MellinBarnesCFF):
 
 
 class CFFTest3(g.gpd.PWNormGPD, g.cff.MellinBarnesCFF):
-	pass
+
+    def pw_strengths_E(self):
+        """For this model, PW strenghts are same as for H."""
+        return self.pw_strengths()
 
 
 class CFFTest4(g.gpd.PWNormGPD, g.cff.HybridFixedPoleCFF):

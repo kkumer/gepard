@@ -15,20 +15,25 @@ par_DMepsGLO1 = {'C': 6.042, 'MC': 1.5238, 'MS': 0.7071067811865476, 'Mv': 0.8,
                  'alv': 0.42999999999999999, 'bS': 4.5845, 'bv': 2.398, 'rS': 1.0,
                  'rv': 1.1064, 'tMv': 0.8, 'tNv': 0.6, 'tbv': 1.5, 'trv': 4.8966}
 
+par_DM12 = {"ns": 0.152, "al0s": 1.1575, "alps": 0.1028, "ms2": 0.1814, "delms2": 0.,
+            "pows": 2., "secs": 0.5142, "this": -0.2106, # "SKEWS": 0.,
+            "al0g": 1.2473, "alpg": -0.023, "mg2": 0.2272, "delmg2": 0.,
+            "powg": 2., "secg": -4.587, "thig": 1.7607, # "SKEWG": 0.,
+            "kaps": 1.5265, "kapg": 0,  # kapg not present in orig
+            "Ens": 0.152,  # for fitting should be pegged to ns
+            "Eal0s": 1.1754, "Ealps": 0.0239, "Ems2": 0.1808, "Edelms2": 0.,
+            "Epows": 2., "Esecs": 0.5235, "Ethis": -0.2194, # "ESKEWS": 0.,
+            "Eal0g": 1.8486, "Ealpg": 0.05, "Emg2": 0.1487, "Edelmg2": 0.,
+            "Epowg": 2., "Esecg": -4.6366, "Ethig": 1.8638} #, "ESKEWG": 0.}
 
-par_DM12 = {"NS": 0.152, "AL0S": 1.1575, "ALPS": 0.1028, "M02S": 0.1814, "DELM2S": 0.,
+par_DM12_orig = {"NS": 0.152, "AL0S": 1.1575, "ALPS": 0.1028, "M02S": 0.1814, "DELM2S": 0.,
             "PS": 2., "SECS": 0.5142, "THIS": -0.2106, "SKEWS": 0., "AL0G": 1.2473,
             "ALPG": -0.023, "M02G": 0.2272, "DELM2G": 0., "PG": 2., "SECG": -4.587,
             "THIG": 1.7607, "SKEWG": 0., "KAPS": 1.5265, "EAL0S": 1.1754,
             "EALPS": 0.0239, "EM02S": 0.1808, "EDELM2S": 0., "EPS": 2., "ESECS": 0.5235,
             "ETHIS": -0.2194, "ESKEWS": 0., "EAL0G": 1.8486, "EALPG": 0.05,
             "EM02G": 0.1487, "EDELM2G": 0., "EPG": 2., "ESECG": -4.6366,
-            "ETHIG": 1.8638, "ESKEWG": 0.,
-            'fix_ALPS': False, 'fix_M02S': False, 'fix_SECS': False, 'fix_THIS': False,
-            'fix_KAPS': False, 'fix_ALPG': False, 'fix_M02G': False, 'fix_SECG': False,
-            'fix_THIG': False, 'fix_EAL0S': False, 'fix_EALPS': False,
-            'fix_EM02S': False, 'fix_ESECS': False, 'fix_ETHIS': False,
-            'fix_EAL0G': False, 'fix_EM02G': False, 'fix_ESECG': False}
+            "ETHIG": 1.8638, "ESKEWG": 0.}
 
 
 # testing data point for hotfixedBMK
@@ -69,6 +74,16 @@ class BMK(g.eff.DipoleEFF, g.cff.DispersionFixedPoleCFF, g.dvcs.hotfixedBMK):
 class BM10(g.eff.DipoleEFF, g.cff.DispersionFixedPoleCFF, g.dvcs.BM10):
 	pass
 
+class DM12(g.eff.KellyEFF, g.gpd.PWNormGPD, g.cff.MellinBarnesCFF, g.dvcs.BMK):
+
+    def gpd_E(self, eta: float, t: float) -> np.ndarray:
+        """Return (npts, 4) array E_j^a for all j-points and 4 flavors."""
+        # Implement BS+BG=0 sum rule that fixes 'kapg'
+        self.parameters['kapg'] = - self.parameters['kaps'] * self.parameters['ns'] / (
+                0.6 - self.parameters['ns'])
+        kappa = np.array([self.parameters['kaps'], self.parameters['kapg'], 0, 0])
+        return kappa * g.gpd.singlet_ng_constrained_E(self.jpoints, t,
+                            self.parameters, self.residualt).transpose()
 
 @fixture
 def th_BMK():
@@ -80,6 +95,12 @@ def th_BMK():
 def th_BM10():
     th = BM10()
     th.parameters.update(par_DMepsGLO1)
+    return th
+
+@fixture
+def th_DM12():
+    th = DM12(residualt='exp')
+    th.parameters.update(par_DM12)
     return th
 
 def test_CFF(th_BMK):
@@ -190,12 +211,9 @@ def test_AUTI(th_BMK):
     assert th_BMK.AUTI(pttrans) == approx(0.075300023640416394)
 
 
-@mark.skip(reason='ansatz EFLEXP not yet transferred.')
-def test_AUTDVCS():
+# @mark.skip(reason='ansatz EFLEXP not yet transferred.')
+def test_AUTDVCS(th_DM12):
     """Calculate transversal TSA - DVCS part - in BMK Approach and frame."""
     # Gepard model
-    mGepard = g.cff.Gepard(ansatz='EFLEXP')
-    mGepard.parameters.update(par_DM12)
-    th = g.dvcs.BMK(mGepard)
     pttrans.varFTn = -1
-    assert th.AUTDVCS(pttrans)*1e3 == approx(-1.5171462298928092)
+    assert th_DM12.AUTDVCS(pttrans) == approx(-0.0015171462298928092)

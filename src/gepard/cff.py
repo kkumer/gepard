@@ -78,7 +78,7 @@ class MellinBarnesCFF(CFF, mellin.MellinBarnes):
         mellin.MellinBarnes.__init__(self, **kwargs)
         super().__init__(**kwargs)
 
-    def cff(self, pt: data.DataPoint) -> np.ndarray:
+    def cff_old(self, pt: data.DataPoint) -> np.ndarray:
         """Return array(ReH, ImH, ReE, ...) for kinematic point."""
         try:
             wce_ar = self.wce[pt.Q2]
@@ -94,6 +94,23 @@ class MellinBarnesCFF(CFF, mellin.MellinBarnes):
         e_prerot = self.gpd_E(pt.xi, pt.t)
         e = np.einsum('f,fa,ja->jf', self.dvcs_charges, self.frot, e_prerot)
         ree, ime = self._mellin_barnes_integral(pt.xi, wce_ar, e)
+        return np.array([reh, imh, ree, ime, 0, 0, 0, 0])
+
+    def cff(self, pt: data.DataPoint) -> np.ndarray:
+        """Return array(ReH, ImH, ReE, ...) for kinematic point."""
+        try:
+            wce_ar = self.wce[pt.Q2]
+        except KeyError:
+            # calculate it
+            wce_ar = wilson.calc_wce(self, pt.Q2, 'DVCS')
+            # memorize it for future
+            self.wce[pt.Q2] = wce_ar
+        # Evaluations depending on model parameters:
+        h_prerot = self.gpd_H(pt.xi, pt.t)
+        h = np.einsum('f,fa,ja->jf', self.dvcs_charges, self.frot, h_prerot)
+        e_prerot = self.gpd_E(pt.xi, pt.t)
+        e = np.einsum('f,fa,ja->jf', self.dvcs_charges, self.frot, e_prerot)
+        reh, imh, ree, ime = self._mellin_barnes_integral_HE(pt.xi, wce_ar, h, e)
         return np.array([reh, imh, ree, ime, 0, 0, 0, 0])
 
     def ReH(self, pt: data.DataPoint) -> float:
@@ -246,13 +263,21 @@ class DispersionFixedPoleCFF(DispersionCFF, PionPole):
         """
         self.nf = kwargs.setdefault('nf', 4)
         # initial values of parameters and limits on their values
-        self.parameters = {'Nsea': 1.5, 'alS': 1.13, 'alpS': 0.15,
+        self.add_parameters({'Nsea': 1.5, 'alS': 1.13, 'alpS': 0.15,
                            'MS': 0.707, 'rS': 1.0, 'bS': 2.0,
                            'Nv': 1.35, 'alv': 0.43, 'alpv': 0.85,
                            'Mv': 1.0, 'rv': 0.5, 'bv': 2.2,
                            'C': 7.0, 'MC': 1.3,
                            'tNv': 0.0, 'tal': 0.43, 'talp': 0.85,
-                           'tMv': 2.7, 'trv': 6.0, 'tbv': 3.0}
+                           'tMv': 2.7, 'trv': 6.0, 'tbv': 3.0})
+
+        # self.parameters = {'Nsea': 1.5, 'alS': 1.13, 'alpS': 0.15,
+                           # 'MS': 0.707, 'rS': 1.0, 'bS': 2.0,
+                           # 'Nv': 1.35, 'alv': 0.43, 'alpv': 0.85,
+                           # 'Mv': 1.0, 'rv': 0.5, 'bv': 2.2,
+                           # 'C': 7.0, 'MC': 1.3,
+                           # 'tNv': 0.0, 'tal': 0.43, 'talp': 0.85,
+                           # 'tMv': 2.7, 'trv': 6.0, 'tbv': 3.0}
 
         self.parameters_limits = {'bS': (0.4, 5.0),
                                   'Mv': (0.4, 1.5), 'rv': (0., 8.), 'bv': (0.4, 5.),

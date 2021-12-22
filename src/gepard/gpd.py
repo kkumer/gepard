@@ -89,7 +89,7 @@ def qj(j: np.ndarray, t: float, poch: int, norm: float, al0: float,
 #  ---- Building block - residual t-dependence ----
 
 def betadip(j: np.ndarray, t: float, m02: float, delm2: float, pp: int) -> np.ndarray:
-    r"""GPD residual dipole t-dependence function beta from Eq. (19) of NPB.
+    r"""GPD residual dipole t-dependence function.
 
     Args:
         j: conformal moment
@@ -99,9 +99,22 @@ def betadip(j: np.ndarray, t: float, m02: float, delm2: float, pp: int) -> np.nd
         pp: exponent (=2 for dipole)
 
     Returns:
-        Dipole residual t-dependence
+        Dipole residual t-dependence (beta from Eq. (19) of 0904.0458)
     """
     return 1. / (1. - t / (m02 + delm2*j))**pp
+
+
+def betaexp(t: float, m02: float) -> float:
+    r"""GPD residual exponential t-dependence function.
+
+    Args:
+        t: momentum transfer
+        m02: mass parameter
+
+    Returns:
+        Exponential residual t-dependence (beta from Eq. (19) of 0904.0458)
+    """
+    return exp(t / (2 * m02))
 
 
 #  ---- Ansaetze for GPD shapes  ----
@@ -124,17 +137,58 @@ def test(j: complex, t: float, par: dict) -> Tuple[complex, complex, complex, co
     return (singlet, gluon, 0+0j, 0+0j)
 
 
-def singlet_ng_constrained(j: np.ndarray, t: float, par: dict) -> np.ndarray:
-    """Singlet-only GPD ansatz, with ng param constrained by sum-rule.
+def singlet_ng_constrained(j: np.ndarray, t: float, par: dict,
+        residualt: str='dipole') -> np.ndarray:
+    r"""Singlet-only GPD ansatz, with ng parameter constrained by sum-rule.
+
+    Args:
+        j: conformal moment
+        t: momentum transfer
+        par: parameters dict
+        residualt: residual t-dependence type ('dipole' or 'exp')
 
     Notes:
-        This ansatz is used for all published KM fits, for sea parton part.
+        This ansatz is used for all published KM fits, for the sea parton part.
     """
     par['ng'] = 0.6 - par['ns']  # first sum-rule constraint
-    singlet = (qj(j, t, 9, par['ns'], par['al0s'], par['alps']) *
-               betadip(j, t, par['ms2'], 0., 2))
-    gluon = (qj(j, t, 7, par['ng'], par['al0g'], par['alpg']) *
-             betadip(j, t, par['mg2'], 0., 2))
+    if residualt == 'dipole':
+        tdep_s = betadip(j, t, par['ms2'], 0., 2)
+        tdep_g = betadip(j, t, par['mg2'], 0., 2)
+    elif residualt == 'exp':
+        tdep_s = betaexp(t, par['ms2'])
+        tdep_g = betaexp(t, par['mg2'])
+    else:
+        raise ValueError("{} unknown. Use 'dipole' or 'exp'".format(residualt))
+
+    singlet = (qj(j, t, 9, par['ns'], par['al0s'], par['alps']) * tdep_s)
+    gluon = (qj(j, t, 7, par['ng'], par['al0g'], par['alpg']) * tdep_g)
+    return np.array((singlet, gluon, np.zeros_like(gluon), np.zeros_like(gluon)))
+
+def singlet_ng_constrained_E(j: np.ndarray, t: float, par: dict,
+        residualt: str='dipole') -> np.ndarray:
+    r"""Singlet-only GPD ansatz, with ng parameter constrained by sum-rule.
+
+    Args:
+        j: conformal moment
+        t: momentum transfer
+        par: parameters dict
+        residualt: residual t-dependence type ('dipole' or 'exp')
+
+    Notes:
+        This ansatz is used for all published KM fits, for the sea parton part.
+    """
+    par['Eng'] = 0.6 - par['Ens']  # first sum-rule constraint
+    if residualt == 'dipole':
+        tdep_s = betadip(j, t, par['Ems2'], 0., 2)
+        tdep_g = betadip(j, t, par['Emg2'], 0., 2)
+    elif residualt == 'exp':
+        tdep_s = betaexp(t, par['Ems2'])
+        tdep_g = betaexp(t, par['Emg2'])
+    else:
+        raise ValueError("{} unknown. Use 'dipole' or 'exp'".format(residualt))
+
+    singlet = (qj(j, t, 9, par['Ens'], par['Eal0s'], par['Ealps']) * tdep_s)
+    gluon = (qj(j, t, 7, par['Eng'], par['Eal0g'], par['Ealpg']) * tdep_g)
     return np.array((singlet, gluon, np.zeros_like(gluon), np.zeros_like(gluon)))
 
 
@@ -208,11 +262,12 @@ class GPD(model.ParameterModel):
 
         Args:
             p: pQCD order (0 = LO, 1 = NLO, 2 = NNLO)
-            scheme: pQCD scheme  (msbar or csbar)
+            scheme: pQCD scheme  ('msbar' or 'csbar')
             nf: number of active quark flavors
             q02: Initial Q0^2 for GPD evolution.
             r20: Initial mu0^2 for alpha_strong definition.
             asp: alpha_strong/(2*pi) at scale r20 for (LO, NLO, NNLO)
+            residualt: residual t dependence ('dipole' or 'exp')
 
         """
         self.p = kwargs.setdefault('p', 0)
@@ -221,11 +276,22 @@ class GPD(model.ParameterModel):
         self.q02 = kwargs.setdefault('q02', 4.0)
         self.r20 = kwargs.setdefault('r20', 2.5)
         self.asp = kwargs.setdefault('asp', np.array([0.0606, 0.0518, 0.0488]))
+        self.residualt = kwargs.setdefault('residualt', 'dipole')
         # scales
         self.rr2 = 1     # ratio of Q2/renorm. scale squared
         self.rf2 = 1     # ratio of Q2/GPD fact. scale sq.
         self.rdaf2 = 1   # ratio of Q2/DA fact. scale sq. (for DVMP)
         #
+        # Model parameters
+        all_pars = [
+            "ns", "al0s", "alps", "ms2", "delms2", "pows", "secs", "this",
+            "ng", "al0g", "alpg", "mg2", "delmg2", "powg", "secg", "thig",
+            "kaps", "kapg",
+            "Ens", "Eal0s", "Ealps", "Ems2", "Edelms2", "Epows", "Esecs", "Ethis",
+            "Eng", "Eal0g", "Ealpg", "Emg2", "Edelmg2", "Epowg", "Esecg", "Ethig"]
+        # subclasses should actually set values
+        for par in all_pars:
+            self.parameters[par] = self.parameters.setdefault(par, 0)
         # Flavor rotation matrix.
         # ----------------------
         # It transforms GPDs from flavor basis to evolution basis.
@@ -279,18 +345,18 @@ class ConformalSpaceGPD(GPD):
         self.wg = weights  # Gauss integration weights
         # Initial parameters:
         self.parameters = {'ns': 2./3. - 0.4,
-                           'al0s': 1.1,
-                           'alps': 0.25,
-                           'ms2': 1.1,
-                           'secs': 0.,
-                           'this': 0.,
-                           'kaps': 0.,
-                           'ng': 0.4,
-                           'al0g': 1.2,
-                           'alpg': 0.25,
-                           'mg2': 1.2,
-                           'secg': 0.,
-                           'thig': 0.,
+                'al0s': 1.1,  'Eal0s': 1.1,
+                'alps': 0.25, 'Ealps': 0.25,
+                'ms2': 1.1, 'Ems2': 1.1,
+                'secs': 0., 'Esecs': 0,
+                'this': 0., 'Ethis': 0,
+                'kaps': 0.,
+                'ng': 0.4, 'Eng': 0.4,
+                'al0g': 1.2, 'Eal0g': 1.2,
+                'alpg': 0.25, 'Ealpg': 0.25,
+                'mg2': 1.2, 'Emg2': 1.2,
+                'secg': 0., 'Esecg': 0,
+                'thig': 0., 'Ethig': 0,
                            'kapg': 0.}
         super().__init__(**kwargs)
 
@@ -304,6 +370,14 @@ class ConformalSpaceGPD(GPD):
                              self.parameters['secg'], 0],
                          [self.parameters['this'],
                              self.parameters['thig'], 0]])
+
+    def pw_strengths_E(self):
+        """Strengths of SO(3) partial waves for gpd E."""
+        return np.array([[1., 1., 1],
+                         [self.parameters['Esecs'],
+                             self.parameters['Esecg'], 0],
+                         [self.parameters['Ethis'],
+                             self.parameters['Ethig'], 0]])
 
     def gpd_H(self, eta: float, t: float) -> np.ndarray:
         """Return (npts, 4) array H_j^a for all j-points and 4 flavors."""
@@ -354,7 +428,7 @@ class PWNormGPD(ConformalSpaceGPD):
     def gpd_H(self, eta: float, t: float) -> np.ndarray:
         """Return (npts, 4) array H_j^a for all j-points and 4 flavors."""
         return singlet_ng_constrained(self.jpoints,
-                                             t, self.parameters).transpose()
+                                      t, self.parameters, self.residualt).transpose()
 
 #     def gpd_H_para(self, eta: float, t: float) -> np.ndarray:
 #         """Return (npts, 4) array H_j^a for all j-points and 4 flavors."""
@@ -367,6 +441,6 @@ class PWNormGPD(ConformalSpaceGPD):
     def gpd_E(self, eta: float, t: float) -> np.ndarray:
         """Return (npts, 4) array E_j^a for all j-points and 4 flavors."""
         kappa = np.array([self.parameters['kaps'], self.parameters['kapg'], 0, 0])
-        return kappa * singlet_ng_constrained(self.jpoints, t,
-                                                     self.parameters).transpose()
+        return kappa * singlet_ng_constrained(self.jpoints, t, self.parameters,
+                self.residualt).transpose()
 
