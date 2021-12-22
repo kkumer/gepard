@@ -54,16 +54,15 @@ def test_KMM12():
     AULptsOLD = TSA1points[:4] + data[54]  # data[54] are not independent
     pts = H1ZEUS + ALUIpts + BCApts + CLASptsOLD + BSDwpoints\
             + AULptsOLD + ALLpts + AUTIpts + BSSwpoints
-    chisq = th_KMM12.chisq(pts)[0]
+    chisq = th_KMM12.chisq(pts)
     # For difference to EPJA review, see comment for KM15 below
     assert chisq == approx(123.53321520926985)
 
 
-@mark.skip('AFKM12 not yet transferred')
 def test_AFKM12():
     """Test model: AFKM12."""
     pts = H1ZEUS
-    chisq = th_AFKM12.chisq(pts)[0]
+    chisq = th_AFKM12.chisq(pts)
     assert chisq == approx(34.07240718424209)
 
 

@@ -1,5 +1,7 @@
 """Fit results."""
 
+import numpy as np
+
 from . import cff, data, dis, dvcs, dvmp, eff, gpd, utils
 
 GLOpoints = data.dset[31][12:] + data.dset[8] + data.dset[29]
@@ -114,6 +116,34 @@ par_KM10b = {'tMv': 0.8, 'rS': 1.0, 'rpi': 4.0201, 'alv': 0.43, 'Nsea': 0.0,
 th_KM10b.parameters.update(par_KM10b)
 th_KM10b.name = 'KM10b'
 pts_KM10b = DVCSpoints+GLOpoints+data.dset[30]
+
+
+class AFKM12(eff.KellyEFF, gpd.PWNormGPD, cff.MellinBarnesCFF, dvcs.BM10):
+
+
+    def gpd_E(self, eta: float, t: float) -> np.ndarray:
+        """Return (npts, 4) array E_j^a for all j-points and 4 flavors."""
+        # Implement BS+BG=0 sum rule that fixes 'kapg'
+        self.parameters['kapg'] = - self.parameters['kaps'] * self.parameters['ns'] / (
+                0.6 - self.parameters['ns'])
+        kappa = np.array([self.parameters['kaps'], self.parameters['kapg'], 0, 0])
+        return kappa * gpd.singlet_ng_constrained_E(self.jpoints, t,
+                            self.parameters, self.residualt).transpose()
+
+th_AFKM12 = AFKM12(residualt='exp')
+par_AFKM12 = {"ns": 0.152, "al0s": 1.1575, "alps": 0.1, "ms2": 0.17857142857142858, "delms2": 0.,
+            "pows": 2., "secs": 0.5127, "this": -0.21,
+            "al0g": 1.2473, "alpg": 0.1, "mg2": 0.25, "delmg2": 0.,
+            "powg": 2., "secg": -4.8055, "thig": 1.8638,
+            "kaps": 1.5,
+            "Ens": 0.152,  # for fitting should be pegged to ns
+            "Eal0s": 1.1575, "Ealps": 0.02, "Ems2": 0.17857142857142858, "Edelms2": 0.,
+            "Epows": 2., "Esecs": 0.5127, "Ethis": -0.21,
+            "Eal0g": 1.2473, "Ealpg": 0.05, "Emg2": 0.25, "Edelmg2": 0.,
+            "Epowg": 2., "Esecg": -4.8055, "Ethig": 1.8638}
+th_AFKM12.parameters.update(par_AFKM12)
+th_AFKM12.name = 'AFKM12'
+pts_AFKM12 = DVCSpoints+GLOpoints+data.dset[30]
 
 
 class KM15(eff.KellyEFF, gpd.PWNormGPD, cff.HybridFreePoleCFF, dvcs.BM10tw2):

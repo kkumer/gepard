@@ -62,11 +62,9 @@ class ParameterModel(Model):
         # Create parameters dict if it doesn't exist yet
         try:
             self.parameters
-            print('id(self.parameters) = {}'.format(id(self.parameters)))
         except AttributeError:
             self.parameters = {}
         self.parameters.update(newpars)
-        print('end id(self.parameters) = {}'.format(id(self.parameters)))
 
 
     def _release_parameters(self, *pars: str):
