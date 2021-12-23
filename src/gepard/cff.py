@@ -244,7 +244,7 @@ class PionPole(object):
     def DMfreepole(self, pt):
         """Free pion-pole as proposed by Dieter."""
         pole = (self.parameters['rpi'] * 2.16444 / (0.0196 - pt.t) / (1.
-                - pt.t/self.parameters['Mpi']**2)**2 / pt.xi)
+                - pt.t/self.parameters['mpi2'])**2 / pt.xi)
         if 'in2particle' in pt and pt.in2particle == 'n':
             return -pole  # neutron
         else:
@@ -264,37 +264,23 @@ class DispersionFixedPoleCFF(DispersionCFF, PionPole):
         self.nf = kwargs.setdefault('nf', 4)
         # initial values of parameters and limits on their values
         self.add_parameters({'Nsea': 1.5, 'alS': 1.13, 'alpS': 0.15,
-                           'MS': 0.707, 'rS': 1.0, 'bS': 2.0,
+                           'mS2': 0.499849, 'rS': 1.0, 'bS': 2.0,
                            'Nv': 1.35, 'alv': 0.43, 'alpv': 0.85,
-                           'Mv': 1.0, 'rv': 0.5, 'bv': 2.2,
-                           'C': 7.0, 'MC': 1.3,
+                           'mv2': 1.0, 'rv': 0.5, 'bv': 2.2,
+                           'C': 7.0, 'mC2': 1.69,
                            'tNv': 0.0, 'tal': 0.43, 'talp': 0.85,
-                           'tMv': 2.7, 'trv': 6.0, 'tbv': 3.0})
-
-        # self.parameters = {'Nsea': 1.5, 'alS': 1.13, 'alpS': 0.15,
-                           # 'MS': 0.707, 'rS': 1.0, 'bS': 2.0,
-                           # 'Nv': 1.35, 'alv': 0.43, 'alpv': 0.85,
-                           # 'Mv': 1.0, 'rv': 0.5, 'bv': 2.2,
-                           # 'C': 7.0, 'MC': 1.3,
-                           # 'tNv': 0.0, 'tal': 0.43, 'talp': 0.85,
-                           # 'tMv': 2.7, 'trv': 6.0, 'tbv': 3.0}
+                           'tmv2': 7.29, 'trv': 6.0, 'tbv': 3.0})
 
         self.parameters_limits = {'bS': (0.4, 5.0),
-                                  'Mv': (0.4, 1.5), 'rv': (0., 8.), 'bv': (0.4, 5.),
-                                  'C': (-10., 10.), 'MC': (0.4, 2.),
-                                  'tMv': (0.4, 2.), 'trv': (0., 8.), 'tbv': (0.4, 5.)}
+                                  'mv2': (0.16, 2.25), 'rv': (0., 8.), 'bv': (0.4, 5.),
+                                  'C': (-10., 10.), 'mC2': (0.16, 4.),
+                                  'tmv2': (0.16, 4.), 'trv': (0., 8.), 'tbv': (0.4, 5.)}
 
-        # order matters to fit.MinuitFitter, so it is defined by:
-#         self.parameter_names = ['Nsea', 'alS', 'alpS', 'MS', 'rS', 'bS',
-#                                 'Nv', 'alv', 'alpv', 'Mv', 'rv', 'bv',
-#                                 'C', 'MC',
-#                                 'tNv', 'tal', 'talp',
-#                                 'tMv', 'trv', 'tbv']
         super().__init__(**kwargs)
 
     def subtraction(self, pt):
         """Dispersion relations subtraction constant."""
-        return self.parameters['C']/(1.-pt.t/self.parameters['MC']**2)**2
+        return self.parameters['C']/(1.-pt.t/self.parameters['mC2'])**2
 
     def ImH(self, pt, xi=0):
         """Imaginary part of CFF H."""
@@ -317,9 +303,9 @@ class DispersionFixedPoleCFF(DispersionCFF, PionPole):
         else:
             chgfac = (2.*4./9. + 1./9.)  # proton
         val = (chgfac * p['Nv'] * p['rv'] * twox**(-p['alv']-p['alpv']*t) *
-               onex**p['bv'] / (1. - onex*t/(p['Mv']**2)))
+               onex**p['bv'] / (1. - onex*t/(p['mv2'])))
         sea = ((2./9.) * p['Nsea'] * p['rS'] * twox**(-p['alS']-p['alpS']*t) *
-               onex**p['bS'] / (1. - onex*t/(p['MS']**2))**2)
+               onex**p['bS'] / (1. - onex*t/(p['mS2']))**2)
         return pi * (val + sea) / (1.+x)
 
     def ImHt(self, pt, xi=0):
@@ -348,7 +334,7 @@ class DispersionFixedPoleCFF(DispersionCFF, PionPole):
         else:
             chgfac = (2.*4./9. + 1./9.)  # proton
         val = (chgfac * p['tNv'] * p['trv']
-               * twox**regge * onex**p['tbv'] / (1. - onex*t/(p['tMv']**2)))
+               * twox**regge * onex**p['tbv'] / (1. - onex*t/(p['tmv2'])))
         return pi * val / (1.+x)
 
     def ImE(self, pt, xi=0):
@@ -368,11 +354,11 @@ class DispersionFreePoleCFF(DispersionFixedPoleCFF):
     def __init__(self, **kwargs):
         """Constructor."""
         # Adding two extra parameters:
-        self.parameters.update({'rpi': 1.0,  'Mpi': 1.0})
+        self.parameters.update({'rpi': 1.0,  'mpi2': 1.0})
 
         self.parameters_limits.update({
              'rpi': (-8, 8.),
-             'Mpi': (0.4, 4.)})
+             'mpi2': (0.16, 16.)})
         super().__init__(**kwargs)
 
     def ReEt(self, pt):

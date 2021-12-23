@@ -46,7 +46,11 @@ class MinuitFitter(Fitter):
         """Start fitting."""
         self.minuit.migrad()
         self.theory.parameters_errors = self.minuit.errors.to_dict()
-        self.theory.covariance = self.minuit.covariance.to_table()
+        # iminuit gives covariance table for all parameters, here
+        # we take only free ones:
+        self.theory.covariance = {(p1, p2): f.minuit.covariance[p1, p2] 
+                                 for p1 in self.theory.free_parameters() 
+                                 for p2 in self.theory.free_parameters()}
 
 
     # The following methods keep status of parameters (fixed, limits)

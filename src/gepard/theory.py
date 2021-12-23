@@ -82,14 +82,12 @@ class Theory(object):
 
     chisq = chisq_single
 
-    def predict(self, pt, error=False, CL=False, **kwargs):
+    def predict(self, pt, uncertainty=False, **kwargs):
         """Give prediction for DataPoint pt.
 
         Args:
             pt: instance of DataPoint
-            error: if available, produce tuple (mean, error)
-            CL: (NNet only) error is not std.dev.,
-                but 68% C.L. (mean, errplus, errminus)
+            uncertainty: if available, produce tuple (mean, uncertainty)
             observable: string. Default is pt.yaxis. It is acceptable also
                         to pass CFF as observable, e.g., observable = 'ImH'
             parameters: dictionary which will temporarily update model's one
@@ -104,63 +102,29 @@ class Theory(object):
         if 'parameters' in kwargs:
             old = m.parameters.copy()
             self.parameters.update(kwargs['parameters'])
-        #elif isinstance(m, Model.ComptonNeuralNets):
-        #    # It is not training (which always uses 'parameters'), and
-        #    # we are not asked for particular net (call would again come
-        #    # with 'parameters'), so we want mean of all nets
-        #    self.parameters['nnet'] = 'ALL'
-        #    result = getattr(self, obs)(pt)
-        #    if error:
-        #        return (result.mean(), result.std())
-        #    else:
-        #        return result.mean()
-
-        # if obs in m.allCFFs or obs in m.allGPDs:
-            # # we want GPD/CFF, which are model attributes
-            # fun = getattr(m, obs)
-        # else:
-            # # we want a "real" observable, which is theory attribute
-            # fun = getattr(self, obs)
 
         fun = getattr(self, obs)
 
-        if error:
-            try:
-                # We now do standard propagation of error from m to observable
-                pars = [p for p in self.parameters if not self.parameters_fix['p']]
-                var = 0
-                dfdp = {}
-                for p in pars:
-                    # calculating dfdp = derivative of observable w.r.t. parameter:
-                    h=sqrt(self.covariance[p,p])
-                    mem = self.parameters[p]
-                    self.parameters[p] = mem+h/2.
-                    up = fun(pt)
-                    self.parameters[p] = mem-h/2.
-                    down = fun(pt)
-                    self.parameters[p] = mem
-                    dfdp[p] = (up-down)/h
-                for p1 in pars:
-                    for p2 in pars:
-                        var += dfdp[p1]*self.covariance[p1,p2]*dfdp[p2]
-                result = (fun(pt), sqrt(var))
-            except KeyError:
-                # we have neural net
-                allnets = fun(pt)
-                if CL:
-                    # 68% confidence level
-                    m = allnets.mean()
-                    try:
-                        result = (m,
-                              scoreatpercentile(allnets, 84)[0] - m,
-                              m - scoreatpercentile(allnets, 16)[0])
-                    except IndexError:
-                        result = (m,
-                              scoreatpercentile(allnets, 84) - m,
-                              m - scoreatpercentile(allnets, 16))
-                else:
-                    # one sigma
-                    result = (allnets.mean(), allnets.std())
+        if uncertainty:
+            # We now do standard propagation of uncertainty from m to observable
+            # using simplified procedure
+            pars = self.free_parameters()
+            var = 0
+            dfdp = {}
+            for p in pars:
+                # calculating dfdp = derivative of observable w.r.t. parameter:
+                h=sqrt(self.covariance[p,p])
+                mem = self.parameters[p]
+                self.parameters[p] = mem+h/2.
+                up = fun(pt)
+                self.parameters[p] = mem-h/2.
+                down = fun(pt)
+                self.parameters[p] = mem
+                dfdp[p] = (up-down)/h
+            for p1 in pars:
+                for p2 in pars:
+                    var += dfdp[p1]*self.covariance[p1,p2]*dfdp[p2]
+            result = (fun(pt), sqrt(var))
         else:
             result = fun(pt)
             if isinstance(result, ndarray):

@@ -1,7 +1,6 @@
 """ 
 Some utility stuff needed all over the application 
 
-loaddata -- loads datafiles from directory
 fill_kinematics --- calculates missing kinematical variables
 parse -- parses datafiles
 npars -- number of free (not fixed) parameters of minuit object

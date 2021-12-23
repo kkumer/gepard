@@ -4,6 +4,7 @@ import sys
 
 import gepard as g
 from pytest import approx, fixture, mark
+from gepard.fits import th_KM15
 
 sys.path.append('/home/kkumer/g')
 sys.path.append('/home/kkumer/g/gepard')
@@ -179,3 +180,9 @@ def test_chisq_XtX(thx):
     """Test chisq Xt+X calculation."""
     assert thx.chisq_single(g.data.dset[39][2:]+g.data.dset[45]) == approx(10.47326924258)
     # assert th.chisq_para(data[39][2:]+data[45]) == approx(10.47326924258)
+
+
+@mark.skip('Uncertainties not yet implemented.')
+def test_uncert():
+    """Test uncertainty of prediction."""
+    assert th_KM15.predict(g.dset[45][0], uncertainty=True) == (5.195327906304886, 0.2081213421895121)
