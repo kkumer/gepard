@@ -6,7 +6,10 @@
 """
 from __future__ import annotations
 
+from math import sqrt
+
 from . import theory
+from .constants import tolerance2
 
 
 class Model(theory.Theory):
@@ -53,6 +56,8 @@ class ParameterModel(Model):
         for d in ['parameters', 'parameters_fixed', 'parameters_limits']:
             if not hasattr(self, d):
                 setattr(self, d, {})
+        # By default, all params are fixed
+        self._fix_parameters('ALL')
         # print('ParameterModel init done')
         super().__init__(**kwargs)
 
@@ -112,15 +117,10 @@ class ParameterModel(Model):
         return [p for p in self.parameters if p not in self.parameters_fixed
                 or not self.parameters_fixed[p]]
 
-    def print_parameters_errors(self, pvalues=False, ndof=0):
+    def print_parameters(self):
         """Print fitting parameters and their errors."""
         tolerance2 = 1   # sqrt(2*Npoints)/1.65^2 according to GJV/MRST
         for p in self.free_parameters():
             val = self.parameters[p]
-            # err = sqrt(tolerance2)*sqrt(self.covariance[p,p])
             err = sqrt(tolerance2)*self.parameters_errors[p]
-            if pvalues:
-                pval = 2*(1.-scipy.stats.t.cdf(abs(val/err), ndof))
-                print('%5s = %8.3f +- %5.3f  (p = %.3g)' % (p, val, err, pval))
-            else:
-                print('%5s = %8.3f +- %5.3f' % (p, val, err))
+            print('{:5s} = {:8.3f} +- {:5.3f}'.format(p, val, err))

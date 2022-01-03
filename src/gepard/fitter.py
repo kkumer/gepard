@@ -48,8 +48,8 @@ class MinuitFitter(Fitter):
         self.theory.parameters_errors = self.minuit.errors.to_dict()
         # iminuit gives covariance table for all parameters, here
         # we take only free ones:
-        self.theory.covariance = {(p1, p2): f.minuit.covariance[p1, p2] 
-                                 for p1 in self.theory.free_parameters() 
+        self.theory.covariance = {(p1, p2): self.minuit.covariance[p1, p2]
+                                 for p1 in self.theory.free_parameters()
                                  for p2 in self.theory.free_parameters()}
 
 
@@ -85,7 +85,4 @@ class MinuitFitter(Fitter):
 
     def print_parameters(self):
         """Values and errors for free parameters."""
-        for par in self.theory.parameters:
-            if not self.minuit.fixed[par]:
-                print('%5s = %4.2f +- %4.2f' % (par,
-                        self.minuit.values[par], self.minuit.errors[par]))
+        self.theory.print_parameters()

@@ -20,6 +20,7 @@ Tool for studying the 3D quark and gluon distributions in the nucleon
    install
    quickstart
    advanced
+   fitting
    datasets
    developer
    gepard
