@@ -44,7 +44,31 @@ Final values of chi-square and of parameters are available as
 Using ``f.minuit`` user can directly access all the functionalities of the ``iminuit``,
 and should consult its `documentation <https://iminuit.readthedocs.io/en/stable/>`_
 
+After successful fit of theory object ``th``, user can access parameter uncertainties as
+``th.parameters_errors`` dictionary, and full covariance matrix (inverse of the
+chi-square Hessian matrix) as ``th.covariance`` dictionary.
 
+Covariance matrix can then be used to propagate uncertainty to prediction
+of observables, like this:
+
+
+   >>> th.predict(pts[0], uncertainty=True)
+   (13.253860520202533, 1.616903222077874)
+
+
+where parameter-dependent form factors (such as CFFs) can also be "predicted",
+i. e.,  calculated together with their uncertainty:
+
+  >>> pt = g.DataPoint({'xB': 0.01, 't': -0.2, 'Q2':10})
+  >>> th.predict(pt, observable='ImH', uncertainty=True)
+  (273.1888807090146, 25.75226315614056)
+
+
+.. note::
+
+   These uncertainties are "naive". They ignore unknown part of uncertainty which
+   results from the rigidity of the model. It is likely that true uncertainty is
+   always significantly larger.
 
 
 

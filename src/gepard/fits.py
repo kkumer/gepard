@@ -153,6 +153,7 @@ par_KM15 = {'tmv2': 15.94293227053628, 'rS': 1.0, 'alv': 0.43, 'tal': 0.43,
             'mg2': 0.7, 'secg': -2.990809378821039, 'thig': 0.9052207712570559,
             'kaps': 0.0, 'kapg': 0.0}
 th_KM15.parameters.update(par_KM15)
+# Fitting parameters:
 th_KM15._release_parameters('mv2', 'rv', 'bv', 'C', 'mC2', 'tmv2', 'trv', 'tbv', 'rpi', 'mpi2', 'ms2',
                             'secs', 'this', 'secg', 'thig')
 th_KM15.name = 'KM15'
