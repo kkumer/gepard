@@ -1,4 +1,5 @@
 [![Build Status](https://app.travis-ci.com/kkumer/gepard.svg?token=LxGQXDrTERP6sTZEjfVh&branch=ps)](https://app.travis-ci.com/kkumer/gepard)
+[![codecov](https://codecov.io/gh/kkumer/gepard/branch/ps/graph/badge.svg?token=YWFZALEK33)](https://codecov.io/gh/kkumer/gepard)
 
 ## Synopsis
 

@@ -1,15 +1,14 @@
 language: python
 python:
-  - "3.10.1"
   - 3.8
 before_install:
   - python --version
 # - pip install -U pip
 # - pip install -U pytest
-# - pip install codecov
+  - pip install codecov
 install:
   - pip install -r requirements.txt
   - pip install .
-script: pytest -q --runslow --doctest-glob="*.rst"
-#after_success:
-#  - codecov # submit coverage
+script: pytest -q # --runslow --doctest-glob="*.rst"
+after_success:
+  - codecov
