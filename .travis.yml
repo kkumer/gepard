@@ -9,6 +9,9 @@ before_install:
 install:
   - pip install -r requirements.txt
   - pip install .
-script: pytest -q # --runslow --doctest-glob="*.rst"
+script:
+  - pytest -q # --runslow --doctest-glob="*.rst"
+env:
+  - CODECOV_TOKEN='25658546-0983-4709-b30b-e83cae772a71'
 after_success:
   - codecov

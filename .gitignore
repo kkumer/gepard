@@ -3,7 +3,6 @@
 **/my*
 **/.mypy_cache
 **/prof
-**/*coverage*
 **/.hypothesis*
 **/.eggs
 **/*egg-info
