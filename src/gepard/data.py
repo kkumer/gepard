@@ -7,7 +7,7 @@ dset -- dictionary with public datasets
 """
 
 import copy
-import importlib.resources
+import importlib_resources
 import math
 import os
 import re
@@ -21,7 +21,7 @@ from .datasets import (DIS, en2engamma, ep2epgamma, gammastarp2gammap,
 def loaddata(resource):
     """Return dictionary {id : DataSet, ...}  out of files in resource package."""
     data = {}
-    files = importlib.resources.files(resource).iterdir()
+    files = importlib_resources.files(resource).iterdir()
     for file in files:
         if file.suffix == '.dat':
             dataset = DataSet(datafile=file.read_text())
