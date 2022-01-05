@@ -1,3 +1,5 @@
+[![Build Status](https://app.travis-ci.com/kkumer/gepard.svg?token=LxGQXDrTERP6sTZEjfVh&branch=ps)](https://app.travis-ci.com/kkumer/gepard)
+
 ## Synopsis
 
 **Gepard** - package for working with generalized parton distributions (GPDs)

@@ -1,5 +1,6 @@
 language: python
 python:
+  - "3.10"
   - 3.8
 before_install:
   - python --version
@@ -9,6 +10,6 @@ before_install:
 install:
   - pip install -r requirements.txt
   - pip install .
-script: pytest # run tests
+script: pytest -q --runslow --doctest-glob="*.rst"
 #after_success:
 #  - codecov # submit coverage
