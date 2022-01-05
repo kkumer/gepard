@@ -66,8 +66,8 @@ i. e.,  calculated together with their uncertainty:
 
 .. note::
 
-   These uncertainties are "naive". They ignore unknown part of uncertainty which
-   results from the rigidity of the model. It is likely that true uncertainty is
+   These uncertainties are "naive". They ignore unknown part of uncertainty due
+   to the rigidity of the model. It is likely that true uncertainty is
    always significantly larger.
 
 

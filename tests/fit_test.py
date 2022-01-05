@@ -83,6 +83,17 @@ def test_gepardfitDVCSnlso3_short(th):
 
 
 @mark.slow
+def test_errorprop(th):
+    """Test uncertainty propagation to CFF."""
+    f = g.fitter.MinuitFitter(g.dset[36], th)
+    f.release_parameters('ns', 'ms2', 'secs')
+    f.fit()
+    res = th.predict(g.dset[36][0], observable='ImH', uncertainty=True)
+    # number from gepard-fortran
+    assert res[1] == approx(187.684, rel=1.e-3)
+
+
+@mark.slow
 def test_gepardfitDVCSnlso3_long(th):
     """Test fitting nl-so3 model to HERA DVCS data.
 
