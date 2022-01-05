@@ -34,11 +34,11 @@ So, the minimal example of fitting is:
 Final values of chi-square and of parameters are available as
 
    >>> f.minuit.fval
-   8.411290505223722
+   8.41129
    >>> f.print_parameters()
-   ns    =    1.455 +- 0.448
-   ms2   =    0.927 +- 0.067
-   secs  =   -0.315 +- 0.005
+   ns    =    1.46 +- 0.45
+   ms2   =    0.93 +- 0.07
+   secs  =   -0.32 +- 0.01
 
 
 Using ``f.minuit`` user can directly access all the functionalities of the ``iminuit``,
@@ -53,7 +53,7 @@ of observables, like this:
 
 
    >>> th.predict(pts[0], uncertainty=True)
-   (13.253860520202533, 1.616903222077874)
+   (13.25, 1.62)
 
 
 where parameter-dependent form factors (such as CFFs) can also be "predicted",
@@ -61,7 +61,7 @@ i. e.,  calculated together with their uncertainty:
 
   >>> pt = g.DataPoint({'xB': 0.01, 't': -0.2, 'Q2':10})
   >>> th.predict(pt, observable='ImH', uncertainty=True)
-  (273.1888807090146, 25.75226315614056)
+  (273.19, 25.75)
 
 
 .. note::
