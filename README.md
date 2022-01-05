@@ -49,4 +49,4 @@ is not presently strictly required for commits.
 
 ## License
 
-GPL, I guess, or LGPL, once gepard becomes public.
+GNU [AGPLv3](https://www.gnu.org/licenses/why-affero-gpl.en.html).
