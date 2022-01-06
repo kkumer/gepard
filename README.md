@@ -2,10 +2,10 @@
 
 **Gepard** - package for working with generalized parton distributions (GPDs)
 
-This git branch contains the last version of old hybrid Python-Fortran code. 
-You can use it (it's not easy to compile and run) if you need some features
-which are not yet transfer to new pure Python version in master branch.
-Important features which are only in this branch are:
+This git branch contains the last version of the old hybrid **Python-Fortran** code. 
+You can use it (it's not trivial to compile and run) if you need some features
+which are not yet transfered to the new pure Python version in master branch.
+Important features which are available only in this branch are:
    * NNLO evolution (partial) and NNLO hard scattering coefficients
    * Neural network fitting using PyBrain
    
