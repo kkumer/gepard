@@ -3,11 +3,13 @@
 
 ## Synopsis
 
-**Gepard** - package for working with generalized parton distributions (GPDs)
+**Gepard** - tool for studying the 3D quark and gluon distributions in the nucleon
 
-(**This git branch is a complete rewrite of the code, and not yet ready for production use!**)
 
-Modelling GPDs in momentum fraction or conformal moment space, perturbative QCD evolution and calculation of conformal Compton form factors (CFFs) up to NNLO accuracy. Modelling CFFs using dispersion relations. Calculation of DVCS and DVMP observables. Fitting to experimental data (both least-squares and neural nets).
+Modelling Generalized Parton Distributions (GPD) and Compton form factors (CFF).
+Perturbative QCD evolution and calculation of deeply virtual
+Compton scattering (DVCS) and deeply virtual meson production (DVMP) to NLO accuracy. 
+Fitting parametrized models to experimental data.
 
 
 ## Installation
@@ -19,32 +21,29 @@ cd gepard
 pip install -e .
 ```
 
+For Python packages which are required to run Gepard code, see
+the file [requirements.txt](requirements.txt).
+
+For public release, we intend to create public PyPI and conda packages.
 
 ## Using
 
-In Python, or, better, Jupyter,
+In Python, or, better, Jupyter, import Gepard like this
 
 ```
 import gepard as g
 ```
 
-For least-squares fitting you need Minuit python package iminuit version 2.
-
-See `tests` subdir for examples of use.
-
-## Documentation
-
-Available at  [https://calculon.phy.hr/gpd/docs/](https://calculon.phy.hr/gpd/docs/).
+See documentation, 
+available at  [https://calculon.phy.hr/gpd/docs/](https://calculon.phy.hr/gpd/docs/).
 and in `docs` subdir.
+Also there are lot of examples in the [tests](tests/) subdirectory.
 
-## Developing
+## Citing
 
-Before pushing anything to github master `pytest -q --runslow` *must* run without errors,
-or commit message should indicate that code is not clean.
-
-We aim for 100% documented, type-hinted code that passes `flake8`, 
-`pydocstyle` (Google doc conventions) and `mypy` linters, but this
-is not presently strictly required for commits.
+If you use Gepard for your scientific publications, you might cite the
+[paper](https://arxiv.org/abs/hep-ph/0703179) where most of the formalism
+that is implemented in the Gepard code is described.
 
 
 ## License
