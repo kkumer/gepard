@@ -23,6 +23,8 @@ C  SYNOPSIS
       IMPLICIT NONE
       DOUBLE COMPLEX J, FCM(4) 
 
+!f2py complex(8) intent(in) :: J
+!f2py complex(8) intent(out) :: FCM
 C  INPUTS
 C           J -- conformal moment
 C  OUTPUT

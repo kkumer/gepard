@@ -212,15 +212,15 @@ C
       CB1 = (0.0d0, 0.0d0)
       DO 20 B = 1, 2
         DO 10 A = 1, 2
+*         CB1 = CB1 + ERFUNC1(A,B) * (LAMN(A) - LAMK(B)) * (
+*    &         (BETA0(NF) - LAMK(B)) * PROJDM(A,B,NI,NJ) 
+*    &         + PROJGOD(A,B,NI,NJ) ) / BETA0(NF)
           CB1 = CB1 + ERFUNC1(A,B) * (LAMN(A) - LAMK(B)) * (
      &         (BETA0(NF) - LAMK(B)) * PROJDM(A,B,NI,NJ) 
-     &         + PROJGOD(A,B,NI,NJ) ) / BETA0(NF)
-c         CB1 = CB1 + ERFUNC1(A,B) * (LAMN(A) - LAMK(B)) * (
-c    &         (BETA0(NF) - LAMK(B)) * PROJDM(A,B,NI,NJ) 
-c    &         + PROJGOD(A,B,NI,NJ) ) * R**(
-c    &          -LAMK(B) / BETA0(NF)) / BETA0(NF)
+     &         + PROJGOD(A,B,NI,NJ) ) * R**(
+     &          -LAMK(B) / BETA0(NF)) / BETA0(NF)
  10     CONTINUE
-        CB1 = CB1 * R**( - LAMK(B) / BETA0(NF) )
+c       CB1 = CB1 * R**( - LAMK(B) / BETA0(NF) )
  20   CONTINUE
 
       ENDIF

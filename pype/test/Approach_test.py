@@ -1,10 +1,13 @@
 
-import copy, sys
-from nose.tools import *
-import numpy as np
+import copy
+import sys
 
-import utils, Model, Approach
-from results import DMGLO1, DMepsGLO1, DM12  #use some testpars here?
+import Approach
+import Model
+import numpy as np
+import utils
+from nose.tools import *
+from results import DM12, DMGLO1, DMepsGLO1  # use some testpars here?
 
 data = utils.loaddata('data/ep2epgamma', approach=Approach.hotfixedBMK)  
 

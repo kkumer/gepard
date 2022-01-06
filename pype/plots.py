@@ -231,7 +231,7 @@ def panel(ax, points=None, lines=None, bands=None, xaxis=None, xs=None,
 
     if bands:
         if not isinstance(bands, list): bands = [bands]
-        bandcolors = ['xkcd:teal', 'red', 'darkcyan', 'blue', 'green', 'purple']
+        bandcolors = ['xkcd:darkgreen', 'red', 'darkcyan', 'blue', 'green', 'purple']
         hatches = ['\\\\', '////', '|', '.']
         bandn = 0
         for band in bands:
@@ -3073,19 +3073,24 @@ def CFF3(cffs=['ImH', 'ReH', 'ImE', 'ReE'],
             for l in leg.get_lines():
                 l.set_linewidth(2.0)  # the legend line width
         if cff == 'ImHt':
-            ax.set_ylim(0,3.8)
-            ax.yaxis.set_major_locator( matplotlib.ticker.MultipleLocator(1.)) 
-            ax.yaxis.set_minor_locator( matplotlib.ticker.MultipleLocator(0.2)) 
+            ax.set_ylim(0,7)
+            ax.yaxis.set_major_locator( matplotlib.ticker.MultipleLocator(2.)) 
+            ax.yaxis.set_minor_locator( matplotlib.ticker.MultipleLocator(0.5)) 
         elif cff == 'ImH':
             ax.yaxis.set_major_locator( matplotlib.ticker.MultipleLocator(3.)) 
             ax.yaxis.set_minor_locator( matplotlib.ticker.MultipleLocator(1.)) 
         elif cff == 'ReE':
+            ax.set_ylim(-5, 20)
             ax.yaxis.set_major_locator( matplotlib.ticker.MultipleLocator(10.)) 
             ax.yaxis.set_minor_locator( matplotlib.ticker.MultipleLocator(2.)) 
         elif cff == 'ImEt':
+            ax.set_ylim(-60, 5)
             ax.yaxis.set_major_locator( matplotlib.ticker.MultipleLocator(20.)) 
             ax.yaxis.set_minor_locator( matplotlib.ticker.MultipleLocator(5.)) 
         elif cff == 'ImE':
+            ax.set_ylim(-14, 3)
+            ax.yaxis.set_major_locator( matplotlib.ticker.MultipleLocator(5.)) 
+            ax.yaxis.set_minor_locator( matplotlib.ticker.MultipleLocator(1.)) 
             ax.set_ylabel(toTeX['{}'.format(cff)], fontsize=18, labelpad=-8)
 
     fig.subplots_adjust(hspace=0., wspace=0.25)

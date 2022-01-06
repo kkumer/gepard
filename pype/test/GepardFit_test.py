@@ -1,11 +1,15 @@
 
-import shutil, copy, math
-from nose.tools import *
+import copy
+import math
+import shutil
 
+import Approach
+import Fitter
+import Model
 import numpy as np
-
-import utils, Model, Approach, Fitter
+import utils
 from abbrevs import *
+from nose.tools import *
 
 # Gepard only
 mGepard = Model.ComptonGepard()
@@ -114,6 +118,40 @@ test_gepardfitDVCSsumso3.long = 1
 # from GepardFitNLO_test.py is more comprehensive
 #  (Actually test fails on 3rd digit)
 test_gepardfitDVCSsumso3.newfeature = 1
+
+def test_errorprop():
+    """Test error propagation
+    
+    This test is faster version of the next one
+    """
+    setpar(11,  0.15203911208796006)
+    setpar(12,  1.1575060246398083)
+    setpar(13,  0.15)
+    setpar(14,  1.)
+    setpar(15,  0.)
+    setpar(16,  2.)
+    setpar(17,  0.)
+    setpar(18,  0.)
+    setpar(19,  0.)
+    setpar(22,  1.247316701070471)
+    setpar(23,  0.15)
+    setpar(24,  0.7)
+    setpar(25,  0.)
+    setpar(26,  2.)
+    setpar(27,  0.)
+    setpar(28,  0.)
+    setpar(29,  0.)
+    setpar(37,  0.)
+    setpar(47,  0.)
+    mGepard.g.parint.p = 0
+    mGepard.g.init()
+    tGepard.model.release_parameters('NS', 'M02S', 'SECS')
+    f = Fitter.FitterMinuit(data[36], tGepard)
+    f.fit()
+    res = tGepard.predict(data[36][0], observable='ImH', error=True)
+    assert_almost_equal(res[1]/1000, 187.6347/1000, 3)
+
+
 
 def test_gepardfitDVCSnlso3():
     """Test fitting to HERA DVCS via gepard in nlso3 model

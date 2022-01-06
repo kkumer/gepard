@@ -11,7 +11,7 @@ logfilename = "/home/kkumer/tmp/{}.log".format(basename)
 logzero.logfile(logfilename,
         loglevel=logging.INFO, maxBytes=1000000, backupCount=5)
 
-import Model, Approach, Fitter, Data, utils, plots
+import Model, Approach, Fitter, Data, utils, plots, shelve
 from results import *
 from utils import listdb
 from abbrevs import *
@@ -20,32 +20,7 @@ from abbrevs import *
 # Some combination of datasets to be fitted to
 pts = GLO15b
 
+db = shelve.open('theories.db')
 
-## --- New fit ---
+th = db['KM15']
 
-## --- Creating new model: ---
-## Gepard sea part
-mGepard = Model.ComptonGepard(p=0, q02=4.0)
-Model.ComptonGepard.gepardPool.pop()
-thGepard = Approach.BM10(mGepard)
-# DR part
-mDRsea = Model.ComptonModelDRPPsea()
-# Hybridization
-m = Model.HybridDipole(mGepard, mDRsea)
-_lg.info('New model created: {}'.format(m.__class__))
-th = Approach.BM10(m)
-th.model.fix_parameters('ALL')
-th.model.release_parameters('M02S', 'SECS', 'ALPG', 'M02G', 'SECG')
-
-## --- Fitting: ---
-pts = utils.select(H1ZEUS, criteria=['Q2 >= 4.0'])
-f = Fitter.FitterMinuit(pts, th)
-f.minuit.tol = 80
-f.minuit.print_level = 1
-
-_lg.info('Start fit to {} data points'.format(len(f.fitpoints)))
-f.fit()
-
-_lg.info('Done. Emailing log file.')
-utils.mailfile('kkumer@calculon.phy.hr', 'kkumer@calculon.phy.hr',
-        'pype fit is done', logfilename)

@@ -1,8 +1,11 @@
 """Classes for fitting."""
 #from IPython.Debugger import Tracer; debug_here = Tracer()
 
-import sys, warnings
+import sys
+import warnings
+
 import logzero
+
 _lg = logzero.logger
 
 import numpy as np
@@ -13,14 +16,17 @@ import numpy as np
     # pass
 
 try:
-    from iminuit import Minuit, InitialParamWarning
+    from iminuit import Minuit
+    #from iminuit import InitialParamWarning, Minuit
+
     # FIXME: maybe we should not switch this off so bluntly
-    warnings.simplefilter('ignore', InitialParamWarning, append=False)
+    # warnings.simplefilter('ignore', InitialParamWarning, append=False)
 except:
     pass
 
 
 from pybrain3.tools.shortcuts import buildNetwork
+
 import brain
 import trans  # output layer transformation for FitterBrain
 import utils

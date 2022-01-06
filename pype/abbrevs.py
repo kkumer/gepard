@@ -13,8 +13,8 @@ data.update(utils.loaddata(os.path.join(DATA_DIR, 'en2engamma'),
        approach=Approach.BMK))
 data.update(utils.loaddata(os.path.join(DATA_DIR, 'DIS'),
        approach=Approach.BMK)) 
-#data.update(utils.loaddata('/home/kkumer/pype/data/gammastarp2gammap/EIC', approach=Approach.BMK))
-#data.update(utils.loaddata('/home/kkumer/pype/data/ep2epgamma/EIC', approach=Approach.BMK))
+data.update(utils.loaddata('/home/kkumer/gepard/pype/data/gammastarp2gammap/EIC', approach=Approach.BMK))
+data.update(utils.loaddata('/home/kkumer/gepard/pype/data/ep2epgamma/EIC', approach=Approach.BMK))
 
 
 ## [2] Choose subset of datapoints for fitting
