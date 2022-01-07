@@ -3,11 +3,13 @@
 
 ## Synopsis
 
-**Gepard** - package for working with generalized parton distributions (GPDs)
+**Gepard** - tool for studying the 3D quark and gluon distributions in the nucleon
 
-(**This git branch is a complete rewrite of the code, and not yet ready for production use!**)
 
-Modelling GPDs in momentum fraction or conformal moment space, perturbative QCD evolution and calculation of conformal Compton form factors (CFFs) up to NNLO accuracy. Modelling CFFs using dispersion relations. Calculation of DVCS and DVMP observables. Fitting to experimental data (both least-squares and neural nets).
+   * Modelling Generalized Parton Distributions (GPD) and Compton form factors (CFF).
+   * Perturbative NLO QCD evolution of GPDs
+   * Calculation of deeply virtual Compton scattering (DVCS) and deeply virtual meson production (DVMP) observables to NLO accuracy.
+   * Fitting parametrized models to the experimental data.
 
 
 ## Installation
@@ -19,32 +21,23 @@ cd gepard
 pip install -e .
 ```
 
+For Python packages which are required to run Gepard code, see
+the file [requirements.txt](requirements.txt).
+
+For the public release (real soon now), we intend to create
+the public PyPI and conda packages for easy installation.
 
 ## Using
 
-In Python, or, better, Jupyter,
+See the documentation,
+available at  [https://calculon.phy.hr/gpd/docs/](https://calculon.phy.hr/gpd/docs/).
+Also there are lots of examples in the [tests](tests/) subdirectory.
 
-```
-import gepard as g
-```
+## Citing
 
-For least-squares fitting you need Minuit python package iminuit version 2.
-
-See `tests` subdir for examples of use.
-
-## Documentation
-
-Available at  [https://calculon.phy.hr/gpd/docs/](https://calculon.phy.hr/gpd/docs/).
-and in `docs` subdir.
-
-## Developing
-
-Before pushing anything to github master `pytest -q --runslow` *must* run without errors,
-or commit message should indicate that code is not clean.
-
-We aim for 100% documented, type-hinted code that passes `flake8`, 
-`pydocstyle` (Google doc conventions) and `mypy` linters, but this
-is not presently strictly required for commits.
+If you use Gepard for your scientific publications, you might cite the
+[arXiv:hep-ph/0703179](https://arxiv.org/abs/hep-ph/0703179) paper where theoretical
+framework that is implemented in the Gepard code is described in some detail.
 
 
 ## License
