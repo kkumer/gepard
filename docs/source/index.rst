@@ -7,8 +7,8 @@
       :alt: Gepard logo
 
 
-Tool for studying the 3D quark and gluon distributions in the nucleon
-=====================================================================
+Software documentation
+======================
 
 .. meta::
       :description lang=en: Intro to Gepard

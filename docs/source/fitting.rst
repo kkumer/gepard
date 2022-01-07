@@ -34,7 +34,7 @@ So, the minimal example of fitting is:
 Final values of chi-square and of parameters are available as
 
    >>> f.minuit.fval
-   8.41129
+   8.411
    >>> f.print_parameters()
    ns    =    1.46 +- 0.45
    ms2   =    0.93 +- 0.07
