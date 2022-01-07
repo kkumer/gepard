@@ -31,12 +31,12 @@ the public PyPI and conda packages for easy installation.
 ## Using
 
 See the documentation,
-available at  [https://calculon.phy.hr/gpd/docs/](https://calculon.phy.hr/gpd/docs/).
+available at  [https://gepard.phy.hr/](https://gepard.phy.hr/).
 Also there are lots of examples in the [tests](tests/) subdirectory.
 
 ## Citing
 
-If you use Gepard for your scientific publications, you might cite the
+If you use Gepard for your scientific publications, you might want to cite the
 [arXiv:hep-ph/0703179](https://arxiv.org/abs/hep-ph/0703179) paper where theoretical
 framework that is implemented in the Gepard code is described in some detail.
 
