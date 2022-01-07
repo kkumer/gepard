@@ -14,6 +14,7 @@
 
 ## Installation
 
+You need Python version 3.7 at the least.
 Just clone the git repository and then
 
 ```

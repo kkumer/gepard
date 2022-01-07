@@ -20,7 +20,7 @@ def read(*names, **kwargs):
 setup(
     name='gepard',
     version='0.9.8',
-    license='LGPL',
+    license='AGPL-3.0',
     description='Python package for studying the 3D quark and gluon distributions.',
     long_description='{}'.format(
         re.compile('^.. start-badges.*^.. end-badges', re.M | re.S).sub('', read('README.md'))
@@ -61,7 +61,7 @@ setup(
     keywords=[
         # eg: 'keyword1', 'keyword2', 'keyword3',
     ],
-    python_requires='>=3.8',
+    python_requires='>=3.7',
     install_requires=['importlib-resources'
         # eg: 'aspectlib==1.1.1', 'six>=1.7',
     ],
