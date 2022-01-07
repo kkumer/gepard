@@ -3,7 +3,7 @@ virt: lxd
 os: linux
 language: python
 python:
-  - "3.10.1"
+#  - "3.10.1"
   - 3.8
 before_install:
   - python --version

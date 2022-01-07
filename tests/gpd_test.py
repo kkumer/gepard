@@ -73,7 +73,7 @@ def test_ConformalMoment_gpdH_test():
     """Test ConformalMoment GPD class with testing GPD H."""
     test_gpd = g.gpd.TestGPD()
     test_gpd.parameters.update(par_test)
-    assert test_gpd.gpd_H(0.1, -0.2)[:1, :2] == approx(
+    assert test_gpd.H(0.1, -0.2)[:1, :2] == approx(
             np.array([[1.65552601-0.00182673j, 3.1300559-0.00436946j]]))
 
 
@@ -81,7 +81,7 @@ def test_ConformalMoment_gpdH_fit():
     """Test ConformalMoment GPD class with testing GPD H."""
     fit_gpd = g.gpd.PWNormGPD()
     fit_gpd.parameters.update(par_fit)
-    assert fit_gpd.gpd_H(0.1, -0.2)[:1, :2] == approx(
+    assert fit_gpd.H(0.1, -0.2)[:1, :2] == approx(
             np.array([[1.1665696086-0.00161121675988j, 5.59105109-0.0109293227j]]))
 
 
@@ -90,7 +90,7 @@ def test_ConformalMoment_gpdH_fit():
 #     """Test parallel evaluation of GPDs on the Mellin-Barnes contour."""
 #     fit_gpd = g.gpd.PWNormGPD()
 #     fit_gpd.parameters.update(par_fit)
-#     assert fit_gpd.gpd_H_para(0.1, -0.2)[:1, :2] == approx(
+#     assert fit_gpd.H_para(0.1, -0.2)[:1, :2] == approx(
 #             np.array([[1.1665696086-0.00161121675988j, 5.59105109-0.0109293227j]]))
 
 

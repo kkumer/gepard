@@ -110,7 +110,7 @@ pts_KM10b = DVCSpoints+GLOpoints+data.dset[30]
 class AFKM12(eff.KellyEFF, gpd.PWNormGPD, cff.MellinBarnesCFF, dvcs.BM10):
 
 
-    def gpd_E(self, eta: float, t: float) -> np.ndarray:
+    def E(self, eta: float, t: float) -> np.ndarray:
         """Return (npts, 4) array E_j^a for all j-points and 4 flavors."""
         # Implement BS+BG=0 sum rule that fixes 'kapg'
         self.parameters['kapg'] = - self.parameters['kaps'] * self.parameters['ns'] / (

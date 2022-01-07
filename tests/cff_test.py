@@ -43,7 +43,7 @@ class gpd_model(g.gpd.ConformalSpaceGPD):
                               [0, 1, 0, 0],
                               [-R/(2+R), 0, 1, -1]])
 
-    def gpd_H(self, eta: float, t: float) -> np.ndarray:
+    def H(self, eta: float, t: float) -> np.ndarray:
         """GPD H from hep-ph/0703179."""
         return g.gpd.ansatz07_fixed(self.jpoints, t, self.type).transpose()
 

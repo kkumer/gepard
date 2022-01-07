@@ -88,10 +88,10 @@ class MellinBarnesCFF(CFF, mellin.MellinBarnes):
             # memorize it for future
             self.wce[pt.Q2] = wce_ar
         # Evaluations depending on model parameters:
-        h_prerot = self.gpd_H(pt.xi, pt.t)
+        h_prerot = self.H(pt.xi, pt.t)
         h = np.einsum('f,fa,ja->jf', self.dvcs_charges, self.frot, h_prerot)
         reh, imh = self._mellin_barnes_integral(pt.xi, wce_ar, h)
-        e_prerot = self.gpd_E(pt.xi, pt.t)
+        e_prerot = self.E(pt.xi, pt.t)
         e = np.einsum('f,fa,ja->jf', self.dvcs_charges, self.frot, e_prerot)
         ree, ime = self._mellin_barnes_integral(pt.xi, wce_ar, e)
         return np.array([reh, imh, ree, ime, 0, 0, 0, 0])
@@ -106,9 +106,9 @@ class MellinBarnesCFF(CFF, mellin.MellinBarnes):
             # memorize it for future
             self.wce[pt.Q2] = wce_ar
         # Evaluations depending on model parameters:
-        h_prerot = self.gpd_H(pt.xi, pt.t)
+        h_prerot = self.H(pt.xi, pt.t)
         h = np.einsum('f,fa,ja->jf', self.dvcs_charges, self.frot, h_prerot)
-        e_prerot = self.gpd_E(pt.xi, pt.t)
+        e_prerot = self.E(pt.xi, pt.t)
         e = np.einsum('f,fa,ja->jf', self.dvcs_charges, self.frot, e_prerot)
         reh, imh, ree, ime = self._mellin_barnes_integral_HE(pt.xi, wce_ar, h, e)
         return np.array([reh, imh, ree, ime, 0, 0, 0, 0])

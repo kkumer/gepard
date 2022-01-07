@@ -27,7 +27,7 @@ class DIS(model.ParameterModel, mellin.MellinBarnes):
             wce_ar_dis = wilson.calc_wce(self, pt.Q2, 'DIS')[0, :, :]
             # memorize it for future
             self.wce_dis[pt.Q2] = wce_ar_dis
-        pdf_prerot = self.gpd_H(0, 0)  # forward limit
+        pdf_prerot = self.H(0, 0)  # forward limit
         pdf = np.einsum('fa,ja->jf', self.frot_pdf, pdf_prerot)
         mb_int = self._dis_mellin_barnes_integral(pt.xB, wce_ar_dis, pdf)
         return self.dis_charge * mb_int / np.pi

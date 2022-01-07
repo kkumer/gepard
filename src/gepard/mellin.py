@@ -23,14 +23,14 @@ class MellinBarnes(object):
         reh = np.dot(self.wg, cch.imag)
         return reh, imh
 
-    def _mellin_barnes_integral_HE(self, xi, wce, gpd_H, gpd_E):
+    def _mellin_barnes_integral_HE(self, xi, wce, H, E):
         """Return convolution of evolved Wilson coefs and GPDs H and E."""
         eph = np.exp(self.phi*1j)
         cfacj = eph * np.exp((self.jpoints + 1) * log(1/xi))  # eph/xi**(j+1)
         cch_H = np.einsum('j,sa,sja,ja->j', cfacj,
-                        self.pw_strengths(), wce, gpd_H)
+                        self.pw_strengths(), wce, H)
         cch_E = np.einsum('j,sa,sja,ja->j', cfacj,
-                        self.pw_strengths_E(), wce, gpd_E)
+                        self.pw_strengths_E(), wce, E)
         imh = np.dot(self.wg, cch_H.imag)
         ime = np.dot(self.wg, cch_E.imag)
         np.multiply(cch_H, self.tgj, out=cch_H)

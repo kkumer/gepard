@@ -67,7 +67,7 @@ class BM10(g.eff.DipoleEFF, g.cff.DispersionFixedPoleCFF, g.dvcs.BM10):
 
 class DM12(g.eff.KellyEFF, g.gpd.PWNormGPD, g.cff.MellinBarnesCFF, g.dvcs.BMK):
 
-    def gpd_E(self, eta: float, t: float) -> np.ndarray:
+    def E(self, eta: float, t: float) -> np.ndarray:
         """Return (npts, 4) array E_j^a for all j-points and 4 flavors."""
         # Implement BS+BG=0 sum rule that fixes 'kapg'
         self.parameters['kapg'] = - self.parameters['kaps'] * self.parameters['ns'] / (

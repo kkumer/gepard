@@ -379,11 +379,11 @@ class ConformalSpaceGPD(GPD):
                          [self.parameters['Ethis'],
                              self.parameters['Ethig'], 0]])
 
-    def gpd_H(self, eta: float, t: float) -> np.ndarray:
+    def H(self, eta: float, t: float) -> np.ndarray:
         """Return (npts, 4) array H_j^a for all j-points and 4 flavors."""
         return np.zeros((self.npts, 4), dtype=complex)
 
-    def gpd_E(self, eta: float, t: float) -> np.ndarray:
+    def E(self, eta: float, t: float) -> np.ndarray:
         """Return (npts, 4) array E_j^a for all j-points and 4 flavors."""
         return np.zeros((self.npts, 4), dtype=complex)
 
@@ -400,7 +400,7 @@ class TestGPD(ConformalSpaceGPD):
         kwargs.setdefault('asp', np.array([0.05, 0.05, 0.05]))
         super().__init__(**kwargs)
 
-    def gpd_H(self, eta: float, t: float) -> np.ndarray:
+    def H(self, eta: float, t: float) -> np.ndarray:
         """Return (npts, 4) array H_j^a for all j-points and 4 flavors."""
         # For testing purposes, we use here sub-optimal non-numpy algorithm
         h = []
@@ -425,12 +425,12 @@ class PWNormGPD(ConformalSpaceGPD):
         """See parent `ConformalSpaceGPD` class for docs."""
         super().__init__(**kwargs)
 
-    def gpd_H(self, eta: float, t: float) -> np.ndarray:
+    def H(self, eta: float, t: float) -> np.ndarray:
         """Return (npts, 4) array H_j^a for all j-points and 4 flavors."""
         return singlet_ng_constrained(self.jpoints,
                                       t, self.parameters, self.residualt).transpose()
 
-#     def gpd_H_para(self, eta: float, t: float) -> np.ndarray:
+#     def H_para(self, eta: float, t: float) -> np.ndarray:
 #         """Return (npts, 4) array H_j^a for all j-points and 4 flavors."""
 #         # This multiprocessing version is actually 2x slower!
 #         h = Parallel(n_jobs=20)(delayed(singlet_ng_constrained)(j, t,
@@ -438,7 +438,7 @@ class PWNormGPD(ConformalSpaceGPD):
 #                                 for j in self.jpoints)
 #         return np.array(h)
 
-    def gpd_E(self, eta: float, t: float) -> np.ndarray:
+    def E(self, eta: float, t: float) -> np.ndarray:
         """Return (npts, 4) array E_j^a for all j-points and 4 flavors."""
         kappa = np.array([self.parameters['kaps'], self.parameters['kapg'], 0, 0])
         return kappa * singlet_ng_constrained(self.jpoints, t, self.parameters,
