@@ -6,7 +6,7 @@
 
 from .cff import (CFF, MellinBarnesCFF, DispersionCFF, PionPole,
         DispersionFixedPoleCFF, DispersionFreePoleCFF,
-        HybridFixedPoleCFF, HybridFreePoleCFF)
+        HybridFixedPoleCFF, HybridFreePoleCFF, GoloskokovKrollCFF)
 from .data import DataPoint, DataSet, dset  # noqa: F401
 from .dis import DIS
 from .dvcs import DVCS, BM10, BMK, BM10ex, BM10tw2, hotfixedBMK

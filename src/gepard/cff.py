@@ -420,3 +420,7 @@ class HybridFreePoleCFF(HybridCFF):
     def ReEt(self, pt):
         """Instead of disp. rel. use free pion pole formula."""
         return self.DMfreepole(pt)
+
+
+# This PEP8 violating end-of-file import serves just to bring GK code into cff namespace
+from .gk import GoloskokovKrollCFF  # noqa: F401, E402

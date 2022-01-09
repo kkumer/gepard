@@ -3,6 +3,14 @@
     * Elastic electromagnetic form factors
     * Generalized parton distribution functions (GPDs)
     * Compton form factors (for DVCS)
+
+Actual implementations are in other files. Here only generic
+treatment of generalized parametrized model is coded.
+
+Todo:
+    * Model defined by grid of numbers
+    * Flavored models
+
 """
 from __future__ import annotations
 
