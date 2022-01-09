@@ -110,10 +110,8 @@ example :math:`\mathfrak{Im}\mathcal{H}`
 
    .. code-block:: python
 
-   >>> th_KM15.ImH(x=0.348, t=-0.3, Q2=3)   # This will NOT work
-   Traceback (most recent call last):
-   ...
-   TypeError: HybridCFF.ImH() got an unexpected keyword argument 'x'
+   >>> # This will NOT work
+   >>> th_KM15.ImH(x=0.348, t=-0.3, Q2=3)  # doctest: +SKIP
 
    You have to create a `DataPoint` object first:
 
