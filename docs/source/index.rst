@@ -19,7 +19,9 @@ Software documentation
 
    install
    quickstart
-   advanced
+   data
+   observables
+   theory
    fitting
    developer
    gepard

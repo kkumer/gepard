@@ -1,7 +1,8 @@
-gepard package
-==============
+Detailed package info
+=====================
 
-This is a **comprehensive** documentation of the code for power users.
+This is a **comprehensive** documentation of the code for
+developers and power users.
 It is automatically generated from documentation strings embedded
 in the code itself.
 

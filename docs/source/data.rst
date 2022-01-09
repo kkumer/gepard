@@ -1,15 +1,33 @@
-######################
-Advanced documentation
-######################
+####################
+Data points and sets
+####################
+
+Instance of ``DataPoint`` represents one kinematic point.
+
+It can correspond to a single experimental measurement,
+and most of Gepard functions that calculate observables
+or various form factors accept ``DataPoint`` as an argument.
+
+So, when you want to tabulate something, or
+plot something (such as CFF or cross-section) as a continuous
+function of some variable, you will have to create
+a "continuum" of ``DataPoints``.
+
+Several ``DataPoint`` objects can be collected in a special
+``DataSet`` object. This is not necessary, but it is convenient,
+and all experimental datasets that ship with Gepard are
+``DataSet`` objects with unique ID number.
 
 
-.. _datapoint-attributes:
+
 
 DataPoint Attributes
 --------------------
 
 Instance of ``DataPoint`` can have following attributes. Some
 are used by the code, some are just for convenience.
+
+.. _tab-datapoint-attributes:
 
 .. list-table:: DataPoint attributes
    :header-rows: 1
@@ -27,7 +45,7 @@ are used by the code, some are just for convenience.
    * - FTn
      -  harmonic of azimuthal angle :math:`\phi`. Here values 0, 1, ... correspond to zeroth, first,  ... cosine harmonics, while -1, -2, ... correspond to first, second, ... sine harmonics.
    * - yaxis or y1name
-     - measured :ref:`observables<observables>`
+     - measured :ref:`observables<tab-observables>`
    * - val
      - value measured
    * - y1unit
@@ -75,7 +93,7 @@ transformed into the BMK frame.
 
 
 
-.. _datasets:
+.. _sec-datasets:
 
 Working with datasets
 ----------------------
@@ -135,49 +153,3 @@ Also, for some datasets there are dedicated plots, like
    >>> import gepard.plots
    >>> from gepard.fits import th_KM15, th_KM10b
    >>> gepard.plots.H1ZEUS(lines=[th_KM15, th_KM10b]).show()
-
-.. _observables:
-
-Observables
------------
-
-Following observables are implemented in gepard. They can be used
-as methods of theory objects, or ``yaxis`` attributes of datapoints.
-
-.. list-table:: Observables
-   :header-rows: 1
-
-   * - Name
-     - Description
-   * - XS
-     - Cross-section
-   * - BSS
-     - beam spin sum a.k.a helicity independent XS
-   * - BSSw
-     - BSS weighted by BH propagator
-   * - BSD
-     - beam spin difference a.k.a helicity dependent XS
-   * - BSDw
-     - BSD weighted by BH propagator
-   * - BCA
-     - beam charge asymmetry
-   * - BSA
-     - beam spin asymmetry
-   * - ALUI
-     - beam spin asymmetry, interference part
-   * - ALUDVCS
-     - beam spin asymmetry, DVCS part
-   * - TSA
-     - (longitudinal) target spin asymmetry
-   * - AUTI
-     - transversal target spin asymmetry, interference part
-   * - AUTDVCS
-     - transversal target spin asymmetry, DVCS part
-   * - BTSA
-     - beam (longitudinal) target double spin asymmetry
-   * - ALTI
-     - beam transversal target double spin asymmetry, interference part
-   * - ALTBHDVCS
-     - beam transversal target double spin asymmetry, BH-DVCS part
-
-

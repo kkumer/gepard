@@ -1,6 +1,6 @@
-#######
-Fitting
-#######
+######################
+Fitting theory to data
+######################
 
 
 At the moment, only the standard least-squares fitting is implemented,

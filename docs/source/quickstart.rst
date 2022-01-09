@@ -2,7 +2,7 @@
 Quickstart
 ##########
 
-To use Gepard it is essential to understand the three main code objects:
+To use Gepard it is essential to understand the two main code objects:
 
 #. ``DataPoint`` contains information about kinematics and, possibly,
    about particular measurement perfomed at that kinematics
@@ -11,13 +11,10 @@ To use Gepard it is essential to understand the three main code objects:
    given data point, which includes information about hadronic structure,
    i. e., GPDs and electromagnetic form factors
 
-#. ``Fitter`` contains information on how to fit model to the set of
-   data points.
 
-
-This objects are classes (in the sense of object-oriented programming)
+These objects are classes (in the sense of object-oriented programming)
 and one actually works with particular instances of these objects.
-If you don't have experience with OO programming paradigm, don't worry,
+If you don't have experience with object-oriented programming paradigm, don't worry,
 examples below explain everything that you need to know.
 
 DataPoint
@@ -49,7 +46,7 @@ of 6 GeV\ :sup:`2`, negative charge (electron) and positive helicity.
 What is measured (``yaxis``) is cross-section (``XS``) and result of the
 measurement is 0.21 nb, with total uncertainty of 0.01 nb.
 
-All attributes of datapoint are documented :ref:`here<datapoint-attributes>`.
+All attributes of datapoint are documented :ref:`here<tab-datapoint-attributes>`.
 
 
 This information can be accessed as attributes of ``DataPoint`` object,
@@ -66,8 +63,8 @@ where one notices that other, dependent kinematic variables are automatically
 precalulated, like :math:`\xi = x_B / (2 - x_B)` here.
 
 Datapoints can be organized in datasets (class ``DataSet``), and, for
-convenience, many datasets come with Gepard and are available as 
-documented in section :ref:`Working with datasets<datasets>`.
+convenience, many datasets are already made available within Gepard,
+as documented in section :ref:`Working with datasets<sec-datasets>`.
 
 
 Theory
@@ -88,7 +85,7 @@ and then used to calculate theory prediction for a given datapoint
    >>> th_KM15.predict(pt)
    0.023449564143725125
 
-This will calculate observable specified in ``yaxis`` attribute of ``pt``.
+This will by default calculate observable specified in ``yaxis`` attribute of ``pt``.
 User can also calculate other observables, like beam charge asymmetry
 
 .. code-block:: python
@@ -96,7 +93,7 @@ User can also calculate other observables, like beam charge asymmetry
    >>> th_KM15.BCA(pt)
    0.07397084871687629
 
-All implemented observables are listed :ref:`here<observables>`.
+All implemented observables are listed :ref:`here<tab-observables>`.
 
 
 Furthermore, values of Compton Form Factors are available, for
@@ -106,3 +103,22 @@ example :math:`\mathfrak{Im}\mathcal{H}`
 
    >>> th_KM15.ImH(pt)
    2.807544271408012
+
+
+.. note::
+   Presently, you cannot calculate observable or form factor by directly specifying kinematics, like
+
+   .. code-block:: python
+
+   >>> th_KM15.ImH(x=0.348, t=-0.3, Q2=3)   # This will NOT work
+   Traceback (most recent call last):
+   ...
+   TypeError: HybridCFF.ImH() got an unexpected keyword argument 'x'
+
+   You have to create a `DataPoint` object first:
+
+   >>> pt = g.DataPoint({'xB': 0.348, 't': -0.3, 'Q2': 3})
+   >>> th_KM15.ImH(pt)  # This will work
+   2.8075
+   
+
