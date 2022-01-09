@@ -21,7 +21,6 @@ Software documentation
    quickstart
    advanced
    fitting
-   datasets
    developer
    gepard
    todo
