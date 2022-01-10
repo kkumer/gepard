@@ -32,14 +32,8 @@ Fast testing the code:
 
    pytest -q
 
-Fast testing the code and the doctests in documentation:
 
-.. code-block:: bash
-
-   pytest -q --doctest-glob="*.rst"
-
-
-Fast testing the doctests only:
+Testing the doctests only:
 
 .. code-block:: bash
 
