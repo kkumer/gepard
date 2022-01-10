@@ -26,6 +26,7 @@ class CFF(model.ParameterModel):
     # allGPDs = []
 
     def __init__(self, **kwargs):
+        self.nf = kwargs.setdefault('nf', 4)
         # squared DVCS charge factors
         if self.nf == 3:
             qs = 2/9
@@ -271,10 +272,10 @@ class DispersionFixedPoleCFF(DispersionCFF, PionPole):
                            'tNv': 0.0, 'tal': 0.43, 'talp': 0.85,
                            'tmv2': 7.29, 'trv': 6.0, 'tbv': 3.0})
 
-        self.parameters_limits = {'bS': (0.4, 5.0),
+        self.add_parameters_limits({'bS': (0.4, 5.0),
                                   'mv2': (0.16, 2.25), 'rv': (0., 8.), 'bv': (0.4, 5.),
                                   'C': (-10., 10.), 'mC2': (0.16, 4.),
-                                  'tmv2': (0.16, 4.), 'trv': (0., 8.), 'tbv': (0.4, 5.)}
+                                  'tmv2': (0.16, 4.), 'trv': (0., 8.), 'tbv': (0.4, 5.)})
 
         super().__init__(**kwargs)
 
@@ -354,9 +355,9 @@ class DispersionFreePoleCFF(DispersionFixedPoleCFF):
     def __init__(self, **kwargs):
         """Constructor."""
         # Adding two extra parameters:
-        self.parameters.update({'rpi': 1.0,  'mpi2': 1.0})
+        self.add_parameters({'rpi': 1.0,  'mpi2': 1.0})
 
-        self.parameters_limits.update({
+        self.add_parameters_limits({
              'rpi': (-8, 8.),
              'mpi2': (0.16, 16.)})
         super().__init__(**kwargs)

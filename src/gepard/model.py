@@ -79,6 +79,15 @@ class ParameterModel(Model):
             self.parameters = {}
         self.parameters.update(newpars)
 
+    def add_parameters_limits(self, newlimits: dict):
+        """Append newlimits to parameters_limits."""
+        # Create parameters_limits dict if it doesn't exist yet
+        try:
+            self.parameters_limits
+        except AttributeError:
+            self.parameters_limits = {}
+        self.parameters_limits.update(newlimits)
+
 
     def _release_parameters(self, *pars: str):
         """Release parameters for fitting.

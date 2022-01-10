@@ -1,3 +1,5 @@
+.. _sec-fitting:
+
 ######################
 Fitting theory to data
 ######################

@@ -344,7 +344,7 @@ class ConformalSpaceGPD(GPD):
         self.jpoints = npoints - 1
         self.wg = weights  # Gauss integration weights
         # Initial parameters:
-        self.parameters = {'ns': 2./3. - 0.4,
+        self.add_parameters({'ns': 2./3. - 0.4,
                 'al0s': 1.1,  'Eal0s': 1.1,
                 'alps': 0.25, 'Ealps': 0.25,
                 'ms2': 1.1, 'Ems2': 1.1,
@@ -357,7 +357,7 @@ class ConformalSpaceGPD(GPD):
                 'mg2': 1.2, 'Emg2': 1.2,
                 'secg': 0., 'Esecg': 0,
                 'thig': 0., 'Ethig': 0,
-                           'kapg': 0.}
+                           'kapg': 0.})
         super().__init__(**kwargs)
 
     def pw_strengths(self):

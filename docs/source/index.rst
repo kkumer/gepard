@@ -20,8 +20,9 @@ Software documentation
    install
    quickstart
    data
-   observables
+   gpds
    theory
+   observables
    fitting
    developer
    gepard
