@@ -2,11 +2,64 @@
 Processes and observables
 #########################
 
+
+Processes
+---------
+
 Presently, only Deeply virtual Compton scattering (DVCS) process
 can be considered fully implemented (using the so-called
 BMK formulas). There is also an implementation of Deeply virtual
 meson production (DVMP) of rho meson, valid for small Bjorken x
 kinematics.
+
+Datapoints should have an attribute ``process``, which is one of
+the following:
+
+.. _tab-processes:
+
+.. list-table:: Processes
+   :header-rows: 1
+
+   * - Proces
+     - DataPoint ``process`` value
+     - Generic theory class
+   * - :math:`e p \to e p \gamma`
+     - ``ep2epgamma``
+     - DVCS
+   * - :math:`e n \to e n \gamma`
+     - ``en2engamma``
+     - DVCS
+   * - :math:`\gamma^* p \to \gamma p`
+     - ``gammastarp2gammap``
+     - DVCS
+   * - :math:`\gamma^* p \to \rho^{0} p`
+     - ``gammastarp2rho0p``
+     - DVMP
+
+
+Formulas for generic theory class DVMP are implemented as
+``g.DVMP``, while those for DVCS have several slightly different
+versions:
+
+.. _tab-bmk:
+
+.. list-table:: Version of BMK formulas
+   :header-rows: 1
+
+   * - Theory class
+     - description
+   * - ``BMK``
+     - old original BMK formulas from 2005
+   * - ``hotfixedBMK``
+     - improved formulas that are better for JLab kinematics
+   * - ``BM10ex``
+     - best formulas from 2010
+   * - ``BM10``
+     - like ``BM10ex``, but with some Q2-suppresed terms removed
+   * - ``BM10tw2``
+     - like ``BM10`` but with higher twists set to zero
+
+
 
 
 .. _tab-observables:

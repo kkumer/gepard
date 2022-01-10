@@ -2,10 +2,11 @@
 Building the theory
 ###################
 
-``Theory`` object consists of collection of formulas
+``Theory`` object is in some sense a collection of formulas
 which implement everything that you want to calculate.
 
-...
+For convenience, formulas are separated into building blocks that
+can in principle be used separately
 
 If you want to make a new model, beyond what is already available in
 Gepard you can work like this:
