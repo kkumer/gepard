@@ -16,8 +16,8 @@ in2particle = p
 
 ### Observable 
 
-y1name = F2
-y1namelong = F2
+y1name = DISF2
+y1namelong = DISF2
 y1unit = 1
 y1value = column2
 y1errorstatistic = column3

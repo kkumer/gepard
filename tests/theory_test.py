@@ -61,7 +61,7 @@ def th_nlo():
 
 def test_F2_NLO(th_dis):
     """Test NLO DIS F2 evaluation."""
-    f2 = th_dis.F2(g.data.dset[201][0])
+    f2 = th_dis.DISF2(g.data.dset[201][0])
     assert f2 == approx(0.4220514008395502)
 
 

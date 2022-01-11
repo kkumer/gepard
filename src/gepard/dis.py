@@ -18,8 +18,12 @@ class DIS(model.ParameterModel, mellin.MellinBarnes):
         super().__init__(**kwargs)
 
 
-    def F2(self, pt: data.DataPoint) -> float:
-        """Return DIS F2 for kinematic point."""
+    def DISF2(self, pt: data.DataPoint) -> float:
+        """Return DIS F2 form factor.
+
+        Name DISF2 is chosen to avoid clash with F2 Pauli form factor.
+
+        """
         try:
             wce_ar_dis = self.wce_dis[pt.Q2]
         except KeyError:
