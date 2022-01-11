@@ -1,5 +1,8 @@
 """Gepard --- Python package for analysis of generalized parton distributions."""
 
+from importlib.metadata import version
+__version__ = version(__name__)
+
 # Some things are brought to gepard top namespace
 # for user's convenience, and easier preservation of
 # backward compatibility
