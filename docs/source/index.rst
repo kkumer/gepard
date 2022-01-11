@@ -30,8 +30,8 @@ There are four levels of documentation below, of increasing detail:
    tutorial
    data
    gpds
-   theory
    observables
+   theory
    fitting
    gepard
    developer

@@ -41,7 +41,7 @@ Formulas for generic theory class DVMP are implemented as
 ``g.DVMP``, while those for DVCS have several slightly different
 versions:
 
-.. _tab-bmk:
+.. _tab-BMK_formulas:
 
 .. list-table:: Version of BMK formulas
    :header-rows: 1

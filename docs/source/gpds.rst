@@ -110,6 +110,9 @@ CFFs
 Compton form factors (CFFs) are required for calculation of DVCS observables.
 There are presently four main classes of CFFs implemented in Gepard
 
+
+.. _tab-CFF_classes:
+
 .. list-table:: CFF classes
    :header-rows: 1
 
@@ -173,6 +176,8 @@ EFFs
 
 To calculate DVCS observables, we also need elastic electromagnetic
 form factors. There are three implementations in Gepard:
+
+.. _tab-EFF_classes:
 
 .. list-table:: EFF classes
    :header-rows: 1
