@@ -8,7 +8,7 @@ Processes
 
 Presently, only Deeply virtual Compton scattering (DVCS) process
 can be considered fully implemented (using the so-called
-BMK formulas). There is also an implementation of Deeply virtual
+BMK formulas). There is also an initial implementation of Deeply virtual
 meson production (DVMP) of rho meson, valid for small Bjorken x
 kinematics.
 
@@ -48,15 +48,15 @@ versions:
 
    * - Theory class
      - description
-   * - ``BMK``
+   * - ``g.BMK``
      - old original BMK formulas from 2005
-   * - ``hotfixedBMK``
+   * - ``g.hotfixedBMK``
      - improved formulas that are better for JLab kinematics
-   * - ``BM10ex``
+   * - ``g.BM10ex``
      - best formulas from 2010
-   * - ``BM10``
+   * - ``g.BM10``
      - like ``BM10ex``, but with some Q2-suppresed terms removed
-   * - ``BM10tw2``
+   * - ``g.BM10tw2``
      - like ``BM10`` but with higher twists set to zero
 
 
@@ -70,40 +70,49 @@ Observables
 Following observables are implemented in gepard. They can be used
 as methods of theory objects, or ``yaxis`` attributes of datapoints.
 
-.. list-table:: Observables
+.. list-table:: DVCS observables
+   :header-rows: 1
+
+   * - Identifier
+     - Description
+   * - ``XS``
+     - cross-section for leptoproduction of real photon
+   * - ``XDVCS``
+     - cross-section for production of real photon by virtual one
+   * - ``BSS``
+     - beam spin sum a.k.a helicity independent XS
+   * - ``BSSw``
+     - BSS weighted by BH propagator
+   * - ``BSD``
+     - beam spin difference a.k.a helicity dependent XS
+   * - ``BSDw``
+     - BSD weighted by BH propagator
+   * - ``BCA``
+     - beam charge asymmetry
+   * - ``BSA``
+     - beam spin asymmetry
+   * - ``ALUI``
+     - beam spin asymmetry, interference part
+   * - ``ALUDVCS``
+     - beam spin asymmetry, DVCS part
+   * - ``TSA``
+     - (longitudinal) target spin asymmetry
+   * - ``AUTI``
+     - transversal target spin asymmetry, interference part
+   * - ``AUTDVCS``
+     - transversal target spin asymmetry, DVCS part
+   * - ``BTSA``
+     - beam (longitudinal) target double spin asymmetry
+   * - ``ALTI``
+     - beam transversal target double spin asymmetry, interference part
+   * - ``ALTBHDVCS``
+     - beam transversal target double spin asymmetry, BH-DVCS part
+
+
+.. list-table:: DVMP observables
    :header-rows: 1
 
    * - Name
      - Description
-   * - XS
-     - Cross-section
-   * - BSS
-     - beam spin sum a.k.a helicity independent XS
-   * - BSSw
-     - BSS weighted by BH propagator
-   * - BSD
-     - beam spin difference a.k.a helicity dependent XS
-   * - BSDw
-     - BSD weighted by BH propagator
-   * - BCA
-     - beam charge asymmetry
-   * - BSA
-     - beam spin asymmetry
-   * - ALUI
-     - beam spin asymmetry, interference part
-   * - ALUDVCS
-     - beam spin asymmetry, DVCS part
-   * - TSA
-     - (longitudinal) target spin asymmetry
-   * - AUTI
-     - transversal target spin asymmetry, interference part
-   * - AUTDVCS
-     - transversal target spin asymmetry, DVCS part
-   * - BTSA
-     - beam (longitudinal) target double spin asymmetry
-   * - ALTI
-     - beam transversal target double spin asymmetry, interference part
-   * - ALTBHDVCS
-     - beam transversal target double spin asymmetry, BH-DVCS part
-
-
+   * - ``X``
+     - cross-section for production of meson by virtual photon

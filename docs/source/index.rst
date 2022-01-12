@@ -18,7 +18,7 @@ There are four levels of documentation below, of increasing detail:
 
    1. Quickstart - for those who just need to calculate predictions of some published model
    2. Tutorial - overview of main Gepard functionalities
-   3. Sections from "Data points and sets" to "Fitting theory to data" - in depth discussion of Gepard
+   3. Sections from "Data points, sets and files" to "Fitting theory to data" - in depth manual
    4. "Detailed package info" and "Developer info" - for power users and developers
 
 

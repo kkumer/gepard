@@ -1,6 +1,6 @@
-####################
-Data points and sets
-####################
+###########################
+Data points, sets and files
+###########################
 
 Instance of ``DataPoint`` represents one kinematic point.
 
@@ -34,40 +34,41 @@ are used by the code, some are just for convenience.
 
    * - Attribute
      - Description
-   * - xB
+   * - ``xB``
      - Bjorken :math:`x_B`
-   * - t
+   * - ``t``
      - Mandelstam t, i. e., momentum transfer to target squared.
-   * - Q2
+   * - ``Q2``
      -  :math:`Q^2`
-   * - phi
+   * - ``phi``
      -  azimutal angle :math:`\phi`
-   * - FTn
+   * - ``FTn``
      -  harmonic of azimuthal angle :math:`\phi`. Here values 0, 1, ... correspond to zeroth, first,  ... cosine harmonics, while -1, -2, ... correspond to first, second, ... sine harmonics.
-   * - yaxis or y1name
+   * - ``y1name`` or ``yaxis``
      - measured :ref:`observables<tab-observables>`
-   * - val
+   * - ``val``
      - value measured
-   * - y1unit
+   * - ``y1unit``
      - units of yaxis
-   * - err
+   * - ``err``
      - total uncertainty of val
-   * - staterr
+   * - ``staterr``
      - statistical uncertainty of val
-   * - systerr
+   * - ``systerr``
      - systematic uncertainty of val (symmetric)
-   * - frame
+   * - ``frame``
      - coordinate frame used (``BMK`` or ``Trento``)
-   * - id
+   * - ``id``
      - id number of the dataset to which point belongs
-   * - reference
+   * - ``reference``
      - reference to where data was published
 
+Some details and other attributes are given :ref:`below<tab-data_syntax>`.
 
 Coordinate frames
 -----------------
 
-Take note that Gepard works in BMK frame, while most of the experimental
+Take note that Gepard internally works in the BMK frame, while most of the experimental
 data is published in the Trento frame. There are convenience functions
 ``to_conventions`` and ``from_conventions`` that transform datapoints
 in place from Trento to BMK frame and back, respectively.
@@ -98,6 +99,13 @@ transformed into the BMK frame.
 Working with datasets
 ----------------------
 
+Datasets that ship with Gepard are all collected in the Python dictionary
+``g.dset``, where keys are ID numbers of datasets. Detailed description
+of available datasets will be :ref:`here<sec-data_sets>`.
+
+There is utility function ``g.list_data`` that gives short tabular description
+of sets with given IDs:
+
 .. code-block:: python
 
    >>> g.list_data(list(range(47, 54)))
@@ -110,7 +118,9 @@ Working with datasets
    [ 53]   HERMES  36      BTSA  1004.0177 Table 4
 
 
-In first column above are ID numbers of a given dataset. They should be unique!
+In first column above are ID numbers of a given dataset.
+Another utility function, ``g.describe_data`` gives short tabular description
+of given ``DataSet``:
 
 .. code-block:: python
 
@@ -153,3 +163,133 @@ Also, for some datasets there are dedicated plots, like
    >>> import gepard.plots
    >>> from gepard.fits import th_KM15, th_KM10b
    >>> gepard.plots.H1ZEUS(lines=[th_KM15, th_KM10b]).show()
+
+
+.. _sec-datafiles:
+
+Dataset files
+-------------
+
+Each dataset that ships with Gepard is stored in the single
+ASCII file. User can add their own data files by placing them
+in some separate directory, say ``mydatafiles``, and adding an empty file named
+``__init__.py`` to this directory, which makes data files into proper Python modules. 
+(Read about Python's library ``importlib_resources`` for details.)
+
+This directory has to be in Python
+module search path. Current working directory (where you start Python, can be
+displayed in IPython or Jupyter by issuing ``%pwd``, is usually in the
+search path, and user can explicitely add some other directory to the path like this:
+
+.. code-block:: python
+
+   >>> import sys
+   >>> sys.path.append('<path to mydatafiles>')
+
+Then datafile is available to be imported, and there is a utility
+function ``g.data.loaddata`` that parses all files in the directory
+and creates corresponding ``DataSet`` objects:
+
+.. code-block:: python
+
+   >>> mydset = g.data.loaddata(mydatafiles)  # doctest: +SKIP
+
+Now ``mydset`` is analogous to ``g.dset``.
+
+Data files are meant to be readable by both human and computer and follow
+the following rules:
+
+
+**Syntactic rules**:
+
+#. Empty lines and lines starting with
+   hash sign (``#``) are ignored by parser
+   and can be used for comments meant
+   for human readers.
+#. First part of the file is a  *preamble*, consisting of lines with structure
+
+     .. code-block::
+
+        key = value
+
+   where ``key`` should be regular computer
+   variable identifier, i. e., should consist only
+   of letters and numbers (no spaces), and should not start
+   with a number. These keys will become attributes of ``DataPoint`` object
+   and can be accessed using dot ``.`` operator, like this:
+
+     .. code-block:: python
+
+        >>> pt = g.dset[52][0]   # first point of this dataset
+        >>> pt.collaboration
+        'HERMES'
+
+#. second and final part of the file is just a *grid* of numbers.
+
+
+.. _tab-data_syntax:
+
+**Semantic rules**:
+
+#. There is world-unique ID number of the file,
+   given by key ``id``, and name of the
+   person who created the file, given by key
+   ``editor``. If there are further edits
+   by other people keys such as ``editor2`` can be used.
+#. Other information describing origin of the
+   data can be given using keys such as
+   ``collaboration``, ``year``, ``reference``,
+   etc. These keys can be used for automatic plots generation.
+#. Coordinate frame used is given by
+   key ``frame``, equal to either ``Trento``
+   or ``BMK``.
+#. Scattering process is described using keys
+   ``in1particle``, ``in2particle``, ...
+   ``out1particle``, ... , set equal to
+   usual symbols for HEP particle names (``e`` for electron,
+   ``p`` for proton, ...).
+#. Kinematical and polarization properties of
+   a particle ``in1`` are then given using keywords
+   ``in1energy``, ``in1polarizationvector`` (``L``
+   for longitudinal, ``T`` for transversal,
+   ``U`` or unspecified for unpolarized) etc.
+#. Key ``in1polarization`` describes the amount
+   of polarization and is set to 1 if
+   polarization is 100% or if measurements are
+   already renormalized to take into account
+   smaller polarization (which they mostly are).
+#. Sign of ``in1polarization`` describes how the
+   asymmetries are formed, by giving polarization of the
+   first term in the asymmetry numerator (and similarly for ``in1charge``).
+#. For convenience, type of the process is summarized
+   by keys ``process`` (equal to ``ep2epgamma``
+   for leptoproduction of photon, ``gammastarp2gammap`` for DVCS,
+   ``gammastarp2rho0p`` for DVMP of rho0, etc.)
+   and ``exptype`` (equal to ``fixed target`` or ``collider``).
+#. Finally, columns of numbers grid are described in the preamble
+   using keys such as ``x1name`` giving the column
+   variable and ``x1value = columnK``,
+   where ``K`` is the corresponding grid column number 
+   counting from 1.
+   Here ``x1``, ``x2``, ..., are used for 
+   kinematics (*x-axes*,
+   such as :math:`x_{\rm B}`, :math:`\Q^2`, :math:`t`, :math:`\phi`),
+   while ``y1`` is for the measured observable.
+#. Units should be specified by keys such as ``in1unit``,
+   and in particular for angles it should be stated whether
+   their unit is ``deg`` or ``rad``.
+#. Uncertainties are given by keys such as ``y1error`` etc., as displayed in
+   the example below.
+#. For Fourier harmonics, special column names are used:
+   ``FTn`` for harmonic of azimuthal angle :math:`\phi` between lepton
+   and reaction plane and ``varFTn`` for harmonic
+   of azimuthal angle :math:`\phi_S` of target polarization vector. Then
+   in the grid, positive numbers 0, 1, 2, ... denote
+   :math:`\cos 0\phi`, :math:`\cos\phi`, :math:`\cos 2\phi`, ... harmonics,
+   while negative numbers -1, -2, ... denote
+   :math:`\sin\phi`, :math:`\sin 2\phi`, ... harmonics.
+#. If some kinematical value is common to the whole data
+   set then instead of ``x1value = columnK`` we can
+   specify, e. g., ``x1value = 0.36``.
+#. Names for observables are standardized. and given in :ref:`table<tab-observables>`.
+
