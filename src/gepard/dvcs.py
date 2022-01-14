@@ -15,8 +15,8 @@ from .kinematics import weight_BH
 class DVCS(theory.Theory):
     """DVCS observables base class.
 
-    Implements cross-section for electroproduction of real photon, and derived
-    cross-sections, asymmetries, chi-squares etc.
+    Implements cross-section for electroproduction of polarized real photon,
+    on polarized nucleon target, as well as derived cross-sections and  asymmetries.
     Subclasses should, as their methods, implement expressions for squared
     BH, interference and squared DVCS amplitudes:
     - TBH2unp, TINTunp, TDVCS2unp  (for unpolarized target)
@@ -33,37 +33,52 @@ class DVCS(theory.Theory):
     """
 
     def PreFacSigma(self, pt):
-        """ Prefactor of 4-fold XS. 
+        """Overall prefactor of 4-fold XS.
 
         Take prefactor in Eq(22) times 2pi because of proton Phi integration
         and times y/Q2 because of dy -> dQ2. Convert to nanobarns.
 
         """
-        return alpha**3 * pt.xB * pt.y**2 / (8. * pi * pt.Q2**2 * 
+        return alpha**3 * pt.xB * pt.y**2 / (8. * pi * pt.Q2**2 *
                                              sqrt(1.+pt.eps2)) * GeV2nb
 
-
-    def XS(self, pt, **kwargs):
+    def XS(self, pt: data.DataPoint, **kwargs) -> float:
         """Differential 4-fold e p --> e p gamma cross section.
 
+        Args:
+            pt: DataPoint instance
+            vars (dict): dict which can override pt kinematics, e.g., vars={'phi': 0}
+            flip (string, list): flip the sign of pt attribute,
+                                 e.g., flip='in1polarization'
+
+        This is for calculation of fully beam and target polarized cross-section.
+        Most of usually measured cross-sections and asymmetries are derived from this.
+
+        Todo:
+            * transversal target BMK/Trento switching
+
         """
-        # Overriding pt kinematics with those from kwargs
+        # We create new instance of data.Datapoint, which can be manipulated with
+        # without messing up the original pt.
+
+        # Overriding pt kinematics with those from 'vars' keyword attribute
         if 'vars' in kwargs:
-            ptvars = data.DataPoint(init=kwargs['vars'])
-            data._fill_kinematics(ptvars, old=pt)
-            kin = ptvars
+            kin = data.DataPoint(init=kwargs['vars'])
+            data._fill_kinematics(kin, old=pt)
         else:
             kin = pt.copy()
 
         # Copy non-kinematical info
-        for atr in ['in1charge', 'in1polarization', 'in2polarization', 'in2particle',
+        for atr in ['in1charge', 'in1polarizationvector', 'in1polarization',
+                    'in2polarizationvector', 'in2polarization', 'in2particle',
                     'process', 'exptype', 'in1energy', 'in2energy', 'yaxis']:
             if atr in pt:
                 setattr(kin, atr, getattr(pt, atr))
 
+        # Pre-calculate some kinematical functions
         kin.prepare()
 
-        # Flipping spins and/or charges for asymmetries
+        # Flipping spins and/or charges for asymmetries, if asked for
         if 'flip' in kwargs and kwargs['flip']:
             if isinstance(kwargs['flip'], list):
                 for item in kwargs['flip']:
@@ -71,29 +86,29 @@ class DVCS(theory.Theory):
             else:
                 setattr(kin, kwargs['flip'], - getattr(pt, kwargs['flip']))
 
-        # Weighting the integrand by BH propagators
+        # Weighting the integrand by BH propagators, if asked for
         if 'weighted' in kwargs and kwargs['weighted']:
             wgh = weight_BH(kin)
         else:
             wgh = 1
 
         # Finally, we build up the cross-section
-        # 1. unpolarized target part
+        # 1. -- unpolarized target part --
         aux = self.TBH2unp(kin) + self.TINTunp(kin) + self.TDVCS2unp(kin)
         if hasattr(pt, 'in2polarizationvector'):
-            # 2. longitudinally polarized target part
+            # 2. -- longitudinally polarized target part --
             if pt.in2polarizationvector == 'L':
                 aux += kin.in2polarization*(
                         self.TBH2LP(kin) + self.TINTLP(kin) + self.TDVCS2LP(kin))
             elif pt.in2polarizationvector == 'T':
-            # 3. transversally polarized target part
-            # We directly take cos(varphi) or sin(varphi) terms depending if
-            # varFTn is specified
+                # 3. -- transversally polarized target part --
+                # We directly take cos(varphi) or sin(varphi) terms depending if
+                # varFTn is specified
                 if hasattr(pt, 'varFTn'):
                     # FIXME: should deal properly with Trento/BKM differences
                     # Also, this gives result in Trento convention now,
                     # and is completely O.K. for Trento asymmetries
-                    #kin.varphi = (3*pt.varFTn+1)*pi/4.  # pi for cos, -pi/2 for sin
+                    # kin.varphi = (3*pt.varFTn+1)*pi/4.  # pi for cos, -pi/2 for sin
                     # And this is for BMK
                     kin.varphi = (1-pt.varFTn)*pi/4.  # 0 for cos, pi/2 for sin
                 aux += kin.in2polarization*(
@@ -104,27 +119,26 @@ class DVCS(theory.Theory):
                 raise ValueError('in2polarizationvector must be L, T, or U!')
         return wgh * self.PreFacSigma(kin) * aux
 
-
     def XUL(self, pt, **kwargs):
-        """ Differential cross section - part for transversely polarized target."""
+        """Cross-section on longitudinally polarized target."""
         assert pt.in2polarizationvector == 'L'
         pol = kwargs.copy()
-        pol.update({'flip':'in2polarization'})
-        o =  self.XS(pt, **kwargs)
-        f =  self.XS(pt, **pol)
+        pol.update({'flip': 'in2polarization'})
+        o = self.XS(pt, **kwargs)
+        f = self.XS(pt, **pol)
         return (o-f)/2.
 
     def XUT(self, pt, **kwargs):
-        """Differential cross section - part for transversely polarized target."""
+        """Cross-section on transversally polarized target."""
         assert pt.in2polarizationvector == 'T'
         pol = kwargs.copy()
         pol.update({'flip': 'in2polarization'})
-        o =  self.XS(pt, **kwargs)
-        f =  self.XS(pt, **pol)
+        o = self.XS(pt, **kwargs)
+        f = self.XS(pt, **pol)
         return (o-f)/2
 
     def _XDVCStApprox(self, pt):
-        """Partial DVCS cross section w.r.t. Mandelstam t.
+        """Partial DVCS (gamma* p -> gamma p) cross section differential in t.
 
         Approx. formula used in NPB10 paper.
         """
@@ -134,13 +148,11 @@ class DVCS(theory.Theory):
         res = 260.5633976788416 * W2 * (
                 (ImH**2 + ReH**2)
                 - pt.t/(4.*Mp2)*(ReE**2 + ImE**2)) / (
-            (W2 + pt.Q2) * (2.0 * W2 + pt.Q2)**2 )
+            (W2 + pt.Q2) * (2.0 * W2 + pt.Q2)**2)
         return res
 
-
     def _XDVCStEx(self, pt):
-        """Partial DVCS cross section w.r.t. Mandelstam t."""
-
+        """Partial DVCS (gamma* p -> gamma p) cross section differential in t."""
         eps2 = 4. * pt.xB**2 * Mp2 / pt.Q2
         if cff.HybridCFF in self.__class__.mro():
             # For hybrid models we cannot ask for cff() since self gets misinterpreted
@@ -151,41 +163,85 @@ class DVCS(theory.Theory):
         else:
             ReH, ImH, ReE, ImE, ReHt, ImHt, ReEt, ImEt = self.m.cff(pt)
         res = 65.14079453579676 * (pt.xB**2 / pt.Q2**2 / (1-pt.xB) / (2-pt.xB)**2 /
-                sqrt(1 + eps2) * (
+                                   sqrt(1 + eps2) * (
                     4 * (1 - pt.xB) * (ImH**2 + ReH**2)
-                - pt.xB**2 * (ReE**2+ImE**2 + 2*ReE*ReH + 2*ImE*ImH)
-                - (2-pt.xB)**2 * pt.t/4/Mp2*(ImE**2+ReE**2)))
+                    - pt.xB**2 * (ReE**2+ImE**2 + 2*ReE*ReH + 2*ImE*ImH)
+                    - (2-pt.xB)**2 * pt.t/4/Mp2*(ImE**2+ReE**2)))
         return res
 
+    # Choice of what is actually used:
     # _XDVCSt = _XDVCStApprox
     _XDVCSt = _XDVCStEx
 
-## General assymetries
-## TODO: Lot of code duplication here - this should be united in one clever function
+    def XSintphi(self, pt, **kwargs):
+        """XS integrated over azimuthal angle.
+
+        Todo:
+            This is unnecessary function. Should be changed to XUU.
+        """
+        mem = pt.__dict__.pop('FTn', None)
+        pt.FTn = 0
+        res = self.BSS(pt, **kwargs)
+        # restore old value if needed
+        if mem:
+            pt.in2polarization = mem
+        return 2*pi*res
 
     def _phiharmonic(self, fun, pt, **kwargs):
-        """Return fun evaluated for phi=pt.phi, or harmonic of fun
-        corresponding to pt.FTn.
-
-        """
+        """Return fun evaluated for phi=pt.phi, or proper harmonic."""
         if 'phi' in pt or ('vars' in kwargs
-                and 'phi' in kwargs['vars']):
+                           and 'phi' in kwargs['vars']):
             return fun(pt, **kwargs)
         elif 'FTn' in pt:
             if pt.FTn < 0:
-                res = quadrature.Hquadrature(lambda phi:
-                        fun(pt, vars={'phi':phi}, **kwargs) * sin(-pt.FTn*phi), 0, 2*pi)
+                res = quadrature.Hquadrature(
+                          lambda phi: fun(pt, vars={'phi': phi}, **kwargs)
+                          * sin(-pt.FTn*phi), 0, 2*pi)
             elif pt.FTn > 0:
-                res = quadrature.Hquadrature(lambda phi:
-                        fun(pt, vars={'phi':phi}, **kwargs) * cos(pt.FTn*phi), 0, 2*pi)
+                res = quadrature.Hquadrature(
+                          lambda phi: fun(pt, vars={'phi': phi}, **kwargs)
+                          * cos(pt.FTn*phi), 0, 2*pi)
             elif pt.FTn == 0:
-                res = quadrature.Hquadrature(lambda phi:
-                        fun(pt, vars={'phi':phi}, **kwargs), 0, 2*pi)/2.
+                res = quadrature.Hquadrature(
+                          lambda phi: fun(pt, vars={'phi': phi}, **kwargs), 0, 2*pi)/2
             else:
-                raise ValueError('FTn = % is weird!' % str(pt.FTn))
-            return  res / pi
+                raise ValueError('FTn = {} looks wrong!'.format(str(pt.FTn)))
+            return res / pi
         else:
-            raise ValueError('[%s] has neither azimuthal angle phi nor harmonic FTn defined!' % pt)
+            raise ValueError(
+              '{} has neither azimuthal angle phi nor harmonic FTn defined!'.format(pt))
+
+# Observables: cross-sections
+
+    def _BSD(self, pt, **kwargs):
+        R = kwargs.copy()
+        R.update({'flip': 'in1polarization'})
+        return (self.XS(pt, **kwargs) - self.XS(pt, **R)) / 2
+
+    def BSD(self, pt, **kwargs):
+        """4-fold beam helicity-dependent cross section (BSDw)."""
+        return self._phiharmonic(self._BSD, pt, **kwargs)
+
+    def BSDw(self, pt, **kwargs):
+        """Weighted 4-fold beam helicity-dependent cross section (BSDw)."""
+        kwargs['weighted'] = True
+        return self._phiharmonic(self.BSD, pt, **kwargs)
+
+    def _BSS(self, pt, **kwargs):
+        R = kwargs.copy()
+        R.update({'flip': 'in1polarization'})
+        return (self.XS(pt, **kwargs) + self.XS(pt, **R)) / 2
+
+    def BSS(self, pt, **kwargs):
+        """4-fold beam helicity-independent cross section (BSS)."""
+        return self._phiharmonic(self._BSS, pt, **kwargs)
+
+    def BSSw(self, pt, **kwargs):
+        """Weighted 4-fold beam helicity-independent cross section (BSDw)."""
+        kwargs['weighted'] = True
+        return self._phiharmonic(self.BSS, pt, **kwargs)
+
+# Observables:  assymetries
 
     def _TSA(self, pt, **kwargs):
         """Target spin asymmetry (transversal or longitudinal)."""
@@ -276,36 +332,6 @@ class DVCS(theory.Theory):
     def ALTBHDVCS(self, pt, **kwargs):
         """Calculate {A_LT,BHDVCS} as defined by HERMES 1106.2990 Eq. (18) or its harmonics."""
         return self._phiharmonic(self._CBTSA, pt, chargepar=+1, **kwargs)
-
-    def _BSD(self, pt, **kwargs):
-        """Calculate 4-fold helicity-dependent cross section"""
-
-        R = kwargs.copy()
-        R.update({'flip':'in1polarization'})
-        return (self.XS(pt, **kwargs) - self.XS(pt, **R)) / 2
-
-    def BSD(self, pt, **kwargs):
-        """Calculate beam spin difference (BSD) or its harmonics."""
-        return self._phiharmonic(self._BSD, pt, **kwargs)
-
-    def _BSS(self, pt, **kwargs):
-        """4-fold helicity-independent cross section"""
-        R = kwargs.copy()
-        R.update({'flip':'in1polarization'})
-        return (self.XS(pt, **kwargs) + self.XS(pt, **R)) / 2
-
-    def XSintphi(self, pt, **kwargs):
-        """Return XS integrated over azimuthal angle"""
-        mem = pt.__dict__.pop('FTn', None)
-        pt.FTn = 0
-        res = self.BSS(pt, **kwargs)
-        # restore old value if needed
-        if mem: pt.in2polarization = mem
-        return 2*pi*self.BSS(pt, **kwargs)
-
-    def BSS(self, pt, **kwargs):
-        """Calculate beam spin sum (BSS) or its harmonics."""
-        return self._phiharmonic(self._BSS, pt, **kwargs)
 
     def _ALUI(self, pt, **kwargs):
         """Calculate BSA as defined by HERMES 0909.3587 Eq. (2.2) """
@@ -461,6 +487,8 @@ class DVCS(theory.Theory):
         """Beam charge-spin asymmetry as measured by COMPASS. """
         return  self.BCSD(pt, **kwargs) / self.BCSS(pt, **kwargs)
 
+# Observables:  ad-hoc, one-off stuff
+
     def BCA0minusr1(self, pt):
         return self.BCAcos0(pt) - pt.r * self.BCAcos1(pt)
 
@@ -479,16 +507,6 @@ class DVCS(theory.Theory):
             return self.ReCCALINTunp(pt) + self.ReDELCCALINTunp(pt)
         elif pt.FTn == 1:
             return self.ReCCALINTunp(pt)
-
-    def BSDw(self, pt, **kwargs):
-        """Calculate weighted beam spin difference (BSD) or its harmonics."""
-        kwargs['weighted'] = True
-        return self._phiharmonic(self.BSD, pt, **kwargs)
-
-    def BSSw(self, pt, **kwargs):
-        """Calculate weighted beam spin sum (BSS) or its harmonics."""
-        kwargs['weighted'] = True
-        return self._phiharmonic(self.BSS, pt, **kwargs)
 
     def XwA(self, pt):
         """Ratio of first two cos harmonics of w-weighted cross section. In BMK, not Trento??"""
