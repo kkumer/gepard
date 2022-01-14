@@ -40,6 +40,10 @@ pt1.in2polarization = 1
 pt1.phi = 2.*np.pi/5.
 # pt1.prepare(Approach.BM10)
 
+# unpolarized testing data point for BM10
+pt2 = g.data.dset[33][-1].copy()
+pt2.phi = 2.*np.pi/5.
+
 # testing data points for BM10 and long. TSA and BTSA
 ptt = g.data.dset[52][6].copy()
 # ptt.prepare(Approach.BM10)
@@ -106,45 +110,45 @@ def test_CFF2(th_BM10):
     assert th_BM10.ReH(pt1) == approx(-3.8889361918326872)
 
 
-def test_Xunp(th_BMK):
-    """Calculate basic cross section Xunp."""
-    assert th_BMK.Xunp(pt0, vars={'phi': 1.}) == approx(1.8872666478756337)
-    ar = th_BMK.Xunp(pt0, vars={'phi': np.array([0.3, 1.1])})
+def test_XS(th_BMK):
+    """Calculate basic cross section XS."""
+    assert th_BMK.XS(pt0, vars={'phi': 1.}) == approx(1.8872666478756337)
+    ar = th_BMK.XS(pt0, vars={'phi': np.array([0.3, 1.1])})
     assert isinstance(ar, np.ndarray)
     assert ar[0] == approx(1.4413231946120821)
     assert ar[1] == approx(1.9763350136864286)
 
 
-def test_Xunp2(th_BMK):
+def test_XS_2(th_BMK):
     """Any kinematic variable can be in vars."""
-    assert th_BMK.Xunp(pt0,
+    assert th_BMK.XS(pt0,
                   vars={'phi': 1., 'xB': 0.07}) == approx(3.0168274215074025)
 
 
 @mark.skip(reason='Feature not implemented.')
-def test_Xunp3(th_BMK):
+def test_XS_3(th_BMK):
     """A ndarray of Q2 could be in vars."""
-    ar = th_BMK.Xunp(pt0, vars={'phi': 1, 'Q2': np.array([2.3, 2.5])})
+    ar = th_BMK.XS(pt0, vars={'phi': 1, 'Q2': np.array([2.3, 2.5])})
     assert isinstance(ar, np.ndarray)
     assert ar[0] == approx(1.9769930014185824)
     assert ar[1] == approx(2.0929323473733308)
 
 
 @mark.skip(reason='Feature not implemented.')
-def test_Xunp4(th_BMK):
+def test_XS_4(th_BMK):
     """New feature: ndarray of any kinematical variable could be in vars."""
-    ar = th_BMK.Xunp(pt0, vars={'phi': 1, 'xB': np.array([0.07, 0.11])})
+    ar = th_BMK.XS(pt0, vars={'phi': 1, 'xB': np.array([0.07, 0.11])})
     assert isinstance(ar, np.ndarray)
     assert ar[1] == approx(0.68881435298587579)
 
 
-def test_XunpBM10(th_BM10):
-    """Calculate unpolarized cross section Xunp in BM10 Approach."""
-    pt1.prepare()
-    assert th_BM10.PreFacSigma(pt1)*th_BM10.TBH2unp(pt1) == approx(0.01502937358336803)
-    assert th_BM10.PreFacSigma(pt1)*th_BM10.TDVCS2unp(pt1) == approx(0.012565093106990456)
-    assert th_BM10.PreFacSigma(pt1)*th_BM10.TINTunp(pt1) == approx(0.0011255158978939425)
-    assert th_BM10.Xunp(pt1) == approx(0.028719982588252427)
+def test_XS_unp_BM10(th_BM10):
+    """Calculate unpolarized cross section in BM10 Approach."""
+    pt2.prepare()
+    assert th_BM10.PreFacSigma(pt2)*th_BM10.TBH2unp(pt2) == approx(0.01502937358336803)
+    assert th_BM10.PreFacSigma(pt2)*th_BM10.TDVCS2unp(pt2) == approx(0.012565093106990456)
+    assert th_BM10.PreFacSigma(pt2)*th_BM10.TINTunp(pt2) == approx(0.0011255158978939425)
+    assert th_BM10.XS(pt2) == approx(0.028719982588252427)
 
 
 def test_XLP(th_BM10):

@@ -41,6 +41,11 @@ class DataPoint(dict):
 
     All necessary information about kinematics, is contained in attributes. E.g.
 
+    `yaxis` -- name of observable measured
+    `xaxes` -- names of kinematical x-axes of data
+    `collaboration` -- name of experimenatal collaboration
+    `units` -- dictionary with pysical units of variables
+    `newunits` -- dictionary with internal pysical units of variables
     `xB` -- x_Bjorken
     `Q2` -- squared momentum of virtual photon
     `val` -- measurement value
@@ -51,20 +56,7 @@ class DataPoint(dict):
     `errplus` --  total positive error
     `errplus` --  total negative error
 
-    Information that is common to all data of a given dataset (i.e.
-    which is contained in a preamble of datafile is accessible
-    via `dataset` attribute:
-
-    `dataset.yaxis` -- name of observable measured
-    `dataset.xaxes` -- names of kinematical x-axes of data
-    `dataset.collaboration` -- name of experimenatal collaboration
-    `dataset.units` -- dictionary with pysical units of variables
-    `dataset.newunits` -- dictionary with internal pysical units of variables
-
-    For user's and programmer's convenience, these `dataset` attributes
-    are also inherited by `DataPoint` objects, so `point.dataset.yaxis == point.yaxis`
     """
-
     xB: float
     Q2: float
     W: float

@@ -53,14 +53,7 @@ class DVCS(theory.Theory):
             data._fill_kinematics(ptvars, old=pt)
             kin = ptvars
         else:
-            # just copy everything from pt
-            ptempty = data.DataPoint()
-            data._fill_kinematics(ptempty, old=pt)
-            kin = ptempty
-            # Nothing seems to be gained by the following approach:
-            # kin = dict((i, getattr(pt, i)) for i in
-            #        ['xB', 'Q2', 'W', 's', 't', 'mt', 'phi', 'in1charge',
-            #            'in1polarization', 'in2particle'])
+            kin = pt.copy()
 
         # Copy non-kinematical info
         for atr in ['in1charge', 'in1polarization', 'in2polarization', 'in2particle',
@@ -69,10 +62,6 @@ class DVCS(theory.Theory):
                 setattr(kin, atr, getattr(pt, atr))
 
         kin.prepare()
-
-        # For efficient calculation of XS with unpolarized beam
-        if 'zeropolarized' in kwargs and kwargs['zeropolarized']:
-            kin.in1polarization = 0
 
         # Flipping spins and/or charges for asymmetries
         if 'flip' in kwargs and kwargs['flip']:
@@ -109,25 +98,12 @@ class DVCS(theory.Theory):
                     kin.varphi = (1-pt.varFTn)*pi/4.  # 0 for cos, pi/2 for sin
                 aux += kin.in2polarization*(
                         self.TBH2TP(kin) + self.TINTTP(kin) + self.TDVCS2TP(kin))
+            elif pt.in2polarizationvector == 'U':
+                pass
             else:
-                raise ValueError('in2polarizationvector must be either L or T!')
+                raise ValueError('in2polarizationvector must be L, T, or U!')
         return wgh * self.PreFacSigma(kin) * aux
 
-
-    def Xunp(self, pt, **kwargs):
-        """ Calculate 4-fold differential cross section for unpolarized target.
-
-        This is a convenience function that calculates XS as if the target were
-        unpolarized even if it is i.e. if pt.in2polarization has some value.
-
-        """
-        # set target polarization to zero, but first write it down
-        mem = pt.__dict__.pop('in2polarization', None)
-        pt.in2polarization = 0
-        res = self.XS(pt, **kwargs)
-        # restore old value
-        if mem: pt.in2polarization = mem
-        return res
 
     def XLP(self, pt, **kwargs):
         """ Differential cross section - part for transversely polarized target."""
@@ -308,8 +284,7 @@ class DVCS(theory.Theory):
 
         R = kwargs.copy()
         R.update({'flip':'in1polarization'})
-        return ( self.Xunp(pt, **kwargs)
-                - self.Xunp(pt, **R) ) / 2.
+        return (self.XS(pt, **kwargs) - self.XS(pt, **R)) / 2
 
     def BSD(self, pt, **kwargs):
         """Calculate beam spin difference (BSD) or its harmonics."""
@@ -319,8 +294,7 @@ class DVCS(theory.Theory):
         """4-fold helicity-independent cross section"""
         R = kwargs.copy()
         R.update({'flip':'in1polarization'})
-        return ( self.Xunp(pt, **kwargs)
-                + self.Xunp(pt, **R) ) / 2.
+        return (self.XS(pt, **kwargs) + self.XS(pt, **R)) / 2
 
     def XSintphi(self, pt, **kwargs):
         """Return XS integrated over azimuthal angle"""
@@ -455,14 +429,11 @@ class DVCS(theory.Theory):
     def _BCA(self, pt, **kwargs):
         """Calculate beam charge asymmetry (BCA)."""
 
-        kwargs.update({'zeropolarized':True})
-        R = kwargs.copy()
-        R.update({'flip':'in1charge'})
-        return (
-           self.Xunp(pt, **kwargs)
-             - self.Xunp(pt, **R) )/(
-           self.Xunp(pt, **kwargs )
-             + self.Xunp(pt, **R) )
+        chg = kwargs.copy()
+        chg.update({'flip':'in1charge'})
+        o =  self.XS(pt, **kwargs)
+        c =  self.XS(pt, **chg)
+        return (o - c) / (o + c)
         # optimized formula (remove parts which cancel anyway)
         # return  self.TINTunp(pt, phi, 0, 1) / (
         #               self.TBH2unp(pt, phi) + self.TDVCS2unp(pt, phi) )
@@ -480,15 +451,13 @@ class DVCS(theory.Theory):
         """4-fold beam charge-spin cross section difference measured by COMPASS """
         R = kwargs.copy()
         R.update({'flip':['in1polarization', 'in1charge']})
-        return (self.Xunp(pt, **kwargs)
-                - self.Xunp(pt, **R))/2.
+        return (self.XS(pt, **kwargs) - self.XS(pt, **R)) / 2
 
     def BCSS(self, pt, **kwargs):
         """4-fold beam charge-spin cross section sum measured by COMPASS. """
         R = kwargs.copy()
         R.update({'flip':['in1polarization', 'in1charge']})
-        return (self.Xunp(pt, **kwargs)
-                + self.Xunp(pt, **R))/2.
+        return (self.XS(pt, **kwargs) + self.XS(pt, **R)) /2
 
     def BCSA(self, pt, **kwargs):
         """Beam charge-spin asymmetry as measured by COMPASS. """

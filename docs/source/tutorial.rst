@@ -130,7 +130,6 @@ Finally, one could calculate and then plot some particular CFF, like this:
    ...     pt = g.DataPoint({'xi': xi, 't': -0.2, 'Q2': 4})
    ...     ims.append(xi*th.ImH(pt))
    ...     res.append(xi*th.ReH(pt))
-   >>>
    >>> plt.plot(xis, ims, label='Im(H)')  # doctest: +SKIP
    >>> plt.plot(xis, res, label='Re(H)')  # doctest: +SKIP
    >>> plt.xlabel(r'$\xi$', fontsize=14)  # doctest: +SKIP
