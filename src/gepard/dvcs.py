@@ -105,25 +105,23 @@ class DVCS(theory.Theory):
         return wgh * self.PreFacSigma(kin) * aux
 
 
-    def XLP(self, pt, **kwargs):
+    def XUL(self, pt, **kwargs):
         """ Differential cross section - part for transversely polarized target."""
-        pt.in2polarizationvector = 'L'
-        pt.in2polarization = 1
+        assert pt.in2polarizationvector == 'L'
         pol = kwargs.copy()
         pol.update({'flip':'in2polarization'})
         o =  self.XS(pt, **kwargs)
         f =  self.XS(pt, **pol)
         return (o-f)/2.
 
-    def XTP(self, pt, **kwargs):
+    def XUT(self, pt, **kwargs):
         """Differential cross section - part for transversely polarized target."""
-        pt.in2polarizationvector = 'T'
-        pt.in2polarization = 1
+        assert pt.in2polarizationvector == 'T'
         pol = kwargs.copy()
         pol.update({'flip': 'in2polarization'})
         o =  self.XS(pt, **kwargs)
         f =  self.XS(pt, **pol)
-        return (o-f)/2.
+        return (o-f)/2
 
     def _XDVCStApprox(self, pt):
         """Partial DVCS cross section w.r.t. Mandelstam t.

@@ -52,7 +52,7 @@ represented as ``H(eta, t)`` function of skewedness :math:`\eta` and
 momentum transfer squared :math:`t`, which returns the two-dimensional
 array of numbers with the shape :math:`npts \times 4`, where :math:`npts` is
 the number of points on the Mellin-Barnes contour (which defines the
-Compton form factors (CFFs)), and the four flavors are:
+Compton form factors (CFFs)), and the 4 flavors are:
 
    - singlet quark
    - gluon

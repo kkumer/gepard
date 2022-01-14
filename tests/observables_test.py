@@ -36,9 +36,7 @@ pt0.FTn = -1
 
 # testing data point for BM10
 pt1 = g.data.dset[33][-1].copy()
-pt1.in2polarization = 1
 pt1.phi = 2.*np.pi/5.
-# pt1.prepare(Approach.BM10)
 
 # unpolarized testing data point for BM10
 pt2 = g.data.dset[33][-1].copy()
@@ -54,6 +52,7 @@ ptb = g.data.dset[53][3].copy()
 pttrans = ptt.copy()
 pttrans.phi = 0.5
 pttrans.in2polarizationvector = 'T'
+pttrans.in2polarization = 1
 pttrans.varFTn = 1
 
 # testing data point for wBSS
@@ -151,23 +150,29 @@ def test_XS_unp_BM10(th_BM10):
     assert th_BM10.XS(pt2) == approx(0.028719982588252427)
 
 
-def test_XLP(th_BM10):
-    """Calculate long. polarized cross section XLP in BM10 Approach."""
-    pt1.prepare()
-    assert th_BM10.PreFacSigma(pt1)*th_BM10.TBH2LP(pt1) == approx(0.009495908777414035)
-    assert th_BM10.PreFacSigma(pt1)*th_BM10.TDVCS2LP(pt1) == approx(-0.0032470111398419628)
-    assert th_BM10.PreFacSigma(pt1)*th_BM10.TINTLP(pt1) == approx(0.0085102074298275109)
-    assert th_BM10.XLP(pt1) == approx(0.014759105067399584)
+def test_XUL(th_BM10):
+    """Calculate long. polarized target cross section XUL in BM10 Approach."""
+    pt = pt1.copy()
+    pt.in2polarizationvector = 'L'
+    pt.in2polarization = 1
+    pt.prepare()
+    assert th_BM10.PreFacSigma(pt)*th_BM10.TBH2LP(pt) == approx(0.009495908777414035)
+    assert th_BM10.PreFacSigma(pt)*th_BM10.TDVCS2LP(pt) == approx(-0.0032470111398419628)
+    assert th_BM10.PreFacSigma(pt)*th_BM10.TINTLP(pt) == approx(0.0085102074298275109)
+    assert th_BM10.XUL(pt) == approx(0.014759105067399584)
 
 
-def test_XTP(th_BMK):
-    """Calculate transv. polarized cross section XTP in BMK Approach."""
-    pt1.varphi = 1.
-    pt1.prepare()
-    assert th_BMK.PreFacSigma(pt1)*th_BMK.TBH2TP(pt1) == approx(0.0021662047872426475)
-    assert th_BMK.PreFacSigma(pt1)*th_BMK.TDVCS2TP(pt1) == approx(-0.0021305191589529025)
-    assert th_BMK.PreFacSigma(pt1)*th_BMK.TINTTP(pt1) == approx(-0.0098483713204748375)
-    assert th_BMK.XTP(pt1) == approx(-0.009812685692185092)
+def test_XUT(th_BMK):
+    """Calculate transv. polarized target cross section XUT in BMK Approach."""
+    pt = pt1.copy()
+    pt.varphi = 1.
+    pt.in2polarizationvector = 'T'
+    pt.in2polarization = 1
+    pt.prepare()
+    assert th_BMK.PreFacSigma(pt)*th_BMK.TBH2TP(pt) == approx(0.0021662047872426475)
+    assert th_BMK.PreFacSigma(pt)*th_BMK.TDVCS2TP(pt) == approx(-0.0021305191589529025)
+    assert th_BMK.PreFacSigma(pt)*th_BMK.TINTTP(pt) == approx(-0.0098483713204748375)
+    assert th_BMK.XUT(pt) == approx(-0.009812685692185092)
 
 
 def test_BSA(th_BMK):
