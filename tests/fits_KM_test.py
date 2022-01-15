@@ -52,7 +52,7 @@ def test_KM10b():
 def test_KMM12():
     """Test model: KMM12."""
     AULptsOLD = TSA1points[:4] + data[54]  # data[54] are not independent
-    pts = H1ZEUS + ALUIpts + BCApts + CLASptsOLD + BSDwpoints\
+    pts = H1ZEUS + ALUIpts + ACpts + CLASptsOLD + BSDwpoints\
             + AULptsOLD + ALLpts + AUTIpts + BSSwpoints
     chisq = th_KMM12.chisq(pts)
     # For difference to EPJA review, see comment for KM15 below
@@ -70,7 +70,7 @@ def test_AFKM12():
 def test_KM15():
     """Test model: KM15."""
     pts = GLO15b
-    #H1ZEUS + ALUIpts + BCApts + CLAS08pts + AULpts + ALLpts + AUTIpts + GLO15new
+    #H1ZEUS + ALUIpts + ACpts + CLAS08pts + AULpts + ALLpts + AUTIpts + GLO15new
     chisq = th_KM15.chisq(pts)
     # Number is slightly different from EPJA review due to change in
     # treatment of uncertainties of Hall A 2015 data 

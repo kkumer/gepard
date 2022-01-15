@@ -203,7 +203,7 @@ def listchis(ths, Q2cut=1., Q2max=1.e3, nsets=10, out='chis'):
     if not isinstance(ths, list): ths = [ths]
     from abbrevs import (C_BSD, C_BSS, H1ZEUS, H_BSD, H_BSS, ALLpts,
                          ALTGLO5points, ALUIpts, AULpts, AUTDVCSpts, AUTICSpts,
-                         AUTIpts, BCApts, BSACLAS_DMpoints, BSACLAS_KKpoints,
+                         AUTIpts, ACpts, BSACLAS_DMpoints, BSACLAS_KKpoints,
                          BSDwpoints, BSSwpoints, C_AULpts, C_BSDwpts,
                          C_BSSw0pts, C_BSSw1pts, CLAS14BSApts, CLAS14BTSApts,
                          CLAS14TSApts, CLASKKpts, CLASpts, CLASTSApts,
@@ -216,7 +216,7 @@ def listchis(ths, Q2cut=1., Q2max=1.e3, nsets=10, out='chis'):
     #ptssets[0] = [UNP5points, ALTGLO5points, data[25], data[8], BSDwpoints, BSSwpoints, TSA1points, BTSApoints, TPpoints]
     sets = {}
     sets[0] = [('H1ZEUS', 'X_DVCS', H1ZEUS), ('HERMES', 'ALUI', ALUIpts),
-            ('HERMES', 'BCA', BCApts), ('CLAS', 'BSA', CLASpts),
+            ('HERMES', 'AC', ACpts), ('CLAS', 'BSA', CLASpts),
             ('Hall A', 'BSDw', BSDwpoints), ('Hall A', 'BSSw', BSSwpoints),
             ('HRM/CLS', 'AUL', AULpts), ('HERMES', 'ALL', ALLpts),
             ('HERMES', 'AUTI', AUTIpts)]
@@ -234,7 +234,7 @@ def listchis(ths, Q2cut=1., Q2max=1.e3, nsets=10, out='chis'):
             ('CLAS14_KK', 'BSA', CLAS14BSApts),
             ('CLAS14_KK', 'TSA', CLAS14TSApts), 
             ('CLAS14_KK', 'BTSA', CLAS14BTSApts)]
-    sets[4] = [ ('HERMES', 'BCA', BCApts), 
+    sets[4] = [ ('HERMES', 'AC', ACpts), 
             ('HERMES', 'ALUI', ALUIpts),
             ('HERMES', 'AUL', H_AULpts), 
             ('HERMES', 'ALL', ALLpts),
@@ -244,7 +244,7 @@ def listchis(ths, Q2cut=1., Q2max=1.e3, nsets=10, out='chis'):
     sets[5] = [
             ('H1ZEUS', 'X_DVCS', H1ZEUS), 
             ('HERMES', 'ALUI', ALUIpts),
-            ('HERMES', 'BCA', BCApts),
+            ('HERMES', 'AC', ACpts),
             ('HRM/CLS', 'AUL', AULpts), ('HERMES', 'ALL', ALLpts),
             ('HERMES', 'AUTI', AUTIpts),
             ('CLAS', 'BSA', CLAS14BSApts),
@@ -270,7 +270,7 @@ def listchis(ths, Q2cut=1., Q2max=1.e3, nsets=10, out='chis'):
             ('Hall A', 'BSS_c1', H_BSS1pts)
             ]
     sets[8] = [('HERMES', 'ALUI', ALUIpts),
-            ('HERMES', 'BCA', BCApts), ('CLAS', 'BSA', CLASpts),
+            ('HERMES', 'AC', ACpts), ('CLAS', 'BSA', CLASpts),
             ('Hall A', 'BSDw', BSDwpoints), ('Hall A', 'BSSw', BSSwpoints),
             ('HERMES', 'AUTI', AUTIpts)]
     sets[9] = [
@@ -289,7 +289,7 @@ def listchis(ths, Q2cut=1., Q2max=1.e3, nsets=10, out='chis'):
     sets[10] = [
             ('H1ZEUS', 'X_DVCS', H1ZEUS), 
             ('HERMES', 'ALUI', ALUIpts),
-            ('HERMES', 'BCA', BCApts),
+            ('HERMES', 'AC', ACpts),
             ('HRM/CLS', 'AUL', AULpts), 
 	    ('HERMES', 'ALL', ALLpts),
             ('HERMES', 'AUTI', AUTIpts),

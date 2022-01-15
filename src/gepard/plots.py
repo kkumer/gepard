@@ -265,10 +265,10 @@ def thline(th, pts, ex_pt, npts=16):
 #################################################################
 
 
-def HERMES09BCA(path=None, fmt='png', **kwargs):
-    """Plot HERMES 09 BCA."""
+def HERMES09AC(path=None, fmt='png', **kwargs):
+    """Plot HERMES 09 AC."""
     id = 32
-    title = 'HERMES 09 BCA'
+    title = 'HERMES 09 AC'
     fig = plt.figure()
     fig.suptitle(title)
     xaxes = ['tm', 'xB', 'Q2']
@@ -286,7 +286,7 @@ def HERMES09BCA(path=None, fmt='png', **kwargs):
     return fig
 
 def HERMES12(path=None, fmt='png', **kwargs):
-    """Plot HERMES combined BCA and BSA data with fit lines."""
+    """Plot HERMES combined AC and BSA data with fit lines."""
 
     title = ''
     fig = plt.figure(figsize=(14, 14))
@@ -414,9 +414,9 @@ def HERMES12t(lines=None, path=None, fmt='png'):
     return fig
 
 
-def HERMES12BCA(path=None, fmt='png', **kwargs):
-    """Plot HERMES combined BCA data with fit lines."""
-    title = 'HERMES-12-BCA'
+def HERMES12AC(path=None, fmt='png', **kwargs):
+    """Plot HERMES combined AC data with fit lines."""
+    title = 'HERMES-12-AC'
     fig = plt.figure()
     fig.suptitle(title)
     xaxes = ['tm', 'xB', 'Q2']
@@ -433,7 +433,7 @@ def HERMES12BCA(path=None, fmt='png', **kwargs):
                 # Leave labels only on leftmost panels
                 ax.set_ylabel('')
             else:
-                ylabels = ['$BCA\\; \\cos 0\\phi$', '$BCA\\; \\cos \\phi$', '$BCA\\; \\cos 2\\phi$']
+                ylabels = ['$AC\\; \\cos 0\\phi$', '$AC\\; \\cos \\phi$', '$AC\\; \\cos 2\\phi$']
                 ax.set_ylabel(ylabels[int((npanel-1)/3)], fontsize=18)
             if npanel < 7:
                 # Leave labels only on lowest panels
@@ -491,7 +491,7 @@ def HERMES12BSA(path=None, fmt='png', **kwargs):
     return fig
 
 def HERMES09(path=None, fmt='png', **kwargs):
-    """Plot HERMES 0909.3587 BCA and BSA data with fit lines."""
+    """Plot HERMES 0909.3587 AC and BSA data with fit lines."""
 
     #ids = [2, 4, 5]
     title = ''#HERMES-09'

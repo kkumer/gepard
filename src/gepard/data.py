@@ -404,7 +404,7 @@ class DataSet(list):
         `preamble` is dictionary obtained by converting datafile preamble
         items into dictionary items like this:
 
-            y1 = BCA from datafile goes into   {'y1' : 'BCA', ...}
+            y1 = AC from datafile goes into   {'y1' : 'AC', ...}
 
         `data` is actual numerical grid of experimental data converted
         into list of lists

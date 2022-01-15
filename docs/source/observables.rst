@@ -87,7 +87,7 @@ as methods of theory objects, or ``yaxis`` attributes of datapoints.
      - beam spin difference a.k.a helicity dependent XS
    * - ``BSDw``
      - BSD weighted by BH propagator
-   * - ``BCA``
+   * - ``AC``
      - beam charge asymmetry
    * - ``BSA``
      - beam spin asymmetry

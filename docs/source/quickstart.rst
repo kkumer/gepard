@@ -90,7 +90,7 @@ User can also calculate other observables, like beam charge asymmetry
 
 .. code-block:: python
 
-   >>> th_KM15.BCA(pt)
+   >>> th_KM15.AC(pt)
    0.138049
 
 All implemented observables are listed :ref:`here<tab-observables>`.

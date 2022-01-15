@@ -450,8 +450,8 @@ class DVCS(theory.Theory):
 
     BSA = BSAold
 
-    def _BCA(self, pt, **kwargs):
-        """Calculate beam charge asymmetry (BCA)."""
+    def _AC(self, pt, **kwargs):
+        """Calculate beam charge asymmetry (AC)."""
 
         chg = kwargs.copy()
         chg.update({'flip':'in1charge'})
@@ -462,9 +462,9 @@ class DVCS(theory.Theory):
         # return  self.TINTunp(pt, phi, 0, 1) / (
         #               self.TBH2unp(pt, phi) + self.TDVCS2unp(pt, phi) )
 
-    def BCA(self, pt, **kwargs):
-        """Calculate beam charge asymmetry (BCA) or its harmonics."""
-        res = self._phiharmonic(self._BCA, pt, **kwargs)
+    def AC(self, pt, **kwargs):
+        """Calculate beam charge asymmetry (AC) or its harmonics."""
+        res = self._phiharmonic(self._AC, pt, **kwargs)
         # FIXME: the following has to be dealt with during
         # conventions translation, and not here?
         #if pt.has_key('FTn') and (pt.FTn == 1 or pt.FTn == 3):
@@ -489,8 +489,8 @@ class DVCS(theory.Theory):
 
 # Observables:  ad-hoc, one-off stuff
 
-    def BCA0minusr1(self, pt):
-        return self.BCAcos0(pt) - pt.r * self.BCAcos1(pt)
+    def AC0minusr1(self, pt):
+        return self.ACcos0(pt) - pt.r * self.ACcos1(pt)
 
     def BSDw2C(self, pt):
         """Im(C^I) as defined by HALL A """

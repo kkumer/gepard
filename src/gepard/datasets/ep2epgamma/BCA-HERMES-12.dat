@@ -29,10 +29,10 @@ out3particle = gamma
 
 
 ### Observable 
-# BCA A^{cos FTn*phi}_{C} 
+# AC A^{cos FTn*phi}_{C} 
 
 y1namelong = Beam Charge Azimuthal Asymmetry
-y1name = BCA 
+y1name = AC 
 y1unit = 1
 y1value = column5
 y1errorstatistic = column6 

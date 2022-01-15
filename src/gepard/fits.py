@@ -21,10 +21,10 @@ H1ZEUSindependentNEW = data.dset[45] + data.dset[39] + data.dset[63] + data.dset
 H1ZEUS = H1ZEUSindependentNEW + utils.select(data.dset[47], criteria=['Q2 >= 4.0'])
 
 ALUIpoints = utils.select(data.dset[68], criteria=['FTn == -1'])  # HERMES
-BCA0points = utils.select(data.dset[67], criteria=['FTn == 0'])  # HERMES
-BCA1points = utils.select(data.dset[67], criteria=['FTn == 1'])  # HERMES
+AC0points = utils.select(data.dset[67], criteria=['FTn == 0'])  # HERMES
+AC1points = utils.select(data.dset[67], criteria=['FTn == 1'])  # HERMES
 ALUIpts = ALUIpoints[:6]
-BCApts = BCA0points[:6] + BCA1points[:6]
+ACpts = AC0points[:6] + AC1points[:6]
 
 TSA1points = utils.select(data.dset[52], criteria=['FTn == -1'])  # HERMES A_UL
 H_AULpts = TSA1points[:4]
@@ -41,7 +41,7 @@ CLAS08pts = utils.select(data.dset[81], criteria=['FTn == -1'])[-3:]
 
 GLO15new = data.dset[94]+data.dset[95]+data.dset[96]+data.dset[101]+data.dset[102]+data.dset[116]+data.dset[117]
 
-GLO15b = H1ZEUS + ALUIpts + BCApts + CLAS08pts + AULpts + ALLpts + AUTIpts + GLO15new
+GLO15b = H1ZEUS + ALUIpts + ACpts + CLAS08pts + AULpts + ALLpts + AUTIpts + GLO15new
 
 
 class KM09(eff.DipoleEFF, cff.DispersionFixedPoleCFF, dvcs.hotfixedBMK):
