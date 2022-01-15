@@ -552,7 +552,7 @@ def HERMES10LP(obs='TSA', path=None, fmt='png', **kwargs):
         harmonics = [-1, -2, -3]
         fun = 'sin'
         lbl = 'A_{UL}'
-    elif obs == 'BTSA':
+    elif obs == 'ALL':
         id = 53
         harmonics = [0, 1, 2]
         fun = 'cos'
@@ -702,11 +702,11 @@ def CLAS14(obs='ALU', path=None, fmt='png', **kwargs):
         dataset = data.DataSet(utils.select(data.dset[86], criteria=['FTn == -2']))
         lbl = '$A_{UL}^{\\sin2\\phi}$'
         ymin, ymax = -0.1, 0.32
-    elif obs == 'BTSA0':
+    elif obs == 'ALL0':
         dataset = data.DataSet(utils.select(data.dset[87], criteria=['FTn == 0']))
         lbl = '$A_{LL}^{\\cos0\\phi}$'
         ymin, ymax = 0, 0.8
-    elif obs == 'BTSA1':
+    elif obs == 'ALL1':
         dataset = data.DataSet(utils.select(data.dset[87], criteria=['FTn == 1']))
         lbl = '$A_{LL}^{\\cos\\phi}$'
         ymin, ymax = -0.3, 0.3
@@ -737,7 +737,7 @@ def CLAS14(obs='ALU', path=None, fmt='png', **kwargs):
         plt.xlim(0.0, 0.6)
         plt.ylim(ymin, ymax)
         ax.yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))
-        if obs == 'TSA2' or obs == 'BTSA1':
+        if obs == 'TSA2' or obs == 'ALL1':
             ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
         if np == 2:
                 ax.legend(loc='upper left', borderaxespad=0.).draw_frame(0)
@@ -772,11 +772,11 @@ def CLAS15(obs='ALU', path=None, fmt='png', **kwargs):
         dataset = data.dset[95]
         lbl = '$A_{UL}^{\\sin\\phi}$'
         ymin, ymax = 0, 0.49
-    elif obs == 'BTSA0':
+    elif obs == 'ALL0':
         dataset = data.DataSet(utils.select(data.dset[96], criteria=['FTn == 0']))
         lbl = '$A_{LL}^{\\cos0\\phi}$'
         ymin, ymax = 0, 0.85
-    elif obs == 'BTSA1':
+    elif obs == 'ALL1':
         dataset = data.DataSet(utils.select(data.dset[96], criteria=['FTn == 1']))
         lbl = '$A_{LL}^{\\cos\\phi}$'
         ymin, ymax = -0.35, 0.35
@@ -812,7 +812,7 @@ def CLAS15(obs='ALU', path=None, fmt='png', **kwargs):
         plt.ylim(ymin, ymax)
         ax.yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))
         ax.yaxis.set_minor_locator(matplotlib.ticker.MultipleLocator(0.02))
-        if obs == 'BTSA1':
+        if obs == 'ALL1':
             ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
         if npanel == 3:
                 # Create legend here, but draw it on last panel
