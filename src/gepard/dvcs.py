@@ -334,7 +334,7 @@ class DVCS(theory.Theory):
         return self._phiharmonic(self._CBTSA, pt, chargepar=+1, **kwargs)
 
     def _ALUI(self, pt, **kwargs):
-        """Calculate BSA as defined by HERMES 0909.3587 Eq. (2.2) """
+        """Calculate ALU as defined by HERMES 0909.3587 Eq. (2.2) """
         pol = kwargs.copy()
         pol.update({'flip':'in1polarization'})
         chg = kwargs.copy()
@@ -348,11 +348,11 @@ class DVCS(theory.Theory):
         return ((o-p) - (c-b)) / ((o+p) + (c+b))
 
     def ALUI(self, pt, **kwargs):
-        """Calculate BSA as defined by HERMES 0909.3587 Eq. (2.2) or its harmonics."""
+        """Calculate ALU as defined by HERMES 0909.3587 Eq. (2.2) or its harmonics."""
         return self._phiharmonic(self._ALUI, pt, **kwargs)
 
     def _ALUDVCS(self, pt, **kwargs):
-        """Calculate BSA as defined by HERMES 0909.3587 Eq. (2.3) """
+        """Calculate ALU as defined by HERMES 0909.3587 Eq. (2.3) """
 
         pol = kwargs.copy()
         pol.update({'flip':'in1polarization'})
@@ -367,7 +367,7 @@ class DVCS(theory.Theory):
         return ((o-p) + (c-b)) / ((o+p) + (c+b))
 
     def ALUDVCS(self, pt, **kwargs):
-        """Calculate BSA as defined by HERMES 0909.3587 Eq. (2.3) or its harmonics."""
+        """Calculate ALU as defined by HERMES 0909.3587 Eq. (2.3) or its harmonics."""
         return self._phiharmonic(self._ALUDVCS, pt, **kwargs)
 
     def _AUTI(self, pt, **kwargs):
@@ -408,47 +408,47 @@ class DVCS(theory.Theory):
         """Calculate TTSA as defined by HERMES 0802.2499 Eq. (15) or its phi-harmonics."""
         return self._phiharmonic(self._AUTDVCS, pt, **kwargs)
 
-    def _BSA(self, pt, **kwargs):
-        """Calculate beam spin asymmetry (BSA)."""
+    def _ALU(self, pt, **kwargs):
+        """Calculate beam spin asymmetry (ALU)."""
         return self.BSD(pt, **kwargs) / self.BSS(pt, **kwargs)
 
-    def BSAold(self, pt, **kwargs):
-        """Calculate beam spin asymmetry (BSA) or its harmonics."""
+    def ALUold(self, pt, **kwargs):
+        """Calculate beam spin asymmetry (ALU) or its harmonics."""
         if 'phi' in pt:
-            return self._BSA(pt, **kwargs)
+            return self._ALU(pt, **kwargs)
         elif 'FTn' in pt and pt.FTn == -1:
             # FIXME: faster shortcut (approximate!)
             if 'vars' in kwargs:
                 kwargs['vars'].update({'phi':pi/2.})
             else:
                 kwargs['vars'] = {'phi':pi/2.}
-            return  self._BSA(pt, **kwargs)
+            return  self._ALU(pt, **kwargs)
         else:
             raise ValueError('[%s] has neither azimuthal angle phi\
  nor harmonic FTn = -1 defined!' % pt)
         ### Exact but slower:
             #res = g.quadrature.Hquadrature(lambda phi:
-            #        self._BSA(pt, vars={'phi':phi}) * sin(phi), 0, 2*pi)
+            #        self._ALU(pt, vars={'phi':phi}) * sin(phi), 0, 2*pi)
             #return  res / pi
 
-    def BSAexact(self, pt, **kwargs):
-        """Calculate beam spin asymmetry (BSA) or its harmonics."""
+    def ALUexact(self, pt, **kwargs):
+        """Calculate beam spin asymmetry (ALU) or its harmonics."""
         if 'phi' in pt:
-            return self._BSA(pt, **kwargs)
+            return self._ALU(pt, **kwargs)
         elif 'FTn' in pt and pt.FTn == -1:
             res = quadrature.Hquadrature(lambda phi:
-                    self._BSA(pt, vars={'phi':phi}) * sin(phi), 0, 2*pi)
+                    self._ALU(pt, vars={'phi':phi}) * sin(phi), 0, 2*pi)
         else:
             raise ValueError('[%s] has neither azimuthal angle phi\
  nor harmonic FTn == -1 defined!' % pt)
         return res / pi
 
-    def BSAnew(self, pt, **kwargs):
-        """Calculate beam spin asymmetry (BSA) or its harmonics."""
-        res = self._phiharmonic(self._BSA, pt, **kwargs)
+    def ALUnew(self, pt, **kwargs):
+        """Calculate beam spin asymmetry (ALU) or its harmonics."""
+        res = self._phiharmonic(self._ALU, pt, **kwargs)
         return  res
 
-    BSA = BSAold
+    ALU = ALUold
 
     def _AC(self, pt, **kwargs):
         """Calculate beam charge asymmetry (AC)."""

@@ -1,7 +1,7 @@
 id = 103
 editor = DM
 # 04/29/2015
-# BSA is calculated from BSD/BSS of id = 33 and id = 34  files 
+# ALU is calculated from BSD/BSS of id = 33 and id = 34  files 
 # errors are separately added in quadrature
 # 05/01/2015
 # bug fixed in error propagation 
@@ -39,7 +39,7 @@ out3particle = gamma
 
 ### Observable 
 
-y1name = BSA 
+y1name = ALU 
 y1namelong = Beam Spin Asymmetry 
 # or Beam Spin Difference over Beam Spin Sum
 y1unit = 1
@@ -71,7 +71,7 @@ x4value = column2
 
 ### Data 
 table = 
-#t   phi      BSDovBSA      sta         sys
+#t   phi      BSDovALU      sta         sys
 ###########################################################
 0.17    7.5     0.0520376   0.0291277   0.00425055
 0.17    22.5    0.00840203  0.0296311   0.000686297

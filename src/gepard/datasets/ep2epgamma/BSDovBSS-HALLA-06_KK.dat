@@ -34,7 +34,7 @@ out3particle = gamma
 
 ### Observable 
 y1long = Beam spin assymetry
-y1name = BSA
+y1name = ALU
 y1unit = 1
 y1value = column3
 y1errorstatistic = column4
@@ -63,7 +63,7 @@ x4value = column2
 
 ### Data
 table=
-#  tm  FTn    BSA     stat  avgsyst
+#  tm  FTn    ALU     stat  avgsyst
 #####################################
  0.17    0  -0.0012  0.0079  0.0078
  0.17    1  -0.0077  0.0110  0.0078

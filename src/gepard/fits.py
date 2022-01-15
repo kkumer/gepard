@@ -12,7 +12,7 @@ DVCSpoints = data.dset[36] + data.dset[37] + data.dset[38] + data.dset[39] + \
 
 H1ZEUSpoints = DVCSpoints + data.dset[48]
 
-ALTGLO5points = data.dset[5] + data.dset[8] + data.dset[32][18:]   # DM's CLAS BSA
+ALTGLO5points = data.dset[5] + data.dset[8] + data.dset[32][18:]   # DM's CLAS ALU
 BSDwpoints = utils.select(data.dset[50], criteria=['FTn == -1'])
 BSSwpoints = utils.select(data.dset[51], criteria=['FTn>=0', 'FTn <= 1'])
 UNP5points = ALTGLO5points + BSSwpoints + BSDwpoints

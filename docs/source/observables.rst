@@ -89,7 +89,7 @@ as methods of theory objects, or ``yaxis`` attributes of datapoints.
      - BSD weighted by BH propagator
    * - ``AC``
      - beam charge asymmetry
-   * - ``BSA``
+   * - ``ALU``
      - beam spin asymmetry
    * - ``ALUI``
      - beam spin asymmetry, interference part

@@ -286,7 +286,7 @@ def HERMES09AC(path=None, fmt='png', **kwargs):
     return fig
 
 def HERMES12(path=None, fmt='png', **kwargs):
-    """Plot HERMES combined AC and BSA data with fit lines."""
+    """Plot HERMES combined AC and ALU data with fit lines."""
 
     title = ''
     fig = plt.figure(figsize=(14, 14))
@@ -452,10 +452,10 @@ def HERMES12AC(path=None, fmt='png', **kwargs):
     return fig
 
 
-def HERMES12BSA(path=None, fmt='png', **kwargs):
-    """Plot HERMES combined BSA data with fit lines."""
+def HERMES12ALU(path=None, fmt='png', **kwargs):
+    """Plot HERMES combined ALU data with fit lines."""
 
-    title = 'HERMES-12-BSA'
+    title = 'HERMES-12-ALU'
     fig = plt.figure()
     fig.suptitle(title)
     xaxes = ['tm', 'xB', 'Q2']
@@ -491,7 +491,7 @@ def HERMES12BSA(path=None, fmt='png', **kwargs):
     return fig
 
 def HERMES09(path=None, fmt='png', **kwargs):
-    """Plot HERMES 0909.3587 AC and BSA data with fit lines."""
+    """Plot HERMES 0909.3587 AC and ALU data with fit lines."""
 
     #ids = [2, 4, 5]
     title = ''#HERMES-09'
@@ -644,7 +644,7 @@ def HERMES08TP(path=None, fmt='png', **kwargs):
     return fig
 
 def CLAS(path=None, fmt='png', **kwargs):
-    """Makes plot of CLAS BSA data with fit lines and bands"""
+    """Makes plot of CLAS ALU data with fit lines and bands"""
 
     dataset = utils.select(data.dset[25], criteria=['Q2 > 1.57'])
     #dataset = data[25]
@@ -685,12 +685,12 @@ def CLAS(path=None, fmt='png', **kwargs):
         #fig.show()
     return fig
 
-def CLAS14(obs='BSA', path=None, fmt='png', **kwargs):
-    """Makes plot of CLAS-14 BSA data with fit lines and bands"""
+def CLAS14(obs='ALU', path=None, fmt='png', **kwargs):
+    """Makes plot of CLAS-14 ALU data with fit lines and bands"""
 
     title = ''
     title = 'CLAS (prelim. 2014)'
-    if obs == 'BSA':
+    if obs == 'ALU':
         dataset = data.dset[85]
         lbl = '$A_{LU}^{\\sin\\phi}$'
         ymin, ymax = 0, 0.4
@@ -758,11 +758,11 @@ def CLAS14(obs='BSA', path=None, fmt='png', **kwargs):
         #fig.show()
     return fig
 
-def CLAS15(obs='BSA', path=None, fmt='png', **kwargs):
+def CLAS15(obs='ALU', path=None, fmt='png', **kwargs):
     """Makes plot of CLAS 2015 data with fit lines and bands"""
 
     title = 'CLAS 2015 (Pisano:2015iqa)'
-    if obs[:3] == 'BSA':
+    if obs[:3] == 'ALU':
         dataset = data.dset[94]
         lbl = '$A_{LU}^{\\sin\\phi}$'
         ymin, ymax = 0, 0.49
@@ -800,7 +800,7 @@ def CLAS15(obs='BSA', path=None, fmt='png', **kwargs):
             panelset.append(ptd)
             panel(ax, points=panelset, xaxis='tm', kinlabels=['Q2', 'xB'], **kwargs)
         else:
-            if obs == 'BSAOLD':
+            if obs == 'ALUOLD':
                 panel(ax, points=[panelset, oldpanels[npanel]], xaxis='tm', kinlabels=['Q2', 'xB'], **kwargs)
             else:
                 panel(ax, points=panelset, xaxis='tm', kinlabels=['Q2', 'xB'], **kwargs)
@@ -953,7 +953,7 @@ def HERAF2(path=None, fmt='png', **kwargs):
     return fig
 
 def CLASJ(path=None, fmt='png', **kwargs):
-    """Makes plot of CLAS-14 BSA data with fit lines and bands.
+    """Makes plot of CLAS-14 ALU data with fit lines and bands.
        Some CLAS-07 data points are also plotted.
     """
 
@@ -1019,7 +1019,7 @@ def CLASJ(path=None, fmt='png', **kwargs):
 
 
 def CLAS08(path=None, fmt='png', **kwargs):
-    """Makes plot of CLAS 2008 BSA data with fit lines and bands"""
+    """Makes plot of CLAS 2008 ALU data with fit lines and bands"""
 
     title = ''
     title = 'CLAS (Gavalian:2008aa)'

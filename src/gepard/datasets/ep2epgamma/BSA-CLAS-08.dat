@@ -31,9 +31,9 @@ out3particle = gamma
 
 
 ### Observable 
-# A_{LU}, BSA
+# A_{LU}, ALU
 
-y1name = BSA
+y1name = ALU
 y1namelong = Beam Spin Asymmetry - Amplitude of Azimuthal Angle Harmonic sin(n phi)
 y1unit = 1
 y1value = column5

@@ -37,7 +37,7 @@ out3particle = gamma
 # A_{LU}
 
 
-y1name = BSA
+y1name = ALU
 y1namelong = Beam Spin Asymmetry
 y1unit = 1
 y1value = column5
@@ -67,9 +67,9 @@ x4value = column4
 
 ### Data
 #
-#  CLAS 2007 BSA
+#  CLAS 2007 ALU
 #
-# xB     Q2     -t     phi     BSA     stat
+# xB     Q2     -t     phi     ALU     stat
 ############################################
 0.1342 1.1661 0.1337 20.0258 -0.0429 0.1578
 0.1342 1.1661 0.1337 50.4962 0.1739 0.0424

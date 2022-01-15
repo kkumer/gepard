@@ -37,7 +37,7 @@ out3particle = gamma
 # A^{sin *phi}_{LU,I}  ??? CHECK!!
 
 y1namelong = Beam Spin Azimuthal Asymmetry - Harmonic Sin^1 Phi
-y1name = BSA
+y1name = ALU
 y1unit = 1
 y1value = column5
 y1error = column6 

@@ -175,9 +175,9 @@ def test_XUT(th_BMK):
     assert th_BMK.XUT(pt) == approx(-0.009812685692185092)
 
 
-def test_BSA(th_BMK):
-    """Calculate BSA in BMK Approach."""
-    assert th_BMK.BSA(pt0) == approx(0.1845304070958366)
+def test_ALU(th_BMK):
+    """Calculate ALU in BMK Approach."""
+    assert th_BMK.ALU(pt0) == approx(0.1845304070958366)
     assert th_BMK.ALUI(pt0) == approx(0.1819945876282851)
 
 

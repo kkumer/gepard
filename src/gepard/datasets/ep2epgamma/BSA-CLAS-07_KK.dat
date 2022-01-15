@@ -4,7 +4,7 @@ editor1 = DM
 # Feb. 2010
 # modified naming scheme
 
-## data were obtained from the BSA_CLAS-07 data set
+## data were obtained from the ALU_CLAS-07 data set
 
 
 ### Experiment
@@ -36,9 +36,9 @@ out3particle = gamma
 
 
 ### Observable 
-# A_{LU}, BSA
+# A_{LU}, ALU
 
-y1name = BSA
+y1name = ALU
 y1namelong = Beam Spin Asymmetry - Amplitude of Azimuthal Angle Harmonic sin(n phi)
 y1unit = 1
 y1value = column4
@@ -67,7 +67,7 @@ x4value = -1
 
 ### Data
 #
-#  CLAS 2007 BSA - F.T. by KK, after cut at t=0.51 GeV^2 
+#  CLAS 2007 ALU - F.T. by KK, after cut at t=0.51 GeV^2 
 #  (thus xB and Q2 of bins are slightly shifted w.r.t. CLAS)
 #  Those points which disagree with CLAS analysis
 #  are commented out below.

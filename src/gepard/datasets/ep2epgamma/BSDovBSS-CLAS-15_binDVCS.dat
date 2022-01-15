@@ -2,7 +2,7 @@ id = 104
 editor = DM
 # data restricted to DVCS kinematics Q2> 1.5 GeV^2 and -t/Q2 < 0.25
 # only data are taken where 18 bins and more are filled
-# BSA is calculated from BSD/BSS errors are separately added in quadrature
+# ALU is calculated from BSD/BSS errors are separately added in quadrature
 
 ### Experiment E145M2
 
@@ -35,7 +35,7 @@ out3particle = gamma
 # BSD
 
 
-y1name = BSA
+y1name = ALU
 y1namelong = Beam Spin Asymmetry
 y1unit = 1
 y1value = column5
@@ -66,7 +66,7 @@ x4value = column4
 #
 # CLAS 2015 BSD/BSS
 #
-#xB      Q2    -t  phi            BSA        stat      syst
+#xB      Q2    -t  phi            ALU        stat      syst
 ###########################################################
 table =
 0.185   1.62    0.11    9.53    0   0   0

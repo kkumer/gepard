@@ -5,7 +5,7 @@ editor1 = DM
 # modified naming scheme
 
 # this data for the amplitude of harmonic are obtained from a fit 
-# of the phi measurement by CLAS (BSA-CLAS-07)
+# of the phi measurement by CLAS (ALU-CLAS-07)
 
 ### Experiment
 
@@ -36,7 +36,7 @@ out3particle = gamma
 ### Observable 
 # A_{LU}(90 degrees) = a
 
-y1name = BSA
+y1name = ALU
 y1namelong = Beam Spin Azimuthal Asymmetry at 90 degrees
 y1unit = 1
 y1value = column4
@@ -64,7 +64,7 @@ x4value = 90
 
 ### Data
 #
-#  CLAS 2007 BSA
+#  CLAS 2007 ALU
 #
 # xB     Q2     -t       a     err
 ############################################

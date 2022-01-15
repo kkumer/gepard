@@ -24,7 +24,7 @@ def test_KM10():
     pts = H1ZEUSpoints + UNP5points
     chisq = th_KM10.chisq(pts)
     # assert_almost_equal(chisq, 135.85499940324056)
-    # # from BSA to ALUI
+    # # from ALU to ALUI
     # assert_almost_equal(chisq, 135.72627340347722)
     # # unclear why the diff
     assert chisq == approx(135.7650869105709)
@@ -36,7 +36,7 @@ def test_KM10a():
     pts = H1ZEUSpoints+ALTGLOpoints
     chisq = th_KM10a.chisq(pts)[0]
     #assert_almost_equal(chisq, 132.14636420551949)
-    # from BSA to ALUI
+    # from ALU to ALUI
     assert chisq == approx(129.18281370844684)
 
 
