@@ -334,7 +334,6 @@ class DVCS(theory.Theory):
         return self._phiharmonic(self._CBTSA, pt, chargepar=+1, **kwargs)
 
     def _ALUI(self, pt, **kwargs):
-        """Calculate ALU as defined by HERMES 0909.3587 Eq. (2.2) """
         pol = kwargs.copy()
         pol.update({'flip':'in1polarization'})
         chg = kwargs.copy()
@@ -348,7 +347,11 @@ class DVCS(theory.Theory):
         return ((o-p) - (c-b)) / ((o+p) + (c+b))
 
     def ALUI(self, pt, **kwargs):
-        """Calculate ALU as defined by HERMES 0909.3587 Eq. (2.2) or its harmonics."""
+        """Calculate beam spin asymmetry, interference part.
+
+        As defined by HERMES 0909.3587 Eq. (2.2).
+
+        """
         return self._phiharmonic(self._ALUI, pt, **kwargs)
 
     def _ALUDVCS(self, pt, **kwargs):
@@ -367,7 +370,11 @@ class DVCS(theory.Theory):
         return ((o-p) + (c-b)) / ((o+p) + (c+b))
 
     def ALUDVCS(self, pt, **kwargs):
-        """Calculate ALU as defined by HERMES 0909.3587 Eq. (2.3) or its harmonics."""
+        """Calculate beam spin asymmetry, DVCS part.
+
+        As defined by HERMES 0909.3587 Eq. (2.3).
+
+        """
         return self._phiharmonic(self._ALUDVCS, pt, **kwargs)
 
     def _AUTI(self, pt, **kwargs):

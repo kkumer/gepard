@@ -108,6 +108,10 @@ as methods of theory objects, or ``yaxis`` attributes of datapoints.
    * - ``ALTBHDVCS``
      - beam transversal target double spin asymmetry, BH-DVCS part
 
+Many of these observables can be evaluated both as differential in azimuthal
+angle :math:`\phi` (if the ``DataPoint`` argument has an attribute ``phi``),
+or as "harmonic", i. e., as Fourier integral over :math:`\phi` (if the
+``DataPoint`` argument has attribute ``FTn``).
 
 .. list-table:: DVMP observables
    :header-rows: 1
