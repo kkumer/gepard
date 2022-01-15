@@ -42,7 +42,7 @@ pt1.phi = 2.*np.pi/5.
 pt2 = g.data.dset[33][-1].copy()
 pt2.phi = 2.*np.pi/5.
 
-# testing data points for BM10 and long. TSA and ALL
+# testing data points for BM10 and long. TSA and BTSA
 ptt = g.data.dset[52][6].copy()
 # ptt.prepare(Approach.BM10)
 ptb = g.data.dset[53][3].copy()
@@ -186,9 +186,9 @@ def test_TSA(th_BM10):
     assert th_BM10.TSA(ptt) == approx(-0.47969623208934847)
 
 
-def test_ALL(th_BM10):
-    """Calculate longitudinal ALL in BM10 Approach."""
-    assert th_BM10.ALL(ptb) == approx(0.25592806446362842)
+def test_BTSA(th_BM10):
+    """Calculate longitudinal BTSA in BM10 Approach."""
+    assert th_BM10.BTSA(ptb) == approx(0.25592806446362842)
 
 
 def test_TTSA(th_BMK):

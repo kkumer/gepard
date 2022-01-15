@@ -101,7 +101,7 @@ as methods of theory objects, or ``yaxis`` attributes of datapoints.
      - transversal target spin asymmetry, interference part
    * - ``AUTDVCS``
      - transversal target spin asymmetry, DVCS part
-   * - ``ALL``
+   * - ``BTSA``
      - beam (longitudinal) target double spin asymmetry
    * - ``ALTI``
      - beam transversal target double spin asymmetry, interference part

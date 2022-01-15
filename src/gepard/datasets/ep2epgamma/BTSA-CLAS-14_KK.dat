@@ -39,7 +39,7 @@ out3particle = gamma
 # A_{LL}
 
 
-y1name = ALL
+y1name = BTSA
 y1namelong = Beam Spin Asymmetry
 y1unit = 1
 y1value = column5
@@ -69,7 +69,7 @@ x4value = column4
 
 ### Data
 #
-#  CLAS 2014 ALL
+#  CLAS 2014 BTSA
 #
 # xB     Q2     -t     FTn A_{LL}^cos(nphi) stat
 ###########################################################

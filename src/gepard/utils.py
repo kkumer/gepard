@@ -205,15 +205,15 @@ def listchis(ths, Q2cut=1., Q2max=1.e3, nsets=10, out='chis'):
                          ALTGLO5points, ALUIpts, AULpts, AUTDVCSpts, AUTICSpts,
                          AUTIpts, ACpts, ALUCLAS_DMpoints, ALUCLAS_KKpoints,
                          BSDwpoints, BSSwpoints, C_AULpts, C_BSDwpts,
-                         C_BSSw0pts, C_BSSw1pts, CLAS14ALUpts, CLAS14ALLpts,
+                         C_BSSw0pts, C_BSSw1pts, CLAS14ALUpts, CLAS14BTSApts,
                          CLAS14TSApts, CLASKKpts, CLASpts, CLASTSApts,
                          H17_BSDwpts, H17_BSSw0pts, H17_BSSw1pts,
                          H20_nBSSw0pts, H20_nBSSw1pts, H_AULpts, H_BSDpts,
                          H_BSDwpts, H_BSS0pts, H_BSS1pts, H_BSSw0pts,
                          H_BSSw1pts, UNP5points)
 
-    #exps[0] = ['UNP5points', 'ALTGLO5', 'CLAS', 'CLASDM', 'BSDw', 'BSSw', 'TSA1', 'ALL', 'TPpoints']
-    #ptssets[0] = [UNP5points, ALTGLO5points, data[25], data[8], BSDwpoints, BSSwpoints, TSA1points, ALLpoints, TPpoints]
+    #exps[0] = ['UNP5points', 'ALTGLO5', 'CLAS', 'CLASDM', 'BSDw', 'BSSw', 'TSA1', 'BTSA', 'TPpoints']
+    #ptssets[0] = [UNP5points, ALTGLO5points, data[25], data[8], BSDwpoints, BSSwpoints, TSA1points, BTSApoints, TPpoints]
     sets = {}
     sets[0] = [('H1ZEUS', 'X_DVCS', H1ZEUS), ('HERMES', 'ALUI', ALUIpts),
             ('HERMES', 'AC', ACpts), ('CLAS', 'ALU', CLASpts),
@@ -223,17 +223,17 @@ def listchis(ths, Q2cut=1., Q2max=1.e3, nsets=10, out='chis'):
     sets[1] = [('CLAS07_KK', 'ALU', ALUCLAS_KKpoints),
                ('CLAS14_KK', 'ALU', CLAS14ALUpts),
                ('CLAS14_KK', 'TSA', CLAS14TSApts), 
-               ('CLAS15_KK', 'ALL', CLAS14ALLpts)]
+               ('CLAS15_KK', 'BTSA', CLAS14BTSApts)]
     sets[2] = [('CLAS07_DM', 'ALU', ALUCLAS_DMpoints),
                ('CLAS06', 'TSA', CLASTSApts),
                ('CLAS14_KK', 'ALU', CLAS14ALUpts),
                ('CLAS14_KK', 'TSA', CLAS14TSApts), 
-               ('CLAS14_KK', 'ALL', CLAS14ALLpts)]
+               ('CLAS14_KK', 'BTSA', CLAS14BTSApts)]
     sets[3] = [('CLAS0708', 'ALU', CLASKKpts),
             ('CLAS', 'AUL', C_AULpts), 
             ('CLAS14_KK', 'ALU', CLAS14ALUpts),
             ('CLAS14_KK', 'TSA', CLAS14TSApts), 
-            ('CLAS14_KK', 'ALL', CLAS14ALLpts)]
+            ('CLAS14_KK', 'BTSA', CLAS14BTSApts)]
     sets[4] = [ ('HERMES', 'AC', ACpts), 
             ('HERMES', 'ALUI', ALUIpts),
             ('HERMES', 'AUL', H_AULpts), 
@@ -249,7 +249,7 @@ def listchis(ths, Q2cut=1., Q2max=1.e3, nsets=10, out='chis'):
             ('HERMES', 'AUTI', AUTIpts),
             ('CLAS', 'ALU', CLAS14ALUpts),
             ('CLAS', 'TSA', CLAS14TSApts), 
-            ('CLAS', 'ALL', CLAS14ALLpts),
+            ('CLAS', 'BTSA', CLAS14BTSApts),
             ('CLAS', 'BSDw_s1', C_BSDwpts), ('CLAS', 'BSSw_c0', C_BSSw0pts),
             ('CLAS', 'BSSw_c1', C_BSSw1pts),
             ('Hall A', 'BSDw_s1', H_BSDwpts), ('Hall A', 'BSSw_c0', H_BSSw0pts),
@@ -276,7 +276,7 @@ def listchis(ths, Q2cut=1., Q2max=1.e3, nsets=10, out='chis'):
     sets[9] = [
             ('CLAS', 'ALU', CLAS14ALUpts),
             ('CLAS', 'TSA', CLAS14TSApts), 
-            ('CLAS', 'ALL', CLAS14ALLpts),
+            ('CLAS', 'BTSA', CLAS14BTSApts),
             ('CLAS', 'BSDw_s1', C_BSDwpts), 
 	    ('CLAS', 'BSSw_c0', C_BSSw0pts),
             ('CLAS', 'BSSw_c1', C_BSSw1pts),
@@ -295,7 +295,7 @@ def listchis(ths, Q2cut=1., Q2max=1.e3, nsets=10, out='chis'):
             ('HERMES', 'AUTI', AUTIpts),
             ('CLAS', 'ALU', CLAS14ALUpts),
             ('CLAS', 'TSA', CLAS14TSApts), 
-            ('CLAS', 'ALL', CLAS14ALLpts),
+            ('CLAS', 'BTSA', CLAS14BTSApts),
             ('CLAS', 'BSDw_s1', C_BSDwpts), 
 	    ('CLAS', 'BSSw_c0', C_BSSw0pts),
             ('CLAS', 'BSSw_c1', C_BSSw1pts),
@@ -309,7 +309,7 @@ def listchis(ths, Q2cut=1., Q2max=1.e3, nsets=10, out='chis'):
     sets[11] = [
             ('CLAS', 'ALU', CLAS14ALUpts),
             ('CLAS', 'TSA', CLAS14TSApts), 
-            ('CLAS', 'ALL', CLAS14ALLpts),
+            ('CLAS', 'BTSA', CLAS14BTSApts),
             ('CLAS', 'BSDw_s1', C_BSDwpts), 
 	    ('CLAS', 'BSSw_c0', C_BSSw0pts),
             ('CLAS', 'BSSw_c1', C_BSSw1pts),

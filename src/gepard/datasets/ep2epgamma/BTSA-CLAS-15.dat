@@ -35,7 +35,7 @@ out3particle = gamma
 # A_{LL}
 
 
-y1name = ALL
+y1name = BTSA
 y1namelong = Double Spin Asymmetry
 y1unit = 1
 y1value = column5
@@ -63,9 +63,9 @@ x4value = column4
 
 ### Data
 #
-#  CLAS 2014 ALL (DSA)
+#  CLAS 2014 BTSA (DSA)
 #                               error
-# Q2    xB    -t   phi  ALL  stat  syst
+# Q2    xB    -t   phi  BTSA  stat  syst
 ###########################################################
 1.68  0.194  0.11   25  0.58  0.33  0.04
 1.68  0.190  0.12   60  0.34  0.16  0.13

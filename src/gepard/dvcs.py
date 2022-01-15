@@ -273,8 +273,8 @@ class DVCS(theory.Theory):
         """Target spin asymmetry (transversal or longitudinal) or its harmonics."""
         return self._phiharmonic(self._TSA, pt, **kwargs)
 
-    def _ALL(self, pt, **kwargs):
-        """Calculate beam-target spin asymmetry (ALL).
+    def _BTSA(self, pt, **kwargs):
+        """Calculate beam-target spin asymmetry (BTSA).
 
         According to 1004.0177 Eq. (1.8)
 
@@ -291,9 +291,9 @@ class DVCS(theory.Theory):
         b =  self.XS(pt, **both)
         return ((o+b) - (p+t)) / ((o+b) + (p+t))
 
-    def ALL(self, pt, **kwargs):
+    def BTSA(self, pt, **kwargs):
         """Calculate beam-target spin asymmetry or its harmonics."""
-        return self._phiharmonic(self._ALL, pt, **kwargs)
+        return self._phiharmonic(self._BTSA, pt, **kwargs)
 
     def _CBTSA(self, pt, chargepar=-1, **kwargs):
         """Calculate charge-beam spin-target spin asymmetry (CBTSA).

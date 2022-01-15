@@ -37,7 +37,7 @@ out3particle = gamma
 ### Observables 
 # A^{cos*phi}_{LL} A^{cos*2phi}_{LL} A^{cos*3phi}_{LL}
 
-y1name = ALL 
+y1name = BTSA 
 y1namelong = Beam Target Spin Asymmetry - Amplitude of Azimuthal Angle Harmonic sin(n phi)
 y1unit = 1
 y1value = column5

@@ -31,8 +31,8 @@ H_AULpts = TSA1points[:4]
 C_AULpts = data.dset[54][:3]
 AULpts = H_AULpts + C_AULpts
 
-ALLpoints = utils.select(data.dset[53], criteria=['FTn==0'])   # HERMES A_LL
-ALLpts = ALLpoints[:4]
+BTSApoints = utils.select(data.dset[53], criteria=['FTn==0'])   # HERMES A_LL
+ALLpts = BTSApoints[:4]
 
 AUTIpoints = utils.select(data.dset[66], criteria=['FTn==1'])  # \sin\varphi\cos\phi
 AUTIpts = AUTIpoints[:4]

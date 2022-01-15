@@ -115,7 +115,7 @@ of sets with given IDs:
    [ 50]    HALLA 288      BSDw    0607029 DFT analysis with MC error propagation by KK
    [ 51]    HALLA  96      BSSw    0607029 DFT analysis with MC error propagation by KK
    [ 52]   HERMES  36       TSA  1004.0177 Table 4
-   [ 53]   HERMES  36       ALL  1004.0177 Table 4
+   [ 53]   HERMES  36      BTSA  1004.0177 Table 4
 
 
 In first column above are ID numbers of a given dataset.
