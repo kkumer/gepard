@@ -55,7 +55,7 @@ def test_KM10b():
 def test_KMM12():
     """Test model: KMM12."""
     AULptsOLD = TSA1points[:4] + data[54]  # data[54] are not independent
-    pts = H1ZEUS + ALUIpts + ACpts + CLASptsOLD + BSDwpoints\
+    pts = H1ZEUS + ALUIpts + ACpts + CLASptsOLD + XLUwpoints\
             + AULptsOLD + ALLpts + AUTIpts + BSSwpoints
     chisq = th_KMM12.chisq(pts)
     # For difference to EPJA review, see comment for KM15 below

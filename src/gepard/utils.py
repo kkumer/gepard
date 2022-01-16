@@ -204,20 +204,20 @@ def listchis(ths, Q2cut=1., Q2max=1.e3, nsets=10, out='chis'):
     from abbrevs import (C_BSD, C_BSS, H1ZEUS, H_BSD, H_BSS, ALLpts,
                          ALTGLO5points, ALUIpts, AULpts, AUTDVCSpts, AUTICSpts,
                          AUTIpts, ACpts, ALUCLAS_DMpoints, ALUCLAS_KKpoints,
-                         BSDwpoints, BSSwpoints, C_AULpts, C_BSDwpts,
+                         XLUwpoints, BSSwpoints, C_AULpts, C_XLUwpts,
                          C_BSSw0pts, C_BSSw1pts, CLAS14ALUpts, CLAS14BTSApts,
                          CLAS14TSApts, CLASKKpts, CLASpts, CLASTSApts,
-                         H17_BSDwpts, H17_BSSw0pts, H17_BSSw1pts,
+                         H17_XLUwpts, H17_BSSw0pts, H17_BSSw1pts,
                          H20_nBSSw0pts, H20_nBSSw1pts, H_AULpts, H_BSDpts,
-                         H_BSDwpts, H_BSS0pts, H_BSS1pts, H_BSSw0pts,
+                         H_XLUwpts, H_BSS0pts, H_BSS1pts, H_BSSw0pts,
                          H_BSSw1pts, UNP5points)
 
-    #exps[0] = ['UNP5points', 'ALTGLO5', 'CLAS', 'CLASDM', 'BSDw', 'BSSw', 'TSA1', 'BTSA', 'TPpoints']
-    #ptssets[0] = [UNP5points, ALTGLO5points, data[25], data[8], BSDwpoints, BSSwpoints, TSA1points, BTSApoints, TPpoints]
+    #exps[0] = ['UNP5points', 'ALTGLO5', 'CLAS', 'CLASDM', 'XLUw', 'BSSw', 'TSA1', 'BTSA', 'TPpoints']
+    #ptssets[0] = [UNP5points, ALTGLO5points, data[25], data[8], XLUwpoints, BSSwpoints, TSA1points, BTSApoints, TPpoints]
     sets = {}
     sets[0] = [('H1ZEUS', 'X_DVCS', H1ZEUS), ('HERMES', 'ALUI', ALUIpts),
             ('HERMES', 'AC', ACpts), ('CLAS', 'ALU', CLASpts),
-            ('Hall A', 'BSDw', BSDwpoints), ('Hall A', 'BSSw', BSSwpoints),
+            ('Hall A', 'XLUw', XLUwpoints), ('Hall A', 'BSSw', BSSwpoints),
             ('HRM/CLS', 'AUL', AULpts), ('HERMES', 'ALL', ALLpts),
             ('HERMES', 'AUTI', AUTIpts)]
     sets[1] = [('CLAS07_KK', 'ALU', ALUCLAS_KKpoints),
@@ -250,37 +250,37 @@ def listchis(ths, Q2cut=1., Q2max=1.e3, nsets=10, out='chis'):
             ('CLAS', 'ALU', CLAS14ALUpts),
             ('CLAS', 'TSA', CLAS14TSApts), 
             ('CLAS', 'BTSA', CLAS14BTSApts),
-            ('CLAS', 'BSDw_s1', C_BSDwpts), ('CLAS', 'BSSw_c0', C_BSSw0pts),
+            ('CLAS', 'XLUw_s1', C_XLUwpts), ('CLAS', 'BSSw_c0', C_BSSw0pts),
             ('CLAS', 'BSSw_c1', C_BSSw1pts),
-            ('Hall A', 'BSDw_s1', H_BSDwpts), ('Hall A', 'BSSw_c0', H_BSSw0pts),
+            ('Hall A', 'XLUw_s1', H_XLUwpts), ('Hall A', 'BSSw_c0', H_BSSw0pts),
             ('Hall A', 'BSSw_c1', H_BSSw1pts)
             ]
     sets[6] = [
-            ('CLAS', 'BSDw_s1', C_BSDwpts), ('CLAS', 'BSSw_c0', C_BSSw0pts),
+            ('CLAS', 'XLUw_s1', C_XLUwpts), ('CLAS', 'BSSw_c0', C_BSSw0pts),
             ('CLAS', 'BSSw_c1', C_BSSw1pts),
-            ('Hall A', 'BSDw_s1', H_BSDwpts), ('Hall A', 'BSSw_c0', H_BSSw0pts),
+            ('Hall A', 'XLUw_s1', H_XLUwpts), ('Hall A', 'BSSw_c0', H_BSSw0pts),
             ('Hall A', 'BSSw_c1', H_BSSw1pts)
             ]
     sets[7] = [
-            ('CLAS', 'BSDw_s1', C_BSDwpts), ('CLAS', 'BSSw_c0', C_BSSw0pts),
+            ('CLAS', 'XLUw_s1', C_XLUwpts), ('CLAS', 'BSSw_c0', C_BSSw0pts),
             ('CLAS', 'BSSw_c1', C_BSSw1pts),
-            ('Hall A', 'BSDw_s1', H_BSDwpts), ('Hall A', 'BSSw_c0', H_BSSw0pts),
+            ('Hall A', 'XLUw_s1', H_XLUwpts), ('Hall A', 'BSSw_c0', H_BSSw0pts),
             ('Hall A', 'BSSw_c1', H_BSSw1pts),
             ('Hall A', 'BSD_s1', H_BSDpts), ('Hall A', 'BSS_c0', H_BSS0pts),
             ('Hall A', 'BSS_c1', H_BSS1pts)
             ]
     sets[8] = [('HERMES', 'ALUI', ALUIpts),
             ('HERMES', 'AC', ACpts), ('CLAS', 'ALU', CLASpts),
-            ('Hall A', 'BSDw', BSDwpoints), ('Hall A', 'BSSw', BSSwpoints),
+            ('Hall A', 'XLUw', XLUwpoints), ('Hall A', 'BSSw', BSSwpoints),
             ('HERMES', 'AUTI', AUTIpts)]
     sets[9] = [
             ('CLAS', 'ALU', CLAS14ALUpts),
             ('CLAS', 'TSA', CLAS14TSApts), 
             ('CLAS', 'BTSA', CLAS14BTSApts),
-            ('CLAS', 'BSDw_s1', C_BSDwpts), 
+            ('CLAS', 'XLUw_s1', C_XLUwpts), 
 	    ('CLAS', 'BSSw_c0', C_BSSw0pts),
             ('CLAS', 'BSSw_c1', C_BSSw1pts),
-            ('HallA 15', 'BSDw_s1', H_BSDwpts), 
+            ('HallA 15', 'XLUw_s1', H_XLUwpts), 
 	    ('HallA 15', 'BSSw_c0', H_BSSw0pts),
             ('HallA 15', 'BSSw_c1', H_BSSw1pts),
 	    ('HallA 17', 'BSSw_c0', H17_BSSw0pts),
@@ -296,13 +296,13 @@ def listchis(ths, Q2cut=1., Q2max=1.e3, nsets=10, out='chis'):
             ('CLAS', 'ALU', CLAS14ALUpts),
             ('CLAS', 'TSA', CLAS14TSApts), 
             ('CLAS', 'BTSA', CLAS14BTSApts),
-            ('CLAS', 'BSDw_s1', C_BSDwpts), 
+            ('CLAS', 'XLUw_s1', C_XLUwpts), 
 	    ('CLAS', 'BSSw_c0', C_BSSw0pts),
             ('CLAS', 'BSSw_c1', C_BSSw1pts),
-            ('HallA 15', 'BSDw_s1', H_BSDwpts), 
+            ('HallA 15', 'XLUw_s1', H_XLUwpts), 
 	    ('HallA 15', 'BSSw_c0', H_BSSw0pts),
             ('HallA 15', 'BSSw_c1', H_BSSw1pts),
-            ('HallA 17', 'BSDw_s1', H17_BSDwpts), 
+            ('HallA 17', 'XLUw_s1', H17_XLUwpts), 
 	    ('HallA 17', 'BSSw_c0', H17_BSSw0pts),
             ('HallA 17', 'BSSw_c1', H17_BSSw1pts)
             ]
@@ -310,10 +310,10 @@ def listchis(ths, Q2cut=1., Q2max=1.e3, nsets=10, out='chis'):
             ('CLAS', 'ALU', CLAS14ALUpts),
             ('CLAS', 'TSA', CLAS14TSApts), 
             ('CLAS', 'BTSA', CLAS14BTSApts),
-            ('CLAS', 'BSDw_s1', C_BSDwpts), 
+            ('CLAS', 'XLUw_s1', C_XLUwpts), 
 	    ('CLAS', 'BSSw_c0', C_BSSw0pts),
             ('CLAS', 'BSSw_c1', C_BSSw1pts),
-            ('HallA 15', 'BSDw_s1', H_BSDwpts), 
+            ('HallA 15', 'XLUw_s1', H_XLUwpts), 
 	    ('HallA 15', 'BSSw_c0', H_BSSw0pts),
             ('HallA 15', 'BSSw_c1', H_BSSw1pts),
 	    ('HallA 17', 'BSSw_c0', H17_BSSw0pts),

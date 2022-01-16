@@ -35,7 +35,7 @@ out3particle = gamma
 
 ### Observable 
 
-y1name = BSDw
+y1name = XLUw
 y1long = Weighted beam spin difference
 y1unit = nb/GeV^4
 y1value = column4
@@ -65,7 +65,7 @@ x4value = -1
 ### Data
 table=
 #                              error
-#  Q2     xB    tm  BSDw   stat   avgsyst
+#  Q2     xB    tm  XLUw   stat   avgsyst
 ##############################################################
  1.62  0.185  0.11  0.298  0.036   0.051
  1.63  0.185  0.15  0.206  0.024   0.037

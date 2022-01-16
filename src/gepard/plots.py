@@ -1252,12 +1252,12 @@ def CLAS15phi(path=None, fmt='png', **kwargs):
 
 def CLAS15xs(lines=None, path=None, fmt='png'):
     NPTS = 12
-    BSDw = pd.DataFrame([(pt.Q2, pt.xB, pt.tm, pt.val, pt.err) for pt in data.dataset[101]], columns=('Q2', 'xB', 'tm', 'val', 'err'))
+    XLUw = pd.DataFrame([(pt.Q2, pt.xB, pt.tm, pt.val, pt.err) for pt in data.dataset[101]], columns=('Q2', 'xB', 'tm', 'val', 'err'))
     xQbins = [(0,4), (5,9), (11,15), (16,20), (21,26), (30,33), (35,38), (39,42), (43,45), (46,47)]
     fig, axs = plt.subplots(2,5, sharey='row', sharex=True, figsize=[12,9])
     axs = axs.reshape(10)
     for pn, (a,b) in enumerate(xQbins):
-        pts = BSDw[a:b+1]
+        pts = XLUw[a:b+1]
         axs[pn].errorbar(pts.tm.values, pts.val.values, pts.err.values, linestyle='None', color='black')
         if not isinstance(lines, list): lines = [lines]
         styles = ['r--', 'b-', 'g-.', 'b--', 'k:', 'r:', 'k--']

@@ -13,9 +13,9 @@ DVCSpoints = data.dset[36] + data.dset[37] + data.dset[38] + data.dset[39] + \
 H1ZEUSpoints = DVCSpoints + data.dset[48]
 
 ALTGLO5points = data.dset[5] + data.dset[8] + data.dset[32][18:]   # DM's CLAS ALU
-BSDwpoints = utils.select(data.dset[50], criteria=['FTn == -1'])
+XLUwpoints = utils.select(data.dset[50], criteria=['FTn == -1'])
 BSSwpoints = utils.select(data.dset[51], criteria=['FTn>=0', 'FTn <= 1'])
-UNP5points = ALTGLO5points + BSSwpoints + BSDwpoints
+UNP5points = ALTGLO5points + BSSwpoints + XLUwpoints
 
 H1ZEUSindependentNEW = data.dset[45] + data.dset[39] + data.dset[63] + data.dset[46]
 H1ZEUS = H1ZEUSindependentNEW + utils.select(data.dset[47], criteria=['Q2 >= 4.0'])

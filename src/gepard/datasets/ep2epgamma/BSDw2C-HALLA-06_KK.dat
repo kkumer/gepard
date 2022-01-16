@@ -38,7 +38,7 @@ out3particle = gamma
 
 ### Observable 
 
-y1name = BSDw2C
+y1name = XLUw2C
 y1namelong = Im Part of BMK01 Angular Harmonic Coefficient CI
 # related to the Fourier transform of weighted Beam Spin Difference
 y1unit = 1

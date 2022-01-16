@@ -34,7 +34,7 @@ out3particle = gamma
 
 ### Observable 
 
-y1name = BSDw
+y1name = XLUw
 y1long = Weighted Beam Spin Difference Crossection
 y1unit = nb/GeV^4
 y1value = column5
@@ -67,7 +67,7 @@ x4value = column4
 ### Data
 table = 
 #                                             error
-#  xB      Q2    tm     FTn   BSDw        stat  avgsyst
+#  xB      Q2    tm     FTn   XLUw        stat  avgsyst
 ################################################################
 # KIN1
 0.345   1.453   0.17    -1  0.0168052   0.00111389  0.00179792

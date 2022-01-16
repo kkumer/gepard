@@ -112,7 +112,7 @@ of sets with given IDs:
    [ 47]     ZEUS   6         X  0812.2517 Table 1
    [ 48]     ZEUS   6         X  0812.2517 Table 2
    [ 49]     ZEUS   8         X  0812.2517 Table 3
-   [ 50]    HALLA 288      BSDw    0607029 DFT analysis with MC error propagation by KK
+   [ 50]    HALLA 288      XLUw    0607029 DFT analysis with MC error propagation by KK
    [ 51]    HALLA  96      BSSw    0607029 DFT analysis with MC error propagation by KK
    [ 52]   HERMES  36       TSA  1004.0177 Table 4
    [ 53]   HERMES  36      BTSA  1004.0177 Table 4

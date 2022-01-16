@@ -207,9 +207,9 @@ def test_BSSw(th_BMK):
     assert th_BMK.BSSw(ptw) == approx(0.056334042569159554)
 
 
-def test_BSDw(th_BMK):
+def test_XLUw(th_BMK):
     """Calculate weighted BSD."""
-    assert th_BMK.BSDw(ptwd)*1e3 == approx(8.91853141911449)
+    assert th_BMK.XLUw(ptwd)*1e3 == approx(8.91853141911449)
 
 
 def test_AUTI(th_BMK):

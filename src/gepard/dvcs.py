@@ -219,11 +219,11 @@ class DVCS(theory.Theory):
         return (self.XS(pt, **kwargs) - self.XS(pt, **R)) / 2
 
     def BSD(self, pt, **kwargs):
-        """4-fold beam helicity-dependent cross section (BSDw)."""
+        """4-fold beam helicity-dependent cross section (XLUw)."""
         return self._phiharmonic(self._BSD, pt, **kwargs)
 
-    def BSDw(self, pt, **kwargs):
-        """Weighted 4-fold beam helicity-dependent cross section (BSDw)."""
+    def XLUw(self, pt, **kwargs):
+        """Weighted 4-fold beam helicity-dependent cross section (XLUw)."""
         kwargs['weighted'] = True
         return self._phiharmonic(self.BSD, pt, **kwargs)
 
@@ -518,7 +518,7 @@ class DVCS(theory.Theory):
     def AC0minusr1(self, pt):
         return self.ACcos0(pt) - pt.r * self.ACcos1(pt)
 
-    def BSDw2C(self, pt):
+    def XLUw2C(self, pt):
         """Im(C^I) as defined by HALL A """
         return self.ImCCALINTunp(pt)
 

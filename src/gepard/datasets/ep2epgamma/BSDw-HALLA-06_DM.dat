@@ -1,7 +1,7 @@
 id = 55
 editor = DM
 # Sept. 2010
-# BSDw obtained by fit to the first three sin harmonics
+# XLUw obtained by fit to the first three sin harmonics
 # from HALLA data BSD-HALLA-06_DM
 
 
@@ -36,7 +36,7 @@ out3particle = gamma
 
 ### Observable 
 
-y1name = BSDw
+y1name = XLUw
 y1namelong = weigthed Beam Helicity Dependent Cross Section
 # or Beam Spin Difference 
 y1unit = nbarn/GeV^4

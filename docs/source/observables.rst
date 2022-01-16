@@ -85,7 +85,7 @@ as methods of theory objects, or ``yaxis`` attributes of datapoints.
      - BSS weighted by BH propagator
    * - ``BSD``
      - beam spin difference a.k.a helicity dependent XS
-   * - ``BSDw``
+   * - ``XLUw``
      - BSD weighted by BH propagator
    * - ``XCLU``
      - beam charge-spin difference (COMPASS)
