@@ -2,7 +2,7 @@ id = 55
 editor = DM
 # Sept. 2010
 # XLUw obtained by fit to the first three sin harmonics
-# from HALLA data BSD-HALLA-06_DM
+# from HALLA data XLU-HALLA-06_DM
 
 
 
@@ -67,7 +67,7 @@ x4value = column4
 
 ### Data
 table = 
-#xB     t     Q2  FTn             BSD                   sta
+#xB     t     Q2  FTn             XLU                   sta
 ############################################################################
 0.36  -0.17  1.5  -1      0.016651152915132843    0.0009465845864092874
 0.36  -0.17  1.5  -2     -0.00006776597188144045  0.0009655777601058924

@@ -1359,7 +1359,7 @@ def HallA15(lines=None, enh=True, path=None, fmt='png'):
     return fig
 
 
-def HallA17(obs='BSScos0', lines=None, path=None, fmt='png'):
+def HallA17(obs='XUUcos0', lines=None, path=None, fmt='png'):
     title = 'HallA (2017) '+obs
     NPTS = 24
     #   E    Q2   ind_low  ind_high
@@ -1372,7 +1372,7 @@ def HallA17(obs='BSScos0', lines=None, path=None, fmt='png'):
     # tupls are (dataset id, ind_low, ind_high)
     xQbins = [(136, 14, 17), (136, 6, 9), (136, 0, 2),
           (136, 18, 21), (136, 10, 13), (136, 3, 5)]
-    if obs == 'BSScos0':
+    if obs == 'XUUcos0':
         ylab = r'$d\sigma^{\cos 0\phi,w}$'
         yminU, ymaxU = 0.0, 0.099   # upper row of panels
         yTU = 0.006
@@ -1382,7 +1382,7 @@ def HallA17(obs='BSScos0', lines=None, path=None, fmt='png'):
         ytickD = 0.05
         dshift = 0
         pshift = 0
-    elif obs == 'BSScos1':
+    elif obs == 'XUUcos1':
         ylab = r'$d\sigma^{\cos \phi,w}$'
         yminU, ymaxU = -0.005, 0.06   # upper row of panels
         yTU = 0.0006
@@ -1392,7 +1392,7 @@ def HallA17(obs='BSScos0', lines=None, path=None, fmt='png'):
         ytickD = 0.02
         dshift = 0
         pshift = 22
-    elif obs == 'BSDsin1':
+    elif obs == 'XLUsin1':
         ylab = r'$\Delta\sigma^{\sin\phi,w}$'
         yminU, ymaxU = -0.00, 0.019   # upper row of panels
         yTU = 0.0006
@@ -1438,11 +1438,11 @@ def HallA17(obs='BSScos0', lines=None, path=None, fmt='png'):
             axs[pn].set_ylim(yminD,ymaxD)
             axs[pn].yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(ytickD))
             axs[pn].text(0.25, yTD, s1, fontsize=14)
-        if pn in [0,3] or (obs == 'BSDsin1' and pn == 4):
+        if pn in [0,3] or (obs == 'XLUsin1' and pn == 4):
             axs[pn].set_ylabel(ylab, fontsize=20)
-        if obs[:6] == 'BSScos' and pn in [1,2,4,5]:
+        if obs[:6] == 'XUUcos' and pn in [1,2,4,5]:
             axs[pn].get_yaxis().set_visible(False)
-        if obs == 'BSDsin1' and pn in [1,2,5]:
+        if obs == 'XLUsin1' and pn in [1,2,5]:
             axs[pn].get_yaxis().set_visible(False)
         if pn == 0:
             axs[pn].legend(loc=2, fontsize=14, handlelength=3).draw_frame(1)

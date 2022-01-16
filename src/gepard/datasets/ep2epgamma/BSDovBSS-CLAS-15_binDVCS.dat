@@ -2,7 +2,7 @@ id = 104
 editor = DM
 # data restricted to DVCS kinematics Q2> 1.5 GeV^2 and -t/Q2 < 0.25
 # only data are taken where 18 bins and more are filled
-# ALU is calculated from BSD/BSS errors are separately added in quadrature
+# ALU is calculated from XLU/XUU errors are separately added in quadrature
 
 ### Experiment E145M2
 
@@ -32,7 +32,7 @@ out3particle = gamma
 
 
 ### Observable
-# BSD
+# XLU
 
 
 y1name = ALU
@@ -64,7 +64,7 @@ x4value = column4
 
 ### Data
 #
-# CLAS 2015 BSD/BSS
+# CLAS 2015 XLU/XUU
 #
 #xB      Q2    -t  phi            ALU        stat      syst
 ###########################################################

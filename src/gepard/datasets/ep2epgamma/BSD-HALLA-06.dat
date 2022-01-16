@@ -39,7 +39,7 @@ out3particle = gamma
 
 ### Observable 
 
-y1name = BSD
+y1name = XLU
 y1namelong = Beam Helicity Dependent Cross Section
 # or Beam Spin Difference 
 y1unit = nbarn/GeV^4
@@ -74,7 +74,7 @@ x4value = column4
 
 ### Data
 table = 
-#xB    t   Q2  phi     BSD        sta      sys
+#xB    t   Q2  phi     XLU        sta      sys
 ##########################################################
 0.36 -0.17 1.5 7.5 0.00493019 0.00488779 0.0002931701739093689
 0.36 -0.17 1.5 22.5 0.00439635 0.00443334 0.00026142576534909484

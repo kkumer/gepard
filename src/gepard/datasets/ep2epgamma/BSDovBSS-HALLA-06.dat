@@ -1,7 +1,7 @@
 id = 103
 editor = DM
 # 04/29/2015
-# ALU is calculated from BSD/BSS of id = 33 and id = 34  files 
+# ALU is calculated from XLU/XUU of id = 33 and id = 34  files 
 # errors are separately added in quadrature
 # 05/01/2015
 # bug fixed in error propagation 
@@ -47,7 +47,7 @@ y1value = column3
 y1errorstatistic = column4
 y1errorsystematic = column5
 # systematic error according to publication
-# were added to BSD and BSS
+# were added to XLU and XUU
 
 
 ### x-axes
@@ -71,7 +71,7 @@ x4value = column2
 
 ### Data 
 table = 
-#t   phi      BSDovALU      sta         sys
+#t   phi      XLUovALU      sta         sys
 ###########################################################
 0.17    7.5     0.0520376   0.0291277   0.00425055
 0.17    22.5    0.00840203  0.0296311   0.000686297

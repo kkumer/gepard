@@ -30,7 +30,7 @@ out3particle = gamma
 
 
 ### Observable 
-y1name = BSD
+y1name = XLU
 y1namelong = Beam Spin Difference Cross Section
 y1unit = nb/GeV^4
 y1value = column6
@@ -63,7 +63,7 @@ x5value = column5
 
 
 ###Data
-#E      xB	    Q2	        t	         phi	    BSS	         errstat
+#E      xB	    Q2	        t	         phi	    XUU	         errstat
 ###########################################################################
 7.383	0.363	3.17		-0.2108		7.5			0.00342	0.002
 7.383	0.363	3.17		-0.2108		22.5			0.0009889	0.0018

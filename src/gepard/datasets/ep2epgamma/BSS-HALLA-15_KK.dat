@@ -2,7 +2,7 @@ id = 120
 editor = KK
 
 # the y1 data are derived from the phi measurement
-# of HALL A data from the experiment (BSS-HALLA-15)
+# of HALL A data from the experiment (XUU-HALLA-15)
 #
 # Enhancement of c1 syst err is included here
 
@@ -36,7 +36,7 @@ out3particle = gamma
 
 ### Observable 
 y1long = Beam spin sum
-y1name = BSS
+y1name = XUU
 y1unit = nb/GeV^4
 y1value = column5
 y1errorstatistic = column6

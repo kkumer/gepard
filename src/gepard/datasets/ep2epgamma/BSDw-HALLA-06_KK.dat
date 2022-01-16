@@ -1,7 +1,7 @@
 id = 50
 editor = KK
 # the y1 data are derived from the phi measurement
-# of HALL A data from the experiment (BSD-HALLA-06)
+# of HALL A data from the experiment (XLU-HALLA-06)
 editor2 = DM
 #2015/05/06
 #attribute y1error replaced by y1errorstatistic

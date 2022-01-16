@@ -30,10 +30,10 @@ out3particle = gamma
 
 
 ### Observable
-# BSS
+# XUU
 
 
-y1name = BSD
+y1name = XLU
 y1namelong = Beam Spin Dependent Cross Section
 y1unit = pb/GeV^4
 y1value = column5
@@ -65,9 +65,9 @@ x4value = column4
 
 ### Data
 #
-# CLAS 2015 BSD
+# CLAS 2015 XLU
 #
-#xB       Q2     -t     phi     BSS   stat systm systp
+#xB       Q2     -t     phi     XUU   stat systm systp
 ###########################################################
 table =
 0.345   1.453   0.170   7.5     0.8 7.9 3.  1.

@@ -79,14 +79,14 @@ as methods of theory objects, or ``yaxis`` attributes of datapoints.
      - cross-section for leptoproduction of real photon
    * - ``XDVCS``
      - cross-section for production of real photon by virtual one
-   * - ``BSS``
+   * - ``XUU``
      - beam spin sum a.k.a helicity independent XS
    * - ``XUUw``
-     - BSS weighted by BH propagator
-   * - ``BSD``
+     - XUU weighted by BH propagator
+   * - ``XLU``
      - beam spin difference a.k.a helicity dependent XS
    * - ``XLUw``
-     - BSD weighted by BH propagator
+     - XLU weighted by BH propagator
    * - ``XCLU``
      - beam charge-spin difference (COMPASS)
    * - ``XCUU``

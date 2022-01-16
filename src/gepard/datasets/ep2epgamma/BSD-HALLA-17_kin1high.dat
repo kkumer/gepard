@@ -28,10 +28,10 @@ out3particle = gamma
 
 
 ### Observable
-# BSD
+# XLU
 
 
-y1name = BSD
+y1name = XLU
 y1namelong = Beam Spin Difference Cross Section
 y1unit = pb/GeV^4
 y1value = column5
@@ -62,9 +62,9 @@ x4value = column4
 
 ### Data
 #
-# HALL A 2017 BSD
+# HALL A 2017 XLU
 #
-#xB       Q2     t     phi     BSD   stat
+#xB       Q2     t     phi     XLU   stat
 ###########################################################
 table =
 0.359 1.51 -0.18 15.0 3.55 6.7

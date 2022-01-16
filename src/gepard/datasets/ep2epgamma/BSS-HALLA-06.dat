@@ -42,7 +42,7 @@ out3particle = gamma
 
 ### Observable 
 
-y1name = BSS
+y1name = XUU
 y1namelong = Beam Helicity Independent Cross Section
 # or Beam spin sum
 y1unit = nb/GeV^4
@@ -76,7 +76,7 @@ x4value = column2
 
 ### Data 
 table = 
-# t      phi        BSS        sta         sys
+# t      phi        XUU        sta         sys
 ###########################################################
 -0.17   7.5     0.0907029   0.00274594  0.00507936
 -0.17   22.5    0.0928639   0.00281678  0.00520038

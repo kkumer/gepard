@@ -31,10 +31,10 @@ out3particle = gamma
 
 
 ### Observable
-# BSS
+# XUU
 
 
-y1name = BSS
+y1name = XUU
 y1namelong = Beam Helicity Independent Cross Section
 y1unit = nb/GeV^4
 y1value = column5
@@ -63,9 +63,9 @@ x4value = column4
 
 ### Data
 #
-# CLAS 2015 BSS
+# CLAS 2015 XUU
 #
-#xB Q2 -t phi BSS stat syst
+#xB Q2 -t phi XUU stat syst
 ###########################################################
 table =
 0.185   1.62    0.11    9.53    0   0   0

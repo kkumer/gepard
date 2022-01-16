@@ -2,7 +2,7 @@ id = 121
 editor = KK
 
 # the y1 data are derived from the phi measurement
-# of HALL A data from the experiment (BSD-HALLA-15)
+# of HALL A data from the experiment (XLU-HALLA-15)
 
 
 ### Experiment
@@ -35,7 +35,7 @@ out3particle = gamma
 
 ### Observable 
 
-y1name = BSD
+y1name = XLU
 y1long = Beam spin difference
 y1unit = nb/GeV^4
 y1value = column4

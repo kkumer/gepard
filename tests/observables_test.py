@@ -55,9 +55,9 @@ pttrans.in2polarizationvector = 'T'
 pttrans.in2polarization = 1
 pttrans.varFTn = 1
 
-# testing data point for wBSS
+# testing data point for wXUU
 ptw = g.data.dset[56][0]
-# testing data point for wBSD
+# testing data point for wXLU
 ptwd = g.data.dset[55][0]
 
 
@@ -203,12 +203,12 @@ def test_TTSA(th_BMK):
 
 
 def test_XUUw(th_BMK):
-    """Calculate weighted BSS."""
+    """Calculate weighted XUU."""
     assert th_BMK.XUUw(ptw) == approx(0.056334042569159554)
 
 
 def test_XLUw(th_BMK):
-    """Calculate weighted BSD."""
+    """Calculate weighted XLU."""
     assert th_BMK.XLUw(ptwd)*1e3 == approx(8.91853141911449)
 
 

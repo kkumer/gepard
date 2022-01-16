@@ -28,10 +28,10 @@ out3particle = gamma
 
 
 ### Observable
-# BSS
+# XUU
 
 
-y1name = BSS
+y1name = XUU
 y1namelong = Beam Spin Sum Cross Section
 y1unit = pb/GeV^4
 y1value = column5
@@ -64,9 +64,9 @@ x4value = column4
 
 ### Data
 #
-# HALL A 2017 BSS
+# HALL A 2017 XUU
 #
-#xB       Q2     t     phi     BSS   stat
+#xB       Q2     t     phi     XUU   stat
 ###########################################################
 table = 
 0.357 1.74 -0.181 7.5 179.2 7.2

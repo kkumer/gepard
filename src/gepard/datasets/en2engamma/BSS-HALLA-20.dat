@@ -28,7 +28,7 @@ out3particle = gamma
 
 
 ### Observable 
-y1name = BSS
+y1name = XUU
 y1namelong = Beam Helicity Independent Cross Section 
 # or Beam spin sum
 y1unit = pb/GeV^4
@@ -63,7 +63,7 @@ x5value = 1.75
 
 ### Data
 
-#in1energy	 t	    phi 				BSS 	stat	sysplus	sysminus
+#in1energy	 t	    phi 				XUU 	stat	sysplus	sysminus
 #########################################################################
 4.45	-0.18		15					95.1959	19.7572	41.6956	43.5123
 4.45	-0.18		45					81.504	13.5705	18.6001	17.5813

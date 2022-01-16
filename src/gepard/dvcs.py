@@ -181,7 +181,7 @@ class DVCS(theory.Theory):
         """
         mem = pt.__dict__.pop('FTn', None)
         pt.FTn = 0
-        res = self.BSS(pt, **kwargs)
+        res = self.XUU(pt, **kwargs)
         # restore old value if needed
         if mem:
             pt.in2polarization = mem
@@ -213,33 +213,33 @@ class DVCS(theory.Theory):
 
 # Observables: cross-sections
 
-    def _BSD(self, pt, **kwargs):
+    def _XLU(self, pt, **kwargs):
         R = kwargs.copy()
         R.update({'flip': 'in1polarization'})
         return (self.XS(pt, **kwargs) - self.XS(pt, **R)) / 2
 
-    def BSD(self, pt, **kwargs):
+    def XLU(self, pt, **kwargs):
         """4-fold beam helicity-dependent cross section (XLUw)."""
-        return self._phiharmonic(self._BSD, pt, **kwargs)
+        return self._phiharmonic(self._XLU, pt, **kwargs)
 
     def XLUw(self, pt, **kwargs):
         """Weighted 4-fold beam helicity-dependent cross section (XLUw)."""
         kwargs['weighted'] = True
-        return self._phiharmonic(self.BSD, pt, **kwargs)
+        return self._phiharmonic(self.XLU, pt, **kwargs)
 
-    def _BSS(self, pt, **kwargs):
+    def _XUU(self, pt, **kwargs):
         R = kwargs.copy()
         R.update({'flip': 'in1polarization'})
         return (self.XS(pt, **kwargs) + self.XS(pt, **R)) / 2
 
-    def BSS(self, pt, **kwargs):
-        """4-fold beam helicity-independent cross section (BSS)."""
-        return self._phiharmonic(self._BSS, pt, **kwargs)
+    def XUU(self, pt, **kwargs):
+        """4-fold beam helicity-independent cross section (XUU)."""
+        return self._phiharmonic(self._XUU, pt, **kwargs)
 
     def XUUw(self, pt, **kwargs):
         """Weighted 4-fold beam helicity-independent cross section (BSDw)."""
         kwargs['weighted'] = True
-        return self._phiharmonic(self.BSS, pt, **kwargs)
+        return self._phiharmonic(self.XUU, pt, **kwargs)
 
     def _XCLU(self, pt, **kwargs):
         """4-fold beam charge-spin cross section difference.
@@ -297,7 +297,7 @@ class DVCS(theory.Theory):
 
     def _ALU(self, pt, **kwargs):
         """Calculate beam spin asymmetry."""
-        return self._BSD(pt, **kwargs) / self._BSS(pt, **kwargs)
+        return self._XLU(pt, **kwargs) / self._XUU(pt, **kwargs)
 
     def _ALUapprox(self, pt, **kwargs):
         """Calculate beam spin asymmetry.
@@ -537,9 +537,9 @@ class DVCS(theory.Theory):
     def XwA(self, pt):
         """Ratio of first two cos harmonics of w-weighted cross section."""
         # In BMK, not Trento?
-        b0 = quadrature.Hquadrature(lambda phi: self.BSS(pt, vars={'phi': phi}, weighted=True),
+        b0 = quadrature.Hquadrature(lambda phi: self.XUU(pt, vars={'phi': phi}, weighted=True),
                 0, 2.0*pi) / (2.0*pi)
-        b1 = quadrature.Hquadrature(lambda phi: self.BSS(pt, vars={'phi': phi}, weighted=True) * cos(phi),
+        b1 = quadrature.Hquadrature(lambda phi: self.XUU(pt, vars={'phi': phi}, weighted=True) * cos(phi),
                 0, 2.0*pi) / pi
         return b1/b0
 

@@ -201,15 +201,15 @@ def listchis(ths, Q2cut=1., Q2max=1.e3, nsets=10, out='chis'):
     'pulls':  sum((th-exp)/err)/sqrt(size)
     """
     if not isinstance(ths, list): ths = [ths]
-    from abbrevs import (C_BSD, C_BSS, H1ZEUS, H_BSD, H_BSS, ALLpts,
+    from abbrevs import (C_XLU, C_XUU, H1ZEUS, H_XLU, H_XUU, ALLpts,
                          ALTGLO5points, ALUIpts, AULpts, AUTDVCSpts, AUTICSpts,
                          AUTIpts, ACpts, ALUCLAS_DMpoints, ALUCLAS_KKpoints,
                          XLUwpoints, XUUwpoints, C_AULpts, C_XLUwpts,
                          C_XUUw0pts, C_XUUw1pts, CLAS14ALUpts, CLAS14BTSApts,
                          CLAS14TSApts, CLASKKpts, CLASpts, CLASTSApts,
                          H17_XLUwpts, H17_XUUw0pts, H17_XUUw1pts,
-                         H20_nXUUw0pts, H20_nXUUw1pts, H_AULpts, H_BSDpts,
-                         H_XLUwpts, H_BSS0pts, H_BSS1pts, H_XUUw0pts,
+                         H20_nXUUw0pts, H20_nXUUw1pts, H_AULpts, H_XLUpts,
+                         H_XLUwpts, H_XUU0pts, H_XUU1pts, H_XUUw0pts,
                          H_XUUw1pts, UNP5points)
 
     #exps[0] = ['UNP5points', 'ALTGLO5', 'CLAS', 'CLASDM', 'XLUw', 'XUUw', 'TSA1', 'BTSA', 'TPpoints']
@@ -266,8 +266,8 @@ def listchis(ths, Q2cut=1., Q2max=1.e3, nsets=10, out='chis'):
             ('CLAS', 'XUUw_c1', C_XUUw1pts),
             ('Hall A', 'XLUw_s1', H_XLUwpts), ('Hall A', 'XUUw_c0', H_XUUw0pts),
             ('Hall A', 'XUUw_c1', H_XUUw1pts),
-            ('Hall A', 'BSD_s1', H_BSDpts), ('Hall A', 'BSS_c0', H_BSS0pts),
-            ('Hall A', 'BSS_c1', H_BSS1pts)
+            ('Hall A', 'XLU_s1', H_XLUpts), ('Hall A', 'XUU_c0', H_XUU0pts),
+            ('Hall A', 'XUU_c1', H_XUU1pts)
             ]
     sets[8] = [('HERMES', 'ALUI', ALUIpts),
             ('HERMES', 'AC', ACpts), ('CLAS', 'ALU', CLASpts),

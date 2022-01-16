@@ -1,7 +1,7 @@
 id = 56
 editor = DM
 # Sept. 2010
-# fit result to cos harmonics of BSS-HALLA-06 data
+# fit result to cos harmonics of XUU-HALLA-06 data
 
 
 ### Experiment
@@ -65,7 +65,7 @@ x4value = column4
 
 ### Data 
 table =
-#xB     t     Q2   FTn          BSS                   sta
+#xB     t     Q2   FTn          XUU                   sta
 #######################################################################
 0.36  -0.17  2.3   0    0.06563526283634245     0.0004357341713453613
 0.36  -0.17  2.3   1   -0.0034733497152058994   0.0006167345183017228
