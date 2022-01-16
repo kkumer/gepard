@@ -241,7 +241,63 @@ class DVCS(theory.Theory):
         kwargs['weighted'] = True
         return self._phiharmonic(self.BSS, pt, **kwargs)
 
-# Observables:  assymetries
+    def BCSD(self, pt, **kwargs):
+        """4-fold beam charge-spin cross section difference measured by COMPASS """
+        R = kwargs.copy()
+        R.update({'flip':['in1polarization', 'in1charge']})
+        return (self.XS(pt, **kwargs) - self.XS(pt, **R)) / 2
+
+    def BCSS(self, pt, **kwargs):
+        """4-fold beam charge-spin cross section sum measured by COMPASS. """
+        R = kwargs.copy()
+        R.update({'flip':['in1polarization', 'in1charge']})
+        return (self.XS(pt, **kwargs) + self.XS(pt, **R)) /2
+
+# Observables:  asymmetries
+
+    def _AC(self, pt, **kwargs):
+        """Calculate beam charge asymmtery."""
+        chg = kwargs.copy()
+        chg.update({'flip':'in1charge'})
+        o =  self.XS(pt, **kwargs)
+        c =  self.XS(pt, **chg)
+        return (o - c) / (o + c)
+        # optimized formula (don't calculate parts which cancel anyway)
+        # return  self.TINTunp(pt, phi, 0, 1) / (
+        #               self.TBH2unp(pt, phi) + self.TDVCS2unp(pt, phi) )
+
+    def AC(self, pt, **kwargs):
+        """Calculate beam charge asymmetry."""
+        res = self._phiharmonic(self._AC, pt, **kwargs)
+        return  res
+
+
+    def _ALU(self, pt, **kwargs):
+        """Calculate beam spin asymmetry."""
+        return self._BSD(pt, **kwargs) / self._BSS(pt, **kwargs)
+
+    def _ALUapprox(self, pt, **kwargs):
+        """Calculate beam spin asymmetry (ALU) or its harmonics."""
+        if 'phi' in pt:
+            return self._ALU(pt, **kwargs)
+        elif 'FTn' in pt and pt.FTn == -1:
+            # FIXME: faster shortcut (approximate!)
+            if 'vars' in kwargs:
+                kwargs['vars'].update({'phi':pi/2.})
+            else:
+                kwargs['vars'] = {'phi':pi/2.}
+            return  self._ALU(pt, **kwargs)
+        else:
+            raise ValueError('[%s] has neither azimuthal angle phi\
+ nor harmonic FTn = -1 defined!' % pt)
+
+    def _ALUexact(self, pt, **kwargs):
+        """Calculate beam spin asymmetry (ALU) or its harmonics."""
+        res = self._phiharmonic(self._ALU, pt, **kwargs)
+        return  res
+
+    ALU = _ALUexact
+
 
     def _TSA(self, pt, **kwargs):
         """Target spin asymmetry (transversal or longitudinal)."""
@@ -251,27 +307,26 @@ class DVCS(theory.Theory):
         p =  self.XS(pt, **pol)
         return (o-p)/(o+p)
 
-    def _TTSAlong(self, pt, **kwargs):
-        """Calculate target spin asymmetry (TSA).
+    def TSA(self, pt, **kwargs):
+        """Calculate target spin asymmetry (AUL or AUT).
 
-        According to 1004.0177 Eq. (1.6)
+        Whether AUL or AUT is calculated is determined by the
+        pt.in2polarizationvector being 'L' or 'T'.
 
         """
-        bpol = kwargs.copy()
-        bpol.update({'flip':'in1polarization'})
-        tpol = kwargs.copy()
-        tpol.update({'flip':'in2polarization'})
-        both = kwargs.copy()
-        both.update({'flip':['in1polarization', 'in2polarization']})
-        o =  self.XS(pt, **kwargs)
-        p =  self.XS(pt, **bpol)
-        t =  self.XS(pt, **tpol)
-        b =  self.XS(pt, **both)
-        return ((p+o) - (b+t)) / ((p+o) + (b+t))
-
-    def TSA(self, pt, **kwargs):
-        """Target spin asymmetry (transversal or longitudinal) or its harmonics."""
         return self._phiharmonic(self._TSA, pt, **kwargs)
+
+    def AUL(self, pt, **kwargs):
+        """Calculate longitudinal target spin asymmetry."""
+
+        assert pt.in2polarizationvector == 'L'
+        return self.TSA(pt, **kwargs)
+
+    def AUT(self, pt, **kwargs):
+        """Calculate transversal target spin asymmetry."""
+
+        assert pt.in2polarizationvector == 'T'
+        return self.TSA(pt, **kwargs)
 
     def _BTSA(self, pt, **kwargs):
         """Calculate beam-target spin asymmetry (BTSA).
@@ -292,8 +347,26 @@ class DVCS(theory.Theory):
         return ((o+b) - (p+t)) / ((o+b) + (p+t))
 
     def BTSA(self, pt, **kwargs):
-        """Calculate beam-target spin asymmetry or its harmonics."""
+        """Calculate beam-target spin asymmetry (ALL or ALT).
+
+        Whether ALL or ALT is calculated is determined by the
+        pt.in2polarizationvector being 'L' or 'T'.
+
+        """
         return self._phiharmonic(self._BTSA, pt, **kwargs)
+
+    def ALL(self, pt, **kwargs):
+        """Calculate beam and longitudinal target spin asymmetry."""
+
+        assert pt.in2polarizationvector == 'L'
+        return self.BTSA(pt, **kwargs)
+
+    def ALT(self, pt, **kwargs):
+        """Calculate beam and transversal target spin asymmetry."""
+
+        assert pt.in2polarizationvector == 'T'
+        return self.BTSA(pt, **kwargs)
+
 
     def _CBTSA(self, pt, chargepar=-1, **kwargs):
         """Calculate charge-beam spin-target spin asymmetry (CBTSA).
@@ -414,81 +487,6 @@ class DVCS(theory.Theory):
     def AUTDVCS(self, pt, **kwargs):
         """Calculate TTSA as defined by HERMES 0802.2499 Eq. (15) or its phi-harmonics."""
         return self._phiharmonic(self._AUTDVCS, pt, **kwargs)
-
-    def _ALU(self, pt, **kwargs):
-        """Calculate beam spin asymmetry (ALU)."""
-        return self.BSD(pt, **kwargs) / self.BSS(pt, **kwargs)
-
-    def ALUold(self, pt, **kwargs):
-        """Calculate beam spin asymmetry (ALU) or its harmonics."""
-        if 'phi' in pt:
-            return self._ALU(pt, **kwargs)
-        elif 'FTn' in pt and pt.FTn == -1:
-            # FIXME: faster shortcut (approximate!)
-            if 'vars' in kwargs:
-                kwargs['vars'].update({'phi':pi/2.})
-            else:
-                kwargs['vars'] = {'phi':pi/2.}
-            return  self._ALU(pt, **kwargs)
-        else:
-            raise ValueError('[%s] has neither azimuthal angle phi\
- nor harmonic FTn = -1 defined!' % pt)
-        ### Exact but slower:
-            #res = g.quadrature.Hquadrature(lambda phi:
-            #        self._ALU(pt, vars={'phi':phi}) * sin(phi), 0, 2*pi)
-            #return  res / pi
-
-    def ALUexact(self, pt, **kwargs):
-        """Calculate beam spin asymmetry (ALU) or its harmonics."""
-        if 'phi' in pt:
-            return self._ALU(pt, **kwargs)
-        elif 'FTn' in pt and pt.FTn == -1:
-            res = quadrature.Hquadrature(lambda phi:
-                    self._ALU(pt, vars={'phi':phi}) * sin(phi), 0, 2*pi)
-        else:
-            raise ValueError('[%s] has neither azimuthal angle phi\
- nor harmonic FTn == -1 defined!' % pt)
-        return res / pi
-
-    def ALUnew(self, pt, **kwargs):
-        """Calculate beam spin asymmetry (ALU) or its harmonics."""
-        res = self._phiharmonic(self._ALU, pt, **kwargs)
-        return  res
-
-    ALU = ALUold
-
-    def _AC(self, pt, **kwargs):
-        """Calculate beam charge asymmetry (AC)."""
-
-        chg = kwargs.copy()
-        chg.update({'flip':'in1charge'})
-        o =  self.XS(pt, **kwargs)
-        c =  self.XS(pt, **chg)
-        return (o - c) / (o + c)
-        # optimized formula (remove parts which cancel anyway)
-        # return  self.TINTunp(pt, phi, 0, 1) / (
-        #               self.TBH2unp(pt, phi) + self.TDVCS2unp(pt, phi) )
-
-    def AC(self, pt, **kwargs):
-        """Calculate beam charge asymmetry (AC) or its harmonics."""
-        res = self._phiharmonic(self._AC, pt, **kwargs)
-        # FIXME: the following has to be dealt with during
-        # conventions translation, and not here?
-        #if pt.has_key('FTn') and (pt.FTn == 1 or pt.FTn == 3):
-        #    res = -res
-        return  res
-
-    def BCSD(self, pt, **kwargs):
-        """4-fold beam charge-spin cross section difference measured by COMPASS """
-        R = kwargs.copy()
-        R.update({'flip':['in1polarization', 'in1charge']})
-        return (self.XS(pt, **kwargs) - self.XS(pt, **R)) / 2
-
-    def BCSS(self, pt, **kwargs):
-        """4-fold beam charge-spin cross section sum measured by COMPASS. """
-        R = kwargs.copy()
-        R.update({'flip':['in1polarization', 'in1charge']})
-        return (self.XS(pt, **kwargs) + self.XS(pt, **R)) /2
 
     def BCSA(self, pt, **kwargs):
         """Beam charge-spin asymmetry as measured by COMPASS. """

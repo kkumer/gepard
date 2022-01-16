@@ -8,14 +8,16 @@ from pytest import approx, fixture, mark
 def test_KM09a():
     """Test model: KM09a."""
     chisq = th_KM09a.chisq(GLOpoints)
-    assert chisq == approx(32.044069303618073)
+    # _ALUapprox verzija: assert chisq == approx(32.044069303618073)
+    assert chisq == approx(31.947900867765128)
 
 
 def test_KM09b():
     """Test model: KM09b."""
     pts = GLOpoints + g.data.dset[30]
     chisq = th_KM09b.chisq(pts)
-    assert chisq == approx(33.36747338543438)
+    # _ALUapprox verzija assert chisq == approx(33.36747338543438)
+    assert chisq == approx(32.99129751427305)
 
 
 @mark.slow
@@ -27,7 +29,8 @@ def test_KM10():
     # # from ALU to ALUI
     # assert_almost_equal(chisq, 135.72627340347722)
     # # unclear why the diff
-    assert chisq == approx(135.7650869105709)
+    # _ALUapprox version assert chisq == approx(135.7650869105709)
+    assert chisq == approx(133.89675949131666)
 
 
 @mark.skip('KM10a not yet transferred')
@@ -39,13 +42,13 @@ def test_KM10a():
     # from ALU to ALUI
     assert chisq == approx(129.18281370844684)
 
-
 @mark.slow
 def test_KM10b():
     """Test model: KM10b."""
     pts = DVCSpoints+GLOpoints+g.data.dset[30]
     chisq = th_KM10b.chisq(pts)
-    assert chisq == approx(115.54198973827977)
+    # _ALUapprox version assert chisq == approx(115.54198973827977)
+    assert chisq == approx(114.34189386519833)
 
 
 @mark.skip('KMM12 not yet transferred')
@@ -76,4 +79,5 @@ def test_KM15():
     # treatment of uncertainties of Hall A 2015 data 
     # in commit 4033d7accb5bea7c371e4145343ef650cb38b6b9
     # on Feb 14 2017 
-    assert chisq == approx(245.82778194537178)
+    # _ALUapprox version assert chisq == approx(245.82778194537178)
+    assert chisq == approx(246.3179087845521)

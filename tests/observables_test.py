@@ -174,10 +174,16 @@ def test_XUT(th_BMK):
     assert th_BMK.PreFacSigma(pt)*th_BMK.TINTTP(pt) == approx(-0.0098483713204748375)
     assert th_BMK.XUT(pt) == approx(-0.009812685692185092)
 
+def test_ALU_approx(th_BMK):
+    """Test approximate formula for ALU in BMK Approach."""
+    assert th_BMK._ALUapprox(pt0) == approx(0.1845304070958366)
 
-def test_ALU(th_BMK):
-    """Calculate ALU in BMK Approach."""
-    assert th_BMK.ALU(pt0) == approx(0.1845304070958366)
+def test_ALU_exact(th_BMK):
+    """Test ALU in BMK Approach."""
+    assert th_BMK._ALUexact(pt0) == approx(0.1847045934136741)
+
+def test_ALUI(th_BMK):
+    """Test ALUI in BMK Approach."""
     assert th_BMK.ALUI(pt0) == approx(0.1819945876282851)
 
 
