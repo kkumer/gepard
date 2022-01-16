@@ -52,7 +52,7 @@ class DVCS(theory.Theory):
                                  e.g., flip='in1polarization'
 
         This is for calculation of fully beam and target polarized cross-section.
-        Most of usually measured cross-sections and asymmetries are derived from this.
+        Most of the usually measured cross-sections and asymmetries are derived from this.
 
         Todo:
             * transversal target BMK/Trento switching
@@ -118,24 +118,6 @@ class DVCS(theory.Theory):
             else:
                 raise ValueError('in2polarizationvector must be L, T, or U!')
         return wgh * self.PreFacSigma(kin) * aux
-
-    def XUL(self, pt, **kwargs):
-        """Cross-section on longitudinally polarized target."""
-        assert pt.in2polarizationvector == 'L'
-        pol = kwargs.copy()
-        pol.update({'flip': 'in2polarization'})
-        o = self.XS(pt, **kwargs)
-        f = self.XS(pt, **pol)
-        return (o-f)/2.
-
-    def XUT(self, pt, **kwargs):
-        """Cross-section on transversally polarized target."""
-        assert pt.in2polarizationvector == 'T'
-        pol = kwargs.copy()
-        pol.update({'flip': 'in2polarization'})
-        o = self.XS(pt, **kwargs)
-        f = self.XS(pt, **pol)
-        return (o-f)/2
 
     def _XDVCStApprox(self, pt):
         """Partial DVCS (gamma* p -> gamma p) cross section differential in t.
@@ -213,33 +195,53 @@ class DVCS(theory.Theory):
 
 # Observables: cross-sections
 
-    def _XLU(self, pt, **kwargs):
-        R = kwargs.copy()
-        R.update({'flip': 'in1polarization'})
-        return (self.XS(pt, **kwargs) - self.XS(pt, **R)) / 2
-
-    def XLU(self, pt, **kwargs):
-        """4-fold beam helicity-dependent cross section (XLUw)."""
-        return self._phiharmonic(self._XLU, pt, **kwargs)
-
-    def XLUw(self, pt, **kwargs):
-        """Weighted 4-fold beam helicity-dependent cross section (XLUw)."""
-        kwargs['weighted'] = True
-        return self._phiharmonic(self.XLU, pt, **kwargs)
-
     def _XUU(self, pt, **kwargs):
+        """4-fold beam helicity-independent cross section."""
         R = kwargs.copy()
         R.update({'flip': 'in1polarization'})
         return (self.XS(pt, **kwargs) + self.XS(pt, **R)) / 2
 
     def XUU(self, pt, **kwargs):
-        """4-fold beam helicity-independent cross section (XUU)."""
+        """4-fold beam helicity-independent cross section."""
         return self._phiharmonic(self._XUU, pt, **kwargs)
 
     def XUUw(self, pt, **kwargs):
-        """Weighted 4-fold beam helicity-independent cross section (BSDw)."""
+        """Weighted 4-fold beam helicity-independent cross section."""
         kwargs['weighted'] = True
         return self._phiharmonic(self.XUU, pt, **kwargs)
+
+    def _XLU(self, pt, **kwargs):
+        """4-fold beam helicity-dependent cross section."""
+        R = kwargs.copy()
+        R.update({'flip': 'in1polarization'})
+        return (self.XS(pt, **kwargs) - self.XS(pt, **R)) / 2
+
+    def XLU(self, pt, **kwargs):
+        """4-fold beam helicity-dependent cross section."""
+        return self._phiharmonic(self._XLU, pt, **kwargs)
+
+    def XLUw(self, pt, **kwargs):
+        """Weighted 4-fold beam helicity-dependent cross section."""
+        kwargs['weighted'] = True
+        return self._phiharmonic(self.XLU, pt, **kwargs)
+
+    def _XUD(self, pt, **kwargs):
+        """Cross-section difference on (long. or trans.) polarized target."""
+        pol = kwargs.copy()
+        pol.update({'flip': 'in2polarization'})
+        o = self.XS(pt, **kwargs)
+        f = self.XS(pt, **pol)
+        return (o-f)/2
+
+    def XUL(self, pt, **kwargs):
+        """Cross-section difference on longitudinally polarized target."""
+        assert pt.in2polarizationvector == 'L'
+        return self._XUD(pt, **kwargs)
+
+    def XUT(self, pt, **kwargs):
+        """Cross-section difference on transversally polarized target."""
+        assert pt.in2polarizationvector == 'T'
+        return self._XUD(pt, **kwargs)
 
     def _XCLU(self, pt, **kwargs):
         """4-fold beam charge-spin cross section difference.
