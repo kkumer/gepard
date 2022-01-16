@@ -39,7 +39,7 @@ out3particle = gamma
 ### Observable 
 y1long = Re Part of BMK01 Angular Harmonic Coefficients CI and DEL CI
 # related to the Fourier transform of weighted Beam Spin Sum
-y1name = BSSw2C
+y1name = XUUw2C
 y1unit = 1
 y1value = column3
 y1error = column4

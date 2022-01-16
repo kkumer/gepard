@@ -81,7 +81,7 @@ as methods of theory objects, or ``yaxis`` attributes of datapoints.
      - cross-section for production of real photon by virtual one
    * - ``BSS``
      - beam spin sum a.k.a helicity independent XS
-   * - ``BSSw``
+   * - ``XUUw``
      - BSS weighted by BH propagator
    * - ``BSD``
      - beam spin difference a.k.a helicity dependent XS

@@ -202,9 +202,9 @@ def test_TTSA(th_BMK):
     assert th_BMK.TSA(pttrans) == approx(0.080468284490077271)
 
 
-def test_BSSw(th_BMK):
+def test_XUUw(th_BMK):
     """Calculate weighted BSS."""
-    assert th_BMK.BSSw(ptw) == approx(0.056334042569159554)
+    assert th_BMK.XUUw(ptw) == approx(0.056334042569159554)
 
 
 def test_XLUw(th_BMK):

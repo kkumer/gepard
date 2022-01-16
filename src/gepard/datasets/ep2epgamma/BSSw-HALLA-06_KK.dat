@@ -34,7 +34,7 @@ out3particle = gamma
 
 ### Observable 
 y1long = Weighted beam spin sum
-y1name = BSSw
+y1name = XUUw
 y1unit = 1
 y1value = column3
 y1errorstatistic = column4
@@ -65,7 +65,7 @@ x4value = column2
 
 ### Data
 
-#  t    FTn    BSSw      stat        syst(5.6%)
+#  t    FTn    XUUw      stat        syst(5.6%)
 ##########################################################
 -0.17   0   0.065704   0.000531   0.003679
 -0.17   -1   -0.001395   0.000674   0.000078

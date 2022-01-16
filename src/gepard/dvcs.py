@@ -236,7 +236,7 @@ class DVCS(theory.Theory):
         """4-fold beam helicity-independent cross section (BSS)."""
         return self._phiharmonic(self._BSS, pt, **kwargs)
 
-    def BSSw(self, pt, **kwargs):
+    def XUUw(self, pt, **kwargs):
         """Weighted 4-fold beam helicity-independent cross section (BSDw)."""
         kwargs['weighted'] = True
         return self._phiharmonic(self.BSS, pt, **kwargs)
@@ -522,7 +522,7 @@ class DVCS(theory.Theory):
         """Im(C^I) as defined by HALL A """
         return self.ImCCALINTunp(pt)
 
-    def BSSw2C(self, pt):
+    def XUUw2C(self, pt):
         """Re(C^I) or Re(C^I + Del C^I) as defined by HALL A.
 
         FIXME: Although it is attributed to FTn=0, Re(C^I + Del C^I)

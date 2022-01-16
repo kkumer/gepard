@@ -34,7 +34,7 @@ out3particle = gamma
 
 ### Observable 
 
-y1name = BSSw
+y1name = XUUw
 y1namelong = weighted Beam Helicity Independent Cross Section
 # or Beam spin sum
 y1unit = nb/GeV^4

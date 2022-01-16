@@ -32,7 +32,7 @@ out3particle = gamma
 
 ### Observable 
 
-y1name = BSSw
+y1name = XUUw
 y1long = Weighted cross-section
 y1unit = nb/GeV^4
 y1value = column5
