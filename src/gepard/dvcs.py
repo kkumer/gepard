@@ -241,17 +241,41 @@ class DVCS(theory.Theory):
         kwargs['weighted'] = True
         return self._phiharmonic(self.BSS, pt, **kwargs)
 
-    def BCSD(self, pt, **kwargs):
-        """4-fold beam charge-spin cross section difference measured by COMPASS """
+    def _XCLU(self, pt, **kwargs):
+        """4-fold beam charge-spin cross section difference.
+
+        D_{CS,U}/2, as measured by COMPASS.
+
+        """
         R = kwargs.copy()
         R.update({'flip':['in1polarization', 'in1charge']})
         return (self.XS(pt, **kwargs) - self.XS(pt, **R)) / 2
 
-    def BCSS(self, pt, **kwargs):
-        """4-fold beam charge-spin cross section sum measured by COMPASS. """
+    def XCLU(self, pt, **kwargs):
+        """4-fold beam charge-spin cross section difference.
+
+        D_{CS,U}/2, as measured by COMPASS. (NOT TESTED.)
+
+        """
+        return self._phiharmonic(self._XCLU, pt, **kwargs)
+
+    def _XCUU(self, pt, **kwargs):
+        """4-fold beam charge-spin cross section sum.
+
+        S_{CS,U}/2, as measured by COMPASS.
+
+        """
         R = kwargs.copy()
         R.update({'flip':['in1polarization', 'in1charge']})
-        return (self.XS(pt, **kwargs) + self.XS(pt, **R)) /2
+        return (self.XS(pt, **kwargs) + self.XS(pt, **R)) / 2
+
+    def XCUU(self, pt, **kwargs):
+        """4-fold beam charge-spin cross section sum.
+
+        S_{CS,U}/2, as measured by COMPASS. (NOT TESTED.)
+
+        """
+        return self._phiharmonic(self._XCUU, pt, **kwargs)
 
 # Observables:  asymmetries
 
@@ -271,17 +295,19 @@ class DVCS(theory.Theory):
         res = self._phiharmonic(self._AC, pt, **kwargs)
         return  res
 
-
     def _ALU(self, pt, **kwargs):
         """Calculate beam spin asymmetry."""
         return self._BSD(pt, **kwargs) / self._BSS(pt, **kwargs)
 
     def _ALUapprox(self, pt, **kwargs):
-        """Calculate beam spin asymmetry (ALU) or its harmonics."""
+        """Calculate beam spin asymmetry.
+
+        For harmonics, fast approximate formula is used.
+
+        """
         if 'phi' in pt:
             return self._ALU(pt, **kwargs)
         elif 'FTn' in pt and pt.FTn == -1:
-            # FIXME: faster shortcut (approximate!)
             if 'vars' in kwargs:
                 kwargs['vars'].update({'phi':pi/2.})
             else:
@@ -292,12 +318,12 @@ class DVCS(theory.Theory):
  nor harmonic FTn = -1 defined!' % pt)
 
     def _ALUexact(self, pt, **kwargs):
-        """Calculate beam spin asymmetry (ALU) or its harmonics."""
+        """Calculate beam spin asymmetry"""
         res = self._phiharmonic(self._ALU, pt, **kwargs)
         return  res
 
+    # Make a choice
     ALU = _ALUexact
-
 
     def _TSA(self, pt, **kwargs):
         """Target spin asymmetry (transversal or longitudinal)."""
@@ -367,9 +393,8 @@ class DVCS(theory.Theory):
         assert pt.in2polarizationvector == 'T'
         return self.BTSA(pt, **kwargs)
 
-
     def _CBTSA(self, pt, chargepar=-1, **kwargs):
-        """Calculate charge-beam spin-target spin asymmetry (CBTSA).
+        """Calculate double charge and spin asymmetries.
 
         According to 1106.2990 Eq. (18)(chargepar=1) and (19)(chargepar=-1)
 
@@ -399,14 +424,15 @@ class DVCS(theory.Theory):
         return ((o-t-b+bt) + chargepar*(c-ct-cb+cbt)) / (o+t+b+bt+c+ct+cb+cbt)
 
     def ALTI(self, pt, **kwargs):
-        """Calculate {A_LT,I} as defined by HERMES 1106.2990 Eq. (19) or its harmonics."""
+        """Calculate {A_LT,I} as defined by HERMES 1106.2990 Eq. (19)."""
         return self._phiharmonic(self._CBTSA, pt, **kwargs)
 
     def ALTBHDVCS(self, pt, **kwargs):
-        """Calculate {A_LT,BHDVCS} as defined by HERMES 1106.2990 Eq. (18) or its harmonics."""
+        """Calculate {A_LT,BHDVCS} as defined by HERMES 1106.2990 Eq. (18)."""
         return self._phiharmonic(self._CBTSA, pt, chargepar=+1, **kwargs)
 
     def _ALUI(self, pt, **kwargs):
+        """Beam spin asymmetry, interference part."""
         pol = kwargs.copy()
         pol.update({'flip':'in1polarization'})
         chg = kwargs.copy()
@@ -451,8 +477,7 @@ class DVCS(theory.Theory):
         return self._phiharmonic(self._ALUDVCS, pt, **kwargs)
 
     def _AUTI(self, pt, **kwargs):
-        """Calculate TTSA as defined by HERMES 0802.2499 Eq. (15) """
-
+        """Calculate trans. target asymmetry, as defined by HERMES 0802.2499 Eq. (15)."""
         pol = kwargs.copy()
         pol.update({'flip':'in2polarization'})
         chg = kwargs.copy()
@@ -466,11 +491,11 @@ class DVCS(theory.Theory):
         return ((o-p) - (c-b)) / ((o+p) + (c+b))
 
     def AUTI(self, pt, **kwargs):
-        """Calculate TTSA as defined by HERMES 0802.2499 Eq. (15) or its phi-harmonics."""
+        """Calculate trans. target asymmetry, as defined by HERMES 0802.2499 Eq. (15)."""
         return self._phiharmonic(self._AUTI, pt, **kwargs)
 
     def _AUTDVCS(self, pt, **kwargs):
-        """Calculate TTSA as defined by HERMES 0802.2499 Eq. (14) """
+        """Calculate trans. target asymmetry, as defined by HERMES 0802.2499 Eq. (14)."""
 
         pol = kwargs.copy()
         pol.update({'flip':'in2polarization'})
@@ -485,12 +510,8 @@ class DVCS(theory.Theory):
         return ((o-p) + (c-b)) / ((o+p) + (c+b))
 
     def AUTDVCS(self, pt, **kwargs):
-        """Calculate TTSA as defined by HERMES 0802.2499 Eq. (15) or its phi-harmonics."""
+        """Calculate trans. target asymmetry, as defined by HERMES 0802.2499 Eq. (14)."""
         return self._phiharmonic(self._AUTDVCS, pt, **kwargs)
-
-    def BCSA(self, pt, **kwargs):
-        """Beam charge-spin asymmetry as measured by COMPASS. """
-        return  self.BCSD(pt, **kwargs) / self.BCSS(pt, **kwargs)
 
 # Observables:  ad-hoc, one-off stuff
 
@@ -514,13 +535,17 @@ class DVCS(theory.Theory):
             return self.ReCCALINTunp(pt)
 
     def XwA(self, pt):
-        """Ratio of first two cos harmonics of w-weighted cross section. In BMK, not Trento??"""
+        """Ratio of first two cos harmonics of w-weighted cross section."""
+        # In BMK, not Trento?
         b0 = quadrature.Hquadrature(lambda phi: self.BSS(pt, vars={'phi': phi}, weighted=True),
                 0, 2.0*pi) / (2.0*pi)
         b1 = quadrature.Hquadrature(lambda phi: self.BSS(pt, vars={'phi': phi}, weighted=True) * cos(phi),
                 0, 2.0*pi) / pi
         return b1/b0
 
+    def BCSA(self, pt, **kwargs):
+        """Beam charge-spin asymmetry as measured by COMPASS. """
+        return  self.BCSD(pt, **kwargs) / self.BCSS(pt, **kwargs)
 
 # This PEP8 violating end-of-file import serves just to bring BMK into dvcs namespace
 from .bmk import BM10, BMK, BM10ex, BM10tw2, hotfixedBMK  # noqa: F401, E402

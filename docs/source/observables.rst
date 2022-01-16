@@ -87,6 +87,10 @@ as methods of theory objects, or ``yaxis`` attributes of datapoints.
      - beam spin difference a.k.a helicity dependent XS
    * - ``BSDw``
      - BSD weighted by BH propagator
+   * - ``XCLU``
+     - beam charge-spin difference (COMPASS)
+   * - ``XCUU``
+     - beam charge-spin sum (COMPASS)
    * - ``AC``
      - beam charge asymmetry
    * - ``ALU``
@@ -95,8 +99,10 @@ as methods of theory objects, or ``yaxis`` attributes of datapoints.
      - beam spin asymmetry, interference part
    * - ``ALUDVCS``
      - beam spin asymmetry, DVCS part
-   * - ``TSA``
-     - (longitudinal) target spin asymmetry
+   * - ``AUL``
+     -  longitudinal target spin asymmetry
+   * - ``AUT``
+     -  transversal target spin asymmetry
    * - ``AUTI``
      - transversal target spin asymmetry, interference part
    * - ``AUTDVCS``
