@@ -8,7 +8,15 @@ from .special import S1, S2, S3, SB3, deldelS2, delS2, parity, poch
 
 
 def c1dvmp(m, sgntr: int, j: complex, k: int) -> Tuple[complex, complex, complex]:
-    """NLO DVMP hard scattering coefficients."""
+    """NLO DVMP hard scattering coefficients.
+
+    Todo:
+        There is an unresolved discrepancy in the code implementing
+        Eq. (4.53b) of Towards DVMP paper term. Dieter's notebook
+        seems to have one different sign. See comments in the code
+        for MCG1CF_new.
+
+    """
     LRR2 = math.log(m.rr2)
     LRGPDF2 = math.log(m.rf2)
     LRDAF2 = math.log(m.rdaf2)
@@ -26,7 +34,7 @@ def c1dvmp(m, sgntr: int, j: complex, k: int) -> Tuple[complex, complex, complex
 
     #  ... quark part
 
-    MCQ1CF = -7.666666666666667+(0.5*(1.+3.*(1.+j)*(2.+j)))/((1
+    MCQ1CF = -23/3+(0.5*(1.+3.*(1.+j)*(2.+j)))/((1
            + j)**2*(2.+j)**2)+(0.5*(1.+3.*(1.+k)*(2.+k)))/((1.+k)**2
            *(2.+k)**2)+0.5*(-3.-2./((1.+j)*(2.+j))+4.*S1(1.+j))*((-
            0.5*(1.+(1.+j)*(2.+j)))/((1.+j)*(2.+j))-(0.5*(1.+(1.+k)*(
@@ -35,7 +43,7 @@ def c1dvmp(m, sgntr: int, j: complex, k: int) -> Tuple[complex, complex, complex
            )*(2.+k)))/((1.+k)*(2.+k))-LRDAF2+S1(1.+j)+S1(1.+k))*(-
            3.-2./((1.+k)*(2.+k))+4.*S1(1.+k))
 
-    MCQ1BET0 = -0.8333333333333334+0.5/((1.+j)*(2.+j))+0.5/((1.
+    MCQ1BET0 = -5/6+0.5/((1.+j)*(2.+j))+0.5/((1.
                + k)*(2.+k))+0.5*LRR2-S1(1.+j)-S1(1.+k)
 
     SUMA = 0j
