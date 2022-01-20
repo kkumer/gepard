@@ -360,6 +360,7 @@ class ConformalSpaceGPD(GPD, mellin.MellinBarnes):
                 'secg': 0., 'Esecg': 0,
                 'thig': 0., 'Ethig': 0,
                            'kapg': 0.})
+        mellin.MellinBarnes.__init__(self, **kwargs)
         super().__init__(**kwargs)
 
     def pw_strengths(self):
@@ -404,7 +405,7 @@ class ConformalSpaceGPD(GPD, mellin.MellinBarnes):
         wce_j2x = wilson.calc_j2x(self, x, eta, Q2)
         gpd_prerot = self.H(eta, t)
         gpd = np.einsum('fa,ja->jf', self.frot_j2x, gpd_prerot)
-        mb_int_flav = self._j2x_mellin_barnes_integral(x, wce_j2x, gpd)
+        mb_int_flav = self._j2x_mellin_barnes_integral(x, eta, wce_j2x, gpd)
         return mb_int_flav / np.pi
 
 

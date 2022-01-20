@@ -107,7 +107,6 @@ def test_ConformalMoment_gpdH_fit():
 #             np.array([[1.1665696086-0.00161121675988j, 5.59105109-0.0109293227j]]))
 
 
-@mark.skip('x-space eta=x GPDs not yet implemented.')
 def test_GPDtraj():
     """Calculate GPDs on border/cross-over trajectory eta=x."""
     gpd = g.gpd.PWNormGPD(residualt='exp')

@@ -3,20 +3,12 @@ Installation
 ############
 
 Gepard is a Python package available from PyPI
-repository so you should be able to install the latest version
-together with required dependencies by simply issuing
+repository (**not yet!!**) so you should be able to install the latest version
+together with the required dependencies by simply issuing
 
 .. code-block:: bash
 
    pip install gepard
-
-
-or 
-
-.. code-block:: bash
-
-   conda install gepard
-
 
 Of course, you should have Python first, as well as `pip`, which
 all major Linux distributions have as standard package.
@@ -53,7 +45,7 @@ or, better, use pip to install as "editable"
 
 which will install the package in your local Python's
 site-packages, but only as a link to sources, so any
-changes will be immediately active.
+changes to the sources will be immediately active.
 
 
 Requirements

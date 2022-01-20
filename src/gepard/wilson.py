@@ -125,35 +125,39 @@ def calc_j2x(m, x: float, eta: float, q2: float):
        q2: final evolution scale
 
     Returns:
-         wce[k,j]: k in range(npts), j in [Q,G,NSP]
+         wce[s,k,j]: s in range(npwmax), k in range(npts), j in [Q,G,NSP]
 
     Todo:
         Implement general (eta != x) j to x transform.
 
     """
-    j = m.jpoints
-    one = np.ones_like(j)
-    zero = np.zeros_like(j)
-    fshu = _fshu(j)
-    if eta < 1e-8:
-        # forward limit, PDF-like
-        # NSP is set to zero before normalization can be checked
-        wc = np.stack((one, x*one, zero)).transpose()
-    elif abs(eta-x) < 1e-8:
-        # cross-over, border eta=x limit
-        wc = np.stack((fshu, fshu*2*x/(3+j), zero)).transpose()
-    else:
-        raise Exception('eta has to be either 0 or equal to x')
-    # evolution operators
-    # DVCS is specified now just so that msbar evolution works properly
-    evola_si = evolution.evolop(m, j, q2, 'DVCS')     # 2x2
-    evola_ns = evolution.evolopns(m, j, q2, 'DVCS')   # 1x1, NSP
-    zero_right = np.zeros((evola_ns.shape[0], 2, 2, 1))
-    zero_down = np.zeros((evola_ns.shape[0], 2, 1, 2))
-    evola_ns = evola_ns.reshape((evola_ns.shape[0], 2, 1, 1))
-    evola = np.block([[evola_si, zero_right],               # 3x3
-                      [zero_down, evola_ns]])
-    # take just appropriate LO or NLO part
-    evola = evola[:, m.p, :, :]
-    # 3. combine coef. with evolution operator
-    return np.einsum('ki,kij->kj', wc, evola)
+    #####
+    wce = []
+    for pw_shift in [0, 2, 4]:
+        j = m.jpoints + pw_shift
+        one = np.ones_like(j)
+        zero = np.zeros_like(j)
+        fshu = _fshu(j)
+        if eta < 1e-8:
+            # forward limit, PDF-like
+            # NSP is set to zero before normalization can be checked
+            wc = np.stack((one, x*one, zero)).transpose()
+        elif abs(eta-x) < 1e-8:
+            # cross-over, border eta=x limit
+            wc = np.stack((fshu, fshu*2*x/(3+j), zero)).transpose()
+        else:
+            raise Exception('eta has to be either 0 or equal to x')
+        # evolution operators
+        # DVCS is specified now just so that msbar evolution works properly
+        evola_si = evolution.evolop(m, j, q2, 'DVCS')     # 2x2
+        evola_ns = evolution.evolopns(m, j, q2, 'DVCS')   # 1x1, NSP
+        zero_right = np.zeros((evola_ns.shape[0], 2, 2, 1))
+        zero_down = np.zeros((evola_ns.shape[0], 2, 1, 2))
+        evola_ns = evola_ns.reshape((evola_ns.shape[0], 2, 1, 1))
+        evola = np.block([[evola_si, zero_right],               # 3x3
+                          [zero_down, evola_ns]])
+        # take just appropriate LO or NLO part
+        evola = evola[:, m.p, :, :]
+        # combine coef. with evolution operator
+        wce.append(np.einsum('ki, kij->kj', wc, evola))
+    return np.stack(wce, axis=0)  # stack PWs

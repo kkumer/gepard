@@ -62,8 +62,9 @@ Speed-benchmarking the code
 
 
 This took about 15 seconds on my machine on old hybrid Fortran/Python gepard with paralelization. 
-At some point, it took about 23 seconds on the pure Python code, without paralelization!
-Then it grew to 29 seconds, I think after introducing general flavor structre with matrices.
+Now it takes about 30 seconds on this new pure Python code, without paralelization!
+(By the way, to parallelize present Python code, one should maybe just switch from ``einsum`` 
+to ``dot`` for numpy array summations, and use proper version of numpy.)
 
 
 Code style
