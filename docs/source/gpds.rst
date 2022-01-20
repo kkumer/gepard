@@ -103,6 +103,23 @@ The following table lists some more important attributes of this model.
 Here residual :math:`t` dependence is beyond the dependence
 :math:`x^{-\alpha' t}` coming from the Regge trajectory.
 
+For a given j-space model, you can evaluate also standard GPDs
+in the x-space (presently only GPD H, and only for :math:`\eta=0`
+or :math:`\eta=x`), using method ``gpd.Hx(x, eta, t, Q2)``,
+which returns triplet of singlet/sea quark GPD, gluon GPD, and
+non-singlet/valence quark GPD (the last one is not implemented yet
+and is set to zero):
+
+.. code-block:: python
+
+   >>> gpd.Hx(0.01, 0, 0, 8)   # should be equal to PDFs
+   array([258.04908329,  25.19998599,   0.        ])
+   >>> gpd.Hx(0.01, 0.01, -0.2, 4)
+   array([267.91985614,   2.13496561,   0.        ])
+   >>> gpd.Hx(0.02, 0.01, -0.2, 4)   # doesn't work for any eta!
+   Traceback (most recent call last):
+   ...
+   Exception: eta has to be either 0 or equal to x
 
 CFFs
 ----
