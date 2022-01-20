@@ -26,7 +26,7 @@ For Python packages which are required to run Gepard code, see
 the file [requirements.txt](requirements.txt).
 
 For the public release (real soon now), we intend to create
-the public PyPI and conda packages for easy installation.
+the public PyPI package for easy installation.
 
 ## Using
 
@@ -41,6 +41,9 @@ If you use Gepard for your scientific publications, you might want to cite the
 framework that is implemented in the Gepard code is described in some detail.
 
 
-## License
+## Copyright and license
 
-GNU [AGPLv3](https://www.gnu.org/licenses/why-affero-gpl.en.html).
+Copyright (C) 2022 Krešimir Kumerički
+
+This program is free software: you can redistribute it and/or modify it under the terms of the 
+GNU Affero General Public License v3.0 or later. See the file [LICENCE](LICENSE) for details.
