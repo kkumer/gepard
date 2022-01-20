@@ -408,6 +408,23 @@ class ConformalSpaceGPD(GPD, mellin.MellinBarnes):
         mb_int_flav = self._j2x_mellin_barnes_integral(x, eta, wce_j2x, gpd)
         return mb_int_flav / np.pi
 
+    def Ex(self, x: float, eta: float, t: float, Q2: float) -> np.ndarray:
+        """Return x-space GPD E.
+
+        3-dim vector (singlet quark, gluon, non-singlet quark) is returned
+        by transforming original conformal moment space (j-space) model.
+
+        Todo:
+            Non-singlet component is set to zero. We need to check
+            normalization/symmetrization first.
+
+        """
+        # get "Wilson" coef., first PW is the only relevant one
+        wce_j2x = wilson.calc_j2x(self, x, eta, Q2)
+        gpd_prerot = self.E(eta, t)
+        gpd = np.einsum('fa,ja->jf', self.frot_j2x, gpd_prerot)
+        mb_int_flav = self._j2x_mellin_barnes_integral_E(x, eta, wce_j2x, gpd)
+        return mb_int_flav / np.pi
 
 
 class TestGPD(ConformalSpaceGPD):
@@ -473,7 +490,10 @@ class PWNormGPD(ConformalSpaceGPD):
 
     def E(self, eta: float, t: float) -> np.ndarray:
         """Return (npts, 4) array E_j^a for all j-points and 4 flavors."""
+        # Implement BS+BG=0 sum rule that fixes 'kapg'
+        self.parameters['kapg'] = - self.parameters['kaps'] * self.parameters['ns'] / (
+                0.6 - self.parameters['ns'])
         kappa = np.array([self.parameters['kaps'], self.parameters['kapg'], 0, 0])
-        return kappa * singlet_ng_constrained(self.jpoints, t, self.parameters,
-                self.residualt).transpose()
+        return kappa * singlet_ng_constrained_E(self.jpoints, t,
+                            self.parameters, self.residualt).transpose()
 

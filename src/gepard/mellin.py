@@ -68,3 +68,20 @@ class MellinBarnes(object):
             raise Exception('eta has to be either 0 or equal to x')
         mb_int_flav = np.dot(self.wg, cch.imag)
         return mb_int_flav
+
+    def _j2x_mellin_barnes_integral_E(self, x, eta, wce, gpd):
+        """Return convolution of j->x coef, evolution operator and GPD E."""
+        # difference wrt above integrations is that here we do NOT sum over flavors
+        eph = np.exp(self.phi*1j)
+        cfacj = eph * np.exp((self.jpoints + 1) * log(1/x))  # eph/x**(j+1)
+        if eta < 1e-8:
+            # forward limit, PDF-like, so only zero-th PW is taken
+            cch = np.einsum('j,ja,ja->ja', cfacj, wce[0,:,:], gpd)
+        elif abs(eta-x) < 1e-8:
+            # cross-over, border eta=x limit
+            cch = np.einsum('j,sa,sja,ja->ja', cfacj,
+                            self.pw_strengths_E(), wce, gpd)
+        else:
+            raise Exception('eta has to be either 0 or equal to x')
+        mb_int_flav = np.dot(self.wg, cch.imag)
+        return mb_int_flav

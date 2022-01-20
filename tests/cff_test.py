@@ -74,6 +74,12 @@ class CFFTest3(g.gpd.PWNormGPD, g.cff.MellinBarnesCFF):
         """For this model, PW strenghts are same as for H."""
         return self.pw_strengths()
 
+    def E(self, eta: float, t: float) -> np.ndarray:
+        """Return (npts, 4) array E_j^a for all j-points and 4 flavors."""
+        kappa = np.array([self.parameters['kaps'], self.parameters['kapg'], 0, 0])
+        return kappa * g.gpd.singlet_ng_constrained(self.jpoints, t, self.parameters,
+                self.residualt).transpose()
+
 
 class CFFTest4(g.gpd.PWNormGPD, g.cff.HybridFixedPoleCFF):
 	pass
