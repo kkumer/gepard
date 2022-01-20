@@ -27,7 +27,7 @@ class DVMP(theory.Theory):
     _Xrhot = _XrhotApprox
 
 
-class MellinBarnesTFF(model.ParameterModel, mellin.MellinBarnes):
+class MellinBarnesTFF(model.ParameterModel):
     """DVMP Transition Form Factors modelled as Mellin-Barnes integral."""
 
     def __init__(self, **kwargs):
@@ -40,8 +40,6 @@ class MellinBarnesTFF(model.ParameterModel, mellin.MellinBarnes):
         # 2. correction to get results from "Towards DVMP" paper.
         #  Set to -1 to get agreement with Dieter's notebook.
         self.corr_c1dvmp_sgn = 1
-        # print('TFF init done.')
-        mellin.MellinBarnes.__init__(self, **kwargs)
         super().__init__(**kwargs)
 
     def tff(self, xi: float, t: float, Q2: float) -> np.ndarray:

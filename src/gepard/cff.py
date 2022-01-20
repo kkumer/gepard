@@ -65,7 +65,7 @@ class CFF(model.ParameterModel):
                 (1e-3 < pt.xB < 0.5))
 
 
-class MellinBarnesCFF(CFF, mellin.MellinBarnes):
+class MellinBarnesCFF(CFF):
     """Class of models built by Mellin-Barnes integration."""
 
     def __init__(self, **kwargs) -> None:
@@ -76,7 +76,6 @@ class MellinBarnesCFF(CFF, mellin.MellinBarnes):
         self.tgj = np.tan(pi*self.jpoints/2.)
         # wce[Q2] = wce[spw, j, a] - Wilson coeffs evolved; local to model instance
         self.wce: Dict[float, np.ndarray] = {}  # DVCS Wilson coefs.
-        mellin.MellinBarnes.__init__(self, **kwargs)
         super().__init__(**kwargs)
 
     def cff_old(self, pt: data.DataPoint) -> np.ndarray:

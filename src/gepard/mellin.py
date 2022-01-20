@@ -1,4 +1,9 @@
-"""Mellin-Barnes integrations."""
+"""Mellin-Barnes integrations.
+
+Todo:
+    Various MB routines should be integrated into one.
+
+"""
 
 from math import log, pi
 
@@ -46,3 +51,12 @@ class MellinBarnes(object):
         cch = np.einsum('j,ja,ja->j', cfacj, wce, pdf)
         mb_int = np.dot(self.wg, cch.imag)
         return mb_int
+
+    def _j2x_mellin_barnes_integral(self, xi, wce, gpd):
+        """Return convolution of j->x coef, evolution operator and GPD."""
+        # difference wrt above integrations is that here we do NOT sum over flavors
+        eph = np.exp(self.phi*1j)
+        cfacj = eph * np.exp((self.jpoints + 1) * log(1/xi))  # eph/xi**(j+1)
+        cch = np.einsum('j,ja,ja->ja', cfacj, wce, gpd)
+        mb_int_flav = np.dot(self.wg, cch.imag)
+        return mb_int_flav

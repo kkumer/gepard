@@ -47,7 +47,7 @@ def r(Q2: float, xB: float, t: float, y: float, eps2: float) -> float:
     return - (2.-y) / (2.-2.*y+y**2) * brace
 
 def P1P2(pt: data.DataPoint) -> float:
-    """ Product of Bethe-Heitler propagators, BMK Eq(32)."""
+    """ Product of Bethe-Heitler propagators, BMK Eq. (32)."""
     P1 = - ( J(pt.Q2, pt.xB, pt.t, pt.y, pt.eps2) + 2. *
             sqrt(K2(pt.Q2, pt.xB, pt.t, pt.y, pt.eps2)) * cos(pt.phi) ) / (
                     pt.y * (1. + pt.eps2) )
@@ -105,4 +105,4 @@ def long2trans(pt: data.DataPoint) -> float:
 
 def HandFlux(pt: data.DataPoint) -> float:
     """ Virtual photon flux (Hand convention) 1304.0077 Eq. (2.9) """
-    return (alpha/2./pi)*(pt.y**2/(1.-self.long2trans(pt)))*(1-pt.xB)/pt.xB/pt.Q2
+    return (alpha/2./pi)*(pt.y**2/(1.-long2trans(pt)))*(1-pt.xB)/pt.xB/pt.Q2

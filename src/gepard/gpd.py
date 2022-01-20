@@ -25,7 +25,7 @@ from typing import Tuple
 import numpy as np
 from scipy.special import loggamma  # type: ignore
 
-from . import constants, model, quadrature, special
+from . import constants, mellin, model, quadrature, special, wilson
 
 #  ---- Building block - j-dependence ----
 
@@ -316,10 +316,12 @@ class GPD(model.ParameterModel):
                                     [0, 1, 0, 0],
                                     [0., 0, 0., 0.]]) / np.sqrt(2)
                                # [3./20., 0, 5./12., 1./12.]]) / np.sqrt(2)
+        # For j2x
+        self.frot_j2x = self.frot_pdf
         super().__init__(**kwargs)
 
 
-class ConformalSpaceGPD(GPD):
+class ConformalSpaceGPD(GPD, mellin.MellinBarnes):
     """Base class of GPD models built in conformal moment space."""
 
     def __init__(self, **kwargs) -> None:
@@ -387,6 +389,25 @@ class ConformalSpaceGPD(GPD):
         """Return (npts, 4) array E_j^a for all j-points and 4 flavors."""
         return np.zeros((self.npts, 4), dtype=complex)
 
+    def Hx(self, x: float, eta: float, t: float, Q2: float) -> np.ndarray:
+        """Return x-space GPD.
+
+        3-dim vector (singlet quark, gluon, non-singlet quark) is returned
+        by transforming original conformal moment space (j-space) model.
+
+        Todo:
+            Non-singlet component is set to zero. We need to check
+            normalization/symmetrization first.
+
+        """
+        # get "Wilson" coef., first PW is the only relevant one
+        wce_j2x = wilson.calc_j2x(self, x, eta, Q2)
+        gpd_prerot = self.H(eta, t)
+        gpd = np.einsum('fa,ja->jf', self.frot_j2x, gpd_prerot)
+        mb_int_flav = self._j2x_mellin_barnes_integral(x, wce_j2x, gpd)
+        return mb_int_flav / np.pi
+
+
 
 class TestGPD(ConformalSpaceGPD):
     """Simple testing ansatz for GPDs."""
@@ -411,6 +432,17 @@ class TestGPD(ConformalSpaceGPD):
 
 class PWNormGPD(ConformalSpaceGPD):
     """Singlet-only model for GPDs with three SO(3) partial waves.
+
+    Args:
+        p: pQCD order (0 = LO, 1 = NLO, 2 = NNLO)
+        scheme: pQCD scheme  ('msbar' or 'csbar')
+        nf: number of active quark flavors
+        q02: Initial Q0^2 for GPD evolution.
+        r20: Initial mu0^2 for alpha_strong definition.
+        asp: alpha_strong/(2*pi) at scale r20 for (LO, NLO, NNLO)
+        residualt: residual t dependence ('dipole' or 'exp')
+        c: intersection of Mellin-Barnes curve with real axis
+        phi: angle of Mellin-Barnes curve with real axis
 
     Notes:
         Subleading PWs are proportional to the leading one, and

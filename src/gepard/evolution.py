@@ -224,6 +224,11 @@ def evolop(m, j, q2: float, process: str) -> np.ndarray:
          -  k is index of point on MB contour,
          -  p is pQCD order (0=LO, 1=NLO)
          -  i, j in [Q, G]
+
+    Todo:
+        Argument should not be a process type but GPD vs PDF, or we
+        should avoid it altogether somehow. This serves here only
+        to get the correct choice of evolution scheme (msbar vs csbar).
     """
     # 1. Alpha-strong ratio.
     # When m.p=1 (NLO), LO part of the evolution operator

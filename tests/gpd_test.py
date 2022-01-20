@@ -32,6 +32,19 @@ par_bp = {'ns': 0, 'al0s': 1.1, 'alps': 0.15,
 
 #  'hard' ansatz:
 par_bp_hard = {'ng': 0.4, 'al0g': 1.1 + 0.05, 'ns': 2./3. - 0.4}
+
+# one of Dieter's fits
+par_DM12 = {"ns": 0.152, "al0s": 1.1575, "alps": 0.1028, "ms2": 0.1814, "delms2": 0.,
+            "pows": 2., "secs": 0.5142, "this": -0.2106, # "SKEWS": 0.,
+            "al0g": 1.2473, "alpg": -0.023, "mg2": 0.2272, "delmg2": 0.,
+            "powg": 2., "secg": -4.587, "thig": 1.7607, # "SKEWG": 0.,
+            "kaps": 1.5265, "kapg": 0,  # kapg not present in orig
+            "Ens": 0.152,  # for fitting should be pegged to ns
+            "Eal0s": 1.1754, "Ealps": 0.0239, "Ems2": 0.1808, "Edelms2": 0.,
+            "Epows": 2., "Esecs": 0.5235, "Ethis": -0.2194, # "ESKEWS": 0.,
+            "Eal0g": 1.8486, "Ealpg": 0.05, "Emg2": 0.1487, "Edelmg2": 0.,
+            "Epowg": 2., "Esecg": -4.6366, "Ethig": 1.8638} #, "ESKEWG": 0.}
+
 #  -- Testing actual ansatze i.e. shapes of functions at single j-point
 
 
@@ -94,19 +107,22 @@ def test_ConformalMoment_gpdH_fit():
 #             np.array([[1.1665696086-0.00161121675988j, 5.59105109-0.0109293227j]]))
 
 
-# def test_GPDtraj():
-#     """Calculate GPDs on border trajectory xi=x."""
-#     assert True
-#     # assert m.gpdHtrajQ(pt0)/1000. == approx(1.34402)
-#     # assert_almost_equal(m.gpdHtrajG(pt0), 2.6866, 4)
-#     # assert_almost_equal(m.gpdEtrajQ(pt0)/1000., 1.98069, 5)
-#     # assert_almost_equal(m.gpdEtrajG(pt0)*100, 3.58365, 5)
+@mark.skip('x-space eta=x GPDs not yet implemented.')
+def test_GPDtraj():
+    """Calculate GPDs on border/cross-over trajectory eta=x."""
+    gpd = g.gpd.PWNormGPD(residualt='exp')
+    gpd.parameters.update(par_DM12)
+    assert gpd.Hx(xi_test, xi_test, t_test, Q2_test) == approx(
+            np.array([1344.02, 2.6866, 0]), rel=1e-5)
+    # assert gpd.gpdEx(xi_test, xi_test, t_test, Q2_test)[0]/1000. == approx(1.98069)
+    # assert gpd.gpdEx(xi_test, xi_test, t_test, Q2_test)[1]*100 == approx(3.58365)
 
 
-# def test_GPDzero():
-#     """Calculate GPDs on forward trajectory xi=0."""
-#     assert True
-#     # assert m.gpdHzeroQ(pt0)/1000. == approx(1.83647)
-#     # assert_almost_equal(m.gpdHzeroG(pt0), 6.9642, 4)
-#     # assert_almost_equal(m.gpdEzeroQ(pt0)/1000., 3.09861, 5)
-#     # assert_almost_equal(m.gpdEzeroG(pt0)*100, 7.56646, 5)
+def test_GPDzero():
+    """Calculate GPDs on forward trajectory eta=0."""
+    gpd = g.gpd.PWNormGPD(residualt='exp')
+    gpd.parameters.update(par_DM12)
+    assert gpd.Hx(xi_test, 0, t_test, Q2_test) == approx(
+            np.array([1836.47, 6.9642, 0]), rel=1e-5)
+    # assert gpd.Ex(xi_test, 0, t_test, Q2_test)[0]/1000. == approx(3.09861)
+    # assert gpd.Ex(xi_test, 0, t_test, Q2_test)[1]*100 == approx(7.56646)
