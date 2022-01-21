@@ -43,9 +43,6 @@ Final values of chi-square and of parameters are available as
    secs  =   -0.32 +- 0.01
 
 
-Using ``f.minuit`` user can directly access all the functionalities of the ``iminuit``,
-and should consult its `documentation <https://iminuit.readthedocs.io/en/stable/>`_
-
 After successful fit of theory object ``th``, user can access parameter uncertainties as
 ``th.parameters_errors`` dictionary, and full covariance matrix (inverse of the
 chi-square Hessian matrix) as ``th.covariance`` dictionary.
@@ -73,4 +70,16 @@ i. e.,  calculated together with their uncertainty:
    always significantly larger.
 
 
+Fitting using ``f.fit()`` is simple but limited. For better control over fitting procedure
+and determination of parameter uncertainties, user should use many functionalities
+of the ``iminuit`` package, and call directly it's functions like ``f.minuit.migrad``,
+``f.minuit.minos`` etc.
+For details one should consult  `documentation <https://iminuit.readthedocs.io/en/stable/>`_
+of this package.
+It is important to keep in mind that although parameter values are automatically kept in sync between
+``iminuit`` and ``Gepard``, parameter uncertainties and covariances are *not*. So, in 
+order to correctly use uncertainties in ``Gepard``, one should
+first syncronize covariances using special function ``f.covsync``. For example, simple
+fitting with ``f.fit()`` is equivalent to first doing ``f.minuit.migrad()`` and then
+``f.covsync()``.
 

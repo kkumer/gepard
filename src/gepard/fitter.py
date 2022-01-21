@@ -42,15 +42,22 @@ class MinuitFitter(Fitter):
             self.minuit.limits[k] = v
         Fitter.__init__(self, **kwargs)
 
-    def fit(self):
-        """Start fitting."""
-        self.minuit.migrad()
+    def covsync(self):
+        """Synchronize covariance and theory parameter errors with iminuit."""
         self.theory.parameters_errors = self.minuit.errors.to_dict()
         # iminuit gives covariance table for all parameters, here
         # we take only free ones:
         self.theory.covariance = {(p1, p2): self.minuit.covariance[p1, p2]
                                  for p1 in self.theory.free_parameters()
                                  for p2 in self.theory.free_parameters()}
+    def fit(self):
+        """Perform simple fit.
+
+        For better control, use iminuit's functions.
+
+        """
+        self.minuit.migrad()
+        self.covsync()
 
 
     # The following methods keep status of parameters (fixed, limits)
