@@ -33,7 +33,7 @@ class gpd_model(g.gpd.ConformalSpaceGPD):
         kwargs.setdefault('p', 1)
         kwargs.setdefault('scheme', 'csbar')
         kwargs.setdefault('nf', 4)
-        kwargs.setdefault('q02', 2.5)
+        kwargs.setdefault('Q02', 2.5)
         kwargs.setdefault('asp', np.array([0.05, 0.05, 0.05]))
         kwargs.setdefault('phi', 1.9)
         self.type = type

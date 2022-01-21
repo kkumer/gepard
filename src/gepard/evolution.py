@@ -143,12 +143,12 @@ def erfunc_nd(m, lamj, lamk, R) -> np.ndarray:
     return er1
 
 
-def cb1(m, q2, zn, zk, NS=False):
+def cb1(m, Q2, zn, zk, NS=False):
     """Non-diagonal part of NLO evol op.
 
     Args:
           m: instance of the model
-          q2: evolution point
+          Q2: evolution point
           zn: non-diagonal evolution Mellin-Barnes integration point (array)
           zk: COPE Mellin-Barnes integration point (not array! - FIXME)
 
@@ -162,9 +162,9 @@ def cb1(m, q2, zn, zk, NS=False):
         (2^(K+1) GAMMA(K+5/2))  / ( GAMMA(3/2) GAMMA(K+3) )
 
     """
-    asmuf2 = qcd.as2pf(m.p, m.nf, q2, m.asp[m.p], m.r20)
-    asq02 = qcd.as2pf(m.p, m.nf, m.q02, m.asp[m.p], m.r20)
-    R = asmuf2/asq02
+    asmuf2 = qcd.as2pf(m.p, m.nf, Q2, m.asp[m.p], m.r20)
+    asQ02 = qcd.as2pf(m.p, m.nf, m.Q02, m.asp[m.p], m.r20)
+    R = asmuf2/asQ02
     b0 = qcd.beta(0, m.nf)
     AAA = (special.S1((zn+zk+2)/2) -
            special.S1((zn-zk-2)/2) +
@@ -209,13 +209,13 @@ def cb1(m, q2, zn, zk, NS=False):
     return cb1
 
 
-def evolop(m, j, q2: float, process: str) -> np.ndarray:
+def evolop(m, j, Q2: float, process: str) -> np.ndarray:
     """GPD evolution operator.
 
     Args:
          m: instance of the model
          j: MB contour points (overrides m.jpoints)
-         q2: final evolution momentum squared
+         Q2: final evolution momentum squared
          process: DIS, DVCS or DVMP
 
     Returns:
@@ -234,9 +234,9 @@ def evolop(m, j, q2: float, process: str) -> np.ndarray:
     # When m.p=1 (NLO), LO part of the evolution operator
     # will still be multiplied by ratio of alpha_strongs
     # evaluated at NLO, as it should.
-    asmuf2 = qcd.as2pf(m.p, m.nf, q2, m.asp[m.p], m.r20)
-    asq02 = qcd.as2pf(m.p, m.nf, m.q02, m.asp[m.p], m.r20)
-    R = asmuf2/asq02
+    asmuf2 = qcd.as2pf(m.p, m.nf, Q2, m.asp[m.p], m.r20)
+    asQ02 = qcd.as2pf(m.p, m.nf, m.Q02, m.asp[m.p], m.r20)
+    R = asmuf2/asQ02
 
     # 2. egeinvalues, projectors, projected mu-indep. part
     lam, pr, r1proj = rnlof(m, j)
@@ -264,8 +264,8 @@ def evolop(m, j, q2: float, process: str) -> np.ndarray:
                 ephnd = np.exp(ndphij)
                 tginv = ephnd/np.tan(np.pi*znd/2)
                 tginvc = ephnd.conjugate()/np.tan(np.pi*znd.conjugate()/2)
-                cb1f = cb1(m, q2, j_single + znd + 2, j_single)
-                cb1fc = cb1(m, q2, j_single + znd.conjugate() + 2, j_single)
+                cb1f = cb1(m, Q2, j_single + znd + 2, j_single)
+                cb1fc = cb1(m, Q2, j_single + znd.conjugate() + 2, j_single)
                 ndint = np.einsum('n,nij,n->ij', wgnd, cb1f, tginv)
                 ndint -= np.einsum('n,nij,n->ij', wgnd, cb1fc, tginvc)
                 ndint = ndint * 0.25j
@@ -279,13 +279,13 @@ def evolop(m, j, q2: float, process: str) -> np.ndarray:
     return evola
 
 
-def evolopns(m, j, q2: float, process: str) -> np.ndarray:
+def evolopns(m, j, Q2: float, process: str) -> np.ndarray:
     """GPD evolution operator (NSP case only atm).
 
     Args:
          m: instance of the model
          j: MB contour points (overrides m.jpoints)
-         q2: final evolution momentum squared
+         Q2: final evolution momentum squared
          process: DIS, DVCS or DVMP
 
     Returns:
@@ -301,9 +301,9 @@ def evolopns(m, j, q2: float, process: str) -> np.ndarray:
     # When m.p=1 (NLO), LO part of the evolution operator
     # will still be multiplied by ratio of alpha_strongs
     # evaluated at NLO, as it should.
-    asmuf2 = qcd.as2pf(m.p, m.nf, q2, m.asp[m.p], m.r20)
-    asq02 = qcd.as2pf(m.p, m.nf, m.q02, m.asp[m.p], m.r20)
-    R = asmuf2/asq02
+    asmuf2 = qcd.as2pf(m.p, m.nf, Q2, m.asp[m.p], m.r20)
+    asQ02 = qcd.as2pf(m.p, m.nf, m.Q02, m.asp[m.p], m.r20)
+    R = asmuf2/asQ02
 
     # 2. mu-indep. part
     gam0, r1 = rnlonsf(m, j, 1)   # prty=1 fixed
@@ -328,8 +328,8 @@ def evolopns(m, j, q2: float, process: str) -> np.ndarray:
                 ephnd = np.exp(ndphij)
                 tginv = ephnd/np.tan(np.pi*znd/2)
                 tginvc = ephnd.conjugate()/np.tan(np.pi*znd.conjugate()/2)
-                cb1f = cb1(m, q2, j_single + znd + 2, j_single, NS=True)
-                cb1fc = cb1(m, q2, j_single + znd.conjugate() + 2, j_single, NS=True)
+                cb1f = cb1(m, Q2, j_single + znd + 2, j_single, NS=True)
+                cb1fc = cb1(m, Q2, j_single + znd.conjugate() + 2, j_single, NS=True)
                 ndint = np.sum(wgnd * cb1f * tginv)
                 ndint -= np.sum(wgnd * cb1fc * tginvc)
                 ndint = ndint * 0.25j

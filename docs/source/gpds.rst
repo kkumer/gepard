@@ -35,7 +35,7 @@ or as attributes:
    0
    >>> th.scheme  # default factorization scheme
    'msbar'
-   >>> th2 = g.PWNormGPD(p=1, q02=2)
+   >>> th2 = g.PWNormGPD(p=1, Q02=2)
 
 Here we constructed second GPD model, ``th2``, which will be used
 at NLO order, and is considered to be defined at lower input scale
@@ -95,7 +95,7 @@ The following table lists some more important attributes of this model.
    * - ``nf``
      - number of active quark flavors
      - 4
-   * - ``q02``
+   * - ``Q02``
      - Initial :math:`Q_{0}^2` for GPD evolution
      - 4 (GeV^2)
    * - ``residual``

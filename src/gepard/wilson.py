@@ -36,7 +36,7 @@ def _fshu(j: np.ndarray) -> np.ndarray:
 
 
 def calc_wc(m, j, process: str):
-    """Calculate Wilson coeffs for given q2.
+    """Calculate Wilson coeffs for given Q2.
 
     Args:
        m: instance of the model
@@ -82,11 +82,11 @@ def calc_wc(m, j, process: str):
     return np.stack((c_quark, c_gluon, c_nsp)).transpose()
 
 
-def calc_wce(m, q2: float, process: str):
-    """Calculate evolved Wilson coeffs for given q2, for all PWs.
+def calc_wce(m, Q2: float, process: str):
+    """Calculate evolved Wilson coeffs for given Q2, for all PWs.
 
     Args:
-       q2: final evolution scale
+       Q2: final evolution scale
        m: instance of the Theory
        process: 'DIS, 'DVCS' or 'DVMP'
 
@@ -98,8 +98,8 @@ def calc_wce(m, q2: float, process: str):
         j = m.jpoints + pw_shift
         wc = calc_wc(m, j, process)
         # evolution operators
-        evola_si = evolution.evolop(m, j, q2, process)     # 2x2
-        evola_ns = evolution.evolopns(m, j, q2, process)   # 1x1, NSP
+        evola_si = evolution.evolop(m, j, Q2, process)     # 2x2
+        evola_ns = evolution.evolopns(m, j, Q2, process)   # 1x1, NSP
         zero_right = np.zeros((evola_ns.shape[0], 2, 2, 1))
         zero_down = np.zeros((evola_ns.shape[0], 2, 1, 2))
         evola_ns = evola_ns.reshape((evola_ns.shape[0], 2, 1, 1))
@@ -107,22 +107,22 @@ def calc_wce(m, q2: float, process: str):
                           [zero_down, evola_ns]])
         # p_mat: matrix that combines (LO, NLO) evolution operator and Wilson coeffs
         # while canceling NNLO term NLO*NLO:
-        asmur2 = qcd.as2pf(m.p, m.nf, q2/m.rr2, m.asp[m.p], m.r20)
-        asmuf2 = qcd.as2pf(m.p, m.nf, q2/m.rf2, m.asp[m.p], m.r20)
+        asmur2 = qcd.as2pf(m.p, m.nf, Q2/m.rr2, m.asp[m.p], m.r20)
+        asmuf2 = qcd.as2pf(m.p, m.nf, Q2/m.rf2, m.asp[m.p], m.r20)
         p_mat = np.array([[1, asmuf2], [asmur2, 0]])
         # 3. evolved Wilson coeff.
         wce.append(np.einsum('kpi,pq,kqij->kj', wc, p_mat, evola))
     return np.stack(wce, axis=0)  # stack PWs
 
 
-def calc_j2x(m, x: float, eta: float, q2: float):
+def calc_j2x(m, x: float, eta: float, Q2: float):
     """Calculate j2x coeffs, combined with evolution operator.
 
     Args:
        m: instance of the Theory
        x: long. momentum fraction argument of GPD
        eta: skewness
-       q2: final evolution scale
+       Q2: final evolution scale
 
     Returns:
          wce[s,k,j]: s in range(npwmax), k in range(npts), j in [Q,G,NSP]
@@ -149,8 +149,8 @@ def calc_j2x(m, x: float, eta: float, q2: float):
             raise Exception('eta has to be either 0 or equal to x')
         # evolution operators
         # DVCS is specified now just so that msbar evolution works properly
-        evola_si = evolution.evolop(m, j, q2, 'DVCS')     # 2x2
-        evola_ns = evolution.evolopns(m, j, q2, 'DVCS')   # 1x1, NSP
+        evola_si = evolution.evolop(m, j, Q2, 'DVCS')     # 2x2
+        evola_ns = evolution.evolopns(m, j, Q2, 'DVCS')   # 1x1, NSP
         zero_right = np.zeros((evola_ns.shape[0], 2, 2, 1))
         zero_down = np.zeros((evola_ns.shape[0], 2, 1, 2))
         evola_ns = evola_ns.reshape((evola_ns.shape[0], 2, 1, 1))

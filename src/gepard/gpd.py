@@ -264,7 +264,7 @@ class GPD(model.ParameterModel):
             p: pQCD order (0 = LO, 1 = NLO, 2 = NNLO)
             scheme: pQCD scheme  ('msbar' or 'csbar')
             nf: number of active quark flavors
-            q02: Initial Q0^2 for GPD evolution.
+            Q02: Initial Q0^2 for GPD evolution.
             r20: Initial mu0^2 for alpha_strong definition.
             asp: alpha_strong/(2*pi) at scale r20 for (LO, NLO, NNLO)
             residualt: residual t dependence ('dipole' or 'exp')
@@ -273,7 +273,7 @@ class GPD(model.ParameterModel):
         self.p = kwargs.setdefault('p', 0)
         self.scheme = kwargs.setdefault('scheme', 'msbar')
         self.nf = kwargs.setdefault('nf', 4)
-        self.q02 = kwargs.setdefault('q02', 4.0)
+        self.Q02 = kwargs.setdefault('Q02', 4.0)
         self.r20 = kwargs.setdefault('r20', 2.5)
         self.asp = kwargs.setdefault('asp', np.array([0.0606, 0.0518, 0.0488]))
         self.residualt = kwargs.setdefault('residualt', 'dipole')
@@ -434,7 +434,7 @@ class TestGPD(ConformalSpaceGPD):
         """Init TestGPD object."""
         kwargs.setdefault('scheme', 'csbar')
         kwargs.setdefault('nf', 3)
-        kwargs.setdefault('q02', 1.0)
+        kwargs.setdefault('Q02', 1.0)
         kwargs.setdefault('r20', 2.5)
         kwargs.setdefault('asp', np.array([0.05, 0.05, 0.05]))
         super().__init__(**kwargs)
@@ -455,7 +455,7 @@ class PWNormGPD(ConformalSpaceGPD):
         p: pQCD order (0 = LO, 1 = NLO, 2 = NNLO)
         scheme: pQCD scheme  ('msbar' or 'csbar')
         nf: number of active quark flavors
-        q02: Initial Q0^2 for GPD evolution.
+        Q02: Initial Q0^2 for GPD evolution.
         r20: Initial mu0^2 for alpha_strong definition.
         asp: alpha_strong/(2*pi) at scale r20 for (LO, NLO, NNLO)
         residualt: residual t dependence ('dipole' or 'exp')
