@@ -127,9 +127,6 @@ class Theory(object):
             result = (fun(pt), sqrt(var))
         else:
             result = fun(pt)
-            if isinstance(result, ndarray):
-                # we have neural net
-                result = result.mean()
 
         if 'parameters' in kwargs:
             # restore old values
