@@ -16,8 +16,8 @@ mass parameter controlling dipole :math:`t`-dependence:
 .. code-block:: python
 
    >>> import gepard as g
-   >>> gpd = g.PWNormGPD()
-   >>> gpd.parameters['ms2']
+   >>> th = g.PWNormGPD()
+   >>> th.parameters['ms2']
    1.1
 
 For more on manipulations with model parameters, see the 
@@ -31,15 +31,17 @@ or as attributes:
 
 .. code-block:: python
 
-   >>> gpd.p    # p=0 for LO, 1 for NLO
+   >>> th.p    # p=0 for LO, 1 for NLO
    0
-   >>> gpd.scheme  # default factorization scheme
+   >>> th.scheme  # default factorization scheme
    'msbar'
-   >>> gpd2 = g.PWNormGPD(p=1, q02=4)
+   >>> th2 = g.PWNormGPD(p=1, q02=2)
 
-Here we constructed second GPD model, `gpd`, which will be used
-at NLO order, and considered to be defined at input scale
-:math:`Q_{0}^2 = 4\, {\rm GeV}^2`,
+Here we constructed second GPD model, ``th2``, which will be used
+at NLO order, and is considered to be defined at lower input scale
+:math:`Q_{0}^2 = 2\, {\rm GeV}^2`.
+(Most of the Gepard models have :math:`Q_{0}^2 = 4\, {\rm GeV}^2`
+as a default input scale.)
 
 
 GPDs
@@ -48,11 +50,11 @@ GPDs
 Generalized parton distributions (GPDs) are modelled in the
 conformal moment :math:`j` space, with GPD of flavor :math:`a`,
 :math:`H^{a}_{j}(\eta, t)`,
-represented as ``H(eta, t)`` function of skewedness :math:`\eta` and
+implemented as ``H(eta, t)`` Python function of skewedness :math:`\eta` and
 momentum transfer squared :math:`t`, which returns the two-dimensional
 array of numbers with the shape :math:`npts \times 4`, where :math:`npts` is
-the number of points on the Mellin-Barnes contour (which defines the
-Compton form factors (CFFs)), and the 4 flavors are:
+the number of points on the Mellin-Barnes contour (the complex-space
+contour which defines the Compton form factors (CFFs)), and the 4 flavors are:
 
    - singlet quark
    - gluon
@@ -63,8 +65,9 @@ Valence here means "valence-like GPD" (see
 `hep-ph/0703179 <https://arXiv.org/abs/hep-ph/0703179>`_ for definition).
 
 GPD :math:`E` is modeled in the same way, while GPDs :math:`\tilde{H}` and
-:math:`\tilde{E}`, are not yet represented in Gepard on the GPD level
-(corresponding CFFs are sometimes modeled directly, see below).
+:math:`\tilde{E}`, are not yet represented in Gepard on the GPD level.
+(In some Gepard theories corresponding CFFs :math:`\tilde{\tilde{H}}`,
+and :math:`\tilde{\tilde{E}}` are modeled directly.)
 
 The conformal space GPDs :math:`H` and :math:`E`, are convoluted with
 appropriate hard-scattering Wilson coefficients and evolution operator
@@ -73,7 +76,7 @@ to create CFFs (for DVCS) or transition form factors (TFFs, for DVMP).
 The default conformal space GPD model in Gepard is ``PWNormGPD``,
 which uses the SO(3) partial waves decomposition of GPDs, with
 second and third partial wave proportional to the first one
-(the only additional parameters are normalization of the waves).
+(the only additional parameters of subleading partial waves are their normalizations).
 This model is described in `arXiv:0904.0458 <https://arxiv.org/abs/0904.0458>`_.
 The following table lists some more important attributes of this model.
 
@@ -100,26 +103,31 @@ The following table lists some more important attributes of this model.
      - 'dipole'
 
 
-Here residual :math:`t` dependence is beyond the dependence
+Here the residual :math:`t` dependence is additional to the dependence
 :math:`x^{-\alpha' t}` coming from the Regge trajectory.
+Parameters of this model are described in the above paper.
 
 For a given j-space model, you can evaluate also standard GPDs
 in the x-space (presently only for :math:`\eta=0`
-or :math:`\eta=x`), using method ``gpd.Hx(x, eta, t, Q2)``,
+or :math:`\eta=x`), using method ``th.Hx``,
 which returns the triplet [singlet/sea quark, gluon,
 non-singlet/valence quark] GPDs (the third one is not implemented yet
 and is set to zero):
 
 .. code-block:: python
 
-   >>> gpd.Hx(0.01, 0, 0, 8)   # should be equal to PDFs
+   >>> pt = g.DataPoint({'x': 0.01, 'eta': 0, 't': 0, 'Q2': 8})
+   >>> th.Hx(pt)   # should be equal to PDFs
    array([258.04908329,  25.19998599,   0.        ])
-   >>> gpd.Hx(0.01, 0.01, -0.2, 4)
+   >>> pt = g.DataPoint({'x': 0.01, 'eta': 0.01, 't': -0.2, 'Q2': 4})
+   >>> th.Hx(pt)
    array([267.91985614,   2.13496561,   0.        ])
-   >>> gpd.Hx(0.02, 0.01, -0.2, 4)   # doesn't work for arbitrary eta!
+   >>> pt.eta = 0.3
+   >>> th.Hx(pt)   # doesn't work yet for arbitrary eta!
    Traceback (most recent call last):
    ...
    Exception: eta has to be either 0 or equal to x
+
 
 CFFs
 ----

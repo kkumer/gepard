@@ -3,11 +3,15 @@ Tutorial
 ########
 
 
-After importing Gepard package, we first construct a new ``theory`` class 
-by combining code for GPDs (SO(3) partial-waves conformal space
-model ``PWNormGPD``), for CFFs (``MellinBarnesCFF`` which combines
-conformal space GPDs with appropriate hard-scattering coefficients).
-We also need code for DVCS cross-section (``BMK``) and for DIS F2:
+After importing Gepard package, if one of the theories available
+in ``gepard.fits`` are not enough, and we want to make a new
+GPD fit, we can construct a new ``theory`` class 
+by combining code for
+
+1. GPDs (we take SO(3) partial-waves conformal space model ``PWNormGPD``), 
+2. for CFFs ( we take ``MellinBarnesCFF`` which combines conformal space GPDs with appropriate hard-scattering coefficients), and
+3. for DVCS observables (``BMK``) 
+4. for DIS F2 (good idea, so that forward limit of GPDs describes DIS data)
 
 .. plot::
    :context:
@@ -18,7 +22,7 @@ We also need code for DVCS cross-section (``BMK``) and for DIS F2:
    ...     pass
 
 
-We then construct an instance of this new model class, where we
+We then construct an instance of this new class, where we
 decide that we want to work at NLO (``p = 1``):
 
 .. plot::
@@ -27,9 +31,15 @@ decide that we want to work at NLO (``p = 1``):
 
    >>> th = MyTheory(p=1)
 
+.. note::
 
-We would like to confront this theory with experimental data on DIS
-and DVCS. We take just two H1 datasets:
+   It is somewhat of a convention, which we follow in this documentation,
+   that names of ``Theory`` instances always start with ``th``, while
+   the names of ``DataPoint`` instances always start with ``pt``.
+
+
+We would now like to confront this theory with experimental data on DIS
+and DVCS. For demonstration purposes, we take just two H1 datasets:
 
 .. plot::
    :context:
@@ -57,7 +67,7 @@ Here we see that dataset ``id=206`` contains 10
 measurements of DIS :math:`F_2`, while ``id=39`` contains
 8 measurements of pure DVCS cross-section, differential in :math:`t`.
 (``FTn`` column is not relevant here.). We also see the
-reference to original literature.
+reference to original literature where measurements were published.
 
 To see if our theory describes this data we can either calculate
 total :math:`\chi^2`:
@@ -79,8 +89,8 @@ or we can plot theory line against data points like this:
    >>> gepard.plots.jbod(points=DVCSpoints, lines=th).show()
 
 
-This is obviously bad, so we now fit the parameters of the
-theory to this data. We construct the ``MinuitFitter`` object,
+This is obviously bad, so let us fit the parameters of the
+theory to this data. For this, we construct the ``MinuitFitter`` object,
 release some of the model parameters (overal normalization ``ns``,
 residual :math:`t`-dependence parameter ``ms2``, and normalization
 of the second partial wave ``secs``, all for sea quarks):
@@ -93,6 +103,16 @@ of the second partial wave ``secs``, all for sea quarks):
    >>> f.release_parameters('ns', 'ms2', 'secs')
    >>> f.fit()
 
+After fitting is done, we print the resulting values and uncertainties of fitting parameters:
+
+.. plot::
+   :context: close-figs
+   :include-source:
+
+   >>> th.print_parameters()
+   ns    =    0.17 +- 0.01
+   ms2   =    0.93 +- 0.10
+   secs  =    0.18 +- 0.03
 
 Theory now describes the data fine, as one can see from :math:`\chi^2`
 value:
@@ -137,14 +157,3 @@ Finally, one could calculate and then plot some particular CFF, like this:
    >>> plt.legend()  # doctest: +SKIP
 
 
-or print the resulting values and uncertainties of fitting parameters:
-
-
-.. plot::
-   :context: close-figs
-   :include-source:
-
-   >>> th.print_parameters()
-   ns    =    0.17 +- 0.01
-   ms2   =    0.93 +- 0.10
-   secs  =    0.18 +- 0.03

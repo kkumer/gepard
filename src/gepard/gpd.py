@@ -25,7 +25,7 @@ from typing import Tuple
 import numpy as np
 from scipy.special import loggamma  # type: ignore
 
-from . import constants, mellin, model, quadrature, special, wilson
+from . import constants, data, mellin, model, quadrature, special, wilson
 
 #  ---- Building block - j-dependence ----
 
@@ -390,7 +390,7 @@ class ConformalSpaceGPD(GPD, mellin.MellinBarnes):
         """Return (npts, 4) array E_j^a for all j-points and 4 flavors."""
         return np.zeros((self.npts, 4), dtype=complex)
 
-    def Hx(self, x: float, eta: float, t: float, Q2: float) -> np.ndarray:
+    def Hx(self, pt: data.DataPoint) -> np.ndarray:
         """Return x-space GPD.
 
         3-dim vector (singlet quark, gluon, non-singlet quark) is returned
@@ -402,13 +402,13 @@ class ConformalSpaceGPD(GPD, mellin.MellinBarnes):
 
         """
         # get "Wilson" coef., first PW is the only relevant one
-        wce_j2x = wilson.calc_j2x(self, x, eta, Q2)
-        gpd_prerot = self.H(eta, t)
+        wce_j2x = wilson.calc_j2x(self, pt.x, pt.eta, pt.Q2)
+        gpd_prerot = self.H(pt.eta, pt.t)
         gpd = np.einsum('fa,ja->jf', self.frot_j2x, gpd_prerot)
-        mb_int_flav = self._j2x_mellin_barnes_integral(x, eta, wce_j2x, gpd)
+        mb_int_flav = self._j2x_mellin_barnes_integral(pt.x, pt.eta, wce_j2x, gpd)
         return mb_int_flav / np.pi
 
-    def Ex(self, x: float, eta: float, t: float, Q2: float) -> np.ndarray:
+    def Ex(self, pt: data.DataPoint) -> np.ndarray:
         """Return x-space GPD E.
 
         3-dim vector (singlet quark, gluon, non-singlet quark) is returned
@@ -420,10 +420,10 @@ class ConformalSpaceGPD(GPD, mellin.MellinBarnes):
 
         """
         # get "Wilson" coef., first PW is the only relevant one
-        wce_j2x = wilson.calc_j2x(self, x, eta, Q2)
-        gpd_prerot = self.E(eta, t)
+        wce_j2x = wilson.calc_j2x(self, pt.x, pt.eta, pt.Q2)
+        gpd_prerot = self.E(pt.eta, pt.t)
         gpd = np.einsum('fa,ja->jf', self.frot_j2x, gpd_prerot)
-        mb_int_flav = self._j2x_mellin_barnes_integral_E(x, eta, wce_j2x, gpd)
+        mb_int_flav = self._j2x_mellin_barnes_integral_E(pt.x, pt.eta, wce_j2x, gpd)
         return mb_int_flav / np.pi
 
 

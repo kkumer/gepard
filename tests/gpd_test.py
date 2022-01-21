@@ -12,6 +12,8 @@ Q2_test = 4.
 
 pt0 = g.DataPoint({'xi': xi_test, 't': t_test, 'Q2': Q2_test})
 pt0.xB = 2.*pt0.xi/(1.+pt0.xi)
+ptzero = g.DataPoint({'x': xi_test, 'eta': 0, 't': t_test, 'Q2': Q2_test})
+pttraj = g.DataPoint({'x': xi_test, 'eta': xi_test, 't': t_test, 'Q2': Q2_test})
 
 par_test = {'ns': 2./3. - 0.4, 'al0s': 1.1, 'alps': 0.25, 'ms2': 1.1**2,
             'ng': 0.4, 'al0g': 1.2, 'alpg': 0.25, 'mg2': 1.2**2}
@@ -127,17 +129,17 @@ def test_GPDzero():
     """Calculate GPDs on forward trajectory eta=0."""
     gpd = g.gpd.PWNormGPD(residualt='exp')
     gpd.parameters.update(par_DM12)
-    # assert gpd.Hx(xi_test, 0, t_test, Q2_test) == approx(
-    #         np.array([1836.47, 6.9642, 0]), rel=1e-5)
-    assert gpd.Ex(xi_test, 0, t_test, Q2_test)[0] == approx(3098.61, rel=1e-5)
-    assert gpd.Ex(xi_test, 0, t_test, Q2_test)[1] == approx(0.0756646, rel=1e-5)
+    assert gpd.Hx(ptzero) == approx(
+            np.array([1836.47, 6.9642, 0]), rel=1e-5)
+    assert gpd.Ex(ptzero) == approx(
+            np.array([3098.61, 0.0756646, 0]), rel=1e-5)
 
 
 def test_GPDtraj():
     """Calculate GPDs on border/cross-over trajectory eta=x."""
     gpd = g.gpd.PWNormGPD(residualt='exp')
     gpd.parameters.update(par_DM12)
-    assert gpd.Hx(xi_test, xi_test, t_test, Q2_test) == approx(
+    assert gpd.Hx(pttraj) == approx(
             np.array([1344.02, 2.6866, 0]), rel=1e-5)
-    assert gpd.Ex(xi_test, xi_test, t_test, Q2_test)[0] == approx(1980.69, rel=1e-5)
-    assert gpd.Ex(xi_test, xi_test, t_test, Q2_test)[1] == approx(0.0358365, rel=1e-5)
+    assert gpd.Ex(pttraj) == approx(
+            np.array([1980.69, 0.0358365, 0]), rel=1e-5)

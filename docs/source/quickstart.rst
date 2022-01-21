@@ -7,9 +7,9 @@ To use Gepard it is essential to understand the two main code objects:
 #. ``DataPoint`` contains information about kinematics and, possibly,
    about particular measurement perfomed at that kinematics
 
-#. ``Theory``, contains information on how to calculate observables for
-   given data point, which includes information about hadronic structure,
-   i. e., GPDs and electromagnetic form factors
+#. ``Theory``, contains algorithms for evaluation of
+   various structure functions (CFFs, GPDs, ...) and observables
+   (cross-sections, asymmetries, ...) for a given data point, 
 
 
 These objects are classes (in the sense of object-oriented programming)
