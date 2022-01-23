@@ -63,7 +63,7 @@ class DVCS(theory.Theory):
 
         # Overriding pt kinematics with those from 'vars' keyword attribute
         if 'vars' in kwargs:
-            kin = data.DataPoint(init=kwargs['vars'])
+            kin = data.DataPoint(kindict=kwargs['vars'])
             data._fill_kinematics(kin, old=pt)
         else:
             kin = pt.copy()

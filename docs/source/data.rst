@@ -76,7 +76,7 @@ in place from Trento to BMK frame and back, respectively.
 .. code-block:: python
 
    >>> import gepard as g
-   >>> pt = g.DataPoint({'xB': 0.1, 'phi': 1, 'frame': 'Trento'})
+   >>> pt = g.DataPoint(xB=0.1, phi=1, frame='Trento')
    >>> pt.to_conventions()
    >>> pt.phi    #  = (pi - phi)
    2.141592653589793

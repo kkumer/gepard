@@ -1,19 +1,18 @@
 """Tests for electromagnetic elastic form factors."""
 
-from pytest import approx
-
 import gepard as g
+from pytest import approx
 
 md = g.eff.DipoleEFF()  # dipole FFs
 m = g.eff.KellyEFF()  # Kelly's FFs
 
 # proton
-pt = g.DataPoint(init={'in2particle': 'p', 'Q2': 4., 't': 0., 'xB': 0.1})
-pt1 = g.DataPoint(init={'in2particle': 'p', 'Q2': 4., 't': -1., 'xB': 0.1})
+pt = g.DataPoint(in2particle='p', Q2=4., t=0., xB=0.1)
+pt1 = g.DataPoint(in2particle='p', Q2=4., t=-1., xB=0.1)
 
 # neutron
-npt = g.DataPoint(init={'in2particle': 'n', 'Q2': 4., 't': 0., 'xB': 0.1})
-npt1 = g.DataPoint(init={'in2particle': 'n', 'Q2': 4., 't': -1., 'xB': 0.1})
+npt = g.DataPoint(in2particle='n', Q2=4., t=0., xB=0.1)
+npt1 = g.DataPoint(in2particle='n', Q2=4., t=-1., xB=0.1)
 
 mup = 2.7928473
 mun = -1.913043

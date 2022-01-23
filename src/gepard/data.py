@@ -62,17 +62,18 @@ class DataPoint(dict):
     W: float
     t: float
 
-    def __init__(self, init=None):
-        """Simple initialization with dict of kinematic values.
-
-        Args:
-            init (dict): initial attributes.
+    def __init__(self, kindict=None, **kwargs):
+        """Simple initialization of kinematic values.
 
         Examples:
-            >>> pt = g.DataPoint({'xB': 0.1, 't': -0.2, 'Q2': 4.0})
+            >>> pt = g.DataPoint(xB=0.1, t=-0.2, Q2=4.0)
+
+        Todo:
+            kindict is temporarily kept for backward compatibility.
+            You should not rely on it.
 
         """
-        # Just list allowed attributes to help mypy:
+        # Just list some allowed attributes to help mypy:
         # -- Kinematics --
         self.xB = None
         self.xi = None
@@ -82,8 +83,9 @@ class DataPoint(dict):
         # from https://stackoverflow.com/questions/4984647/
         super(DataPoint, self).__init__()
         self.__dict__ = self
-        if init:
-            self.update(init)
+        if kindict:
+            self.update(kindict)
+        self.update(kwargs)
         # calculate other determined kinematic variables:
         _fill_kinematics(self)
 

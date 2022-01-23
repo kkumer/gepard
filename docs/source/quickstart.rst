@@ -21,12 +21,12 @@ DataPoint
 ---------
 
 Instance of ``DataPoint`` can be constructed from the scratch, by passing
-kinematics information as a Python dictionary:
+kinematics information as Python keyword (named) arguments:
 
 .. code-block:: python
 
    >>> import gepard as g
-   >>> pt = g.DataPoint({'xB': 0.348, 't': -0.3, 'Q2': 3., 'phi': 0.3})
+   >>> pt = g.DataPoint(xB=0.348, t=-0.3, Q2=3., phi=0.3)
 
 
 Information about some experimental measurement, performed at a
@@ -34,10 +34,10 @@ given kinematic point, can be added:
 
 .. code-block:: python
 
-   >>> pt = g.DataPoint({'xB': 0.348, 't': -0.3, 'Q2':3., 'phi': 0.3,
-   ...                   'process': 'ep2epgamma', 'exptype': 'fixed target',
-   ...                   'in1energy': 6., 'in1charge': -1, 'in1polarization': +1,
-   ...                   'yaxis': 'XS', 'val': 0.21, 'err': 0.01})
+   >>> pt = g.DataPoint(xB=0.348, t=-0.3, Q2=3., phi=0.3,
+   ...                   process='ep2epgamma', exptype='fixed target',
+   ...                   in1energy=6., in1charge=-1, in1polarization=+1,
+   ...                   yaxis='XS', val=0.21, err=0.01)
 
 This particular datapoint corresponds to a measurement of DVCS, i. e.,
 :math:`e p \to e p \gamma`, in a fixed target setting, where beam
@@ -115,7 +115,7 @@ example :math:`\mathfrak{Im}\mathcal{H}`
 
    You have to create a `DataPoint` object first:
 
-   >>> pt = g.DataPoint({'xB': 0.348, 't': -0.3, 'Q2': 3})
+   >>> pt = g.DataPoint(xB=0.348, t=-0.3, Q2=3)
    >>> th_KM15.ImH(pt)  # This will work
    2.8075
    

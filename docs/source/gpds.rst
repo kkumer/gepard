@@ -116,10 +116,10 @@ and is set to zero):
 
 .. code-block:: python
 
-   >>> pt = g.DataPoint({'x': 0.01, 'eta': 0, 't': 0, 'Q2': 8})
+   >>> pt = g.DataPoint(x=0.01, eta=0, t=0, Q2=8)
    >>> th.Hx(pt)   # should be equal to PDFs
    array([258.04908329,  25.19998599,   0.        ])
-   >>> pt = g.DataPoint({'x': 0.01, 'eta': 0.01, 't': -0.2, 'Q2': 4})
+   >>> pt = g.DataPoint(x=0.01, eta=0.01, t=-0.2, Q2=4)
    >>> th.Hx(pt)
    array([267.91985614,   2.13496561,   0.        ])
    >>> pt.eta = 0.3
@@ -174,7 +174,7 @@ This is now a complete object and CFFs can be evaluated for some kinematics:
 
 .. code-block:: python
 
-   >>> cff.ReH(g.DataPoint({'xB': 0.1, 't': -0.3, 'Q2': 6}))
+   >>> cff.ReH(g.DataPoint(xB=0.1, t=-0.3, Q2=6))
    13.44851
 
 
@@ -220,6 +220,6 @@ form factors. There are three implementations in Gepard:
 .. code-block:: python
 
    >>> eff = g.KellyEFF()
-   >>> eff.F1(g.DataPoint({'t': 0}))  # Dirac form factor for proton
+   >>> eff.F1(g.DataPoint(t=0))  # Dirac form factor for proton
    1.0
 

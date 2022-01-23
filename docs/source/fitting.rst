@@ -58,7 +58,7 @@ of observables, like this:
 where parameter-dependent form factors (such as CFFs) can also be "predicted",
 i. e.,  calculated together with their uncertainty:
 
-  >>> pt = g.DataPoint({'xB': 0.01, 't': -0.2, 'Q2':10})
+  >>> pt = g.DataPoint(xB=0.01, t=-0.2, Q2=10)
   >>> th.predict(pt, observable='ImH', uncertainty=True)
   (273.19, 25.75)
 
