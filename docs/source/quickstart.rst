@@ -57,7 +57,7 @@ using ``.`` (dot) operator:
    >>> pt.xB
    0.348
    >>> pt.xi
-   0.21065375302663436
+   0.210653753
 
 where one notices that other, dependent kinematic variables are automatically
 precalulated, like :math:`\xi = x_B / (2 - x_B)` here.
@@ -84,7 +84,7 @@ and then used to calculate theory prediction for a given datapoint
 .. code-block:: python
 
    >>> th_KM15.predict(pt)
-   0.023449564143725125
+   0.02344956
 
 Method ``predict`` of the ``Theory`` object will by default calculate 
 observable specified in ``yaxis`` attribute of ``pt``.
@@ -104,7 +104,7 @@ example :math:`\mathfrak{Im}\mathcal{H}`
 .. code-block:: python
 
    >>> th_KM15.ImH(pt)
-   2.807544271408012
+   2.80754427
 
 
 .. note::
