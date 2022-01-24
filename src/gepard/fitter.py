@@ -47,9 +47,14 @@ class MinuitFitter(Fitter):
         self.theory.parameters_errors = self.minuit.errors.to_dict()
         # iminuit gives covariance table for all parameters, here
         # we take only free ones:
-        self.theory.covariance = {(p1, p2): self.minuit.covariance[p1, p2]
-                                 for p1 in self.theory.free_parameters()
-                                 for p2 in self.theory.free_parameters()}
+        try:
+            self.theory.covariance = {(p1, p2): self.minuit.covariance[p1, p2]
+                                     for p1 in self.theory.free_parameters()
+                                     for p2 in self.theory.free_parameters()}
+        except:
+            print("Something's problematic. No covariances available.")
+
+
     def fit(self):
         """Perform simple fit.
 
@@ -72,7 +77,7 @@ class MinuitFitter(Fitter):
             for par in self.theory.model.parameters:
                 self.minuit.fixed[par] = True
         else:
-            self.theory.model.fix_parameters(*args)
+            self.theory._fix_parameters(*args)
             for par in args:
                 self.minuit.fixed[par] = True
 
