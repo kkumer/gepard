@@ -20,7 +20,7 @@ examples below explain everything that you need to know.
 DataPoint
 ---------
 
-Instance of ``DataPoint`` can be constructed from the scratch, by passing
+Instance of ``DataPoint`` can be constructed by passing
 kinematics information as Python keyword (named) arguments:
 
 .. code-block:: python
@@ -49,7 +49,7 @@ measurement is 0.21 nb, with total uncertainty of 0.01 nb.
 All attributes of datapoint are documented :ref:`here<tab-datapoint-attributes>`.
 
 
-This information can be accessed as attributes of ``DataPoint`` object,
+This information can then be accessed as attributes of ``DataPoint`` object,
 using ``.`` (dot) operator:
 
 .. code-block:: python
@@ -63,15 +63,16 @@ where one notices that other, dependent kinematic variables are automatically
 precalulated, like :math:`\xi = x_B / (2 - x_B)` here.
 
 Datapoints can be organized in datasets (class ``DataSet``), and, for
-convenience, many datasets are already made available within Gepard,
+convenience, many datasets, corresponding to various measurements
+performed over the years, are already made available within Gepard,
 as documented in section :ref:`Working with datasets<sec-datasets>`.
 
 
 Theory
 ------
 
-For convenience, several ``theory`` objects are immediately available to the user
-who just wants to calculate observables. For example, ``KM15`` model can be loaded
+For convenience, several ``Theory`` objects are immediately available to the user
+who just wants to calculate observables. For example, ``KM15`` model can be imported
 like this
 
 .. code-block:: python
@@ -85,7 +86,8 @@ and then used to calculate theory prediction for a given datapoint
    >>> th_KM15.predict(pt)
    0.023449564143725125
 
-This will by default calculate observable specified in ``yaxis`` attribute of ``pt``.
+Method ``predict`` of the ``Theory`` object will by default calculate 
+observable specified in ``yaxis`` attribute of ``pt``.
 User can also calculate other observables, like beam charge asymmetry
 
 .. code-block:: python

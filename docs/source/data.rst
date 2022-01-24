@@ -140,6 +140,17 @@ of given ``DataSet``:
    >>> pt.xB, pt.t, pt.Q2, pt.val, pt.err
    (0.079, -0.031, 1.982, -0.008, 0.05239274758971894)
 
+Useful utility function is ``g.select`` which selects subset of points
+from a dataset according to some criteria:
+
+.. code-block:: python
+
+   >>> len(g.dset[143])
+   90
+   >>> twist_resist = g.select(g.dset[143], criteria=['Q2 > 5', 't < 0.2'])
+   >>> len(twist_resist)
+   40
+
 
 There are some plotting routines available for inspection of data and
 comparison with theory. First, there is a universal ``jbod`` ("just a bunch
