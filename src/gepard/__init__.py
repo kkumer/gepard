@@ -10,7 +10,7 @@ __version__ = version(__name__)
 from .cff import (CFF, MellinBarnesCFF, DispersionCFF, PionPole,
         DispersionFixedPoleCFF, DispersionFreePoleCFF,
         HybridFixedPoleCFF, HybridFreePoleCFF, GoloskokovKrollCFF)
-from .data import DataPoint, DataSet, dset  # noqa: F401
+from .data import DataPoint, DataSet, dset, loaddata  # noqa: F401
 from .dis import DIS
 from .dvcs import DVCS, BM10, BMK, BM10ex, BM10tw2, hotfixedBMK
 from .dvmp import DVMP, MellinBarnesTFF

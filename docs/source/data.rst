@@ -189,7 +189,7 @@ in some separate directory, say ``mydatafiles``, and adding an empty file named
 
 This directory has to be in Python
 module search path. Current working directory (where you start Python, can be
-displayed in IPython or Jupyter by issuing ``%pwd``, is usually in the
+displayed in IPython or Jupyter by issuing ``%pwd``), is usually in the
 search path, and user can explicitely add some other directory to the path like this:
 
 .. code-block:: python
@@ -198,14 +198,16 @@ search path, and user can explicitely add some other directory to the path like 
    >>> sys.path.append('<path to mydatafiles>')
 
 Then datafile is available to be imported, and there is a utility
-function ``g.data.loaddata`` that parses all files in the directory
+function ``g.loaddata`` that parses all files in the directory
 and creates corresponding ``DataSet`` objects:
 
 .. code-block:: python
 
+   >>> import mydatafiles  # doctest: +SKIP
    >>> mydset = g.data.loaddata(mydatafiles)  # doctest: +SKIP
 
-Now ``mydset`` is analogous to ``g.dset``.
+Now ``mydset`` is analogous to ``g.dset``, which means that datasets
+are available as  ``mydset[id]``.
 
 Data files are meant to be readable by both human and computer and follow
 the following rules:
