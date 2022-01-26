@@ -12,6 +12,8 @@ import math
 import os
 import re
 
+import pandas as pd
+
 from . import kinematics
 from .constants import Mp, Mp2
 from .datasets import (DIS, en2engamma, ep2epgamma, gammastarp2gammap,
@@ -436,6 +438,23 @@ class DataSet(list):
                 data.append(list(map(float, numbers)))
 
         return desc, data
+
+    def df(self):
+        """Return pandas DataFrame of a DataSet."""
+        attrs = ['y1name', 'collaboration', 'id', 'x', 'eta',
+                'xi', 'xB', 'Q2', 't', 'tm', 'in1energy', 'W', 'phi', 'FTn', 'varFTn', 'val',
+                 'err', 'errminus', 'errplus', 'errstat', 'errsyst', 'errnorm']
+        dat = []
+        for pt in self:
+            row = []
+            for atr in attrs:
+                if hasattr(pt, atr):
+                    row.append(getattr(pt, atr))
+                else:
+                    row.append(None)
+            row.append(pt)
+            dat.append(row)
+        return pd.DataFrame(dat, columns=attrs+['pt',])
 
 
 def _str2num(s):
