@@ -72,7 +72,7 @@ i. e.,  calculated together with their uncertainty:
 
 Fitting using ``f.fit()`` is simple but limited. For better control over fitting procedure
 and determination of parameter uncertainties, user should use many functionalities
-of the ``iminuit`` package, and call directly it's functions like ``f.minuit.migrad``,
+of the ``iminuit`` package, and call directly its functions like ``f.minuit.migrad``,
 ``f.minuit.minos`` etc.
 For details one should consult  `documentation <https://iminuit.readthedocs.io/en/stable/>`_
 of this package.

@@ -120,6 +120,7 @@ class AFKM12(eff.KellyEFF, gpd.PWNormGPD, cff.MellinBarnesCFF, dvcs.BM10):
                             self.parameters, self.residualt).transpose()
 
 th_AFKM12 = AFKM12(residualt='exp')
+# In AFKM12 paper we use b instead of m2, where m2 = 1/(2b)
 par_AFKM12 = {"ns": 0.152, "al0s": 1.1575, "alps": 0.1, "ms2": 0.17857142857142858, "delms2": 0.,
             "pows": 2., "secs": 0.5127, "this": -0.21,
             "al0g": 1.2473, "alpg": 0.1, "mg2": 0.25, "delmg2": 0.,
@@ -132,7 +133,7 @@ par_AFKM12 = {"ns": 0.152, "al0s": 1.1575, "alps": 0.1, "ms2": 0.178571428571428
             "Epowg": 2., "Esecg": -4.8055, "Ethig": 1.8638}
 th_AFKM12.parameters.update(par_AFKM12)
 th_AFKM12.name = 'AFKM12'
-pts_AFKM12 = DVCSpoints+GLOpoints+data.dset[30]
+pts_AFKM12 = H1ZEUS
 
 
 class KM15(eff.KellyEFF, gpd.PWNormGPD, cff.HybridFreePoleCFF, dvcs.BM10tw2):
