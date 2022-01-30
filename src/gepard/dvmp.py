@@ -11,20 +11,19 @@ class DVMP(theory.Theory):
     Implements cross-section for electroproduction of meson.
     """
 
-    def _XrhotApprox(self, pt):
+    def _XGAMMA_rho_t_Approx(self, pt):
         """Partial DVrhoP cross section w.r.t. Mandelstam t.
 
         Approximate formula valid for small xB.
 
         """
-
         # 4 * pi**2 * alpha_em * GeV2nb = 112175.5
         res = 112175.5 * pt.xB**2 * (
                 self.m.ImH_rho(pt)**2 + self.m.ReH_rho(pt)**2) / pt.Q2**2
         return res
 
 
-    _Xrhot = _XrhotApprox
+    _XGAMMA_rho_t = _XGAMMA_rho_t_Approx
 
 
 class MellinBarnesTFF(model.ParameterModel):

@@ -109,9 +109,9 @@ of sets with given IDs:
 .. code-block:: python
 
    >>> g.list_data(list(range(47, 54)))
-   [ 47]     ZEUS   6         X  0812.2517 Table 1
-   [ 48]     ZEUS   6         X  0812.2517 Table 2
-   [ 49]     ZEUS   8         X  0812.2517 Table 3
+   [ 47]     ZEUS   6    XGAMMA  0812.2517 Table 1
+   [ 48]     ZEUS   6    XGAMMA  0812.2517 Table 2
+   [ 49]     ZEUS   8    XGAMMA  0812.2517 Table 3
    [ 50]    HALLA 288      XLUw    0607029 DFT analysis with MC error propagation by KK
    [ 51]    HALLA  96      XUUw    0607029 DFT analysis with MC error propagation by KK
    [ 52]   HERMES  36       TSA  1004.0177 Table 4
@@ -125,12 +125,12 @@ of given ``DataSet``:
 .. code-block:: python
 
    >>> g.describe_data(g.dset[52])
-   npt x obs    collab  FTn    id  ref.        
-   ---------------------------------------------
-   12 x TSA    HERMES  -1.0   52  arXiv:1004.0177v1
-   12 x TSA    HERMES  -2.0   52  arXiv:1004.0177v1
-   12 x TSA    HERMES  -3.0   52  arXiv:1004.0177v1
-   ---------------------------------------------
+   npt x obs     collab  FTn    id  ref.        
+   ----------------------------------------------
+   12 x TSA     HERMES  -1.0   52  arXiv:1004.0177v1
+   12 x TSA     HERMES  -2.0   52  arXiv:1004.0177v1
+   12 x TSA     HERMES  -3.0   52  arXiv:1004.0177v1
+   ----------------------------------------------
    TOTAL = 36
 
 

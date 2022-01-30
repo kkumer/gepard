@@ -22,7 +22,7 @@ the following:
 
    * - Proces
      - DataPoint ``process`` value
-     - Generic theory class
+     - Generic process class
    * - :math:`e p \to e p \gamma`
      - ``ep2epgamma``
      - DVCS
@@ -77,7 +77,7 @@ as methods of theory objects, or ``yaxis`` attributes of datapoints.
      - Description
    * - ``XS``
      - cross-section for leptoproduction of real photon
-   * - ``XDVCS``
+   * - ``XGAMMA``
      - cross-section for production of real photon by virtual one
    * - ``XUU``
      - beam spin sum a.k.a helicity independent XS
@@ -118,11 +118,17 @@ Many of these observables can be evaluated both as differential in azimuthal
 angle :math:`\phi` (if the ``DataPoint`` argument has an attribute ``phi``),
 or as "harmonic", i. e., as Fourier integral over :math:`\phi` (if the
 ``DataPoint`` argument has attribute ``FTn``).
+Similary, ``XGAMMA`` will be evaluated as differential in :math:`t` if
+``DataPoint`` has attribute ``t``, and as integrated over :math:`t` if
+it doesn't.
 
 .. list-table:: DVMP observables
    :header-rows: 1
 
    * - Name
      - Description
-   * - ``X``
+   * - ``XGAMMA``
      - cross-section for production of meson by virtual photon
+
+Choice whether DVCS or DVMP ``XGAMMA`` will be evaluated is dependent
+on the value of ``pt.process``.

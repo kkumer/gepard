@@ -89,7 +89,7 @@ class Theory(object):
             pt: instance of DataPoint
             uncertainty: if available, produce tuple (mean, uncertainty)
             observable: string. Default is pt.yaxis. It is acceptable also
-                        to pass CFF as observable, e.g., observable = 'ImH'
+                        to pass CFF or x-space GPD as observable, e.g., observable = 'ImH'
             parameters: dictionary which will temporarily update model's one
             orig_conventions: give prediction using original conventions of
                               the given DataPoint (e.g. for plotting)
@@ -140,9 +140,10 @@ class Theory(object):
                 result = pt.orig_conventions(result)
         return result
 
+# Photoproduction - select DVCS or DVMP
 
-    def _Xt4int(self, t, pt):
-        """Same as _XDVCSt/_Xrhot but with additional variable t
+    def _XGAMMA_int(self, t, pt):
+        """Same as _XGAMMA_DVCS_t/_XGAMMA_rho_t but with additional variable t
         to facilitate integration over it.
 
         """
@@ -150,28 +151,28 @@ class Theory(object):
         for t_single in t:
             pt.t = t_single
             if hasattr(pt, 'process') and pt.process == 'gammastarp2rho0p':
-                res = self._Xrhot(pt)
+                res = self._XGAMMA_rho_t(pt)
             else:
-                res = self._XDVCSt(pt)
+                res = self._XGAMMA_DVCS_t(pt)
             del pt.t
             aux.append(res)
         return array(aux)
 
 
-    def X(self, pt):
-        """Total DVCS or DVMP cross section. """
+    def XGAMMA(self, pt):
+        """Total gamma* DVCS or DVMP cross section."""
         if 't' in pt or 'tm' in pt:
-            # partial XS w.r.t momentum transfer t
+            # XGAMMA differential in momentum transfer t
             if hasattr(pt, 'process') and pt.process == 'gammastarp2rho0p':
-                return self._Xrhot(pt)
+                return self._XGAMMA_rho_t(pt)
             else:
-                return self._XDVCSt(pt)
+                return self._XGAMMA_DVCS_t(pt)
 
         else:
-            # total XS
+            # total XGAMMA
             if 'tmmax' in pt:
                 tmmax = pt.tmmax
             else:
                 tmmax = 1.  # default -t cuttoff in GeV^2
-            res = quadrature.tquadrature(lambda t: self._Xt4int(t, pt), -tmmax, 0)
+            res = quadrature.tquadrature(lambda t: self._XGAMMA_int(t, pt), -tmmax, 0)
             return res

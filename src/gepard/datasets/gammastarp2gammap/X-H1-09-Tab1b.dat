@@ -31,7 +31,7 @@ out2particle = p
 
 ### Observable 
 
-y1name = X
+y1name = XGAMMA
 y1namelong = total DVCS cross section
 y1unit = nb
 y1value = column2

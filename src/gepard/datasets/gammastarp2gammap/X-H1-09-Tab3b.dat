@@ -27,7 +27,7 @@ out2particle = p
 
 ### Observable 
 
-y1name = X
+y1name = XGAMMA
 y1namelong = DVCS cross section differential in t
 y1unit = nb/GeV^2
 y1value = column3

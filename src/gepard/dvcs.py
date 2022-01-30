@@ -119,7 +119,7 @@ class DVCS(theory.Theory):
                 raise ValueError('in2polarizationvector must be L, T, or U!')
         return wgh * self.PreFacSigma(kin) * aux
 
-    def _XDVCStApprox(self, pt):
+    def _XGAMMA_DVCS_t_Approx(self, pt):
         """Partial DVCS (gamma* p -> gamma p) cross section differential in t.
 
         Approx. formula used in NPB10 paper.
@@ -133,7 +133,7 @@ class DVCS(theory.Theory):
             (W2 + pt.Q2) * (2.0 * W2 + pt.Q2)**2)
         return res
 
-    def _XDVCStEx(self, pt):
+    def _XGAMMA_DVCS_t_Ex(self, pt):
         """Partial DVCS (gamma* p -> gamma p) cross section differential in t."""
         eps2 = 4. * pt.xB**2 * Mp2 / pt.Q2
         if cff.HybridCFF in self.__class__.mro():
@@ -152,8 +152,7 @@ class DVCS(theory.Theory):
         return res
 
     # Choice of what is actually used:
-    # _XDVCSt = _XDVCStApprox
-    _XDVCSt = _XDVCStEx
+    _XGAMMA_DVCS_t = _XGAMMA_DVCS_t_Ex
 
     def XSintphi(self, pt, **kwargs):
         """XS integrated over azimuthal angle.

@@ -56,11 +56,11 @@ function ``describe_data``:
    :include-source:
 
    >>> g.describe_data(DISpoints+DVCSpoints)
-   npt x obs    collab  FTn    id  ref.        
-   ---------------------------------------------
-   10 x DISF2  H1      N/A    206 Nucl.Phys.B470(96)3
-    8 x Xt     H1      N/A    39  hep-ex/0505061
-   ---------------------------------------------
+   npt x obs     collab  FTn    id  ref.        
+   ----------------------------------------------
+   10 x DISF2   H1      N/A    206 Nucl.Phys.B470(96)3
+    8 x XGAMMA  H1      N/A    39  hep-ex/0505061
+   ----------------------------------------------
    TOTAL = 18
 
 Here we see that dataset ``id=206`` contains 10

@@ -34,7 +34,7 @@ out2particle = p
 
 ### Observable 
 
-y1name = X
+y1name = XGAMMA
 y1namelong = differential cross section XL + XT for fixed W=75 GeV
 y1unit = nb
 y1value = column5

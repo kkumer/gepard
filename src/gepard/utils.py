@@ -376,21 +376,17 @@ def stringcolor(a, c, colors=False):
 def describe_data(pts):
     """Print observables and where they come from."""
     all = []
-    print("{:2s} x {:5s}  {:6s}  {:4s}   {:3s} {:12s}".format(
+    print("{:2s} x {:6s}  {:6s}  {:4s}   {:3s} {:12s}".format(
      'npt', 'obs', 'collab', 'FTn', 'id', 'ref.'))
-    print(45*'-')
+    print(46*'-')
     #print "{:2s} x {:5s}  {:6s}  {:4s}".format(
      #'npt', 'obs', 'collab', 'FTn')
     #print 30*'-'
     for pt in pts:
         props = []
         for prop in ['y1name', 'collaboration', 'FTn', 'id', 'reference']:
-        #for prop in ['y1name', 'collaboration', 'FTn']:
             if hasattr(pt, prop):
-                if prop=='y1name' and pt.y1name=='X' and 't' in pt:
-                    props.append('Xt')
-                else:
-                    props.append(str(getattr(pt,prop)))
+                props.append(str(getattr(pt,prop)))
             else:
                 props.append('N/A')
         all.append(tuple(props))
@@ -400,8 +396,8 @@ def describe_data(pts):
     for uniq in sorted(uniqs):
         n = all.count(uniq)
         cc += n
-        print("{:2d} x {:5s}  {:6s}  {:4s}   {:3s} {:12s}".format(n, *uniq))
+        print("{:2d} x {:6s}  {:6s}  {:4s}   {:3s} {:12s}".format(n, *uniq))
         #print "{:2d} x {:5s}  {:6s}  {:4s}".format(n, *uniq)
     assert cc == tot
-    print(45*'-')
+    print(46*'-')
     print("TOTAL = {}".format(tot))

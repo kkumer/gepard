@@ -70,7 +70,7 @@ def test_XDVCSt_noevol(th_lo):
     pt = g.data.DataPoint({'W': 82., 'Q2': 1., 't': 0.})
     pt.xi = pt.Q2 / (2.0 * pt.W * pt.W + pt.Q2)
     pt.xB = 2*pt.xi/(1.+pt.xi)
-    pt.yaxis = 'X'
+    pt.yaxis = 'XGAMMA'
     # Have to decrease precision due to slightly different formula
     assert th_lo.predict(pt) == approx(5608.42804256, rel=1e-3)
 
@@ -80,10 +80,10 @@ def test_XDVCSt(th_lo):
     pt = g.data.DataPoint({'W': 82., 'Q2': 3., 't': -0.5})
     pt.xi = pt.Q2 / (2.0 * pt.W * pt.W + pt.Q2)
     pt.xB = 2*pt.xi/(1.+pt.xi)
-    pt.yaxis = 'X'
+    pt.yaxis = 'XGAMMA'
     # Comparison to old pure-Fortran 'src/test/test.F':
-    # assert th._XDVCStApprox(pt) == approx(900.11627295345193)  # for t=0
-    assert th_lo._XDVCStApprox(pt) == approx(15.633422291049154)
+    # assert th_lo._XGAMMA_DVCS_t_Approx(pt) == approx(900.11627295345193)  # for t=0
+    assert th_lo._XGAMMA_DVCS_t_Approx(pt) == approx(15.633422291049154)
 
 
 def test_XDVCSt_NLO(th_nlo):
@@ -91,8 +91,8 @@ def test_XDVCSt_NLO(th_nlo):
     pt = g.data.DataPoint({'W': 82., 'Q2': 1., 't': 0.})
     pt.xi = pt.Q2 / (2.0 * pt.W * pt.W + pt.Q2)
     pt.xB = 2*pt.xi/(1.+pt.xi)
-    pt.yaxis = 'X'
-    assert th_nlo._XDVCStEx(pt) == approx(821.0062045181508)
+    pt.yaxis = 'XGAMMA'
+    assert th_nlo._XGAMMA_DVCS_t_Ex(pt) == approx(821.0062045181508)
 
 
 def test_XDVCSt_NLOevol(th_nlo):
@@ -100,8 +100,8 @@ def test_XDVCSt_NLOevol(th_nlo):
     pt = g.data.DataPoint({'W': 82., 'Q2': 8., 't': 0.})
     pt.xi = pt.Q2 / (2.0 * pt.W * pt.W + pt.Q2)
     pt.xB = 2*pt.xi/(1.+pt.xi)
-    pt.yaxis = 'X'
-    assert th_nlo._XDVCStEx(pt) == approx(90.76770897337423)
+    pt.yaxis = 'XGAMMA'
+    assert th_nlo._XGAMMA_DVCS_t_Ex(pt) == approx(90.76770897337423)
 
 
 def test_XDVCS(th_lo):
@@ -109,7 +109,7 @@ def test_XDVCS(th_lo):
     pt = g.data.DataPoint({'W': 82., 'Q2': 3.})
     pt.xi = pt.Q2 / (2.0 * pt.W * pt.W + pt.Q2)
     pt.xB = 2*pt.xi/(1.+pt.xi)
-    pt.yaxis = 'X'
+    pt.yaxis = 'XGAMMA'
     # Comparison to old pure-Fortran 'src/test/test.F':
     # Have to decrease precision due to slightly different formula
     assert th_lo.predict(pt) == approx(105.18391660404916, rel=1e-3)
@@ -120,7 +120,7 @@ def test_XDVCS_NLO(th_nlo):
     pt = g.data.DataPoint({'W': 55., 'Q2': 3.})
     pt.xi = pt.Q2 / (2.0 * pt.W * pt.W + pt.Q2)
     pt.xB = 2*pt.xi/(1.+pt.xi)
-    pt.yaxis = 'X'
+    pt.yaxis = 'XGAMMA'
     assert th_nlo.predict(pt) == approx(32.29728102, rel=1e-5)
     # To get complete agreement with Fortran take
     # (slower) tquadrature = quadSciPy10 and:
