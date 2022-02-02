@@ -1,17 +1,14 @@
-"""Definitions of Compton Form Factors.
+"""Definitions of Compton Form Factors."""
 
-"""
 from __future__ import annotations
 
-from math import log, pi, sqrt
-from typing import Dict, List
+from math import log, pi
+from typing import Dict, Union
 
 import numpy as np
-import scipy.stats
 
-from . import constants, data, eff, gpd, mellin, model, qcd, quadrature, utils, wilson
+from . import data, gpd, model, quadrature, utils, wilson  # noqa: F401
 
-# from joblib import Parallel, delayed
 
 class CFF(model.ParameterModel):
     """Base class for CFFs.
@@ -26,6 +23,7 @@ class CFF(model.ParameterModel):
     # allGPDs = []
 
     def __init__(self, **kwargs):
+        """Initialize base class for CFFs. Set global attributes."""
         self.nf = kwargs.setdefault('nf', 4)
         # squared DVCS charge factors
         if self.nf == 3:
@@ -37,8 +35,13 @@ class CFF(model.ParameterModel):
         self.dvcs_charges = (qs, qs, qns)
         super().__init__(**kwargs)
 
-    def print_CFFs(self, pt, format=None):
-        """Print values of CFFs at given kinematic point."""
+    def print_CFFs(self, pt: data.DataPoint, format: str = None):
+        """Print values of CFFs at given kinematic point.
+
+        Args:
+            pt: DataPoint instance
+            format: 'mma' to get output pastable into Mathematica
+        """
         vals = [getattr(self, cff)(pt) for cff in self.allCFFs]
         if format == 'mma':
             s = "{" + 8*"%s -> %f, "
@@ -54,12 +57,27 @@ class CFF(model.ParameterModel):
     for name in allCFFeffs:
         exec('def %s(self, pt): return 0.' % name)
 
-    # Define E-bar as xi*E-tilde
-    def ReEb(self, pt):
+    def ReEb(self, pt: data.DataPoint):
+        """Derived from E-tilde by multiplying with xi.
+
+        Args:
+            pt: DataPoint instance
+
+        Returns:
+            xi*ReEt
+        """
         return (pt.xi)*self.ReEt(pt)
 
-    def is_within_model_kinematics(self, pt):
-        """Check if kinematics is sensible."""
+    def is_within_model_kinematics(self, pt: data.DataPoint):
+        """Check if kinematics is sensible.
+
+        Args:
+            pt: DataPoint instance
+
+        Returns:
+            True if pt kinematics is inside the model validity range.
+
+        """
         return ((1.5 <= pt.Q2 <= 5.) and
                 (pt.tm < min(1., pt.Q2/4)) and
                 (1e-3 < pt.xB < 0.5))
@@ -69,10 +87,7 @@ class MellinBarnesCFF(CFF):
     """Class of models built by Mellin-Barnes integration."""
 
     def __init__(self, **kwargs) -> None:
-        """Init MellinBarnes class and pre-calculate stuff.
-
-        """
-        #
+        """Init MellinBarnes class and pre-calculate stuff."""
         self.tgj = np.tan(pi*self.jpoints/2.)
         # wce[Q2] = wce[spw, j, a] - Wilson coeffs evolved; local to model instance
         self.wce: Dict[float, np.ndarray] = {}  # DVCS Wilson coefs.
@@ -129,14 +144,15 @@ class MellinBarnesCFF(CFF):
         """Return Im(CFF E) for kinematic point."""
         return self.cff(pt)[3]
 
+
 class DispersionCFF(CFF):
     """Use dispersion relations for real parts of CFFs.
 
     methods: ReH, ReE, ReHt, ReEt, subtraction
     Subclass should implement ansaetze for ImH, ImE, ImHt, ImEt
     and subtraction. This class implements just dispersion integrals.
-    """
 
+    """
     def __init__(self, **kwargs) -> None:
         """Init."""
         super().__init__(**kwargs)
@@ -144,9 +160,15 @@ class DispersionCFF(CFF):
     def dispargV(self, x, fun, pt):
         """Integrand of the dispersion integral (vector case).
 
-        fun -- Im(CFF)
-        With variable change x->x^(1/(1-ga))=u in
-        order to tame the singularity at x=0.
+        Args:
+            x: integration variable, longitudinal momentum fraction
+            fun: function providing imaginary part of CFF
+            pt: DataPoint instance
+
+        Returns:
+            Integrand of dispersion integral.
+            With variable change x->x^(1/(1-ga))=u in
+            order to tame the singularity at x=0.
 
         """
         ga = 0.9  # Nice value obtained by experimentation in Mathematica
@@ -160,9 +182,15 @@ class DispersionCFF(CFF):
     def dispargA(self, x, fun, pt):
         """Integrand of the dispersion integral (axial-vector case).
 
-        fun -- Im(CFF)
-        With variable change x->x^(1/(1-ga))=u in
-        order to tame the singularity at x=0.
+        Args:
+            x: integration variable, longitudinal momentum fraction
+            fun: function providing imaginary part of CFF
+            pt: DataPoint instance
+
+        Returns:
+            Integrand of dispersion integral.
+            With variable change x->x^(1/(1-ga))=u in
+            order to tame the singularity at x=0.
 
         """
         ga = 0.9  # Value same as for V-case (TODO: is this the best choice?)
@@ -180,7 +208,13 @@ class DispersionCFF(CFF):
     def _ReV(self, pt, imfun, subsign):
         """Real part of vector CFFs H and E.
 
-        Given by dispersion integral over imfun minus/plus subtraction constant.
+        Args:
+            pt: DataPoint instance
+            imfun: function providing imaginary part of CFF
+            subsign: sign of subtraction constant (-1 for H, +1 for E)
+
+        Returns:
+            Dispersion integral over imfun minus/plus subtraction constant.
 
         """
         res = quadrature.PVquadrature(self.dispargV, 0, 1, (imfun, pt))
@@ -194,7 +228,12 @@ class DispersionCFF(CFF):
     def _ReA(self, pt, imfun):
         """Real part of axial vector CFFs Ht and Et.
 
-        Given by dispersion integral over imfun.
+        Args:
+            pt: DataPoint instance
+            imfun: function providing imaginary part of CFF
+
+        Returns:
+            Dispersion integral over imfun.
 
         """
         res = quadrature.PVquadrature(self.dispargA, 0, 1, (imfun, pt))
@@ -255,26 +294,22 @@ class DispersionFixedPoleCFF(DispersionCFF, PionPole):
     """Model for CFFs as in arXiv:0904.0458."""
 
     def __init__(self, **kwargs):
-        """Init DispersionFixedPoleCFF object.
-
-        Args:
-            nf: number of active quark flavors
-
-        """
+        """Init DispersionFixedPoleCFF object."""
         self.nf = kwargs.setdefault('nf', 4)
         # initial values of parameters and limits on their values
         self.add_parameters({'Nsea': 1.5, 'alS': 1.13, 'alpS': 0.15,
-                           'mS2': 0.499849, 'rS': 1.0, 'bS': 2.0,
-                           'Nv': 1.35, 'alv': 0.43, 'alpv': 0.85,
-                           'mv2': 1.0, 'rv': 0.5, 'bv': 2.2,
-                           'C': 7.0, 'mC2': 1.69,
-                           'tNv': 0.0, 'tal': 0.43, 'talp': 0.85,
-                           'tmv2': 7.29, 'trv': 6.0, 'tbv': 3.0})
+                             'mS2': 0.499849, 'rS': 1.0, 'bS': 2.0,
+                             'Nv': 1.35, 'alv': 0.43, 'alpv': 0.85,
+                             'mv2': 1.0, 'rv': 0.5, 'bv': 2.2,
+                             'C': 7.0, 'mC2': 1.69,
+                             'tNv': 0.0, 'tal': 0.43, 'talp': 0.85,
+                             'tmv2': 7.29, 'trv': 6.0, 'tbv': 3.0})
 
-        self.add_parameters_limits({'bS': (0.4, 5.0),
-                                  'mv2': (0.16, 2.25), 'rv': (0., 8.), 'bv': (0.4, 5.),
-                                  'C': (-10., 10.), 'mC2': (0.16, 4.),
-                                  'tmv2': (0.16, 4.), 'trv': (0., 8.), 'tbv': (0.4, 5.)})
+        self.add_parameters_limits({'bS': (0.4, 5.0), 'mv2': (0.16, 2.25),
+                                    'rv': (0., 8.), 'bv': (0.4, 5.),
+                                    'C': (-10., 10.), 'mC2': (0.16, 4.),
+                                    'tmv2': (0.16, 4.), 'trv': (0., 8.),
+                                    'tbv': (0.4, 5.)})
 
         super().__init__(**kwargs)
 
@@ -282,7 +317,7 @@ class DispersionFixedPoleCFF(DispersionCFF, PionPole):
         """Dispersion relations subtraction constant."""
         return self.parameters['C']/(1.-pt.t/self.parameters['mC2'])**2
 
-    def ImH(self, pt, xi=0):
+    def ImH(self, pt: data.DataPoint, xi: Union[float, np.ndarray] = 0):
         """Imaginary part of CFF H."""
         p = self.parameters  # just a shortcut
         # FIXME: The following solution is not elegant
@@ -308,7 +343,7 @@ class DispersionFixedPoleCFF(DispersionCFF, PionPole):
                onex**p['bS'] / (1. - onex*t/(p['mS2']))**2)
         return pi * (val + sea) / (1.+x)
 
-    def ImHt(self, pt, xi=0):
+    def ImHt(self, pt: data.DataPoint, xi: Union[float, np.ndarray] = 0):
         """Imaginary part of CFF Ht i.e. tilde{H}."""
         p = self.parameters  # just a shortcut
         # FIXME: The following solution is not elegant
@@ -337,13 +372,13 @@ class DispersionFixedPoleCFF(DispersionCFF, PionPole):
                * twox**regge * onex**p['tbv'] / (1. - onex*t/(p['tmv2'])))
         return pi * val / (1.+x)
 
-    def ImE(self, pt, xi=0):
+    def ImE(self, pt: data.DataPoint, xi: Union[float, np.ndarray] = 0):
         """Imaginary part of CFF E."""
         # Just changing function signature w.r.t. CFF
         # to make it compatible for dispersion integral
         return 0
 
-    def ReEt(self, pt):
+    def ReEt(self, pt: data.DataPoint):
         """Instead of disp. rel. use pole formula."""
         return self.DMfixpole(pt)
 
@@ -367,8 +402,11 @@ class DispersionFreePoleCFF(DispersionFixedPoleCFF):
 
 
 class HybridCFF(MellinBarnesCFF, DispersionFixedPoleCFF, CFF):
-    """This combines MB model for small xB and DR model for valence xB."""
+    """This combines MB model for small xB and DR model for valence xB.
 
+    Todo:
+        Check general consistency for xi != pt.xi for imag CFFs.
+    """
 
     def is_within_model_kinematics(self, pt):
         """Is kinematics of datapoint ok?"""
@@ -380,31 +418,41 @@ class HybridCFF(MellinBarnesCFF, DispersionFixedPoleCFF, CFF):
     # FIXME: this below looks inconsistent generally for xi != pt.xi !!
 
     def ImH(self, pt, xi=0):
+        """Imaginary part of CFF H."""
         return MellinBarnesCFF.ImH(self, pt) + DispersionFixedPoleCFF.ImH(self, pt, xi)
 
     def ReH(self, pt):
-        return MellinBarnesCFF.ReH(self, pt) + DispersionFixedPoleCFF.ReH(self, pt, imfun=DispersionFixedPoleCFF.ImH)
+        """Real part of CFF H."""
+        return MellinBarnesCFF.ReH(self, pt) + DispersionFixedPoleCFF.ReH(
+                self, pt, imfun=DispersionFixedPoleCFF.ImH)
 
     def ImE(self, pt, xi=0):
+        """Imaginary part of CFF E."""
         return MellinBarnesCFF.ImE(self, pt) + DispersionFixedPoleCFF.ImE(self, pt, xi)
 
     def ReE(self, pt):
-        return MellinBarnesCFF.ReE(self, pt) + DispersionFixedPoleCFF.ReE(self, pt, imfun=DispersionFixedPoleCFF.ImE)
+        """Real part of CFF E."""
+        return MellinBarnesCFF.ReE(self, pt) + DispersionFixedPoleCFF.ReE(
+                self, pt, imfun=DispersionFixedPoleCFF.ImE)
 
     # Tildes are not yet provided by MellinBarnesCFF model
 
     def ImHt(self, pt, xi=0):
+        """Imaginary part of CFF Ht."""
         return DispersionFixedPoleCFF.ImHt(self, pt, xi)
 
     def ReHt(self, pt):
+        """Real part of CFF Ht."""
         return DispersionFixedPoleCFF.ReHt(self, pt, imfun=DispersionFixedPoleCFF.ImHt)
 
     def ImEt(self, pt):
+        """Imaginary part of CFF Et."""
         return DispersionFixedPoleCFF.ImEt(self, pt)
 
     def ReEt(self, pt):
-        """Provided by subclasses."""
+        """Real part of CFF Et. Provided by subclasses."""
         return 0
+
 
 class HybridFixedPoleCFF(HybridCFF):
     """HybridCFF model with fixed pion pole model for ReEt."""

@@ -70,9 +70,10 @@ to ``dot`` for numpy array summations, and use proper version of numpy.)
 Code style
 ----------
 
-I use flake8, pydocstyle and mypy Python linters for the actual code.
+Stick to `google conventions <https://google.github.io/styleguide/pyguide.html#s3.8-comments-and-docstrings>`_,
+especially for docstrings.
 
-For docstrings, stick to google conventions.
+I use flake8, pydocstyle and mypy Python linters for the actual code.
 
 Fixed global parameters, like proton mass ``Mp``, or QCD constants ``Nc``, ``CF``, 
 etc.  can be capitalized, but for model parameters we consistently use small initial

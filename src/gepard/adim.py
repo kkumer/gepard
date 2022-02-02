@@ -23,6 +23,9 @@ def non_singlet_LO(n: complex, nf: int, prty: int = 1) -> complex:
         nf (int): number of active quark flavors
         prty (int): 1 for NS^{+}, -1 for NS^{-}, irrelevant at LO
 
+    Returns:
+        Non-singlet LO anomalous dimension.
+
     """
     return CF*(-3.0-2.0/(n*(1.0+n))+4.0*S1(n))
 
@@ -56,6 +59,9 @@ def non_singlet_NLO(n: complex, nf: int, prty: int) -> complex:
         n (complex): which moment (= Mellin moment for integer n)
         nf (int): number of active quark flavors
         prty (int): 1 for NS^{+}, -1 for NS^{-}
+
+    Returns:
+        Non-singlet NLO anomalous dimension.
 
     """
     # From Curci et al.
