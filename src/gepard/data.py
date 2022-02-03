@@ -1,6 +1,6 @@
 """Representation of experimental data.
 
-DataPoint -- class for points representing experimental measurements
+DataPoint -- class for kinematical points, possibly representing measurements
 DataSet   -- container for DataPoint instances
 
 dset -- dictionary with public datasets
@@ -11,6 +11,7 @@ import importlib_resources
 import math
 import os
 import re
+from typing import Union
 
 import pandas as pd
 
@@ -34,47 +35,40 @@ def loaddata(resource):
 
 
 class KinematicsError(Exception):
-    """Exception throwsn when kinematics is unphysical."""
+    """Exception thrown when kinematics is unphysical."""
     pass
 
 
 class DataPoint(dict):
-    """Experimental measurement point.
+    """Kinematical point. May correspond to actual measurement.
 
-    All necessary information about kinematics, is contained in attributes. E.g.
+    Args:
+        xB (float): Bjorken x_B
+        t (float): momentum transfer to target squared
+        Q2 (float): Q^2
+        phi (float): azimuthal angle
+        FTn (int): harmonic of azimuthal angle, e.g. -1 for sin(phi)
+        yaxis (str): name of the measured observable
+        val (float): measurement value
+        errstat (float): statistical error of `val`
+        errsyst (float): systematic error of `val`
+        err (float):  `errstat` and `errsyst` added in quadrature
+        units (dict): pysical units of variables
+        kindict (dict): for old, alternative passing of kinematics values,
+                 like ``g.DataPoint({'xB': 0.1, 't': -0.2, 'Q2': 4.0})``
 
-    `yaxis` -- name of observable measured
-    `xaxes` -- names of kinematical x-axes of data
-    `collaboration` -- name of experimenatal collaboration
-    `units` -- dictionary with pysical units of variables
-    `newunits` -- dictionary with internal pysical units of variables
-    `xB` -- x_Bjorken
-    `Q2` -- squared momentum of virtual photon
-    `val` -- measurement value
-    `errstat` -- statistical error of `val`
-    `errsyst` -- systematic error of `val`
-    `errnorm` -- normalization error of `val` (included also in errsyst)
-    `err` --  `stat` and `syst` added in quadrature
-    `errplus` --  total positive error
-    `errplus` --  total negative error
+    There are other args as well.
 
-    """
-    xB: float
-    Q2: float
-    W: float
-    t: float
-
-    def __init__(self, kindict=None, **kwargs):
-        """Simple initialization of kinematic values.
-
-        Examples:
+    Examples:
             >>> pt = g.DataPoint(xB=0.1, t=-0.2, Q2=4.0)
 
-        Todo:
-            kindict is temporarily kept for backward compatibility.
-            You should not rely on it.
+    Todo:
+        `kindict` is temporarily kept for backward compatibility.
+        You should not rely on it.
 
-        """
+    """
+
+    def __init__(self, kindict: dict = None, **kwargs):
         # Just list some allowed attributes to help mypy:
         # -- Kinematics --
         self.xB = None
@@ -106,17 +100,22 @@ class DataPoint(dict):
     def update_from_grid(self, gridline, dataset):
         """Take data gridline, and update point atributes.
 
-        `gridline` is a list constructed from one row of data grid in data file.
-        It is assumed that data gridline is of the form:
+        Args:
+            gridline (list): list constructed from one row of data grid in data file.
+            dataset (:obj:`DataSet`): container that is to contain this `DataPoint`
 
-              x1  x2 ....   y1  y1stat y1syst
+        Note:
+            It is assumed that data gridline is of the form::
 
-        where y1syst need not be present, or can have one or two values, syst+ and syst-
+               x1  x2 ....   y1  y1stat y1syst
 
-        (Further elements are ignored.)
-        `dataset` is container `DataSet` that is to contain this `DataPoint`
-        FIXME: this passing of higher-level DataSet as argument sounds wrong!
-        (See comment about aquisition in class docstring.)
+            where `y1syst` need not be present, or can have one or two values,
+            `syst+` and `syst-` (Further elements are ignored.)
+
+        Todo:
+            This passing of higher-level DataSet as argument sounds wrong!
+            (See comment about aquisition in class docstring.)
+
         """
         # from https://stackoverflow.com/questions/4984647/
         # we want accessibility via both attributes and dict keys
@@ -211,7 +210,7 @@ class DataPoint(dict):
         return
 
     def __repr__(self):
-        """Printing something useful."""
+        """Print something useful."""
         try:
             return "DataPoint: " + self.yaxis + " = " + str(self.val)
         except AttributeError:
@@ -301,19 +300,26 @@ class DataPoint(dict):
 class DataSet(list):
     """A container for `DataPoint` instances.
 
+    Args:
+        datapoints (list): list of :obj:`DataPoint` instances
+        datafile (str): data file to be parsed, represented as string
+
+    Either take explicit list of DataPoints or get them by parsing datafile.
+
     Information that is common to all data of a given dataset (i.e.
     which is contained in a preamble of datafile is accessible
     via attributes:
 
-    `yaxis` -- name of observable measured
-    `xaxes` -- names of kinematical x-axes of data
-    `collaboration` -- name of experimenatal collaboration
-    `units` -- dictionary with pysical units of variables
-    `newunits` -- dictionary with internal pysical units of variables
+    Attributes:
+        yaxis (str): name of observable measured
+        collaboration (str): name of experimenatal collaboration
+        units (dict): pysical units of variables
+        newunits (dict): internal pysical units of variables
+
+    There are other attributes as well.
 
     """
     def __init__(self, datapoints=None, datafile=None):
-        """Either take explicit list of DataPoints or get them by parsing datafile."""
         if datapoints:
             list.__init__(self, datapoints)
         else:
@@ -373,7 +379,14 @@ class DataSet(list):
     def __add__(self, rhs):
         """Add datasets.
 
+        Args:
+            rhs (:obj:`DataSet`): dataset to be appended
+
+        Returns:
+            joined dataset
+
         http://stackoverflow.com/questions/8180014/how-to-subclass-python-list-without-type-problems.
+
         """
         return DataSet(datapoints=list.__add__(self, rhs))
 
@@ -405,13 +418,19 @@ class DataSet(list):
     def parse(self, dataFile):
         """Parse `dataresource` string and return tuple (preamble, data).
 
+        Args:
+            dataFile (str): datafile to be parsed, as string
+
+        Returns:
+            (preamble, data) (tuple):
+
         `preamble` is dictionary obtained by converting datafile preamble
-        items into dictionary items like this:
+        items into dictionary items like this::
 
             y1 = AC from datafile goes into   {'y1' : 'AC', ...}
 
         `data` is actual numerical grid of experimental data converted
-        into list of lists
+        into list of lists.
 
         """
         # [First] parsing the formatted ASCII file
@@ -442,7 +461,8 @@ class DataSet(list):
     def df(self):
         """Return pandas DataFrame of a DataSet."""
         attrs = ['y1name', 'collaboration', 'id', 'x', 'eta',
-                'xi', 'xB', 'Q2', 't', 'tm', 'in1energy', 'W', 'phi', 'FTn', 'varFTn', 'val',
+                 'xi', 'xB', 'Q2', 't', 'tm', 'in1energy', 'W',
+                 'phi', 'FTn', 'varFTn', 'val',
                  'err', 'errminus', 'errplus', 'errstat', 'errsyst', 'errnorm']
         dat = []
         for pt in self:
@@ -454,13 +474,20 @@ class DataSet(list):
                     row.append(None)
             row.append(pt)
             dat.append(row)
-        return pd.DataFrame(dat, columns=attrs+['pt',])
+        return pd.DataFrame(dat, columns=attrs+['pt', ])
 
 
-def _str2num(s):
+def _str2num(s: str) -> Union[int, float]:
     """Convert string to number, taking care if it should be int or float.
 
+    Args:
+        s: string to be converted
+
+    Returns:
+        number Union[int, float]
+
     http://mail.python.org/pipermail/tutor/2003-November/026136.html
+
     """
     if "." in s:
         return float(s)
@@ -495,12 +522,16 @@ def _complete_tmt(kin):
 
 
 def _fill_kinematics(kin, old={}):
-    """Return complete up-to-date kinematical dictionary.
+    """Update kinematics in place.
 
     Complete set of kinematical variables is {xB, t, Q2, W, s, xi, tm, phi}.
     Using standard identities, missing values are calculated, if possible, first
     solely from values given in 'kin', and then, second, using values in 'old',
     if provided.
+
+    Args:
+        kin (:obj:`DataPoint`): datapoint to be updated
+        old (:obj:`DataPoint`): extra kinematical info
 
     """
     kkeys = set(kin.keys())
@@ -547,6 +578,7 @@ def _fill_kinematics(kin, old={}):
         kin.phi = old.phi
     if 'varphi' not in kin and 'varphi' in old:
         kin.varphi = old.varphi
+
 
 # Load all public datasets and make them globaly available
 dset = loaddata(ep2epgamma)
