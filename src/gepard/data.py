@@ -50,9 +50,7 @@ class DataPoint(dict):
         FTn (int): harmonic of azimuthal angle, e.g. -1 for sin(phi)
         yaxis (str): name of the measured observable
         val (float): measurement value
-        errstat (float): statistical error of `val`
-        errsyst (float): systematic error of `val`
-        err (float):  `errstat` and `errsyst` added in quadrature
+        err (float): total uncertainty of `val`
         units (dict): pysical units of variables
         kindict (dict): for old, alternative passing of kinematics values,
                  like ``g.DataPoint({'xB': 0.1, 't': -0.2, 'Q2': 4.0})``

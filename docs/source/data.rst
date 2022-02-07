@@ -46,16 +46,12 @@ are used by the code, some are just for convenience.
      -  harmonic of azimuthal angle :math:`\phi`. Here values 0, 1, ... correspond to zeroth, first,  ... cosine harmonics, while -1, -2, ... correspond to first, second, ... sine harmonics.
    * - ``y1name`` or ``yaxis``
      - measured :ref:`observables<tab-observables>`
-   * - ``val``
-     - value measured
    * - ``y1unit``
      - units of yaxis
+   * - ``val``
+     - value measured
    * - ``err``
      - total uncertainty of val
-   * - ``staterr``
-     - statistical uncertainty of val
-   * - ``systerr``
-     - systematic uncertainty of val (symmetric)
    * - ``frame``
      - coordinate frame used (``BMK`` or ``Trento``)
    * - ``id``
@@ -286,13 +282,14 @@ the following rules:
    counting from 1.
    Here ``x1``, ``x2``, ..., are used for 
    kinematics (*x-axes*,
-   such as :math:`x_{\rm B}`, :math:`\Q^2`, :math:`t`, :math:`\phi`),
+   such as :math:`x_{\rm B}`, :math:`Q^2`, :math:`t`, :math:`\phi`),
    while ``y1`` is for the measured observable.
 #. Units should be specified by keys such as ``in1unit``,
    and in particular for angles it should be stated whether
    their unit is ``deg`` or ``rad``.
-#. Uncertainties are given by keys such as ``y1error`` etc., as displayed in
-   the example below.
+#. Uncertainties are given by keys ``y1error`` (total error), ``y1errorstatistic``,
+   ``y1errorsystematic``, ``y1errorsystematicplus````y1errorsystematicminus``,
+   ``y1errornormalization``.
 #. For Fourier harmonics, special column names are used:
    ``FTn`` for harmonic of azimuthal angle :math:`\phi` between lepton
    and reaction plane and ``varFTn`` for harmonic

@@ -12,7 +12,7 @@ class DVMP(theory.Theory):
     """
 
     def _XGAMMA_rho_t_Approx(self, pt):
-        """Partial DVrhoP cross section w.r.t. Mandelstam t.
+        """Partial (longitudinal) gamma* p -> rho0 p cross section w.r.t. Mandelstam t.
 
         Approximate formula valid for small xB.
 

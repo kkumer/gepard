@@ -160,7 +160,13 @@ class Theory(object):
 
 
     def XGAMMA(self, pt):
-        """Total gamma* DVCS or DVMP cross section."""
+        """Total gamma* DVCS or DVMP cross section.
+
+        For DVMP, this calculates only longitudinal_gamma* part.
+        If `pt` has no momentum transfer defined, it calculates
+        total xs.
+
+        """
         if 't' in pt or 'tm' in pt:
             # XGAMMA differential in momentum transfer t
             if hasattr(pt, 'process') and pt.process == 'gammastarp2rho0p':
