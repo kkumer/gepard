@@ -68,6 +68,20 @@ class CFF(model.ParameterModel):
         """
         return (pt.xi)*self.ReEt(pt)
 
+    def cff(self, pt: data.DataPoint) -> np.ndarray:
+        """Return array(ReH, ImH, ReE, ...) for kinematic point.
+
+        This is generic top-class method that only gathers results
+        of dedicated ReH(), ImH(), etc. functions.
+        The idea is that this method can be implemented more efficiently
+        in subclases where components of CFFs can be calculated at the
+        same time or in parallel.
+
+        """
+
+        return np.array([self.ReH(pt), self.ImH(pt), self.ReE(pt), self.ImE(pt),
+                         self.ReHt(pt), self.ImHt(pt), self.ReEt(pt), self.ImEt(pt)])
+
     def is_within_model_kinematics(self, pt: data.DataPoint):
         """Check if kinematics is sensible.
 
