@@ -80,28 +80,22 @@ second and third partial wave proportional to the first one
 This model is described in `arXiv:0904.0458 <https://arxiv.org/abs/0904.0458>`_.
 The following table lists some more important attributes of this model.
 
-.. list-table:: Attributes of PWNormGPD model
-   :header-rows: 1
+.. table:: Attributes of PWNormGPD model
+    :widths: auto
 
-   * - Name
-     - Description
-     - Default value
-   * - ``p``
-     - pQCD order (0=LO, 1=NLO)
-     - 0
-   * - ``scheme``
-     - pQCD factorization scheme ('msbar' or 'csbar')
-     - 'msbar'
-   * - ``nf``
-     - number of active quark flavors
-     - 4
-   * - ``Q02``
-     - Initial :math:`Q_{0}^2` for GPD evolution
-     - 4 (GeV^2)
-   * - ``residual``
-     - Residual :math:`t` dependence ('dipole' or 'exp')
-     - 'dipole'
-
+    +------------------+--------------------------------------------------------+------------------+
+    | Name             | Description                                            | Default value    |
+    +==================+========================================================+==================+
+    | ``p``            | pQCD order (0=LO, 1=NLO)                               | 0                |
+    +------------------+--------------------------------------------------------+------------------+
+    | ``scheme``       | pQCD factorization scheme ('msbar' or 'csbar')         | 'msbar'          |
+    +------------------+--------------------------------------------------------+------------------+
+    | ``nf``           | number of active quark flavors                         | 4                |
+    +------------------+--------------------------------------------------------+------------------+
+    | ``Q02``          | Initial :math:`Q_{0}^2` for GPD evolution              | 4 (GeV^2)        |
+    +------------------+--------------------------------------------------------+------------------+
+    | ``residual``     | Residual :math:`t` dependence ('dipole' or 'exp')      | 'dipole'         |
+    +------------------+--------------------------------------------------------+------------------+
 
 Here the residual :math:`t` dependence is additional to the dependence
 :math:`x^{-\alpha' t}` coming from the Regge trajectory.
@@ -138,22 +132,24 @@ There are presently four main classes of CFFs implemented in Gepard
 
 .. _tab-CFF_classes:
 
-.. list-table:: CFF classes
-   :header-rows: 1
+.. table:: CFF classes
+    :widths: auto
 
-   * - Name of the class
-     - Description
-   * - ``MellinBarnesCFF``
-     - Uses conformal-space GPDs as described in the section above
-   * - ``DispersionFreePoleCFF``
-     - Imaginary part of CFF is directly modelled, while real part
-       is obtained by dispersion relations. :math:`\mathfrak{Re}\tilde{\mathcal{E}}` is given by freely
-       parametrized pion pole.
-   * - ``HybridCFF``
-     - Combines ``MellinBarnesCFF`` for sea partons, with
-       ``DispersionFreePoleCFF`` for valence quarks
-   * - ``GoloskokovKrollCFF``
-     - Model of Goloskokov and Kroll
+    +--------------------------+------------------------------------------------------------------+
+    | Name of the class        | Description                                                      |
+    +==========================+==================================================================+
+    | ``MellinBarnesCFF``      | Uses conformal-space GPDs as described in the section above      |
+    +--------------------------+------------------------------------------------------------------+
+    | ``DispersionFreePoleCFF``| Imaginary part of CFF is directly modelled, while real part is   |
+    |                          | obtained by dispersion relations.                                |
+    |                          | :math:`\mathfrak{Re}\tilde{\mathcal{E}}` is given by freely      |
+    |                          | parametrized pion pole.                                          |
+    +--------------------------+------------------------------------------------------------------+
+    | ``HybridCFF``            | Combines ``MellinBarnesCFF`` for sea partons, with               |
+    |                          | ``DispersionFreePoleCFF`` for valence quarks                     |
+    +--------------------------+------------------------------------------------------------------+
+    | ``GoloskokovKrollCFF``   | ``GoloskokovKrollCFF`` Model of Goloskokov and Kroll             |
+    +--------------------------+------------------------------------------------------------------+
        
 
 Apart from ``GoloskokovKrollCFF`` which is completely fixed, all other CFFs
@@ -187,13 +183,14 @@ amplitude (DA) for the produced meson.
 Presently, only the simplest TFF model is implemented, where DA is
 given by its asymptotic form, while rest of the model is analogous
 
-.. list-table:: TFF class
-   :header-rows: 1
+.. table:: TFF class
+    :widths: auto
 
-   * - Name of the class
-     - Description
-   * - ``MellinBarnesTFF``
-     - Uses conformal-space GPDs and asymptotic DA
+    +--------------------------+--------------------------------------------------------------+
+    | Name of the class        | Description                                                  |
+    +==========================+==============================================================+
+    | ``MellinBarnesTFF``      | Uses conformal-space GPDs and asymptotic DA                  |
+    +--------------------------+--------------------------------------------------------------+
 
 
 EFFs
@@ -204,17 +201,19 @@ form factors. There are three implementations in Gepard:
 
 .. _tab-EFF_classes:
 
-.. list-table:: EFF classes
-   :header-rows: 1
+.. table:: EFF classes
+    :widths: auto
 
-   * - Name of the class
-     - Description
-   * - ``DipoleEFF``
-     - dipole form of t-dependence
-   * - ``KellyEFF``
-     - EFFs as parametrized by J.J. Kelly, PRC 70 (2004) 068202
-   * - ``ZeroEFF``
-     - All EFFs are set to zero. Convenient for calculation of pure DVCS effects.
+    +--------------------+--------------------------------------------------------------+
+    | Name of the class  | Description                                                  |
+    +====================+==============================================================+
+    | ``DipoleEFF``      | dipole form of t-dependence                                  |
+    +--------------------+--------------------------------------------------------------+
+    | ``KellyEFF``       | EFFs as parametrized by J.J. Kelly, PRC 70 (2004) 068202     |
+    +--------------------+--------------------------------------------------------------+
+    | ``ZeroEFF``        | All EFFs are set to zero. Convenient for calculation of pure |
+    |                    | DVCS effects.                                                |
+    +--------------------+--------------------------------------------------------------+
 
 
 .. code-block:: python

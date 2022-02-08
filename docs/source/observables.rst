@@ -17,25 +17,21 @@ the following:
 
 .. _tab-processes:
 
-.. list-table:: Processes
-   :header-rows: 1
+.. table:: Processes
+    :widths: auto
 
-   * - Proces
-     - DataPoint ``process`` value
-     - Generic process class
-   * - :math:`e p \to e p \gamma`
-     - ``ep2epgamma``
-     - DVCS
-   * - :math:`e n \to e n \gamma`
-     - ``en2engamma``
-     - DVCS
-   * - :math:`\gamma^* p \to \gamma p`
-     - ``gammastarp2gammap``
-     - DVCS
-   * - :math:`\gamma^* p \to \rho^{0} p`
-     - ``gammastarp2rho0p``
-     - DVMP
-
+    +--------------------------------------+--------------------------+------------------+
+    | Proces                               | DataPoint ``process``    | Generic process  |
+    |                                      | value                    | class            |
+    +======================================+==========================+==================+
+    | :math:`e p \to e p \gamma`           | ``ep2epgamma``           | DVCS             |
+    +--------------------------------------+--------------------------+------------------+
+    | :math:`e n \to e n \gamma`           | ``en2engamma``           | DVCS             |
+    +--------------------------------------+--------------------------+------------------+
+    | :math:`\gamma^* p \to \gamma p`      | ``gammastarp2gammap``    | DVCS             |
+    +--------------------------------------+--------------------------+------------------+
+    | :math:`\gamma^* p \to \rho^{0} p`    | ``gammastarp2rho0p``     | DVMP             |
+    +--------------------------------------+--------------------------+------------------+
 
 Formulas for generic theory class DVMP are implemented as
 ``g.DVMP``, while those for DVCS have several slightly different
@@ -43,23 +39,22 @@ versions:
 
 .. _tab-BMK_formulas:
 
-.. list-table:: Version of BMK formulas
-   :header-rows: 1
+.. table:: Version of BMK formulas
+    :widths: auto
 
-   * - Theory class
-     - description
-   * - ``g.BMK``
-     - old original BMK formulas from 2005
-   * - ``g.hotfixedBMK``
-     - improved formulas that are better for JLab kinematics
-   * - ``g.BM10ex``
-     - best formulas from 2010
-   * - ``g.BM10``
-     - like ``BM10ex``, but with some Q2-suppresed terms removed
-   * - ``g.BM10tw2``
-     - like ``BM10`` but with higher twists set to zero
-
-
+    +--------------------+------------------------------------------------------------------+
+    | Theory class       | description                                                      |
+    +====================+==================================================================+
+    | ``g.BMK``          | old original BMK formulas from 2005                              |
+    +--------------------+------------------------------------------------------------------+
+    | ``g.hotfixedBMK``  | improved formulas that are better for JLab kinematics            |
+    +--------------------+------------------------------------------------------------------+
+    | ``g.BM10ex``       | best formulas from 2010                                          |
+    +--------------------+------------------------------------------------------------------+
+    | ``g.BM10``         | like ``BM10ex``, but with some Q2-suppresed terms removed        |
+    +--------------------+------------------------------------------------------------------+
+    | ``g.BM10tw2``      | like ``BM10`` but with higher twists set to zero                 |
+    +--------------------+------------------------------------------------------------------+
 
 
 .. _tab-observables:
@@ -70,49 +65,50 @@ Observables
 Following observables are implemented in gepard. They can be used
 as methods of theory objects, or ``yaxis`` attributes of datapoints.
 
-.. list-table:: DVCS observables
-   :header-rows: 1
+.. table:: DVCS observables
+    :widths: auto
 
-   * - Identifier
-     - Description
-   * - ``XS``
-     - cross-section for leptoproduction of real photon
-   * - ``XGAMMA``
-     - cross-section for production of real photon by virtual one
-   * - ``XUU``
-     - beam spin sum a.k.a helicity independent XS
-   * - ``XUUw``
-     - XUU weighted by BH propagator
-   * - ``XLU``
-     - beam spin difference a.k.a helicity dependent XS
-   * - ``XLUw``
-     - XLU weighted by BH propagator
-   * - ``XCLU``
-     - beam charge-spin difference (COMPASS)
-   * - ``XCUU``
-     - beam charge-spin sum (COMPASS)
-   * - ``AC``
-     - beam charge asymmetry
-   * - ``ALU``
-     - beam spin asymmetry
-   * - ``ALUI``
-     - beam spin asymmetry, interference part
-   * - ``ALUDVCS``
-     - beam spin asymmetry, DVCS part
-   * - ``AUL``
-     -  longitudinal target spin asymmetry
-   * - ``AUT``
-     -  transversal target spin asymmetry
-   * - ``AUTI``
-     - transversal target spin asymmetry, interference part
-   * - ``AUTDVCS``
-     - transversal target spin asymmetry, DVCS part
-   * - ``BTSA``
-     - beam (longitudinal) target double spin asymmetry
-   * - ``ALTI``
-     - beam transversal target double spin asymmetry, interference part
-   * - ``ALTBHDVCS``
-     - beam transversal target double spin asymmetry, BH-DVCS part
+    +----------------+------------------------------------------------------------------+
+    | Identifier     | Description                                                      |
+    +================+==================================================================+
+    | ``XS``         | cross-section for leptoproduction of real photon                 |
+    +----------------+------------------------------------------------------------------+
+    | ``XGAMMA``     | cross-section for production of real photon by virtual one       |
+    +----------------+------------------------------------------------------------------+
+    | ``XUU``        | beam spin sum a.k.a helicity independent XS                      |
+    +----------------+------------------------------------------------------------------+
+    | ``XUUw``       | XUU weighted by BH propagator                                    |
+    +----------------+------------------------------------------------------------------+
+    | ``XLU``        | beam spin difference a.k.a helicity dependent XS                 |
+    +----------------+------------------------------------------------------------------+
+    | ``XLUw``       | XLU weighted by BH propagator                                    |
+    +----------------+------------------------------------------------------------------+
+    | ``XCLU``       | beam charge-spin difference (COMPASS)                            |
+    +----------------+------------------------------------------------------------------+
+    | ``XCUU``       | beam charge-spin sum (COMPASS)                                   |
+    +----------------+------------------------------------------------------------------+
+    | ``AC``         | beam charge asymmetry                                            |
+    +----------------+------------------------------------------------------------------+
+    | ``ALU``        | beam spin asymmetry                                              |
+    +----------------+------------------------------------------------------------------+
+    | ``ALUI``       | beam spin asymmetry, interference part                           |
+    +----------------+------------------------------------------------------------------+
+    | ``ALUDVCS``    | beam spin asymmetry, DVCS part                                   |
+    +----------------+------------------------------------------------------------------+
+    | ``AUL``        | longitudinal target spin asymmetry                               |
+    +----------------+------------------------------------------------------------------+
+    | ``AUT``        | transversal target spin asymmetry                                |
+    +----------------+------------------------------------------------------------------+
+    | ``AUTI``       | transversal target spin asymmetry, interference part             |
+    +----------------+------------------------------------------------------------------+
+    | ``AUTDVCS``    | transversal target spin asymmetry, DVCS part                     |
+    +----------------+------------------------------------------------------------------+
+    | ``BTSA``       | beam (longitudinal) target double spin asymmetry                 |
+    +----------------+------------------------------------------------------------------+
+    | ``ALTI``       | beam transversal target double spin asymmetry, interference part |
+    +----------------+------------------------------------------------------------------+
+    | ``ALTBHDVCS``  | beam transversal target double spin asymmetry, BH-DVCS part      |
+    +----------------+------------------------------------------------------------------+
 
 Many of these observables can be evaluated both as differential in azimuthal
 angle :math:`\phi` (if the ``DataPoint`` argument has an attribute ``phi``),
@@ -122,13 +118,14 @@ Similary, ``XGAMMA`` will be evaluated as differential in :math:`t` if
 ``DataPoint`` has attribute ``t``, and as integrated over :math:`t` if
 it doesn't.
 
-.. list-table:: DVMP observables
-   :header-rows: 1
+.. table:: DVMP observables
+    :widths: auto
 
-   * - Name
-     - Description
-   * - ``XGAMMA``
-     - cross-section for production of meson by virtual photon
+    +--------------------+------------------------------------------------------------------+
+    | Name               | Description                                                      |
+    +====================+==================================================================+
+    | ``XGAMMA``         | cross-section for production of meson by virtual photon          |
+    +--------------------+------------------------------------------------------------------+
 
 Choice whether DVCS or DVMP ``XGAMMA`` will be evaluated is dependent
 on the value of ``pt.process``.

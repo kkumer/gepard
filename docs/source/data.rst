@@ -29,35 +29,35 @@ are used by the code, some are just for convenience.
 
 .. _tab-datapoint-attributes:
 
-.. list-table:: DataPoint attributes
-   :header-rows: 1
+.. table:: DataPoint attributes
 
-   * - Attribute
-     - Description
-   * - ``xB``
-     - Bjorken :math:`x_B`
-   * - ``t``
-     - Mandelstam t, i. e., momentum transfer to target squared.
-   * - ``Q2``
-     -  :math:`Q^2`
-   * - ``phi``
-     -  azimutal angle :math:`\phi`
-   * - ``FTn``
-     -  harmonic of azimuthal angle :math:`\phi`. Here values 0, 1, ... correspond to zeroth, first,  ... cosine harmonics, while -1, -2, ... correspond to first, second, ... sine harmonics.
-   * - ``y1name`` or ``yaxis``
-     - measured :ref:`observables<tab-observables>`
-   * - ``y1unit``
-     - units of yaxis
-   * - ``val``
-     - value measured
-   * - ``err``
-     - total uncertainty of val
-   * - ``frame``
-     - coordinate frame used (``BMK`` or ``Trento``)
-   * - ``id``
-     - id number of the dataset to which point belongs
-   * - ``reference``
-     - reference to where data was published
+    +----------------+------------------------------------------------------------------+
+    | Attribute      | Description                                                      |
+    +================+==================================================================+
+    | ``xB``         | Bjorken :math:`x_B`                                              |
+    +----------------+------------------------------------------------------------------+
+    | ``t``          | Mandelstam t, i. e., momentum transfer to target squared.        |
+    +----------------+------------------------------------------------------------------+
+    | ``Q2``         | :math:`Q^2`                                                      |
+    +----------------+------------------------------------------------------------------+
+    | ``phi``        | azimutal angle :math:`\phi`                                      |
+    +----------------+------------------------------------------------------------------+
+    | ``FTn``        | harmonic of azimuthal angle :math:`\phi`. Here values 0, 1, ...  |
+    |                | correspond to zeroth, first,  ... cosine harmonics, while -1,    |
+    |                | -2, ... correspond to first, second, ... sine harmonics.         |
+    +----------------+------------------------------------------------------------------+
+    | ``obs``        | measured :ref:`observables<tab-observables>`                     |
+    +----------------+------------------------------------------------------------------+
+    | ``val``        | value measured                                                   |
+    +----------------+------------------------------------------------------------------+
+    | ``err``        | total uncertainty of val                                         |
+    +----------------+------------------------------------------------------------------+
+    | ``frame``      | coordinate frame used (``BMK`` or ``Trento``)                    |
+    +----------------+------------------------------------------------------------------+
+    | ``id``         | id number of the dataset to which point belongs                  |
+    +----------------+------------------------------------------------------------------+
+    | ``reference``  | reference to where data was published                            |
+    +----------------+------------------------------------------------------------------+
 
 Some details and other attributes are given :ref:`below<tab-data_syntax>`.
 
