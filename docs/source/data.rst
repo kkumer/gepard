@@ -46,11 +46,15 @@ are used by the code, some are just for convenience.
     |                | correspond to zeroth, first,  ... cosine harmonics, while -1,    |
     |                | -2, ... correspond to first, second, ... sine harmonics.         |
     +----------------+------------------------------------------------------------------+
-    | ``obs``        | measured :ref:`observables<tab-observables>`                     |
+    | ``observable`` | measured :ref:`observables<tab-observables>`                     |
     +----------------+------------------------------------------------------------------+
     | ``val``        | value measured                                                   |
     +----------------+------------------------------------------------------------------+
     | ``err``        | total uncertainty of val                                         |
+    +----------------+------------------------------------------------------------------+
+    | ``errstat``    | statistical uncertainty of val                                   |
+    +----------------+------------------------------------------------------------------+
+    | ``errsyst``    | systematic uncertainty of val                                    |
     +----------------+------------------------------------------------------------------+
     | ``frame``      | coordinate frame used (``BMK`` or ``Trento``)                    |
     +----------------+------------------------------------------------------------------+

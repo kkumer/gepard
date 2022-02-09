@@ -48,7 +48,7 @@ class DataPoint(dict):
         Q2 (float): Q^2
         phi (float): azimuthal angle
         FTn (int): harmonic of azimuthal angle, e.g. -1 for sin(phi)
-        yaxis (str): name of the measured observable
+        observable (str): name of the measured observable
         val (float): measurement value
         err (float): total uncertainty of `val`
         units (dict): pysical units of variables
@@ -210,7 +210,7 @@ class DataPoint(dict):
     def __repr__(self):
         """Print something useful."""
         try:
-            return "DataPoint: " + self.yaxis + " = " + str(self.val)
+            return "DataPoint: " + self.observable + " = " + str(self.val)
         except AttributeError:
             return "DataPoint"
 
@@ -244,18 +244,18 @@ class DataPoint(dict):
                                      self.varFTn))
             self.newframe = 'BMK'
         # C4. cross-sections should be in nb
-        if hasattr(self, 'units') and self.units[self.y1name] == 'pb/GeV^4':
+        if hasattr(self, 'units') and self.units[self.observable] == 'pb/GeV^4':
             self.val = self.val/1000
             for errtype in self.errtypes:
                 if hasattr(self, errtype):
                     err = getattr(self, errtype)
                     setattr(self, errtype, err/1000)
-            self.newunits[self.y1name] = 'nb/GeV^4'
+            self.newunits[self.observable] = 'nb/GeV^4'
 
     def from_conventions(self):
         """Transform stuff from Approach's conventions into original data's."""
         # C4. cross-sections should be in nb
-        if hasattr(self, 'units') and self.units[self.y1name] == 'pb/GeV^4':
+        if hasattr(self, 'units') and self.units[self.observable] == 'pb/GeV^4':
             self.val = self.val*1000
             for errtype in self.errtypes:
                 if hasattr(self, errtype):
@@ -283,7 +283,7 @@ class DataPoint(dict):
         """Like from_conventions, but for the prediction val."""
         # This doesn't touches self
         # C4. cross-sections nb --> pb
-        if hasattr(self, 'units') and self.units[self.y1name] == 'pb/GeV^4':
+        if hasattr(self, 'units') and self.units[self.observable] == 'pb/GeV^4':
             val = val*1000
         # C2. phi_{BKM} --> (pi - phi_{Trento})
         if 'frame' in self and self.frame == 'Trento' and 'FTn' in self:
@@ -309,7 +309,7 @@ class DataSet(list):
     via attributes:
 
     Attributes:
-        yaxis (str): name of observable measured
+        observable (str): name of observable measured
         collaboration (str): name of experimenatal collaboration
         units (dict): pysical units of variables
         newunits (dict): internal pysical units of variables
@@ -333,20 +333,19 @@ class DataSet(list):
                 except ValueError:  # rest stays as is
                     setattr(self, key, preamble[key])
 
-            #  Extracting names of x-axes variables
+            #  Extracting names of x-axes variables and observable
             #  xnames = ['x1name', 'x2name', ...], not necessarily sorted!
             #  xaxes = ['t', 'xB', ...]
             self.xnames = [key for key in preamble if re.match(r'^x\dname$', key)]
             self.xaxes = [preamble[key] for key in self.xnames]
-
+            self.observable = preamble['y1name']
             # Good to have:
-            self.yaxis = preamble['y1name']
             self.filename = os.path.split(datafile)[-1]
             # Following dictionary will contain units for everything
             # i.e.  {'phi' : 'degrees', 't' : 'GeV^2', ...}
             self.units = dict((preamble[key], preamble[key[:2]+'unit'])
                               for key in self.xnames)
-            self.units[self.yaxis] = preamble['y1unit']
+            self.units[self.observable] = preamble['y1unit']
             # Following dictionary will have units which are changed so that match
             # units used for internal theoretical formulas
             self.newunits = {}
@@ -458,7 +457,7 @@ class DataSet(list):
 
     def df(self):
         """Return pandas DataFrame of a DataSet."""
-        attrs = ['y1name', 'collaboration', 'id', 'x', 'eta',
+        attrs = ['observable', 'collaboration', 'id', 'x', 'eta',
                  'xi', 'xB', 'Q2', 't', 'tm', 'in1energy', 'W',
                  'phi', 'FTn', 'varFTn', 'val',
                  'err', 'errminus', 'errplus', 'errstat', 'errsyst', 'errnorm']

@@ -63,7 +63,7 @@ Observables
 -----------
 
 Following observables are implemented in gepard. They can be used
-as methods of theory objects, or ``yaxis`` attributes of datapoints.
+as methods of theory objects, or ``observable`` attributes of datapoints.
 
 .. table:: DVCS observables
     :widths: auto
@@ -124,7 +124,7 @@ it doesn't.
     +--------------------+------------------------------------------------------------------+
     | Name               | Description                                                      |
     +====================+==================================================================+
-    | ``XGAMMA``         | cross-section for production of meson by virtual photon          |
+    | ``XGAMMA``         | cross-section for production of meson by longit. virtual photon  |
     +--------------------+------------------------------------------------------------------+
 
 Choice whether DVCS or DVMP ``XGAMMA`` will be evaluated is dependent

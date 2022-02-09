@@ -41,11 +41,11 @@ class Theory(object):
 
         Args:
             points: measurements with uncertainties, observable is
-                named in `yaxis` attribute of each DataPoint,
+                named in `observable` attribute of each DataPoint,
                 value is `val` and uncertainty is `err`.
             asym: if measurements provide asymmetric uncertainties
                 `errplus` and `errminus`, this enables their usage
-            observable (str): overrides `yaxis` of DataPoints
+            observable (str): overrides `observable` of DataPoints
 
         Notes:
             If the theory or model provide uncertainties, they are ignored -
@@ -53,7 +53,7 @@ class Theory(object):
            """
         allpulls = []
         for pt in points:
-            diff = (self.predict(pt, observable=pt.yaxis, **kwargs) - pt.val)
+            diff = (self.predict(pt, observable=pt.observable, **kwargs) - pt.val)
             if asym:
                 if diff > 0:
                     allpulls.append(diff/pt.errplus)
@@ -66,7 +66,7 @@ class Theory(object):
 
     def pull(self, pt: data.DataPoint):
         """Return pull of a single Datapoint."""
-        return (self.predict(pt, observable=pt.yaxis) - pt.val) / pt.err
+        return (self.predict(pt, observable=pt.observable) - pt.val) / pt.err
 
 #     def chisq_para(self, points: DataSet, asym: bool = False,
 #                    **kwargs) -> float:
@@ -88,7 +88,7 @@ class Theory(object):
         Args:
             pt: instance of DataPoint
             uncertainty: if available, produce tuple (mean, uncertainty)
-            observable: string. Default is pt.yaxis. It is acceptable also
+            observable: string. Default is pt.observable. It is acceptable also
                         to pass CFF or x-space GPD as observable, e.g., observable = 'ImH'
             parameters: dictionary which will temporarily update model's one
             orig_conventions: give prediction using original conventions of
@@ -97,7 +97,7 @@ class Theory(object):
         if 'observable' in kwargs:
             obs = kwargs['observable']
         else:
-            obs = pt.yaxis
+            obs = pt.observable
 
         if 'parameters' in kwargs:
             old = m.parameters.copy()

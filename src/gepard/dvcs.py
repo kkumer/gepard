@@ -71,7 +71,7 @@ class DVCS(theory.Theory):
         # Copy non-kinematical info
         for atr in ['in1charge', 'in1polarizationvector', 'in1polarization',
                     'in2polarizationvector', 'in2polarization', 'in2particle',
-                    'process', 'exptype', 'in1energy', 'in2energy', 'yaxis']:
+                    'process', 'exptype', 'in1energy', 'in2energy', 'observable']:
             if atr in pt:
                 setattr(kin, atr, getattr(pt, atr))
 

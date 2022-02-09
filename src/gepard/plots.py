@@ -538,27 +538,27 @@ def HERMES09(path=None, fmt='png', **kwargs):
         #fig.show()
     return fig
 
-def HERMES10LP(obs='TSA', path=None, fmt='png', **kwargs):
+def HERMES10LP(observable='TSA', path=None, fmt='png', **kwargs):
     """Plot HERMES 1004.0177 TSA data with fit lines."""
 
-    title = 'HERMES-10-'+obs
+    title = 'HERMES-10-'+observable
     fig = plt.figure()
     fig.suptitle(title)
     xaxes = ['tm', 'xB', 'Q2']
     ylims = [(-0.05, 0.3), (-0.15, 0.15), (-0.45, 0.05)]
     xticks = [0.2, 0.1, 2]
-    if obs == 'TSA':
+    if observable == 'TSA':
         id = 52
         harmonics = [-1, -2, -3]
         fun = 'sin'
         lbl = 'A_{UL}'
-    elif obs == 'BTSA':
+    elif observable == 'BTSA':
         id = 53
         harmonics = [0, 1, 2]
         fun = 'cos'
         lbl = 'A_{LL}'
     else:
-        raise ValueError('Observable %s nonexistent.' % obs)
+        raise ValueError('Observable %s nonexistent.' % observable)
     subsets = {}
     for k in range(3):
         subsets[k] = utils.select(data.dset[id], criteria=['FTn == %i' % harmonics[k]])
@@ -685,36 +685,36 @@ def CLAS(path=None, fmt='png', **kwargs):
         #fig.show()
     return fig
 
-def CLAS14(obs='ALU', path=None, fmt='png', **kwargs):
+def CLAS14(observable='ALU', path=None, fmt='png', **kwargs):
     """Makes plot of CLAS-14 ALU data with fit lines and bands"""
 
     title = ''
     title = 'CLAS (prelim. 2014)'
-    if obs == 'ALU':
+    if observable == 'ALU':
         dataset = data.dset[85]
         lbl = '$A_{LU}^{\\sin\\phi}$'
         ymin, ymax = 0, 0.4
-    elif obs == 'TSA1':
+    elif observable == 'TSA1':
         dataset = data.DataSet(utils.select(data.dset[86], criteria=['FTn == -1']))
         lbl = '$A_{UL}^{\\sin\\phi}$'
         ymin, ymax = 0, 0.4
-    elif obs == 'TSA2':
+    elif observable == 'TSA2':
         dataset = data.DataSet(utils.select(data.dset[86], criteria=['FTn == -2']))
         lbl = '$A_{UL}^{\\sin2\\phi}$'
         ymin, ymax = -0.1, 0.32
-    elif obs == 'BTSA0':
+    elif observable == 'BTSA0':
         dataset = data.DataSet(utils.select(data.dset[87], criteria=['FTn == 0']))
         lbl = '$A_{LL}^{\\cos0\\phi}$'
         ymin, ymax = 0, 0.8
-    elif obs == 'BTSA1':
+    elif observable == 'BTSA1':
         dataset = data.DataSet(utils.select(data.dset[87], criteria=['FTn == 1']))
         lbl = '$A_{LL}^{\\cos\\phi}$'
         ymin, ymax = -0.3, 0.3
     else:
-        raise ValueError('Observable %s unavailable.' % obs)
+        raise ValueError('Observable %s unavailable.' % observable)
     fig, axs = plt.subplots(2, 2, sharey=True, sharex=True, figsize=[5,5])
     axs = axs.reshape(4)
-    fig.suptitle(title + ' -- ' +  obs)
+    fig.suptitle(title + ' -- ' +  observable)
     # Each different Q2 has its own panel
     panelorder = [3, 4, 1, 2]
     npanel = 0
@@ -737,7 +737,7 @@ def CLAS14(obs='ALU', path=None, fmt='png', **kwargs):
         plt.xlim(0.0, 0.6)
         plt.ylim(ymin, ymax)
         ax.yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))
-        if obs == 'TSA2' or obs == 'BTSA1':
+        if observable == 'TSA2' or observable == 'BTSA1':
             ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
         if np == 2:
                 ax.legend(loc='upper left', borderaxespad=0.).draw_frame(0)
@@ -758,33 +758,33 @@ def CLAS14(obs='ALU', path=None, fmt='png', **kwargs):
         #fig.show()
     return fig
 
-def CLAS15(obs='ALU', path=None, fmt='png', **kwargs):
+def CLAS15(observable='ALU', path=None, fmt='png', **kwargs):
     """Makes plot of CLAS 2015 data with fit lines and bands"""
 
     title = 'CLAS 2015 (Pisano:2015iqa)'
-    if obs[:3] == 'ALU':
+    if observable[:3] == 'ALU':
         dataset = data.dset[94]
         lbl = '$A_{LU}^{\\sin\\phi}$'
         ymin, ymax = 0, 0.49
         old = data.dset[25]
         oldpanels = [old[:1], old[3:6], old[6:9], old[11:14], None]
-    elif obs == 'TSA':
+    elif observable == 'TSA':
         dataset = data.dset[95]
         lbl = '$A_{UL}^{\\sin\\phi}$'
         ymin, ymax = 0, 0.49
-    elif obs == 'BTSA0':
+    elif observable == 'BTSA0':
         dataset = data.DataSet(utils.select(data.dset[96], criteria=['FTn == 0']))
         lbl = '$A_{LL}^{\\cos0\\phi}$'
         ymin, ymax = 0, 0.85
-    elif obs == 'BTSA1':
+    elif observable == 'BTSA1':
         dataset = data.DataSet(utils.select(data.dset[96], criteria=['FTn == 1']))
         lbl = '$A_{LL}^{\\cos\\phi}$'
         ymin, ymax = -0.35, 0.35
     else:
-        raise ValueError('Observable %s unavailable.' % obs)
+        raise ValueError('Observable %s unavailable.' % observable)
     fig, axs = plt.subplots(3, 2, sharey=True, sharex=True)
     axs = axs.reshape(6)
-    fig.suptitle(title + ' -- ' +  obs, fontsize=20)
+    fig.suptitle(title + ' -- ' +  observable, fontsize=20)
     #
     panels = [ dataset[:1],
                dataset[1:4],
@@ -800,7 +800,7 @@ def CLAS15(obs='ALU', path=None, fmt='png', **kwargs):
             panelset.append(ptd)
             panel(ax, points=panelset, xaxis='tm', kinlabels=['Q2', 'xB'], **kwargs)
         else:
-            if obs == 'ALUOLD':
+            if observable == 'ALUOLD':
                 panel(ax, points=[panelset, oldpanels[npanel]], xaxis='tm', kinlabels=['Q2', 'xB'], **kwargs)
             else:
                 panel(ax, points=panelset, xaxis='tm', kinlabels=['Q2', 'xB'], **kwargs)
@@ -812,7 +812,7 @@ def CLAS15(obs='ALU', path=None, fmt='png', **kwargs):
         plt.ylim(ymin, ymax)
         ax.yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))
         ax.yaxis.set_minor_locator(matplotlib.ticker.MultipleLocator(0.02))
-        if obs == 'BTSA1':
+        if observable == 'BTSA1':
             ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
         if npanel == 3:
                 # Create legend here, but draw it on last panel
@@ -916,7 +916,7 @@ def HERAF2(path=None, fmt='png', **kwargs):
     ymin, ymax = 0, 1.79
     fig, axs = plt.subplots(2, 1, sharey=True, sharex=True, figsize=[8,12])
     axs = axs.reshape(2)
-    #fig.suptitle(title + ' -- ' +  obs)
+    #fig.suptitle(title + ' -- ' +  observable)
     #
     panels = [ data.dset[208],
                data.dset[202] ]
@@ -1183,7 +1183,7 @@ def HallAphi(path=None, fmt='png', **kwargs):
         panel(ax, points=subsets[np], xaxis='phi', kinlabels=['Q2', 't'], **kwargs)
         #ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(2.))
         ax.set_xlabel('$\\phi\\; {\\rm [deg]}$', fontsize=16)
-        ax.set_ylabel('{}'.format(subsets[np][0].y1name), fontsize=18)
+        ax.set_ylabel('{}'.format(subsets[np][0].observable), fontsize=18)
         if np == 1:
             ax.legend(loc='upper left', borderaxespad=0.).draw_frame(0)
         if np == 3:
@@ -1359,8 +1359,8 @@ def HallA15(lines=None, enh=True, path=None, fmt='png'):
     return fig
 
 
-def HallA17(obs='XUUcos0', lines=None, path=None, fmt='png'):
-    title = 'HallA (2017) '+obs
+def HallA17(observable='XUUcos0', lines=None, path=None, fmt='png'):
+    title = 'HallA (2017) '+observable
     NPTS = 24
     #   E    Q2   ind_low  ind_high
     #  5.6  1.5   0  2
@@ -1372,7 +1372,7 @@ def HallA17(obs='XUUcos0', lines=None, path=None, fmt='png'):
     # tupls are (dataset id, ind_low, ind_high)
     xQbins = [(136, 14, 17), (136, 6, 9), (136, 0, 2),
           (136, 18, 21), (136, 10, 13), (136, 3, 5)]
-    if obs == 'XUUcos0':
+    if observable == 'XUUcos0':
         ylab = r'$d\sigma^{\cos 0\phi,w}$'
         yminU, ymaxU = 0.0, 0.099   # upper row of panels
         yTU = 0.006
@@ -1382,7 +1382,7 @@ def HallA17(obs='XUUcos0', lines=None, path=None, fmt='png'):
         ytickD = 0.05
         dshift = 0
         pshift = 0
-    elif obs == 'XUUcos1':
+    elif observable == 'XUUcos1':
         ylab = r'$d\sigma^{\cos \phi,w}$'
         yminU, ymaxU = -0.005, 0.06   # upper row of panels
         yTU = 0.0006
@@ -1392,7 +1392,7 @@ def HallA17(obs='XUUcos0', lines=None, path=None, fmt='png'):
         ytickD = 0.02
         dshift = 0
         pshift = 22
-    elif obs == 'XLUsin1':
+    elif observable == 'XLUsin1':
         ylab = r'$\Delta\sigma^{\sin\phi,w}$'
         yminU, ymaxU = -0.00, 0.019   # upper row of panels
         yTU = 0.0006
@@ -1404,7 +1404,7 @@ def HallA17(obs='XUUcos0', lines=None, path=None, fmt='png'):
         pshift = 0
         xQbins[3] = ('blank', 0, 0)
     else:
-        raise ValueError('Observable %s unavailable.' % obs)
+        raise ValueError('Observable %s unavailable.' % observable)
     #fig, axs = plt.subplots(2, 3, sharey='row', sharex='all', figsize=[12,10])
     fig, axs = plt.subplots(2, 3, figsize=[12,10])
     axs = axs.reshape(6)
@@ -1438,11 +1438,11 @@ def HallA17(obs='XUUcos0', lines=None, path=None, fmt='png'):
             axs[pn].set_ylim(yminD,ymaxD)
             axs[pn].yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(ytickD))
             axs[pn].text(0.25, yTD, s1, fontsize=14)
-        if pn in [0,3] or (obs == 'XLUsin1' and pn == 4):
+        if pn in [0,3] or (observable == 'XLUsin1' and pn == 4):
             axs[pn].set_ylabel(ylab, fontsize=20)
-        if obs[:6] == 'XUUcos' and pn in [1,2,4,5]:
+        if observable[:6] == 'XUUcos' and pn in [1,2,4,5]:
             axs[pn].get_yaxis().set_visible(False)
-        if obs == 'XLUsin1' and pn in [1,2,5]:
+        if observable == 'XLUsin1' and pn in [1,2,5]:
             axs[pn].get_yaxis().set_visible(False)
         if pn == 0:
             axs[pn].legend(loc=2, fontsize=14, handlelength=3).draw_frame(1)
@@ -1598,7 +1598,7 @@ def COMPASSt(path=None, fmt='png', **kwargs):
     ks['phi'] = 3.141
     ks['units'] = {'phi' : 'radian'}
     ks['frame'] = 'BMK'
-    ks['yaxis'] = 'BCSA'
+    ks['observable'] = 'BCSA'
     for xB, Q2 in kinpoints:
         ax = fig.add_subplot(2,3,pn)
         ax.axhline(y=0, linewidth=1, color='g')  # y=0 thin line
@@ -1662,7 +1662,7 @@ def jbod(path=None, fmt='png', **kwargs):
         kwargs['points'] = [kwargs['points']]
     for pts in kwargs['points']:
         label = ' + '.join(set('%s-%s-%s' % (pt.collaboration,
-            str(pt.year)[-2:], pt.yaxis) for pt in pts))
+            str(pt.year)[-2:], pt.observable) for pt in pts))
         # x-coordinate is in data frame, while y-coordinate is in 0.0-1.0 frame
         ax.text(n, 0.9, label, transform=matplotlib.transforms.blended_transform_factory(
             ax.transData, ax.transAxes))
@@ -1708,8 +1708,8 @@ def CFF(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
             ax = axs[0]
         else:
             ax = axs[n, 0]
-        panel(ax, xaxis='xi', xs=xvals, kins={'yaxis':cff, 't':-0.2, 'Q2':4.,
-        'units':{'CFF': 1}, 'y1name': 'CFF'}, **kwargs)
+        panel(ax, xaxis='xi', xs=xvals, kins={'observable':cff, 't':-0.2, 'Q2':4.,
+        'units':{'CFF': 1}, 'observable': 'CFF'}, **kwargs)
         ax.axhline(y=0, linewidth=0.5, color='k')  # y=0 thin line
         try:
             ax.set_ylim(*ylims[cff])
@@ -1731,8 +1731,8 @@ def CFF(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
         else:
             ax = axs[n, 1]
         ax.set_xscale('log')  # x-axis to be logarithmic
-        panel(ax, xaxis='xi', xs=logxvals, kins={'yaxis':cff, 't':-0.2, 'Q2':4.,
-            'units':{'CFF': 1}, 'y1name': 'CFF'}, **kwargs)
+        panel(ax, xaxis='xi', xs=logxvals, kins={'observable':cff, 't':-0.2, 'Q2':4.,
+            'units':{'CFF': 1}, 'observable': 'CFF'}, **kwargs)
         ax.axvspan(0.1, 0.25, facecolor='g', alpha=0.1)  # vertical band
         ax.axhline(y=0, linewidth=0.5, color='k')  # y=0 thin line
         #ax.set_ylim(*ylims[cff])
@@ -1779,7 +1779,7 @@ def CFF2(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
             ax = fig.add_subplot(len(cffs), 2, 2*n+nt+1)
             ax.set_xscale('log')  # x-axis to be logarithmic
             panel(ax, xaxis='xi', xs=logxvals, kins={
-                    'yaxis':cff, 't':ts[nt], 'Q2':4., 'units':{'CFF': 1}, 'y1name': 'CFF'}, **kwargs)
+                    'observable':cff, 't':ts[nt], 'Q2':4., 'units':{'CFF': 1}, 'observable': 'CFF'}, **kwargs)
             ax.axhspan(-0.0005, 0.0005, facecolor='g', alpha=0.6)  # horizontal bar
             ax.text(0.31, 0.02, "$t = %s\\, {\\rm GeV}^2$" % str(ts[nt]),
                     transform=ax.transAxes, fontsize=14)
@@ -1840,8 +1840,8 @@ def CFFt(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
         cff = cffs[n]
         # smaller x
         ax = fig.add_subplot(len(cffs), 2, 2*n+1)
-        panel(ax, xaxis='tm', xs=tmvals, kins={'yaxis':cff, 'xi':0.12, 'Q2':4.,
-           'units':{'CFF': 1}, 'y1name': 'CFF'}, **kwargs)
+        panel(ax, xaxis='tm', xs=tmvals, kins={'observable':cff, 'xi':0.12, 'Q2':4.,
+           'units':{'CFF': 1}, 'observable': 'CFF'}, **kwargs)
         ax.set_xlabel(constants.toTeX['tm'], fontsize=15)
         try:
             ax.set_ylabel(constants.toTeX['%s' % cff], fontsize=18)
@@ -1857,8 +1857,8 @@ def CFFt(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
                     # fontsize=12)
         # larger x
         ax = fig.add_subplot(len(cffs), 2, 2*n+2)
-        panel(ax, xaxis='tm', xs=tmvals, kins={'yaxis':cff, 'xi':0.22, 'Q2':4.,
-            'units':{'CFF': 1}, 'y1name': 'CFF'}, **kwargs)
+        panel(ax, xaxis='tm', xs=tmvals, kins={'observable':cff, 'xi':0.22, 'Q2':4.,
+            'units':{'CFF': 1}, 'observable': 'CFF'}, **kwargs)
         ax.set_xlabel(constants.toTeX['tm'], fontsize=15)
         try:
             ax.set_ylabel(constants.toTeX['%s' % cff], fontsize=18)
@@ -1898,8 +1898,8 @@ def CFF3(cffs=['ImH', 'ReH', 'ImE', 'ReE'],
     # ordinates
     for pn, ax in enumerate(axs.flatten()):
         cff = cffs[pn]
-        panel(ax, xaxis='xi', xs=xvals, kins={'yaxis':cff, 't':-0.2, 'Q2':4.,
-            'units':{'CFF': 1}, 'y1name': 'CFF'}, **kwargs)
+        panel(ax, xaxis='xi', xs=xvals, kins={'observable':cff, 't':-0.2, 'Q2':4.,
+            'units':{'CFF': 1}, 'observable': 'CFF'}, **kwargs)
         ax.set_ylabel(constants.toTeX['{}'.format(cff)], fontsize=18)
         ax.axhline(y=0, lw=0.5, color='k', ls=':')  # horizontal bar
         for ticklabel in ax.get_xticklabels() + ax.get_yticklabels():
@@ -1958,8 +1958,8 @@ def CFF3log(cffs=['ImH', 'ReH', 'ImE', 'ReE', 'ImHt', 'ImEt'], tval=-0.2,
     for pn, ax in enumerate(axs.flatten()):
         cff = cffs[pn]
         ax.set_xscale('log')  # x-axis to be logarithmic
-        panel(ax, xaxis='xi', xs=xvals, kins={'yaxis':cff, 't':tval, 'Q2':4.,
-            'units':{'CFF': 1}, 'y1name': 'CFF'}, **kwargs)
+        panel(ax, xaxis='xi', xs=xvals, kins={'observable':cff, 't':tval, 'Q2':4.,
+            'units':{'CFF': 1}, 'observable': 'CFF'}, **kwargs)
         ax.set_ylabel(constants.toTeX['{}'.format(cff)], fontsize=18)
         ax.axhline(y=0, lw=0.5, color='k', ls=':')  # horizontal bar
         for ticklabel in ax.get_xticklabels() + ax.get_yticklabels():

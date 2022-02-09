@@ -146,7 +146,7 @@ def select(dataset, criteria=[], logic='AND'):
 
     logic='OR': select points satisfying any
     of the list of criteria.
-    Example: criteria=['xB > 0.1', 'y1name == ALU']
+    Example: criteria=['xB > 0.1', 'observable == ALU']
     
     """
     selected = []
@@ -187,7 +187,7 @@ def list_data(ids):
                 ref2 = dt.reference2
             except:
                 ref2 =  ''
-            print('[%3i] %8s %3i %9s %10s %s' % (dt.id, dt.collaboration, len(dt), dt.y1name, ref, ref2))
+            print('[%3i] %8s %3i %9s %10s %s' % (dt.id, dt.collaboration, len(dt), dt.observable, ref, ref2))
         except KeyError:
             pass
 
@@ -384,7 +384,7 @@ def describe_data(pts):
     #print 30*'-'
     for pt in pts:
         props = []
-        for prop in ['y1name', 'collaboration', 'FTn', 'id', 'reference']:
+        for prop in ['observable', 'collaboration', 'FTn', 'id', 'reference']:
             if hasattr(pt, prop):
                 props.append(str(getattr(pt,prop)))
             else:

@@ -37,13 +37,13 @@ given kinematic point, can be added:
    >>> pt = g.DataPoint(xB=0.348, t=-0.3, Q2=3., phi=0.3,
    ...                   process='ep2epgamma', exptype='fixed target',
    ...                   in1energy=6., in1charge=-1, in1polarization=+1,
-   ...                   yaxis='XS', val=0.21, err=0.01)
+   ...                   observable='XS', val=0.21, err=0.01)
 
 This particular datapoint corresponds to a measurement of DVCS, i. e.,
 :math:`e p \to e p \gamma`, in a fixed target setting, where beam
 particle (target particle has attributes starting as ``in2...``) has energy
 of 6 GeV\ :sup:`2`, negative charge (electron) and positive helicity.
-What is measured (``yaxis``) is cross-section (``XS``) and result of the
+What is measured (``observable``) is cross-section (``XS``) and result of the
 measurement is 0.21 nb, with total uncertainty of 0.01 nb.
 
 All attributes of datapoint are documented :ref:`here<tab-datapoint-attributes>`.
@@ -87,7 +87,7 @@ and then used to calculate theory prediction for a given datapoint
    0.02344956
 
 Method ``predict`` of the ``Theory`` object will by default calculate 
-observable specified in ``yaxis`` attribute of ``pt``.
+observable specified in ``observable`` attribute of ``pt``.
 User can also calculate other observables, like beam charge asymmetry
 
 .. code-block:: python
