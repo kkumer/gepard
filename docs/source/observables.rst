@@ -32,6 +32,8 @@ the following:
     +--------------------------------------+--------------------------+------------------+
     | :math:`\gamma^* p \to \rho^{0} p`    | ``gammastarp2rho0p``     | DVMP             |
     +--------------------------------------+--------------------------+------------------+
+    | :math:`e p \to e p X`                | ``dis``                  | DIS              |
+    +--------------------------------------+--------------------------+------------------+
 
 Formulas for generic theory class DVMP are implemented as
 ``g.DVMP``, while those for DVCS have several slightly different

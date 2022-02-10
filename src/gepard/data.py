@@ -20,6 +20,14 @@ from .constants import Mp, Mp2
 from .datasets import (DIS, en2engamma, ep2epgamma, gammastarp2gammap,
                        gammastarp2Mp)
 
+process_class_map = {
+        'ep2epgamma': 'DVCS',
+        'en2engamma': 'DVCS',
+        'gammastarp2gammap': 'DVCS',
+        'gammastarp2rho0p': 'DVMP',
+        'gammastarp2phip': 'DVMP',
+        'dis': 'DIS'
+        }
 
 def loaddata(resource):
     """Return dictionary {id : DataSet, ...}  out of files in resource package."""
@@ -366,7 +374,8 @@ class DataSet(list):
                         pass  # FIXME: raise error
             except AttributeError:
                 pass
-                # _lg.debug('Variable beam energy dataset in {}'.format(datafile))
+            if hasattr(self, 'process'):
+                self.process_class = process_class_map[self.process]
 
             for gridline in data:
                 pt = DataPoint()

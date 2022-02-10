@@ -209,14 +209,14 @@ def cb1(m, Q2, zn, zk, NS=False):
     return cb1
 
 
-def evolop(m, j, Q2: float, process: str) -> np.ndarray:
+def evolop(m, j, Q2: float, process_class: str) -> np.ndarray:
     """GPD evolution operator.
 
     Args:
          m: instance of the model
          j: MB contour points (overrides m.jpoints)
          Q2: final evolution momentum squared
-         process: DIS, DVCS or DVMP
+         process_class: DIS, DVCS or DVMP
 
     Returns:
          Array corresponding Eq. (121) of Towards DVCS paper.
@@ -226,7 +226,7 @@ def evolop(m, j, Q2: float, process: str) -> np.ndarray:
          -  i, j in [Q, G]
 
     Todo:
-        Argument should not be a process type but GPD vs PDF, or we
+        Argument should not be a process class but GPD vs PDF, or we
         should avoid it altogether somehow. This serves here only
         to get the correct choice of evolution scheme (msbar vs csbar).
     """
@@ -254,8 +254,8 @@ def evolop(m, j, Q2: float, process: str) -> np.ndarray:
         evola1ab = - np.einsum('kab,kabij->kabij', er1, r1proj)
         evola1 = np.einsum('kabij,bk->kij', evola1ab, Rfact)
         # adding non-diagonal evolution when needed or asked for
-        # if ((process == 'DVMP') or (process == 'DVCS' and m.scheme == 'msbar')):
-        if ((process != 'DIS') and (m.scheme == 'msbar')):
+        # if ((process_class == 'DVMP') or (process_class == 'DVCS' and m.scheme == 'msbar')):
+        if ((process_class != 'DIS') and (m.scheme == 'msbar')):
             # FIXME: find a way to do it array-wise i.e. get rid of j_single
             nd = []
             for j_single in j:
@@ -279,14 +279,14 @@ def evolop(m, j, Q2: float, process: str) -> np.ndarray:
     return evola
 
 
-def evolopns(m, j, Q2: float, process: str) -> np.ndarray:
+def evolopns(m, j, Q2: float, process_class: str) -> np.ndarray:
     """GPD evolution operator (NSP case only atm).
 
     Args:
          m: instance of the model
          j: MB contour points (overrides m.jpoints)
          Q2: final evolution momentum squared
-         process: DIS, DVCS or DVMP
+         process_class: DIS, DVCS or DVMP
 
     Returns:
          Array corresponding Eq. (116) of Towards DVCS paper.
@@ -318,8 +318,8 @@ def evolopns(m, j, Q2: float, process: str) -> np.ndarray:
     if m.p == 1:
         evola1 = aux1 * R**(-gam0/b0)
         # adding non-diagonal evolution when needed or asked for
-        # if ((process == 'DVMP') or (process == 'DVCS' and m.scheme == 'msbar')):
-        if ((process != 'DIS') and (m.scheme == 'msbar')):
+        # if ((process_class == 'DVMP') or (process_class == 'DVCS' and m.scheme == 'msbar')):
+        if ((process_class != 'DIS') and (m.scheme == 'msbar')):
             # FIXME: find a way to do it array-wise i.e. get rid of j_single
             nd = []
             for j_single in j:

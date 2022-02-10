@@ -5,7 +5,7 @@ editor2 = DM
 ### Pseudo-data
 
 collaboration = EIC
-process = DVCS
+process = gammastarp2gammap
 exptype = collider
 year = 2011
 reference = 

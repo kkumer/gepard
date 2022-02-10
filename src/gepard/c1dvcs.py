@@ -46,39 +46,39 @@ def c1_V(j: np.ndarray, nf: int) -> np.ndarray:
     return np.array((Q, G, NSP, NSM)).transpose()
 
 
-def shift1(m, j: np.ndarray, process: str) -> np.ndarray:
+def shift1(m, j: np.ndarray, process_class: str) -> np.ndarray:
     """Calculate NLO shift coeff s_1.
 
     Args:
        m: instance of g.cff.MellinBarnes
        j: MB contour points
-       process: 'DVCS' or 'DIS'
+       process_class: 'DVCS' or 'DIS'
 
     """
     LRF2 = math.log(m.rf2)
-    if process == 'DIS':
+    if process_class == 'DIS':
         s1 = - LRF2*np.ones_like(j)
-    elif process == 'DVCS':    # Eq. (88a)
+    elif process_class == 'DVCS':    # Eq. (88a)
         s1 = S1(j+3/2) - S1(j+2) + 2*math.log(2) - LRF2
     else:
-        raise Exception('Process {} is neither DVCS nor DIS!'.format(process))
+        raise Exception('Process class {} is neither DVCS nor DIS!'.format(process_class))
     return s1
 
 
-def C1(m, j: np.ndarray, process: str) -> np.ndarray:
+def C1(m, j: np.ndarray, process_class: str) -> np.ndarray:
     """Calculate NLO Wilson coeff C_1 for DVCS or DIS.
 
     Args:
        m: instance of g.cff.MellinBarnes
        j: MB contour points
-       process: 'DVCS' or 'DIS'
+       process_class: 'DVCS' or 'DIS'
 
     "Big C" from eqs. (91) and (101) from "Towards ... DVCS." paper
     """
     c0 = np.array([1, 0, 1, 1])  # LO, valid for DIS and DVCS
 
-    if ((process == 'DIS') or (m.scheme == 'csbar')):
-        shift = np.einsum('k,i,kij->kj', shift1(m, j, process), c0,
+    if ((process_class == 'DIS') or (m.scheme == 'csbar')):
+        shift = np.einsum('k,i,kij->kj', shift1(m, j, process_class), c0,
                           adim.block(j+1, m.nf)[:, 0, :, :])/2
     elif m.scheme == 'msbar':
         shift = - np.einsum('i,kij->kj', c0,
@@ -86,14 +86,14 @@ def C1(m, j: np.ndarray, process: str) -> np.ndarray:
     else:
         raise Exception('Scheme {} is neither msbar nor csbar!'.format(m.scheme))
 
-    if process == 'DIS':
+    if process_class == 'DIS':
         c1 = c1_F2(j+1, m.nf)
-    elif process == 'DVCS':
+    elif process_class == 'DVCS':
         if m.scheme == 'csbar':
             c1 = c1_F1(j+1, m.nf)
         else:  # msbar
             c1 = c1_V(j, m.nf)
     else:
-        raise Exception('Process {} is neither DVCS nor DIS!'.format(process))
+        raise Exception('Process class {} is neither DVCS nor DIS!'.format(process_class))
 
     return c1 + shift

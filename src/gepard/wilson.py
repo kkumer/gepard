@@ -35,13 +35,13 @@ def _fshu(j: np.ndarray) -> np.ndarray:
                               - loggamma(3 + j) - loggamma(3/2)))
 
 
-def calc_wc(m, j, process: str):
+def calc_wc(m, j, process_class: str):
     """Calculate Wilson coeffs for given Q2.
 
     Args:
        m: instance of the model
        j: MB contour point(s) (overrides m.jpoints)
-       process: 'DIS, 'DVCS' or 'DVMP'
+       process_class: 'DIS, 'DVCS' or 'DVMP'
 
     Returns:
          wc[k, p, f]: k in range(npts), p in [LO, NLO], f in [Q,G,NSP]
@@ -49,8 +49,8 @@ def calc_wc(m, j, process: str):
     one = np.ones_like(m.jpoints)
     zero = np.zeros_like(m.jpoints)
     fshu = _fshu(j)
-    if process in ['DVCS', 'DIS']:
-        if process == 'DVCS':
+    if process_class in ['DVCS', 'DIS']:
+        if process_class == 'DVCS':
             quark_norm = fshu
             gluon_norm = fshu
         else:  # DIS
@@ -60,8 +60,8 @@ def calc_wc(m, j, process: str):
         q1, g1, nsp1 = (zero, zero, zero)  # NLO if only LO is asked for (m.p=0)
         if m.p == 1:
             # don't take NSM part atm:
-            q1, g1, nsp1 = c1dvcs.C1(m, j, process)[:, :3].transpose()
-    elif process == 'DVMP':
+            q1, g1, nsp1 = c1dvcs.C1(m, j, process_class)[:, :3].transpose()
+    elif process_class == 'DVMP':
         # Normalizations. Factor 3 is from normalization of DA, so not NC
         # See p. 37, 39 of "Towards DVMP" paper. Eq. (3.62c)
         quark_norm = 3 * fshu
@@ -75,20 +75,20 @@ def calc_wc(m, j, process: str):
             q1 = qp1/m.nf + ps1
             nsp1 = qp1
     else:
-        raise Exception('{} is not DIS, DVCS or DVMP!'.format(process))
+        raise Exception('{} is not DIS, DVCS or DVMP!'.format(process_class))
     c_quark = quark_norm * np.stack([q0, q1])
     c_gluon = gluon_norm * np.stack([g0, g1])
     c_nsp = quark_norm * np.stack([nsp0, nsp1])
     return np.stack((c_quark, c_gluon, c_nsp)).transpose()
 
 
-def calc_wce(m, Q2: float, process: str):
+def calc_wce(m, Q2: float, process_class: str):
     """Calculate evolved Wilson coeffs for given Q2, for all PWs.
 
     Args:
        Q2: final evolution scale
        m: instance of the Theory
-       process: 'DIS, 'DVCS' or 'DVMP'
+       process_class: 'DIS, 'DVCS' or 'DVMP'
 
     Returns:
          wce[s,k,j]: s in range(npwmax), k in range(npts), j in [Q,G,NSP]
@@ -96,10 +96,10 @@ def calc_wce(m, Q2: float, process: str):
     wce = []
     for pw_shift in [0, 2, 4]:
         j = m.jpoints + pw_shift
-        wc = calc_wc(m, j, process)
+        wc = calc_wc(m, j, process_class)
         # evolution operators
-        evola_si = evolution.evolop(m, j, Q2, process)     # 2x2
-        evola_ns = evolution.evolopns(m, j, Q2, process)   # 1x1, NSP
+        evola_si = evolution.evolop(m, j, Q2, process_class)     # 2x2
+        evola_ns = evolution.evolopns(m, j, Q2, process_class)   # 1x1, NSP
         zero_right = np.zeros((evola_ns.shape[0], 2, 2, 1))
         zero_down = np.zeros((evola_ns.shape[0], 2, 1, 2))
         evola_ns = evola_ns.reshape((evola_ns.shape[0], 2, 1, 1))
