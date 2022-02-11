@@ -1,9 +1,11 @@
 """Deep Inelastic Scattering."""
+from __future__ import annotations
 
-from math import log
+from typing import Dict
 import numpy as np
 
 from . import data, mellin, model, wilson
+
 
 class DIS(model.ParameterModel, mellin.MellinBarnes):
     """Deep Inelastic Scattering (DIS) - form factors only."""
@@ -17,13 +19,9 @@ class DIS(model.ParameterModel, mellin.MellinBarnes):
         self.wce_dis: Dict[float, np.ndarray] = {}
         super().__init__(**kwargs)
 
-
     def DISF2(self, pt: data.DataPoint) -> float:
-        """Return DIS F2 form factor.
-
-        Name DISF2 is chosen to avoid clash with F2 Pauli form factor.
-
-        """
+        """Return DIS F2 form factor."""
+        # Name DISF2 is chosen to avoid clash with F2 Pauli form factor.
         try:
             wce_ar_dis = self.wce_dis[pt.Q2]
         except KeyError:
@@ -35,4 +33,3 @@ class DIS(model.ParameterModel, mellin.MellinBarnes):
         pdf = np.einsum('fa,ja->jf', self.frot_pdf, pdf_prerot)
         mb_int = self._dis_mellin_barnes_integral(pt.xB, wce_ar_dis, pdf)
         return self.dis_charge * mb_int / np.pi
-

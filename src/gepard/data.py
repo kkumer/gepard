@@ -30,6 +30,7 @@ process_class_map = {
         'dis': 'DIS'
         }
 
+
 def loaddata(resource):
     """Return dictionary {id : DataSet, ...}  out of files in resource package."""
     data = {}
@@ -588,12 +589,19 @@ def _fill_kinematics(kin, old={}):
 
 
 def select(dataset: DataSet, criteria: List[str] = [], logic='AND'):
-    """Return DataSet of DataPoints satisfying criteria.
+    """Filter point of dataset satisfying criteria.
 
-    logic='OR': select points satisfying any
-    of the list of criteria.
-    Example: criteria=['xB > 0.1', 'observable == ALU']
-    
+    Args:
+        dataset: DataSet or any collection of DataPoints
+        criteria: list of strings describing selection criteria
+        logic: 'AND' or 'OR': how to logically combine criteria
+
+    Returns:
+        DataSet of DataPoints satisfying criterion.
+
+    Example:
+        criteria=['xB > 0.1', 'observable == ALU']
+
     """
     selected = []
     for pt in dataset:
@@ -611,22 +619,29 @@ def select(dataset: DataSet, criteria: List[str] = [], logic='AND'):
                 selected.append(pt)
     # convert list to DataSet instance
     tmp = DataSet(selected)
-    tmp.__dict__ = dataset.__dict__.copy() # transfer the attributes
+    tmp.__dict__ = dataset.__dict__.copy()  # transfer the attributes
     return tmp
 
 
 def list_data(ids):
     """List basic info about datasets specified by id numbers."""
-    if not isinstance(ids, list): ids = [ids]
+    if not isinstance(ids, list):
+        ids = [ids]
     for id in ids:
         try:
             dt = dset[id]
-            ref = dt.reference.replace('arXiv:', '').replace('hep-ex', '').replace('nucl-ex', '').replace('from Morgan Murray, draft_90@hermes.desy.de, J. Burns and M. Murray', 'Morgan M.').replace('v1', '').replace('F. Ellinghaus, QCD02', 'Frank E.').replace('PRELIMINARY', 'prelim.').strip('[]/ ')
+            ref = dt.reference.replace('arXiv:', '').replace('hep-ex', '').replace(
+                  'nucl-ex', '').replace(
+                  'from Morgan Murray, draft_90@hermes.desy.de, J. Burns and M. Murray',
+                  'Morgan M.').replace('v1', '').replace(
+                            'F. Ellinghaus, QCD02', 'Frank E.').replace(
+                                    'PRELIMINARY', 'prelim.').strip('[]/ ')
             try:
                 ref2 = dt.reference2
-            except:
-                ref2 =  ''
-            print('[%3i] %8s %3i %9s %10s %s' % (dt.id, dt.collaboration, len(dt), dt.observable, ref, ref2))
+            except AttributeError:
+                ref2 = ''
+            print('[%3i] %8s %3i %9s %10s %s' % (
+                  dt.id, dt.collaboration, len(dt), dt.observable, ref, ref2))
         except KeyError:
             pass
 
@@ -637,14 +652,11 @@ def describe_data(pts):
     print("{:2s} x {:6s}  {:6s}  {:4s}   {:3s} {:12s}".format(
      'npt', 'obs', 'collab', 'FTn', 'id', 'ref.'))
     print(46*'-')
-    #print "{:2s} x {:5s}  {:6s}  {:4s}".format(
-     #'npt', 'obs', 'collab', 'FTn')
-    #print 30*'-'
     for pt in pts:
         props = []
         for prop in ['observable', 'collaboration', 'FTn', 'id', 'reference']:
             if hasattr(pt, prop):
-                props.append(str(getattr(pt,prop)))
+                props.append(str(getattr(pt, prop)))
             else:
                 props.append('N/A')
         all.append(tuple(props))
@@ -655,10 +667,10 @@ def describe_data(pts):
         n = all.count(uniq)
         cc += n
         print("{:2d} x {:6s}  {:6s}  {:4s}   {:3s} {:12s}".format(n, *uniq))
-        #print "{:2d} x {:5s}  {:6s}  {:4s}".format(n, *uniq)
     assert cc == tot
     print(46*'-')
     print("TOTAL = {}".format(tot))
+
 
 # Load all public datasets and make them globaly available
 dset = loaddata(ep2epgamma)
