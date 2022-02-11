@@ -1,20 +1,17 @@
-"""Initialization of evolved Wilson coefficients.
-
-"""
-import sys
+"""Wilson coefficients and evolved Wilson coefficients."""
 
 import numpy as np
 from scipy.special import loggamma  # type: ignore
 
-from . import adim, c1dvcs, c1dvmp, constants, evolution, qcd
+from . import adim, c1dvcs, c1dvmp, constants, evolution, qcd, theory
 
 
-def calc_gam(npoints, nf):
+def calc_gam(npoints: np.ndarray, nf: int):
     """Calculate LO singlet anomalous dimensions matrix on MB contour.
 
     Args:
-       npoints: coordinates of MB contour
-            nf: number of active quark flavors
+        npoints: coordinates of MB contour
+        nf: number of active quark flavors
 
     Returns:
          gam[s,k,i,j]: s in range(npwmax), k in range(npts), i,j in [Q,G]
@@ -35,16 +32,17 @@ def _fshu(j: np.ndarray) -> np.ndarray:
                               - loggamma(3 + j) - loggamma(3/2)))
 
 
-def calc_wc(m, j, process_class: str):
-    """Calculate Wilson coeffs for given Q2.
+def calc_wc(m: theory.Theory, j: np.ndarray, process_class: str):
+    """Calculate Wilson coeffs.
 
     Args:
-       m: instance of the model
-       j: MB contour point(s) (overrides m.jpoints)
-       process_class: 'DIS, 'DVCS' or 'DVMP'
+        m: instance of the Theory class
+        j: MB contour point(s) (overrides m.jpoints)
+        process_class: 'DIS', 'DVCS' or 'DVMP'
 
     Returns:
-         wc[k, p, f]: k in range(npts), p in [LO, NLO], f in [Q,G,NSP]
+        wc[k, p, f]: k in range(npts), p in [LO, NLO], f in [Q,G,NSP]
+
     """
     one = np.ones_like(m.jpoints)
     zero = np.zeros_like(m.jpoints)
@@ -82,16 +80,17 @@ def calc_wc(m, j, process_class: str):
     return np.stack((c_quark, c_gluon, c_nsp)).transpose()
 
 
-def calc_wce(m, Q2: float, process_class: str):
+def calc_wce(m: theory.Theory, Q2: float, process_class: str):
     """Calculate evolved Wilson coeffs for given Q2, for all PWs.
 
     Args:
-       Q2: final evolution scale
-       m: instance of the Theory
-       process_class: 'DIS, 'DVCS' or 'DVMP'
+        Q2: final evolution scale
+        m: instance of the Theory
+        process_class: 'DIS', 'DVCS' or 'DVMP'
 
     Returns:
-         wce[s,k,j]: s in range(npwmax), k in range(npts), j in [Q,G,NSP]
+        wce[s,k,j]: s in range(npwmax), k in range(npts), j in [Q,G,NSP]
+
     """
     wce = []
     for pw_shift in [0, 2, 4]:
@@ -115,23 +114,22 @@ def calc_wce(m, Q2: float, process_class: str):
     return np.stack(wce, axis=0)  # stack PWs
 
 
-def calc_j2x(m, x: float, eta: float, Q2: float):
+def calc_j2x(m: theory.Theory, x: float, eta: float, Q2: float):
     """Calculate j2x coeffs, combined with evolution operator.
 
     Args:
-       m: instance of the Theory
-       x: long. momentum fraction argument of GPD
-       eta: skewness
-       Q2: final evolution scale
+        m: instance of the Theory
+        x: long. momentum fraction argument of GPD
+        eta: skewness
+        Q2: final evolution scale
 
     Returns:
-         wce[s,k,j]: s in range(npwmax), k in range(npts), j in [Q,G,NSP]
+        wce[s,k,j]: s in range(npwmax), k in range(npts), j in [Q,G,NSP]
 
     Todo:
         Implement general (eta != x) j to x transform.
 
     """
-    #####
     wce = []
     for pw_shift in [0, 2, 4]:
         j = m.jpoints + pw_shift

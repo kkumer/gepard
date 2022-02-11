@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd  # type: ignore
 from scipy.interpolate import InterpolatedUnivariateSpline  # type: ignore
 
-from . import constants, data, utils
+from . import constants, data
 
 # if os.sys.platform == 'win32':
 #     matplotlib.use('WxAgg')
@@ -338,9 +338,9 @@ def HERMES10t(lines=None, path=None, fmt='png'):
     """Plot AUL(t) and ALL(t) for HERMES 2010 data."""
     title = 'HERMES-10'
     NPTS = 30
-    dfAUL = utils.select(data.dset[52], criteria=['FTn == -1'])[:4].df()
-    dfALL0 = utils.select(data.dset[53], criteria=['FTn == 0'])[:4].df()
-    dfALL1 = utils.select(data.dset[53], criteria=['FTn == 1'])[:4].df()
+    dfAUL = data.select(data.dset[52], criteria=['FTn == -1'])[:4].df()
+    dfALL0 = data.select(data.dset[53], criteria=['FTn == 0'])[:4].df()
+    dfALL1 = data.select(data.dset[53], criteria=['FTn == 1'])[:4].df()
     dfs = [dfAUL, dfALL1, dfALL0]
     ylabels = [r'$A_{UL,+}^{\sin\phi}$',
                r'$-A_{LL,+}^{\cos\phi}$',
@@ -561,7 +561,7 @@ def HERMES10LP(observable='TSA', path=None, fmt='png', **kwargs):
         raise ValueError('Observable %s nonexistent.' % observable)
     subsets = {}
     for k in range(3):
-        subsets[k] = utils.select(data.dset[id], criteria=['FTn == %i' % harmonics[k]])
+        subsets[k] = data.select(data.dset[id], criteria=['FTn == %i' % harmonics[k]])
     # we have 3x12=36 points to be separated in nine panels four points each:
     for y in range(2):  # put this to 3 to plot also 3rd harmonic
         for x in range(3):
@@ -646,7 +646,7 @@ def HERMES08TP(path=None, fmt='png', **kwargs):
 def CLAS(path=None, fmt='png', **kwargs):
     """Makes plot of CLAS ALU data with fit lines and bands"""
 
-    dataset = utils.select(data.dset[25], criteria=['Q2 > 1.57'])
+    dataset = data.select(data.dset[25], criteria=['Q2 > 1.57'])
     #dataset = data[25]
     title = ''
     title = 'CLAS (Girod:2007aa)'
@@ -695,19 +695,19 @@ def CLAS14(observable='ALU', path=None, fmt='png', **kwargs):
         lbl = '$A_{LU}^{\\sin\\phi}$'
         ymin, ymax = 0, 0.4
     elif observable == 'TSA1':
-        dataset = data.DataSet(utils.select(data.dset[86], criteria=['FTn == -1']))
+        dataset = data.DataSet(data.select(data.dset[86], criteria=['FTn == -1']))
         lbl = '$A_{UL}^{\\sin\\phi}$'
         ymin, ymax = 0, 0.4
     elif observable == 'TSA2':
-        dataset = data.DataSet(utils.select(data.dset[86], criteria=['FTn == -2']))
+        dataset = data.DataSet(data.select(data.dset[86], criteria=['FTn == -2']))
         lbl = '$A_{UL}^{\\sin2\\phi}$'
         ymin, ymax = -0.1, 0.32
     elif observable == 'BTSA0':
-        dataset = data.DataSet(utils.select(data.dset[87], criteria=['FTn == 0']))
+        dataset = data.DataSet(data.select(data.dset[87], criteria=['FTn == 0']))
         lbl = '$A_{LL}^{\\cos0\\phi}$'
         ymin, ymax = 0, 0.8
     elif observable == 'BTSA1':
-        dataset = data.DataSet(utils.select(data.dset[87], criteria=['FTn == 1']))
+        dataset = data.DataSet(data.select(data.dset[87], criteria=['FTn == 1']))
         lbl = '$A_{LL}^{\\cos\\phi}$'
         ymin, ymax = -0.3, 0.3
     else:
@@ -773,11 +773,11 @@ def CLAS15(observable='ALU', path=None, fmt='png', **kwargs):
         lbl = '$A_{UL}^{\\sin\\phi}$'
         ymin, ymax = 0, 0.49
     elif observable == 'BTSA0':
-        dataset = data.DataSet(utils.select(data.dset[96], criteria=['FTn == 0']))
+        dataset = data.DataSet(data.select(data.dset[96], criteria=['FTn == 0']))
         lbl = '$A_{LL}^{\\cos0\\phi}$'
         ymin, ymax = 0, 0.85
     elif observable == 'BTSA1':
-        dataset = data.DataSet(utils.select(data.dset[96], criteria=['FTn == 1']))
+        dataset = data.DataSet(data.select(data.dset[96], criteria=['FTn == 1']))
         lbl = '$A_{LL}^{\\cos\\phi}$'
         ymin, ymax = -0.35, 0.35
     else:
@@ -876,8 +876,8 @@ def HERAF2xB(path=None, fmt='png', **kwargs):
     #title = 'H1 hep-ex/9603004 (Aid:1996au)'
     title = 'H1-F2'
     fig, ax = plt.subplots(figsize=[8,6])
-    Q15 = utils.select(DISpoints, criteria=['Q2 == 15'])
-    Q8 = utils.select(DISpoints, criteria=['Q2 == 8.5'])
+    Q15 = data.select(DISpoints, criteria=['Q2 == 15'])
+    Q8 = data.select(DISpoints, criteria=['Q2 == 8.5'])
     panels = [Q15, Q8 ]
     for npanel, panelset in enumerate(panels):
         panel(ax, points=panelset, xaxis='xB', **kwargs)
@@ -1023,7 +1023,7 @@ def CLAS08(path=None, fmt='png', **kwargs):
 
     title = ''
     title = 'CLAS (Gavalian:2008aa)'
-    alldata = utils.select(data.dset[81], criteria=['FTn == -1'])
+    alldata = data.select(data.dset[81], criteria=['FTn == -1'])
     datasets = [alldata[:3], alldata[-3:]]
     xaxes = ['Q2', 'tm']
     xlabels = ['$Q^2\\; [{\\rm GeV}^2]$', '$-t\\; [{\\rm GeV}^2]$']
@@ -1065,12 +1065,12 @@ def HallAFT(path=None, fmt='png', **kwargs):
     """Makes plot of harmonics of Hall-A data with fit lines"""
 
     subsets = {}
-    subsets[1] = utils.select(data.dset[50], criteria=['Q2 == 1.5', 'FTn == -1'])
-    subsets[2] = utils.select(data.dset[50], criteria=['Q2 == 1.9', 'FTn == -1'])
-    subsets[3] = utils.select(data.dset[50], criteria=['Q2 == 2.3', 'FTn == -1'])
-    subsets[4] = utils.select(data.dset[51], criteria=['FTn == 0'])
-    subsets[5] = utils.select(data.dset[51], criteria=['FTn == 1'])
-    #subsets[6] = utils.select(data.dset[51], criteria=['FTn == 2'])
+    subsets[1] = data.select(data.dset[50], criteria=['Q2 == 1.5', 'FTn == -1'])
+    subsets[2] = data.select(data.dset[50], criteria=['Q2 == 1.9', 'FTn == -1'])
+    subsets[3] = data.select(data.dset[50], criteria=['Q2 == 2.3', 'FTn == -1'])
+    subsets[4] = data.select(data.dset[51], criteria=['FTn == 0'])
+    subsets[5] = data.select(data.dset[51], criteria=['FTn == 1'])
+    #subsets[6] = data.select(data.dset[51], criteria=['FTn == 2'])
     ylabels = 3*['$d^{\,4}\\Sigma^{\,\\sin\\phi,w}$'] + \
                 ['$d^{\,4}\\sigma^{\,\\cos0\\phi,w}$'] + \
                 ['$d^{\,4}\\sigma^{\,\\cos\\phi,w}$']
@@ -1104,11 +1104,11 @@ def HallA06(lines=None, path=None, fmt='png'):
               'blank', 'blank', 4,
               'blank', 'blank', 5]
     subsets = {}
-    subsets[1] = utils.select(data.dset[50], criteria=['Q2 == 1.5', 'FTn == -1'])
-    subsets[2] = utils.select(data.dset[50], criteria=['Q2 == 1.9', 'FTn == -1'])
-    subsets[3] = utils.select(data.dset[50], criteria=['Q2 == 2.3', 'FTn == -1'])
-    subsets[4] = utils.select(data.dset[51], criteria=['FTn == 0'])
-    subsets[5] = utils.select(data.dset[51], criteria=['FTn == 1'])
+    subsets[1] = data.select(data.dset[50], criteria=['Q2 == 1.5', 'FTn == -1'])
+    subsets[2] = data.select(data.dset[50], criteria=['Q2 == 1.9', 'FTn == -1'])
+    subsets[3] = data.select(data.dset[50], criteria=['Q2 == 2.3', 'FTn == -1'])
+    subsets[4] = data.select(data.dset[51], criteria=['FTn == 0'])
+    subsets[5] = data.select(data.dset[51], criteria=['FTn == 1'])
     #fig, axs = plt.subplots(3, 3, sharey='row', sharex=True, figsize=[10,10])
     fig, axs = plt.subplots(3, 3, figsize=[7,9])
     axs = axs.reshape(9)
@@ -1168,12 +1168,12 @@ def HallAphi(path=None, fmt='png', **kwargs):
 
     ids = [9, 14, 20, 21, 23, 24]
     subsets = {}
-    subsets[9] = utils.select(data.dset[33], criteria=['Q2 == 1.5', 't == -0.17'])
-    subsets[14] = utils.select(data.dset[33], criteria=['Q2 == 1.9', 't == -0.23'])
-    subsets[20] = utils.select(data.dset[33], criteria=['Q2 == 2.3', 't == -0.33'])
-    subsets[21] = utils.select(data.dset[34], criteria=['t == -0.17'])
-    subsets[23] = utils.select(data.dset[34], criteria=['t == -0.28'])
-    subsets[24] = utils.select(data.dset[34], criteria=['t == -0.33'])
+    subsets[9] = data.select(data.dset[33], criteria=['Q2 == 1.5', 't == -0.17'])
+    subsets[14] = data.select(data.dset[33], criteria=['Q2 == 1.9', 't == -0.23'])
+    subsets[20] = data.select(data.dset[33], criteria=['Q2 == 2.3', 't == -0.33'])
+    subsets[21] = data.select(data.dset[34], criteria=['t == -0.17'])
+    subsets[23] = data.select(data.dset[34], criteria=['t == -0.28'])
+    subsets[24] = data.select(data.dset[34], criteria=['t == -0.33'])
     title = ''
     fig = plt.figure(figsize=[12,7])
     fig.suptitle(title)
@@ -1204,12 +1204,12 @@ def CLAS15phi(path=None, fmt='png', **kwargs):
     fig, axs = plt.subplots(2, 3, sharey='row', sharex=True, figsize=[14,8])
     axs = axs.reshape(6)
     panels = [
-       utils.select(data.dset[98], criteria=['xB == 0.335', 'Q2 == 2.78', 't == -0.20']),
-       utils.select(data.dset[98], criteria=['xB == 0.335', 'Q2 == 2.78', 't == -0.26']),
-       utils.select(data.dset[98], criteria=['xB == 0.335', 'Q2 == 2.78', 't == -0.45']),
-       utils.select(data.dset[97], criteria=['xB == 0.335', 'Q2 == 2.78', 't == -0.20']),
-       utils.select(data.dset[97], criteria=['xB == 0.335', 'Q2 == 2.78', 't == -0.26']),
-       utils.select(data.dset[97], criteria=['xB == 0.335', 'Q2 == 2.78', 't == -0.45'])
+       data.select(data.dset[98], criteria=['xB == 0.335', 'Q2 == 2.78', 't == -0.20']),
+       data.select(data.dset[98], criteria=['xB == 0.335', 'Q2 == 2.78', 't == -0.26']),
+       data.select(data.dset[98], criteria=['xB == 0.335', 'Q2 == 2.78', 't == -0.45']),
+       data.select(data.dset[97], criteria=['xB == 0.335', 'Q2 == 2.78', 't == -0.20']),
+       data.select(data.dset[97], criteria=['xB == 0.335', 'Q2 == 2.78', 't == -0.26']),
+       data.select(data.dset[97], criteria=['xB == 0.335', 'Q2 == 2.78', 't == -0.45'])
                ]
     for np, panelset in enumerate(panels):
         ax = axs[np]
@@ -1459,14 +1459,14 @@ def H1ZEUS(path=None, fmt='png', **kwargs):
     """Makes plot of H1 DVCS data with fit lines"""
 
     subsets = {}
-    subsets[1] = [utils.select(data.dset[63], criteria=['Q2 == 8.']),
-            utils.select(data.dset[63], criteria=['Q2 == 15.5']),
-            utils.select(data.dset[63], criteria=['Q2 == 25.'])]
+    subsets[1] = [data.select(data.dset[63], criteria=['Q2 == 8.']),
+            data.select(data.dset[63], criteria=['Q2 == 15.5']),
+            data.select(data.dset[63], criteria=['Q2 == 25.'])]
     subsets[2] = [data.dset[46]] # ZEUS t-dep
     subsets[3] = [data.dset[48],
-            utils.select(data.dset[41], criteria=['Q2 == 8.']),
-            utils.select(data.dset[41], criteria=['Q2 == 15.5']),
-            utils.select(data.dset[41], criteria=['Q2 == 25.'])]
+            data.select(data.dset[41], criteria=['Q2 == 8.']),
+            data.select(data.dset[41], criteria=['Q2 == 15.5']),
+            data.select(data.dset[41], criteria=['Q2 == 25.'])]
     subsets[4] = [data.dset[47]] # ZEUS Q2-dep
     xs = ['t', 't', 'W', 'Q2']
     title = 'H1_07_ZEUS_08_DVCS'
@@ -1529,10 +1529,10 @@ def DVMP(H109WdepXL, path=None, fmt='png', **kwargs):
 
     subsets = {}
     subsets[1] = [data.dset[76]]
-    subsets[2] = [utils.select(H109WdepXL, criteria=['Q2 == 6.6']),
-            utils.select(H109WdepXL, criteria=['Q2 == 11.9']),
-            utils.select(H109WdepXL, criteria=['Q2 == 19.5']),
-            utils.select(H109WdepXL, criteria=['Q2 == 35.6'])]
+    subsets[2] = [data.select(H109WdepXL, criteria=['Q2 == 6.6']),
+                  data.select(H109WdepXL, criteria=['Q2 == 11.9']),
+                  data.select(H109WdepXL, criteria=['Q2 == 19.5']),
+                  data.select(H109WdepXL, criteria=['Q2 == 35.6'])]
     subsets[3] = []
     subsets[4] = []
     xs = ['Q2', 'W', 't', 'Q2']

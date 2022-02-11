@@ -2,7 +2,7 @@
 
 import numpy as np
 
-from . import cff, data, dis, dvcs, dvmp, eff, gpd, utils
+from . import cff, data, dis, dvcs, dvmp, eff, gpd
 
 GLOpoints = data.dset[31][12:] + data.dset[8] + data.dset[29]
 
@@ -13,31 +13,31 @@ DVCSpoints = data.dset[36] + data.dset[37] + data.dset[38] + data.dset[39] + \
 H1ZEUSpoints = DVCSpoints + data.dset[48]
 
 ALTGLO5points = data.dset[5] + data.dset[8] + data.dset[32][18:]   # DM's CLAS ALU
-XLUwpoints = utils.select(data.dset[50], criteria=['FTn == -1'])
-XUUwpoints = utils.select(data.dset[51], criteria=['FTn>=0', 'FTn <= 1'])
+XLUwpoints = data.select(data.dset[50], criteria=['FTn == -1'])
+XUUwpoints = data.select(data.dset[51], criteria=['FTn>=0', 'FTn <= 1'])
 UNP5points = ALTGLO5points + XUUwpoints + XLUwpoints
 
 H1ZEUSindependentNEW = data.dset[45] + data.dset[39] + data.dset[63] + data.dset[46]
-H1ZEUS = H1ZEUSindependentNEW + utils.select(data.dset[47], criteria=['Q2 >= 4.0'])
+H1ZEUS = H1ZEUSindependentNEW + data.select(data.dset[47], criteria=['Q2 >= 4.0'])
 
-ALUIpoints = utils.select(data.dset[68], criteria=['FTn == -1'])  # HERMES
-AC0points = utils.select(data.dset[67], criteria=['FTn == 0'])  # HERMES
-AC1points = utils.select(data.dset[67], criteria=['FTn == 1'])  # HERMES
+ALUIpoints = data.select(data.dset[68], criteria=['FTn == -1'])  # HERMES
+AC0points = data.select(data.dset[67], criteria=['FTn == 0'])  # HERMES
+AC1points = data.select(data.dset[67], criteria=['FTn == 1'])  # HERMES
 ALUIpts = ALUIpoints[:6]
 ACpts = AC0points[:6] + AC1points[:6]
 
-TSA1points = utils.select(data.dset[52], criteria=['FTn == -1'])  # HERMES A_UL
+TSA1points = data.select(data.dset[52], criteria=['FTn == -1'])  # HERMES A_UL
 H_AULpts = TSA1points[:4]
 C_AULpts = data.dset[54][:3]
 AULpts = H_AULpts + C_AULpts
 
-BTSApoints = utils.select(data.dset[53], criteria=['FTn==0'])   # HERMES A_LL
+BTSApoints = data.select(data.dset[53], criteria=['FTn==0'])   # HERMES A_LL
 ALLpts = BTSApoints[:4]
 
-AUTIpoints = utils.select(data.dset[66], criteria=['FTn==1'])  # \sin\varphi\cos\phi
+AUTIpoints = data.select(data.dset[66], criteria=['FTn==1'])  # \sin\varphi\cos\phi
 AUTIpts = AUTIpoints[:4]
 
-CLAS08pts = utils.select(data.dset[81], criteria=['FTn == -1'])[-3:]
+CLAS08pts = data.select(data.dset[81], criteria=['FTn == -1'])[-3:]
 
 GLO15new = data.dset[94]+data.dset[95]+data.dset[96]+data.dset[101]+data.dset[102]+data.dset[116]+data.dset[117]
 

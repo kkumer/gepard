@@ -7,7 +7,7 @@ from typing import Dict, Union
 
 import numpy as np
 
-from . import data, gpd, model, quadrature, utils, wilson  # noqa: F401
+from . import data, gpd, model, quadrature, wilson  # noqa: F401
 
 
 class CFF(model.ParameterModel):
@@ -34,6 +34,15 @@ class CFF(model.ParameterModel):
         self.dvcs_charges = (qs, qs, qns)
         super().__init__(**kwargs)
 
+    def _flatten(T):
+        """Flatten the tuple."""
+        if not isinstance(T, tuple):
+            return (T,)
+        elif len(T) == 0:
+            return ()
+        else:
+            return flatten(T[0]) + flatten(T[1:])
+
     def print_CFFs(self, pt: data.DataPoint, format: str = None):
         """Print values of CFFs at given kinematic point.
 
@@ -47,7 +56,7 @@ class CFF(model.ParameterModel):
             s = s[:-2] + "}"
         else:
             s = 8*"%4s = %5.2f\n"
-        print(s % utils.flatten(tuple(zip(self.allCFFs, vals))))
+        print(s % _flatten(tuple(zip(self.allCFFs, vals))))
 
     # Initial definition of all CFFs. All just return zero.
     for name in allCFFs:
