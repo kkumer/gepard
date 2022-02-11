@@ -42,7 +42,6 @@ def beta(p: int, nf: int) -> float:
         -9.0
 
     """
-
     B00 = 11./3. * constants.CA
     B01 = -4./3. * constants.TF
     B10 = 34./3. * constants.CA**2
@@ -61,8 +60,10 @@ def beta(p: int, nf: int) -> float:
 
     return beta
 
+
 def _fbeta1(a: float, nf: int) -> float:
     return a**2 * (beta(0, nf) + a * beta(1, nf))
+
 
 def as2pf(p: int, nf: int,  r2: float, as0: float, r20: float) -> float:
     """QCD beta function coefficient.
