@@ -2,11 +2,10 @@
 
 # from joblib import Parallel, delayed
 from numpy import array, ndarray, sqrt
-from scipy.stats import scoreatpercentile
 
-from . import data, eff, gpd, model, quadrature
+from . import data, quadrature
 
-NCPU = 23  # how many CPUs to use in parallel
+# NCPU = 23  # how many CPUs to use in parallel
 
 
 class Theory(object):
@@ -34,8 +33,8 @@ class Theory(object):
         # not accapt **kwargs. This means that Theory has to be the last
         # class in mro.
 
-    def chisq_single(self, points: data.DataSet, asym: bool = False,
-                     **kwargs) -> float:
+    def chisq(self, points: data.DataSet, asym: bool = False,
+              **kwargs) -> float:
         """Return total chi-square.
 
         Args:
@@ -44,12 +43,16 @@ class Theory(object):
                 value is `val` and uncertainty is `err`.
             asym: if measurements provide asymmetric uncertainties
                 `errplus` and `errminus`, this enables their usage
-            observable (str): overrides `observable` of DataPoints
+            **kwargs: keyword arguments
+
+        Returns:
+            Total chi^square for points.
 
         Notes:
             If the theory or model provide uncertainties, they are ignored -
             only experimental uncertainties are taken into account.
-           """
+
+        """
         allpulls = []
         for pt in points:
             diff = (self.predict(pt, observable=pt.observable, **kwargs) - pt.val)
@@ -70,7 +73,7 @@ class Theory(object):
 #     def chisq_para(self, points: DataSet, asym: bool = False,
 #                    **kwargs) -> float:
 #         """Return total chi-square - parallel version.
-# 
+#
 #         Warning:
 #             Cannot be used until underlying global Fortran variables can change
 #             during session. (Like different kinematics of data points.)
@@ -79,19 +82,26 @@ class Theory(object):
 #         chi = sum(p*p for p in allpulls)  # equal to m.fval if minuit fit is done
 #         return chi
 
-    chisq = chisq_single
-
-    def predict(self, pt, uncertainty=False, **kwargs):
+    def predict(self, pt: data.DataPoint, uncertainty: bool = False, **kwargs) -> float:
         """Give prediction for DataPoint pt.
 
         Args:
             pt: instance of DataPoint
             uncertainty: if available, produce tuple (mean, uncertainty)
+            **kwargs: keyword arguments
+
+        Keyword Args:
             observable: string. Default is pt.observable. It is acceptable also
-                        to pass CFF or x-space GPD as observable, e.g., observable = 'ImH'
-            parameters: dictionary which will temporarily update model's one
+                        to pass CFF or x-space GPD as observable,
+                        e.g., observable = 'ImH'
+            parameters: dictionary which will temporarily update model's parameters
             orig_conventions: give prediction using original conventions of
                               the given DataPoint (e.g. for plotting)
+
+        Returns:
+            Predicted value for observable. If uncertainty is requested,
+            tuple (value, uncertainty) is returned.
+
         """
         if 'observable' in kwargs:
             obs = kwargs['observable']
@@ -99,7 +109,7 @@ class Theory(object):
             obs = pt.observable
 
         if 'parameters' in kwargs:
-            old = m.parameters.copy()
+            old = self.parameters.copy()
             self.parameters.update(kwargs['parameters'])
 
         fun = getattr(self, obs)
@@ -125,7 +135,7 @@ class Theory(object):
                 # Full calculation of uncertainty
                 for p1 in pars:
                     for p2 in pars:
-                        var += dfdp[p1]*self.covariance[p1,p2]*dfdp[p2]
+                        var += dfdp[p1]*self.covariance[p1, p2]*dfdp[p2]
             elif hasattr(self, 'parameters_errors') and self.parameters_errors:
                 # Just the diagonal part, no parameter correlations
                 for p in pars:
@@ -150,11 +160,19 @@ class Theory(object):
 
 # Photoproduction - select DVCS or DVMP
 
-    def _XGAMMA_int(self, t, pt):
-        """Same as _XGAMMA_DVCS_t/_XGAMMA_rho0_t but with additional variable t
-        to facilitate integration over it.
+    def _XGAMMA_int(self, t: ndarray, pt: data.DataPoint):
+        """Return gamma* DVCS or DVMP cross sections differential in t (array version).
+
+        Args:
+            t: array of Mandelstam t values
+            pt: datapoint with the rest of kinematics
+
+        Returns:
+            numpy array of cross-sections
 
         """
+        # same as _XGAMMA_DVCS_t/_XGAMMA_rho0_t but with additional variable t
+        # to facilitate integration over it.
         aux = []
         for t_single in t:
             pt.t = t_single
@@ -166,13 +184,17 @@ class Theory(object):
             aux.append(res)
         return array(aux)
 
+    def XGAMMA(self, pt: data.DataPoint) -> float:
+        """Return total gamma* DVCS or DVMP cross section.
 
-    def XGAMMA(self, pt):
-        """Total gamma* DVCS or DVMP cross section.
+        Args:
+            pt: datapoint
 
-        For DVMP, this calculates only longitudinal_gamma* part.
-        If `pt` has no momentum transfer defined, it calculates
-        total xs.
+        Returns:
+            Total or differential cross-section.
+            For DVMP, this calculates only longitudinal_gamma* part.
+            If `pt` has no momentum transfer defined, it calculates
+            total xs.
 
         """
         if 't' in pt or 'tm' in pt:
