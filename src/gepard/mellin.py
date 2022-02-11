@@ -9,6 +9,7 @@ from math import log, pi
 
 import numpy as np
 
+
 class MellinBarnes(object):
     """Base class for models built by Mellin-Barnes integration."""
 
@@ -32,9 +33,9 @@ class MellinBarnes(object):
         eph = np.exp(self.phi*1j)
         cfacj = eph * np.exp((self.jpoints + 1) * log(1/xi))  # eph/xi**(j+1)
         cch_H = np.einsum('j,sa,sja,ja->j', cfacj,
-                        self.pw_strengths(), wce, H)
+                          self.pw_strengths(), wce, H)
         cch_E = np.einsum('j,sa,sja,ja->j', cfacj,
-                        self.pw_strengths_E(), wce, E)
+                          self.pw_strengths_E(), wce, E)
         imh = np.dot(self.wg, cch_H.imag)
         ime = np.dot(self.wg, cch_E.imag)
         np.multiply(cch_H, self.tgj, out=cch_H)
@@ -58,7 +59,7 @@ class MellinBarnes(object):
         cfacj = eph * np.exp((self.jpoints + 1) * log(1/x))  # eph/x**(j+1)
         if eta < 1e-8:
             # forward limit, PDF-like, so only zero-th PW is taken
-            cch = np.einsum('j,ja,ja->ja', cfacj, wce[0,:,:], gpd)
+            cch = np.einsum('j,ja,ja->ja', cfacj, wce[0, :, :], gpd)
         elif abs(eta-x) < 1e-8:
             # cross-over, border eta=x limit
             cch = np.einsum('j,sa,sja,ja->ja', cfacj,
@@ -75,7 +76,7 @@ class MellinBarnes(object):
         cfacj = eph * np.exp((self.jpoints + 1) * log(1/x))  # eph/x**(j+1)
         if eta < 1e-8:
             # forward limit, PDF-like, so only zero-th PW is taken
-            cch = np.einsum('j,ja,ja->ja', cfacj, wce[0,:,:], gpd)
+            cch = np.einsum('j,ja,ja->ja', cfacj, wce[0, :, :], gpd)
         elif abs(eta-x) < 1e-8:
             # cross-over, border eta=x limit
             cch = np.einsum('j,sa,sja,ja->ja', cfacj,

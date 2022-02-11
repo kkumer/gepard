@@ -15,6 +15,7 @@ Todo:
 from __future__ import annotations
 
 from math import sqrt
+from typing import List
 
 from . import theory
 from .constants import tolerance2
@@ -67,7 +68,6 @@ class ParameterModel(Model):
         # print('ParameterModel init done')
         super().__init__(**kwargs)
 
-
     def add_parameters(self, newpars: dict):
         """Append newpars to parameters."""
         # Create parameters dict if it doesn't exist yet
@@ -85,7 +85,6 @@ class ParameterModel(Model):
         except AttributeError:
             self.parameters_limits = {}
         self.parameters_limits.update(newlimits)
-
 
     def _release_parameters(self, *pars: str):
         """Release parameters for fitting.
@@ -134,7 +133,6 @@ class ParameterModel(Model):
 
     def print_parameters(self):
         """Print fitting parameters and their errors."""
-        tolerance2 = 1   # sqrt(2*Npoints)/1.65^2 according to GJV/MRST
         for p in self.free_parameters():
             val = self.parameters[p]
             err = sqrt(tolerance2)*self.parameters_errors[p]

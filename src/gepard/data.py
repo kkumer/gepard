@@ -12,7 +12,7 @@ import importlib_resources
 import math
 import os
 import re
-from typing import Union
+from typing import Union, List
 
 import pandas as pd
 
