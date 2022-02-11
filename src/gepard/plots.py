@@ -1,4 +1,4 @@
-"""Plotting scripts."""
+"""Plotting scripts. Not everything works."""
 
 import itertools
 import os
@@ -30,16 +30,19 @@ from . import constants, data
 
 
 #################################################################
-##                                                             ##
-##  [1]  Universal stuff, used to build up panels of figures   ##
-##                                                             ##
+#                                                               #
+#   [1]  Universal stuff, used to build up panels of figures    #
+#                                                               #
 #################################################################
 
 def _axpoints(ax, pts, xaxis, **kwargs):
     """Make an errorbar plot defined by a single set of data points.
 
-    pts   -- single set of data points
-    xaxis -- 'Q2', 't', 'xB', ...
+    Args:
+        ax: matplotlib axis object
+        pts: single set of data points
+        xaxis: 'Q2', 't', 'xB', ...
+        **kwargs: keyword arguments
 
     """
     kwargs.pop('justbars', False)  # Kludge, FIXME
@@ -55,9 +58,12 @@ def _axpoints(ax, pts, xaxis, **kwargs):
 def _axline(ax, fun, points, xaxis, **kwargs):
     """Make a line(s) corresponding to points.
 
-    fun -- real-valued function of DataPoint instance
-    points -- list of sets of DataPoint instances
-    xaxis -- 'Q2', 't', 'xB', ...
+    Args:
+        ax: matplotlib axis object
+        fun: real-valued function of DataPoint instance
+        points: list of sets of DataPoint instances
+        xaxis: 'Q2', 't', 'xB', ...
+        **kwargs: keyword arguments
 
     """
     for pts in points:
@@ -80,10 +86,13 @@ def _axline(ax, fun, points, xaxis, **kwargs):
 def _axband(ax, fun, pts, xaxis, **kwargs):
     """Make a band corresponding to points.
 
-    fun -- function of DataPoint instance returning tuple
-           (mean, err) or (mean, err+, err-) defining errorband
-    pts -- set of DataPoint instances (just one set!)
-    xaxis -- 'Q2', 't', 'xB', ...
+    Args:
+        ax: matplotlib axis object
+        fun: function of DataPoint instance returning tuple
+             (mean, err) or (mean, err+, err-) defining errorband
+        pts: set of DataPoint instances (just one set!)
+        xaxis: 'Q2', 't', 'xB', ...
+        **kwargs: keyword arguments
 
     """
     if 'phi' in pts[0] and pts[0].frame == 'Trento':
@@ -118,29 +127,22 @@ def _axband(ax, fun, pts, xaxis, **kwargs):
 
 
 def panel(ax, points=None, lines=None, bands=None, xaxis=None, xs=None,
-          kins={}, kinlabels=None, CL=False, **kwargs):
+          kins={}, kinlabels=None, **kwargs):
     """Plot datapoints together with fit/theory line(s) and band(s).
 
-    ax -- subplot of matplotlib's figure i.e. ax = figure.add_subplot(..)
-
-    Keyword arguments:
-
-    points --  (list of) `DataSet` instance(s) to be plotted.
-    lines -- (list of) 'theorie(s)' describing curves for plotting.
-    bands  -- (list of) neural network 'theorie(s)' or 'theorie(s)' with
-              defined uncertianties, defining band by their mean and std.dev.
-    xaxis -- abscissa variable; if None, last of sets.xaxes is taken;
-             if 'points' all points are just put equidistantly along x-axis
-    xs    -- list of xvalues, needed if not specified by points
-
-    Additional keywoard arguments:
-
-    kinlabels -- list of constant kinematic variables whose values will
-                 be extracted from points and put on plot as annotation
-    CL -- if 68% C.L. is required for bands instead of one sigma
-
-    **kwargs -- passed to matplotlib
-    TODO: legend
+    Args:
+        ax: matplotlib axis object
+        points: (list of) `DataSet` instance(s) to be plotted.
+        lines: (list of) 'theorie(s)' describing curves for plotting.
+        bands: (list of) neural network 'theorie(s)' or 'theorie(s)' with
+               defined uncertianties, defining band by their mean and std.dev.
+        xaxis: abscissa variable; if None, last of sets.xaxes is taken;
+               if 'points' all points are just put equidistantly along x-axis
+        xs: list of xvalues, needed if not specified by points
+        kins: additional kinematic data
+        kinlabels: list of constant kinematic variables whose values will
+                   be extracted from points and put on plot as annotation
+        **kwargs: keyword arguments passed to matplotlib
 
     """
     if points:
@@ -199,7 +201,7 @@ def panel(ax, points=None, lines=None, bands=None, xaxis=None, xs=None,
         bandn = 0
         for band in bands:
             for pts in points:
-                _axband(ax, lambda pt: band.predict(pt, error=True, CL=CL,
+                _axband(ax, lambda pt: band.predict(pt, error=True,
                         orig_conventions=True), pts, xaxis=xaxis,
                         hatch=hatches[bandn],
                         # color=bandcolors[bandn],
