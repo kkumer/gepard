@@ -14,7 +14,7 @@ CG = CF - CA/2
 TF = 0.5
 
 # Meson decay constants
-F_rho = 0.209
+F_rho0 = 0.209
 
 # Parameters needed for harmonic sums etc.
 ZETA2 = zeta(2)

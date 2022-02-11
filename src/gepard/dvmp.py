@@ -11,7 +11,7 @@ class DVMP(theory.Theory):
     Implements cross-section for electroproduction of meson.
     """
 
-    def _XGAMMA_rho_t_Approx(self, pt):
+    def _XGAMMA_rho0_t_Approx(self, pt):
         """Partial (longitudinal) gamma* p -> rho0 p cross section w.r.t. Mandelstam t.
 
         Approximate formula valid for small xB.
@@ -19,11 +19,11 @@ class DVMP(theory.Theory):
         """
         # 4 * pi**2 * alpha_em * GeV2nb = 112175.5
         res = 112175.5 * pt.xB**2 * (
-                self.m.ImH_rho(pt)**2 + self.m.ReH_rho(pt)**2) / pt.Q2**2
+                self.m.ImH_rho0(pt)**2 + self.m.ReH_rho0(pt)**2) / pt.Q2**2
         return res
 
 
-    _XGAMMA_rho_t = _XGAMMA_rho_t_Approx
+    _XGAMMA_rho0_t = _XGAMMA_rho0_t_Approx
 
 
 class MellinBarnesTFF(model.ParameterModel):
@@ -42,7 +42,7 @@ class MellinBarnesTFF(model.ParameterModel):
         super().__init__(**kwargs)
 
     def tff(self, xi: float, t: float, Q2: float) -> np.ndarray:
-        """Return array(ReH_rho, ImH_rho, ReE_rho, ...) of DVrhoP transition FFs."""
+        """Return array(ReH_rho0, ImH_rho0, ReE_rho0, ...) of DVrho0P transition FFs."""
         assert self.nf == 4
 
         astrong = 2 * pi * qcd.as2pf(self.p, self.nf,  Q2, self.asp[self.p], self.r20)
@@ -56,17 +56,17 @@ class MellinBarnesTFF(model.ParameterModel):
             self.wce_dvmp[Q2] = wce_ar_dvmp
         # Evaluations depending on model parameters:
         h_prerot = self.H(xi, t)
-        h = np.einsum('fa,ja->jf', self.frot_rho_4, h_prerot)
+        h = np.einsum('fa,ja->jf', self.frot_rho0_4, h_prerot)
         reh, imh = self._mellin_barnes_integral(xi, wce_ar_dvmp, h)
-        return (constants.CF * constants.F_rho * astrong / constants.NC
+        return (constants.CF * constants.F_rho0 * astrong / constants.NC
                 / np.sqrt(Q2) * np.array([reh, imh, 0, 0, 0, 0, 0, 0]))
 
-    def ImH_rho(self, pt: data.DataPoint) -> np.ndarray:
+    def ImH_rho0(self, pt: data.DataPoint) -> np.ndarray:
         """Return Im(TFF H) for kinematic point."""
         tffs = self.tff(pt.xi, pt.t, pt.Q2)
         return tffs[1]
 
-    def ReH_rho(self, pt: data.DataPoint) -> np.ndarray:
+    def ReH_rho0(self, pt: data.DataPoint) -> np.ndarray:
         """Return Re(TFF H) for kinematic point."""
         tffs = self.tff(pt.xi, pt.t, pt.Q2)
         return tffs[0]

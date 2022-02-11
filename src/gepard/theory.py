@@ -152,7 +152,7 @@ class Theory(object):
 # Photoproduction - select DVCS or DVMP
 
     def _XGAMMA_int(self, t, pt):
-        """Same as _XGAMMA_DVCS_t/_XGAMMA_rho_t but with additional variable t
+        """Same as _XGAMMA_DVCS_t/_XGAMMA_rho0_t but with additional variable t
         to facilitate integration over it.
 
         """
@@ -160,7 +160,7 @@ class Theory(object):
         for t_single in t:
             pt.t = t_single
             if hasattr(pt, 'process') and pt.process == 'gammastarp2rho0p':
-                res = self._XGAMMA_rho_t(pt)
+                res = self._XGAMMA_rho0_t(pt)
             else:
                 res = self._XGAMMA_DVCS_t(pt)
             del pt.t
@@ -179,7 +179,7 @@ class Theory(object):
         if 't' in pt or 'tm' in pt:
             # XGAMMA differential in momentum transfer t
             if hasattr(pt, 'process') and pt.process == 'gammastarp2rho0p':
-                return self._XGAMMA_rho_t(pt)
+                return self._XGAMMA_rho0_t(pt)
             else:
                 return self._XGAMMA_DVCS_t(pt)
 

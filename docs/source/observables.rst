@@ -9,7 +9,7 @@ Processes
 Presently, only Deeply virtual Compton scattering (DVCS) process
 can be considered fully implemented (using the so-called
 BMK formulas). There is also an initial implementation of Deeply virtual
-meson production (DVMP) of rho meson, valid for small Bjorken x
+meson production (DVMP) of rho0 meson, valid for small Bjorken x
 kinematics.
 
 Datapoints should have an attribute ``process``, which is one of

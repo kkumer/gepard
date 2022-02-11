@@ -312,7 +312,7 @@ class GPD(model.ParameterModel):
                                   [0, 1, 0, 0],
                                   [0, 0, 0, 0]])
         # For DVMP
-        self.frot_rho_4 = np.array([[1, 0, 1, 1],
+        self.frot_rho0_4 = np.array([[1, 0, 1, 1],
                                     [0, 1, 0, 0],
                                     [0., 0, 0., 0.]]) / np.sqrt(2)
                                # [3./20., 0, 5./12., 1./12.]]) / np.sqrt(2)

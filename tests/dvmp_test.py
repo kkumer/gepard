@@ -37,7 +37,7 @@ def th_KM10b():
 
 
 def test_dvmp_TFFs_LO(th_dvmp):
-    """Calculate LO DVMP TFFs for rho production at input scale."""
+    """Calculate LO DVMP TFFs for rho0 production at input scale."""
     xB = 1e-4
     pt = g.data.DataPoint({'Q2': 4., 't': 0, 'xB': xB})
     tffs = th_dvmp.tff(pt.xi, pt.t, pt.Q2)
@@ -48,7 +48,7 @@ def test_dvmp_TFFs_LO(th_dvmp):
 
 
 def test_gepardTFFsEvol(th_KM10b):
-    """Calculate LO DVMP TFFs for rho production + evolution."""
+    """Calculate LO DVMP TFFs for rho0 production + evolution."""
     pt = g.data.DataPoint({'Q2': 6.6, 'W': 75., 't': -0.025})
     tffs = th_KM10b.tff(pt.xi, pt.t, pt.Q2)
     reh, imh = tffs[0], tffs[1]
@@ -56,7 +56,7 @@ def test_gepardTFFsEvol(th_KM10b):
     assert imh == approx(511.39622404, rel=1e-2)
 
 
-def test_gepardXrhot(th_KM10b):
+def test_gepardXrho0t(th_KM10b):
     """Calculate LO DVMP cross section d sigma / dt"""
     pt = g.data.DataPoint({'Q2': 6.6, 'W': 75., 't': -0.025,
                            'process': 'gammastarp2rho0p'})
@@ -86,7 +86,7 @@ def test_c1_NLO(th_dvmp):
 
 @mark.slow
 def test_dvmp_TFFs_NLO(th_nlo):
-    """Calculate NLO DVMP TFFs for rho production at input scale."""
+    """Calculate NLO DVMP TFFs for rho0 production at input scale."""
     xB = 1e-4
     pt = g.data.DataPoint({'Q2': 4., 't': 0, 'xB': xB})
     # to get agreement with these old numbers:
