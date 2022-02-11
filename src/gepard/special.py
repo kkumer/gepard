@@ -21,18 +21,20 @@ def pochhammer(z: Union[complex, np.ndarray], m: int) -> Union[complex, np.ndarr
     """Pochhammer symbol.
 
     Args:
-        z (complex):
-        m (int):
+        z: complex argument
+        m: integer index
 
     Returns:
         complex: pochhammer(z,m)
+
     """
     p = z
     for k in range(1, m):
         p = p * (z + k)
     return p
 
-poch = pochhammer
+
+poch = pochhammer  # just an abbreviation
 
 
 def dpsi_one(z: complex, m: int) -> complex:
@@ -108,19 +110,30 @@ def S3_prime(z: Union[complex, np.ndarray], prty: int) -> Union[complex, np.ndar
 
 
 def delS2(z: Union[complex, np.ndarray]) -> Union[complex, np.ndarray]:
-    """Harmonic sum S_2 difference.
+    """Return Harmonic sum S_2 difference.
 
-    Equal to delS2((z+1)/2) From Eq. (4.13) of 1310.5394.
-    Note halving of the argument.
+    Args:
+        z: complex argument
+
+    Returns:
+        delS2((z+1)/2) From Eq. (4.13) of 1310.5394.
+        Note halving of the argument.
+
     """
     return S2(z) - S2(z - 1/2)
 
 
 def deldelS2(j: Union[complex, np.ndarray], k: int) -> Union[complex, np.ndarray]:
-    """Diference of harmonic sum S_2 differences.
+    """Return diference of harmonic sum S_2 differences.
 
-    Equal to delS2((j+1)/2, (k+1)/2) From Eq. (4.38) of 1310.5394.
-    Note halving of the argument.
+    Args:
+        j: complex argument
+        k: integer index
+
+    Returns:
+        Equal to delS2((j+1)/2, (k+1)/2) From Eq. (4.38) of 1310.5394.
+        Note halving of the argument.
+
     """
     return (delS2(j) - delS2(k)) / (4*(j-k)*(2*j+2*k+1))
 
@@ -131,9 +144,14 @@ def Sm1(z: Union[complex, np.ndarray], k: int) -> Union[complex, np.ndarray]:
 
 
 def MellinF2(n: Union[complex, np.ndarray]) -> Union[complex, np.ndarray]:
-    """Mellin transform  i.e. x^(N-1) moment of Li2(x)/(1+x).
+    """Return Mellin transform  i.e. x^(N-1) moment of Li2(x)/(1+x).
 
-    According to Eq. (33) in Bluemlein and Kurth, hep-ph/9708388
+    Args:
+        n: complex argument
+
+    Returns:
+        According to Eq. (33) in Bluemlein and Kurth, hep-ph/9708388
+
     """
     abk = np.array([0.9999964239, -0.4998741238,
                     0.3317990258, -0.2407338084, 0.1676540711,
@@ -152,10 +170,10 @@ def MellinF2(n: Union[complex, np.ndarray]) -> Union[complex, np.ndarray]:
 
 
 def SB3(j: Union[complex, np.ndarray]) -> Union[complex, np.ndarray]:
-    """Function from Eq. (4.44e) of arXiv:1310.5394."""
+    """Eq. (4.44e) of arXiv:1310.5394."""
     return 0.5*S1(j)*(-S2(-0.5+0.5*j)+S2(0.5*j))+0.125*(-S3(
-             - 0.5 + 0.5 * j) + S3(0.5 * j)) - 2 * (0.8224670334241131 * (-S1(0.5 *
-                                        (-1 + j)) + S1(0.5 * j)) - MellinF2(1 + j))
+             - 0.5 + 0.5 * j) + S3(0.5 * j)) - 2 * (0.8224670334241131 * (
+                 -S1(0.5 * (-1 + j)) + S1(0.5 * j)) - MellinF2(1 + j))
 
 
 def S2_tilde(n: Union[complex, np.ndarray], prty: int) -> Union[complex, np.ndarray]:

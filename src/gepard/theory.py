@@ -33,8 +33,8 @@ class Theory(object):
         # not accapt **kwargs. This means that Theory has to be the last
         # class in mro.
 
-    def chisq(self, points: data.DataSet, asym: bool = False,
-              **kwargs) -> float:
+    def chisq_single(self, points: data.DataSet, asym: bool = False,
+                     **kwargs) -> float:
         """Return total chi-square.
 
         Args:
@@ -81,6 +81,8 @@ class Theory(object):
 #         allpulls = Parallel(n_jobs=NCPU)(delayed(self.pull)(pt) for pt in points)
 #         chi = sum(p*p for p in allpulls)  # equal to m.fval if minuit fit is done
 #         return chi
+
+    chisq = chisq_single
 
     def predict(self, pt: data.DataPoint, uncertainty: bool = False, **kwargs) -> float:
         """Give prediction for DataPoint pt.
