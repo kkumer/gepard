@@ -1,5 +1,6 @@
 """Implementation of fitting algorithms."""
 
+from __future__ import annotations
 
 from iminuit import Minuit
 
@@ -94,6 +95,10 @@ class MinuitFitter(Fitter):
         self.theory.parameters_limits.update(dct)
         for k, v in dct.items():
             self.minuit.limits[k] = v
+
+    def free_parameters(self) -> List[str]:
+        """Return list of names of free fitting parameters."""
+        self.theory.free_parameters()
 
     def print_parameters(self):
         """Values and errors for free parameters."""

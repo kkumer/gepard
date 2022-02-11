@@ -113,7 +113,8 @@ class Theory(object):
             dfdp = {}
             for p in pars:
                 # calculating dfdp = derivative of observable w.r.t. parameter:
-                h=sqrt(self.covariance[p,p])
+                # h=sqrt(self.covariance[p,p])
+                h = self.parameters_errors[p]
                 mem = self.parameters[p]
                 self.parameters[p] = mem+h/2.
                 up = fun(pt)
@@ -121,9 +122,17 @@ class Theory(object):
                 down = fun(pt)
                 self.parameters[p] = mem
                 dfdp[p] = (up-down)/h
-            for p1 in pars:
-                for p2 in pars:
-                    var += dfdp[p1]*self.covariance[p1,p2]*dfdp[p2]
+            if hasattr(self, 'covariance') and self.covariance:
+                # Full calculation of uncertainty
+                for p1 in pars:
+                    for p2 in pars:
+                        var += dfdp[p1]*self.covariance[p1,p2]*dfdp[p2]
+            elif hasattr(self, 'parameters_errors') and self.parameters_errors:
+                # Just the diagonal part, no parameter correlations
+                for p in pars:
+                    var += (dfdp[p]*self.parameters_errors[p])**2
+            else:
+                print('Theory has neither covariance matrix, nor parameters_errors.')
             result = (fun(pt), sqrt(var))
         else:
             result = fun(pt)

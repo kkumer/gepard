@@ -64,8 +64,9 @@ versions:
 Observables
 -----------
 
-Following observables are implemented in gepard. They can be used
-as methods of theory objects, or ``observable`` attributes of datapoints.
+Following observables are implemented in Gepard. Identifiers
+from the table can be used either
+as methods of theory objects, or as ``observable`` attributes of datapoints.
 
 .. table:: DVCS observables
     :widths: auto
