@@ -256,20 +256,19 @@ def ansatz07_fixed(j: np.ndarray, t: float, type: str) -> np.ndarray:
 
 
 class GPD(model.ParameterModel):
-    """Base class of all GPD models."""
+    """Base class of all GPD models.
+
+    Args:
+        p: pQCD order (0 = LO, 1 = NLO, 2 = NNLO)
+        scheme: pQCD scheme  ('msbar' or 'csbar')
+        nf: number of active quark flavors
+        Q02: Initial Q0^2 for GPD evolution.
+        r20: Initial mu0^2 for alpha_strong definition.
+        asp: alpha_strong/(2*pi) at scale r20 for (LO, NLO, NNLO)
+        residualt: residual t dependence ('dipole' or 'exp')
+
+    """
     def __init__(self, **kwargs) -> None:
-        """Init GPD object.
-
-        Args:
-            p: pQCD order (0 = LO, 1 = NLO, 2 = NNLO)
-            scheme: pQCD scheme  ('msbar' or 'csbar')
-            nf: number of active quark flavors
-            Q02: Initial Q0^2 for GPD evolution.
-            r20: Initial mu0^2 for alpha_strong definition.
-            asp: alpha_strong/(2*pi) at scale r20 for (LO, NLO, NNLO)
-            residualt: residual t dependence ('dipole' or 'exp')
-
-        """
         self.p = kwargs.setdefault('p', 0)
         self.scheme = kwargs.setdefault('scheme', 'msbar')
         self.nf = kwargs.setdefault('nf', 4)
@@ -315,29 +314,27 @@ class GPD(model.ParameterModel):
         self.frot_rho0_4 = np.array([[1, 0, 1, 1],
                                     [0, 1, 0, 0],
                                     [0., 0, 0., 0.]]) / np.sqrt(2)
-                               # [3./20., 0, 5./12., 1./12.]]) / np.sqrt(2)
+                                    # [3./20., 0, 5./12., 1./12.]]) / np.sqrt(2)
         # For j2x
         self.frot_j2x = self.frot_pdf
         super().__init__(**kwargs)
 
 
 class ConformalSpaceGPD(GPD, mellin.MellinBarnes):
-    """Base class of GPD models built in conformal moment space."""
+    """Base class of GPD models built in conformal moment space.
 
+    Args:
+        c: intersection of Mellin-Barnes curve with real axis
+        phi: angle of Mellin-Barnes curve with real axis
+
+    Notes:
+        This just takes care of initialization of Mellin-Barnes
+        contour points, and evolved Wilson coeffs, and MB Gauss
+        integration weights. Actual choice and code for GPDs
+        is provided by subclasses.
+
+    """
     def __init__(self, **kwargs) -> None:
-        """Init ConformalSpaceGPD object.
-
-        Args:
-            c: intersection of Mellin-Barnes curve with real axis
-            phi: angle of Mellin-Barnes curve with real axis
-
-        Notes:
-            This just takes care of initialization of Mellin-Barnes
-            contour points, and evolved Wilson coeffs, and MB Gauss
-            integration weights. Actual choice and code for GPDs
-            is provided by subclasses.
-
-        """
         self.c = kwargs.setdefault('c', 0.35)
         self.phi = kwargs.setdefault('phi', 1.57079632)
         npoints, weights = quadrature.mellin_barnes(self.c, self.phi)
@@ -347,19 +344,19 @@ class ConformalSpaceGPD(GPD, mellin.MellinBarnes):
         self.wg = weights  # Gauss integration weights
         # Initial parameters:
         self.add_parameters({'ns': 2./3. - 0.4,
-                'al0s': 1.1,  'Eal0s': 1.1,
-                'alps': 0.25, 'Ealps': 0.25,
-                'ms2': 1.1, 'Ems2': 1.1,
-                'secs': 0., 'Esecs': 0,
-                'this': 0., 'Ethis': 0,
-                'kaps': 0.,
-                'ng': 0.4, 'Eng': 0.4,
-                'al0g': 1.2, 'Eal0g': 1.2,
-                'alpg': 0.25, 'Ealpg': 0.25,
-                'mg2': 1.2, 'Emg2': 1.2,
-                'secg': 0., 'Esecg': 0,
-                'thig': 0., 'Ethig': 0,
-                           'kapg': 0.})
+                             'al0s': 1.1,  'Eal0s': 1.1,
+                             'alps': 0.25, 'Ealps': 0.25,
+                             'ms2': 1.1, 'Ems2': 1.1,
+                             'secs': 0., 'Esecs': 0,
+                             'this': 0., 'Ethis': 0,
+                             'kaps': 0.,
+                             'ng': 0.4, 'Eng': 0.4,
+                             'al0g': 1.2, 'Eal0g': 1.2,
+                             'alpg': 0.25, 'Ealpg': 0.25,
+                             'mg2': 1.2, 'Emg2': 1.2,
+                             'secg': 0., 'Esecg': 0,
+                             'thig': 0., 'Ethig': 0,
+                             'kapg': 0.})
         mellin.MellinBarnes.__init__(self, **kwargs)
         super().__init__(**kwargs)
 
@@ -431,7 +428,6 @@ class TestGPD(ConformalSpaceGPD):
     """Simple testing ansatz for GPDs."""
 
     def __init__(self, **kwargs) -> None:
-        """Init TestGPD object."""
         kwargs.setdefault('scheme', 'csbar')
         kwargs.setdefault('nf', 3)
         kwargs.setdefault('Q02', 1.0)
@@ -469,10 +465,9 @@ class PWNormGPD(ConformalSpaceGPD):
         and norm of third PWs is given by 'this' and 'thig'.
 
         This is used for modelling sea partons in KM10-KM20 models.
-    """
 
+    """
     def __init__(self, **kwargs) -> None:
-        """See parent `ConformalSpaceGPD` class for docs."""
         super().__init__(**kwargs)
 
     def H(self, eta: float, t: float) -> np.ndarray:

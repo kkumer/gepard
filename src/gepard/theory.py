@@ -12,19 +12,18 @@ NCPU = 23  # how many CPUs to use in parallel
 class Theory(object):
     """Class of theory frameworks for calculation of observables.
 
+    Args:
+        name: short unique model name
+        texname: TeX model name for (e.g. for plot annotation)
+        description: longer description of the model
+
     This is a base class for a complete theory framework.
     It implements the generic routines for calculation of
     observables and uncertainty propagation.
+
     """
-
     def __init__(self, **kwargs) -> None:
-        """This init is guaranteed to run.
-
-        Args:
-            name: short unique model name
-            texname: TeX model name for (e.g. for plot annotation)
-            description: longer description of the model
-        """
+        # This init is guaranteed to run.
         self.name = kwargs.setdefault('name', 'N/A')
         self.texname = kwargs.setdefault('texname', self.name)
         self.description = kwargs.setdefault('description', 'N/A')

@@ -13,7 +13,6 @@ class MellinBarnes(object):
     """Base class for models built by Mellin-Barnes integration."""
 
     def __init__(self, **kwargs) -> None:
-        """Init base MellinBarnes object."""
         self.tgj = np.tan(pi*self.jpoints/2)
         # print('MellinBarnes init done.')
 

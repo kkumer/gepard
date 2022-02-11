@@ -23,7 +23,6 @@ class CFF(model.ParameterModel):
     # allGPDs = []
 
     def __init__(self, **kwargs):
-        """Initialize base class for CFFs. Set global attributes."""
         self.nf = kwargs.setdefault('nf', 4)
         # squared DVCS charge factors
         if self.nf == 3:
@@ -101,7 +100,6 @@ class MellinBarnesCFF(CFF):
     """Class of models built by Mellin-Barnes integration."""
 
     def __init__(self, **kwargs) -> None:
-        """Init MellinBarnes class and pre-calculate stuff."""
         self.tgj = np.tan(pi*self.jpoints/2.)
         # wce[Q2] = wce[spw, j, a] - Wilson coeffs evolved; local to model instance
         self.wce: Dict[float, np.ndarray] = {}  # DVCS Wilson coefs.
@@ -168,7 +166,6 @@ class DispersionCFF(CFF):
 
     """
     def __init__(self, **kwargs) -> None:
-        """Init."""
         super().__init__(**kwargs)
 
     def dispargV(self, x, fun, pt):
@@ -308,7 +305,6 @@ class DispersionFixedPoleCFF(DispersionCFF, PionPole):
     """Model for CFFs as in arXiv:0904.0458."""
 
     def __init__(self, **kwargs):
-        """Init DispersionFixedPoleCFF object."""
         self.nf = kwargs.setdefault('nf', 4)
         # initial values of parameters and limits on their values
         self.add_parameters({'Nsea': 1.5, 'alS': 1.13, 'alpS': 0.15,
@@ -401,7 +397,6 @@ class DispersionFreePoleCFF(DispersionFixedPoleCFF):
     """Model for CFFs as in arXiv:0904.0458. + free pion pole."""
 
     def __init__(self, **kwargs):
-        """Constructor."""
         # Adding two extra parameters:
         self.add_parameters({'rpi': 1.0,  'mpi2': 1.0})
 

@@ -16,11 +16,15 @@ class Fitter(object):
 
 
 class MinuitFitter(Fitter):
-    """Fits using iminuit Python frontend to MINUIT2 C++ library."""
+    """Fits using iminuit Python frontend to MINUIT2 C++ library.
 
+    Args:
+        fitpoints (data.DataSet): points to fit to
+        theory (theory.Theory): theory/model to be fitted
+
+    """
     def __init__(self, fitpoints: data.DataSet,
                  theory: theory.Theory, **kwargs) -> None:
-        """Set what is fitted to what and how."""
         self.fitpoints = fitpoints
         self.theory = theory
         init_vals = [v for v in self.theory.parameters.values()]

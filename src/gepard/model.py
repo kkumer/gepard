@@ -40,7 +40,6 @@ class Model(theory.Theory):
 
     """
     def __init__(self, **kwargs) -> None:
-        """Init Model object."""
         super().__init__(**kwargs)
 
 
@@ -58,7 +57,6 @@ class ParameterModel(Model):
 
     """
     def __init__(self, **kwargs) -> None:
-        """Init ParameterModel object."""
         # If subclases don't create these dicts, this is the
         # last chance. They have to exist.
         for d in ['parameters', 'parameters_fixed', 'parameters_limits']:

@@ -12,14 +12,11 @@ from . import cff
 class GoloskokovKrollCFF(cff.DispersionCFF):
     """ Goloskokov-Kroll GPD/CFF model 
 
-        From [arXiv:1210.6975], Kroll:2012sm
-        Real part of CFFs is obtained using dispersion relations.
+    From [arXiv:1210.6975], Kroll:2012sm
+    Real part of CFFs is obtained using dispersion relations.
 
     """
-
     def __init__(self, **kwargs) -> None:
-        """Init GK model."""
-        #
         self.nf = 3  # not used! Needed not to trigger error
         super().__init__(**kwargs)
 
