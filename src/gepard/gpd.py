@@ -38,6 +38,7 @@ def qj(j: np.ndarray, t: float, poch: int, norm: float, al0: float,
         j: complex conformal moment
         t: momentum transfer
         poch: pochhammer (beta+1)
+        norm: overall normalization
         al0: Regge intercept
         alp: Regge slope (leading pole)
         alpf: Regge slope (full)
@@ -100,6 +101,7 @@ def betadip(j: np.ndarray, t: float, m02: float, delm2: float, pp: int) -> np.nd
 
     Returns:
         Dipole residual t-dependence (beta from Eq. (19) of 0904.0458)
+
     """
     return 1. / (1. - t / (m02 + delm2*j))**pp
 
@@ -113,6 +115,7 @@ def betaexp(t: float, m02: float) -> float:
 
     Returns:
         Exponential residual t-dependence (beta from Eq. (19) of 0904.0458)
+
     """
     return exp(t / (2 * m02))
 
@@ -138,7 +141,7 @@ def test(j: complex, t: float, par: dict) -> Tuple[complex, complex, complex, co
 
 
 def singlet_ng_constrained(j: np.ndarray, t: float, par: dict,
-        residualt: str='dipole') -> np.ndarray:
+                           residualt: str = 'dipole') -> np.ndarray:
     r"""Singlet-only GPD ansatz, with ng parameter constrained by sum-rule.
 
     Args:
@@ -147,8 +150,12 @@ def singlet_ng_constrained(j: np.ndarray, t: float, par: dict,
         par: parameters dict
         residualt: residual t-dependence type ('dipole' or 'exp')
 
+    Returns:
+        GPD ansatz, as numpy array
+
     Notes:
         This ansatz is used for all published KM fits, for the sea parton part.
+
     """
     par['ng'] = 0.6 - par['ns']  # first sum-rule constraint
     if residualt == 'dipole':
@@ -164,8 +171,9 @@ def singlet_ng_constrained(j: np.ndarray, t: float, par: dict,
     gluon = (qj(j, t, 7, par['ng'], par['al0g'], par['alpg']) * tdep_g)
     return np.array((singlet, gluon, np.zeros_like(gluon), np.zeros_like(gluon)))
 
+
 def singlet_ng_constrained_E(j: np.ndarray, t: float, par: dict,
-        residualt: str='dipole') -> np.ndarray:
+                             residualt: str = 'dipole') -> np.ndarray:
     r"""Singlet-only GPD ansatz, with ng parameter constrained by sum-rule.
 
     Args:
@@ -174,8 +182,12 @@ def singlet_ng_constrained_E(j: np.ndarray, t: float, par: dict,
         par: parameters dict
         residualt: residual t-dependence type ('dipole' or 'exp')
 
+    Returns:
+        GPD ansatz, as numpy array
+
     Notes:
         This ansatz is used for all published KM fits, for the sea parton part.
+
     """
     par['Eng'] = 0.6 - par['Ens']  # first sum-rule constraint
     if residualt == 'dipole':
@@ -209,12 +221,18 @@ def ansatz07_fixed(j: np.ndarray, t: float, type: str) -> np.ndarray:
     """GPD ansatz from hep-ph/0703179 with fixed parameters.
 
     Args:
+        j: conformal moment
+        t: momentum transfer
         type: 'soft', 'hard', 'softNS', 'hardNS'
+
+    Returns:
+        GPD ansatz, as numpy array
 
     Notes:
         This is the same as ansatz07, only instead of passing
         parameter dict, user passes type string choosing
         particular fixed parameter choices from the paper above.
+
     """
     # a.k.a. 'FITBP' ansatz from Fortran Gepard
     par = {'al0s': 1.1, 'alps': 0.15, 'alpg': 0.15,
@@ -238,16 +256,16 @@ def ansatz07_fixed(j: np.ndarray, t: float, type: str) -> np.ndarray:
     pochv = 4
     mjt = 1 - t / (constants.Mp2*(4+j))
     uv = qj(j, t, pochv, par['nu'], par['al0v'],
-                      alpf=0, alp=par['alpv'], val=1)
+            alpf=0, alp=par['alpv'], val=1)
     uv = uv / mjt
     dv = qj(j, t, pochv, par['nd'], par['al0v'],
-                      alpf=0, alp=par['alpv'], val=1)
+            alpf=0, alp=par['alpv'], val=1)
     dv = dv / mjt
     sea = qj(j, t, pochs, par['nsea'], par['al0s'],
-                       alpf=0, alp=par['alps'])
+             alpf=0, alp=par['alps'])
     sea = sea / mjt**3
     gluon = qj(j, t, pochg, par['ng'], par['al0g'],
-                         alpf=0, alp=par['alpg'])
+               alpf=0, alp=par['alpg'])
     gluon = gluon / mjt**2
     return np.array((sea, gluon, uv, dv))
 
@@ -314,7 +332,7 @@ class GPD(model.ParameterModel):
         self.frot_rho0_4 = np.array([[1, 0, 1, 1],
                                     [0, 1, 0, 0],
                                     [0., 0, 0., 0.]]) / np.sqrt(2)
-                                    # [3./20., 0, 5./12., 1./12.]]) / np.sqrt(2)
+        #                           # [3./20., 0, 5./12., 1./12.]]) / np.sqrt(2)
         # For j2x
         self.frot_j2x = self.frot_pdf
         super().__init__(**kwargs)
@@ -388,10 +406,14 @@ class ConformalSpaceGPD(GPD, mellin.MellinBarnes):
         return np.zeros((self.npts, 4), dtype=complex)
 
     def Hx(self, pt: data.DataPoint) -> np.ndarray:
-        """Return x-space GPD.
+        """Return x-space GPD H.
 
-        3-dim vector (singlet quark, gluon, non-singlet quark) is returned
-        by transforming original conformal moment space (j-space) model.
+        Args:
+            pt: datapoint with kinematics info
+
+        Returns:
+            x-space GPD. 3-dim vector (singlet quark, gluon, non-singlet quark)
+            is returned by transforming original conformal moment space (j-space) model.
 
         Todo:
             Non-singlet component is set to zero. We need to check
@@ -408,8 +430,12 @@ class ConformalSpaceGPD(GPD, mellin.MellinBarnes):
     def Ex(self, pt: data.DataPoint) -> np.ndarray:
         """Return x-space GPD E.
 
-        3-dim vector (singlet quark, gluon, non-singlet quark) is returned
-        by transforming original conformal moment space (j-space) model.
+        Args:
+            pt: datapoint with kinematics info
+
+        Returns:
+            x-space GPD. 3-dim vector (singlet quark, gluon, non-singlet quark)
+            is returned by transforming original conformal moment space (j-space) model.
 
         Todo:
             Non-singlet component is set to zero. We need to check
@@ -489,6 +515,5 @@ class PWNormGPD(ConformalSpaceGPD):
         self.parameters['kapg'] = - self.parameters['kaps'] * self.parameters['ns'] / (
                 0.6 - self.parameters['ns'])
         kappa = np.array([self.parameters['kaps'], self.parameters['kapg'], 0, 0])
-        return kappa * singlet_ng_constrained_E(self.jpoints, t,
-                            self.parameters, self.residualt).transpose()
-
+        return kappa * singlet_ng_constrained_E(
+                self.jpoints, t, self.parameters, self.residualt).transpose()
