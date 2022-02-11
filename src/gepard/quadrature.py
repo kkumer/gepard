@@ -85,61 +85,62 @@ def nd_mellin_barnes(accuracy: int = 3) -> Tuple[np.ndarray, np.ndarray]:
 
 
 def quadSciPy81(func, a, b, args=()):
-    """Compute a definite integral using 81-order Gaussian quadrature.
-    Adapted from scipy."""
+    """Compute a definite integral using 81-order Gaussian quadrature."""
     y = (b-a)*(roots81+1)/2.0 + a
     return (b-a)/2.0*np.sum(weights81*func(y, *args), 0)
 
-def quadSciPy35(func,a,b,args=()):
-    """Compute a definite integral using 35-order Gaussian quadrature.
-    Adapted from scipy."""
+
+def quadSciPy35(func, a, b, args=()):
+    """Compute a definite integral using 35-order Gaussian quadrature."""
     y = (b-a)*(roots35+1)/2.0 + a
-    return (b-a)/2.0*np.sum(weights35*func(y,*args),0)
+    return (b-a)/2.0*np.sum(weights35*func(y, *args), 0)
 
-def quadSciPy18transposed(func,a,b,args=()):
-    """Compute a definite integral using 18-order Gaussian quadrature.
-    Adapted from scipy."""
+
+def quadSciPy18transposed(func, a, b, args=()):
+    """Compute a definite integral using 18-order Gaussian quadrature."""
     y = (b-a)*(roots18+1)/2.0 + a
-    return (b-a)/2.0*np.sum((weights18*func(y,*args)).transpose(),0)
+    return (b-a)/2.0*np.sum((weights18*func(y, *args)).transpose(), 0)
 
-def quadSciPy10(func,a,b,args=()):
-    """Compute a definite integral using tenth-order Gaussian quadrature.
-    Adapted from scipy."""
+
+def quadSciPy10(func, a, b, args=()):
+    """Compute a definite integral using tenth-order Gaussian quadrature."""
     y = (b-a)*(roots10+1)/2.0 + a
-    return (b-a)/2.0*np.sum(weights10*func(y,*args),0)
+    return (b-a)/2.0*np.sum(weights10*func(y, *args), 0)
 
-def quadSciPy10transposed(func,a,b,args=()):
-    """Compute a definite integral using fifth-order Gaussian quadrature.
-    Adapted from scipy."""
+
+def quadSciPy10transposed(func, a, b, args=()):
+    """Compute a definite integral using fifth-order Gaussian quadrature."""
     y = (b-a)*(roots10+1)/2.0 + a
-    return (b-a)/2.0*np.sum((weights10*func(y,*args)).transpose(),0)
+    return (b-a)/2.0*np.sum((weights10*func(y, *args)).transpose(), 0)
 
-def quad10(func,a,b,args=()):
-    """Compute a definite integral using tenth-order Gaussian quadrature.
-    Adapted from scipy. Slower, but doesn't require ndarray from our code."""
+
+def quad10(func, a, b, args=()):
+    """Compute a definite integral using tenth-order Gaussian quadrature."""
+    # Slower, but doesn't require ndarray from our code.
     int = 0.0
     for i in range(len(roots10)):
         y = (b-a)*(roots10[i]+1)/2.0 + a
-        int = int + (b-a)/2.0*(weights10[i]*func(y,*args))
+        int = int + (b-a)/2.0*(weights10[i]*func(y, *args))
     return int
 
-def quadSciPy5(func,a,b,args=()):
-    """Compute a definite integral using fifth-order Gaussian quadrature.
-    Adapted from scipy."""
-    y = (b-a)*(roots5+1)/2.0 + a
-    return (b-a)/2.0*sum(weights5*func(y,*args),0)
 
-def quadSciPy5transposed(func,a,b,args=()):
-    """Compute a definite integral using fifth-order Gaussian quadrature.
-    Adapted from scipy."""
+def quadSciPy5(func, a, b, args=()):
+    """Compute a definite integral using fifth-order Gaussian quadrature."""
     y = (b-a)*(roots5+1)/2.0 + a
-    return (b-a)/2.0*sum((weights5*func(y,*args)).transpose(),0)
+    return (b-a)/2.0*sum(weights5*func(y, *args), 0)
 
-def quadSciPy4(func,a,b,args=()):
-    """Compute a definite integral using fifth-order Gaussian quadrature.
-    Adapted from scipy."""
+
+def quadSciPy5transposed(func, a, b, args=()):
+    """Compute a definite integral using fifth-order Gaussian quadrature."""
+    y = (b-a)*(roots5+1)/2.0 + a
+    return (b-a)/2.0*sum((weights5*func(y, *args)).transpose(), 0)
+
+
+def quadSciPy4(func, a, b, args=()):
+    """Compute a definite integral using fifth-order Gaussian quadrature."""
     y = (b-a)*(roots4+1)/2.0 + a
-    return (b-a)/2.0*sum(weights4*func(y,*args),0)
+    return (b-a)/2.0*sum(weights4*func(y, *args), 0)
+
 
 # Choice of routine used for P.V. integration
 PVquadrature = quadSciPy18transposed
@@ -158,8 +159,8 @@ rthtquadrature = quadSciPy10
 
 
 def deriv(func, x, h, nevals):
-    """Derivative using Ridders-Neville algorithm."""
-    # Adapted from Press et al., Numerical Recipes 
+    """Return derivative func'(x) using Ridders-Neville algorithm."""
+    # Adapted from Press et al., Numerical Recipes
     # in a blind, non-pythonic way
     con = 1.4  # scale decrease per step
     safe = 2   # return when error is safe worse than the best so far
