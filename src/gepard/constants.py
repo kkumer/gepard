@@ -1,6 +1,5 @@
 """Constants, with their numerical values, not to be changed by user.
 
-Maybe one should make sure they stay constant.
 Also, fixed dictionaries.
 """
 
@@ -48,7 +47,7 @@ toTeX = {
     "ALU": "$A_{\\rm LU}$",
     "ALUI": "$A_{\\rm LU}^{\\rm I}$",
     "ALUDVCS": "$A_{\\rm LU}^{\\rm DVCS}$",
-    "XLU": "$d\\Sigma/d\\Phi$",
+    "XLU": "$\\Delta\\Sigma/d\\Phi$",
     "XUU": "$d\\sigma/d\\Phi$",
     "ImCI": "$Im\\mathcal{C}^{I}$",
     "ReCI": "$Re\\mathcal{C}^{I}$",
@@ -60,9 +59,6 @@ toTeX = {
     "XwA": " $b_{1}/b_{0}$ (XwA)",
     "AC": "$AC$",
     "BCSA": "$BCSA$",
-    "ALU": "$ALU$",
-    "XLU": "$XLU$",
-    "XUU": "$XUU$",
     "TSA": "$TSA$",
     "BTSA": "$BTSA$",
     "ACcos0": "$A_{C}^{\\cos 0\\phi}$",

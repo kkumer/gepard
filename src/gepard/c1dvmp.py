@@ -10,6 +10,15 @@ from .special import S1, S2, S3, SB3, deldelS2, delS2, parity, poch
 def c1dvmp(m, sgntr: int, j: complex, k: int) -> Tuple[complex, complex, complex]:
     """NLO DVMP hard scattering coefficients.
 
+    Args:
+        m: Theory instance
+        sgntr: signature (+1 or -1)
+        j: conformal moment
+        k: moment
+
+    Returns:
+        (quark, pure singlet, gluon) NLO coefficients.
+
     Todo:
         There is an unresolved discrepancy in the code implementing
         Eq. (4.53b) of Towards DVMP paper term. Dieter's notebook
@@ -34,17 +43,17 @@ def c1dvmp(m, sgntr: int, j: complex, k: int) -> Tuple[complex, complex, complex
 
     #  ... quark part
 
-    MCQ1CF = -23/3+(0.5*(1.+3.*(1.+j)*(2.+j)))/((1
-           + j)**2*(2.+j)**2)+(0.5*(1.+3.*(1.+k)*(2.+k)))/((1.+k)**2
-           *(2.+k)**2)+0.5*(-3.-2./((1.+j)*(2.+j))+4.*S1(1.+j))*((-
-           0.5*(1.+(1.+j)*(2.+j)))/((1.+j)*(2.+j))-(0.5*(1.+(1.+k)*(
-           2.+k)))/((1.+k)*(2.+k))-LRGPDF2+S1(1.+j)+S1(1.+k))+0.5 * \
-           ((-0.5*(1.+(1.+j)*(2.+j)))/((1.+j)*(2.+j))-(0.5*(1.+(1.+k
-           )*(2.+k)))/((1.+k)*(2.+k))-LRDAF2+S1(1.+j)+S1(1.+k))*(-
-           3.-2./((1.+k)*(2.+k))+4.*S1(1.+k))
+    MCQ1CF = -23/3+(0.5*(1.+3.*(1.+j)*(2.+j)))/((
+             1 + j)**2*(2.+j)**2)+(0.5*(1.+3.*(1.+k)*(2.+k)))/((1.+k)**2
+             *(2.+k)**2)+0.5*(-3.-2./((1.+j)*(2.+j))+4.*S1(1.+j))*((-
+             0.5*(1.+(1.+j)*(2.+j)))/((1.+j)*(2.+j))-(0.5*(1.+(1.+k)*(
+             2.+k)))/((1.+k)*(2.+k))-LRGPDF2+S1(1.+j)+S1(1.+k))+0.5 * \
+             ((-0.5*(1.+(1.+j)*(2.+j)))/((1.+j)*(2.+j))-(0.5*(1.+(1.+k
+             )*(2.+k)))/((1.+k)*(2.+k))-LRDAF2+S1(1.+j)+S1(1.+k))*(-
+             3.-2./((1.+k)*(2.+k))+4.*S1(1.+k))
 
-    MCQ1BET0 = -5/6+0.5/((1.+j)*(2.+j))+0.5/((1.
-               + k)*(2.+k))+0.5*LRR2-S1(1.+j)-S1(1.+k)
+    MCQ1BET0 = -5/6+0.5/((1.+j)*(2.+j))+0.5/((
+               1 + k)*(2.+k))+0.5*LRR2-S1(1.+j)-S1(1.+k)
 
     SUMA = 0j
     SUMB = 0j

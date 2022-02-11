@@ -10,6 +10,16 @@ import numpy as np
 from . import data, gpd, model, quadrature, wilson  # noqa: F401
 
 
+def _flatten(T):
+    """Flatten the tuple."""
+    if not isinstance(T, tuple):
+        return (T,)
+    elif len(T) == 0:
+        return ()
+    else:
+        return _flatten(T[0]) + _flatten(T[1:])
+
+
 class CFF(model.ParameterModel):
     """Base class for CFFs.
 
@@ -34,21 +44,13 @@ class CFF(model.ParameterModel):
         self.dvcs_charges = (qs, qs, qns)
         super().__init__(**kwargs)
 
-    def _flatten(T):
-        """Flatten the tuple."""
-        if not isinstance(T, tuple):
-            return (T,)
-        elif len(T) == 0:
-            return ()
-        else:
-            return flatten(T[0]) + flatten(T[1:])
-
     def print_CFFs(self, pt: data.DataPoint, format: str = None):
         """Print values of CFFs at given kinematic point.
 
         Args:
             pt: DataPoint instance
             format: 'mma' to get output pastable into Mathematica
+
         """
         vals = [getattr(self, cff)(pt) for cff in self.allCFFs]
         if format == 'mma':
@@ -66,18 +68,25 @@ class CFF(model.ParameterModel):
         exec('def %s(self, pt): return 0.' % name)
 
     def ReEb(self, pt: data.DataPoint):
-        """Derived from E-tilde by multiplying with xi.
+        """Return Re(E-bar).
 
         Args:
             pt: DataPoint instance
 
         Returns:
             xi*ReEt
+
         """
         return (pt.xi)*self.ReEt(pt)
 
     def cff(self, pt: data.DataPoint) -> np.ndarray:
         """Return array(ReH, ImH, ReE, ...) for kinematic point.
+
+        Args:
+            pt: DataPoint instance
+
+        Returns:
+            Eight CFFs (ReH, ImH, ReE, ..., ImEt).
 
         This is generic top-class method that only gathers results
         of dedicated ReH(), ImH(), etc. functions.
@@ -86,7 +95,6 @@ class CFF(model.ParameterModel):
         same time or in parallel.
 
         """
-
         return np.array([self.ReH(pt), self.ImH(pt), self.ReE(pt), self.ImE(pt),
                          self.ReHt(pt), self.ImHt(pt), self.ReEt(pt), self.ImEt(pt)])
 
@@ -292,7 +300,7 @@ class PionPole(object):
     """Various options for pion-pole contribution."""
 
     def DMfixpole(self, pt):
-        """Fixed pion-pole as used by Dieter."""
+        """Return fixed pion-pole as used by Dieter."""
         pole = (2.2390424 * (1. - (1.7*(0.0196 - pt.t))/(1.
                 - pt.t/2.)**2))/((0.0196 - pt.t)*pt.xi)
         if 'in2particle' in pt and pt.in2particle == 'n':
@@ -301,7 +309,7 @@ class PionPole(object):
             return pole  # proton
 
     def DMfreepole(self, pt):
-        """Free pion-pole as proposed by Dieter."""
+        """Return free pion-pole as proposed by Dieter."""
         pole = (self.parameters['rpi'] * 2.16444 / (0.0196 - pt.t) / (1.
                 - pt.t/self.parameters['mpi2'])**2 / pt.xi)
         if 'in2particle' in pt and pt.in2particle == 'n':
@@ -420,14 +428,15 @@ class DispersionFreePoleCFF(DispersionFixedPoleCFF):
 
 
 class HybridCFF(MellinBarnesCFF, DispersionFixedPoleCFF, CFF):
-    """This combines MB model for small xB and DR model for valence xB.
+    """Combines MB model for small xB and DR model for valence xB.
 
     Todo:
         Check general consistency for xi != pt.xi for imag CFFs.
+
     """
 
     def is_within_model_kinematics(self, pt):
-        """Is kinematics of datapoint ok?"""
+        """Test kinematics of datapoint."""
         # relaxing xBmin and removing Q2max
         return ((1.5 <= pt.Q2) and
                 (pt.tm < min(1., pt.Q2/4)) and

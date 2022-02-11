@@ -50,9 +50,12 @@ def shift1(m, j: np.ndarray, process_class: str) -> np.ndarray:
     """Calculate NLO shift coeff s_1.
 
     Args:
-       m: instance of g.cff.MellinBarnes
-       j: MB contour points
-       process_class: 'DVCS' or 'DIS'
+        m: instance of g.cff.MellinBarnes
+        j: MB contour points
+        process_class: 'DVCS' or 'DIS'
+
+    Returns:
+        NLO shift coefficient s_1.
 
     """
     LRF2 = math.log(m.rf2)
@@ -61,7 +64,8 @@ def shift1(m, j: np.ndarray, process_class: str) -> np.ndarray:
     elif process_class == 'DVCS':    # Eq. (88a)
         s1 = S1(j+3/2) - S1(j+2) + 2*math.log(2) - LRF2
     else:
-        raise Exception('Process class {} is neither DVCS nor DIS!'.format(process_class))
+        raise Exception(
+                'Process class {} is neither DVCS nor DIS!'.format(process_class))
     return s1
 
 
@@ -69,11 +73,13 @@ def C1(m, j: np.ndarray, process_class: str) -> np.ndarray:
     """Calculate NLO Wilson coeff C_1 for DVCS or DIS.
 
     Args:
-       m: instance of g.cff.MellinBarnes
-       j: MB contour points
-       process_class: 'DVCS' or 'DIS'
+        m: instance of g.cff.MellinBarnes
+        j: MB contour points
+        process_class: 'DVCS' or 'DIS'
 
-    "Big C" from eqs. (91) and (101) from "Towards ... DVCS." paper
+    Returns:
+        "Big C" from eqs. (91) and (101) from "Towards ... DVCS." paper
+
     """
     c0 = np.array([1, 0, 1, 1])  # LO, valid for DIS and DVCS
 
@@ -94,6 +100,7 @@ def C1(m, j: np.ndarray, process_class: str) -> np.ndarray:
         else:  # msbar
             c1 = c1_V(j, m.nf)
     else:
-        raise Exception('Process class {} is neither DVCS nor DIS!'.format(process_class))
+        raise Exception(
+                'Process class {} is neither DVCS nor DIS!'.format(process_class))
 
     return c1 + shift
