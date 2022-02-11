@@ -32,11 +32,16 @@ class DVCS(theory.Theory):
      - BM10tw2 - BM10 with higher twists set to zero
     """
 
-    def PreFacSigma(self, pt):
+    def PreFacSigma(self, pt: data.DataPoint) -> float:
         """Overall prefactor of 4-fold XS.
 
-        Take prefactor in Eq(22) times 2pi because of proton Phi integration
-        and times y/Q2 because of dy -> dQ2. Convert to nanobarns.
+        Args:
+            pt: instance of DataPoint
+
+        Returns:
+            Overal prefactor from Eq. (22) of BMK,  times 2pi because of
+            proton Phi integration and times y/Q2 because of dy -> dQ2.
+            Converted to nanobarns.
 
         """
         return alpha**3 * pt.xB * pt.y**2 / (8. * pi * pt.Q2**2 *
@@ -47,12 +52,19 @@ class DVCS(theory.Theory):
 
         Args:
             pt: DataPoint instance
+            **kwargs: keyword arguments
+
+        Keyword args:
             vars (dict): dict which can override pt kinematics, e.g., vars={'phi': 0}
             flip (string, list): flip the sign of pt attribute,
                                  e.g., flip='in1polarization'
 
+        Returns:
+            Cross section.
+
         This is for calculation of fully beam and target polarized cross-section.
-        Most of the usually measured cross-sections and asymmetries are derived from this.
+        Most of the usually measured cross-sections and asymmetries are derived
+        from this one.
 
         Todo:
             * transversal target BMK/Trento switching
@@ -122,7 +134,12 @@ class DVCS(theory.Theory):
     def _XGAMMA_DVCS_t_Approx(self, pt):
         """Partial DVCS (gamma* p -> gamma p) cross section differential in t.
 
-        Approx. formula used in NPB10 paper.
+        Args:
+            pt: instance of DataPoint
+
+        Returns:
+            Cross section. Approx. formula used in NPB10 paper.
+
         """
         W2 = pt.W * pt.W
         # Simplified formula used also in Fortran gepard code
@@ -154,11 +171,19 @@ class DVCS(theory.Theory):
     # Choice of what is actually used:
     _XGAMMA_DVCS_t = _XGAMMA_DVCS_t_Ex
 
-    def XSintphi(self, pt, **kwargs):
+    def XSintphi(self, pt: data.DataPoint, **kwargs) -> float:
         """XS integrated over azimuthal angle.
+
+        Args:
+            pt: instance of DataPoint
+            **kwargs: keyword arguments
+
+        Returns:
+            Cross section (unpolarized)
 
         Todo:
             This is unnecessary function. Should be changed to XUU.
+
         """
         mem = pt.__dict__.pop('FTn', None)
         pt.FTn = 0
@@ -245,17 +270,27 @@ class DVCS(theory.Theory):
     def _XCLU(self, pt, **kwargs):
         """4-fold beam charge-spin cross section difference.
 
-        D_{CS,U}/2, as measured by COMPASS.
+        Args:
+            pt: instance of DataPoint
+            **kwargs: keyword arguments
+
+        Returns:
+            D_{CS,U}/2, as measured by COMPASS.
 
         """
         R = kwargs.copy()
-        R.update({'flip':['in1polarization', 'in1charge']})
+        R.update({'flip': ['in1polarization', 'in1charge']})
         return (self.XS(pt, **kwargs) - self.XS(pt, **R)) / 2
 
     def XCLU(self, pt, **kwargs):
         """4-fold beam charge-spin cross section difference.
 
-        D_{CS,U}/2, as measured by COMPASS. (NOT TESTED.)
+        Args:
+            pt: instance of DataPoint
+            **kwargs: keyword arguments
+
+        Returns:
+            D_{CS,U}/2, as measured by COMPASS. (NOT TESTED.)
 
         """
         return self._phiharmonic(self._XCLU, pt, **kwargs)
@@ -263,17 +298,27 @@ class DVCS(theory.Theory):
     def _XCUU(self, pt, **kwargs):
         """4-fold beam charge-spin cross section sum.
 
-        S_{CS,U}/2, as measured by COMPASS.
+        Args:
+            pt: instance of DataPoint
+            **kwargs: keyword arguments
+
+        Returns:
+            S_{CS,U}/2, as measured by COMPASS.
 
         """
         R = kwargs.copy()
-        R.update({'flip':['in1polarization', 'in1charge']})
+        R.update({'flip': ['in1polarization', 'in1charge']})
         return (self.XS(pt, **kwargs) + self.XS(pt, **R)) / 2
 
     def XCUU(self, pt, **kwargs):
         """4-fold beam charge-spin cross section sum.
 
-        S_{CS,U}/2, as measured by COMPASS. (NOT TESTED.)
+        Args:
+            pt: instance of DataPoint
+            **kwargs: keyword arguments
+
+        Returns:
+            S_{CS,U}/2, as measured by COMPASS. (NOT TESTED.)
 
         """
         return self._phiharmonic(self._XCUU, pt, **kwargs)
@@ -283,9 +328,9 @@ class DVCS(theory.Theory):
     def _AC(self, pt, **kwargs):
         """Calculate beam charge asymmtery."""
         chg = kwargs.copy()
-        chg.update({'flip':'in1charge'})
-        o =  self.XS(pt, **kwargs)
-        c =  self.XS(pt, **chg)
+        chg.update({'flip': 'in1charge'})
+        o = self.XS(pt, **kwargs)
+        c = self.XS(pt, **chg)
         return (o - c) / (o + c)
         # optimized formula (don't calculate parts which cancel anyway)
         # return  self.TINTunp(pt, phi, 0, 1) / (
@@ -294,7 +339,7 @@ class DVCS(theory.Theory):
     def AC(self, pt, **kwargs):
         """Calculate beam charge asymmetry."""
         res = self._phiharmonic(self._AC, pt, **kwargs)
-        return  res
+        return res
 
     def _ALU(self, pt, **kwargs):
         """Calculate beam spin asymmetry."""
@@ -303,25 +348,31 @@ class DVCS(theory.Theory):
     def _ALUapprox(self, pt, **kwargs):
         """Calculate beam spin asymmetry.
 
-        For harmonics, fast approximate formula is used.
+        Args:
+            pt: instance of DataPoint
+            **kwargs: keyword arguments
+
+        Returns:
+            Beam spin asymmetry A_LU.
+            For harmonics, fast approximate formula is used.
 
         """
         if 'phi' in pt:
             return self._ALU(pt, **kwargs)
         elif 'FTn' in pt and pt.FTn == -1:
             if 'vars' in kwargs:
-                kwargs['vars'].update({'phi':pi/2.})
+                kwargs['vars'].update({'phi': pi/2.})
             else:
-                kwargs['vars'] = {'phi':pi/2.}
-            return  self._ALU(pt, **kwargs)
+                kwargs['vars'] = {'phi': pi/2.}
+            return self._ALU(pt, **kwargs)
         else:
             raise ValueError('[%s] has neither azimuthal angle phi\
  nor harmonic FTn = -1 defined!' % pt)
 
     def _ALUexact(self, pt, **kwargs):
-        """Calculate beam spin asymmetry"""
+        """Calculate beam spin asymmetry."""
         res = self._phiharmonic(self._ALU, pt, **kwargs)
-        return  res
+        return res
 
     # Make a choice
     ALU = _ALUexact
@@ -329,99 +380,101 @@ class DVCS(theory.Theory):
     def _TSA(self, pt, **kwargs):
         """Target spin asymmetry (transversal or longitudinal)."""
         pol = kwargs.copy()
-        pol.update({'flip':'in2polarization'})
-        o =  self.XS(pt, **kwargs)
-        p =  self.XS(pt, **pol)
+        pol.update({'flip': 'in2polarization'})
+        o = self.XS(pt, **kwargs)
+        p = self.XS(pt, **pol)
         return (o-p)/(o+p)
 
     def TSA(self, pt, **kwargs):
         """Calculate target spin asymmetry (AUL or AUT).
 
-        Whether AUL or AUT is calculated is determined by the
-        pt.in2polarizationvector being 'L' or 'T'.
+        Args:
+            pt: instance of DataPoint
+            **kwargs: keyword arguments
+
+        Returns:
+            Target spin asymmetry.
+            Whether AUL or AUT is calculated is determined by the
+            pt.in2polarizationvector being 'L' or 'T'.
 
         """
         return self._phiharmonic(self._TSA, pt, **kwargs)
 
     def AUL(self, pt, **kwargs):
         """Calculate longitudinal target spin asymmetry."""
-
         assert pt.in2polarizationvector == 'L'
         return self.TSA(pt, **kwargs)
 
     def AUT(self, pt, **kwargs):
         """Calculate transversal target spin asymmetry."""
-
         assert pt.in2polarizationvector == 'T'
         return self.TSA(pt, **kwargs)
 
     def _BTSA(self, pt, **kwargs):
-        """Calculate beam-target spin asymmetry (BTSA).
-
-        According to 1004.0177 Eq. (1.8)
-
-        """
+        """Calculate beam-target spin asymmetry (BTSA)."""
+        # According to 1004.0177 Eq. (1.8)
         bpol = kwargs.copy()
-        bpol.update({'flip':'in1polarization'})
+        bpol.update({'flip': 'in1polarization'})
         tpol = kwargs.copy()
-        tpol.update({'flip':'in2polarization'})
+        tpol.update({'flip': 'in2polarization'})
         both = kwargs.copy()
-        both.update({'flip':['in1polarization', 'in2polarization']})
-        o =  self.XS(pt, **kwargs)
-        p =  self.XS(pt, **bpol)
-        t =  self.XS(pt, **tpol)
-        b =  self.XS(pt, **both)
+        both.update({'flip': ['in1polarization', 'in2polarization']})
+        o = self.XS(pt, **kwargs)
+        p = self.XS(pt, **bpol)
+        t = self.XS(pt, **tpol)
+        b = self.XS(pt, **both)
         return ((o+b) - (p+t)) / ((o+b) + (p+t))
 
     def BTSA(self, pt, **kwargs):
         """Calculate beam-target spin asymmetry (ALL or ALT).
 
-        Whether ALL or ALT is calculated is determined by the
-        pt.in2polarizationvector being 'L' or 'T'.
+        Args:
+            pt: instance of DataPoint
+            **kwargs: keyword arguments
+
+        Returns:
+            Beam-target spin asymmetry.
+            Whether ALL or ALT is calculated is determined by the
+            pt.in2polarizationvector being 'L' or 'T'.
 
         """
         return self._phiharmonic(self._BTSA, pt, **kwargs)
 
     def ALL(self, pt, **kwargs):
         """Calculate beam and longitudinal target spin asymmetry."""
-
         assert pt.in2polarizationvector == 'L'
         return self.BTSA(pt, **kwargs)
 
     def ALT(self, pt, **kwargs):
         """Calculate beam and transversal target spin asymmetry."""
-
         assert pt.in2polarizationvector == 'T'
         return self.BTSA(pt, **kwargs)
 
     def _CBTSA(self, pt, chargepar=-1, **kwargs):
-        """Calculate double charge and spin asymmetries.
-
-        According to 1106.2990 Eq. (18)(chargepar=1) and (19)(chargepar=-1)
-
-        """
+        """Calculate double charge and spin asymmetries."""
+        # According to 1106.2990 Eq. (18)(chargepar=1) and (19)(chargepar=-1)
         T_args = kwargs.copy()
-        T_args.update({'flip':'in2polarization'})
+        T_args.update({'flip': 'in2polarization'})
         B_args = kwargs.copy()
-        B_args.update({'flip':'in1polarization'})
+        B_args.update({'flip': 'in1polarization'})
         BT_args = kwargs.copy()
-        BT_args.update({'flip':['in1polarization', 'in2polarization']})
+        BT_args.update({'flip': ['in1polarization', 'in2polarization']})
         C_args = kwargs.copy()
-        C_args.update({'flip':'in1charge'})
+        C_args.update({'flip': 'in1charge'})
         CT_args = kwargs.copy()
-        CT_args.update({'flip':['in1charge', 'in2polarization']})
+        CT_args.update({'flip': ['in1charge', 'in2polarization']})
         CB_args = kwargs.copy()
-        CB_args.update({'flip':['in1charge', 'in1polarization']})
+        CB_args.update({'flip': ['in1charge', 'in1polarization']})
         CBT_args = kwargs.copy()
-        CBT_args.update({'flip':['in1charge' ,'in1polarization', 'in2polarization']})
-        o =  self.XS(pt, **kwargs)
-        t =  self.XS(pt, **T_args)
-        b =  self.XS(pt, **B_args)
-        bt =  self.XS(pt, **BT_args)
-        c =  self.XS(pt, **C_args)
-        ct =  self.XS(pt, **CT_args)
-        cb =  self.XS(pt, **CB_args)
-        cbt =  self.XS(pt, **CBT_args)
+        CBT_args.update({'flip': ['in1charge', 'in1polarization', 'in2polarization']})
+        o = self.XS(pt, **kwargs)
+        t = self.XS(pt, **T_args)
+        b = self.XS(pt, **B_args)
+        bt = self.XS(pt, **BT_args)
+        c = self.XS(pt, **C_args)
+        ct = self.XS(pt, **CT_args)
+        cb = self.XS(pt, **CB_args)
+        cbt = self.XS(pt, **CBT_args)
         return ((o-t-b+bt) + chargepar*(c-ct-cb+cbt)) / (o+t+b+bt+c+ct+cb+cbt)
 
     def ALTI(self, pt, **kwargs):
@@ -435,99 +488,99 @@ class DVCS(theory.Theory):
     def _ALUI(self, pt, **kwargs):
         """Beam spin asymmetry, interference part."""
         pol = kwargs.copy()
-        pol.update({'flip':'in1polarization'})
+        pol.update({'flip': 'in1polarization'})
         chg = kwargs.copy()
-        chg.update({'flip':'in1charge'})
+        chg.update({'flip': 'in1charge'})
         both = kwargs.copy()
-        both.update({'flip':['in1polarization', 'in1charge']})
-        o =  self.XS(pt, **kwargs)
-        p =  self.XS(pt, **pol)
-        c =  self.XS(pt, **chg)
-        b =  self.XS(pt, **both)
+        both.update({'flip': ['in1polarization', 'in1charge']})
+        o = self.XS(pt, **kwargs)
+        p = self.XS(pt, **pol)
+        c = self.XS(pt, **chg)
+        b = self.XS(pt, **both)
         return ((o-p) - (c-b)) / ((o+p) + (c+b))
 
     def ALUI(self, pt, **kwargs):
-        """Calculate beam spin asymmetry, interference part.
-
-        As defined by HERMES 0909.3587 Eq. (2.2).
-
-        """
+        """Calculate beam spin asymmetry, interference part."""
+        # As defined by HERMES 0909.3587 Eq. (2.2).
         return self._phiharmonic(self._ALUI, pt, **kwargs)
 
     def _ALUDVCS(self, pt, **kwargs):
-        """Calculate ALU as defined by HERMES 0909.3587 Eq. (2.3) """
-
+        """Calculate ALU as defined by HERMES 0909.3587 Eq. (2.3)."""
         pol = kwargs.copy()
-        pol.update({'flip':'in1polarization'})
+        pol.update({'flip': 'in1polarization'})
         chg = kwargs.copy()
-        chg.update({'flip':'in1charge'})
+        chg.update({'flip': 'in1charge'})
         both = kwargs.copy()
-        both.update({'flip':['in1polarization', 'in1charge']})
-        o =  self.XS(pt, **kwargs)
-        p =  self.XS(pt, **pol)
-        c =  self.XS(pt, **chg)
-        b =  self.XS(pt, **both)
+        both.update({'flip': ['in1polarization', 'in1charge']})
+        o = self.XS(pt, **kwargs)
+        p = self.XS(pt, **pol)
+        c = self.XS(pt, **chg)
+        b = self.XS(pt, **both)
         return ((o-p) + (c-b)) / ((o+p) + (c+b))
 
     def ALUDVCS(self, pt, **kwargs):
-        """Calculate beam spin asymmetry, DVCS part.
-
-        As defined by HERMES 0909.3587 Eq. (2.3).
-
-        """
+        """Calculate beam spin asymmetry, DVCS part."""
+        # As defined by HERMES 0909.3587 Eq. (2.3).
         return self._phiharmonic(self._ALUDVCS, pt, **kwargs)
 
     def _AUTI(self, pt, **kwargs):
-        """Calculate trans. target asymmetry, as defined by HERMES 0802.2499 Eq. (15)."""
+        """Calculate trans. target asymmetry, defined by HERMES 0802.2499 Eq. (15)."""
         pol = kwargs.copy()
-        pol.update({'flip':'in2polarization'})
+        pol.update({'flip': 'in2polarization'})
         chg = kwargs.copy()
-        chg.update({'flip':'in1charge'})
+        chg.update({'flip': 'in1charge'})
         both = kwargs.copy()
-        both.update({'flip':['in2polarization', 'in1charge']})
-        o =  self.XS(pt, **kwargs)
-        p =  self.XS(pt, **pol)
-        c =  self.XS(pt, **chg)
-        b =  self.XS(pt, **both)
+        both.update({'flip': ['in2polarization', 'in1charge']})
+        o = self.XS(pt, **kwargs)
+        p = self.XS(pt, **pol)
+        c = self.XS(pt, **chg)
+        b = self.XS(pt, **both)
         return ((o-p) - (c-b)) / ((o+p) + (c+b))
 
     def AUTI(self, pt, **kwargs):
-        """Calculate trans. target asymmetry, as defined by HERMES 0802.2499 Eq. (15)."""
+        """Calculate trans. target asymmetry, defined by HERMES 0802.2499 Eq. (15)."""
         return self._phiharmonic(self._AUTI, pt, **kwargs)
 
     def _AUTDVCS(self, pt, **kwargs):
-        """Calculate trans. target asymmetry, as defined by HERMES 0802.2499 Eq. (14)."""
-
+        """Calculate trans. target asymmetry, defined by HERMES 0802.2499 Eq. (14)."""
         pol = kwargs.copy()
-        pol.update({'flip':'in2polarization'})
+        pol.update({'flip': 'in2polarization'})
         chg = kwargs.copy()
-        chg.update({'flip':'in1charge'})
+        chg.update({'flip': 'in1charge'})
         both = kwargs.copy()
-        both.update({'flip':['in2polarization', 'in1charge']})
-        o =  self.XS(pt, **kwargs)
-        p =  self.XS(pt, **pol)
-        c =  self.XS(pt, **chg)
-        b =  self.XS(pt, **both)
+        both.update({'flip': ['in2polarization', 'in1charge']})
+        o = self.XS(pt, **kwargs)
+        p = self.XS(pt, **pol)
+        c = self.XS(pt, **chg)
+        b = self.XS(pt, **both)
         return ((o-p) + (c-b)) / ((o+p) + (c+b))
 
     def AUTDVCS(self, pt, **kwargs):
-        """Calculate trans. target asymmetry, as defined by HERMES 0802.2499 Eq. (14)."""
+        """Calculate trans. target asymmetry, defined by HERMES 0802.2499 Eq. (14)."""
         return self._phiharmonic(self._AUTDVCS, pt, **kwargs)
 
 # Observables:  ad-hoc, one-off stuff
 
     def AC0minusr1(self, pt):
+        """Return some combination liked by Dieter."""
         return self.ACcos0(pt) - pt.r * self.ACcos1(pt)
 
     def XLUw2C(self, pt):
-        """Im(C^I) as defined by HALL A """
+        """Im(C^I) as defined by HALL A."""
         return self.ImCCALINTunp(pt)
 
     def XUUw2C(self, pt):
         """Re(C^I) or Re(C^I + Del C^I) as defined by HALL A.
 
-        FIXME: Although it is attributed to FTn=0, Re(C^I + Del C^I)
-        is only a part of zeroth harmonic.
+        Args:
+            pt: instance of DataPoint
+
+        Returns:
+            Harmonic coefficients.
+
+        Todo:
+            Although it is attributed to FTn=0, Re(C^I + Del C^I)
+            is only a part of zeroth harmonic.
 
         """
         if pt.FTn == 0:
@@ -538,15 +591,18 @@ class DVCS(theory.Theory):
     def XwA(self, pt):
         """Ratio of first two cos harmonics of w-weighted cross section."""
         # In BMK, not Trento?
-        b0 = quadrature.Hquadrature(lambda phi: self.XUU(pt, vars={'phi': phi}, weighted=True),
+        b0 = quadrature.Hquadrature(
+                lambda phi: self.XUU(pt, vars={'phi': phi}, weighted=True),
                 0, 2.0*pi) / (2.0*pi)
-        b1 = quadrature.Hquadrature(lambda phi: self.XUU(pt, vars={'phi': phi}, weighted=True) * cos(phi),
+        b1 = quadrature.Hquadrature(
+                lambda phi: self.XUU(pt, vars={'phi': phi}, weighted=True) * cos(phi),
                 0, 2.0*pi) / pi
         return b1/b0
 
     def BCSA(self, pt, **kwargs):
-        """Beam charge-spin asymmetry as measured by COMPASS. """
-        return  self.BCSD(pt, **kwargs) / self.BCSS(pt, **kwargs)
+        """Beam charge-spin asymmetry as measured by COMPASS."""
+        return self.BCSD(pt, **kwargs) / self.BCSS(pt, **kwargs)
+
 
 # This PEP8 violating end-of-file import serves just to bring BMK into dvcs namespace
 from .bmk import BM10, BMK, BM10ex, BM10tw2, hotfixedBMK  # noqa: F401, E402

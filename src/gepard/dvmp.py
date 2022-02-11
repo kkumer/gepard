@@ -1,27 +1,34 @@
 """Deeply Virtual Meson Production (DVMP) observables."""
+from __future__ import annotations
 
-from math import log, pi
+from math import pi
+from typing import Dict
 import numpy as np
 
-from . import constants, data, mellin, model, qcd, theory, wilson
+from . import constants, data, model, qcd, theory, wilson
+
 
 class DVMP(theory.Theory):
-    """DVMP observables
+    """DVMP observables.
 
     Implements cross-section for electroproduction of meson.
     """
 
-    def _XGAMMA_rho0_t_Approx(self, pt):
+    def _XGAMMA_rho0_t_Approx(self, pt: data.DataPoint) -> float:
         """Partial (longitudinal) gamma* p -> rho0 p cross section w.r.t. Mandelstam t.
 
-        Approximate formula valid for small xB.
+        Args:
+            pt: instance of DataPoint
+
+        Returns:
+            Cross-section differential in t.
+            Approximate formula valid for small xB.
 
         """
         # 4 * pi**2 * alpha_em * GeV2nb = 112175.5
         res = 112175.5 * pt.xB**2 * (
                 self.m.ImH_rho0(pt)**2 + self.m.ReH_rho0(pt)**2) / pt.Q2**2
         return res
-
 
     _XGAMMA_rho0_t = _XGAMMA_rho0_t_Approx
 
@@ -33,7 +40,7 @@ class MellinBarnesTFF(model.ParameterModel):
         self.wce_dvmp: Dict[float, np.ndarray] = {}
         # correction factors for NLO expressions
         # needed to be able to have some tests w.r.t. old wrong notebooks
-        # 1. correction introduced below Eq. (20) of 1612.01937. Set 
+        # 1. correction introduced below Eq. (20) of 1612.01937. Set
         #  to zero to get agreement with older results
         self.corr_c1dvmp_one = 1
         # 2. correction to get results from "Towards DVMP" paper.
@@ -70,5 +77,3 @@ class MellinBarnesTFF(model.ParameterModel):
         """Return Re(TFF H) for kinematic point."""
         tffs = self.tff(pt.xi, pt.t, pt.Q2)
         return tffs[0]
-
-
