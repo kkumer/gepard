@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from iminuit import Minuit
+from typing import List
+from iminuit import Minuit  # type: ignore
 
 from . import data, theory
 
@@ -54,11 +55,10 @@ class MinuitFitter(Fitter):
         # we take only free ones:
         try:
             self.theory.covariance = {(p1, p2): self.minuit.covariance[p1, p2]
-                                     for p1 in self.theory.free_parameters()
-                                     for p2 in self.theory.free_parameters()}
-        except:
+                                      for p1 in self.theory.free_parameters()
+                                      for p2 in self.theory.free_parameters()}
+        except AttributeError:
             print("Something's problematic. No covariances available.")
-
 
     def fit(self):
         """Perform simple fit.
@@ -69,13 +69,11 @@ class MinuitFitter(Fitter):
         self.minuit.migrad()
         self.covsync()
 
-
     # The following methods keep status of parameters (fixed, limits)
     # in sync between Theory object and minuit object
 
-    def fix_parameters(self, *args):
+    def fix_parameters(self, *args):  # noqa: D402
         """fix_parameters('p1', 'p2', ...)."""
-
         if args[0] == 'ALL':
             # fix 'em all
             self.theory._fix_parameters('ALL')
@@ -86,16 +84,14 @@ class MinuitFitter(Fitter):
             for par in args:
                 self.minuit.fixed[par] = True
 
-    def release_parameters(self, *args):
+    def release_parameters(self, *args):  # noqa: D402
         """release_parameters('p1', 'p2', ...)."""
-
         self.theory._release_parameters(*args)
         for par in args:
             self.minuit.fixed[par] = False
 
-    def limit_parameters(self, dct):
+    def limit_parameters(self, dct):  # noqa: D402
         """limit_parameters({'p1': (lo, hi), ...}."""
-
         self.theory.parameters_limits.update(dct)
         for k, v in dct.items():
             self.minuit.limits[k] = v

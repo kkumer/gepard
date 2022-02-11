@@ -49,8 +49,7 @@ def projectors(gam0) -> Tuple[np.ndarray, np.ndarray]:
     """Projectors on evolution quark-gluon singlet eigenaxes.
 
     Args:
-          m: instance of the model
-          j: MB contour points (overrides m.jpoints)
+          gam0: LO anomalous dimension
 
     Returns:
          lam: eigenvalues of LO an. dimm matrix lam[a, k]  # Eq. (123)
@@ -74,7 +73,7 @@ def projectors(gam0) -> Tuple[np.ndarray, np.ndarray]:
 
 
 def rnlof(m, j) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
-    """Returns projected NLO mu-independent P(bet*gam0 - gam1)P.
+    """Return projected NLO mu-independent P(bet*gam0 - gam1)P.
 
     Args:
           m: instance of the model
@@ -82,9 +81,10 @@ def rnlof(m, j) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
 
     Returns:
          lam: eigenvalues of LO an. dimm matrix lam[a, k]  # Eq. (123)
-          pr: Projector pr[k, a, i, j]  # Eq. (122)
-      r1proj: r1proj[a,b] = sum_ij pr[a,i,j] R1[i,j] pr[b,i,j]  # Eq. (124)
+         pr: Projector pr[k, a, i, j]  # Eq. (122)
+         r1proj: r1proj[a,b] = sum_ij pr[a,i,j] R1[i,j] pr[b,i,j]  # Eq. (124)
                  a,b in {+,-};  i,j in {Q, G}
+
     """
     # cf. my DIS notes p. 61
     gam0 = adim.singlet_LO(j+1, m.nf).transpose((2, 0, 1))  # LO singlet an. dim.
@@ -100,15 +100,16 @@ def rnlof(m, j) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
 
 
 def rnlonsf(m, j, prty) -> np.ndarray:
-    """Returns NLO mu-independent part of evolution operator.
+    """Return NLO mu-independent part of evolution operator.
 
     Args:
           m: instance of the model
           j: MB contour points (overrides m.jpoints)
-       prty: 1 for NS^{+}, -1 for NS^{-}
+          prty: 1 for NS^{+}, -1 for NS^{-}
 
     Returns:
          r1: beta/gama ratio from Eq. (117)
+
     """
     # cf. my DIS notes p. 61
     gam0 = adim.non_singlet_LO(j+1, m.nf, prty)   # LO non-singlet an. dim.
@@ -143,7 +144,7 @@ def erfunc_nd(m, lamj, lamk, R) -> np.ndarray:
     return er1
 
 
-def cb1(m, Q2, zn, zk, NS=False):
+def cb1(m, Q2, zn, zk, NS: bool = False):
     """Non-diagonal part of NLO evol op.
 
     Args:
@@ -151,6 +152,7 @@ def cb1(m, Q2, zn, zk, NS=False):
           Q2: evolution point
           zn: non-diagonal evolution Mellin-Barnes integration point (array)
           zk: COPE Mellin-Barnes integration point (not array! - FIXME)
+          NS: do we want non-singlet?
 
     Returns:
          B_jk: non-diagonal part of evol. op. from Eq. (140)
@@ -171,16 +173,16 @@ def cb1(m, Q2, zn, zk, NS=False):
            2*special.S1(zn-zk-1) -
            special.S1(zn+1))
     # GOD = "G Over D" = g_jk / d_jk
-    GOD_11 = 2 * constants.CF * (2*AAA +
-            (AAA - special.S1(zn+1))*(zn-zk)*(zn+zk +
-                                      3)/(zk+1)/(zk+2))
+    GOD_11 = 2 * constants.CF * (
+            2*AAA + (AAA - special.S1(zn+1))*(zn-zk)*(
+                zn+zk + 3)/(zk+1)/(zk+2))
     nzero = np.zeros_like(GOD_11)
     GOD_12 = nzero
     GOD_21 = 2*constants.CF*(zn-zk)*(zn+zk+3)/zn/(zk+1)/(zk+2)
-    GOD_22 = 2 * constants.CA * (2*AAA + (AAA - special.S1(zn +
-         1)) * (special.poch(zn, 4) / special.poch(zk, 4) -
-                1) + 2 * (zn-zk) * (zn+zk +
-            3) / special.poch(zk, 4)) * zk / zn
+    GOD_22 = 2 * constants.CA * (2*AAA + (AAA - special.S1(
+        zn + 1)) * (special.poch(zn, 4) / special.poch(zk, 4) -
+                    1) + 2 * (zn-zk) * (
+            zn+zk + 3) / special.poch(zk, 4)) * zk / zn
     god = np.array([[GOD_11, GOD_12], [GOD_21, GOD_22]])
     dm_22 = zk/zn
     dm_11 = np.ones_like(dm_22)
@@ -229,6 +231,7 @@ def evolop(m, j, Q2: float, process_class: str) -> np.ndarray:
         Argument should not be a process class but GPD vs PDF, or we
         should avoid it altogether somehow. This serves here only
         to get the correct choice of evolution scheme (msbar vs csbar).
+
     """
     # 1. Alpha-strong ratio.
     # When m.p=1 (NLO), LO part of the evolution operator
@@ -254,7 +257,8 @@ def evolop(m, j, Q2: float, process_class: str) -> np.ndarray:
         evola1ab = - np.einsum('kab,kabij->kabij', er1, r1proj)
         evola1 = np.einsum('kabij,bk->kij', evola1ab, Rfact)
         # adding non-diagonal evolution when needed or asked for
-        # if ((process_class == 'DVMP') or (process_class == 'DVCS' and m.scheme == 'msbar')):
+        # if ((process_class == 'DVMP') or (
+        #        process_class == 'DVCS' and m.scheme == 'msbar')):
         if ((process_class != 'DIS') and (m.scheme == 'msbar')):
             # FIXME: find a way to do it array-wise i.e. get rid of j_single
             nd = []
@@ -295,7 +299,8 @@ def evolopns(m, j, Q2: float, process_class: str) -> np.ndarray:
          -  p is pQCD order (0=LO, 1=NLO)
 
     Notes:
-        FIXME: code duplication, should be merged with evolop function
+        Code duplication, should be merged with evolop function
+
     """
     # 1. Alpha-strong ratio.
     # When m.p=1 (NLO), LO part of the evolution operator
@@ -318,7 +323,8 @@ def evolopns(m, j, Q2: float, process_class: str) -> np.ndarray:
     if m.p == 1:
         evola1 = aux1 * R**(-gam0/b0)
         # adding non-diagonal evolution when needed or asked for
-        # if ((process_class == 'DVMP') or (process_class == 'DVCS' and m.scheme == 'msbar')):
+        # if ((process_class == 'DVMP') or (
+        #    process_class == 'DVCS' and m.scheme == 'msbar')):
         if ((process_class != 'DIS') and (m.scheme == 'msbar')):
             # FIXME: find a way to do it array-wise i.e. get rid of j_single
             nd = []

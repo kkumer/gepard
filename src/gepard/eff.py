@@ -1,4 +1,4 @@
-# --- Models for Elastic (Electromagnetic) Form Factors --- #
+"""Models for Elastic (Electromagnetic) Form Factors."""
 
 
 class EFF(object):
@@ -6,7 +6,7 @@ class EFF(object):
 
 
 class DipoleEFF(EFF):
-    """Dipole approximation from DM's notebook."""
+    """Dipole approximation from Dieter's notebook."""
 
     def F1(self, pt):
         """Dirac elastic proton form factor - dipole parametrization."""
@@ -84,4 +84,3 @@ class ZeroEFF(EFF):
     def F2(self, pt):
         """Elastic em Pauli form factor F2 set to zero."""
         return 0.
-

@@ -2,7 +2,7 @@
 
 import numpy as np
 
-from . import cff, data, dis, dvcs, dvmp, eff, gpd
+from . import cff, data, dvcs, eff, gpd
 
 GLOpoints = data.dset[31][12:] + data.dset[8] + data.dset[29]
 
@@ -39,13 +39,15 @@ AUTIpts = AUTIpoints[:4]
 
 CLAS08pts = data.select(data.dset[81], criteria=['FTn == -1'])[-3:]
 
-GLO15new = data.dset[94]+data.dset[95]+data.dset[96]+data.dset[101]+data.dset[102]+data.dset[116]+data.dset[117]
+GLO15new = data.dset[94]+data.dset[95]+data.dset[96]+data.dset[101] + \
+           data.dset[102]+data.dset[116]+data.dset[117]
 
 GLO15b = H1ZEUS + ALUIpts + ACpts + CLAS08pts + AULpts + ALLpts + AUTIpts + GLO15new
 
 
-class KM09(eff.DipoleEFF, cff.DispersionFixedPoleCFF, dvcs.hotfixedBMK):
+class KM09(eff.DipoleEFF, cff.DispersionFixedPoleCFF, dvcs.hotfixedBMK):  # noqa: D101
     pass
+
 
 th_KM09a = KM09()
 par_KM09a = {'tMv': 0.8, 'rS': 1.0, 'alv': 0.43, 'Nv': 1.35,
@@ -66,8 +68,9 @@ th_KM09b.name = 'KM09b'
 pts_KM09b = GLOpoints + data.dset[30]
 
 
-class KM10(eff.DipoleEFF, gpd.PWNormGPD, cff.HybridFreePoleCFF, dvcs.BM10):
-	pass
+class KM10(eff.DipoleEFF, gpd.PWNormGPD, cff.HybridFreePoleCFF, dvcs.BM10):  # noqa: D101, E501
+    pass
+
 
 th_KM10 = KM10()
 par_KM10 = {'tmv2': 0.7812091281581667, 'rS': 1.0, 'rpi': 3.5355742996824659,
@@ -88,8 +91,9 @@ th_KM10.name = 'KM10'
 pts_KM10 = H1ZEUSpoints + UNP5points
 
 
-class KM10b(eff.KellyEFF, gpd.PWNormGPD, cff.HybridFreePoleCFF, dvcs.BM10):
-	pass
+class KM10b(eff.KellyEFF, gpd.PWNormGPD, cff.HybridFreePoleCFF, dvcs.BM10):  # noqa: D101, E501
+    pass
+
 
 th_KM10b = KM10b()
 par_KM10b = {'tmv2': 0.64, 'rS': 1.0, 'rpi': 4.0201, 'alv': 0.43, 'Nsea': 0.0,
@@ -107,8 +111,7 @@ th_KM10b.name = 'KM10b'
 pts_KM10b = DVCSpoints+GLOpoints+data.dset[30]
 
 
-class AFKM12(eff.KellyEFF, gpd.PWNormGPD, cff.MellinBarnesCFF, dvcs.BM10):
-
+class AFKM12(eff.KellyEFF, gpd.PWNormGPD, cff.MellinBarnesCFF, dvcs.BM10):  # noqa: D101
 
     def E(self, eta: float, t: float) -> np.ndarray:
         """Return (npts, 4) array E_j^a for all j-points and 4 flavors."""
@@ -116,28 +119,31 @@ class AFKM12(eff.KellyEFF, gpd.PWNormGPD, cff.MellinBarnesCFF, dvcs.BM10):
         self.parameters['kapg'] = - self.parameters['kaps'] * self.parameters['ns'] / (
                 0.6 - self.parameters['ns'])
         kappa = np.array([self.parameters['kaps'], self.parameters['kapg'], 0, 0])
-        return kappa * gpd.singlet_ng_constrained_E(self.jpoints, t,
-                            self.parameters, self.residualt).transpose()
+        return kappa * gpd.singlet_ng_constrained_E(
+                self.jpoints, t, self.parameters, self.residualt).transpose()
+
 
 th_AFKM12 = AFKM12(residualt='exp')
 # In AFKM12 paper we use b instead of m2, where m2 = 1/(2b)
-par_AFKM12 = {"ns": 0.152, "al0s": 1.1575, "alps": 0.1, "ms2": 0.17857142857142858, "delms2": 0.,
-            "pows": 2., "secs": 0.5127, "this": -0.21,
-            "al0g": 1.2473, "alpg": 0.1, "mg2": 0.25, "delmg2": 0.,
-            "powg": 2., "secg": -4.8055, "thig": 1.8638,
-            "kaps": 1.5,
-            "Ens": 0.152,  # for fitting should be pegged to ns
-            "Eal0s": 1.1575, "Ealps": 0.02, "Ems2": 0.17857142857142858, "Edelms2": 0.,
-            "Epows": 2., "Esecs": 0.5127, "Ethis": -0.21,
-            "Eal0g": 1.2473, "Ealpg": 0.05, "Emg2": 0.25, "Edelmg2": 0.,
-            "Epowg": 2., "Esecg": -4.8055, "Ethig": 1.8638}
+par_AFKM12 = {"ns": 0.152, "al0s": 1.1575, "alps": 0.1, "ms2": 0.17857142857142858,
+              "delms2": 0,
+              "pows": 2., "secs": 0.5127, "this": -0.21,
+              "al0g": 1.2473, "alpg": 0.1, "mg2": 0.25, "delmg2": 0,
+              "powg": 2., "secg": -4.8055, "thig": 1.8638,
+              "kaps": 1.5,
+              "Ens": 0.152,  # for fitting should be pegged to ns
+              "Eal0s": 1.1575, "Ealps": 0.02, "Ems2": 0.17857142857142858, "Edelms2": 0,
+              "Epows": 2., "Esecs": 0.5127, "Ethis": -0.21,
+              "Eal0g": 1.2473, "Ealpg": 0.05, "Emg2": 0.25, "Edelmg2": 0,
+              "Epowg": 2., "Esecg": -4.8055, "Ethig": 1.8638}
 th_AFKM12.parameters.update(par_AFKM12)
 th_AFKM12.name = 'AFKM12'
 pts_AFKM12 = H1ZEUS
 
 
-class KM15(eff.KellyEFF, gpd.PWNormGPD, cff.HybridFreePoleCFF, dvcs.BM10tw2):
+class KM15(eff.KellyEFF, gpd.PWNormGPD, cff.HybridFreePoleCFF, dvcs.BM10tw2):  # noqa: D101, E501
     pass
+
 
 th_KM15 = KM15()
 par_KM15 = {'tmv2': 15.94293227053628, 'rS': 1.0, 'alv': 0.43, 'tal': 0.43,
@@ -146,7 +152,8 @@ par_KM15 = {'tmv2': 15.94293227053628, 'rS': 1.0, 'alv': 0.43, 'tal': 0.43,
             'C': 2.7678681812890016, 'tNv': 0.6, 'bS': 2.0, 'tbv': 0.4000000003259146,
             'bv': 0.40000206775282354, 'mv2': 0.6228490959696493, 'alpv': 0.85,
             'talp': 0.85, 'mC2': 1.4497411858248308, 'trv': 0.881085721967267,
-            'pows': 2.0, 'Ealpg': 0.15, 'md2': 1.0, 'mg2': 0.7, 'Ealps': 0.15, 'powg': 2.0,
+            'pows': 2.0, 'Ealpg': 0.15, 'md2': 1.0, 'mg2': 0.7, 'Ealps': 0.15,
+            'powg': 2.0,
             'al0d': 0.5, 'delms2': 0.0,  'delmg2': 0.0, 'nd': 1.0, 'alpd': 1.0,
             'ns':  0.15203911208796006, 'al0s': 1.1575060246398083, 'alps': 0.15,
             'ms2': 0.4818827240886959, 'secs': 1.0707825621025808, 'ng': 0.5,
@@ -155,7 +162,7 @@ par_KM15 = {'tmv2': 15.94293227053628, 'rS': 1.0, 'alv': 0.43, 'tal': 0.43,
             'kaps': 0.0, 'kapg': 0.0}
 th_KM15.parameters.update(par_KM15)
 # Fitting parameters:
-th_KM15._release_parameters('mv2', 'rv', 'bv', 'C', 'mC2', 'tmv2', 'trv', 'tbv', 'rpi', 'mpi2', 'ms2',
-                            'secs', 'this', 'secg', 'thig')
+th_KM15._release_parameters('mv2', 'rv', 'bv', 'C', 'mC2', 'tmv2', 'trv', 'tbv', 'rpi',
+                            'mpi2', 'ms2', 'secs', 'this', 'secg', 'thig')
 th_KM15.name = 'KM15'
 pts_KM15 = GLO15b
