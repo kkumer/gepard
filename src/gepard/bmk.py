@@ -1769,7 +1769,7 @@ class BM10ex(hotfixedBMK):
 
 
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
-        return ( -((4*K)/(1 + eps2)**3)*
+        return ( -((4*pt.K)/(1 + eps2)**3)*
      ((-(2 - y)**2)*(-1 - 2*eps2 + sqrt(1 + eps2) +
         (t*(-1 + 2*xB + sqrt(1 + eps2)))/pt.Q2) +
       (1 - y - (y**2*eps2)/4)*(-2 - eps2 +
