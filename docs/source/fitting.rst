@@ -60,7 +60,7 @@ i. e.,  calculated together with their uncertainty:
 
   >>> pt = g.DataPoint(xB=0.01, t=-0.2, Q2=10)
   >>> th.predict(pt, observable='ImH', uncertainty=True)
-  (273.19, 25.75)
+  (273.2, 25.8)
 
 
 .. note::
