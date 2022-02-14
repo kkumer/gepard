@@ -28,6 +28,9 @@ from . import constants, data
 # hspace = 0.2   # the amount of height reserved for white space between subplots
 # Usage: fig.subplots_adjust(wspace=0.7)
 
+DISpoints = data.dset[201].copy()
+for id in range(202, 213):
+    DISpoints += data.dset[id]
 
 #################################################################
 #                                                               #
@@ -1253,6 +1256,7 @@ def CLAS15phi(path=None, fmt='png', **kwargs):
     return fig
 
 def CLAS15xs(lines=None, path=None, fmt='png'):
+    title = 'CLAS15xs'
     NPTS = 12
     XLUw = pd.DataFrame([(pt.Q2, pt.xB, pt.tm, pt.val, pt.err) for pt in data.dataset[101]], columns=('Q2', 'xB', 'tm', 'val', 'err'))
     xQbins = [(0,4), (5,9), (11,15), (16,20), (21,26), (30,33), (35,38), (39,42), (43,45), (46,47)]
@@ -1596,7 +1600,7 @@ def COMPASSt(path=None, fmt='png', **kwargs):
     ks['in1charge'] = 1
     ks['in1energy'] = 160.
     ks['in1polarization'] = -0.8
-    ks['s'] = 2 * Mp * ks['in1energy'] + Mp2
+    ks['s'] = 2 * constants.Mp * ks['in1energy'] + constants.Mp2
     ks['phi'] = 3.141
     ks['units'] = {'phi' : 'radian'}
     ks['frame'] = 'BMK'
@@ -1816,9 +1820,7 @@ def CFF2(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
                 label.set_fontsize(12)
     fig.subplots_adjust(bottom=0.2, wspace=0.0, hspace=0.0)
     if path:
-        #fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
-        fig.set_size_inches((14, 16))
-        mkpdf(path)
+        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
         fig.canvas.draw()
         #fig.show()
