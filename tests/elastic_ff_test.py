@@ -1,7 +1,7 @@
 """Tests for electromagnetic elastic form factors."""
 
 import gepard as g
-from pytest import approx
+from pytest import approx, raises
 
 md = g.eff.DipoleEFF()  # dipole FFs
 m = g.eff.KellyEFF()  # Kelly's FFs
@@ -36,6 +36,13 @@ def test_KellyFFp_one():
     assert m.F2(pt1) == approx(0.260398, rel=1.e-5)
 
 # Neutron:
+def test_DipoleFFn_exception():
+    with raises(Exception,
+                match='Neutron dipole elastic FFs are not implemented yet! Use Kelly.'):
+        md.F1(npt) == 0.
+    with raises(Exception,
+                match='Neutron dipole elastic FFs are not implemented yet! Use Kelly.'):
+        md.F2(npt) == 0.
 
 def test_KellyFFn_zero():
     assert m.F1(npt) == 0.

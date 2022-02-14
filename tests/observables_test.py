@@ -222,3 +222,13 @@ def test_AUTDVCS(th_DM12):
     # Gepard model
     pttrans.varFTn = -1
     assert th_DM12.AUTDVCS(pttrans) == approx(-0.0015171462298928092)
+
+
+def test_repr_DataPoint():
+    """Representation of DataPoint for printing."""
+    assert repr(g.dset[32][0]) == 'DataPoint: AC = -0.027'
+
+
+def test_DataSet_slice():
+    """Slicing the DataSet."""
+    assert repr(g.dset[32][1:4]) == 'DataSet with 3 points'

@@ -273,7 +273,7 @@ def test_cff_E_nlso3_separate():
     # # Q2 can be changed during calls:
     # assert m_fit.ImH(pt0_fit) == approx(66.90122688611703)
     # assert m_fit.cff(pt_fit)[1] == approx(
-            # 66.90122688611703)
+    #       # 66.90122688611703)
 
 
 def test_KM15_cffs():
@@ -293,3 +293,12 @@ def test_print_cffs(capfd):
     m.print_CFFs(pt0_fit)
     out, err = capfd.readouterr()
     assert out[:25] == " ImH = 70.36\n ReH =  7.76"
+
+
+def test_print_cffs_mma(capfd):
+    """Test printing CFFs at a point (mma style)."""
+    m = CFFTest4()
+    m.parameters.update(par_KM15)
+    m.print_CFFs(pt0_fit, format='mma')
+    out, err = capfd.readouterr()
+    assert out[:51] == "{ImH -> 70.361913, ReH -> 7.764978, ImE -> 0.000000"
