@@ -1,5 +1,5 @@
 [![Python package](https://github.com/kkumer/gepard/actions/workflows/python-package.yml/badge.svg)](https://github.com/kkumer/gepard/actions/workflows/python-package.yml)
-[![codecov](https://codecov.io/gh/kkumer/gepard/branch/ps/graph/badge.svg)](https://codecov.io/gh/kkumer/gepard)
+[![codecov](https://codecov.io/gh/kkumer/gepard/branch/ps/graph/badge.svg?event=push)](https://codecov.io/gh/kkumer/gepard)
 
 ## Synopsis
 
