@@ -1,6 +1,7 @@
 [run]
 branch = True
 source = gepard
+dynamic_context = test_function
 
 [report]
 exclude_lines =

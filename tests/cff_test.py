@@ -3,7 +3,7 @@
 import gepard as g
 import numpy as np
 from gepard.fits import par_KM15
-from pytest import approx, fixture, mark
+from pytest import approx, fixture, mark, raises
 
 par_test = {'ns': 2./3. - 0.4, 'al0s': 1.1, 'alps': 0.25, 'ms2': 1.1**2,
             'ng': 0.4, 'al0g': 1.2, 'alpg': 0.25, 'mg2': 1.2**2}
@@ -134,6 +134,28 @@ def test_cff_radNLO():
     m.dvcs_charges = (qs, qs, 0)  # select only singlet part of CFF
     assert m.cff(pt_bp)[:2] == approx(
             [5747.0424614455933, 201256.45352582674])
+
+
+def test_cff_proc_class_except():
+    """Trigger process_class exception."""
+    m = CFFTest2(type='hard', p=1, scheme='csbar')
+    qs = 5/18  # for nf=4
+    m.dvcs_charges = (qs, qs, 0)  # select only singlet part of CFF
+    with raises(Exception, match='process_class SIDIS is not DIS, DVCS or DVMP!'):
+        g.wilson.calc_wc(m, m.jpoints, 'SIDIS')
+    with raises(Exception, match='process_class SIDIS is neither DVCS nor DIS!'):
+        g.c1dvcs.shift1(m, m.jpoints, 'SIDIS')
+    with raises(Exception, match='process_class SIDIS is neither DVCS nor DIS!'):
+        g.c1dvcs.C1(m, m.jpoints, 'SIDIS')
+
+
+def test_cff_scheme_except():
+    """Trigger scheme exception."""
+    m = CFFTest2(type='hard', p=1, scheme='ms')
+    qs = 5/18  # for nf=4
+    m.dvcs_charges = (qs, qs, 0)  # select only singlet part of CFF
+    with raises(Exception, match='Scheme ms is neither msbar nor csbar!'):
+        m.cff(pt_bp)
 
 
 def test_cff_radLO_evol_NS():

@@ -65,7 +65,7 @@ def shift1(m, j: np.ndarray, process_class: str) -> np.ndarray:
         s1 = S1(j+3/2) - S1(j+2) + 2*math.log(2) - LRF2
     else:
         raise Exception(
-                'Process class {} is neither DVCS nor DIS!'.format(process_class))
+                'process_class {} is neither DVCS nor DIS!'.format(process_class))
     return s1
 
 
@@ -101,6 +101,6 @@ def C1(m, j: np.ndarray, process_class: str) -> np.ndarray:
             c1 = c1_V(j, m.nf)
     else:
         raise Exception(
-                'Process class {} is neither DVCS nor DIS!'.format(process_class))
+                'process_class {} is neither DVCS nor DIS!'.format(process_class))
 
     return c1 + shift

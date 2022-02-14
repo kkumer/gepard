@@ -73,7 +73,8 @@ def calc_wc(m: theory.Theory, j: np.ndarray, process_class: str):
             q1 = qp1/m.nf + ps1
             nsp1 = qp1
     else:
-        raise Exception('{} is not DIS, DVCS or DVMP!'.format(process_class))
+        raise Exception(
+                'process_class {} is not DIS, DVCS or DVMP!'.format(process_class))
     c_quark = quark_norm * np.stack([q0, q1])
     c_gluon = gluon_norm * np.stack([g0, g1])
     c_nsp = quark_norm * np.stack([nsp0, nsp1])
