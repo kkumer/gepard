@@ -1,4 +1,4 @@
-[![Build Status](https://app.travis-ci.com/kkumer/gepard.svg?token=LxGQXDrTERP6sTZEjfVh&branch=ps)](https://app.travis-ci.com/kkumer/gepard)
+[![Python package](https://github.com/kkumer/gepard/actions/workflows/python-package.yml/badge.svg)](https://github.com/kkumer/gepard/actions/workflows/python-package.yml)
 [![codecov](https://codecov.io/gh/kkumer/gepard/branch/ps/graph/badge.svg?token=YWFZALEK33)](https://codecov.io/gh/kkumer/gepard)
 
 ## Synopsis
