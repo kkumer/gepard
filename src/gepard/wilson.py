@@ -6,24 +6,6 @@ from scipy.special import loggamma  # type: ignore
 from . import adim, c1dvcs, c1dvmp, constants, evolution, qcd, theory
 
 
-def calc_gam(npoints: np.ndarray, nf: int):
-    """Calculate LO singlet anomalous dimensions matrix on MB contour.
-
-    Args:
-        npoints: coordinates of MB contour
-        nf: number of active quark flavors
-
-    Returns:
-         gam[s,k,i,j]: s in range(npwmax), k in range(npts), i,j in [Q,G]
-
-    """
-    # LO only
-    gam = []
-    for pw_shift in [0, 2, 4]:
-        gam.append(adim.singlet_LO(npoints+pw_shift, nf, 1).transpose(2, 0, 1))
-    return np.array(gam)
-
-
 def _fshu(j: np.ndarray) -> np.ndarray:
     """Shuvaev factor."""
     #  = 2^(J+1) Gamma(5/2+J) / Gamma(3/2) / Gamma(3+J) =

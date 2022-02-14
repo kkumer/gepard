@@ -94,13 +94,11 @@ def C1(m, j: np.ndarray, process_class: str) -> np.ndarray:
 
     if process_class == 'DIS':
         c1 = c1_F2(j+1, m.nf)
-    elif process_class == 'DVCS':
+    else:
+        # process_class == 'DVCS':
         if m.scheme == 'csbar':
             c1 = c1_F1(j+1, m.nf)
         else:  # msbar
             c1 = c1_V(j, m.nf)
-    else:
-        raise Exception(
-                'process_class {} is neither DVCS nor DIS!'.format(process_class))
 
     return c1 + shift

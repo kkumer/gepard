@@ -145,8 +145,6 @@ def test_cff_proc_class_except():
         g.wilson.calc_wc(m, m.jpoints, 'SIDIS')
     with raises(Exception, match='process_class SIDIS is neither DVCS nor DIS!'):
         g.c1dvcs.shift1(m, m.jpoints, 'SIDIS')
-    with raises(Exception, match='process_class SIDIS is neither DVCS nor DIS!'):
-        g.c1dvcs.C1(m, m.jpoints, 'SIDIS')
 
 
 def test_cff_scheme_except():
@@ -286,3 +284,12 @@ def test_KM15_cffs():
             70.3619128283078)
     assert m.ReH(pt0_fit) == approx(
             7.764977856195072)
+
+
+def test_print_cffs(capfd):
+    """Test printing CFFs at a point."""
+    m = CFFTest4()
+    m.parameters.update(par_KM15)
+    m.print_CFFs(pt0_fit)
+    out, err = capfd.readouterr()
+    assert out[:25] == " ImH = 70.36\n ReH =  7.76"
