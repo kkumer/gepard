@@ -42,6 +42,17 @@ gpd module
 
 .. automodule:: gepard.gpd
 
+dvmp module
+^^^^^^^^^^^
+
+.. automodule:: gepard.dvmp
+
+
+eff module
+^^^^^^^^^^^
+
+.. automodule:: gepard.eff
+
 
 2. Perturbative QCD
 -------------------
@@ -96,15 +107,16 @@ special module
 .. automodule:: gepard.special
 
 
+mellin module
+^^^^^^^^^^^^^
+
+.. automodule:: gepard.mellin
+
+
 quadrature module
 ^^^^^^^^^^^^^^^^^
 
 .. automodule:: gepard.quadrature
-
-utils module
-^^^^^^^^^^^^
-
-.. automodule:: gepard.utils
 
 
 constants module

@@ -80,10 +80,11 @@ def rnlof(m, j) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
           j: MB contour points (overrides m.jpoints)
 
     Returns:
+         Tuple of three arrays, namely:
          lam: eigenvalues of LO an. dimm matrix lam[a, k]  # Eq. (123)
          pr: Projector pr[k, a, i, j]  # Eq. (122)
          r1proj: r1proj[a,b] = sum_ij pr[a,i,j] R1[i,j] pr[b,i,j]  # Eq. (124)
-                 a,b in {+,-};  i,j in {Q, G}
+         a,b in {+,-};  i,j in {Q, G}
 
     """
     # cf. my DIS notes p. 61
