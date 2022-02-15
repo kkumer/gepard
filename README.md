@@ -1,5 +1,7 @@
-[![Python package](https://github.com/kkumer/gepard/actions/workflows/python-package.yml/badge.svg)](https://github.com/kkumer/gepard/actions/workflows/python-package.yml)
+[![Tests](https://github.com/kkumer/gepard/actions/workflows/python-package.yml/badge.svg)](https://github.com/kkumer/gepard/actions/workflows/python-package.yml)
 [![codecov](https://codecov.io/gh/kkumer/gepard/branch/ps/graph/badge.svg)](https://codecov.io/gh/kkumer/gepard)
+
+![Gepard logo](docs/source/media/Gepard_logo.png)
 
 ## Synopsis
 
@@ -14,19 +16,21 @@
 
 ## Installation
 
-You need Python version 3.7 at the least.
-Just clone the git repository and then
+Gepard is a Python package available from standard PyPI repository so you
+should be able to install the latest version together with the required
+dependencies by simply issuing
 
 ```
-cd gepard
-pip install -e .
+pip install gepard
 ```
 
-For Python packages which are required to run Gepard code, see
-the file [requirements.txt](requirements.txt).
+Of course, you should have Python first (version 3.7 at the least), 
+as well as `pip`, which all major Linux distributions have as standard package.
+See the documentation for alternative instalation from sources, which is also easy.
 
-For the public release (real soon now), we intend to create
-the public PyPI package for easy installation.
+Gepard is developed on Linux, but is tested also on Windows and MacOS. 
+Please complain if you have problems.
+
 
 ## Using
 

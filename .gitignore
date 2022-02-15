@@ -11,5 +11,8 @@
 # Prototype package
 gproto
 
+# Package
+dist/
+
 # Generated documentation
 docs/build/
