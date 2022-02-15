@@ -3,18 +3,19 @@ Installation
 ############
 
 Gepard is a Python package available from PyPI
-repository (**not yet!!**) so you should be able to install the latest version
+repository so you should be able to install the latest version
 together with the required dependencies by simply issuing
 
 .. code-block:: bash
 
    pip install gepard
 
-Of course, you should have Python first, as well as `pip`, which
-all major Linux distributions have as standard package.
+Of course, you should have Python first (version 3.7 at the least), 
+as well as `pip`, which
+all major Linux distributions have as a standard package.
 
-Gepard is developed and tested on Linux, but should work on
-Windows and Mac as well. Please complain if you have problems.
+Gepard is developed on Linux, but is tested also on
+Windows and MacOS. Please complain if you have problems.
 
 
 Installation from sources
