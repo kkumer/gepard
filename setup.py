@@ -23,7 +23,7 @@ def read(*names, **kwargs):
 
 setup(
     name='gepard',
-    version='0.9.9',
+    version='0.9.10',
     license='AGPL-3.0',
     description='Tool for studying the 3D quark and gluon distributions in the nucleon',
     long_description='{}'.format(
