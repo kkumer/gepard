@@ -1,4 +1,4 @@
-[![Tests](https://github.com/kkumer/gepard/actions/workflows/python-package.yml/badge.svg)](https://github.com/kkumer/gepard/actions/workflows/python-package.yml)
+[![Tests](https://github.com/kkumer/gepard/actions/workflows/tests.yml/badge.svg)](https://github.com/kkumer/gepard/actions/workflows/tests.yml)
 [![codecov](https://codecov.io/gh/kkumer/gepard/branch/ps/graph/badge.svg)](https://codecov.io/gh/kkumer/gepard)
 
 ![Gepard logo](docs/source/media/Gepard_logo.png)
