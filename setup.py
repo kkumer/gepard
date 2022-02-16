@@ -66,7 +66,9 @@ setup(
         'Physics', 'Particle Physics',
     ],
     python_requires='>=3.7',
-    install_requires=['importlib-resources', 'importlib-metadata'],
+    install_requires=['importlib-resources', 'importlib-metadata',
+        'numpy', 'scipy', 'matplotlib', 'pandas', 'iminuit',
+        ],
     extras_require={
         # eg:
         #   'rst': ['docutils>=0.11'],
