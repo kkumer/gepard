@@ -59,7 +59,8 @@ def test_gepardTFFsEvol(th_KM10b):
 def test_gepardXrho0t(th_KM10b):
     """Calculate LO DVMP cross section d sigma / dt"""
     pt = g.data.DataPoint({'Q2': 6.6, 'W': 75., 't': -0.025,
-                           'process': 'gammastarp2rho0p'})
+                           'process': 'gammastarp2rho0p',
+                           'process_class': 'DVMP'})
     assert th_KM10b.XGAMMA(pt) == approx(1212.62165, rel=1.e-2)
 
 

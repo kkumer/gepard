@@ -173,13 +173,13 @@ class Theory(object):
             numpy array of cross-sections
 
         """
-        # same as _XGAMMA_DVCS_t/_XGAMMA_rho0_t but with additional variable t
+        # same as _XGAMMA_DVCS_t/_XGAMMA_DVMP_t but with additional variable t
         # to facilitate integration over it.
         aux = []
         for t_single in t:
             pt.t = t_single
-            if hasattr(pt, 'process') and pt.process == 'gammastarp2rho0p':
-                res = self._XGAMMA_rho0_t(pt)
+            if hasattr(pt, 'process_class') and pt.process_class == 'DVMP':
+                res = self._XGAMMA_DVMP_t(pt)
             else:
                 res = self._XGAMMA_DVCS_t(pt)
             del pt.t
@@ -201,8 +201,8 @@ class Theory(object):
         """
         if 't' in pt or 'tm' in pt:
             # XGAMMA differential in momentum transfer t
-            if hasattr(pt, 'process') and pt.process == 'gammastarp2rho0p':
-                return self._XGAMMA_rho0_t(pt)
+            if hasattr(pt, 'process_class') and pt.process_class == 'DVMP':
+                return self._XGAMMA_DVMP_t(pt)
             else:
                 return self._XGAMMA_DVCS_t(pt)
 

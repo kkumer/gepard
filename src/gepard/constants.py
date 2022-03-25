@@ -14,6 +14,7 @@ TF = 0.5
 
 # Meson decay constants
 F_rho0 = 0.209
+F_phi = 0.221
 
 # Parameters needed for harmonic sums etc.
 ZETA2 = zeta(2)

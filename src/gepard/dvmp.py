@@ -14,8 +14,8 @@ class DVMP(theory.Theory):
     Implements cross-section for electroproduction of meson.
     """
 
-    def _XGAMMA_rho0_t_Approx(self, pt: data.DataPoint) -> float:
-        """Partial (longitudinal) gamma* p -> rho0 p cross section w.r.t. Mandelstam t.
+    def _XGAMMA_DVMP_t_Approx(self, pt: data.DataPoint) -> float:
+        """Partial (longitudinal) gamma* p -> V p cross section w.r.t. Mandelstam t.
 
         Args:
             pt: instance of DataPoint
@@ -27,10 +27,10 @@ class DVMP(theory.Theory):
         """
         # 4 * pi**2 * alpha_em * GeV2nb = 112175.5
         res = 112175.5 * pt.xB**2 * (
-                self.m.ImH_rho0(pt)**2 + self.m.ReH_rho0(pt)**2) / pt.Q2**2
+                self.m.ImH_V(pt)**2 + self.m.ReH_V(pt)**2) / pt.Q2**2
         return res
 
-    _XGAMMA_rho0_t = _XGAMMA_rho0_t_Approx
+    _XGAMMA_DVMP_t = _XGAMMA_DVMP_t_Approx
 
 
 class MellinBarnesTFF(model.ParameterModel):
@@ -48,8 +48,11 @@ class MellinBarnesTFF(model.ParameterModel):
         self.corr_c1dvmp_sgn = 1
         super().__init__(**kwargs)
 
-    def tff(self, xi: float, t: float, Q2: float) -> np.ndarray:
-        """Return array(ReH_rho0, ImH_rho0, ReE_rho0, ...) of DVrho0P transition FFs."""
+    def tff(self, xi: float, t: float, Q2: float, meson: str = 'rho0') -> np.ndarray:
+        """Return array(ReH_V, ImH_V, ReE_V, ...) of DVMP transition FFs.
+
+        Only vector mesons are implemented, thus _V.
+        """
         assert self.nf == 4
 
         astrong = 2 * pi * qcd.as2pf(self.p, self.nf,  Q2, self.asp[self.p], self.r20)
@@ -63,17 +66,31 @@ class MellinBarnesTFF(model.ParameterModel):
             self.wce_dvmp[Q2] = wce_ar_dvmp
         # Evaluations depending on model parameters:
         h_prerot = self.H(xi, t)
-        h = np.einsum('fa,ja->jf', self.frot_rho0_4, h_prerot)
+        if meson == 'rho0':
+            frot = self.frot_rho0_4
+            FV = constants.F_rho0
+        elif meson == 'phi':
+            frot = self.frot_phi_4
+            FV = constants.F_phi
+        else:
+            raise ValueError("{} unknown. Use 'rho0' or 'phi'".format(meson))
+        h = np.einsum('fa,ja->jf', frot, h_prerot)
         reh, imh = self._mellin_barnes_integral(xi, wce_ar_dvmp, h)
-        return (constants.CF * constants.F_rho0 * astrong / constants.NC
+        return (constants.CF * FV * astrong / constants.NC
                 / np.sqrt(Q2) * np.array([reh, imh, 0, 0, 0, 0, 0, 0]))
 
-    def ImH_rho0(self, pt: data.DataPoint) -> np.ndarray:
+    def ImH_V(self, pt: data.DataPoint) -> np.ndarray:
         """Return Im(TFF H) for kinematic point."""
-        tffs = self.tff(pt.xi, pt.t, pt.Q2)
+        if pt.process == 'gammastarp2rho0p':
+            tffs = self.tff(pt.xi, pt.t, pt.Q2, 'rho0')
+        elif pt.process == 'gammastarp2phip':
+            tffs = self.tff(pt.xi, pt.t, pt.Q2, 'phi')
         return tffs[1]
 
-    def ReH_rho0(self, pt: data.DataPoint) -> np.ndarray:
+    def ReH_V(self, pt: data.DataPoint) -> np.ndarray:
         """Return Re(TFF H) for kinematic point."""
-        tffs = self.tff(pt.xi, pt.t, pt.Q2)
+        if pt.process == 'gammastarp2rho0p':
+            tffs = self.tff(pt.xi, pt.t, pt.Q2, 'rho0')
+        elif pt.process == 'gammastarp2phip':
+            tffs = self.tff(pt.xi, pt.t, pt.Q2, 'phi')
         return tffs[0]

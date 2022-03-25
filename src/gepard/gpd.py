@@ -331,8 +331,16 @@ class GPD(model.ParameterModel):
         # For DVMP
         self.frot_rho0_4 = np.array([[1, 0, 1, 1],
                                     [0, 1, 0, 0],
-                                    [0., 0, 0., 0.]]) / np.sqrt(2)
-        #                           # [3./20., 0, 5./12., 1./12.]]) / np.sqrt(2)
+                                    [0, 0, 0, 0]]) / np.sqrt(2)
+        #                           # [3/20, 0, 5/12, 1/12]]) / np.sqrt(2)
+        self.frot_phi_4 = np.array([[-1, 0, -1, -1],
+                                    [0, -1, 0, 0],
+                                    [0, 0, 0, 0]]) / 3
+        #                           # [1/20, 0, 1/4, 1/4]]) / 3
+        self.frot_omega_4 = np.array([[1, 0, 1, 1],
+                                      [0, 1, 0, 0],
+                                      [0, 0, 0, 0]]) / np.sqrt(2) / 3
+        #                           # [3/20, 0, 7/4, -5/4]]) / np.sqrt(2) / 3
         # For j2x
         self.frot_j2x = self.frot_pdf
         super().__init__(**kwargs)
