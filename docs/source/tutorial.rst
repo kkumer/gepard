@@ -4,14 +4,17 @@ Tutorial
 
 
 After importing Gepard package, if one of the theories available
-in ``gepard.fits`` are not enough, and we want to make a new
-GPD fit, we can construct a new ``theory`` class 
-by combining code for
+in ``gepard.fits`` are not enough, because, for example, we want to make a new
+GPD fit, we can construct a new "theory"  (more precissely, a 
+subclass of the ``Theory`` class). We do this by combining code for
+GPDs, CFFs and observables like in the next example:
 
-1. GPDs (we take SO(3) partial-waves conformal space model ``PWNormGPD``), 
-2. for CFFs ( we take ``MellinBarnesCFF`` which combines conformal space GPDs with appropriate hard-scattering coefficients), and
-3. for DVCS observables (``BMK``) 
-4. for DIS F2 (good idea, so that forward limit of GPDs describes DIS data)
+1. for GPDs we take SO(3) partial-waves conformal space model ``PWNormGPD``, 
+2. for CFFs we take ``MellinBarnesCFF`` which combines conformal space GPDs with appropriate hard-scattering coefficients,
+3. for implementation of DVCS observables we take ``BMK`` 
+4. we also use ``DIS`` to be able to check that forward limit of GPDs describes DIS data
+
+This is combined like this:
 
 .. plot::
    :context:

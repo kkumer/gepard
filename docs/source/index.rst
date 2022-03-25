@@ -36,6 +36,3 @@ There are four levels of documentation below, of increasing detail:
    gepard
    developer
    todo
-   about
-
-

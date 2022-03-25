@@ -66,8 +66,8 @@ Valence here means "valence-like GPD" (see
 
 GPD :math:`E` is modeled in the same way, while GPDs :math:`\tilde{H}` and
 :math:`\tilde{E}`, are not yet represented in Gepard on the GPD level.
-(In some Gepard theories corresponding CFFs :math:`\tilde{\tilde{H}}`,
-and :math:`\tilde{\tilde{E}}` are modeled directly.)
+(In some Gepard theories corresponding CFFs :math:`\tilde{H}`,
+and :math:`\tilde{E}` are modeled directly.)
 
 The conformal space GPDs :math:`H` and :math:`E`, are convoluted with
 appropriate hard-scattering Wilson coefficients and evolution operator

@@ -176,6 +176,21 @@ Also, for some datasets there are dedicated plots, like
    >>> gepard.plots.H1ZEUS(lines=[th_KM15, th_KM10b]).show()
 
 
+Finally, there is a convenient method ``df`` which transforms any ``DataSet`` into a 
+corresponding `pandas <https://pandas.pydata.org>`_  ``DataFrame``, which makes
+it easy to perform various dataset analyses. E. g., to find the mean
+values of kinematic variables of a dataset, you can do it like this:
+
+
+.. code-block:: python
+
+   >>> g.dset[52].df()[['Q2', 'xB', 't']].mean()
+   Q2    2.780750
+   xB    0.107083
+   t    -0.143667
+   dtype: float64
+
+
 .. _sec-datafiles:
 
 Dataset files
