@@ -170,13 +170,8 @@ def panel(ax, points=None, lines=None, bands=None, xaxis=None, xs=None,
         # via xaxis and kins)
         pts = []
         for x in xs:
-            pt = data.DataPoint(init=kins)
+            pt = data.DataPoint(kindict=kins)
             setattr(pt, xaxis, x)
-            # workaround for imperfect fill_kinematics
-            if hasattr(pt, 'xi'):
-                pt.xB = 2*pt.xi/(1.+pt.xi)
-            # end of workaorund
-            data._fill_kinematics(pt)
             pts.append(pt)
         points = [pts]
 
@@ -1715,7 +1710,7 @@ def CFF(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
         else:
             ax = axs[n, 0]
         panel(ax, xaxis='xi', xs=xvals, kins={'observable':cff, 't':-0.2, 'Q2':4.,
-        'units':{'CFF': 1}, 'observable': 'CFF'}, **kwargs)
+                                              }, **kwargs)
         ax.axhline(y=0, linewidth=0.5, color='k')  # y=0 thin line
         try:
             ax.set_ylim(*ylims[cff])
@@ -1738,7 +1733,7 @@ def CFF(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
             ax = axs[n, 1]
         ax.set_xscale('log')  # x-axis to be logarithmic
         panel(ax, xaxis='xi', xs=logxvals, kins={'observable':cff, 't':-0.2, 'Q2':4.,
-            'units':{'CFF': 1}, 'observable': 'CFF'}, **kwargs)
+                                                 }, **kwargs)
         ax.axvspan(0.1, 0.25, facecolor='g', alpha=0.1)  # vertical band
         ax.axhline(y=0, linewidth=0.5, color='k')  # y=0 thin line
         #ax.set_ylim(*ylims[cff])
@@ -1785,7 +1780,7 @@ def CFF2(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
             ax = fig.add_subplot(len(cffs), 2, 2*n+nt+1)
             ax.set_xscale('log')  # x-axis to be logarithmic
             panel(ax, xaxis='xi', xs=logxvals, kins={
-                    'observable':cff, 't':ts[nt], 'Q2':4., 'units':{'CFF': 1}, 'observable': 'CFF'}, **kwargs)
+                    'observable':cff, 't':ts[nt], 'Q2':4.}, **kwargs)
             ax.axhspan(-0.0005, 0.0005, facecolor='g', alpha=0.6)  # horizontal bar
             ax.text(0.31, 0.02, "$t = %s\\, {\\rm GeV}^2$" % str(ts[nt]),
                     transform=ax.transAxes, fontsize=14)
@@ -1844,8 +1839,8 @@ def CFFt(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
         cff = cffs[n]
         # smaller x
         ax = fig.add_subplot(len(cffs), 2, 2*n+1)
-        panel(ax, xaxis='tm', xs=tmvals, kins={'observable':cff, 'xi':0.12, 'Q2':4.,
-           'units':{'CFF': 1}, 'observable': 'CFF'}, **kwargs)
+        panel(ax, xaxis='tm', xs=tmvals, kins={'observable':cff, 'xi':0.12, 'Q2':4.
+                                               }, **kwargs)
         ax.set_xlabel(constants.toTeX['tm'], fontsize=15)
         try:
             ax.set_ylabel(constants.toTeX['%s' % cff], fontsize=18)
@@ -1861,8 +1856,8 @@ def CFFt(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
                     # fontsize=12)
         # larger x
         ax = fig.add_subplot(len(cffs), 2, 2*n+2)
-        panel(ax, xaxis='tm', xs=tmvals, kins={'observable':cff, 'xi':0.22, 'Q2':4.,
-            'units':{'CFF': 1}, 'observable': 'CFF'}, **kwargs)
+        panel(ax, xaxis='tm', xs=tmvals, kins={'observable':cff, 'xi':0.22, 'Q2':4.
+                                               }, **kwargs)
         ax.set_xlabel(constants.toTeX['tm'], fontsize=15)
         try:
             ax.set_ylabel(constants.toTeX['%s' % cff], fontsize=18)
@@ -1903,7 +1898,7 @@ def CFF3(cffs=['ImH', 'ReH', 'ImE', 'ReE'],
     for pn, ax in enumerate(axs.flatten()):
         cff = cffs[pn]
         panel(ax, xaxis='xi', xs=xvals, kins={'observable':cff, 't':-0.2, 'Q2':4.,
-            'units':{'CFF': 1}, 'observable': 'CFF'}, **kwargs)
+                                              }, **kwargs)
         ax.set_ylabel(constants.toTeX['{}'.format(cff)], fontsize=18)
         ax.axhline(y=0, lw=0.5, color='k', ls=':')  # horizontal bar
         for ticklabel in ax.get_xticklabels() + ax.get_yticklabels():
@@ -1963,7 +1958,7 @@ def CFF3log(cffs=['ImH', 'ReH', 'ImE', 'ReE', 'ImHt', 'ImEt'], tval=-0.2,
         cff = cffs[pn]
         ax.set_xscale('log')  # x-axis to be logarithmic
         panel(ax, xaxis='xi', xs=xvals, kins={'observable':cff, 't':tval, 'Q2':4.,
-            'units':{'CFF': 1}, 'observable': 'CFF'}, **kwargs)
+                                              }, **kwargs)
         ax.set_ylabel(constants.toTeX['{}'.format(cff)], fontsize=18)
         ax.axhline(y=0, lw=0.5, color='k', ls=':')  # horizontal bar
         for ticklabel in ax.get_xticklabels() + ax.get_yticklabels():
