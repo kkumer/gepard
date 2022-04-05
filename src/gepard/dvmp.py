@@ -46,6 +46,11 @@ class MellinBarnesTFF(model.ParameterModel):
         # 2. correction to get results from "Towards DVMP" paper.
         #  Set to -1 to get agreement with Dieter's notebook.
         self.corr_c1dvmp_sgn = 1
+        # 3. Prefactors to kill parts of NLO hard scattering amplitude
+        #  Set to zero to kill corresponding part.
+        self.Q1_prefac = 1
+        self.PS1_prefac = 1
+        self.G1_prefac = 1
         super().__init__(**kwargs)
 
     def tff(self, xi: float, t: float, Q2: float, meson: str = 'rho0') -> np.ndarray:

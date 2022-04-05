@@ -210,4 +210,4 @@ def c1dvmp(m, sgntr: int, j: complex, k: int) -> Tuple[complex, complex, complex
 
     MCG1 = constants.CF * MCG1CF + constants.CA * MCG1CA + b0 * MCG1BET0
 
-    return (MCQ1, MCPS1, MCG1)
+    return (m.Q1_prefac*MCQ1, m.PS1_prefac*MCPS1, m.G1_prefac*MCG1)
