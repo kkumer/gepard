@@ -435,6 +435,35 @@ class ConformalSpaceGPD(GPD, mellin.MellinBarnes):
         mb_int_flav = self._j2x_mellin_barnes_integral(pt.x, pt.eta, wce_j2x, gpd)
         return mb_int_flav / np.pi
 
+    def skewness_Hx(self, pt: data.DataPoint) -> np.ndarray:
+        """Return skewness of GPD H.
+
+        Args:
+            pt: datapoint with kinematics info
+
+        Returns:
+            2-dim vector (singlet quark, gluon) of ratio
+            GPD(x, x, t) / GPD(x, 0, t).
+
+        Todo:
+            Non-singlet component is missing. See Todo for Hx.
+
+        """
+        if pt.eta == pt.x:
+            ptt = pt
+            ptz = pt.copy()
+            ptz.eta = 0
+        elif pt.eta == 0:
+            ptz = pt
+            ptt = pt.copy()
+            ptt.eta = ptt.x
+        else:
+            ptt = pt.copy()
+            ptt.eta = pt.x
+            ptz = pt.copy()
+            ptz.eta = 0
+        return self.Hx(ptt)[:2] / self.Hx(ptz)[:2]
+
     def Ex(self, pt: data.DataPoint) -> np.ndarray:
         """Return x-space GPD E.
 
