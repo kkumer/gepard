@@ -12,6 +12,8 @@ class FitTest(g.gpd.PWNormGPD, g.cff.MellinBarnesCFF, g.dvcs.BMK):
 class FitTestDIS(g.gpd.PWNormGPD, g.dis.DIS):
     pass
 
+class FitTestHot(g.gpd.PWNormGPD, g.cff.MellinBarnesCFF, g.eff.DipoleEFF, g.dvcs.hotfixedBMK):
+    pass
 
 @fixture
 def th_dis_lo():
@@ -36,6 +38,19 @@ def th():
                             'ms2': 1.,
                             'secs': 0.,
                             'al0g': 1.247316701070471,
+                            'alpg': 0.15,
+                            'mg2': 0.7})
+    return th
+
+@fixture
+def th_nlo():
+    th = FitTestHot(p=1, scheme='msbar')
+    th.m.parameters.update({'ns': 0.1678,
+                            'al0s': 1.12835,
+                            'alps': 0.15,
+                            'ms2': 1.,
+                            'secs': 0.,
+                            'al0g': 1.099,
                             'alpg': 0.15,
                             'mg2': 0.7})
     return th
@@ -91,8 +106,8 @@ def test_errorprop(th):
 
 
 @mark.slow
-def test_gepardfitDVCSnlso3_long(th):
-    """Test fitting nl-so3 model to HERA DVCS data.
+def test_gepardfitDVCSnlso3_lo_long(th):
+    """Test fitting nl-SO3 LO model to HERA DVCS data.
 
     This should give same results as in gepard's
     'fit dvcs dvcs dvcs' or
@@ -105,10 +120,37 @@ def test_gepardfitDVCSnlso3_long(th):
     th.chisq_single(DVCSpoints)
     f = g.fitter.MinuitFitter(DVCSpoints, th)
     f.release_parameters('ms2', 'secs', 'secg')
-    print(th.m.parameters_limits)
-    print(f.minuit.limits)
     f.minuit.migrad()
-    assert th.chisq(f.fitpoints) == approx(95.92, rel=1.e-2)
-    assert th.m.parameters['ms2'] == approx(0.47839, rel=1e-2)
-    assert th.m.parameters['secs'] == approx(-0.15152, rel=1e-2)
-    assert th.m.parameters['secg'] == approx(-0.81216, rel=1e-2)
+    # These are old value from NPB paper days:
+    # assert th.chisq(f.fitpoints) == approx(95.92, rel=1.e-2)
+    # assert th.parameters['ms2'] == approx(0.47839, rel=1e-2)
+    # assert th.parameters['secs'] == approx(-0.15152, rel=1e-2)
+    # assert th.parameters['secg'] == approx(-0.81216, rel=1e-2)
+    # Today's values, from pyfortran 2022 branch:
+    assert th.chisq(f.fitpoints) == approx(96.52722, rel=1.e-4)
+    assert th.parameters['ms2'] == approx(0.477888357, rel=1e-4)
+    assert th.parameters['secs'] == approx(-0.1513351, rel=1e-4)
+    assert th.parameters['secg'] == approx(-0.8146066876, rel=1e-4)
+
+
+@mark.slow
+def test_gepardfitDVCSnlso3_nlo_long(th_nlo):
+    """Test fitting nl-SO3 NLO model to HERA DVCS data.
+
+    This should give same results as in
+    smallx-final.nb, section 1-[nlo]-NLO MSBAR.
+    """
+    # To pre-calculate wce for parallel execution:
+    DVCSpoints = g.dset[36].copy()
+    for id in range(37, 46):
+        DVCSpoints += g.dset[id]
+    th_nlo.chisq_single(DVCSpoints)
+    f = g.fitter.MinuitFitter(DVCSpoints, th_nlo)
+    f.release_parameters('ms2', 'secs', 'secg')
+    f.minuit.migrad()
+    # These are old value from NPB paper days:
+    # assert th_nlo.chisq(f.fitpoints) == approx(101.581, rel=1e-2)
+    # assert th_nlo.parameters['ms2'] == approx(0.590339, rel=1e-2)
+    # Today's values, from pyfortran 2022 branch:
+    assert th_nlo.chisq(f.fitpoints) == approx(104.8157642, rel=1e-4)
+    assert th_nlo.parameters['ms2'] == approx(0.586664, rel=1e-4)
