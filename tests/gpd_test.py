@@ -15,12 +15,25 @@ pt0.xB = 2.*pt0.xi/(1.+pt0.xi)
 ptzero = g.DataPoint({'x': xi_test, 'eta': 0, 't': t_test, 'Q2': Q2_test})
 pttraj = g.DataPoint({'x': xi_test, 'eta': xi_test, 't': t_test, 'Q2': Q2_test})
 
+ptzero0 = g.DataPoint({'x': xi_test, 'eta': 0, 't': 0, 'Q2': 4})
+pttraj0 = g.DataPoint({'x': xi_test, 'eta': xi_test, 't': 0, 'Q2': 4})
+ptzero8 = g.DataPoint({'x': xi_test, 'eta': 0, 't': 0, 'Q2': 8})
+pttraj8 = g.DataPoint({'x': xi_test, 'eta': xi_test, 't': 0, 'Q2': 8})
+
+pt_noevol = g.DataPoint(xi=xi_test, t=0, Q2=4)
+pt_evol = g.DataPoint(xi=xi_test, t=0, Q2=8)
+
 par_test = {'ns': 2./3. - 0.4, 'al0s': 1.1, 'alps': 0.25, 'ms2': 1.1**2,
             'ng': 0.4, 'al0g': 1.2, 'alpg': 0.25, 'mg2': 1.2**2}
 
 par_fit = {'ns':  0.152039, 'al0s': 1.15751, 'alps': 0.15, 'ms2': 0.478391,
            'secs': -0.15152, 'this': 0.,  # 'ng': 0.4,  # provided by ns
            'al0g': 1.24732, 'alpg': 0.15, 'mg2': 0.7, 'secg': -0.81217, 'thig': 0.}
+
+par_loNLOMS = {'ns': 0.1678001855399918, 'al0s': 1.1283507054223731, 'alps': 0.15,
+               'ms2': 0.708882566444302, 'secs': 0, 'this': 0,  # 'ng': 0.432,  # provided by ns
+               'al0g': 1.0990016751643479, 'alpg': 0.15, 'mg2': 0.7, 'secg': 0, 'thig': 0}
+
 
 MP = 0.938272  # proton mass
 par_bp = {'ns': 0, 'al0s': 1.1, 'alps': 0.15,
@@ -109,9 +122,8 @@ def test_ConformalMoment_gpdH_fit():
 #     assert fit_gpd.H_para(0.1, -0.2)[:1, :2] == approx(
 #             np.array([[1.1665696086-0.00161121675988j, 5.59105109-0.0109293227j]]))
 
-# class MyTheory(g.gpd.PWNormGPD, g.cff.MellinBarnesCFF):
-    # pass
-
+class MyTheory(g.gpd.PWNormGPD, g.cff.MellinBarnesCFF):
+    pass
 
 # def test_aux_H():
     # """Calculate some CFFs."""
@@ -125,6 +137,20 @@ def test_ConformalMoment_gpdH_fit():
     # cff.parameters.update(par_DM12)
     # assert cff.ImE(pt0) == approx(1728.4783865956076)
 
+@mark.slow
+def test_loNLO_ImH_noevol():
+    """Calculate some CFFs."""
+    cff = MyTheory(p=1, residualt='dipole', scheme='msbar')
+    cff.parameters.update(par_loNLOMS)
+    assert cff.ImH(pt_noevol) == approx(1487.99, rel=1e-5)
+
+@mark.slow
+def test_loNLO_ImH_evol():
+    """Calculate some CFFs."""
+    cff = MyTheory(p=1, residualt='dipole', scheme='msbar')
+    cff.parameters.update(par_loNLOMS)
+    assert cff.ImH(pt_evol) == approx(2014.9, rel=1e-5)
+
 def test_GPDzero():
     """Calculate GPDs on forward trajectory eta=0."""
     gpd = g.gpd.PWNormGPD(residualt='exp')
@@ -134,7 +160,6 @@ def test_GPDzero():
     assert gpd.Ex(ptzero) == approx(
             np.array([3098.61, 0.0756646, 0]), rel=1e-5)
 
-
 def test_GPDtraj():
     """Calculate GPDs on border/cross-over trajectory eta=x."""
     gpd = g.gpd.PWNormGPD(residualt='exp')
@@ -143,3 +168,35 @@ def test_GPDtraj():
             np.array([1344.02, 2.6866, 0]), rel=1e-5)
     assert gpd.Ex(pttraj) == approx(
             np.array([1980.69, 0.0358365, 0]), rel=1e-5)
+
+@mark.slow
+def test_loNLO_GPDzero_noevol():
+    """Calculate NLO-lPW GPDs on forward trajectory eta=0 (no evol)."""
+    gpd = g.gpd.PWNormGPD(p=1, residualt='dipole', scheme='msbar')
+    gpd.parameters.update(par_loNLOMS)
+    assert gpd.Hx(ptzero0) == approx(
+            np.array([2494.65, 4.57403, 0]), rel=1e-5)
+
+@mark.slow
+def test_loNLO_GPDtraj_noevol():
+    """Calculate NLO-lPW GPDs on border/cross-over trajectory eta=x (no evol)."""
+    gpd = g.gpd.PWNormGPD(p=1, residualt='dipole', scheme='msbar')
+    gpd.parameters.update(par_loNLOMS)
+    assert gpd.Hx(pttraj0) == approx(
+            np.array([3990.54, 4.64348, 0]), rel=1e-5)
+
+@mark.slow
+def test_loNLO_GPDzero():
+    """Calculate NLO-lPW GPDs on forward trajectory eta=0."""
+    gpd = g.gpd.PWNormGPD(p=1, residualt='dipole', scheme='msbar')
+    gpd.parameters.update(par_loNLOMS)
+    assert gpd.Hx(ptzero8) == approx(
+            np.array([3258.91, 7.11361, 0]), rel=1e-5)
+
+@mark.slow
+def test_loNLO_GPDtraj():
+    """Calculate NLO-lPW GPDs on border/cross-over trajectory eta=x."""
+    gpd = g.gpd.PWNormGPD(p=1, residualt='dipole', scheme='msbar')
+    gpd.parameters.update(par_loNLOMS)
+    assert gpd.Hx(pttraj8) == approx(
+            np.array([5537.6, 7.35669, 0]), rel=1e-5)

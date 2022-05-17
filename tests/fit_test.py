@@ -133,7 +133,7 @@ def test_gepardfitDVCSnlso3_lo_long(th):
     assert th.parameters['secg'] == approx(-0.8146066876, rel=1e-4)
 
 
-@mark.slow
+@mark.skip(reason='redundant, slow')
 def test_gepardfitDVCSnlso3_nlo_long(th_nlo):
     """Test fitting nl-SO3 NLO model to HERA DVCS data.
 

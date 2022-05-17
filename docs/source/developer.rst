@@ -58,7 +58,7 @@ Speed-benchmarking the code
 
 .. code-block:: bash
 
-   pytest -v --runslow tests/fit_test.py::test_gepardfitDVCSnlso3_long
+   pytest -v --runslow tests/fit_test.py::test_gepardfitDVCSnlso3_lo_long
 
 
 This took about 15 seconds on my machine on old hybrid Fortran/Python gepard with paralelization. 

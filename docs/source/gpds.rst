@@ -112,7 +112,7 @@ and is set to zero):
 
    >>> pt = g.DataPoint(x=0.01, eta=0, t=0, Q2=8)
    >>> th.Hx(pt)   # should be equal to PDFs
-   array([258.04908329,  25.19998599,   0.        ])
+   array([279.30501299,   3.94405629,   0.        ])
    >>> pt = g.DataPoint(x=0.01, eta=0.01, t=-0.2, Q2=4)
    >>> th.Hx(pt)
    array([267.91985614,   2.13496561,   0.        ])
