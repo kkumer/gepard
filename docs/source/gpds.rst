@@ -94,7 +94,7 @@ The following table lists some more important attributes of this model.
     +------------------+--------------------------------------------------------+------------------+
     | ``Q02``          | Initial :math:`Q_{0}^2` for GPD evolution              | 4 (GeV^2)        |
     +------------------+--------------------------------------------------------+------------------+
-    | ``residual``     | Residual :math:`t` dependence ('dipole' or 'exp')      | 'dipole'         |
+    | ``residualt``    | Residual :math:`t` dependence ('dipole' or 'exp')      | 'dipole'         |
     +------------------+--------------------------------------------------------+------------------+
 
 Here the residual :math:`t` dependence is additional to the dependence
