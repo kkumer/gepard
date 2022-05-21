@@ -57,7 +57,7 @@ class MinuitFitter(Fitter):
             self.theory.covariance = {(p1, p2): self.minuit.covariance[p1, p2]
                                       for p1 in self.theory.free_parameters()
                                       for p2 in self.theory.free_parameters()}
-        except AttributeError:
+        except (AttributeError, TypeError) as error:
             print("Something's problematic. No covariances available.")
 
     def fit(self):
