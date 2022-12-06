@@ -1,0 +1,68 @@
+id = 607
+editor = KK
+
+collaboration = ZEUS
+process = gammastarp2rho0p
+exptype = collider
+year = 2007
+reference = arXiv:0708.1478
+inspiretex = ZEUS:2007iet
+reference2 = Table 4
+reference3 = PMC Phys.A 1 (2007) 6
+
+### Scattering Process
+
+s = 102400.  # 320**2 ?! wrong and shouldn't be needed
+
+in1particle = gammastar
+in1polarizationvector = L
+in1polarization = 1
+in2particle = p
+
+out1particle = rho0
+out2particle = p
+
+
+### Observable 
+
+y1name = XGAMMA
+y1namelong = total cross section for fixed W=90 GeV
+y1unit = nb
+y1value = column2
+y1errorstatistic = column3
+y1errorsystematicplus = column4
+y1errorsystematicminus = column5
+y1errornormalization = 0.06
+
+
+### x-axes
+x1name = Q2
+x1unit = GeV^2
+x1value = column1
+
+x2name = W
+x2unit = GeV
+x2value = 90
+
+x3name = tmmax
+x3unit = GeV^2
+x3value = 1
+
+table =
+### Data
+# Q2     val     stat    syst+    syst-
+#########################################
+2.4     647.1    8.7     +28.4   −41.7
+3.4     396.7    6.7     +14.6   −19.4
+4.4     247.8    5.8     +8.9    −12.6
+5.8     140.3    2.6     +3.9    −5.9
+8.2     71.9     1.4     +1.7    −2.9
+12      29.73    0.68    +0.75   −1.14
+17      12.77    0.50    +0.27   −0.42
+24      6.03     0.31    +0.37   −0.13
+37      1.88     0.16    +0.07   −0.15
+60      0.36     0.07    +0.04   −0.03
+100     0.05     0.03    +0.02   −0.01
+
+# We added luminosity (2%) and background (4%) uncertainty
+# simply, following Tobias
