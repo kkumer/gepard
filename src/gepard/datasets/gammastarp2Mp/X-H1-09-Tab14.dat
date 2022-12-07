@@ -21,11 +21,9 @@ reference3 = JHEP05 (2010) 032
 
 ### Scattering Process
 
-s = 102400.  # 320**2
+s = 102400.  # 320**2   # Check! and not needed
 
 in1particle = gammastar
-in1polarizationvector = L
-in1polarization = 1
 in2particle = p
 
 out1particle = rho0
@@ -85,9 +83,3 @@ table =
 35.0    1.68    0.27   +0.24   −0.21
 46.0    0.742   0.105  +0.101  −0.088
 
-
-
-
-## Q2 dependence of the longitudinal gamma^star p cross section for elastic rho0 meson 
-## production for W =75 GeV. The overall normalisation uncertainty of 3.9% is 
-## not included in the systematic errors.

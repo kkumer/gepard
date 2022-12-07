@@ -2,11 +2,14 @@
 **/*.pyc
 **/my*
 **/.mypy_cache
+
+# Testing/Packaging
 **/prof
-**/.hypothesis*
-**/.eggs
-**/*egg-info
-**/.tox
+.eggs
+*.egg-info
+.tox
+.coverage
+.hypothesis/
 
 # Prototype package
 gproto

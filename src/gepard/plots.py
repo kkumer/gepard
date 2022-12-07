@@ -187,7 +187,7 @@ def panel(ax, points=None, lines=None, bands=None, xaxis=None, xs=None,
         for line in lines:
             _axline(ax, lambda pt: line.predict(pt, orig_conventions=True), points,
                     xaxis=xaxis, color=linecolors[linen], linestyle=linestyles[linen],
-                    linewidth=2, alpha=1.0, label=r'\texttt{{{}}}'.format(line.name),
+                    linewidth=2, alpha=1.0, label=r'{}'.format(line.name),
                     **kwargs)
             linen += 1
 
@@ -1562,7 +1562,7 @@ def DVMP(H109WdepXL, path=None, fmt='png', **kwargs):
         #else: # npanel 4
         #    ax.set_xlabel('$t\\quad [{\\rm GeV}^2]$', fontsize=18)
         if npanel==1:
-            ax.text(15, 100, '${\\rm W = 75}\\, {\\rm GeV}$', fontsize=16)
+            ax.text(4, 3, '${\\rm W = 75}\\, {\\rm GeV}$', fontsize=16)
             ax.legend(loc='upper right', borderaxespad=0.).draw_frame(0)
         if npanel==2:
             ax.text(60, 300, '$Q^2 = 6.6,\\, 11.9,\\, 19.5,\\, 35.6\\, {\\rm GeV}^2$', fontsize=16)
