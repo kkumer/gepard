@@ -1,14 +1,6 @@
 id = 80
 editor = DM
 
-## Location: T 26,F 21A
-## RE : GAMMA* P --> PHI P
-## sqrts IN GEV : 300 + 320
-## x: Q**2 IN GEV**2
-## y: SIG(C=T) IN NB
-
-### Experiment
-# data taken 1996-2000
 
 collaboration = H1
 process = gammastarp2phip
@@ -21,8 +13,7 @@ reference3 = JHEP05 (2010) 032
 
 ### Scattering Process
 
-sqrtsenergy = 320
-s = 102400.  # 320**2
+s = 102400.  # 320**2  ?! not needed?
 
 in1particle = gammastar
 in2particle = p
@@ -41,7 +32,7 @@ y1errorstatisticplus = column4
 y1errorstatisticminus = column5
 y1errorsystematicplus = column6
 y1errorsystematicminus = column7
-y1errornormalization = 0.039
+y1errornormalization = 0.047
 
 
 ### x-axes
@@ -77,8 +68,4 @@ table =
 15.8 116.0   3.9  +0.6  -0.6  +0.3  -0.2 
 15.8 139.0   4.4  +0.8  -0.8  +0.5  -0.3 
 15.8 165.0   7.6  +3.2  -3.2  +0.6  -0.4 
-
-## W dependence of the GAMMA* P cross section for elastic phi production  
-## for several values. There is an additional overall normalization 
-## uncertainty of 4.7 PCT.
 
