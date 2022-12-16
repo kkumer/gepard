@@ -14,8 +14,8 @@ reference3 = JHEP05 (2010) 032
 
 ### Scattering Process
 
-sqrtsenergy = 318
-sqrtsenergyunit = GeV
+s = 101124   # = 318**2
+sunit = GeV^2
 
 in1particle = gammastar
 in2particle = p

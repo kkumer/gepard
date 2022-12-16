@@ -21,7 +21,9 @@ reference3 = JHEP05 (2010) 032
 
 ### Scattering Process
 
-s = 102400.  # 320**2   # Check! and not needed
+s = 102400.
+# 320**2, with <30% of data being 300**2
+# this is for e-p, and not gammastar-p scattering!
 
 in1particle = gammastar
 in2particle = p
