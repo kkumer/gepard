@@ -1,0 +1,61 @@
+id = 148
+editor = KK
+
+### Experiment
+# data taken 1996-2000
+
+collaboration = H1
+process = gammastarp2phip
+exptype = collider
+year = 2010
+reference = arXiv:0910.5831
+inspiretex = Aaron:2009xp
+reference2 = Table 20a
+reference3 = JHEP05 (2010) 032
+
+### Scattering Process
+
+s = 102400.  # 320**2
+
+in1particle = gammastar
+in1polarizationvector = T
+in1polarization = 1
+in2particle = p
+
+out1particle = phi
+out2particle = p
+
+
+### Observable 
+
+y1name = XGAMMA
+y1namelong = t integrated transversal cross section for fixed W=75 GeV
+y1unit = nb
+y1value = column2
+
+y1errorstatistic = column3
+y1errorsystematicplus = column4
+y1errorsystematicminus = column5
+y1errornormalization = 0.047
+
+
+### x-axes
+x1name = Q2
+x1unit = GeV^2
+x1value = column1
+
+x2name = W
+x2unit = GeV
+x2value = 75
+
+x3name = tmmax
+x3unit = GeV^2
+x3value = 0.5
+
+table =
+### Data
+# Q2     X     stat    syst+  syst-
+#######################################
+ 3.3    19.6    2.4    +2.9    −2.1
+ 6.6    3.8     0.5    +0.6    −0.5
+15.8    0.34    0.10   +0.07   −0.06

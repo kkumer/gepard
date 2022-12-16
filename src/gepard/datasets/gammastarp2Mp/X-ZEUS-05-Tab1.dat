@@ -1,0 +1,79 @@
+id = 613
+editor = KK
+
+collaboration = ZEUS
+process = gammastarp2phip
+exptype = collider
+year = 2005
+reference = arXiv:hep-ex/0504010
+inspiretex = ZEUS:2005bhf
+reference2 = Table 1
+reference3 = NPB 718 (2005) 3
+
+### Scattering Process
+
+s = 101124   #  = 318**2 (e-p, not gamma-p)
+sunit = GeV^2
+
+in1particle = gammastar
+in2particle = p
+
+out1particle = phi
+out2particle = p
+
+
+### Observable 
+
+y1name = XGAMMA
+y1namelong = total cross section
+y1unit = nb
+y1value = column3
+y1errorstatistic = column4
+y1errorsystematicplus = column5
+y1errorsystematicminus = column6
+y1errornormalization = 0.053
+
+
+### x-axes
+x1name = Q2
+x1unit = GeV^2
+x1value = column1
+
+x2name = W
+x2unit = GeV
+x2value = column2
+
+x3name = tmmax
+x3unit = GeV^2
+x3value = 0.6
+
+table =
+### Data
+# Q2  W     val     stat    syst+    syst-
+#########################################
+2.4  40       76.4    6.5   +4.0    −5.9
+2.4  50       101.2   7.7   +8.1    −4.2
+2.4  60       101.9   8.3   +6.3    −7.4
+2.4  70       112.8   9.4   +6.3    −7.6
+2.4  80       107     11    +4       -6
+2.4  90       122     11    +10     −10
+2.4  100      110     11    +8       −7
+3.8  45       47.0    4.1   +1.4    −2.5
+3.8  55       44.3    4.5   +2.8    −3.6
+3.8  65       56.7    5.1   +3.6    −4.0
+3.8  77.5     62.3    5.0   +4.3    -4.2
+3.8  92.5     57.4    5.4   +3.2    −4.3
+3.8  107.5    59.0    6.2   +3.0    −2.6
+6.5  50       16.4    1.8   +1.1    −1.1
+6.5  62.5     19.1    1.7   +1.5    −1.4
+6.5  77.5     19.6    1.9   +1.6    −1.5
+6.5  92.5     21.6    2.3   +1.1    −1.1
+6.5  107.5    23.1    2.5   +1.3    −1.3
+6.5  125      25.3    3.5   +3.9    −3.9
+13   55       5.05    0.73  +0.37   −0.37
+13   67.5     4.96    0.59  +0.27   −0.26
+13   82.5     6.12    0.81  +0.34   −0.40
+13   97.5     6.82    0.85  +0.40   −0.37
+13   115      6.33    0.78  +0.50   −0.22
+13   135      6.65    0.97  +0.44   −0.52
+
