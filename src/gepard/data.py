@@ -27,6 +27,7 @@ process_class_map = {
         'gammastarp2gammap': 'DVCS',
         'gammastarp2rho0p': 'DVMP',
         'gammastarp2phip': 'DVMP',
+        'gammastarp2Vp': 'DVMP',
         'dis': 'DIS'
         }
 

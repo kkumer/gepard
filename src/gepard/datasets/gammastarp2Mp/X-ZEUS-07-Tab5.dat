@@ -27,10 +27,10 @@ out2particle = p
 y1name = XGAMMA
 y1namelong = total cross section binned in Q2 and W
 y1unit = nb
-y1value = column2
-y1errorstatistic = column3
-y1errorsystematicplus = column4
-y1errorsystematicminus = column5
+y1value = column3
+y1errorstatistic = column4
+y1errorsystematicplus = column5
+y1errorsystematicminus = column6
 y1errornormalization = 0.06
 
 

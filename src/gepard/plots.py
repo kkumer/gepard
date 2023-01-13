@@ -1519,7 +1519,7 @@ def H1ZEUS(path=None, fmt='png', **kwargs):
             #ax.text(30, 3, '${\\rm ZEUS}\\, (idem)$', fontsize=16)
             #ax.set_xlim(0, 80)
     if path:
-        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+        fig.savefig(path+'.'+fmt, format=fmt)
     else:
         fig.canvas.draw()
         #fig.show()
