@@ -53,15 +53,22 @@ class MinuitFitter(Fitter):
         self.theory.parameters_errors = self.minuit.errors.to_dict()
         # iminuit gives covariance table for all parameters, here
         # we take only free ones:
+        free_pars = self.theory.free_parameters()
         try:
             self.theory.covariance = {(p1, p2): self.minuit.covariance[p1, p2]
-                                      for p1 in self.theory.free_parameters()
-                                      for p2 in self.theory.free_parameters()}
-            self.theory.correlation = {(p1, p2): self.minuit.covariance.correlation()[p1, p2]
-                                      for p1 in self.theory.free_parameters()
-                                       for p2 in self.theory.free_parameters() if p2 != p1}
+                                      for p1 in free_pars
+                                      for p2 in free_pars}
+            # determine corresponding correlation matrix, but only upper triangular part since
+            # it is symmetric and we use it only for eye-inspecting correlations
+            self.theory.correlation = {}
+            for i, pi in enumerate(free_pars):
+                for j in range(i+1, len(free_pars)):
+                    pj = free_pars[j]
+                    self.theory.correlation[pi, pj] = self.minuit.covariance.correlation()[pi, pj]
         except (AttributeError, TypeError) as error:
             print("Something's problematic. No covariances available.")
+            self.theory.covariance = None   # otherwise covariance of previous fit can survive
+            self.theory.correlation = None
 
     def fit(self):
         """Perform simple fit.

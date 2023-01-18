@@ -45,9 +45,10 @@ Final values of chi-square and of parameters are available as
 
 After successful fit of theory object ``th``, user can access parameter uncertainties as
 ``th.parameters_errors`` dictionary, and full covariance matrix (inverse of the
-chi-square Hessian matrix) as ``th.covariance`` dictionary.
+chi-square Hessian matrix) as ``th.covariance`` dictionary. Correlation matrix is
+also available as ``th.correlation``.
 
-Covariance matrix can then be used to propagate uncertainty to prediction
+Covariance matrix is then internally used to propagate parameter uncertainties to prediction
 of observables, like this:
 
 
