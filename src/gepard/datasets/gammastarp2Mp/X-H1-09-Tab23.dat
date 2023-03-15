@@ -7,7 +7,7 @@ process = gammastarp2phip
 exptype = collider
 year = 2010
 reference = arXiv:0910.5831
-inspiretex = Aaron:2009xp
+inspiretex = H1:2009cml
 reference2 = Table 23
 reference3 = JHEP05 (2010) 032
 

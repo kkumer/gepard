@@ -839,30 +839,31 @@ def HERAF2Q2(path=None, fmt='png', **kwargs):
     """Makes plot of HERA F2(Q2) DIS data with fit lines and bands"""
 
     #title = 'H1 hep-ex/9603004 (Aid:1996au)'
-    title = 'H1-F2'
+    # title = 'H1-F2'
     ymin, ymax = 0, 1.79
     fig, ax = plt.subplots(figsize=[8,6])
     panels = [ data.dset[208],
+               data.dset[206],
+               data.dset[204],
                data.dset[202] ]
     for npanel, panelset in enumerate(panels):
         panel(ax, points=panelset, xaxis='Q2', **kwargs)
-        if npanel == 0:
-            ax.text(20, 1.1, r'$x_B = {}$'.format(panelset[0].xB), fontsize=16)
-            # Take legend info once
+        if npanel == 0: # Take legend info once
             handles, labels = ax.get_legend_handles_labels()
-        else:
-            ax.text(50, 0.63, r'$x_B = {}$'.format(panelset[0].xB), fontsize=16)
-
+    ax.text(30, 1.5, r'$x_B = {}$'.format(panels[0][0].xB), fontsize=16)
+    ax.text(48, 1.3, r'${}$'.format(panels[1][0].xB), fontsize=16)
+    ax.text(76, 0.96, r'${}$'.format(panels[2][0].xB), fontsize=16)
+    ax.text(50, 0.65, r'${}$'.format(panels[3][0].xB), fontsize=16)
     ax.set_ylabel(r'$F_{2}^{p}(x_{\rm B}, Q^2)$', fontsize=16)
     ax.set_xlabel(r'$Q^2\; [{\rm GeV}^2]$', fontsize=16)
-    plt.xlim(0.0, 65)
+    plt.xlim(0.0, 95)
     ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(10))
     ax.xaxis.set_minor_locator(matplotlib.ticker.MultipleLocator(5))
     ax.tick_params(axis='both', which='major', labelsize=14)
     plt.ylim(ymin, ymax)
     #ax.yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))
     #ax.yaxis.set_minor_locator(matplotlib.ticker.MultipleLocator(0.02))
-    ax.legend(handles, labels, loc="upper right", borderaxespad=0.).draw_frame(0)
+    ax.legend(handles, labels, loc="upper right", handlelength=3).draw_frame(1)
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
@@ -1499,25 +1500,25 @@ def H1ZEUS(path=None, fmt='png', **kwargs):
         else: # npanel 4
             ax.set_xlabel('$Q^2\\quad [{\\rm GeV}^2]$', fontsize=18)
         if npanel==1:
-            ax.text(-0.78, 22, '${\\rm H1}$', fontsize=16)
-            ax.text(-0.78, 10, '${\\rm W = 82}\\, {\\rm GeV}$', fontsize=12)
-            ax.text(-0.78, 3, '$Q^2\\!= 8,\\, 15.5,\\, 25\\,{\\rm GeV}^2$', fontsize=12)
+            # ax.text(-0.78, 22, '${\\rm H1}$', fontsize=16)
+            ax.text(-0.78, 10, 'H1, ${\\rm W = 82}\\, {\\rm GeV}$', fontsize=12)
+            ax.text(-0.78, 5, '$Q^2\\!= 8,\\, 15.5,\\, 25\\,{\\rm GeV}^2$', fontsize=12)
         if npanel==2:
-            ax.text(-0.3, 6, '${\\rm ZEUS}$', fontsize=16)
-            ax.text(-0.3, 3.5, '${\\rm W = 104}\\, {\\rm GeV}$', fontsize=12)
-            ax.text(-0.3, 2.1, '$Q^2\\!= 3.2\\,{\\rm GeV}^2$', fontsize=12)
+            # ax.text(-0.3, 6, '${\\rm ZEUS}$', fontsize=16)
+            ax.text(-0.3, 3.5, 'ZEUS, ${\\rm W = 104}\\, {\\rm GeV}$', fontsize=12)
+            ax.text(-0.3, 2.3, '$Q^2\\!= 3.2\\,{\\rm GeV}^2$', fontsize=12)
+        if npanel==3:
+            ax.text(42, 30, 'ZEUS, idem', fontsize=12)
+            ax.text(45, 5, 'H1, idem', fontsize=12)
+        elif npanel==4:
+            ax.text(10, 0.3, 'ZEUS, ${\\rm W = 104}\\, {\\rm GeV}$', fontsize=12)
             handles, labels = ax.get_legend_handles_labels()
             handles.pop()
             labels.pop()
-            ax.legend(handles, labels, loc="upper left").draw_frame(0)
-        if npanel==3:
-            pass
-            #ax.text(50, 28, '${\\rm ZEUS}\\, (idem):$', fontsize=16)
-            #ax.text(50, 5, '${\\rm H1}\\, (idem):$', fontsize=16)
-        else: # npanel==4
-            pass
-            #ax.text(30, 3, '${\\rm ZEUS}\\, (idem)$', fontsize=16)
+            ax.legend(handles, labels, loc="upper right", handlelength=3, fontsize=14).draw_frame(1)
             #ax.set_xlim(0, 80)
+        for label in ax.get_xticklabels() + ax.get_yticklabels():
+            label.set_fontsize(14)
     if path:
         fig.savefig(path+'.'+fmt, format=fmt)
     else:

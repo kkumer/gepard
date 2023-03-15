@@ -11,7 +11,7 @@ process = gammastarp2rho0p
 exptype = collider
 year = 2007
 reference = arXiv:0708.1478
-inspiretex = Chekanov:2007zr
+inspiretex = ZEUS:2007iet
 reference2 = Table 8
 reference3 = 1754-0410-1-6
 
