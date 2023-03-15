@@ -14,7 +14,7 @@ process = gammastarp2gammap
 exptype = collider
 year = 2007
 reference = arXiv:0709.4114 [hep-ex]
-inspiretex = Aaron:2007ab
+inspiretex = H1:2007vrx
 reference2 = Table 2
 
 

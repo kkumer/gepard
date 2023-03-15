@@ -9,7 +9,7 @@ process = gammastarp2gammap
 exptype = collider
 year = 2009
 reference = arXiv:0907.5289 [hep-ex]
-inspiretex = Aaron:2009ac
+inspiretex = H1:2009wnw
 reference2 = Table 1a
 reference3 = Table 1 [hepdata]
 
