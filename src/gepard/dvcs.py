@@ -144,6 +144,7 @@ class DVCS(theory.Theory):
         W2 = pt.W * pt.W
         # Simplified formula used also in Fortran gepard code
         ReH, ImH, ReE, ImE, ReHt, ImHt, ReEt, ImEt = self.m.cff(pt)
+        #  260.5... = 4 pi alpha^2 GeV^2 nb
         res = 260.5633976788416 * W2 * (
                 (ImH**2 + ReH**2)
                 - pt.t/(4.*Mp2)*(ReE**2 + ImE**2)) / (
@@ -151,7 +152,19 @@ class DVCS(theory.Theory):
         return res
 
     def _XGAMMA_DVCS_t_Ex(self, pt):
-        """Partial DVCS (gamma* p -> gamma p) cross section differential in t."""
+        """Partial DVCS (gamma* p -> gamma p) cross section differential in t.
+
+        Args:
+            pt: instance of DataPoint
+            **kwargs: keyword arguments
+
+        Returns:
+            Cross section
+
+        Todo:
+            Htilde is missing here. Small at low-x, but bigger than some terms that are retained.
+
+        """
         eps2 = 4. * pt.xB**2 * Mp2 / pt.Q2
         if cff.HybridCFF in self.__class__.mro():
             # For hybrid models we cannot ask for cff() since self gets misinterpreted
@@ -161,6 +174,7 @@ class DVCS(theory.Theory):
             ImE = self.m.ImE(pt)
         else:
             ReH, ImH, ReE, ImE, ReHt, ImHt, ReEt, ImEt = self.m.cff(pt)
+        #  65.1... = pi alpha^2 GeV^2 nb
         res = 65.14079453579676 * (pt.xB**2 / pt.Q2**2 / (1-pt.xB) / (2-pt.xB)**2 /
                                    sqrt(1 + eps2) * (
                     4 * (1 - pt.xB) * (ImH**2 + ReH**2)
