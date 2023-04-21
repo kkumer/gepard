@@ -203,28 +203,20 @@ def c1dvmp(m, sgntr: int, j: complex, k: int) -> Tuple[complex, complex, complex
              (k+2)/2))/(2*(2*k+3)))*poch(k+1,2)*(poch(k+1,2)+2)/4
              -(poch(k+1,2)+2)/(2*poch(j+1,2)*poch(k+1,2)))
 
-    # NOTE: There is an unresolved discrepancy in the next term! In the
-    # Eq. (4.53b) of Towards DVMP paper term -4/poch(k+1,2)^2
-    # in the second row, should have the opposite sign to agree
-    # with the expression in Dieter's notebook!
+    # Note that there is a typo in the
+    # Eq. (4.53b) of Towards DVMP paper: Term -4/poch(k+1,2)^2
+    # in the third row, should have the opposite sign to agree
+    # with the expression in Dieter's notebook! Confirmed by
+    # Kornelija.
     # Here, in _new, correction from 1612.01937 is implemented
 
     MCG1CF_new = ((-LRDAF2+S1(j+1)+S1(k+1)-3/4-
             1/(2*poch(k+1,2))-1/poch(j+1,2))*gamQQCF/2+
             (-LRGPDF2+m.corr_c1dvmp_one+3*S1(j+1)-1/2+(2*S1(j+1)-
              1)/poch(k+1,2)-1/poch(j+1,2))*(j+3)/2*gamQGNF/2
-            -(35-(poch(k+1,2)+2)*delS2((k+1)/2) -   # this sign ?!
-             m.corr_c1dvmp_sgn*4/poch(k+1,2)**2)/8+((poch(k+1,2)+2)*S1(j+
+            -(35-(poch(k+1,2)+2)*delS2((k+1)/2) +   # this sign has typo
+             4/poch(k+1,2)**2)/8+((poch(k+1,2)+2)*S1(j+
                  1)/poch(k+1,2)+1)/poch(j+1,2) + DELC1FG)
-
-    # From DM's notebook:
-#     MCG1CF_DM = ((-LRDAF2+S1(j+1)+S1(k+1)-3/4-
-#             1/(2*poch(k+1,2))-1/poch(j+1,2))*gamQQCF/2+
-#             (-LRGPDF2+3*S1(j+1)-3/2+2/poch(k+1,2)-
-#                 1/poch(j+1,2))*(j+3)/2*gamQGNF/2
-#             -(39-(poch(k+1,2)+2)*delS2((k+1)/2))/8-
-#             (S1(j+1)-3/2-3/poch(j+1,2) +  # this sign ?!
-#             1/(2*poch(k+1,2)))/poch(k+1,2) + S1(j+1)/poch(j+1,2) + DELC1FG)
 
     MCG1CF = MCG1CF_new
 

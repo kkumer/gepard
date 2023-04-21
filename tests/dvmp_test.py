@@ -70,7 +70,6 @@ def test_c1_NLO(th_dvmp):
     pt = g.data.DataPoint({'Q2': 4., 't': 0, 'xB': xB})
     # to get agreement with these old numbers:
     th_dvmp.corr_c1dvmp_one = 0
-    th_dvmp.corr_c1dvmp_sgn = -1
     # c1dvmp(model, sgntr, j, k)
     aux = g.c1dvmp.c1dvmp(th_dvmp, 1, (0.5+1.j), 2)
     # comparing to DM's DVEM-c1_forKreso.nb
@@ -92,7 +91,6 @@ def test_dvmp_TFFs_NLO(th_nlo):
     pt = g.data.DataPoint({'Q2': 4., 't': 0, 'xB': xB})
     # to get agreement with these old numbers:
     th_nlo.corr_c1dvmp_one = 0
-    th_nlo.corr_c1dvmp_sgn = -1
     tffs = th_nlo.tff(pt.xi, pt.t, pt.Q2)
     reh, imh = tffs[0], tffs[1]
     # following agrees with gepard-fortran ...

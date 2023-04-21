@@ -43,10 +43,7 @@ class MellinBarnesTFF(model.ParameterModel):
         # 1. correction introduced below Eq. (20) of 1612.01937. Set
         #  to zero to get agreement with older results
         self.corr_c1dvmp_one = 1
-        # 2. correction to get results from "Towards DVMP" paper.
-        #  Set to -1 to get agreement with Dieter's notebook.
-        self.corr_c1dvmp_sgn = 1
-        # 3. Prefactors to kill parts of NLO hard scattering amplitude
+        # 2. Prefactors to kill parts of NLO hard scattering amplitude
         #  Set to zero to kill corresponding part.
         self.Q1_prefac = 1
         self.PS1_prefac = 1
