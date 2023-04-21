@@ -7,6 +7,39 @@ from . import adim, constants, qcd
 from .special import S1, S2, S3, SB3, deldelS2, delS2, parity, poch
 
 
+def mcq1cf(j: complex, k: complex, LRF2: float) -> complex:
+    """Towards DVMP, Eq. (4.44a)
+
+    Args:
+        j: conformal moment
+        k: conformal moment
+     LRF2: ratio of Q^2 and the factorization scale
+
+    Returns:
+        "j-half" of c_{jk}^{(1,F)}
+    """
+    gam0F_half = (-3/2 - 1/poch(1+j,2) + 2*S1(1+j))
+    return (
+             -23/6 + (1 + 3*poch(1+j,2))/2/poch(1+j,2)**2 +
+             (-1 - 1/2/poch(1+j,2) - 1/2/poch(1+k,2) -
+             LRF2 + S1(1+j) + S1(1+k)) * gam0F_half
+           )
+
+
+def mcq1bet0(j: complex, k: complex, LRR2: float) -> complex:
+    """Towards DVMP, Eq. (4.44b)
+
+    Args:
+        j: conformal moment
+        k: conformal moment
+     LRR2: ratio of Q^2 and the renormalization scale
+
+    Returns:
+        "j-half" of c_{jk}^{(1,beta)}
+    """
+    return -5/12 + 1/2/poch(1+j,2) + LRR2/4 - S1(1+j)
+
+
 def c1dvmp(m, sgntr: int, j: complex, k: int) -> Tuple[complex, complex, complex]:
     """NLO DVMP hard scattering coefficients.
 
@@ -20,10 +53,8 @@ def c1dvmp(m, sgntr: int, j: complex, k: int) -> Tuple[complex, complex, complex
         (quark, pure singlet, gluon) NLO coefficients.
 
     Todo:
-        There is an unresolved discrepancy in the code implementing
-        Eq. (4.53b) of Towards DVMP paper term. Dieter's notebook
-        seems to have one different sign. See comments in the code
-        for MCG1CF_new.
+        Expressions are not thoroughly checked for when factorization
+        and renormalization scales are different from Q^2, but should be OK.
 
     """
     LRR2 = math.log(m.rr2)
@@ -39,21 +70,39 @@ def c1dvmp(m, sgntr: int, j: complex, k: int) -> Tuple[complex, complex, complex
     gamQQCF = 4*S1(k+1) - 3 - 2/poch(k+1, 2)
     gamQGNF = -(4+2*(j+1)*(j+2))/(j+1)/(j+2)/(j+3)
 
-    # Spliced from Mathematica:
-
     #  ... quark part
 
-    MCQ1CF = -23/3+(0.5*(1.+3.*(1.+j)*(2.+j)))/((
-             1 + j)**2*(2.+j)**2)+(0.5*(1.+3.*(1.+k)*(2.+k)))/((1.+k)**2
-             *(2.+k)**2)+0.5*(-3.-2./((1.+j)*(2.+j))+4.*S1(1.+j))*((-
-             0.5*(1.+(1.+j)*(2.+j)))/((1.+j)*(2.+j))-(0.5*(1.+(1.+k)*(
-             2.+k)))/((1.+k)*(2.+k))-LRGPDF2+S1(1.+j)+S1(1.+k))+0.5 * \
-             ((-0.5*(1.+(1.+j)*(2.+j)))/((1.+j)*(2.+j))-(0.5*(1.+(1.+k
-             )*(2.+k)))/((1.+k)*(2.+k))-LRDAF2+S1(1.+j)+S1(1.+k))*(-
-             3.-2./((1.+k)*(2.+k))+4.*S1(1.+k))
+    # # Spliced from Mathematica:
+    # MCQ1CF = -23/3+(0.5*(1.+3.*(1.+j)*(2.+j)))/((
+             # 1 + j)**2*(2.+j)**2)+(0.5*(1.+3.*(1.+k)*(2.+k)))/((1.+k)**2
+             # *(2.+k)**2)+0.5*(-3.-2./((1.+j)*(2.+j))+4.*S1(1.+j))*((-
+             # 0.5*(1.+(1.+j)*(2.+j)))/((1.+j)*(2.+j))-(0.5*(1.+(1.+k)*(
+             # 2.+k)))/((1.+k)*(2.+k))-LRGPDF2+S1(1.+j)+S1(1.+k))+0.5 * \
+             # ((-0.5*(1.+(1.+j)*(2.+j)))/((1.+j)*(2.+j))-(0.5*(1.+(1.+k
+             # )*(2.+k)))/((1.+k)*(2.+k))-LRDAF2+S1(1.+j)+S1(1.+k))*(-
+             # 3.-2./((1.+k)*(2.+k))+4.*S1(1.+k))
 
-    MCQ1BET0 = -5/6+0.5/((1.+j)*(2.+j))+0.5/((
-               1 + k)*(2.+k))+0.5*LRR2-S1(1.+j)-S1(1.+k)
+    # # Hand-polished the above for Python:
+    # MCQ1CF = (
+             # -23/3 +
+             # (1+3*(1+j)*(2+j))/2/(1+j)**2/(2+j)**2 +
+             # (1+3*(1+k)*(2+k))/2/(1+k)**2/(2+k)**2 +
+             # (-3/2 - 1/(1+j)/(2+j) + 2*S1(1+j))*(-
+             # (1+(1+j)*(2+j))/2/(1+j)/(2+j) -
+             # (1+(1+k)*(2+k))/2/(1+k)/(2+k) - LRGPDF2 + S1(1+j) + S1(1+k)) +
+             # (-3/2 - 1/(1+k)/(2+k) + 2*S1(1+k))*(-
+             # (1+(1+j)*(2+j))/2/(1+j)/(2+j) -
+             # (1+(1+k)*(2+k))/2/(1+k)/(2+k) - LRDAF2  + S1(1+j) + S1(1+k))
+             # )
+
+    MCQ1CF = mcq1cf(j, k, LRGPDF2) + mcq1cf(k, j, LRDAF2)
+
+    # MCQ1BET0 = -5/6+0.5/((1.+j)*(2.+j))+0.5/((
+               # 1 + k)*(2.+k))+0.5*LRR2-S1(1.+j)-S1(1.+k)
+
+    # MCQ1BET0 = -5/6 + 1/2/(1+j)/(2+j) + 1/2/(1+k)/(2+k) + LRR2/2 - S1(1+j) - S1(1+k)
+
+    MCQ1BET0 = mcq1bet0(j, k, LRR2) + mcq1bet0(k, j, LRR2)
 
     SUMA = 0j
     SUMB = 0j
