@@ -28,7 +28,7 @@ Of course, you should have Python first (version 3.7 at the least),
 as well as `pip`, which all major Linux distributions have as standard package.
 See the documentation for alternative instalation from sources, which is also easy.
 
-Gepard is developed on Linux, but is tested also on Windows and MacOS. 
+Gepard is developed on Linux, but official releases are tested also on Windows and MacOS.
 Please complain if you have problems.
 
 
