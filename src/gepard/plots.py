@@ -190,7 +190,7 @@ def panel(ax, points=None, lines=None, bands=None, xaxis=None, xs=None,
                       '-', '--', '-.', ':', '-', '--', '-.', ':']
         linen = 0
         for line in lines:
-            _axline(ax, lambda pt: line.predict(pt, orig_conventions=True), points,
+            _axline(ax, lambda pt: line.predict(pt, orig_conventions=True).detach().numpy(), points,
                     xaxis=xaxis, color=linecolors[linen], linestyle=linestyles[linen],
                     linewidth=2, alpha=1.0, label=r'\texttt{{{}}}'.format(line.name),
                     **kwargs)

@@ -390,6 +390,7 @@ class DataSet(list):
             for gridline in data:
                 pt = DataPoint()
                 pt.update_from_grid(gridline, self)
+                pt.to_tensor()
                 self.append(pt)
 
     def __add__(self, rhs):
