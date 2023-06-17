@@ -147,6 +147,7 @@ class Theory(object):
             result = (fun(pt), sqrt(var))
         else:
             result = fun(pt)
+            self.cffs_evaluated = False  # be ready for the next evaluation
 
         if 'parameters' in kwargs:
             # restore old values
@@ -159,6 +160,22 @@ class Theory(object):
             except (IndexError, TypeError):
                 result = pt.orig_conventions(result)
         return result
+
+    def predict_while_train(self, cffs, pt: data.DataPoint, **kwargs):
+        """Give prediction for DataPoint pt using CFFs values provided.
+
+        Args:
+            cffs: list of CFF values provided by neural net during training
+            pt: instance of DataPoint
+            **kwargs: keyword arguments
+
+        Returns:
+            Predicted value for the observable.
+
+        """
+        self._cffs = cffs
+        self.cffs_evaluated = True
+        return self.predict(pt)
 
 # Photoproduction - select DVCS or DVMP
 

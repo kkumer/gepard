@@ -14,6 +14,8 @@ Todo:
 """
 from __future__ import annotations
 
+import torch
+
 from math import sqrt
 from typing import List
 
@@ -41,6 +43,7 @@ class Model(theory.Theory):
 
     """
     def __init__(self, **kwargs) -> None:
+        self.cffs_evaluated = False  # Controls that NNet CFFs eval happens only once per predict()
         super().__init__(**kwargs)
 
 
@@ -137,3 +140,45 @@ class ParameterModel(Model):
             val = self.parameters[p]
             err = sqrt(tolerance2)*self.parameters_errors[p]
             print('{:5s} = {:8.3f} +- {:5.3f}'.format(p, val, err))
+
+
+class NeuralModel(Model):
+    """Model where CFFs are represented by neural net.
+
+    Note:
+        There will be separate model where GPDs are represented by neural net.
+
+    """
+
+    def __init__(self, **kwargs) -> None:
+        self.nn_model = torch.nn.Sequential(
+                torch.nn.Linear(2, 32),
+                torch.nn.ReLU(),
+                torch.nn.Linear(32, 64),
+                torch.nn.ReLU(),
+                torch.nn.Linear(64, 32),
+                torch.nn.ReLU(),
+                torch.nn.Linear(32, 2)
+            )
+        self.cffsmap = {'ReH': 0, 'ImH': 1, 'ReE': 2, 'ImE': 3,
+                       'ReHt': 4, 'ImHt': 5, 'ReEt': 6, 'ImEt': 7}
+        self.output_layer = ['ReH', 'ImH']
+        super().__init__(**kwargs)
+
+    def __getattr__(self, name):
+        # if name in object.__getatribute__(self, 'output_layer'):
+        if name in self.output_layer:
+            self.cff_index = self.cffsmap[name]
+            return self.cffs
+        elif name in self.cffsmap.keys():
+            return self.zero
+
+    def zero(self, pt):
+        return 0
+        
+    def cffs(self, pt):
+        if not self.cffs_evaluated:
+            self._cffs = self.nn_model(torch.tensor([pt.xB, pt.t], dtype=torch.float32))
+            self.cffs_evaluated = True
+        return self._cffs[self.cff_index]
+
