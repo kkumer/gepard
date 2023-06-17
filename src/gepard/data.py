@@ -15,6 +15,7 @@ import re
 from typing import Union, List
 
 import pandas as pd
+import torch
 
 from . import kinematics
 from .constants import Mp, Mp2
@@ -90,6 +91,7 @@ class DataPoint(dict):
         if kindict:
             self.update(kindict)
         self.update(kwargs)
+        self._tensor_keys = ['Q2']
         # calculate other determined kinematic variables:
         _fill_kinematics(self)
 
@@ -104,6 +106,12 @@ class DataPoint(dict):
         new = copy.copy(self)
         new.__dict__ = new
         return new
+
+    def to_tensor(self):
+        """Make torch tensors out of selected attributes."""
+        for key in self._tensor_keys:
+            if hasattr(self, key):
+                setattr(self, key, torch.tensor(getattr(self, key)))
 
     def update_from_grid(self, gridline, dataset):
         """Take data gridline, and update point atributes.

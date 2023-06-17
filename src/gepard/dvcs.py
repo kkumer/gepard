@@ -5,7 +5,7 @@
 #   bmk.py  -  BMK formulas for interference, DVCS-squared and BH-squared terms
 #   cff.py  -  models for Compton Form Factors
 
-from numpy import cos, pi, sin, sqrt
+from torch import cos, pi, sin, sqrt
 
 from . import cff, data, quadrature, theory
 from .constants import GeV2nb, Mp2, alpha

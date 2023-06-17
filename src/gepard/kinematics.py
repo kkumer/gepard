@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import math
-from numpy import cos, pi, sqrt
+from torch import cos, pi, sqrt
 
 from . import data
 from gepard.constants import Mp, Mp2, alpha

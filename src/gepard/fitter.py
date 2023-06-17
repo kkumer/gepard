@@ -139,7 +139,7 @@ class NeuralFitter(Fitter):
         y_train = []
         for k, pt in enumerate(fitpoints):
             pt.ptid = k
-            pt.phi = torch.tensor(pt.phi)
+            # pt.phi = torch.tensor(pt.phi)
             x_train.append([pt.xB, pt.t])
             y_train.append([pt.val, pt.err, k])
         # We pass the point index k through the NNet (as irellevant feature!) so that Gepard

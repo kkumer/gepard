@@ -1,7 +1,6 @@
 """DVCS cross-section formulas from Belitsky, Mueller et al. (Kirchner, Ji) papers."""
 
-from numpy import array, ndarray
-from torch import cos, linspace, pi, sin, sqrt, transpose
+from torch import cos, pi, sin, sqrt
 
 from .constants import GeV2nb, Mp, Mp2, alpha
 from .dvcs import DVCS
