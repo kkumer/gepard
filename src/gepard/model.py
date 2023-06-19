@@ -153,8 +153,12 @@ class NeuralModel(Model):
     def __init__(self, **kwargs) -> None:
         self.nets = []  # here come PyTorch models
         self.cffsmap = {'ReH': 0, 'ImH': 1, 'ReE': 2, 'ImE': 3,
-                       'ReHt': 4, 'ImHt': 5, 'ReEt': 6, 'ImEt': 7}
-        self.output_layer = ['ReH', 'ImH']
+                       # 'ReHt': 4, 'ImHt': 5, 'ReEt': 6, 'ImEt': 7,   KLUDGE! FIXME!
+                       'ReHt': 6, 'ImHt': 4, 'ReEt': 7, 'ImEt': 5,
+                        'ReHeff': 8, 'ImHeff': 9, 'ReEeff': 10, 'ImEeff': 11,
+                       'ReHteff': 12, 'ImHteff': 13, 'ReEteff': 14, 'ImEteff': 15}
+        # self.output_layer = ['ReH', 'ImH']
+        self.output_layer = ['ReH', 'ImH', 'ReE', 'ImE', 'ImHt', 'ImEt']
         super().__init__(**kwargs)
 
     def __getattr__(self, name):

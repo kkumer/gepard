@@ -1,6 +1,7 @@
 """DVCS cross-section formulas from Belitsky, Mueller et al. (Kirchner, Ji) papers."""
 
 from torch import cos, pi, sin, sqrt
+import math
 
 from .constants import GeV2nb, Mp, Mp2, alpha
 from .dvcs import DVCS
@@ -839,7 +840,7 @@ class BM10ex(hotfixedBMK):
 
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
         return (
-     ((8*sqrt(2)*pt.K*(1 - xB)*y*sqrt(1 - y - (y**2*eps2)/4)*pt.in1polarization)/
+     ((8*math.sqrt(2)*pt.K*(1 - xB)*y*sqrt(1 - y - (y**2*eps2)/4)*pt.in1polarization)/
       (1 + eps2)**2)*(t/pt.Q2)
     )
 
@@ -851,7 +852,7 @@ class BM10ex(hotfixedBMK):
 
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
         return (
-     -((8*sqrt(2)*(2 - y)*y*sqrt(1 - y - (y**2*eps2)/4)*pt.in1polarization)/
+     -((8*math.sqrt(2)*(2 - y)*y*sqrt(1 - y - (y**2*eps2)/4)*pt.in1polarization)/
       (1 + eps2)**2)*(pt.tK2/pt.Q2)
     )
 
@@ -863,7 +864,7 @@ class BM10ex(hotfixedBMK):
 
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
         return (
-     -((8*sqrt(2)*pt.K*y*sqrt(1 - y - (y**2*eps2)/4)*pt.in1polarization)/
+     -((8*math.sqrt(2)*pt.K*y*sqrt(1 - y - (y**2*eps2)/4)*pt.in1polarization)/
       (1 + eps2)**2)*(1 + (xB*t)/pt.Q2)
     )
 
@@ -990,7 +991,7 @@ class BM10ex(hotfixedBMK):
 
 
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
-        return ( (-8*sqrt(2)*pt.K*t*xB*y*(1 + t/pt.Q2)*
+        return ( (-8*math.sqrt(2)*pt.K*t*xB*y*(1 + t/pt.Q2)*
       sqrt(1 - y - (y**2*eps2)/4)*pt.in1polarization)/
      (pt.Q2*(1 + eps2)**2)
     )
@@ -1012,7 +1013,7 @@ class BM10ex(hotfixedBMK):
 
 
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
-        return ( (8*sqrt(2)*pt.K*t*xB*y*(1 + t/pt.Q2)*
+        return ( (8*math.sqrt(2)*pt.K*t*xB*y*(1 + t/pt.Q2)*
       sqrt(1 - y - (y**2*eps2)/4)*pt.in1polarization)/
      (pt.Q2*(1 + eps2)**2)
     )
@@ -1141,7 +1142,7 @@ class BM10ex(hotfixedBMK):
 
 
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
-        return ( (-8*sqrt(2)*pt.K*t*y*
+        return ( (-8*math.sqrt(2)*pt.K*t*y*
       (-xB + (t*(1 - 2*xB))/pt.Q2)*
       sqrt(1 - y - (y**2*eps2)/4)*pt.in1polarization)/
      (pt.Q2*(1 + eps2)**2)
@@ -1154,7 +1155,7 @@ class BM10ex(hotfixedBMK):
 
 
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
-        return ( (8*sqrt(2)*t*pt.tK2*(2 - y)*y*
+        return ( (8*math.sqrt(2)*t*pt.tK2*(2 - y)*y*
       sqrt(1 - y - (y**2*eps2)/4)*pt.in1polarization)/
      (pt.Q2**2*(1 + eps2)**2)
     )
@@ -1166,7 +1167,7 @@ class BM10ex(hotfixedBMK):
 
 
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
-        return ( (8*sqrt(2)*pt.K*t*(1 - xB)*y*
+        return ( (8*math.sqrt(2)*pt.K*t*(1 - xB)*y*
       sqrt(1 - y - (y**2*eps2)/4)*pt.in1polarization)/
      (pt.Q2*(1 + eps2)**2)
     )
@@ -1311,7 +1312,7 @@ class BM10ex(hotfixedBMK):
 
 
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
-        return ( (12*sqrt(2)*pt.K*(2 - y)*
+        return ( (12*math.sqrt(2)*pt.K*(2 - y)*
       sqrt(1 - y - (y**2*eps2)/4)*(eps2 +
        (t*(2 - 6*xB - eps2))/(3*pt.Q2)))/
      (1 + eps2)**(5/2.)
@@ -1324,7 +1325,7 @@ class BM10ex(hotfixedBMK):
 
 
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
-        return ( (8*sqrt(2)*sqrt(1 - y - (y**2*eps2)/4)*
+        return ( (8*math.sqrt(2)*sqrt(1 - y - (y**2*eps2)/4)*
       (((t - tmin(Q2, xB, eps2))*(2 - y)**2*(1 - xB + ((t - tmin(Q2, xB, eps2))*((1 - xB)*xB +
              eps2/4))/(pt.Q2*sqrt(1 + eps2))))/
         pt.Q2 + ((1 - (t*(1 - 2*xB))/pt.Q2)*
@@ -1340,7 +1341,7 @@ class BM10ex(hotfixedBMK):
 
 
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
-        return ( (-8*sqrt(2)*pt.K*(2 - y)*(1 + eps2/2.)*
+        return ( (-8*math.sqrt(2)*pt.K*(2 - y)*(1 + eps2/2.)*
       sqrt(1 - y - (y**2*eps2)/4)*
       (1 + (t*xB*(1 + eps2/(2*xB)))/(pt.Q2*
          (1 + eps2/2.))))/(1 + eps2)**(5/2.)
@@ -1489,7 +1490,7 @@ class BM10ex(hotfixedBMK):
 
 
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
-        return ( (4*sqrt(2)*pt.K*t*(2 - y)*
+        return ( (4*math.sqrt(2)*pt.K*t*(2 - y)*
       (8 - 6*xB + 5*eps2)*sqrt(1 - y - (y**2*eps2)/4)*
       (1 - (t*(2 - 12*(1 - xB)*xB - eps2))/(pt.Q2*
          (8 - 6*xB + 5*eps2))))/(pt.Q2*
@@ -1503,7 +1504,7 @@ class BM10ex(hotfixedBMK):
 
 
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
-        return ( (8*sqrt(2)*t*sqrt(1 - y - (y**2*eps2)/4)*
+        return ( (8*math.sqrt(2)*t*sqrt(1 - y - (y**2*eps2)/4)*
       ((pt.tK2*(1 - 2*xB)*(2 - y)**2)/pt.Q2 +
        (1 - (t*(1 - 2*xB))/pt.Q2)*
         (1 - y - (y**2*eps2)/4)*(4 - 2*xB + 3*eps2 +
@@ -1518,7 +1519,7 @@ class BM10ex(hotfixedBMK):
 
 
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
-        return ( (8*sqrt(2)*pt.K*t*(2 - y)*
+        return ( (8*math.sqrt(2)*pt.K*t*(2 - y)*
       sqrt(1 - y - (y**2*eps2)/4)*(1 - xB +
        (2*(t - tmin(Q2, xB, eps2))*((1 - xB)*xB + eps2/4))/(pt.Q2*
          sqrt(1 + eps2))))/(pt.Q2*(1 + eps2)**2)
@@ -1662,7 +1663,7 @@ class BM10ex(hotfixedBMK):
 
 
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
-        return ( (24*sqrt(2)*pt.K*t*xB*(2 - y)*
+        return ( (24*math.sqrt(2)*pt.K*t*xB*(2 - y)*
       (1 - (t*(1 - 2*xB))/pt.Q2)*
       sqrt(1 - y - (y**2*eps2)/4))/(pt.Q2*
       (1 + eps2)**(5/2.))
@@ -1676,7 +1677,7 @@ class BM10ex(hotfixedBMK):
 
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
         return (
-    (16*sqrt(2)*t*xB*sqrt(1 - y - (y**2*eps2)/4)*
+    (16*math.sqrt(2)*t*xB*sqrt(1 - y - (y**2*eps2)/4)*
       ((pt.tK2*(2 - y)**2)/pt.Q2 +
        (1 - (t*(1 - 2*xB)*(2 - (t*(1 - 2*xB))/pt.Q2))/
           pt.Q2)*(1 - y - (y**2*eps2)/4)))/
@@ -1690,7 +1691,7 @@ class BM10ex(hotfixedBMK):
 
 
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
-        return ( (8*sqrt(2)*pt.K*t*xB*(2 - y)*
+        return ( (8*math.sqrt(2)*pt.K*t*xB*(2 - y)*
       (1 - (t*(1 - 2*xB))/pt.Q2)*
       sqrt(1 - y - (y**2*eps2)/4))/(pt.Q2*
       (1 + eps2)**(5/2.))
@@ -1817,7 +1818,7 @@ class BM10ex(hotfixedBMK):
 
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
         return (
-     ((8*sqrt(2)*sqrt(1 - y - (y**2*eps2)/4))/
+     ((8*math.sqrt(2)*sqrt(1 - y - (y**2*eps2)/4))/
       (1 + eps2)**(5/2.))*((pt.tK2*(2 - y)**2)/pt.Q2 +
       (1 + t/pt.Q2)*(1 - y - (y**2*eps2)/4)*
        ((2*xB*t)/pt.Q2 - (1 - t/pt.Q2)*
@@ -1832,7 +1833,7 @@ class BM10ex(hotfixedBMK):
 
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
         return (
-     ((8*sqrt(2)*pt.K*(2 - y)*sqrt(1 - y - (y**2*eps2)/4))/
+     ((8*math.sqrt(2)*pt.K*(2 - y)*sqrt(1 - y - (y**2*eps2)/4))/
       (1 + eps2)**(5/2.))*(1 + (xB*t)/pt.Q2)
     )
 
@@ -1945,7 +1946,7 @@ class BM10ex(hotfixedBMK):
 
 
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
-        return ( (-16*sqrt(2)*t*xB*(1 + t/pt.Q2)*
+        return ( (-16*math.sqrt(2)*t*xB*(1 + t/pt.Q2)*
       (1 - (t*(1 - 2*xB))/pt.Q2)*(1 - y - (y**2*eps2)/4)**
        (3/2.))/(pt.Q2*(1 + eps2)**(5/2.))
     )
@@ -1957,7 +1958,7 @@ class BM10ex(hotfixedBMK):
 
 
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
-        return ( (-8*sqrt(2)*pt.K*t*xB*(2 - y)*
+        return ( (-8*math.sqrt(2)*pt.K*t*xB*(2 - y)*
       (1 + t/pt.Q2)*sqrt(1 - y - (y**2*eps2)/4)
       )/(pt.Q2*(1 + eps2)**(5/2.))
     )
@@ -2067,7 +2068,7 @@ class BM10ex(hotfixedBMK):
 
 
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
-        return ( (-8*sqrt(2)*t*sqrt(1 - y - (y**2*eps2)/4)*
+        return ( (-8*math.sqrt(2)*t*sqrt(1 - y - (y**2*eps2)/4)*
       ((pt.tK2*(2 - y)**2)/pt.Q2 + (1 + t/pt.Q2)*
         (1 - y - (y**2*eps2)/4)*(4 - 2*xB + 3*eps2 +
          (t*(4*xB - 4*xB**2 + eps2))/pt.Q2))
@@ -2081,7 +2082,7 @@ class BM10ex(hotfixedBMK):
 
 
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
-        return ( (-8*sqrt(2)*pt.K*t*(1 - xB)*(2 - y)*
+        return ( (-8*math.sqrt(2)*pt.K*t*(1 - xB)*(2 - y)*
       sqrt(1 - y - (y**2*eps2)/4))/
      (pt.Q2*(1 + eps2)**(5/2.))
     )
@@ -2184,7 +2185,7 @@ class BM10ex(hotfixedBMK):
 
 
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
-        return ( (8*sqrt(2)*pt.tK2*(2 - y)*y*
+        return ( (8*math.sqrt(2)*pt.tK2*(2 - y)*y*
       sqrt(1 - y - (y**2*eps2)/4)*pt.in1polarization)/
      (pt.Q2*(1 + eps2)**2)
     )
@@ -2196,7 +2197,7 @@ class BM10ex(hotfixedBMK):
 
 
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
-        return ( (8*sqrt(2)*pt.K*y*(1 + eps2/2.)*
+        return ( (8*math.sqrt(2)*pt.K*y*(1 + eps2/2.)*
       sqrt(1 - y - (y**2*eps2)/4)*
       (1 + (t*xB*(1 + eps2/(2*xB)))/(pt.Q2*
          (1 + eps2/2.)))*pt.in1polarization)/(1 + eps2)**2
@@ -2296,7 +2297,7 @@ class BM10ex(hotfixedBMK):
 
 
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
-        return ( (-8*sqrt(2)*t*pt.tK2*(1 - 2*xB)*(2 - y)*y*
+        return ( (-8*math.sqrt(2)*t*pt.tK2*(1 - 2*xB)*(2 - y)*y*
       sqrt(1 - y - (y**2*eps2)/4)*pt.in1polarization)/
      (pt.Q2**2*(1 + eps2)**2)
     )
@@ -2308,7 +2309,7 @@ class BM10ex(hotfixedBMK):
 
 
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
-        return ( (-2*sqrt(2)*pt.K*t*y*
+        return ( (-2*math.sqrt(2)*pt.K*t*y*
       sqrt(1 - y - (y**2*eps2)/4)*(4 - 4*xB + 2*eps2 +
        (2*t*(4*xB - 4*xB**2 + eps2))/pt.Q2)*pt.in1polarization)/
      (pt.Q2*(1 + eps2)**2)
@@ -2406,7 +2407,7 @@ class BM10ex(hotfixedBMK):
 
 
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
-        return ( (4*sqrt(2)*t*xB*(2 - y)*y*
+        return ( (4*math.sqrt(2)*t*xB*(2 - y)*y*
       sqrt(1 - y - (y**2*eps2)/4)*
       ((4*t*(1 - xB)*(1 + (t*xB)/pt.Q2))/pt.Q2 +
        (1 + t/pt.Q2)**2*eps2)*pt.in1polarization)/
@@ -2420,7 +2421,7 @@ class BM10ex(hotfixedBMK):
 
 
         xB, Q2, t, y, eps2  = pt.xB, pt.Q2, pt.t, pt.y, pt.eps2
-        return ( (-8*sqrt(2)*pt.K*t*xB*y*
+        return ( (-8*math.sqrt(2)*pt.K*t*xB*y*
       (1 - (t*(1 - 2*xB))/pt.Q2)*
       sqrt(1 - y - (y**2*eps2)/4)*pt.in1polarization)/
      (pt.Q2*(1 + eps2)**2)
@@ -2482,7 +2483,7 @@ class BM10ex(hotfixedBMK):
          self.CINT["unp", (1, 1), n](self, pt) * self.CCALINTunp(pt) +
          self.CINT["unpV", (1, 1), n](self, pt) * self.CCALINTunpV(pt) +
          self.CINT["unpA", (1, 1), n](self, pt) * self.CCALINTunpA(pt) +
-         sqrt(2.)/(2.-pt.xB+pt.xB*pt.t/pt.Q2)*pt.tK/sqrt(pt.Q2)*(
+         math.sqrt(2.)/(2.-pt.xB+pt.xB*pt.t/pt.Q2)*pt.tK/sqrt(pt.Q2)*(
          self.CINT["unp", (0, 1), n](self, pt) * self.CCALINTunp(pt, eff=1) +
          self.CINT["unpV", (0, 1), n](self, pt) * self.CCALINTunpV(pt, eff=1) +
          self.CINT["unpA", (0, 1), n](self, pt) * self.CCALINTunpV(pt, eff=1) )
@@ -2495,7 +2496,7 @@ class BM10ex(hotfixedBMK):
          self.SINT["unp", (1, 1), n](self, pt) * self.CCALINTunp(pt, im=1) +
          self.SINT["unpV", (1, 1), n](self, pt) * self.CCALINTunpV(pt, im=1) +
          self.SINT["unpA", (1, 1), n](self, pt) * self.CCALINTunpA(pt, im=1) +
-         sqrt(2.)/(2.-pt.xB+pt.xB*pt.t/pt.Q2)*pt.tK/sqrt(pt.Q2)*(
+         math.sqrt(2.)/(2.-pt.xB+pt.xB*pt.t/pt.Q2)*pt.tK/sqrt(pt.Q2)*(
          self.SINT["unp", (0, 1), n](self, pt) * self.CCALINTunp(pt, im=1, eff=1) +
          self.SINT["unpV", (0, 1), n](self, pt) * self.CCALINTunpV(pt, im=1, eff=1) +
          self.SINT["unpA", (0, 1), n](self, pt) * self.CCALINTunpA(pt, im=1, eff=1) )
@@ -2516,7 +2517,7 @@ class BM10ex(hotfixedBMK):
          self.CINT["LP", (1, 1), n](self, pt) * self.CCALINTLP(pt) +
          self.CINT["LPV", (1, 1), n](self, pt) * self.CCALINTLPV(pt) +
          self.CINT["LPA", (1, 1), n](self, pt) * self.CCALINTLPA(pt) +
-         sqrt(2.)/(2.-pt.xB+pt.xB*pt.t/pt.Q2)*pt.tK/sqrt(pt.Q2)*(
+         math.sqrt(2.)/(2.-pt.xB+pt.xB*pt.t/pt.Q2)*pt.tK/sqrt(pt.Q2)*(
          self.CINT["LP", (0, 1), n](self, pt) * self.CCALINTLP(pt, eff=1) +
          self.CINT["LPV", (0, 1), n](self, pt) * self.CCALINTLPV(pt, eff=1) +
          self.CINT["LPA", (0, 1), n](self, pt) * self.CCALINTLPV(pt, eff=1) )
@@ -2529,7 +2530,7 @@ class BM10ex(hotfixedBMK):
          self.SINT["LP", (1, 1), n](self, pt) * self.CCALINTLP(pt, im=1) +
          self.SINT["LPV", (1, 1), n](self, pt) * self.CCALINTLPV(pt, im=1) +
          self.SINT["LPA", (1, 1), n](self, pt) * self.CCALINTLPA(pt, im=1) +
-         sqrt(2.)/(2.-pt.xB+pt.xB*pt.t/pt.Q2)*pt.tK/sqrt(pt.Q2)*(
+         math.sqrt(2.)/(2.-pt.xB+pt.xB*pt.t/pt.Q2)*pt.tK/sqrt(pt.Q2)*(
          self.SINT["LP", (0, 1), n](self, pt) * self.CCALINTLP(pt, im=1, eff=1) +
          self.SINT["LPV", (0, 1), n](self, pt) * self.CCALINTLPV(pt, im=1, eff=1) +
          self.SINT["LPA", (0, 1), n](self, pt) * self.CCALINTLPV(pt, im=1, eff=1) )

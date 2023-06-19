@@ -5,7 +5,7 @@
 #   bmk.py  -  BMK formulas for interference, DVCS-squared and BH-squared terms
 #   cff.py  -  models for Compton Form Factors
 
-from torch import cos, pi, sin, sqrt
+from torch import cos, pi, sin, sqrt, tensor
 
 from . import cff, data, quadrature, theory
 from .constants import GeV2nb, Mp2, alpha
@@ -122,7 +122,7 @@ class DVCS(theory.Theory):
                     # and is completely O.K. for Trento asymmetries
                     # kin.varphi = (3*pt.varFTn+1)*pi/4.  # pi for cos, -pi/2 for sin
                     # And this is for BMK
-                    kin.varphi = (1-pt.varFTn)*pi/4.  # 0 for cos, pi/2 for sin
+                    kin.varphi = tensor((1-pt.varFTn)*pi/4.)  # 0 for cos, pi/2 for sin
                 aux += kin.in2polarization*(
                         self.TBH2TP(kin) + self.TINTTP(kin) + self.TDVCS2TP(kin))
             elif pt.in2polarizationvector == 'U':
