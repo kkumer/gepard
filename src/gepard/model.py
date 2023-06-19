@@ -143,7 +143,7 @@ class ParameterModel(Model):
 
 
 class NeuralModel(Model):
-    """Model where CFFs are represented by neural net.
+    """Model where CFFs are represented by set of neural nets.
 
     Note:
         There will be separate model where GPDs are represented by neural net.
@@ -151,15 +151,7 @@ class NeuralModel(Model):
     """
 
     def __init__(self, **kwargs) -> None:
-        self.nn_model = torch.nn.Sequential(
-                torch.nn.Linear(2, 32),
-                torch.nn.ReLU(),
-                torch.nn.Linear(32, 64),
-                torch.nn.ReLU(),
-                torch.nn.Linear(64, 32),
-                torch.nn.ReLU(),
-                torch.nn.Linear(32, 2)
-            )
+        self.nets = []  # here come PyTorch models
         self.cffsmap = {'ReH': 0, 'ImH': 1, 'ReE': 2, 'ImE': 3,
                        'ReHt': 4, 'ImHt': 5, 'ReEt': 6, 'ImEt': 7}
         self.output_layer = ['ReH', 'ImH']

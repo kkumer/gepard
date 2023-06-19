@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
+import numpy as np
 import torch
 from typing import List
 from iminuit import Minuit  # type: ignore
-
 
 from . import data, theory
 
@@ -106,6 +106,36 @@ class MinuitFitter(Fitter):
         """Values and errors for free parameters."""
         self.theory.print_parameters()
 
+def data_replica(datapoints, train_percentage=70):
+    """Returns datapoints split into training and testing set.
+
+    Note that datapoints get id numbers pt.ptid needed for
+    keeping link to proper datapoint for the loss calculation.
+
+    """
+    x_train = []
+    y_train = []
+    x_test = []
+    y_test = []
+    train_size = int(len(datapoints) * train_percentage / 100.)
+    for k, pt in enumerate(np.random.permutation(datapoints)):
+        pt.ptid = k  # this gets overwritten in different training runs
+        y = pt.val + round(np.random.normal(0, pt.err, 1)[0], 5)
+        if k < train_size:
+            x_train.append([pt.xB, pt.t])
+            y_train.append([pt.val, pt.err, k])
+        else:
+            x_test.append([pt.xB, pt.t])
+            y_test.append([pt.val, pt.err, k])
+    # We pass the point index k through the NNet (as irellevant feature!) so that Gepard
+    # can determine which DataPoint to use to calculate observable.
+    # TODO: Explain to Torch that this feature is irellevant! (This likely mean using
+    #        some more involved specific net architecture.
+    x_train = torch.tensor(x_train, dtype=torch.float32)
+    y_train = torch.tensor(y_train, dtype=torch.float32)
+    x_test = torch.tensor(x_test, dtype=torch.float32)
+    y_test = torch.tensor(y_test, dtype=torch.float32)
+    return x_train, y_train, x_test, y_test
 
 class CustomLoss(torch.nn.Module):
     def __init__(self, fitpoints, theory):
@@ -120,7 +150,6 @@ class CustomLoss(torch.nn.Module):
             pt = self.fitpoints[int(id)]
             preds.append(self.theory.predict_while_train(cffs, pt))
         preds = torch.stack(preds)
-        # print("Loss preds = {}".format(preds))
         return torch.mean(torch.square((preds - obs_true[:, 0])/obs_true[:, 1]))
 
 class NeuralFitter(Fitter):
@@ -135,33 +164,78 @@ class NeuralFitter(Fitter):
                  theory: theory.Theory, **kwargs) -> None:
         self.fitpoints = fitpoints
         self.theory = theory
-        x_train = []
-        y_train = []
-        for k, pt in enumerate(fitpoints):
-            pt.ptid = k
-            # pt.phi = torch.tensor(pt.phi)
-            x_train.append([pt.xB, pt.t])
-            y_train.append([pt.val, pt.err, k])
-        # We pass the point index k through the NNet (as irellevant feature!) so that Gepard
-        # can determine which DataPoint to use to calculate observable.
-        # TODO: Explain to Torch that this feature is irellevant! (This likely mean using
-        #        some more involved specific net architecture.
-        self.x_train = torch.tensor(x_train, dtype=torch.float32)
-        self.y_train = torch.tensor(y_train, dtype=torch.float32)
+        self.nnets = 4
+        self.maxtries = 999
+        self.learning_rate = 0.01
+        self.nbatch = 20
+        self.batchlen = 5
+        self.minprob = 0.05
         self.criterion = CustomLoss(fitpoints, theory)
-        self.optimizer = torch.optim.Adam(self.theory.nn_model.parameters(), lr=0.01)
+        Fitter.__init__(self, **kwargs)
+
+    def makenet(self, datapoints):
+        """Create net trained on datapoints."""
+        x_train, y_train, x_test, y_test = data_replica(datapoints)
+        self.theory.nn_model = torch.nn.Sequential(
+                torch.nn.Linear(2, 32),
+                torch.nn.ReLU(),
+                torch.nn.Linear(32, 64),
+                torch.nn.ReLU(),
+                torch.nn.Linear(64, 32),
+                torch.nn.ReLU(),
+                torch.nn.Linear(32, len(self.theory.output_layer))
+            )
+        self.optimizer = torch.optim.Adam(self.theory.nn_model.parameters(), lr=self.learning_rate)
         self.history = []
-    
+        mem_state_dict = self.theory.nn_model.state_dict()
+        mem_err = 100
+        for k in range(1, self.nbatch+1):
+            for epoch in range(self.batchlen):
+                self.optimizer.zero_grad()
+                cff_pred = self.theory.nn_model(x_train)
+                loss = self.criterion(cff_pred, y_train)
+                self.history.append(float(loss))
+                loss.backward()
+                self.optimizer.step()
+            test_cff_pred = self.theory.nn_model(x_test)
+            test_loss = float(self.criterion(test_cff_pred, y_test))
+            print("Epoch {}: train error = {:.2f} test error = {:.2f}".format(
+                k*self.batchlen, self.history[-1], test_loss))
+            if float(test_loss) < mem_err:
+                mem_state_dict = self.theory.nn_model.state_dict()
+                mem_err = float(test_loss)
+            elif test_loss > 100:
+                print("Hopeless. Giving up")
+                break
+        self.theory.nn_model.load_state_dict(mem_state_dict)
+        return self.theory.nn_model, mem_err
 
-    def train(self, epochs=1000):
-        
-        for epoch in range(epochs):
-            self.optimizer.zero_grad()
-            cff_pred = self.theory.nn_model(self.x_train)
-            self.loss = self.criterion(cff_pred, self.y_train)
-            self.history.append(float(self.loss))
-            self.loss.backward()
-            self.optimizer.step()
 
-        print("Final loss = {}".format(self.history[-1]))
+    def fit(self):
+        """Train some nets."""
+        for n in range(self.nnets):
+            net, mem_err = self.makenet(self.fitpoints)
+            self.theory.nets.append(net)
+            chi, dof, fitprob = self.theory.chisq(self.fitpoints)
+            print("Net {} --> test_err = {}, P(chisq={})={}".format(
+                   n, mem_err, chi, fitprob))
 
+
+    def fitgood(self, minchi=0.):
+        """Train until you have nnet good nets."""
+        n = 0
+        k = 0
+        while n < self.nnets and k < self.maxtries:
+            k += 1
+            net, mem_err = self.makenet(self.fitpoints)
+            self.theory.nets.append(net)
+            chi, dof, fitprob = self.theory.chisq(self.fitpoints)
+            if fitprob < self.minprob and chi > minchi:
+                del self.theory.nets[-1]
+            else:
+                n += 1
+            print("[{}/{}] Net {} --> test_err = {}, P(chisq={})={}".format(
+                k, self.maxtries, n, mem_err, chi, fitprob))
+            if (k > self.maxtries/4) and (n < 2):
+                print("Less than 2 nets found after 25% of maxtries. Giving up.")
+                break

@@ -2,6 +2,7 @@
 
 # from joblib import Parallel, delayed
 from numpy import array, ndarray, sqrt
+from scipy.special import gammainc
 
 from . import data, quadrature
 
@@ -63,8 +64,14 @@ class Theory(object):
                     allpulls.append(diff/pt.errminus)
             else:
                 allpulls.append(diff/pt.err)
-        chi = sum(p*p for p in allpulls)  # equal to m.fval if minuit fit is done
-        return chi
+        chi = float(sum(p*p for p in allpulls))
+        try:
+            npars = len(self.free_parameters())
+        except:
+            npars = 0
+        ndof = len(points) - npars
+        fitprob = 1 - gammainc(ndof/2, chi/2)
+        return chi, ndof, fitprob
 
     def pull(self, pt: data.DataPoint):
         """Return pull of a single Datapoint."""
