@@ -85,6 +85,34 @@ def _axline(ax, fun, points, xaxis, **kwargs):
             yvals = xis*np.array(yvals)
         ax.plot(xvals, yvals, **kwargs)
 
+def _axmesh(ax, fun, points, xaxis, **kwargs):
+    """Make a mesh of neural net lines corresponding to points.
+
+    Args:
+        ax: matplotlib axis object
+        fun: array-valued function when evaluated for DataPoint
+        points: list of sets of DataPoint instances
+        xaxis: 'Q2', 't', 'xB', ...
+        **kwargs: keyword arguments
+
+    """
+    for pts in points:
+        if 'phi' in pts[0] and pts[0].frame == 'Trento':
+            # go back to degrees
+            oldpts = [pt.copy() for pt in pts]
+            for pt in oldpts:
+                pt.from_conventions()
+            xvals = [getattr(pt, xaxis) for pt in oldpts]
+        else:
+            xvals = [getattr(pt, xaxis) for pt in pts]
+        yvals = np.array([fun(pt) for pt in pts])
+        kwargs.pop('justbars', False)  # Kludge
+        if kwargs.pop('xF', False):  # do we want  xF(x) plotted?
+            xis = np.array([pt.xi for pt in pts])
+            yvals = xis*np.array(yvals)
+        for k, aux in enumerate(yvals[0, :]):   # UGLY!
+            ax.plot(xvals, yvals[:, k], **kwargs)
+
 
 def _axband(ax, fun, pts, xaxis, **kwargs):
     """Make a band corresponding to points.
@@ -129,7 +157,7 @@ def _axband(ax, fun, pts, xaxis, **kwargs):
         ax.fill(x, y, alpha=0.5, **kwargs)
 
 
-def panel(ax, points=None, lines=None, bands=None, xaxis=None, xs=None,
+def panel(ax, points=None, lines=None, bands=None, mesh=None, xaxis=None, xs=None,
           kins={}, kinlabels=None, **kwargs):
     """Plot datapoints together with fit/theory line(s) and band(s).
 
@@ -139,6 +167,7 @@ def panel(ax, points=None, lines=None, bands=None, xaxis=None, xs=None,
         lines: (list of) 'theorie(s)' describing curves for plotting.
         bands: (list of) neural network 'theorie(s)' or 'theorie(s)' with
                defined uncertianties, defining band by their mean and std.dev.
+        mesh: neural net theory that will be plotted as mesh of nets
         xaxis: abscissa variable; if None, last of sets.xaxes is taken;
                if 'points' all points are just put equidistantly along x-axis
         xs: list of xvalues, needed if not specified by points
@@ -214,6 +243,10 @@ def panel(ax, points=None, lines=None, bands=None, xaxis=None, xs=None,
                         linewidth=2,
                         label=r'\texttt{{{}}}'.format(band.name), **kwargs)
             bandn += 1
+
+    if mesh:
+        _axmesh(ax, lambda pt: mesh.predict(pt, orig_conventions=True, mesh=True), points,
+                xaxis=xaxis, linewidth=0.5, alpha=0.7, **kwargs)
 
     if kinlabels:
         # constant kinematic variables positioning

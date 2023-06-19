@@ -187,10 +187,13 @@ class Theory(object):
 
         if kwargs.pop('orig_conventions', False):
             # express result in conventions of original datapoint
-            try:
-                result = (pt.orig_conventions(result[0]),) + result[1:]
-            except (IndexError, TypeError):
-                result = pt.orig_conventions(result)
+            if mesh:
+                result = array([pt.orig_conventions(res) for res in result])
+            else:
+                try:
+                    result = (pt.orig_conventions(result[0]),) + result[1:]
+                except (IndexError, TypeError):
+                    result = pt.orig_conventions(result)
         return result
 
     def predict_while_train(self, cffs, pt: data.DataPoint, **kwargs):
