@@ -91,12 +91,13 @@ class Theory(object):
 
     chisq = chisq_single
 
-    def predict(self, pt: data.DataPoint, uncertainty: bool = False, **kwargs) -> float:
+    def predict(self, pt: data.DataPoint, uncertainty: bool = False, mesh: bool = False, **kwargs) -> float:
         """Give prediction for DataPoint pt.
 
         Args:
             pt: instance of DataPoint
             uncertainty: if available, produce tuple (mean, uncertainty)
+            mesh: return results of all particular neural nets
             **kwargs: keyword arguments
 
         Keyword Args:
@@ -123,38 +124,62 @@ class Theory(object):
 
         fun = getattr(self, obs)
 
-        if uncertainty:
-            # We now do standard propagation of uncertainty from m to observable
-            # using simplified procedure
-            pars = self.free_parameters()
-            var = 0
-            dfdp = {}
-            for p in pars:
-                # calculating dfdp = derivative of observable w.r.t. parameter:
-                # h=sqrt(self.covariance[p,p])
-                h = self.parameters_errors[p]
-                mem = self.parameters[p]
-                self.parameters[p] = mem+h/2.
-                up = fun(pt)
-                self.parameters[p] = mem-h/2.
-                down = fun(pt)
-                self.parameters[p] = mem
-                dfdp[p] = (up-down)/h
-            if hasattr(self, 'covariance') and self.covariance:
-                # Full calculation of uncertainty
-                for p1 in pars:
-                    for p2 in pars:
-                        var += dfdp[p1]*self.covariance[p1, p2]*dfdp[p2]
-            elif hasattr(self, 'parameters_errors') and self.parameters_errors:
-                # Just the diagonal part, no parameter correlations
-                for p in pars:
-                    var += (dfdp[p]*self.parameters_errors[p])**2
+        if uncertainty or mesh:
+            if hasattr(self, 'nets'):
+                # It's a neural net model. Do averaging over nets.
+                res = []
+                for net in self.nets:
+                    self.nn_model = net
+                    self.cffs_evaluated = False
+                    res.append(float(fun(pt)))
+                res = array(res)
+                if mesh:
+                    result = res
+                else:
+                    result = (res.mean(), res.std())
             else:
-                print('Theory has neither covariance matrix, nor parameters_errors.')
-            result = (fun(pt), sqrt(var))
+                # We now do standard propagation of uncertainty from m to observable
+                # using simplified procedure
+                pars = self.free_parameters()
+                var = 0
+                dfdp = {}
+                for p in pars:
+                    # calculating dfdp = derivative of observable w.r.t. parameter:
+                    # h=sqrt(self.covariance[p,p])
+                    h = self.parameters_errors[p]
+                    mem = self.parameters[p]
+                    self.parameters[p] = mem+h/2.
+                    up = fun(pt)
+                    self.parameters[p] = mem-h/2.
+                    down = fun(pt)
+                    self.parameters[p] = mem
+                    dfdp[p] = (up-down)/h
+                if hasattr(self, 'covariance') and self.covariance:
+                    # Full calculation of uncertainty
+                    for p1 in pars:
+                        for p2 in pars:
+                            var += dfdp[p1]*self.covariance[p1, p2]*dfdp[p2]
+                elif hasattr(self, 'parameters_errors') and self.parameters_errors:
+                    # Just the diagonal part, no parameter correlations
+                    for p in pars:
+                        var += (dfdp[p]*self.parameters_errors[p])**2
+                else:
+                    print('Theory has neither covariance matrix, nor parameters_errors.')
+                result = (fun(pt), sqrt(var))
         else:
-            result = fun(pt)
-            self.cffs_evaluated = False  # be ready for the next evaluation
+            if hasattr(self, 'nets') and not self.in_training:
+                # return average over nets
+                res = []
+                self.cffs_evaluated = False  # just in case
+                for net in self.nets:
+                    self.nn_model = net
+                    res.append(float(fun(pt)))
+                    self.cffs_evaluated = False
+                res = array(res)
+                result = res.mean()
+            else:
+                result = fun(pt)
+                self.cffs_evaluated = False  # be ready for the next evaluation
 
         if 'parameters' in kwargs:
             # restore old values
