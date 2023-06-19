@@ -117,25 +117,25 @@ def data_replica(datapoints, train_percentage=70):
     y_train = []
     x_test = []
     y_test = []
-    train_size = int(len(datapoints) * train_percentage / 100.)
+    train_size = int(len(datapoints) * train_percentage / 100)
     for k, pt in enumerate(np.random.permutation(datapoints)):
-        pt.ptid = k  # this gets overwritten in different training runs
-        y = pt.val + round(np.random.normal(0, pt.err, 1)[0], 5)
+        # This rounding was because pt.val was used as pt ID in old pybrain version
+        # y = pt.val + round(np.random.normal(0, pt.err, 1)[0], 5)
+        y = pt.val + np.random.normal(0, pt.err, 1)[0]
         if k < train_size:
             x_train.append([pt.xB, pt.t])
-            y_train.append([pt.val, pt.err, k])
+            y_train.append([y, pt.err, pt.ptid])
         else:
             x_test.append([pt.xB, pt.t])
-            y_test.append([pt.val, pt.err, k])
-    # We pass the point index k through the NNet (as irellevant feature!) so that Gepard
-    # can determine which DataPoint to use to calculate observable.
-    # TODO: Explain to Torch that this feature is irellevant! (This likely mean using
-    #        some more involved specific net architecture.
+            y_test.append([y, pt.err, pt.ptid])
+    # We pass the pt.ptid to the loss function so Gepard
+    # can use it to determine which DataPoint to use to calculate observable.
     x_train = torch.tensor(x_train, dtype=torch.float32)
     y_train = torch.tensor(y_train, dtype=torch.float32)
     x_test = torch.tensor(x_test, dtype=torch.float32)
     y_test = torch.tensor(y_test, dtype=torch.float32)
     return x_train, y_train, x_test, y_test
+
 
 class CustomLoss(torch.nn.Module):
     def __init__(self, fitpoints, theory):
@@ -151,6 +151,7 @@ class CustomLoss(torch.nn.Module):
             preds.append(self.theory.predict_while_train(cffs, pt))
         preds = torch.stack(preds)
         return torch.mean(torch.square((preds - obs_true[:, 0])/obs_true[:, 1]))
+
 
 class NeuralFitter(Fitter):
     """Fits using PyTorch library.
@@ -188,7 +189,7 @@ class NeuralFitter(Fitter):
         self.optimizer = torch.optim.Adam(self.theory.nn_model.parameters(), lr=self.learning_rate)
         self.history = []
         mem_state_dict = self.theory.nn_model.state_dict()
-        mem_err = 100
+        mem_err = 100  # large init error, almost certain to be bettered
         for k in range(1, self.nbatch+1):
             for epoch in range(self.batchlen):
                 self.optimizer.zero_grad()
