@@ -199,13 +199,12 @@ def panel(ax, points=None, lines=None, bands=None, mesh=None, xaxis=None, xs=Non
         # via xaxis and kins)
         pts = []
         for x in xs:
-            pt = data.DataPoint(init=kins)
+            pt = data.DataPoint(kins)
             setattr(pt, xaxis, x)
             # workaround for imperfect fill_kinematics
             if hasattr(pt, 'xi'):
                 pt.xB = 2*pt.xi/(1.+pt.xi)
             # end of workaorund
-            data._fill_kinematics(pt)
             pts.append(pt)
         points = [pts]
 
@@ -1996,7 +1995,7 @@ def CFF3log(cffs=['ImH', 'ReH', 'ImE', 'ReE', 'ImHt', 'ImEt'], tval=-0.2,
         cff = cffs[pn]
         ax.set_xscale('log')  # x-axis to be logarithmic
         panel(ax, xaxis='xi', xs=xvals, kins={'observable':cff, 't':tval, 'Q2':4.,
-            'units':{'CFF': 1}, 'observable': 'CFF'}, **kwargs)
+            'units':{cff:1}}, **kwargs)
         ax.set_ylabel(constants.toTeX['{}'.format(cff)], fontsize=18)
         ax.axhline(y=0, lw=0.5, color='k', ls=':')  # horizontal bar
         for ticklabel in ax.get_xticklabels() + ax.get_yticklabels():
