@@ -220,7 +220,7 @@ def panel(ax, points=None, lines=None, bands=None, mesh=None, xaxis=None, xs=Non
         for line in lines:
             _axline(ax, lambda pt: line.predict(pt, orig_conventions=True), points,
                     xaxis=xaxis, color=linecolors[linen], linestyle=linestyles[linen],
-                    linewidth=2, alpha=1.0, label=r'\texttt{{{}}}'.format(line.name),
+                    linewidth=2, alpha=1.0, label=r'{}'.format(line.name),
                     **kwargs)
             linen += 1
 
@@ -240,10 +240,11 @@ def panel(ax, points=None, lines=None, bands=None, mesh=None, xaxis=None, xs=Non
                         facecolor='none',
                         edgecolor=bandcolors[bandn],  # band edge color
                         linewidth=2,
-                        label=r'\texttt{{{}}}'.format(band.name), **kwargs)
+                        label=r'{}'.format(band.name), **kwargs)
             bandn += 1
 
     if mesh:
+        # Only one mesh. It makes no sense probably confusing more meshes.
         _axmesh(ax, lambda pt: mesh.predict(pt, orig_conventions=True, mesh=True), points,
                 xaxis=xaxis, linewidth=0.5, alpha=0.7, **kwargs)
 

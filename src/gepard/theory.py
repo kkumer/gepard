@@ -122,6 +122,7 @@ class Theory(object):
             old = self.parameters.copy()
             self.parameters.update(kwargs['parameters'])
 
+        self.cffs_evaluated = False  # new prediction, need fresh CFFs
         fun = getattr(self, obs)
 
         if uncertainty or mesh:
@@ -130,8 +131,8 @@ class Theory(object):
                 res = []
                 for net in self.nets:
                     self.nn_model = net
-                    self.cffs_evaluated = False
                     res.append(float(fun(pt)))
+                    self.cffs_evaluated = False
                 res = array(res)
                 if mesh:
                     result = res
@@ -170,7 +171,6 @@ class Theory(object):
             if hasattr(self, 'nets') and not self.in_training:
                 # return average over nets
                 res = []
-                self.cffs_evaluated = False  # just in case
                 for net in self.nets:
                     self.nn_model = net
                     res.append(float(fun(pt)))

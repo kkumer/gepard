@@ -150,23 +150,38 @@ class NeuralModel(Model):
 
     """
 
-    def __init__(self, **kwargs) -> None:
+    def __init__(self, output_layer=['ReH', 'ImH'], **kwargs) -> None:
         self.nets = []  # here come PyTorch models
-        self.cffsmap = {'ReH': 0, 'ImH': 1, 'ReE': 2, 'ImE': 3,
-                       # 'ReHt': 4, 'ImHt': 5, 'ReEt': 6, 'ImEt': 7,   KLUDGE! FIXME!
-                       'ReHt': 6, 'ImHt': 4, 'ReEt': 7, 'ImEt': 5,
-                        'ReHeff': 8, 'ImHeff': 9, 'ReEeff': 10, 'ImEeff': 11,
-                       'ReHteff': 12, 'ImHteff': 13, 'ReEteff': 14, 'ImEteff': 15}
-        # self.output_layer = ['ReH', 'ImH']
-        self.output_layer = ['ReH', 'ImH', 'ReE', 'ImE', 'ImHt', 'ImEt']
+        self.allCFFs = {'ReH', 'ImH', 'ReE', 'ImE', 'ReHt', 'ImHt', 'ReEt', 'ImEt',
+                        'ReHeff', 'ImHeff', 'ReEeff', 'ImEeff',
+                        'ReHteff', 'ImHteff', 'ReEteff', 'ImEteff'}
+        self.output_layer = output_layer
+        self.cffs_map = {cff: k for k, cff in  enumerate(self.output_layer)}
+        self.in_training = False
         super().__init__(**kwargs)
+
+    def build_net(self):
+        '''Builds net architecture. For user to override.'''
+        nn_model = torch.nn.Sequential(
+                torch.nn.Linear(2, 32),
+                torch.nn.ReLU(),
+                torch.nn.Linear(32, 64),
+                torch.nn.ReLU(),
+                torch.nn.Linear(64, 32),
+                torch.nn.ReLU(),
+                torch.nn.Linear(32, len(self.output_layer))
+            )
+        optimizer = torch.optim.Rprop(nn_model.parameters(),
+                lr=0.01)
+        return nn_model, optimizer
 
     def __getattr__(self, name):
         # if name in object.__getatribute__(self, 'output_layer'):
+        #print("Asked for NeuralModel attribute {}".format(name))
         if name in self.output_layer:
-            self.cff_index = self.cffsmap[name]
+            self.cff_index = self.cffs_map[name]
             return self.cffs
-        elif name in self.cffsmap.keys():
+        elif name in self.allCFFs:
             return self.zero
 
     def zero(self, pt):

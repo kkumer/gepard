@@ -167,27 +167,17 @@ class NeuralFitter(Fitter):
         self.theory = theory
         self.nnets = 4
         self.maxtries = 999
-        self.learning_rate = 0.01
         self.nbatch = 20
         self.batchlen = 5
         self.minprob = 0.05
         self.criterion = CustomLoss(fitpoints, theory)
         Fitter.__init__(self, **kwargs)
 
-    def makenet(self, datapoints):
+    def train_net(self, datapoints):
         """Create net trained on datapoints."""
+        self.theory.in_training = True
         x_train, y_train, x_test, y_test = data_replica(datapoints)
-        self.theory.nn_model = torch.nn.Sequential(
-                torch.nn.Linear(2, 32),
-                torch.nn.ReLU(),
-                torch.nn.Linear(32, 64),
-                torch.nn.ReLU(),
-                torch.nn.Linear(64, 32),
-                torch.nn.ReLU(),
-                torch.nn.Linear(32, len(self.theory.output_layer))
-            )
-        self.optimizer = torch.optim.Rprop(self.theory.nn_model.parameters(),
-                lr=self.learning_rate)
+        self.theory.nn_model, self.optimizer = self.theory.build_net()
         self.history = []
         mem_state_dict = self.theory.nn_model.state_dict()
         mem_err = 100  # large init error, almost certain to be bettered
@@ -210,13 +200,14 @@ class NeuralFitter(Fitter):
                 print("Hopeless. Giving up")
                 break
         self.theory.nn_model.load_state_dict(mem_state_dict)
+        self.theory.in_training = False
         return self.theory.nn_model, mem_err
 
 
     def fit(self):
         """Train some nets."""
         for n in range(self.nnets):
-            net, mem_err = self.makenet(self.fitpoints)
+            net, mem_err = self.train_net(self.fitpoints)
             self.theory.nets.append(net)
             chi, dof, fitprob = self.theory.chisq(self.fitpoints)
             print("Net {} --> test_err = {}, P(chisq={})={}".format(
@@ -229,7 +220,7 @@ class NeuralFitter(Fitter):
         k = 0
         while n < self.nnets and k < self.maxtries:
             k += 1
-            net, mem_err = self.makenet(self.fitpoints)
+            net, mem_err = self.train_net(self.fitpoints)
             self.theory.nets.append(net)
             chi, dof, fitprob = self.theory.chisq(self.fitpoints)
             if fitprob < self.minprob and chi > minchi:
