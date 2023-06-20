@@ -186,7 +186,8 @@ class NeuralFitter(Fitter):
                 torch.nn.ReLU(),
                 torch.nn.Linear(32, len(self.theory.output_layer))
             )
-        self.optimizer = torch.optim.Adam(self.theory.nn_model.parameters(), lr=self.learning_rate)
+        self.optimizer = torch.optim.Rprop(self.theory.nn_model.parameters(),
+                lr=self.learning_rate)
         self.history = []
         mem_state_dict = self.theory.nn_model.state_dict()
         mem_err = 100  # large init error, almost certain to be bettered
