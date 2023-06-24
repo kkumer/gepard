@@ -176,8 +176,6 @@ class NeuralModel(Model):
         return nn_model, optimizer
 
     def __getattr__(self, name):
-        # if name in object.__getatribute__(self, 'output_layer'):
-        #print("Asked for NeuralModel attribute {}".format(name))
         if name in self.output_layer:
             self.cff_index = self.cffs_map[name]
             return self.cffs
@@ -191,5 +189,30 @@ class NeuralModel(Model):
         if not self.cffs_evaluated:
             self._cffs = self.nn_model(torch.tensor([pt.xB, pt.t], dtype=torch.float32))
             self.cffs_evaluated = True
+        return self._cffs[self.cff_index]
+
+
+class FlavoredNeuralModel(NeuralModel):
+
+    def __init__(self, output_layer=['ReHu', 'ReHd', 'ImHu', 'ImHd']):
+         '''Flavored CFFs are defined by 'u' and 'd' name endings and they have to come in pairs.'''
+         super().__init__(output_layer)
+
+    def __getattr__(self, name):
+        if name+'u' in self.output_layer:
+            self.cff_flavored_indices = self.cffs_map[name+'u'], self.cffs_map[name+'d']
+            return self.flavored_cffs
+        else:  # relegate to normal non-flavor-separated CFFs of parent class
+            return super().__getattr__(name)
+
+    def flavored_cffs(self, pt):
+        u_ind, d_ind = self.cff_flavored_indices
+        if not self.cffs_evaluated:
+            self._cffs = self.nn_model(torch.tensor([pt.xB, pt.t], dtype=torch.float32))
+            self.cffs_evaluated = True
+        if hasattr(pt, 'in2particle') and pt.in2particle == 'n':
+            return (4/9)*self._cffs[d_ind] + (1/9)*self._cffs[u_ind]   # neutron
+        else:
+            return (4/9)*self._cffs[u_ind] + (1/9)*self._cffs[d_ind]   # proton
         return self._cffs[self.cff_index]
 
