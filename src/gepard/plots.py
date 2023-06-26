@@ -205,6 +205,10 @@ def panel(ax, points=None, lines=None, bands=None, mesh=None, xaxis=None, xs=Non
             if hasattr(pt, 'xi'):
                 pt.xB = 2*pt.xi/(1.+pt.xi)
             # end of workaorund
+            # another workaround
+            if xaxis == 'tm':
+                setattr(pt, 't', -x)
+            # end of workaorund
             pts.append(pt)
         points = [pts]
 
@@ -227,7 +231,7 @@ def panel(ax, points=None, lines=None, bands=None, mesh=None, xaxis=None, xs=Non
     if bands:
         if not isinstance(bands, list):
             bands = [bands]
-        bandcolors = ['xkcd:teal', 'red', 'darkcyan', 'blue', 'green', 'purple']
+        bandcolors = ['red', 'xkcd:teal', 'darkcyan', 'blue', 'green', 'purple']
         hatches = ['\\\\', '////', '|', '.']
         bandn = 0
         for band in bands:
@@ -1878,7 +1882,7 @@ def CFFt(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
         # smaller x
         ax = fig.add_subplot(len(cffs), 2, 2*n+1)
         panel(ax, xaxis='tm', xs=tmvals, kins={'observable':cff, 'xi':0.12, 'Q2':4.,
-           'units':{'CFF': 1}, 'observable': 'CFF'}, **kwargs)
+           'units':{cff: 1},}, **kwargs)
         ax.set_xlabel(constants.toTeX['tm'], fontsize=15)
         try:
             ax.set_ylabel(constants.toTeX['%s' % cff], fontsize=18)
@@ -1895,7 +1899,7 @@ def CFFt(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
         # larger x
         ax = fig.add_subplot(len(cffs), 2, 2*n+2)
         panel(ax, xaxis='tm', xs=tmvals, kins={'observable':cff, 'xi':0.22, 'Q2':4.,
-            'units':{'CFF': 1}, 'observable': 'CFF'}, **kwargs)
+            'units':{cff: 1}}, **kwargs)
         ax.set_xlabel(constants.toTeX['tm'], fontsize=15)
         try:
             ax.set_ylabel(constants.toTeX['%s' % cff], fontsize=18)
@@ -1936,7 +1940,7 @@ def CFF3(cffs=['ImH', 'ReH', 'ImE', 'ReE'],
     for pn, ax in enumerate(axs.flatten()):
         cff = cffs[pn]
         panel(ax, xaxis='xi', xs=xvals, kins={'observable':cff, 't':-0.2, 'Q2':4.,
-            'units':{'CFF': 1}, 'observable': 'CFF'}, **kwargs)
+            'units':{cff:1}}, **kwargs)
         ax.set_ylabel(constants.toTeX['{}'.format(cff)], fontsize=18)
         ax.axhline(y=0, lw=0.5, color='k', ls=':')  # horizontal bar
         for ticklabel in ax.get_xticklabels() + ax.get_yticklabels():

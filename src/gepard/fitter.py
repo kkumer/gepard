@@ -170,6 +170,8 @@ class NeuralFitter(Fitter):
         self.nbatch = 20
         self.batchlen = 5
         self.minprob = 0.05
+        self.lx_lambda = 0.001
+        self.regularization = None
         self.criterion = CustomLoss(fitpoints, theory)
         Fitter.__init__(self, **kwargs)
 
@@ -186,6 +188,15 @@ class NeuralFitter(Fitter):
                 self.optimizer.zero_grad()
                 cff_pred = self.theory.nn_model(x_train)
                 loss = self.criterion(cff_pred, y_train)
+                if self.regularization == 'L1':
+                    lx_norm = sum(torch.linalg.norm(p, 1)
+                            for p in self.theory.nn_model.parameters())
+                elif self.regularization == 'L2':
+                    lx_norm = sum(torch.linalg.norm(p, 2) ** 2
+                            for p in self.theory.nn_model.parameters())
+                else:
+                    lx_norm = 0
+                loss = loss + self.lx_lambda * lx_norm
                 self.history.append(float(loss))
                 loss.backward()
                 self.optimizer.step()

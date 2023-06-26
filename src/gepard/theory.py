@@ -64,7 +64,7 @@ class Theory(object):
                     allpulls.append(diff/pt.errminus)
             else:
                 allpulls.append(diff/pt.err)
-        chi = float(sum(p*p for p in allpulls))
+        chi = sum(p*p for p in allpulls)
         try:
             npars = len(self.free_parameters())
         except:
