@@ -216,16 +216,14 @@ class NeuralFitter(Fitter):
 
 
     def fit(self):
-        """Train some nets."""
+        """Train number (nnet) of nets."""
         for n in range(self.nnets):
             net, mem_err = self.train_net(self.fitpoints)
             self.theory.nets.append(net)
-            chi, dof, fitprob = self.theory.chisq(self.fitpoints)
-            print("Net {} --> test_err = {}, P(chisq={})={}".format(
-                   n, mem_err, chi, fitprob))
+            print("Net {} --> test_err = {}".format(n, mem_err))
 
 
-    def fitgood(self, minchi=0.):
+    def fitgood(self, min_mem_err : float = 2):
         """Train until you have nnet good nets."""
         n = 0
         k = 0
@@ -233,13 +231,12 @@ class NeuralFitter(Fitter):
             k += 1
             net, mem_err = self.train_net(self.fitpoints)
             self.theory.nets.append(net)
-            chi, dof, fitprob = self.theory.chisq(self.fitpoints)
-            if fitprob < self.minprob and chi > minchi:
+            if mem_err > min_mem_err:
                 del self.theory.nets[-1]
             else:
                 n += 1
             print("[{}/{}] Net {} --> test_err = {}, P(chisq={})={}".format(
                 k, self.maxtries, n, mem_err, chi, fitprob))
             if (k > self.maxtries/4) and (n < 2):
-                print("Less than 2 nets found after 25% of maxtries. Giving up.")
+                print("Less than 2 good nets found after 25% of maxtries. Giving up.")
                 break
