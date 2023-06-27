@@ -169,7 +169,6 @@ class NeuralFitter(Fitter):
         self.maxtries = 999
         self.nbatch = 20
         self.batchlen = 5
-        self.minprob = 0.05
         self.lx_lambda = 0.001
         self.regularization = None
         self.criterion = CustomLoss(fitpoints, theory)
@@ -218,25 +217,25 @@ class NeuralFitter(Fitter):
     def fit(self):
         """Train number (nnet) of nets."""
         for n in range(self.nnets):
-            net, mem_err = self.train_net(self.fitpoints)
+            net, test_err = self.train_net(self.fitpoints)
             self.theory.nets.append(net)
-            print("Net {} --> test_err = {}".format(n, mem_err))
+            print("Net {} --> test_err = {}".format(n, test_err))
 
 
-    def fitgood(self, min_mem_err : float = 2):
+    def fitgood(self, max_test_err : float = 2):
         """Train until you have nnet good nets."""
         n = 0
         k = 0
         while n < self.nnets and k < self.maxtries:
             k += 1
-            net, mem_err = self.train_net(self.fitpoints)
+            net, test_err = self.train_net(self.fitpoints)
             self.theory.nets.append(net)
-            if mem_err > min_mem_err:
+            if test_err > max_test_err:
                 del self.theory.nets[-1]
             else:
                 n += 1
-            print("[{}/{}] Net {} --> test_err = {}, P(chisq={})={}".format(
-                k, self.maxtries, n, mem_err, chi, fitprob))
+            print("[Try {}/{}] {} good nets. Last test_err = {}".format(
+                k, self.maxtries, n, test_err))
             if (k > self.maxtries/4) and (n < 2):
                 print("Less than 2 good nets found after 25% of maxtries. Giving up.")
                 break
