@@ -19,7 +19,7 @@ import torch
 from math import sqrt
 from typing import List
 
-from . import theory
+from . import data, theory
 from .constants import tolerance2
 
 
@@ -190,6 +190,30 @@ class NeuralModel(Model):
             self._cffs = self.nn_model(torch.tensor([pt.xB, pt.t], dtype=torch.float32))
             self.cffs_evaluated = True
         return self._cffs[self.cff_index]
+
+    def prune(self, pts: data.DataSet, min_prob: float = 0.05,
+                    max_chisq: float = 1000, max_chisq_npt: float = 3):
+        """Remove bad nets.
+
+        Args:
+            pts: List of datapoints that will be used to evaluate net performance.
+            min_prob: Probability that data occurs if model is true has to be larger
+                than this if the model is to be considered good (i.e. "p-value")
+            max_chisq: Chi-squared has to be smaller than this for the model to be considered good.
+            max_chisq_npt: Chi-squared per datapoint has to be smaller than this for the model
+                to be considered good.
+
+        Returns:
+            None. Changes Theory instance in place by deleting bad nets.
+
+        """
+        chis, npts, probs = self.chisq(pts, mesh=True)
+        bad_indices = []
+        for k, (chi, prob) in enumerate(zip(chis, probs)):
+            if (prob < min_prob) or (chi > max_chisq) or (chi/npts > max_chisq_npt):
+                bad_indices.append(k)
+        for k in bad_indices[::-1]:   # must delete backwards
+            del self.nets[k]
 
 
 class FlavoredNeuralModel(NeuralModel):
