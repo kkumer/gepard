@@ -6,6 +6,7 @@ import os
 import matplotlib  # type: ignore
 import matplotlib.pyplot as plt  # type: ignore
 import numpy as np
+import torch
 import pandas as pd  # type: ignore
 from scipy.interpolate import InterpolatedUnivariateSpline  # type: ignore
 
@@ -215,8 +216,8 @@ def panel(ax, points=None, lines=None, bands=None, mesh=None, xaxis=None, xs=Non
     if lines:
         if not isinstance(lines, list):
             lines = [lines]
-        linecolors = ['red', 'black', 'blue', 'green', 'darkorchid', 'olive',
-                      'darkcyan', 'indianred', 'red', 'black', 'blue', 'green',
+        linecolors = ['indianred', 'xkcd:teal', 'darkcyan', 'blue', 'green', 'darkorchid', 'olive',
+                      'red', 'red', 'black', 'blue', 'green',
                       'darkorchid', 'olive', 'darkcyan', 'indianred']
         linestyles = ['-', '--', '-.', ':', '-', '--', '-.', ':',
                       '-', '--', '-.', ':', '-', '--', '-.', ':']
@@ -231,7 +232,7 @@ def panel(ax, points=None, lines=None, bands=None, mesh=None, xaxis=None, xs=Non
     if bands:
         if not isinstance(bands, list):
             bands = [bands]
-        bandcolors = ['red', 'xkcd:teal', 'darkcyan', 'blue', 'green', 'purple']
+        bandcolors = ['indianred', 'xkcd:teal', 'darkcyan', 'blue', 'green', 'purple']
         hatches = ['\\\\', '////', '|', '.']
         bandn = 0
         for band in bands:
@@ -293,7 +294,7 @@ def thline(th, pts, ex_pt, npts=16):
     for tm in tms:
         pt.tm = tm
         pt.xB = spl_xB(tm)[()]
-        pt.Q2 = spl_Q2(tm)[()]
+        pt.Q2 = torch.tensor(spl_Q2(tm)[()])
         del pt.t
         del pt.W
         data._fill_kinematics(pt)
@@ -1295,7 +1296,7 @@ def CLAS15phi(path=None, fmt='png', **kwargs):
 def CLAS15xs(lines=None, path=None, fmt='png'):
     title = 'CLAS15xs'
     NPTS = 12
-    XLUw = pd.DataFrame([(pt.Q2, pt.xB, pt.tm, pt.val, pt.err) for pt in data.dataset[101]], columns=('Q2', 'xB', 'tm', 'val', 'err'))
+    XLUw = pd.DataFrame([(pt.Q2, pt.xB, pt.tm, pt.val, pt.err) for pt in data.dset[101]], columns=('Q2', 'xB', 'tm', 'val', 'err'))
     xQbins = [(0,4), (5,9), (11,15), (16,20), (21,26), (30,33), (35,38), (39,42), (43,45), (46,47)]
     fig, axs = plt.subplots(2,5, sharey='row', sharex=True, figsize=[12,9])
     axs = axs.reshape(10)
@@ -1881,7 +1882,7 @@ def CFFt(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
         cff = cffs[n]
         # smaller x
         ax = fig.add_subplot(len(cffs), 2, 2*n+1)
-        panel(ax, xaxis='tm', xs=tmvals, kins={'observable':cff, 'xi':0.12, 'Q2':4.,
+        panel(ax, xaxis='tm', xs=tmvals, kins={'observable':cff, 'xB':0.2, 'Q2':4.,
            'units':{cff: 1},}, **kwargs)
         ax.set_xlabel(constants.toTeX['tm'], fontsize=15)
         try:
@@ -1898,7 +1899,7 @@ def CFFt(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
                     # fontsize=12)
         # larger x
         ax = fig.add_subplot(len(cffs), 2, 2*n+2)
-        panel(ax, xaxis='tm', xs=tmvals, kins={'observable':cff, 'xi':0.22, 'Q2':4.,
+        panel(ax, xaxis='tm', xs=tmvals, kins={'observable':cff, 'xB':0.2, 'Q2':4.,
             'units':{cff: 1}}, **kwargs)
         ax.set_xlabel(constants.toTeX['tm'], fontsize=15)
         try:
