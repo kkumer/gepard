@@ -151,7 +151,7 @@ class NeuralModel(Model):
     """
 
     def __init__(self, output_layer=['ReH', 'ImH'], **kwargs) -> None:
-        self.nets = []  # here come PyTorch models
+        self.nets = []  # here come PyTorch models [(mean, std, net), ...]
         self.allCFFs = {'ReH', 'ImH', 'ReE', 'ImE', 'ReHt', 'ImHt', 'ReEt', 'ImEt',
                         'ReHeff', 'ImHeff', 'ReEeff', 'ImEeff',
                         'ReHteff', 'ImHteff', 'ReEteff', 'ImEteff'}
@@ -159,6 +159,25 @@ class NeuralModel(Model):
         self.cffs_map = {cff: k for k, cff in  enumerate(self.output_layer)}
         self.in_training = False
         super().__init__(**kwargs)
+
+    def get_standard(self, x, leave=[]):
+        mean = x.mean(0, keepdim=True)
+        std = x.std(0, unbiased=False, keepdim=True)
+        for dim in leave:
+            # we don't standardize indices e.g.        
+            mean[0, dim] = 0
+            std[0, dim] = 1 - 1e-7
+        return mean, std
+
+    def standardize(self, x, mean, std):
+        y = x - mean
+        y /= (std + 1e-7)
+        return y
+
+    def unstandardize(self, x, mean, std):
+        y = x * (std + 1e-7)
+        y += mean
+        return y
 
     def build_net(self):
         '''Builds net architecture. For user to override.'''
@@ -187,7 +206,9 @@ class NeuralModel(Model):
         
     def cffs(self, pt):
         if not self.cffs_evaluated:
-            self._cffs = self.nn_model(torch.tensor([pt.xB, pt.t], dtype=torch.float32))
+            x = self.standardize(torch.tensor([pt.xB, pt.t], dtype=torch.float32),
+                                    self.nn_mean, self.nn_std)
+            self._cffs = self.nn_model(x)[0]
             self.cffs_evaluated = True
         return self._cffs[self.cff_index]
 
@@ -232,7 +253,9 @@ class FlavoredNeuralModel(NeuralModel):
     def flavored_cffs(self, pt):
         u_ind, d_ind = self.cff_flavored_indices
         if not self.cffs_evaluated:
-            self._cffs = self.nn_model(torch.tensor([pt.xB, pt.t], dtype=torch.float32))
+            x = self.standardize(torch.tensor([pt.xB, pt.t], dtype=torch.float32),
+                                    self.nn_mean, self.nn_std)
+            self._cffs = self.nn_model(x)[0]
             self.cffs_evaluated = True
         if hasattr(pt, 'in2particle') and pt.in2particle == 'n':
             return (4/9)*self._cffs[d_ind] + (1/9)*self._cffs[u_ind]   # neutron

@@ -112,6 +112,10 @@ def data_replica(datapoints, train_percentage=70):
     Note that datapoints get id numbers pt.ptid needed for
     keeping link to proper datapoint for the loss calculation.
 
+    TODO: pt.err should be removed from y_train and loss, we should NOT
+      weigh the point twice, once when creating replicas and
+      second time when we train to it!
+
     """
     x_train = []
     y_train = []
@@ -149,8 +153,9 @@ class CustomLoss(torch.nn.Module):
         for cffs, id in zip(cff_pred, obs_true[:, -1]):
             pt = self.fitpoints[int(id)]
             preds.append(self.theory.predict_while_train(cffs, pt))
-        preds = torch.stack(preds)
-        return torch.mean(torch.square((preds - obs_true[:, 0])/obs_true[:, 1]))
+        preds = self.theory.standardize(torch.stack(preds),
+                    self.theory.nn_y_mean[:, 0], self.theory.nn_y_std[:, 0])
+        return torch.mean(torch.square((preds - obs_true[:, 0])))
 
 
 class NeuralFitter(Fitter):
@@ -178,6 +183,16 @@ class NeuralFitter(Fitter):
         """Create net trained on datapoints."""
         self.theory.in_training = True
         x_train, y_train, x_test, y_test = data_replica(datapoints)
+        self.theory.nn_mean, self.theory.nn_std = self.theory.get_standard(x_train)
+        self.theory.nn_y_mean, self.theory.nn_y_std = self.theory.get_standard(y_train, leave=[-1])
+        x_train_standardized = self.theory.standardize(x_train,
+                self.theory.nn_mean, self.theory.nn_std)
+        x_test_standardized = self.theory.standardize(x_test,
+                self.theory.nn_mean, self.theory.nn_std)
+        y_train_standardized = self.theory.standardize(y_train,
+                self.theory.nn_y_mean, self.theory.nn_y_std)
+        y_test_standardized = self.theory.standardize(y_test,
+                self.theory.nn_y_mean, self.theory.nn_y_std)
         self.theory.nn_model, self.optimizer = self.theory.build_net()
         self.history = []
         mem_state_dict = self.theory.nn_model.state_dict()
@@ -185,8 +200,8 @@ class NeuralFitter(Fitter):
         for k in range(1, self.nbatch+1):
             for epoch in range(self.batchlen):
                 self.optimizer.zero_grad()
-                cff_pred = self.theory.nn_model(x_train)
-                loss = self.criterion(cff_pred, y_train)
+                cff_pred = self.theory.nn_model(x_train_standardized)
+                loss = self.criterion(cff_pred, y_train_standardized)
                 if self.regularization == 'L1':
                     lx_norm = sum(torch.linalg.norm(p, 1)
                             for p in self.theory.nn_model.parameters())
@@ -199,8 +214,8 @@ class NeuralFitter(Fitter):
                 self.history.append(float(loss))
                 loss.backward()
                 self.optimizer.step()
-            test_cff_pred = self.theory.nn_model(x_test)
-            test_loss = float(self.criterion(test_cff_pred, y_test))
+            test_cff_pred = self.theory.nn_model(x_test_standardized)
+            test_loss = float(self.criterion(test_cff_pred, y_test_standardized))
             print("Epoch {}: train error = {:.2f} test error = {:.2f}".format(
                 k*self.batchlen, self.history[-1], test_loss))
             if float(test_loss) < mem_err:
@@ -211,14 +226,14 @@ class NeuralFitter(Fitter):
                 break
         self.theory.nn_model.load_state_dict(mem_state_dict)
         self.theory.in_training = False
-        return self.theory.nn_model, mem_err
+        return self.theory.nn_model, self.theory.nn_mean, self.theory.nn_std, mem_err
 
 
     def fit(self):
         """Train number (nnet) of nets."""
         for n in range(self.nnets):
-            net, test_err = self.train_net(self.fitpoints)
-            self.theory.nets.append(net)
+            net, mean, std, test_err = self.train_net(self.fitpoints)
+            self.theory.nets.append((net, mean, std))
             print("Net {} --> test_err = {}".format(n, test_err))
 
 
@@ -228,8 +243,8 @@ class NeuralFitter(Fitter):
         k = 0
         while n < self.nnets and k < self.maxtries:
             k += 1
-            net, test_err = self.train_net(self.fitpoints)
-            self.theory.nets.append(net)
+            net, mean, std, test_err = self.train_net(self.fitpoints)
+            self.theory.nets.append((net, mean, std))
             if test_err > max_test_err:
                 del self.theory.nets[-1]
             else:

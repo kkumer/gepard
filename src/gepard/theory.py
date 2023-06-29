@@ -130,7 +130,7 @@ class Theory(object):
                 # It's a neural net model. Do averaging over nets.
                 res = []
                 for net in self.nets:
-                    self.nn_model = net
+                    self.nn_model, self.nn_mean, self.nn_std = net
                     res.append(float(fun(pt)))
                     self.cffs_evaluated = False
                 res = array(res)
@@ -172,7 +172,7 @@ class Theory(object):
                 # return average over nets
                 res = []
                 for net in self.nets:
-                    self.nn_model = net
+                    self.nn_model, self.nn_mean, self.nn_std = net
                     res.append(float(fun(pt)))
                     self.cffs_evaluated = False
                 res = array(res)
