@@ -129,9 +129,10 @@ def data_replica(datapoints, train_percentage=70, smear_replicas=True):
     for k, pt in enumerate(np.random.permutation(datapoints)):
         # This rounding was because pt.val was used as pt ID in old pybrain version
         # y = pt.val + round(np.random.normal(0, pt.err, 1)[0], 5)
-        y = pt.val
         if smear_replicas:
-            y += np.random.normal(0, pt.err, 1)[0]
+            y = pt.val + np.random.normal(0, pt.err, 1)[0]
+        else:
+            y = pt.val
         if k < train_size:
             x_train.append([pt.xB, pt.t])
             y_train.append([y, pt.err, pt.ptid])
@@ -171,6 +172,7 @@ class NeuralFitter(Fitter):
         fitpoints (data.DataSet): points to fit to
         theory (theory.Theory): theory/model to be fitted
         smear_replicas (Bool): Should we smear the replica according the uncertainties
+        patience (Int): How many batches to wait for improvement before early stopping
 
     """
     def __init__(self, fitpoints: data.DataSet,
@@ -181,6 +183,7 @@ class NeuralFitter(Fitter):
         self.maxtries = 999
         self.nbatch = 20
         self.batchlen = 5
+        self.patience = 5
         self.lx_lambda = 0.001
         self.regularization = None
         self.smear_replicas = True
@@ -205,6 +208,7 @@ class NeuralFitter(Fitter):
         self.history = []
         mem_state_dict = self.theory.nn_model.state_dict()
         mem_err = 100  # large init error, almost certain to be bettered
+        early_stop_counter = 1
         for k in range(1, self.nbatch+1):
             for epoch in range(self.batchlen):
                 self.optimizer.zero_grad()
@@ -224,14 +228,24 @@ class NeuralFitter(Fitter):
                 self.optimizer.step()
             test_cff_pred = self.theory.nn_model(x_test_standardized)
             test_loss = float(self.criterion(test_cff_pred, y_test_standardized))
-            print("Epoch {}: train error = {:.2f} test error = {:.2f}".format(
-                k*self.batchlen, self.history[-1], test_loss))
-            if float(test_loss) < mem_err:
+            print("\nEpoch {:3d}: train error = {:.3f} test error = {:.3f} ".format(
+                k*self.batchlen, self.history[-1], test_loss), end='')
+            if test_loss < mem_err:
                 mem_state_dict = self.theory.nn_model.state_dict()
-                mem_err = float(test_loss)
+                mem_err = test_loss
+                print('-', end='')
+                early_stop_counter = 1
             elif test_loss > 100:
-                print("Hopeless. Giving up")
+                # with early stopping implemented this point should likely never be reached
+                print("\nHopeless. Giving up")
                 break
+            else:
+                if early_stop_counter == self.patience:
+                    print("+\nNo improvement for {} batches. Stopping early.".format(self.patience))
+                    break
+                else:
+                    print('+', end='')
+                    early_stop_counter += 1
         self.theory.nn_model.load_state_dict(mem_state_dict)
         self.theory.in_training = False
         return self.theory.nn_model, self.theory.nn_mean, self.theory.nn_std, mem_err
