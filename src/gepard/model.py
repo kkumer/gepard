@@ -164,7 +164,8 @@ class NeuralModel(Model):
         mean = x.mean(0, keepdim=True)
         std = x.std(0, unbiased=False, keepdim=True)
         for dim in leave:
-            # we don't standardize indices e.g.        
+            # we don't standardize indices e.g.
+            # FIXME: if we give up on y-standardization remove this
             mean[0, dim] = 0
             std[0, dim] = 1 - 1e-7
         return mean, std

@@ -160,9 +160,8 @@ class CustomLoss(torch.nn.Module):
         for cffs, id in zip(cff_pred, obs_true[:, -1]):
             pt = self.fitpoints[int(id)]
             preds.append(self.theory.predict_while_train(cffs, pt))
-        preds = self.theory.standardize(torch.stack(preds),
-                    self.theory.nn_y_mean[:, 0], self.theory.nn_y_std[:, 0])
-        return torch.mean(torch.square((preds - obs_true[:, 0])))
+        # FIXME: Hard-wired factor 10 tuned to CLAS observables y range. Kludge.
+        return 10*torch.mean(torch.square((torch.stack(preds) - obs_true[:, 0]))/obs_true[:, 1])
 
 
 class NeuralFitter(Fitter):
@@ -195,15 +194,10 @@ class NeuralFitter(Fitter):
         self.theory.in_training = True
         x_train, y_train, x_test, y_test = data_replica(datapoints, smear_replicas=self.smear_replicas)
         self.theory.nn_mean, self.theory.nn_std = self.theory.get_standard(x_train)
-        self.theory.nn_y_mean, self.theory.nn_y_std = self.theory.get_standard(y_train, leave=[-1])
         x_train_standardized = self.theory.standardize(x_train,
                 self.theory.nn_mean, self.theory.nn_std)
         x_test_standardized = self.theory.standardize(x_test,
                 self.theory.nn_mean, self.theory.nn_std)
-        y_train_standardized = self.theory.standardize(y_train,
-                self.theory.nn_y_mean, self.theory.nn_y_std)
-        y_test_standardized = self.theory.standardize(y_test,
-                self.theory.nn_y_mean, self.theory.nn_y_std)
         self.theory.nn_model, self.optimizer = self.theory.build_net()
         self.history = []
         mem_state_dict = self.theory.nn_model.state_dict()
@@ -213,7 +207,7 @@ class NeuralFitter(Fitter):
             for epoch in range(self.batchlen):
                 self.optimizer.zero_grad()
                 cff_pred = self.theory.nn_model(x_train_standardized)
-                loss = self.criterion(cff_pred, y_train_standardized)
+                loss = self.criterion(cff_pred, y_train)
                 if self.regularization == 'L1':
                     lx_norm = sum(torch.linalg.norm(p, 1)
                             for p in self.theory.nn_model.parameters())
@@ -227,8 +221,8 @@ class NeuralFitter(Fitter):
                 loss.backward()
                 self.optimizer.step()
             test_cff_pred = self.theory.nn_model(x_test_standardized)
-            test_loss = float(self.criterion(test_cff_pred, y_test_standardized))
-            print("\nEpoch {:3d}: train error = {:.3f} test error = {:.3f} ".format(
+            test_loss = float(self.criterion(test_cff_pred, y_test))
+            print("\nEpoch {:3d}: train error = {:.4f} test error = {:.4f} ".format(
                 k*self.batchlen, self.history[-1], test_loss), end='')
             if test_loss < mem_err:
                 mem_state_dict = self.theory.nn_model.state_dict()
