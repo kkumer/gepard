@@ -106,8 +106,12 @@ class MinuitFitter(Fitter):
         """Values and errors for free parameters."""
         self.theory.print_parameters()
 
-def data_replica(datapoints, train_percentage=70):
+def data_replica(datapoints, train_percentage=70, smear_replicas=True):
     """Returns datapoints split into training and testing set.
+
+    Args:
+        datapoints (data.DataSet): points that are to be replicated
+        smear_replicas (Bool): Should we smear the replica according the uncertainties
 
     Note that datapoints get id numbers pt.ptid needed for
     keeping link to proper datapoint for the loss calculation.
@@ -125,7 +129,9 @@ def data_replica(datapoints, train_percentage=70):
     for k, pt in enumerate(np.random.permutation(datapoints)):
         # This rounding was because pt.val was used as pt ID in old pybrain version
         # y = pt.val + round(np.random.normal(0, pt.err, 1)[0], 5)
-        y = pt.val + np.random.normal(0, pt.err, 1)[0]
+        y = pt.val
+        if smear_replicas:
+            y += np.random.normal(0, pt.err, 1)[0]
         if k < train_size:
             x_train.append([pt.xB, pt.t])
             y_train.append([y, pt.err, pt.ptid])
@@ -164,6 +170,7 @@ class NeuralFitter(Fitter):
     Args:
         fitpoints (data.DataSet): points to fit to
         theory (theory.Theory): theory/model to be fitted
+        smear_replicas (Bool): Should we smear the replica according the uncertainties
 
     """
     def __init__(self, fitpoints: data.DataSet,
@@ -176,13 +183,14 @@ class NeuralFitter(Fitter):
         self.batchlen = 5
         self.lx_lambda = 0.001
         self.regularization = None
+        self.smear_replicas = True
         self.criterion = CustomLoss(fitpoints, theory)
         Fitter.__init__(self, **kwargs)
 
     def train_net(self, datapoints):
         """Create net trained on datapoints."""
         self.theory.in_training = True
-        x_train, y_train, x_test, y_test = data_replica(datapoints)
+        x_train, y_train, x_test, y_test = data_replica(datapoints, smear_replicas=self.smear_replicas)
         self.theory.nn_mean, self.theory.nn_std = self.theory.get_standard(x_train)
         self.theory.nn_y_mean, self.theory.nn_y_std = self.theory.get_standard(y_train, leave=[-1])
         x_train_standardized = self.theory.standardize(x_train,
@@ -248,6 +256,8 @@ class NeuralFitter(Fitter):
             if test_err > max_test_err:
                 del self.theory.nets[-1]
             else:
+                print("test_err = {} < max_test_err = {} so we accept the net".format(
+                    test_err, max_test_err))
                 n += 1
             print("[Try {}/{}] {} good nets. Last test_err = {}".format(
                 k, self.maxtries, n, test_err))
