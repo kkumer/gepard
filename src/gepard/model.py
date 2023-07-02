@@ -213,9 +213,11 @@ class NeuralModel(Model):
             self.cffs_evaluated = True
         return self._cffs[self.cff_index]
 
-    def prune(self, pts: data.DataSet, min_prob: float = 0.05,
-                    max_chisq: float = 1000, max_chisq_npt: float = 3):
+    def prune(self, pts: data.DataSet, min_prob: float = None,
+                    max_chisq: float = None, max_chisq_npt: float = None):
         """Remove bad nets.
+
+        If you specify more criteria, violating any is enough to be pruned.
 
         Args:
             pts: List of datapoints that will be used to evaluate net performance.
@@ -232,7 +234,9 @@ class NeuralModel(Model):
         chis, npts, probs = self.chisq(pts, mesh=True)
         bad_indices = []
         for k, (chi, prob) in enumerate(zip(chis, probs)):
-            if (prob < min_prob) or (chi > max_chisq) or (chi/npts > max_chisq_npt):
+            if ( (min_prob and (prob < min_prob)) or
+                    (max_chisq and (chi > max_chisq)) or
+                    (max_chisq_npt and (chi/npts > max_chisq_npt)) ):
                 bad_indices.append(k)
         for k in bad_indices[::-1]:   # must delete backwards
             del self.nets[k]
