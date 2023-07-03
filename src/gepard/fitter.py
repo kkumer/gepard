@@ -106,7 +106,7 @@ class MinuitFitter(Fitter):
         """Values and errors for free parameters."""
         self.theory.print_parameters()
 
-def data_replica(datapoints, train_percentage=70, smear_replicas=True):
+def data_replica(datapoints, train_percentage=50, smear_replicas=True):
     """Returns datapoints split into training and testing set.
 
     Args:
@@ -147,6 +147,34 @@ def data_replica(datapoints, train_percentage=70, smear_replicas=True):
     y_test = torch.tensor(y_test, dtype=torch.float32)
     return x_train, y_train, x_test, y_test
 
+def datasets_replica(datasets, train_percentage=50, smear_replicas=True):
+    """TODO: merge with data_replica / a lot of code duplication."""
+    x_train = []
+    y_train = []
+    x_test = []
+    y_test = []
+    # We make train/test separation on level of datasets because our datasets
+    # can have very different sizes
+    for dataset in datasets:
+        train_size = int(len(dataset) * train_percentage / 100)
+        for k, pt in enumerate(np.random.permutation(dataset)):
+            if smear_replicas:
+                y = pt.val + np.random.normal(0, pt.err, 1)[0]
+            else:
+                y = pt.val
+            if k < train_size:
+                x_train.append([pt.xB, pt.t])
+                y_train.append([y, pt.err, pt.ptid])
+            else:
+                x_test.append([pt.xB, pt.t])
+                y_test.append([y, pt.err, pt.ptid])
+    # We pass the pt.ptid to the loss function so Gepard
+    # can use it to determine which DataPoint to use to calculate observable.
+    x_train = torch.tensor(x_train, dtype=torch.float32)
+    y_train = torch.tensor(y_train, dtype=torch.float32)
+    x_test = torch.tensor(x_test, dtype=torch.float32)
+    y_test = torch.tensor(y_test, dtype=torch.float32)
+    return x_train, y_train, x_test, y_test
 
 class CustomLoss(torch.nn.Module):
     def __init__(self, fitpoints, theory):
@@ -161,7 +189,9 @@ class CustomLoss(torch.nn.Module):
             pt = self.fitpoints[int(id)]
             preds.append(self.theory.predict_while_train(cffs, pt))
         # FIXME: Hard-wired factor 10 tuned to CLAS observables y range. Kludge.
-        return 10*torch.mean(torch.square((torch.stack(preds) - obs_true[:, 0]))/obs_true[:, 1])
+        # return 10*torch.mean(torch.square((torch.stack(preds) - obs_true[:, 0]))/obs_true[:, 1])
+        # Standard chisq. Do we doubly penalize the large-uncertainty points?
+        return torch.mean(torch.square((torch.stack(preds) - obs_true[:, 0])/obs_true[:, 1]))
 
 
 class NeuralFitter(Fitter):
@@ -176,7 +206,16 @@ class NeuralFitter(Fitter):
     """
     def __init__(self, fitpoints: data.DataSet,
                  theory: theory.Theory, **kwargs) -> None:
-        self.fitpoints = fitpoints
+        if type(fitpoints) == list:
+            self.datasets = fitpoints
+            self.datapoints = fitpoints[0]
+            for dataset in fitpoints[1:]:
+                self.datapoints += dataset
+        else:
+            self.datapoints = fitpoints
+            self.datasets = [fitpoints]
+        for k, pt in enumerate(self.datapoints):
+            pt.ptid = k
         self.theory = theory
         self.nnets = 4
         self.maxtries = 999
@@ -186,13 +225,13 @@ class NeuralFitter(Fitter):
         self.lx_lambda = 0.001
         self.regularization = None
         self.smear_replicas = True
-        self.criterion = CustomLoss(fitpoints, theory)
+        self.criterion = CustomLoss(self.datapoints, theory)
         Fitter.__init__(self, **kwargs)
 
-    def train_net(self, datapoints):
+    def train_net(self, datasets):
         """Create net trained on datapoints."""
         self.theory.in_training = True
-        x_train, y_train, x_test, y_test = data_replica(datapoints, smear_replicas=self.smear_replicas)
+        x_train, y_train, x_test, y_test = datasets_replica(datasets, smear_replicas=self.smear_replicas)
         self.theory.nn_mean, self.theory.nn_std = self.theory.get_standard(x_train)
         x_train_standardized = self.theory.standardize(x_train,
                 self.theory.nn_mean, self.theory.nn_std)
@@ -248,18 +287,22 @@ class NeuralFitter(Fitter):
     def fit(self):
         """Train number (nnet) of nets."""
         for n in range(self.nnets):
-            net, mean, std, test_err = self.train_net(self.fitpoints)
+            net, mean, std, test_err = self.train_net(self.datasets)
             self.theory.nets.append((net, mean, std))
             print("Net {} --> test_err = {}".format(n, test_err))
 
 
     def fitgood(self, max_test_err : float = 2):
-        """Train until you have nnet good nets."""
+        """Train until you have nnet good nets.
+
+        CAREFUL: you are in danger of overfitting if you use this,
+                 stick with normal fit unless you know what you are doing!
+        """
         n = 0
         k = 0
         while n < self.nnets and k < self.maxtries:
             k += 1
-            net, mean, std, test_err = self.train_net(self.fitpoints)
+            net, mean, std, test_err = self.train_net(self.datasets)
             self.theory.nets.append((net, mean, std))
             if test_err > max_test_err:
                 del self.theory.nets[-1]
