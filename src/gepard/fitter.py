@@ -106,7 +106,7 @@ class MinuitFitter(Fitter):
         """Values and errors for free parameters."""
         self.theory.print_parameters()
 
-def data_replica(datapoints, train_percentage=50, smear_replicas=True):
+def data_replica(datapoints, train_percentage=70, smear_replicas=True):
     """Returns datapoints split into training and testing set.
 
     Args:
@@ -147,7 +147,7 @@ def data_replica(datapoints, train_percentage=50, smear_replicas=True):
     y_test = torch.tensor(y_test, dtype=torch.float32)
     return x_train, y_train, x_test, y_test
 
-def datasets_replica(datasets, train_percentage=50, smear_replicas=True):
+def datasets_replica(datasets, train_percentage=70, smear_replicas=True):
     """TODO: merge with data_replica / a lot of code duplication."""
     x_train = []
     y_train = []
@@ -208,7 +208,7 @@ class NeuralFitter(Fitter):
                  theory: theory.Theory, **kwargs) -> None:
         if type(fitpoints) == list:
             self.datasets = fitpoints
-            self.datapoints = fitpoints[0]
+            self.datapoints = fitpoints[0][:]
             for dataset in fitpoints[1:]:
                 self.datapoints += dataset
         else:
@@ -225,13 +225,15 @@ class NeuralFitter(Fitter):
         self.lx_lambda = 0.001
         self.regularization = None
         self.smear_replicas = True
+        self.train_percentage = 70
         self.criterion = CustomLoss(self.datapoints, theory)
         Fitter.__init__(self, **kwargs)
 
     def train_net(self, datasets):
         """Create net trained on datapoints."""
         self.theory.in_training = True
-        x_train, y_train, x_test, y_test = datasets_replica(datasets, smear_replicas=self.smear_replicas)
+        x_train, y_train, x_test, y_test = datasets_replica(datasets,
+				train_percentage=self.train_percentage, smear_replicas=self.smear_replicas)
         self.theory.nn_mean, self.theory.nn_std = self.theory.get_standard(x_train)
         x_train_standardized = self.theory.standardize(x_train,
                 self.theory.nn_mean, self.theory.nn_std)
@@ -269,8 +271,8 @@ class NeuralFitter(Fitter):
                 print('-', end='')
                 early_stop_counter = 1
             elif test_loss > 100:
-                # with early stopping implemented this point should likely never be reached
                 print("\nHopeless. Giving up")
+                mem_err = -1  # fail flag
                 break
             else:
                 if early_stop_counter == self.patience:
@@ -287,7 +289,9 @@ class NeuralFitter(Fitter):
     def fit(self):
         """Train number (nnet) of nets."""
         for n in range(self.nnets):
-            net, mean, std, test_err = self.train_net(self.datasets)
+            test_err = -1
+            while test_err < 0:
+                net, mean, std, test_err = self.train_net(self.datasets)
             self.theory.nets.append((net, mean, std))
             print("Net {} --> test_err = {}".format(n, test_err))
 
