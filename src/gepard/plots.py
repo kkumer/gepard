@@ -113,6 +113,8 @@ def _axmesh(ax, fun, points, xaxis, **kwargs):
             yvals = xis*np.array(yvals)
         for k, aux in enumerate(yvals[0, :]):   # UGLY!
             ax.plot(xvals, yvals[:, k], **kwargs)
+            ax.text(xvals[0], yvals[0, k], f'{k}')
+            ax.text(xvals[-1], yvals[-1, k], f'{k}')
 
 
 def _axband(ax, fun, pts, xaxis, **kwargs):
@@ -216,7 +218,7 @@ def panel(ax, points=None, lines=None, bands=None, mesh=None, xaxis=None, xs=Non
     if lines:
         if not isinstance(lines, list):
             lines = [lines]
-        linecolors = ['indianred', 'xkcd:teal', 'darkcyan', 'blue', 'green', 'darkorchid', 'olive',
+        linecolors = ['indianred', 'xkcd:teal', 'blue', 'darkcyan', 'green', 'darkorchid', 'olive',
                       'red', 'red', 'black', 'blue', 'green',
                       'darkorchid', 'olive', 'darkcyan', 'indianred']
         linestyles = ['-', '--', '-.', ':', '-', '--', '-.', ':',
@@ -269,11 +271,11 @@ def panel(ax, points=None, lines=None, bands=None, mesh=None, xaxis=None, xs=Non
         labtxt = ""
         for lab in kinlabels:
             try:
-                labtxt += constants.toTeX[lab] + ' = ' + str(getattr(points[0], lab)) + ', '
+                labtxt += constants.toTeX[lab] + ' = {:.2f}'.format(getattr(points[0], lab)) + ', '
             except AttributeError:
                 # If dataset doesn't have it, all points should have it
-                labtxt += constants.toTeX[lab] + ' = ' + str(getattr(points[0][0],lab)) + ', '
-        ax.text(labx, laby, labtxt[:-2], fontsize=14)
+                labtxt += constants.toTeX[lab] + ' = {:.2f}'.format(getattr(points[0][0],lab)) + ', '
+        ax.text(labx, laby, labtxt[:-2], fontsize=12)
 
 
 def thline(th, pts, ex_pt, npts=16):
@@ -794,6 +796,45 @@ def CLAS14(observable='ALU', path=None, fmt='png', **kwargs):
         else:
             ax.set_xlabel('$-t\\; [{\\rm GeV}^2]$', fontsize=16)
         npanel += 1
+    if path:
+        fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
+    else:
+        fig.canvas.draw()
+        #fig.show()
+    return fig
+
+def CLAS22(path=None, fmt='png', **kwargs):
+    """Makes plot of CLAS 2022 preliminary proton DVCS data."""
+
+    title = 'CLAS 2022 (preliminary)'
+    lbl = r'$A_{LU}^{\sin\phi}$'
+    fig, axs = plt.subplots(2, 2, sharey=True, sharex=True)
+    axs = axs.reshape(4)
+    # inds = [[[31, 16, 1], [32, 17, 2], [33, 18, 3]],    # Q2 = 1.5
+            # [[35, 20, 5], [36, 21, 6], [37, 22, 7]],    # Q2 = 1.8
+            # [[40, 25, 10], [41, 26, 11]],               # Q2 = 2.5
+            # [[42, 27, 12], [43, 28, 13], [44, 29, 14]]] # Q2 = 3-5
+    inds = [[[31, 16, 1]],    # Q2 = 1.5
+            [[35, 20, 5]],    # Q2 = 1.8
+            [[40, 25, 10]],     # Q2 = 2.5
+            [[42, 27, 12]]]   # Q2 = 3-5
+    for npanel, linds in enumerate(inds):
+        ax = axs[npanel]
+        pts = []
+        for ptinds in linds:
+            pts.append(data.DataSet([data.dset[150][k] for k in ptinds]))
+        panel(ax, points=pts, xaxis='tm', kinlabels=['Q2', 'xB'], **kwargs)
+        plt.xlim(0.0, 1.65)
+        # ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))
+        # ax.xaxis.set_minor_locator(matplotlib.ticker.MultipleLocator(0.02))
+        plt.ylim(0, 0.4)
+        # ax.yaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))
+        # ax.yaxis.set_minor_locator(matplotlib.ticker.MultipleLocator(0.02))
+        if (npanel == 0) or (npanel == 3):
+            ax.set_ylabel(lbl, fontsize=16)
+        ax.set_xlabel(r'$-t\; [{\rm GeV}^2]$', fontsize=12)
+    # axs[5].legend(handles, labels, loc="center", borderaxespad=0.).draw_frame(0)
+    fig.subplots_adjust(wspace=0.0, hspace=0.0)
     if path:
         fig.savefig(os.path.join(path, title+'.'+fmt), format=fmt)
     else:
@@ -1957,7 +1998,7 @@ def CFF3(cffs=['ImH', 'ReH', 'ImE', 'ReE'],
             for l in leg.get_lines():
                 l.set_linewidth(2.0)  # the legend line width
         if cff == 'ImHt':
-            ax.set_ylim(0,3.8)
+            # ax.set_ylim(-0.5, 5)
             ax.yaxis.set_major_locator( matplotlib.ticker.MultipleLocator(1.)) 
             ax.yaxis.set_minor_locator( matplotlib.ticker.MultipleLocator(0.2)) 
         elif cff == 'ImH':
@@ -1995,7 +2036,7 @@ def CFF3log(cffs=['ImH', 'ReH', 'ImE', 'ReE', 'ImHt', 'ImEt'], tval=-0.2,
     nncolors = ['xkcd:teal', 'xkcd:tomato']  # cold computer colors
     linestyles = ['solid', 'dashed']
     # Define abscissas
-    xvals = np.logspace(-2.3, -0.01, 50)
+    xvals = np.logspace(-1.8, -0.01, 10)
     # ordinates
     for pn, ax in enumerate(axs.flatten()):
         cff = cffs[pn]
@@ -2021,13 +2062,13 @@ def CFF3log(cffs=['ImH', 'ReH', 'ImE', 'ReE', 'ImHt', 'ImEt'], tval=-0.2,
             ax.yaxis.set_major_locator( matplotlib.ticker.MultipleLocator(1.)) 
             ax.yaxis.set_minor_locator( matplotlib.ticker.MultipleLocator(0.2)) 
         elif cff == 'ImH':
-            ax.yaxis.set_major_locator( matplotlib.ticker.MultipleLocator(3.)) 
-            ax.yaxis.set_minor_locator( matplotlib.ticker.MultipleLocator(1.)) 
+            # ax.yaxis.set_major_locator( matplotlib.ticker.MultipleLocator(3.)) 
+            # ax.yaxis.set_minor_locator( matplotlib.ticker.MultipleLocator(1.)) 
             ax.text(0.1, 0.1, r'$t = {}\, {{\rm GeV}}^2$'.format(tval),
                     transform=ax.transAxes, fontsize=16)
         elif cff == 'ReE':
-            ax.yaxis.set_major_locator( matplotlib.ticker.MultipleLocator(10.)) 
-            ax.yaxis.set_minor_locator( matplotlib.ticker.MultipleLocator(2.)) 
+             ax.yaxis.set_major_locator( matplotlib.ticker.MultipleLocator(5.)) 
+             ax.yaxis.set_minor_locator( matplotlib.ticker.MultipleLocator(1.)) 
         elif cff == 'ImEt':
             ax.yaxis.set_major_locator( matplotlib.ticker.MultipleLocator(20.)) 
             ax.yaxis.set_minor_locator( matplotlib.ticker.MultipleLocator(5.)) 

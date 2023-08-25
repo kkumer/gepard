@@ -91,7 +91,7 @@ class DataPoint(dict):
         if kindict:
             self.update(kindict)
         self.update(kwargs)
-        self._tensor_keys = ['Q2']
+        self._tensor_keys = ['Q2', 'phi']
         # calculate other determined kinematic variables:
         _fill_kinematics(self)
 
