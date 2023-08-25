@@ -37,7 +37,7 @@ def loaddata(resource):
     files = importlib_resources.files(resource).iterdir()
     for file in files:
         if file.suffix == '.dat':
-            dataset = DataSet(datafile=file.read_text())
+            dataset = DataSet(datafile=file.read_text(encoding='utf-8'))
             for pt in dataset:
                 pt.to_conventions()
             data[dataset.id] = dataset
