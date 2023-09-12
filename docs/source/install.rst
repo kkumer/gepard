@@ -141,7 +141,7 @@ kernel within your new virtual env like this:
 .. code-block:: bash
 
    pip install ipykernel
-   ipykernel install --user --name myenv
+   ipython kernel install --user --name=myenv
 
 
 Then in the system Jupyter, you will have a new python kernel
