@@ -6,7 +6,7 @@ import math
 from numpy import cos, pi, sqrt
 
 from . import data
-from gepard.constants import Mp, Mp2, alpha
+from .constants import Mp, Mp2, alpha
 
 
 def tmin(Q2: float, xB: float, eps2: float) -> float:
