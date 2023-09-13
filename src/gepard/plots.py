@@ -1923,7 +1923,7 @@ def CFFt(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
         cff = cffs[n]
         # smaller x
         ax = fig.add_subplot(len(cffs), 2, 2*n+1)
-        panel(ax, xaxis='tm', xs=tmvals, kins={'observable':cff, 'xB':0.1, 'Q2':2.,
+        panel(ax, xaxis='tm', xs=tmvals, kins={'observable':cff, 'xB':0.11, 'Q2':2.,
            'units':{cff: 1},}, **kwargs)
         ax.set_xlabel(constants.toTeX['tm'], fontsize=15)
         try:
@@ -1934,13 +1934,13 @@ def CFFt(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
         if n == 0:
             ax.legend(loc='upper right')
             ax.legend().draw_frame(0)
-            ax.text(0.1, 0.18, r"$xB = 0.1$", transform=ax.transAxes,
+            ax.text(0.1, 0.18, r"$xB = 0.11$", transform=ax.transAxes,
                     fontsize=12)
             # ax.text(0.1, 0.12, "$Q^2 = 4\\, {\\rm GeV}^2$", transform=ax.transAxes,
                     # fontsize=12)
         # larger x
         ax = fig.add_subplot(len(cffs), 2, 2*n+2)
-        panel(ax, xaxis='tm', xs=tmvals, kins={'observable':cff, 'xB':0.2, 'Q2':2.,
+        panel(ax, xaxis='tm', xs=tmvals, kins={'observable':cff, 'xB':0.21, 'Q2':2.,
             'units':{cff: 1}}, **kwargs)
         ax.set_xlabel(constants.toTeX['tm'], fontsize=15)
         try:
@@ -1951,9 +1951,9 @@ def CFFt(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
         if n == 0:
             ax.legend(loc='upper right')
             ax.legend().draw_frame(0)
-            ax.text(0.1, 0.18, r"$x_B = 0.2$", transform=ax.transAxes,
+            ax.text(0.35, 0.18, r"$x_B = 0.21$", transform=ax.transAxes,
                     fontsize=12)
-            ax.text(0.1, 0.10, r"$Q^2 = 4\, {\rm GeV}^2$", transform=ax.transAxes,
+            ax.text(0.35, 0.10, r"$Q^2 = 4\, {\rm GeV}^2$", transform=ax.transAxes,
                     fontsize=12)
     fig.subplots_adjust(bottom=0.1)
     if path:
