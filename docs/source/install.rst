@@ -141,10 +141,10 @@ kernel within your new virtual env like this:
 .. code-block:: bash
 
    pip install ipykernel
-   ipython kernel install --user --name=myenv
+   python -m ipykernel install --user --name myenv --display-name "myenv (Gepard)"
 
 
 Then in the system Jupyter, you will have a new python kernel
-``myenv`` available, which you should use for your Gepard notebooks
-instead of the default Python 3 kernel.
+``myenv (Gepard)`` available, which you should use for your Gepard notebooks
+instead of the default ``Python 3`` kernel.
 
