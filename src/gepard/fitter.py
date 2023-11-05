@@ -147,7 +147,7 @@ def data_replica(datapoints, train_percentage=70, smear_replicas=True):
     y_test = torch.tensor(y_test, dtype=torch.float32)
     return x_train, y_train, x_test, y_test
 
-def datasets_replica(datasets, train_percentage=70, smear_replicas=True):
+def datasets_replica(datasets, train_percentage=70, smear_replicas=True, q2in=False):
     """TODO: merge with data_replica / a lot of code duplication."""
     x_train = []
     y_train = []
@@ -163,10 +163,16 @@ def datasets_replica(datasets, train_percentage=70, smear_replicas=True):
             else:
                 y = pt.val
             if k < train_size:
-                x_train.append([pt.xB, pt.t])
+                if q2in:
+                    x_train.append([pt.xB, pt.t, pt.Q2])
+                else:
+                    x_train.append([pt.xB, pt.t])
                 y_train.append([y, pt.err, pt.ptid])
             else:
-                x_test.append([pt.xB, pt.t])
+                if q2in:
+                    x_test.append([pt.xB, pt.t, pt.Q2])
+                else:
+                    x_test.append([pt.xB, pt.t])
                 y_test.append([y, pt.err, pt.ptid])
     # We pass the pt.ptid to the loss function so Gepard
     # can use it to determine which DataPoint to use to calculate observable.
@@ -229,18 +235,25 @@ class NeuralFitter(Fitter):
         self.criterion = CustomLoss(self.datapoints, theory)
         Fitter.__init__(self, **kwargs)
 
-    def train_net(self, datasets):
-        """Create net trained on datapoints."""
+    def train_net(self, datasets, new_net=True):
+        """Create net trained on datapoints.
+
+        Args:
+            new_net (bool): should we create new net or continue
+                            with existing self.theory.nn_model
+        """
         self.theory.in_training = True
         x_train, y_train, x_test, y_test = datasets_replica(datasets,
-				train_percentage=self.train_percentage, smear_replicas=self.smear_replicas)
+				train_percentage=self.train_percentage, smear_replicas=self.smear_replicas,
+                q2in = self.theory.q2in)
         self.theory.nn_mean, self.theory.nn_std = self.theory.get_standard(x_train)
         x_train_standardized = self.theory.standardize(x_train,
                 self.theory.nn_mean, self.theory.nn_std)
         x_test_standardized = self.theory.standardize(x_test,
                 self.theory.nn_mean, self.theory.nn_std)
-        self.theory.nn_model, self.optimizer = self.theory.build_net()
-        self.history = []
+        if new_net:
+            self.theory.nn_model, self.optimizer = self.theory.build_net()
+            self.history = []
         mem_state_dict = self.theory.nn_model.state_dict()
         mem_err = 100  # large init error, almost certain to be bettered
         early_stop_counter = 1

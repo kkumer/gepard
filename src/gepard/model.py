@@ -145,6 +145,13 @@ class ParameterModel(Model):
 class NeuralModel(Model):
     """Model where CFFs are represented by set of neural nets.
 
+    Args:
+        fitpoints (data.DataSet): points to fit to
+        theory (theory.Theory): theory/model to be fitted
+        smear_replicas (Bool): Should we smear the replica according the uncertainties
+        patience (Int): How many batches to wait for improvement before early stopping
+        q2in (Bool): Should input layer be [xB, t, Q2] or only [xB, t]? Default: False.
+
     Note:
         There will be separate model where GPDs are represented by neural net.
 
@@ -158,6 +165,11 @@ class NeuralModel(Model):
         self.output_layer = output_layer
         self.cffs_map = {cff: k for k, cff in  enumerate(self.output_layer)}
         self.in_training = False
+        self.q2in = kwargs.setdefault('q2in', False)
+        if self.q2in:
+            self.indim = 3
+        else:
+            self.indim = 2
         super().__init__(**kwargs)
 
     def get_standard(self, x, leave=[]):
@@ -183,7 +195,7 @@ class NeuralModel(Model):
     def build_net(self):
         '''Builds net architecture. For user to override.'''
         nn_model = torch.nn.Sequential(
-                torch.nn.Linear(2, 32),
+                torch.nn.Linear(self.indim, 32),
                 torch.nn.ReLU(),
                 torch.nn.Linear(32, 64),
                 torch.nn.ReLU(),
@@ -206,8 +218,12 @@ class NeuralModel(Model):
         return 0
         
     def cffs(self, pt):
-        if not self.cffs_evaluated:
-            x = self.standardize(torch.tensor([pt.xB, pt.t], dtype=torch.float32),
+        if not self.in_training and not self.cffs_evaluated:
+            if self.q2in:
+                input_layer = [pt.xB, pt.t, pt.Q2]
+            else:
+                input_layer = [pt.xB, pt.t]
+            x = self.standardize(torch.tensor(input_layer, dtype=torch.float32),
                                     self.nn_mean, self.nn_std)
             self._cffs = self.nn_model(x)[0]
             self.cffs_evaluated = True
@@ -258,7 +274,11 @@ class FlavoredNeuralModel(NeuralModel):
     def flavored_cffs(self, pt):
         u_ind, d_ind = self.cff_flavored_indices
         if not self.cffs_evaluated:
-            x = self.standardize(torch.tensor([pt.xB, pt.t], dtype=torch.float32),
+            if self.q2in:
+                input_layer = [pt.xB, pt.t, pt.Q2]
+            else:
+                input_layer = [pt.xB, pt.t]
+            x = self.standardize(torch.tensor(input_layer, dtype=torch.float32),
                                     self.nn_mean, self.nn_std)
             self._cffs = self.nn_model(x)[0]
             self.cffs_evaluated = True

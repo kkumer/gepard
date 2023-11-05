@@ -209,7 +209,6 @@ class Theory(object):
 
         """
         self._cffs = cffs
-        self.cffs_evaluated = True
         return self.predict(pt)
 
 # Photoproduction - select DVCS or DVMP

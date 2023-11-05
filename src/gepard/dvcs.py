@@ -7,7 +7,7 @@
 
 from torch import cos, pi, sin, sqrt, tensor
 
-from . import cff, data, quadrature, theory
+from . import cff, data, model, quadrature, theory
 from .constants import GeV2nb, Mp2, alpha
 from .kinematics import weight_BH
 
@@ -153,12 +153,14 @@ class DVCS(theory.Theory):
     def _XGAMMA_DVCS_t_Ex(self, pt):
         """Partial DVCS (gamma* p -> gamma p) cross section differential in t."""
         eps2 = 4. * pt.xB**2 * Mp2 / pt.Q2
-        if cff.HybridCFF in self.__class__.mro():
+        if cff.HybridCFF in self.__class__.mro() or model.NeuralModel in self.__class__.mro():
             # For hybrid models we cannot ask for cff() since self gets misinterpreted
+            # while for NeuralModel we don't have optimal cff() yet
             ReH = self.m.ReH(pt)
             ImH = self.m.ImH(pt)
             ReE = self.m.ReE(pt)
             ImE = self.m.ImE(pt)
+            # print('in_training = {};  ImH = {}'.format(self.in_training, ImH))
         else:
             ReH, ImH, ReE, ImE, ReHt, ImHt, ReEt, ImEt = self.m.cff(pt)
         res = 65.14079453579676 * (pt.xB**2 / pt.Q2**2 / (1-pt.xB) / (2-pt.xB)**2 /
