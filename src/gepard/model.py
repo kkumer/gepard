@@ -227,7 +227,7 @@ class NeuralModel(Model):
                                     self.nn_mean, self.nn_std)
             self._cffs = self.nn_model(x)[0]
             self.cffs_evaluated = True
-        return self._cffs[self.cff_index]
+        return self._cffs[self.cff_index]/pt.xB
 
     def prune(self, pts: data.DataSet, min_prob: float = None,
                     max_chisq: float = None, max_chisq_npt: float = None):
@@ -260,9 +260,9 @@ class NeuralModel(Model):
 
 class FlavoredNeuralModel(NeuralModel):
 
-    def __init__(self, output_layer=['ReHu', 'ReHd', 'ImHu', 'ImHd']):
+    def __init__(self, output_layer=['ReHu', 'ReHd', 'ImHu', 'ImHd'], **kwargs):
          '''Flavored CFFs are defined by 'u' and 'd' name endings and they have to come in pairs.'''
-         super().__init__(output_layer)
+         super().__init__(output_layer, **kwargs)
 
     def __getattr__(self, name):
         if name+'u' in self.output_layer:
@@ -283,8 +283,8 @@ class FlavoredNeuralModel(NeuralModel):
             self._cffs = self.nn_model(x)[0]
             self.cffs_evaluated = True
         if hasattr(pt, 'in2particle') and pt.in2particle == 'n':
-            return (4/9)*self._cffs[d_ind] + (1/9)*self._cffs[u_ind]   # neutron
+            return (4/9)*self._cffs[d_ind]/pt.xB + (1/9)*self._cffs[u_ind]/pt.xB   # neutron
         else:
-            return (4/9)*self._cffs[u_ind] + (1/9)*self._cffs[d_ind]   # proton
-        return self._cffs[self.cff_index]
+            return (4/9)*self._cffs[u_ind]/pt.xB + (1/9)*self._cffs[d_ind]/pt.xB   # proton
+        return self._cffs[self.cff_index]/pt.xB
 

@@ -1923,7 +1923,7 @@ def CFFt(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
         cff = cffs[n]
         # smaller x
         ax = fig.add_subplot(len(cffs), 2, 2*n+1)
-        panel(ax, xaxis='tm', xs=tmvals, kins={'observable':cff, 'xB':0.05, 'Q2':2.,
+        panel(ax, xaxis='tm', xs=tmvals, kins={'observable':cff, 'xB':0.005, 'Q2':2.,
            'units':{cff: 1},}, **kwargs)
         ax.set_xlabel(constants.toTeX['tm'], fontsize=15)
         try:
@@ -1934,7 +1934,7 @@ def CFFt(cffs=['ImH', 'ReH'], path=None, fmt='png', **kwargs):
         if n == 0:
             ax.legend(loc='upper right')
             ax.legend().draw_frame(0)
-            ax.text(0.1, 0.18, r"$xB = 0.05$", transform=ax.transAxes,
+            ax.text(0.1, 0.18, r"$xB = 0.005$", transform=ax.transAxes,
                     fontsize=12)
             # ax.text(0.1, 0.12, "$Q^2 = 4\\, {\\rm GeV}^2$", transform=ax.transAxes,
                     # fontsize=12)
@@ -1989,21 +1989,23 @@ def CFF3(cffs=['ImH', 'ReH', 'ImE', 'ReE'],
                     ticklabel.set_fontsize(16)
         if pn >= 2*(nrows-1):
             ax.set_xlabel(constants.toTeX['xixB'], fontsize=16)
-        if pn == 0:
+        if pn == 1:
             leg = ax.legend(loc='upper right', handlelength=4.0, fancybox=True)
             frame  = leg.get_frame()
             #frame.set_facecolor('0.90')    # set the frame face color to light gray
             for t in leg.get_texts():
-                t.set_fontsize(16)    # the legend text fontsize
+                t.set_fontsize(12)    # the legend text fontsize
             for l in leg.get_lines():
                 l.set_linewidth(2.0)  # the legend line width
         if cff == 'ImHt':
+            pass
             # ax.set_ylim(-0.5, 5)
-            ax.yaxis.set_major_locator( matplotlib.ticker.MultipleLocator(1.)) 
-            ax.yaxis.set_minor_locator( matplotlib.ticker.MultipleLocator(0.2)) 
+            # ax.yaxis.set_major_locator( matplotlib.ticker.MultipleLocator(1.)) 
+            # ax.yaxis.set_minor_locator( matplotlib.ticker.MultipleLocator(0.2)) 
         elif cff == 'ImH':
-            ax.yaxis.set_major_locator( matplotlib.ticker.MultipleLocator(3.)) 
-            ax.yaxis.set_minor_locator( matplotlib.ticker.MultipleLocator(1.)) 
+            pass
+            # ax.yaxis.set_major_locator( matplotlib.ticker.MultipleLocator(3.)) 
+            # ax.yaxis.set_minor_locator( matplotlib.ticker.MultipleLocator(1.)) 
         elif cff == 'ReE':
             ax.yaxis.set_major_locator( matplotlib.ticker.MultipleLocator(10.)) 
             ax.yaxis.set_minor_locator( matplotlib.ticker.MultipleLocator(2.)) 
@@ -2036,7 +2038,7 @@ def CFF3log(cffs=['ImH', 'ReH', 'ImE', 'ReE', 'ImHt', 'ImEt'], tval=-0.2,
     nncolors = ['xkcd:teal', 'xkcd:tomato']  # cold computer colors
     linestyles = ['solid', 'dashed']
     # Define abscissas
-    xvals = np.logspace(-1.8, -0.01, 10)
+    xvals = np.logspace(-2.8, -0.01, 10)
     # ordinates
     for pn, ax in enumerate(axs.flatten()):
         cff = cffs[pn]
