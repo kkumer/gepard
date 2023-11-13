@@ -151,6 +151,7 @@ class NeuralModel(Model):
         smear_replicas (Bool): Should we smear the replica according the uncertainties
         patience (Int): How many batches to wait for improvement before early stopping
         q2in (Bool): Should input layer be [xB, t, Q2] or only [xB, t]? Default: False.
+        xpow: CFF will be modelled as CFF = xB**(xpow) * NNet. Default: 0.
 
     Note:
         There will be separate model where GPDs are represented by neural net.
@@ -166,6 +167,7 @@ class NeuralModel(Model):
         self.cffs_map = {cff: k for k, cff in  enumerate(self.output_layer)}
         self.in_training = False
         self.q2in = kwargs.setdefault('q2in', False)
+        self.xpow = kwargs.setdefault('xpow', 0)
         if self.q2in:
             self.indim = 3
         else:
@@ -227,7 +229,7 @@ class NeuralModel(Model):
                                     self.nn_mean, self.nn_std)
             self._cffs = self.nn_model(x)[0]
             self.cffs_evaluated = True
-        return self._cffs[self.cff_index]/pt.xB
+        return self._cffs[self.cff_index] * pt.xB**(self.xpow)
 
     def prune(self, pts: data.DataSet, min_prob: float = None,
                     max_chisq: float = None, max_chisq_npt: float = None):
@@ -283,8 +285,8 @@ class FlavoredNeuralModel(NeuralModel):
             self._cffs = self.nn_model(x)[0]
             self.cffs_evaluated = True
         if hasattr(pt, 'in2particle') and pt.in2particle == 'n':
-            return (4/9)*self._cffs[d_ind]/pt.xB + (1/9)*self._cffs[u_ind]/pt.xB   # neutron
-        else:
-            return (4/9)*self._cffs[u_ind]/pt.xB + (1/9)*self._cffs[d_ind]/pt.xB   # proton
-        return self._cffs[self.cff_index]/pt.xB
+            res = (4/9)*self._cffs[d_ind] + (1/9)*self._cffs[u_ind]
+        else:  # proton
+            res = (4/9)*self._cffs[u_ind] + (1/9)*self._cffs[d_ind]
+        return res * pt.xB**(self.xpow)
 
