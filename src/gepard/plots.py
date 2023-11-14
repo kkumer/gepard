@@ -1072,9 +1072,9 @@ def HallAFT(path=None, fmt='png', **kwargs):
     subsets[4] = data.select(data.dset[51], criteria=['FTn == 0'])
     subsets[5] = data.select(data.dset[51], criteria=['FTn == 1'])
     #subsets[6] = data.select(data.dset[51], criteria=['FTn == 2'])
-    ylabels = 3*['$d^{\,4}\\Sigma^{\,\\sin\\phi,w}$'] + \
-                ['$d^{\,4}\\sigma^{\,\\cos0\\phi,w}$'] + \
-                ['$d^{\,4}\\sigma^{\,\\cos\\phi,w}$']
+    ylabels = 3*[r'$d^{\,4}\Sigma^{\,\sin\phi,w}$'] + \
+                [r'$d^{\,4}\sigma^{\,\cos0\phi,w}$'] + \
+                [r'$d^{\,4}\sigma^{\,\cos\phi,w}$']
     title = 'MunozCamacho:2006hx'
     fig = plt.figure()
     fig.suptitle(title)

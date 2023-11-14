@@ -39,8 +39,13 @@ def procdir(dirname, datafiles):
     if len(ids) > 0:
         print("-----------\n[{}] used ids: {}".format(dirname, ids))
         print("[{}] first unused: {}".format(dirname, ids[-1]+1))
+    return ids
 
 
+allids = []
 for root, d_names, f_names in os.walk(os.path.curdir):
     datafiles = [f for f in f_names if f.split('.')[-1]=="dat"]
-    procdir(root, datafiles)
+    allids += procdir(root, datafiles)
+
+allids.sort()
+print("-----------\n[ALL] used ids: {}".format(allids))
