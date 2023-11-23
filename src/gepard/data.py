@@ -14,6 +14,7 @@ import os
 import re
 from typing import Union, List
 
+import numpy as np
 import pandas as pd
 
 from . import kinematics
@@ -672,6 +673,150 @@ def describe_data(pts):
     print(46*'-')
     print("TOTAL = {}".format(tot))
 
+def FTF(data, testdata=None, cosmax=None, sinmax=None, inverse=False):
+    """Fourier series fit to data (takes and returns pandas dataframe).
+
+    cosmax, sinmax  - index of highest harmonics
+    inverse = True  - data values ARE harmonics, calculate function(phi)
+
+    """
+    N = len(data)
+    # If length of series is not specified by the user, use maximal one
+    #   which makes this fit equal to DFT
+    if not cosmax and not (cosmax == 0):
+        cosmax = int((N-1)/2.)  # maximal cos harmonic
+    if not sinmax and not (sinmax == 0):
+        sinmax = cosmax + ((N-1) % 2)  # maximal sin harmonic
+    nharm = 1 + cosmax + sinmax  # number of harmonics
+    if isinstance(testdata, pd.DataFrame):
+        A = np.array([[np.cos(n*phi) for n in range(cosmax+1)] + [np.sin(n*phi) for n in range(1,sinmax+1)] for phi in testdata.phi.values])
+    else:
+        # take phis from first argument data
+        A = np.array([[np.cos(n*phi) for n in range(cosmax+1)] + [np.sin(n*phi) for n in range(1,sinmax+1)] for phi in data.phi.values])
+    B = data.val.values
+    if not inverse:
+        res = np.linalg.lstsq(A, B, rcond=None)
+        #print "Sum of residuals = {}".format(res[1])
+        z = np.zeros(N-len(res[0]), dtype=A.dtype)
+        vals = np.concatenate((res[0], z), axis=0)
+        df = pd.DataFrame({'phi': data.phi.values, 'val': vals})
+        #print "Number of harmonics = {}".format(nharm)
+    else:
+        if isinstance(testdata, pd.DataFrame):
+            res = np.dot(A, B[:nharm])
+            df = pd.DataFrame({'phi': testdata.phi.values, 'val': testdata.val.values, 'pred': res})
+        else:
+            # we invert on phis of first argument
+            res = np.dot(A, B[:nharm])
+            df = pd.DataFrame({'phi': data.phi.values, 'val': res})
+    return df
+
+
+def FTFMC(data, nsamples=100, cosmax=None, sinmax=None, inverse=False):
+    """Fourier series fit to data with MC error propagation (takes and returns pandas dataframe).
+
+    cosmax, sinmax  - index of highest harmonics
+    inverse = True  - data values ARE harmonics, calculate function(phi)
+
+    """
+    N = len(data)
+    # If length of series is not specified by the user, use maximal one
+    #   which makes this fit equal to DFT
+    if not cosmax and not (cosmax == 0):
+        cosmax = int((N-1)/2.)  # maximal cos harmonic
+    if not sinmax and not (sinmax == 0):
+        sinmax = cosmax + ((N-1) % 2)  # maximal sin harmonic
+    nharm = 1 + cosmax + sinmax  # number of harmonics
+    A = np.array([[np.cos(n*phi) for n in range(cosmax+1)] + [np.sin(n*phi) for n in range(1,sinmax+1)] for phi in data.phi.values])
+    B = np.transpose((np.ones((nsamples,N))*data.val.values + np.random.randn(nsamples,N)*data.err.values))  # replicas
+    if not inverse:
+        res = np.linalg.lstsq(A, B, rcond=None)
+        z = np.zeros((nsamples, N-len(res[0])), dtype=A.dtype)
+        vals = np.concatenate((res[0].T, z), axis=1)
+        df = pd.DataFrame({'phi': data.phi.values, 'val': vals.mean(axis=0), 'err': vals.std(axis=0)})
+        #print "Number of harmonics = {}".format(nharm)
+    else:
+        res = np.dot(A, B[:nharm])
+        df = pd.DataFrame({'phi': data.phi.values, 'val': res.mean(axis=1), 'err': res.std(axis=1)})
+    return df
+
+
+def cvsets(df_in, nfolds=3, shuffle=True):
+        """Return n-fold cross-validation sets [(train1, valid1), (train2, valid2), ...].
+
+        Copies data.
+
+        """
+        if shuffle:
+            df = df_in.reindex(np.random.permutation(df_in.index))
+        else:
+            df = df_in.copy()
+        # stolen from sklearn
+        n = len(df)
+        fold_sizes = (n // nfolds) * np.ones(nfolds, dtype=np.int)
+        fold_sizes[:n % nfolds] += 1
+        current = 0
+        chunks = []
+        for fold_size in fold_sizes:
+            start, stop = current, current + fold_size
+            #yield obj.idxs[start:stop]
+            chunks.append(df[start:stop])
+            current = stop
+        sets = []
+        # my ugly coding
+        for f in range(nfolds):
+            inds = list(range(nfolds))
+            k = inds.pop(f)
+            train = chunks[inds[0]]
+            for i in inds[1:]:
+                train = train.append(chunks[i])
+            sets.append([train, chunks[f]])
+        return sets
+
+
+def FTanalyse(bins, HMAX=2, nf=4, Nrep=1):
+    """Determine the number of harmonics present in bins according to n-fold cross-validation.
+
+       bins - dictionary with bins
+       HMAX - highest harmonic used in searches
+         NS - number of replicas for MC error propagation
+       Nrep - number of CV repetitions (probably wrong to make > 1)
+         nf - number of folds for cross-validation
+
+    """
+
+    mins = []
+    for nn in range(Nrep):
+        for k in bins:
+            df = bins[k]
+            err_min = 100
+            for CM in range(HMAX+1):
+                for SM in range(HMAX+1):
+                    errs = []
+                    for cvtrain, cvtest in cvsets(df, nfolds=nf):
+                        cvtest.reset_index(drop=True, inplace=True)
+                        dfFT = FTF(cvtrain, cosmax=CM, sinmax=SM)
+                        dftest = FTF(dfFT, testdata=cvtest, cosmax=CM, sinmax=SM, inverse=True)
+                        errs.append(np.sum((dftest.val.values-dftest.pred.values)**2))
+                    errs = np.array(errs)
+                    # We divide by npts and not ndof because test set
+                    # is NOT used for fitting, so there should be no penalization
+                    # of model's complexity
+                    err = errs.mean() / len(cvtest)
+                    # However, experiments show that small penalty for complexity
+                    # sometimes improves accuracy (but this is quite simple
+                    # and creates problems with large number of folds)
+                    #err = errs.mean() /(len(cvtest)-np.sqrt(CM+SM+1))
+                    #print CM, SM, err
+                    if err <= err_min:
+                        err_min = err
+                        h_min = (CM, SM)
+            mins.append(h_min)
+    nc, ns = np.array(mins).mean(axis=0)
+    delc, dels = np.array(mins).std(axis=0)
+    print("Highest extractable cos harmonic = {:.3f} +- {:.3f}".format(nc, delc))
+    print("Highest extractable sin harmonic = {:.3f} +- {:.3f}\n".format(ns, dels))
+    return int(np.round(nc)), int(np.round(ns))
 
 # Load all public datasets and make them globaly available
 dset = loaddata(ep2epgamma)
