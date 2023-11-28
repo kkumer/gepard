@@ -714,9 +714,10 @@ def FTF(data, testdata=None, cosmax=None, sinmax=None, inverse=False):
 
 def FTFMC(data, nsamples=100, cosmax=None, sinmax=None, inverse=False):
     """Fourier series fit to data with MC error propagation (takes and returns pandas dataframe).
-
-    cosmax, sinmax  - index of highest harmonics
-    inverse = True  - data values ARE harmonics, calculate function(phi)
+    Args:
+        cosmax: index of highest cosine harmonic
+        sinmax: index of highest sine harmonics
+        inverse: if True data values ARE harmonics, calculate function(phi) (default: False)
 
     """
     N = len(data)
@@ -777,14 +778,14 @@ def cvsets(df_in, nfolds=3, shuffle=True):
 def FTanalyse(bins, HMAX=2, nf=4, Nrep=1):
     """Determine the number of harmonics present in bins according to n-fold cross-validation.
 
-       bins - dictionary with bins
-       HMAX - highest harmonic used in searches
-         NS - number of replicas for MC error propagation
-       Nrep - number of CV repetitions (probably wrong to make > 1)
-         nf - number of folds for cross-validation
+    Args:
+        bins: dictionary with bins
+        HMAX: highest harmonic used in searches
+        NS: number of replicas for MC error propagation
+        Nrep: number of CV repetitions (probably wrong to make > 1)
+        nf: number of folds for cross-validation
 
     """
-
     mins = []
     for nn in range(Nrep):
         for k in bins:
