@@ -1998,12 +1998,11 @@ def CFF3(cffs=['ImH', 'ReH', 'ImE', 'ReE'],
             for l in leg.get_lines():
                 l.set_linewidth(2.0)  # the legend line width
         if cff == 'ImHt':
-            pass
-            # ax.set_ylim(-0.5, 5)
+            ax.set_ylim(-5, 10)
             # ax.yaxis.set_major_locator( matplotlib.ticker.MultipleLocator(1.)) 
             # ax.yaxis.set_minor_locator( matplotlib.ticker.MultipleLocator(0.2)) 
         elif cff == 'ImH':
-            pass
+            ax.set_ylim(-0.5, 25)
             # ax.yaxis.set_major_locator( matplotlib.ticker.MultipleLocator(3.)) 
             # ax.yaxis.set_minor_locator( matplotlib.ticker.MultipleLocator(1.)) 
         elif cff == 'ReE':
@@ -2013,6 +2012,7 @@ def CFF3(cffs=['ImH', 'ReH', 'ImE', 'ReE'],
             ax.yaxis.set_major_locator( matplotlib.ticker.MultipleLocator(20.)) 
             ax.yaxis.set_minor_locator( matplotlib.ticker.MultipleLocator(5.)) 
         elif cff == 'ImE':
+            ax.set_ylim(-70, 30)
             ax.set_ylabel(constants.toTeX['{}'.format(cff)], fontsize=18, labelpad=-8)
 
     fig.subplots_adjust(hspace=0., wspace=0.25)
