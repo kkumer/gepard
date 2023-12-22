@@ -38,6 +38,7 @@ class MellinBarnesTFF(model.ParameterModel):
 
     def __init__(self, **kwargs):
         self.wce_dvmp: Dict[float, np.ndarray] = {}
+        self.wce_dvmp2: Dict[float, np.ndarray] = {}
         # correction factors for NLO expressions
         # needed to be able to have some tests w.r.t. old wrong notebooks
         # 1. correction introduced below Eq. (20) of 1612.01937. Set
@@ -61,11 +62,15 @@ class MellinBarnesTFF(model.ParameterModel):
 
         try:
             wce_ar_dvmp = self.wce_dvmp[Q2]
+            wce_ar_dvmp2 = self.wce_dvmp2[Q2]
         except KeyError:
             # calculate it
-            wce_ar_dvmp = wilson.calc_wce(self, Q2, 'DVMP')
+            wce_ar_dvmp = wilson.calc_wce(self, Q2, 'DVMP', 0) # added DA moment "kk"
+            wce_ar_dvmp2 = wilson.calc_wce(self, Q2, 'DVMP', 2) # added DA moment "kk"
+
             # memorize it for future
             self.wce_dvmp[Q2] = wce_ar_dvmp
+            self.wce_dvmp2[Q2] = wce_ar_dvmp2
         # Evaluations depending on model parameters:
         h_prerot = self.H(xi, t)
         if meson == 'rho0':
@@ -77,10 +82,18 @@ class MellinBarnesTFF(model.ParameterModel):
         else:
             raise ValueError("{} unknown. Use 'rho0' or 'phi'".format(meson))
         h = np.einsum('fa,ja->jf', frot, h_prerot)
-        reh, imh = self._mellin_barnes_integral(xi, wce_ar_dvmp, h)
+        reh0, imh0 = self._mellin_barnes_integral(xi, wce_ar_dvmp, h)
+        reh2, imh2 = self._mellin_barnes_integral(xi, wce_ar_dvmp2, h)
+        reh2 *=self.parameters['a2']
+        imh2 *=self.parameters['a2']
+        reh = reh0 + reh2
+        imh = imh0 + imh2
+        #print(self.parameters['a2'])
+        #print(self._mellin_barnes_integral(xi, wce_ar_dvmp, h))
+        #print(reh,imh)
         return (constants.CF * FV * astrong / constants.NC
                 / np.sqrt(Q2) * np.array([reh, imh, 0, 0, 0, 0, 0, 0]))
-
+         
     def ImH_V(self, pt: data.DataPoint) -> np.ndarray:
         """Return Im(TFF H) for kinematic point."""
         if pt.process == 'gammastarp2rho0p':

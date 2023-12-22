@@ -14,8 +14,8 @@ def _fshu(j: np.ndarray) -> np.ndarray:
                               - loggamma(3 + j) - loggamma(3/2)))
 
 
-def calc_wc(m: theory.Theory, j: np.ndarray, process_class: str):
-    """Calculate Wilson coeffs.
+def calc_wc(m: theory.Theory, j: np.ndarray, kk: int, process_class: str):
+    """Calculate Wilson coeffs. Added 'kk: int' in the argument
 
     Args:
         m: instance of the Theory class
@@ -51,7 +51,7 @@ def calc_wc(m: theory.Theory, j: np.ndarray, process_class: str):
         q0, g0, nsp0 = (one/m.nf, one, one)   # LO Q, G, NSP
         q1, g1, nsp1 = (zero, zero, zero)      # NLO if only LO is asked for (m.p=0)
         if m.p == 1:
-            qp1, ps1, g1 = c1dvmp.c1dvmp(m, 1, j, 0)
+            qp1, ps1, g1 = c1dvmp.c1dvmp(m, 1, j, kk)   # 0 replaced with kk
             q1 = qp1/m.nf + ps1
             nsp1 = qp1
     else:
@@ -63,8 +63,8 @@ def calc_wc(m: theory.Theory, j: np.ndarray, process_class: str):
     return np.stack((c_quark, c_gluon, c_nsp)).transpose()
 
 
-def calc_wce(m: theory.Theory, Q2: float, process_class: str):
-    """Calculate evolved Wilson coeffs for given Q2, for all PWs.
+def calc_wce(m: theory.Theory, Q2: float, process_class: str, kk: int):
+    """Calculate evolved Wilson coeffs for given Q2, for all PWs. Added 'kk: int' in the argument
 
     Args:
         Q2: final evolution scale
@@ -78,7 +78,7 @@ def calc_wce(m: theory.Theory, Q2: float, process_class: str):
     wce = []
     for pw_shift in [0, 2, 4]:
         j = m.jpoints + pw_shift
-        wc = calc_wc(m, j, process_class)
+        wc = calc_wc(m, j, kk, process_class) # added kk 
         # evolution operators
         evola_si = evolution.evolop(m, j, Q2, process_class)     # 2x2
         evola_ns = evolution.evolopns(m, j, Q2, process_class)   # 1x1, NSP
