@@ -91,7 +91,7 @@ def calc_wce(m: theory.Theory, Q2: float, process_class: str, kk: int):
         # while canceling NNLO term NLO*NLO:
         asmur2 = qcd.as2pf(m.p, m.nf, Q2/m.rr2, m.asp[m.p], m.r20)
         asmuf2 = qcd.as2pf(m.p, m.nf, Q2/m.rf2, m.asp[m.p], m.r20)
-        
+        # below section implimentation is for LO evolution in DA (E1 evolution)
         if kk==0:
             evol_DA = 1
         elif kk==2:     
