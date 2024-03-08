@@ -1,4 +1,4 @@
-r"""Perturbative QCD functions.
+"""Perturbative QCD functions.
 
 Coefficients of beta function of QCD up to order :math:`\alpha_s^5` (NNNLO),
 normalized by

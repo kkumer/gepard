@@ -91,11 +91,12 @@ def calc_wce(m: theory.Theory, Q2: float, process_class: str, kk: int):
         # while canceling NNLO term NLO*NLO:
         asmur2 = qcd.as2pf(m.p, m.nf, Q2/m.rr2, m.asp[m.p], m.r20)
         asmuf2 = qcd.as2pf(m.p, m.nf, Q2/m.rf2, m.asp[m.p], m.r20)
+        asmur2_l = qcd.as2pf(m.p, m.nf, 4.0, m.asp[m.p], m.r20)  # if 2.5 is latice scale
         # below section implimentation is for LO evolution in DA (E1 evolution)
         if kk==0:
             evol_DA = 1
         elif kk==2:     
-            evol_DA =  (asmuf2/m.asp[m.p])**(2*adim.non_singlet_LO(kk+1,m.nf)/(-qcd.beta(m.p,m.nf)))
+            evol_DA =  (asmuf2/asmur2_l)**(2*adim.non_singlet_LO(kk+1,m.nf)/(-qcd.beta(m.p,m.nf)))
         else: print('Higher DA moments not incorporated yet ') 
 
         #print(asmuf2,m.asp[m.p],evol_DA,2*adim.non_singlet_LO(kk+1,m.nf),(-qcd.beta(m.p,m.nf)))
