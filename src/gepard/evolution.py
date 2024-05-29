@@ -156,7 +156,10 @@ def cb1(m, Q2, zn, zk, NS: bool = False):
           NS: do we want non-singlet?
 
     Returns:
-         B_jk: non-diagonal part of evol. op. from Eq. (140)
+         B_jk: non-diagonal part of evol. op. from Eq. (140).
+         For NS=True we get array cb1[zn=j] and dependent on zk=k.
+         For NS=False we get array cb1[zn=j, i, j] and dependent on zk=k,
+         where i,j are in [Q, G].
 
     Note:
          It's multiplied by GAMMA(3/2) GAMMA(K+3) / (2^(K+1) GAMMA(K+5/2))
@@ -271,6 +274,15 @@ def evolop(m, j, Q2: float, process_class: str) -> np.ndarray:
                 tginvc = ephnd.conjugate()/np.tan(np.pi*znd.conjugate()/2)
                 cb1f = cb1(m, Q2, j_single + znd + 2, j_single)
                 cb1fc = cb1(m, Q2, j_single + znd.conjugate() + 2, j_single)
+                if process_class == 'DVMP':
+                    Vdvmp = np.array([[np.ones_like(znd), np.zeros_like(znd)],
+                                        [np.zeros_like(znd),
+                                           (j_single+3)/(j_single+znd+5)]])
+                    cb1f = np.einsum('ikn,nkj->nij', Vdvmp, cb1f)
+                    Vdvmpc = np.array([[np.ones_like(znd), np.zeros_like(znd)],
+                                        [np.zeros_like(znd),
+                                           (j_single+3)/(j_single+znd.conjugate()+5)]])
+                    cb1fc = np.einsum('ikn,nkj->nij', Vdvmpc, cb1fc)
                 ndint = np.einsum('n,nij,n->ij', wgnd, cb1f, tginv)
                 ndint -= np.einsum('n,nij,n->ij', wgnd, cb1fc, tginvc)
                 ndint = ndint * 0.25j

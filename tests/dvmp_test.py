@@ -100,3 +100,15 @@ def test_dvmp_TFFs_NLO(th_nlo):
     # following agrees with DM to best than percent
     # assert reh == approx(5328.3678, rel=1e-3)
     # assert imh == approx(22676.063, rel=1e-3)
+
+@mark.slow
+def test_dvmp_TFFs_NLO_evol(th_nlo):
+    """Calculate Q2-evolved NLO DVMP TFFs (numbers not independently confirmed)"""
+    xB = 1e-4
+    pt = g.data.DataPoint({'Q2': 20., 't': 0, 'xB': xB})
+    # to get agreement with these old numbers:
+    tffs = th_nlo.tff(pt.xi, pt.t, pt.Q2)
+    reh, imh = tffs[0], tffs[1]
+    # obtained by running the 611460a+stash version of Gepard
+    assert reh == approx(-2352.8053, rel=1e-5)
+    assert imh == approx(408.0244726988, rel=1e-5)
