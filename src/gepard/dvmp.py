@@ -44,7 +44,7 @@ class MellinBarnesTFF(model.ParameterModel):
         #  to zero to get agreement with older results
         self.corr_c1dvmp_one = 1
         # 2. Prefactors to kill parts of NLO hard scattering amplitude
-        #  Set to zero to kill corresponding part.
+        #  Set to zero to kill corresponding part. (For checking.)
         self.Q1_prefac = 1
         self.PS1_prefac = 1
         self.G1_prefac = 1
@@ -63,10 +63,11 @@ class MellinBarnesTFF(model.ParameterModel):
             wce_ar_dvmp = self.wce_dvmp[Q2]
         except KeyError:
             # calculate it
-            wce_ar_dvmp = wilson.calc_wce(self, Q2, 'DVMP')
+            wce_ar_dvmp = wilson.calc_wce_dvmp(self, Q2)
             # memorize it for future
             self.wce_dvmp[Q2] = wce_ar_dvmp
         # Evaluations depending on model parameters:
+        wce_da = np.einsum('skgf,g->skf', wce_ar_dvmp, self.gegenbauers())
         h_prerot = self.H(xi, t)
         if meson == 'rho0':
             frot = self.frot_rho0_4
@@ -77,7 +78,7 @@ class MellinBarnesTFF(model.ParameterModel):
         else:
             raise ValueError("{} unknown. Use 'rho0' or 'phi'".format(meson))
         h = np.einsum('fa,ja->jf', frot, h_prerot)
-        reh, imh = self._mellin_barnes_integral(xi, wce_ar_dvmp, h)
+        reh, imh = self._mellin_barnes_integral(xi, wce_da, h)
         return (constants.CF * FV * astrong / constants.NC
                 / np.sqrt(Q2) * np.array([reh, imh, 0, 0, 0, 0, 0, 0]))
 

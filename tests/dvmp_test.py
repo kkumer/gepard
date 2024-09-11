@@ -9,7 +9,7 @@ par_dvmp = {'ns':  0.152, 'al0s': 1.158, 'alps': 0.15, 'ms2': 0.446,
             'al0g': 1.247, 'alpg': 0.15, 'mg2': 0.7, 'secg': -2.309, 'thig': 0.812}
 
 
-class MyTheory(g.gpd.PWNormGPD, g.dvmp.MellinBarnesTFF, g.dvmp.DVMP):
+class MyTheory(g.gpd.PWNormGPD, g.da.GegenbauerDA, g.dvmp.MellinBarnesTFF, g.dvmp.DVMP):
     pass
 
 @fixture

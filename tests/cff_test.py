@@ -141,9 +141,9 @@ def test_cff_proc_class_except():
     m = CFFTest2(type='hard', p=1, scheme='csbar')
     qs = 5/18  # for nf=4
     m.dvcs_charges = (qs, qs, 0)  # select only singlet part of CFF
-    with raises(Exception, match='process_class SIDIS is not DIS, DVCS or DVMP!'):
+    with raises(Exception, match='process_class SIDIS is neither DIS nor DVCS!'):
         g.wilson.calc_wc(m, m.jpoints, 'SIDIS')
-    with raises(Exception, match='process_class SIDIS is neither DVCS nor DIS!'):
+    with raises(Exception, match='process_class SIDIS is neither DIS nor DVCS!'):
         g.c1dvcs.shift1(m, m.jpoints, 'SIDIS')
 
 

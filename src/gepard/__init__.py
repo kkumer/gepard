@@ -18,6 +18,7 @@ from .dvmp import DVMP, MellinBarnesTFF  # noqa: F401
 from .eff import ZeroEFF, DipoleEFF, KellyEFF  # noqa: F401
 from .fitter import MinuitFitter  # noqa: F401
 from .gpd import GPD, ConformalSpaceGPD, TestGPD, PWNormGPD  # noqa: F401
+from .da import DA, GegenbauerDA  # noqa: F401
 from .kinematics import tmin, tmax, weight_BH, prepare  # noqa: F401
 from .qcd import beta, as2pf  # noqa: F401
 from .theory import Theory  # noqa: F401
