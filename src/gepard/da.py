@@ -41,25 +41,29 @@ class GegenbauerDA(DA):
 
     Args:
         ngegens: number of conformal/Gegenbauer moments
-                 beyond the first asymptotic a0 = 1
+                 including the first asymptotic a0 = 1.
 
     Notes:
         Parameters of this model must have names of form
-        a2, a4, ..., a<2*ngegens>.
+        a2, a4, ..., a<2*(ngegens-1)>. a0 is fixed to be 1
+        and is not a model parameter.
 
     """
 
     def __init__(self, **kwargs) -> None:
-        self.ngegens = 2
+        self.ngegens = 3
+        # gpoints is array of integer DA moments [0, 2, 4, ...] and
+        # corresponds to complex jpoints on GPD MB contour
+        self.gpoints = np.arange(0, 2*self.ngegens, 2)
         # Initial parameters correspond to asymptotic DA.
         self.add_parameters({'a2': 0., 'a4': 0.}) 
         super().__init__(**kwargs)
 
     def gegenbauers(self) -> np.ndarray:
-        """Array of present values of Gegenbauer moments."""
+        """Values of DA Gegenbauer moments."""
 
         gegens = [1]  # a0 = 1
-        for g in range(2, 2*self.ngegens+1, 2):
+        for g in self.gpoints[1:]:
             gegens.append(self.parameters['a{:d}'.format(g)])
         return np.array(gegens)
 

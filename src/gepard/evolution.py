@@ -180,18 +180,6 @@ def cb1(m, Q2, zn, zk, NS: bool = False):
     GOD_11 = 2 * constants.CF * (
             2*AAA + (AAA - special.S1(zn+1))*(zn-zk)*(
                 zn+zk + 3)/(zk+1)/(zk+2))
-    nzero = np.zeros_like(GOD_11)
-    GOD_12 = nzero
-    GOD_21 = 2*constants.CF*(zn-zk)*(zn+zk+3)/zn/(zk+1)/(zk+2)
-    GOD_22 = 2 * constants.CA * (2*AAA + (AAA - special.S1(
-        zn + 1)) * (special.poch(zn, 4) / special.poch(zk, 4) -
-                    1) + 2 * (zn-zk) * (
-            zn+zk + 3) / special.poch(zk, 4)) * zk / zn
-    god = np.array([[GOD_11, GOD_12], [GOD_21, GOD_22]])
-    dm_22 = zk/zn
-    dm_11 = np.ones_like(dm_22)
-    dm_12 = np.zeros_like(dm_22)
-    dm = np.array([[dm_11, dm_12], [dm_12, dm_22]])
     fac = (zk+1)*(zk+2)*(2*zn+3)/(zn+1)/(zn+2)/(zn-zk)/(zn+zk+3)
     if NS:
         gamn = adim.non_singlet_LO(zn+1, m.nf)
@@ -200,6 +188,18 @@ def cb1(m, Q2, zn, zk, NS: bool = False):
         cb1 = r1 * (gamn-gamk) * (b0 - gamk + GOD_11) * R**(-gamk/b0)
         cb1 = fac * cb1
     else:
+        nzero = np.zeros_like(GOD_11)
+        GOD_12 = nzero
+        GOD_21 = 2*constants.CF*(zn-zk)*(zn+zk+3)/zn/(zk+1)/(zk+2)
+        GOD_22 = 2 * constants.CA * (2*AAA + (AAA - special.S1(
+            zn + 1)) * (special.poch(zn, 4) / special.poch(zk, 4) -
+                        1) + 2 * (zn-zk) * (
+                zn+zk + 3) / special.poch(zk, 4)) * zk / zn
+        god = np.array([[GOD_11, GOD_12], [GOD_21, GOD_22]])
+        dm_22 = zk/zn
+        dm_11 = np.ones_like(dm_22)
+        dm_12 = np.zeros_like(dm_22)
+        dm = np.array([[dm_11, dm_12], [dm_12, dm_22]])
         gamn = adim.singlet_LO(zn+1, m.nf).transpose((2, 0, 1))
         gamk = adim.singlet_LO(zk+1, m.nf)
         lamn, pn = evolution.projectors(gamn)
@@ -235,6 +235,7 @@ def evolop(m, j, Q2: float, process_class: str) -> np.ndarray:
         Argument should not be a process class but GPD vs PDF, or we
         should avoid it altogether somehow. This serves here only
         to get the correct choice of evolution scheme (msbar vs csbar).
+        Factorization scales not general. mu2=Q2 is hardwired here!
 
     """
     # 1. Alpha-strong ratio.
@@ -311,8 +312,9 @@ def evolopns(m, j, Q2: float, process_class: str) -> np.ndarray:
          -  k is index of point on MB contour,
          -  p is pQCD order (0=LO, 1=NLO)
 
-    Notes:
+    Todo:
         Code duplication, should be merged with evolop function
+        Factorization scales not general. mu2=Q2 is hardwired here!
 
     """
     # 1. Alpha-strong ratio.

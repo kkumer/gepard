@@ -124,7 +124,7 @@ def calc_wce_dvmp(m: theory.Theory, Q2: float):
 
     Returns:
         wce[s,k,g,j]: s in range(npwmax), k in range(npts),
-                       g in range(ngegens), j in [Q,G,NSP]
+                       g in gegens, j in [Q,G,NSP]
 
     Todo:
         Code duplication, merge with calc_wce()
@@ -135,12 +135,13 @@ def calc_wce_dvmp(m: theory.Theory, Q2: float):
     for pw_shift in [0, 2, 4]:
         j = m.jpoints + pw_shift
         wc = []
-        for kk in range(m.ngegens+1):
-            wc.append(calc_wc_dvmp(m, j, kk))
+        for g in m.gpoints:
+            wc.append(calc_wc_dvmp(m, j, g))
         wc = np.stack(wc, axis=0)  # FIXME: unnatural axis
         # evolution operators
         evola_si = evolution.evolop(m, j, Q2, process_class)     # 2x2
         evola_ns = evolution.evolopns(m, j, Q2, process_class)   # 1x1, NSP
+        evola_da = evolution.evolopns(m, m.gpoints, Q2, process_class)
         zero_right = np.zeros((evola_ns.shape[0], 2, 2, 1))
         zero_down = np.zeros((evola_ns.shape[0], 2, 1, 2))
         evola_ns = evola_ns.reshape((evola_ns.shape[0], 2, 1, 1))
@@ -150,9 +151,14 @@ def calc_wce_dvmp(m: theory.Theory, Q2: float):
         # while canceling NNLO term NLO*NLO:
         asmur2 = qcd.as2pf(m.p, m.nf, Q2/m.rr2, m.asp[m.p], m.r20)
         asmuf2 = qcd.as2pf(m.p, m.nf, Q2/m.rf2, m.asp[m.p], m.r20)
-        p_mat = np.array([[1, asmuf2], [asmur2, 0]])
-        # 3. evolved Wilson coeff.
-        wce.append(np.einsum('gkpi,pq,kqij->kgj', wc, p_mat, evola))
+        asmudaf2 = qcd.as2pf(m.p, m.nf, Q2/m.rdaf2, m.asp[m.p], m.r20)
+        p_mat = np.zeros((2, 2, 2))
+        p_mat[0, 0, 0] = 1.
+        p_mat[1, 0, 0] = asmur2
+        p_mat[0, 1, 0] = asmuf2
+        p_mat[0, 0, 1] = asmudaf2
+        # 3. evolved Wilson coeff. (evola for GPD, evola_ns for DA)
+        wce.append(np.einsum('gkpi,pqr,kqij,gr->kgj', wc, p_mat, evola, evola_da))
     return np.stack(wce, axis=0)  # stack PWs
 
 def calc_j2x(m: theory.Theory, x: float, eta: float, Q2: float):
