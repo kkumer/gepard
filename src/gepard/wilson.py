@@ -140,7 +140,7 @@ def calc_wce_dvmp(m: theory.Theory, Q2: float):
         # evolution operators
         evola_si = evolution.evolop(m, j, Q2, process_class)     # 2x2
         evola_ns = evolution.evolopns(m, j, Q2, process_class)   # 1x1, NSP
-        evola_da = evolution.evolopns(m, m.gpoints, Q2, process_class)
+        evola_da = evolution.evolopns(m, m.gpoints, Q2, process_class, 'DA')
         zero_right = np.zeros((evola_ns.shape[0], 2, 2, 1))
         zero_down = np.zeros((evola_ns.shape[0], 2, 1, 2))
         evola_ns = evola_ns.reshape((evola_ns.shape[0], 2, 1, 1))

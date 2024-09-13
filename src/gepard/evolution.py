@@ -297,7 +297,7 @@ def evolop(m, j, Q2: float, process_class: str) -> np.ndarray:
     return evola
 
 
-def evolopns(m, j, Q2: float, process_class: str) -> np.ndarray:
+def evolopns(m, j, Q2: float, process_class: str, evolobj: str = 'GPD') -> np.ndarray:
     """GPD evolution operator (NSP case only atm).
 
     Args:
@@ -305,6 +305,7 @@ def evolopns(m, j, Q2: float, process_class: str) -> np.ndarray:
          j: MB contour points (overrides m.jpoints)
          Q2: final evolution momentum squared
          process_class: DIS, DVCS or DVMP
+         evolobj: GPD or DA  (object of evolution)
 
     Returns:
          Array corresponding Eq. (116) of Towards DVCS paper.
@@ -315,6 +316,7 @@ def evolopns(m, j, Q2: float, process_class: str) -> np.ndarray:
     Todo:
         Code duplication, should be merged with evolop function
         Factorization scales not general. mu2=Q2 is hardwired here!
+        CB1 should be factorized to C*B1 and C should be moved somewhere else.
 
     """
     # 1. Alpha-strong ratio.
@@ -322,7 +324,10 @@ def evolopns(m, j, Q2: float, process_class: str) -> np.ndarray:
     # will still be multiplied by ratio of alpha_strongs
     # evaluated at NLO, as it should.
     asmuf2 = qcd.as2pf(m.p, m.nf, Q2, m.asp[m.p], m.r20)
-    asQ02 = qcd.as2pf(m.p, m.nf, m.Q02, m.asp[m.p], m.r20)
+    if evolobj == 'DA':
+        asQ02 = qcd.as2pf(m.p, m.nf, m.daQ02, m.asp[m.p], m.r20)
+    else:
+        asQ02 = qcd.as2pf(m.p, m.nf, m.Q02, m.asp[m.p], m.r20)
     R = asmuf2/asQ02
 
     # 2. mu-indep. part
