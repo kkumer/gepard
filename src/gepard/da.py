@@ -9,6 +9,8 @@
 """
 
 import numpy as np
+from scipy.special import gegenbauer  # type: ignore
+
 from . import model
 
 class DA(model.ParameterModel):
@@ -51,12 +53,14 @@ class GegenbauerDA(DA):
     """
 
     def __init__(self, **kwargs) -> None:
-        self.ngegens = 3
+        self.ngegens = kwargs.setdefault('ngegens', 3)
         # gpoints is array of integer DA moments [0, 2, 4, ...] and
         # corresponds to complex jpoints on GPD MB contour
         self.gpoints = np.arange(0, 2*self.ngegens, 2)
-        # Initial parameters correspond to asymptotic DA.
-        self.add_parameters({'a2': 0., 'a4': 0.}) 
+        # Initial parameters are by default all zero
+        self.add_parameters({f'a{g}': 0 for g in self.gpoints[1:]})
+        # x-space Gegenbauer polynomials
+        self.polynomials = [gegenbauer(g, 1.5) for g in self.gpoints]
         super().__init__(**kwargs)
 
     def gegenbauers(self) -> np.ndarray:
@@ -67,3 +71,8 @@ class GegenbauerDA(DA):
             gegens.append(self.parameters['a{:d}'.format(g)])
         return np.array(gegens)
 
+    def x(self, x: float) -> float:
+        """Value of DA at momentum fraction x at input scale."""
+
+        polyvals = np.array([poly(2*x-1) for poly in self.polynomials])
+        return 6*x*(1-x)*np.dot(self.gegenbauers(), polyvals)
