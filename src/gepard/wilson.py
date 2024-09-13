@@ -120,7 +120,6 @@ def calc_wce_dvmp(m: theory.Theory, Q2: float):
     Args:
         Q2: final evolution scale
         m: instance of the Theory
-        process_class: 'DIS', 'DVCS' or 'DVMP'
 
     Returns:
         wce[s,k,g,j]: s in range(npwmax), k in range(npts),

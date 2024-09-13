@@ -81,3 +81,13 @@ def test_KM15():
     # on Feb 14 2017 
     # _ALUapprox version assert chisq == approx(245.82778194537178)
     assert chisq == approx(246.3179087845521)
+
+@mark.slow
+def test_CDKP23():
+    """Test model: CDKP23."""
+    pt = g.dset[75][23]  # H1 DVMP at Q2 = 17.4 GeV^2, xB = 0.003084, t = -0.125 GeV^2
+    res = th_CDKP23.predict(pt)
+    # The number below is slightly different than what would one get
+    # with Gepard version used for published paper. This is because
+    # published paper did not use NLO evolution of DA, but only of GPDs
+    assert res == approx(21.082760258798167)

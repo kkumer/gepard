@@ -2,7 +2,7 @@
 
 import numpy as np
 
-from . import cff, data, dvcs, eff, gpd
+from . import cff, data, dvcs, dis, dvmp, bmk, eff, gpd, da
 
 GLOpoints = data.dset[31][12:] + data.dset[8] + data.dset[29]
 
@@ -166,3 +166,23 @@ th_KM15._release_parameters('mv2', 'rv', 'bv', 'C', 'mC2', 'tmv2', 'trv', 'tbv',
                             'mpi2', 'ms2', 'secs', 'this', 'secg', 'thig')
 th_KM15.name = 'KM15'
 pts_KM15 = GLO15b
+
+
+class CDKP23(gpd.PWNormGPD, da.GegenbauerDA, cff.MellinBarnesCFF, dis.DIS, bmk.BMK,
+             dvcs.DVCS, dvmp.MellinBarnesTFF, dvmp.DVMP):  # noqa: D101, E501
+    """Model from 'nloimpact' paper arXiv:2310.13837."""
+    pass
+
+th_CDKP23 = CDKP23(p=1)
+par_CDKP23 = {'ns': 0.1678043222729481, 'al0s': 1.1283578703321924,
+              'al0g': 1.0990669706445293, 'alps': 0.11768521317413813,
+              'ms2': 0.40737136645591576, 'secs': 0.2814645298864766,
+              'this': -0.04288751479636837, 'alpg': 3.23324590334337e-07,
+              'mg2': 0.15742752834603854, 'secg': 2.562182278164635,
+              'thig': -0.8067497032304659}
+th_CDKP23.parameters.update(par_CDKP23)
+# Fitting parameters:
+th_CDKP23._release_parameters('ns', 'al0s', 'al0g', 'ms2', 'alps',
+                              'secs', 'this', 'mg2', 'alpg', 'secg', 'thig')
+th_CDKP23.name = 'CDKP23'
+th_CDKP23.description = 'DVCS+DVMP fit from arXiv:2310.13837.'
