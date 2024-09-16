@@ -53,7 +53,7 @@ class GegenbauerDA(DA):
     """
 
     def __init__(self, **kwargs) -> None:
-        self.ngegens = kwargs.setdefault('ngegens', 3)
+        self.ngegens = kwargs.setdefault('ngegens', 1)
         # gpoints is array of integer DA moments [0, 2, 4, ...] and
         # corresponds to complex jpoints on GPD MB contour
         self.gpoints = np.arange(0, 2*self.ngegens, 2)
