@@ -71,8 +71,19 @@ class GegenbauerDA(DA):
             gegens.append(self.parameters['a{:d}'.format(g)])
         return np.array(gegens)
 
-    def x(self, x: float) -> float:
+    def dax(self, x: np.ndarray) -> np.ndarray:
         """Value of DA at momentum fraction x at input scale."""
 
         polyvals = np.array([poly(2*x-1) for poly in self.polynomials])
         return 6*x*(1-x)*np.dot(self.gegenbauers(), polyvals)
+
+    def uncertdax(self, x: np.ndarray) -> np.ndarray:
+        """Uncertainty of DA at momentum fraction x at input scale."""
+        if not isinstance(x, np.ndarray):
+            x = np.array([x])
+        da_pars = [f'a{g}' for g in self.gpoints[1:]]   # ['a2', 'a4', ...]
+        # covariance matrix:
+        cov = np.array([[self.covariance[(par1, par2)] for par2 in da_pars]
+                        for par1 in da_pars])
+        polyvals = np.array([poly(2*x-1) for poly in self.polynomials[1:]])
+        return 6*x*(1-x)*np.sqrt(np.einsum('ix, ij, jx -> x', polyvals, cov, polyvals))
