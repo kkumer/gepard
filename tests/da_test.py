@@ -13,5 +13,5 @@ def test_DA():
 
 def test_DA_xspace():
     """Evaluate DA at x=0.5."""
-    assert CZ.x(0.5) == approx(0)
+    assert CZ.dax(0.5) == approx(0)
 
