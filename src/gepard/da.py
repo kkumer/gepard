@@ -57,8 +57,10 @@ class GegenbauerDA(DA):
         # gpoints is array of integer DA moments [0, 2, 4, ...] and
         # corresponds to complex jpoints on GPD MB contour
         self.gpoints = np.arange(0, 2*self.ngegens, 2)
-        # Initial parameters are by default all zero
-        self.add_parameters({f'a{g}': 0 for g in self.gpoints[1:]})
+        # daparameters are ['a2', 'a4', ...]
+        self.daparameters = [f'a{g}' for g in self.gpoints[1:]]
+        # Initial parameters are by default all set to zero
+        self.add_parameters({par: 0 for par in self.daparameters})
         # x-space Gegenbauer polynomials
         self.polynomials = [gegenbauer(g, 1.5) for g in self.gpoints]
         super().__init__(**kwargs)
