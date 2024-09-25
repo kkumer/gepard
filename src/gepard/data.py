@@ -754,7 +754,7 @@ def cvsets(df_in, nfolds=3, shuffle=True):
             df = df_in.copy()
         # stolen from sklearn
         n = len(df)
-        fold_sizes = (n // nfolds) * np.ones(nfolds, dtype=np.int)
+        fold_sizes = (n // nfolds) * np.ones(nfolds, dtype=int)
         fold_sizes[:n % nfolds] += 1
         current = 0
         chunks = []
@@ -764,18 +764,13 @@ def cvsets(df_in, nfolds=3, shuffle=True):
             chunks.append(df[start:stop])
             current = stop
         sets = []
-        # my ugly coding
         for f in range(nfolds):
-            inds = list(range(nfolds))
-            k = inds.pop(f)
-            train = chunks[inds[0]]
-            for i in inds[1:]:
-                train = train.append(chunks[i])
+            train = pd.concat([ch for j, ch in enumerate(chunks) if j != f])
             sets.append([train, chunks[f]])
         return sets
 
 
-def FTanalyse(bins, HMAX=2, nf=4, Nrep=1):
+def FTanalyse(bins, HMAX=3, nf=4, Nrep=1):
     """Determine the number of harmonics present in bins according to n-fold cross-validation.
 
     Args:
@@ -791,27 +786,32 @@ def FTanalyse(bins, HMAX=2, nf=4, Nrep=1):
         for k in bins:
             df = bins[k]
             err_min = 100
-            for CM in range(HMAX+1):
-                for SM in range(HMAX+1):
-                    errs = []
-                    for cvtrain, cvtest in cvsets(df, nfolds=nf):
-                        cvtest.reset_index(drop=True, inplace=True)
-                        dfFT = FTF(cvtrain, cosmax=CM, sinmax=SM)
-                        dftest = FTF(dfFT, testdata=cvtest, cosmax=CM, sinmax=SM, inverse=True)
-                        errs.append(np.sum((dftest.val.values-dftest.pred.values)**2))
-                    errs = np.array(errs)
-                    # We divide by npts and not ndof because test set
-                    # is NOT used for fitting, so there should be no penalization
-                    # of model's complexity
-                    err = errs.mean() / len(cvtest)
-                    # However, experiments show that small penalty for complexity
-                    # sometimes improves accuracy (but this is quite simple
-                    # and creates problems with large number of folds)
-                    #err = errs.mean() /(len(cvtest)-np.sqrt(CM+SM+1))
-                    #print CM, SM, err
-                    if err <= err_min:
-                        err_min = err
-                        h_min = (CM, SM)
+            for CM in range(HMAX):
+                for SM in range(HMAX):
+                    try:
+                        errs = []
+                        for cvtrain, cvtest in cvsets(df, nfolds=nf):
+                            cvtest.reset_index(drop=True, inplace=True)
+                            dfFT = FTF(cvtrain, cosmax=CM, sinmax=SM)
+                            dftest = FTF(dfFT, testdata=cvtest, cosmax=CM, sinmax=SM, inverse=True)
+                            errs.append(np.sum((dftest.val.values-dftest.pred.values)**2))
+                        errs = np.array(errs)
+                        # We divide by npts and not ndof because test set
+                        # is NOT used for fitting, so there should be no penalization
+                        # of model's complexity
+                        err = errs.mean() / len(cvtest)
+                        # However, experiments show that small penalty for complexity
+                        # sometimes improves accuracy (but this is quite simple
+                        # and creates problems with large number of folds)
+                        #err = errs.mean() /(len(cvtest)-np.sqrt(CM+SM+1))
+                        #print CM, SM, err
+                        if err <= err_min:
+                            err_min = err
+                            h_min = (CM, SM)
+                    except ValueError:
+                        # asking too large harmonic from small-statistics bin
+                        # FIXME: switch this to "look before leap" philosophy
+                        pass
             mins.append(h_min)
     nc, ns = np.array(mins).mean(axis=0)
     delc, dels = np.array(mins).std(axis=0)
