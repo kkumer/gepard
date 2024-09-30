@@ -16,6 +16,8 @@ class DIS(model.ParameterModel, mellin.MellinBarnes):
             self.dis_charge = 2/9
         else:  # nf = 4
             self.dis_charge = 5/18
+        self.rr2 = kwargs.setdefault('rr2', 1) # ratio Q2/(DVCS renorm. scale squared)
+        # FIXME: separate DIS and DVCS renorm. scales
         self.wce_dis: Dict[float, np.ndarray] = {}
         super().__init__(**kwargs)
 

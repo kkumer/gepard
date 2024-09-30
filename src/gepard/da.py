@@ -32,7 +32,6 @@ class DA(model.ParameterModel):
         self.r20 = kwargs.setdefault('r20', 2.5)
         self.asp = kwargs.setdefault('asp', np.array([0.0606, 0.0518, 0.0488]))
         # scales
-        self.rr2 = 1     # ratio of Q2/renorm. scale squared
         self.rdaf2 = 1   # ratio of Q2/DA fact. scale sq.
         #
         super().__init__(**kwargs)

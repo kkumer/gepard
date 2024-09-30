@@ -148,7 +148,7 @@ def calc_wce_dvmp(m: theory.Theory, Q2: float):
                           [zero_down, evola_ns]])
         # p_mat: matrix that combines (LO, NLO) evolution operator and Wilson coeffs
         # while canceling NNLO term NLO*NLO:
-        asmur2 = qcd.as2pf(m.p, m.nf, Q2/m.rr2, m.asp[m.p], m.r20)
+        asmur2 = qcd.as2pf(m.p, m.nf, Q2/m.rdvmpr2, m.asp[m.p], m.r20)
         asmuf2 = qcd.as2pf(m.p, m.nf, Q2/m.rf2, m.asp[m.p], m.r20)
         asmudaf2 = qcd.as2pf(m.p, m.nf, Q2/m.rdaf2, m.asp[m.p], m.r20)
         p_mat = np.zeros((2, 2, 2))
@@ -210,10 +210,8 @@ def calc_j2x(m: theory.Theory, x: float, eta: float, Q2: float):
                           [zero_down, evola_ns]])
         # p_mat: matrix that combines (LO, NLO) evolution operator and Wilson coeffs
         # while canceling NNLO term NLO*NLO:
-        # Since wc_NLO = 0, asmur2 is redundant here. I keep it for cleaner code.
-        asmur2 = qcd.as2pf(m.p, m.nf, Q2/m.rr2, m.asp[m.p], m.r20)
         asmuf2 = qcd.as2pf(m.p, m.nf, Q2/m.rf2, m.asp[m.p], m.r20)
-        p_mat = np.array([[1, asmuf2], [asmur2, 0]])
+        p_mat = np.array([[1, asmuf2], [0, 0]])
         # 3. evolved Wilson coeff.
         # Note the difference w.r.t. usual wce, where we have inner product of
         # wc and evola, while here we have element-wise product, so that we

@@ -57,7 +57,7 @@ def c1dvmp(m, sgntr: int, j: complex, k: int) -> Tuple[complex, complex, complex
         and renormalization scales are different from Q^2, but should be OK.
 
     """
-    LRR2 = math.log(m.rr2)
+    LRR2 = math.log(m.rdvmpr2)
     LRGPDF2 = math.log(m.rf2)
     LRDAF2 = math.log(m.rdaf2)
     b0 = qcd.beta(0, m.nf)

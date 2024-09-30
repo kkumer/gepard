@@ -37,6 +37,7 @@ class MellinBarnesTFF(model.ParameterModel):
     """DVMP Transition Form Factors modelled as Mellin-Barnes integral."""
 
     def __init__(self, **kwargs):
+        self.rdvmpr2 = kwargs.setdefault('rdvmpr2', 1) # ratio Q2/(DVMP renorm. scale sq.)
         self.wce_dvmp: Dict[float, np.ndarray] = {}
         # correction factors for NLO expressions
         # needed to be able to have some tests w.r.t. old wrong notebooks

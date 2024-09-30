@@ -34,6 +34,7 @@ class CFF(model.ParameterModel):
 
     def __init__(self, **kwargs):
         self.nf = kwargs.setdefault('nf', 4)
+        self.rr2 = kwargs.setdefault('rr2', 1) # ratio Q2/(DVCS renorm. scale squared)
         # squared DVCS charge factors
         if self.nf == 3:
             qs = 2/9
