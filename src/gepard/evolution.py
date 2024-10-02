@@ -145,12 +145,11 @@ def erfunc_nd(m, lamj, lamk, R) -> np.ndarray:
     return er1
 
 
-def cb1(m, Q2, zn, zk, NS: bool = False):
+def cb1(m, R, zn, zk, NS: bool = False):
     """Non-diagonal part of NLO evol op.
 
     Args:
           m: instance of the model
-          Q2: default endpoint of evolution (can be changed with m.rf2)
           zn: non-diagonal evolution Mellin-Barnes integration point (array)
           zk: COPE Mellin-Barnes integration point (not array! - FIXME)
           NS: do we want non-singlet?
@@ -168,9 +167,6 @@ def cb1(m, Q2, zn, zk, NS: bool = False):
         (2^(K+1) GAMMA(K+5/2))  / ( GAMMA(3/2) GAMMA(K+3) )
 
     """
-    asmuf2 = qcd.as2pf(m.p, m.nf, Q2/m.rf2, m.asp[m.p], m.r20)
-    asQ02 = qcd.as2pf(m.p, m.nf, m.Q02, m.asp[m.p], m.r20)
-    R = asmuf2/asQ02
     b0 = qcd.beta(0, m.nf)
     AAA = (special.S1((zn+zk+2)/2) -
            special.S1((zn-zk-2)/2) +
@@ -215,12 +211,13 @@ def cb1(m, Q2, zn, zk, NS: bool = False):
     return cb1
 
 
-def evolop(m, j, Q2: float, process_class: str) -> np.ndarray:
+def evolop(m, j, R: float, process_class: str) -> np.ndarray:
     """GPD evolution operator.
 
     Args:
          m: instance of the model
          j: MB contour points (overrides m.jpoints)
+         R: ratio of astrong(mu_fact)/astrong(mu_input)
          Q2: default endpoint of evolution (can be changed with m.rf2)
          process_class: DIS, DVCS or DVMP
 
@@ -237,18 +234,10 @@ def evolop(m, j, Q2: float, process_class: str) -> np.ndarray:
         to get the correct choice of evolution scheme (msbar vs csbar).
 
     """
-    # 1. Alpha-strong ratio.
-    # When m.p=1 (NLO), LO part of the evolution operator
-    # will still be multiplied by ratio of alpha_strongs
-    # evaluated at NLO, as it should.
-    asmuf2 = qcd.as2pf(m.p, m.nf, Q2/m.rf2, m.asp[m.p], m.r20)
-    asQ02 = qcd.as2pf(m.p, m.nf, m.Q02, m.asp[m.p], m.r20)
-    R = asmuf2/asQ02
-
-    # 2. egeinvalues, projectors, projected mu-indep. part
+    # eigenvalues, projectors, projected mu-indep. part
     lam, pr, r1proj = rnlof(m, j)
 
-    # 3. LO errfunc
+    # LO errfunc
     b0 = qcd.beta(0, m.nf)
     er1 = erfunc(m, lam, lam, R)
 
@@ -272,8 +261,8 @@ def evolop(m, j, Q2: float, process_class: str) -> np.ndarray:
                 ephnd = np.exp(ndphij)
                 tginv = ephnd/np.tan(np.pi*znd/2)
                 tginvc = ephnd.conjugate()/np.tan(np.pi*znd.conjugate()/2)
-                cb1f = cb1(m, Q2, j_single + znd + 2, j_single)
-                cb1fc = cb1(m, Q2, j_single + znd.conjugate() + 2, j_single)
+                cb1f = cb1(m, R, j_single + znd + 2, j_single)
+                cb1fc = cb1(m, R, j_single + znd.conjugate() + 2, j_single)
                 if process_class == 'DVMP':
                     Vdvmp = np.array([[np.ones_like(znd), np.zeros_like(znd)],
                                         [np.zeros_like(znd),
@@ -296,15 +285,14 @@ def evolop(m, j, Q2: float, process_class: str) -> np.ndarray:
     return evola
 
 
-def evolopns(m, j, Q2: float, process_class: str, evolobj: str = 'GPD') -> np.ndarray:
+def evolopns(m, j, R: float, process_class: str) -> np.ndarray:
     """GPD evolution operator (NSP case only atm).
 
     Args:
          m: instance of the model
          j: MB contour points (overrides m.jpoints)
-         Q2: default endpoint of evolution (can be changed with m.rf2)
+         R: ratio of astrong(mu_fact)/astrong(mu_input)
          process_class: DIS, DVCS or DVMP
-         evolobj: GPD or DA  (object of evolution)
 
     Returns:
          Array corresponding Eq. (116) of Towards DVCS paper.
@@ -314,26 +302,13 @@ def evolopns(m, j, Q2: float, process_class: str, evolobj: str = 'GPD') -> np.nd
 
     Todo:
         Code duplication, should be merged with evolop function
-        Factorization scales not general. mu2=Q2 is hardwired here!
         CB1 should be factorized to C*B1 and C should be moved somewhere else.
 
     """
-    # 1. Alpha-strong ratio.
-    # When m.p=1 (NLO), LO part of the evolution operator
-    # will still be multiplied by ratio of alpha_strongs
-    # evaluated at NLO, as it should.
-    if evolobj == 'DA':
-        asQ02 = qcd.as2pf(m.p, m.nf, m.daQ02, m.asp[m.p], m.r20)
-        asmuf2 = qcd.as2pf(m.p, m.nf, Q2/m.rdaf2, m.asp[m.p], m.r20)
-    else:  # GPD
-        asQ02 = qcd.as2pf(m.p, m.nf, m.Q02, m.asp[m.p], m.r20)
-        asmuf2 = qcd.as2pf(m.p, m.nf, Q2/m.rf2, m.asp[m.p], m.r20)
-    R = asmuf2/asQ02
-
-    # 2. mu-indep. part
+    # mu-indep. part
     gam0, r1 = rnlonsf(m, j, 1)   # prty=1 fixed
 
-    # 2. LO errfunc
+    # LO errfunc
     b0 = qcd.beta(0, m.nf)
     aux1 = - (1 - 1 / R) * r1  # Cf. eq. (117), but with opposite sign
     aux0 = np.ones_like(aux1)
@@ -354,8 +329,8 @@ def evolopns(m, j, Q2: float, process_class: str, evolobj: str = 'GPD') -> np.nd
                 ephnd = np.exp(ndphij)
                 tginv = ephnd/np.tan(np.pi*znd/2)
                 tginvc = ephnd.conjugate()/np.tan(np.pi*znd.conjugate()/2)
-                cb1f = cb1(m, Q2, j_single + znd + 2, j_single, NS=True)
-                cb1fc = cb1(m, Q2, j_single + znd.conjugate() + 2, j_single, NS=True)
+                cb1f = cb1(m, R, j_single + znd + 2, j_single, NS=True)
+                cb1fc = cb1(m, R, j_single + znd.conjugate() + 2, j_single, NS=True)
                 ndint = np.sum(wgnd * cb1f * tginv)
                 ndint -= np.sum(wgnd * cb1fc * tginvc)
                 ndint = ndint * 0.25j

@@ -85,21 +85,27 @@ def calc_wce(m: theory.Theory, Q2: float, process_class: str):
     """Calculate evolved Wilson coeffs for given Q2, for all PWs.
 
     Args:
-        Q2: final evolution scale
         m: instance of the Theory
+        Q2: default renormalization and factorization scale
+            (can be changed with m.rr2 and m.rf2)
         process_class: 'DIS' or 'DVCS'
 
     Returns:
         wce[s,k,j]: s in range(npwmax), k in range(npts), j in [Q,G,NSP]
 
     """
+    # alpha_strong/2pi at renormalization, factorization and input scales:
+    asmur2 = qcd.as2pf(m.p, m.nf, Q2/m.rr2, m.asp[m.p], m.r20)
+    asmuf2 = qcd.as2pf(m.p, m.nf, Q2/m.rf2, m.asp[m.p], m.r20)
+    asQ02 = qcd.as2pf(m.p, m.nf, m.Q02, m.asp[m.p], m.r20)
+    R = asmuf2/asQ02
     wce = []
     for pw_shift in [0, 2, 4]:
         j = m.jpoints + pw_shift
         wc = calc_wc(m, j, process_class)
         # evolution operators
-        evola_si = evolution.evolop(m, j, Q2, process_class)     # 2x2
-        evola_ns = evolution.evolopns(m, j, Q2, process_class)   # 1x1, NSP
+        evola_si = evolution.evolop(m, j, R, process_class)     # 2x2
+        evola_ns = evolution.evolopns(m, j, R, process_class)   # 1x1, NSP
         zero_right = np.zeros((evola_ns.shape[0], 2, 2, 1))
         zero_down = np.zeros((evola_ns.shape[0], 2, 1, 2))
         evola_ns = evola_ns.reshape((evola_ns.shape[0], 2, 1, 1))
@@ -107,8 +113,6 @@ def calc_wce(m: theory.Theory, Q2: float, process_class: str):
                           [zero_down, evola_ns]])
         # p_mat: matrix that combines (LO, NLO) evolution operator and Wilson coeffs
         # while canceling NNLO term NLO*NLO:
-        asmur2 = qcd.as2pf(m.p, m.nf, Q2/m.rr2, m.asp[m.p], m.r20)
-        asmuf2 = qcd.as2pf(m.p, m.nf, Q2/m.rf2, m.asp[m.p], m.r20)
         p_mat = np.array([[1, asmuf2], [asmur2, 0]])
         # 3. evolved Wilson coeff.
         wce.append(np.einsum('kpi,pq,kqij->kj', wc, p_mat, evola))
@@ -118,8 +122,9 @@ def calc_wce_dvmp(m: theory.Theory, Q2: float):
     """Calculate evolved DVMP Wilson coeffs for given Q2, for all PWs.
 
     Args:
-        Q2: final evolution scale
         m: instance of the Theory
+        Q2: default renormalization and factorization scale
+            (can be changed with m.rdvmpr2, m.rf2 and m.rdaf2)
 
     Returns:
         wce[s,k,g,j]: s in range(npwmax), k in range(npts),
@@ -130,6 +135,16 @@ def calc_wce_dvmp(m: theory.Theory, Q2: float):
 
     """
     process_class = 'DVMP'
+    # alpha_strong/2pi at various scales:
+    asmur2 = qcd.as2pf(m.p, m.nf, Q2/m.rdvmpr2, m.asp[m.p], m.r20)
+    # GPD
+    asmuf2 = qcd.as2pf(m.p, m.nf, Q2/m.rf2, m.asp[m.p], m.r20)
+    asQ02 = qcd.as2pf(m.p, m.nf, m.Q02, m.asp[m.p], m.r20)
+    R = asmuf2/asQ02
+    # DA
+    asdamuf2 = qcd.as2pf(m.p, m.nf, Q2/m.rdaf2, m.asp[m.p], m.r20)
+    asdaQ02 = qcd.as2pf(m.p, m.nf, m.daQ02, m.asp[m.p], m.r20)
+    RDA = asdamuf2/asdaQ02
     wce = []
     for pw_shift in [0, 2, 4]:
         j = m.jpoints + pw_shift
@@ -138,9 +153,9 @@ def calc_wce_dvmp(m: theory.Theory, Q2: float):
             wc.append(calc_wc_dvmp(m, j, g))
         wc = np.stack(wc, axis=0)  # FIXME: unnatural axis
         # evolution operators
-        evola_si = evolution.evolop(m, j, Q2, process_class)     # 2x2
-        evola_ns = evolution.evolopns(m, j, Q2, process_class)   # 1x1, NSP
-        evola_da = evolution.evolopns(m, m.gpoints, Q2, process_class, 'DA')
+        evola_si = evolution.evolop(m, j, R, process_class)     # 2x2
+        evola_ns = evolution.evolopns(m, j, R, process_class)   # 1x1, NSP
+        evola_da = evolution.evolopns(m, m.gpoints, RDA, process_class)
         zero_right = np.zeros((evola_ns.shape[0], 2, 2, 1))
         zero_down = np.zeros((evola_ns.shape[0], 2, 1, 2))
         evola_ns = evola_ns.reshape((evola_ns.shape[0], 2, 1, 1))
@@ -148,14 +163,11 @@ def calc_wce_dvmp(m: theory.Theory, Q2: float):
                           [zero_down, evola_ns]])
         # p_mat: matrix that combines (LO, NLO) evolution operator and Wilson coeffs
         # while canceling NNLO term NLO*NLO:
-        asmur2 = qcd.as2pf(m.p, m.nf, Q2/m.rdvmpr2, m.asp[m.p], m.r20)
-        asmuf2 = qcd.as2pf(m.p, m.nf, Q2/m.rf2, m.asp[m.p], m.r20)
-        asmudaf2 = qcd.as2pf(m.p, m.nf, Q2/m.rdaf2, m.asp[m.p], m.r20)
         p_mat = np.zeros((2, 2, 2))
         p_mat[0, 0, 0] = 1.
         p_mat[1, 0, 0] = asmur2
         p_mat[0, 1, 0] = asmuf2
-        p_mat[0, 0, 1] = asmudaf2
+        p_mat[0, 0, 1] = asdamuf2
         # 3. evolved Wilson coeff. (evola for GPD, evola_ns for DA)
         wce.append(np.einsum('gkpi,pqr,kqij,gr->kgj', wc, p_mat, evola, evola_da))
     return np.stack(wce, axis=0)  # stack PWs
@@ -176,6 +188,9 @@ def calc_j2x(m: theory.Theory, x: float, eta: float, Q2: float):
         Implement general (eta != x) j to x transform.
 
     """
+    asmuf2 = qcd.as2pf(m.p, m.nf, Q2/m.rf2, m.asp[m.p], m.r20)
+    asQ02 = qcd.as2pf(m.p, m.nf, m.Q02, m.asp[m.p], m.r20)
+    R = asmuf2/asQ02
     wce = []
     for pw_shift in [0, 2, 4]:
         j = m.jpoints + pw_shift
@@ -190,8 +205,8 @@ def calc_j2x(m: theory.Theory, x: float, eta: float, Q2: float):
             wc = np.stack((wc_lo, wc_nlo), axis=1)
             # evolution operators
             # DIS is specified now just so that msbar evolution works properly
-            evola_si = evolution.evolop(m, j, Q2, 'DIS')     # 2x2
-            evola_ns = evolution.evolopns(m, j, Q2, 'DIS')   # 1x1, NSP
+            evola_si = evolution.evolop(m, j, R, 'DIS')     # 2x2
+            evola_ns = evolution.evolopns(m, j, R, 'DIS')   # 1x1, NSP
         elif abs(eta-x) < 1e-8:
             # cross-over, border eta=x limit
             wc_lo = np.stack((fshu, fshu*2*x/(3+j), zero)).transpose()
@@ -199,8 +214,8 @@ def calc_j2x(m: theory.Theory, x: float, eta: float, Q2: float):
             wc = np.stack((wc_lo, wc_nlo), axis=1)
             # evolution operators
             # DVCS is specified now just so that msbar evolution works properly
-            evola_si = evolution.evolop(m, j, Q2, 'DVCS')     # 2x2
-            evola_ns = evolution.evolopns(m, j, Q2, 'DVCS')   # 1x1, NSP
+            evola_si = evolution.evolop(m, j, R, 'DVCS')     # 2x2
+            evola_ns = evolution.evolopns(m, j, R, 'DVCS')   # 1x1, NSP
         else:
             raise Exception('eta has to be either 0 or equal to x')
         zero_right = np.zeros((evola_ns.shape[0], 2, 2, 1))

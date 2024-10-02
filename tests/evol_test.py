@@ -36,12 +36,18 @@ def th():
 def th_lo():
     th = MyTest2(p=0)
     th.parameters.update(par_test)
+    asmuf2 = g.qcd.as2pf(th.p, th.nf, 3.0, th.asp[th.p], th.r20)
+    asQ02 = g.qcd.as2pf(th.p, th.nf, 1.0, th.asp[th.p], th.r20)
+    th.R = asmuf2/asQ02
     return th
 
 @fixture
 def th_nlo():
     th = MyTest2(p=1)
     th.parameters.update(par_test)
+    asmuf2 = g.qcd.as2pf(th.p, th.nf, 3.0, th.asp[th.p], th.r20)
+    asQ02 = g.qcd.as2pf(th.p, th.nf, 1.0, th.asp[th.p], th.r20)
+    th.R = asmuf2/asQ02
     return th
 
 
@@ -85,7 +91,7 @@ def test_rnlof(th_nlo):
 
 def test_evolop_LO(th_lo):
     """Test LO evolution operator."""
-    assert g.evolution.evolop(th_lo, th_lo.jpoints, 3.0,
+    assert g.evolution.evolop(th_lo, th_lo.jpoints, th_lo.R,
                               'DVCS')[0, 0, :, :] == approx(
            np.array([[0.97360574083605833-4.26361786894205834e-05j,
                       0.12173639863278003-5.99655383745874504e-05j],
@@ -96,14 +102,14 @@ def test_evolop_LO(th_lo):
 def test_evolop_NLO(th_nlo):
     """Test NLO evolution operator."""
     # LO part (but with NLO alpha_strong)
-    assert g.evolution.evolop(th_nlo, th_nlo.jpoints, 3.0,
+    assert g.evolution.evolop(th_nlo, th_nlo.jpoints, th_nlo.R,
                               'DVCS')[0, 0, :, :] == approx(
            np.array([[0.97506856774185890-6.13627841862173179e-05j,
                       0.16175930125082716-9.38626466680329819e-05j],
                      [0.68811853114565436-7.48865910115848387e-04j,
                       2.2521082168110360-1.65744690707721643e-03j]]))
     # NLO part
-    assert g.evolution.evolop(th_nlo, th_nlo.jpoints, 3.0,
+    assert g.evolution.evolop(th_nlo, th_nlo.jpoints, th_nlo.R,
                               'DVCS')[0, 1, :, :] == approx(
            np.array([[1.3209647413503760-2.00187561001276184e-03j,
                       3.0958151106827598-4.13038076850684704e-03j],
