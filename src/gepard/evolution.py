@@ -150,7 +150,7 @@ def cb1(m, Q2, zn, zk, NS: bool = False):
 
     Args:
           m: instance of the model
-          Q2: evolution point
+          Q2: default endpoint of evolution (can be changed with m.rf2)
           zn: non-diagonal evolution Mellin-Barnes integration point (array)
           zk: COPE Mellin-Barnes integration point (not array! - FIXME)
           NS: do we want non-singlet?
@@ -168,7 +168,7 @@ def cb1(m, Q2, zn, zk, NS: bool = False):
         (2^(K+1) GAMMA(K+5/2))  / ( GAMMA(3/2) GAMMA(K+3) )
 
     """
-    asmuf2 = qcd.as2pf(m.p, m.nf, Q2, m.asp[m.p], m.r20)
+    asmuf2 = qcd.as2pf(m.p, m.nf, Q2/m.rf2, m.asp[m.p], m.r20)
     asQ02 = qcd.as2pf(m.p, m.nf, m.Q02, m.asp[m.p], m.r20)
     R = asmuf2/asQ02
     b0 = qcd.beta(0, m.nf)
@@ -221,7 +221,7 @@ def evolop(m, j, Q2: float, process_class: str) -> np.ndarray:
     Args:
          m: instance of the model
          j: MB contour points (overrides m.jpoints)
-         Q2: final evolution momentum squared
+         Q2: default endpoint of evolution (can be changed with m.rf2)
          process_class: DIS, DVCS or DVMP
 
     Returns:
@@ -235,14 +235,13 @@ def evolop(m, j, Q2: float, process_class: str) -> np.ndarray:
         Argument should not be a process class but GPD vs PDF, or we
         should avoid it altogether somehow. This serves here only
         to get the correct choice of evolution scheme (msbar vs csbar).
-        Factorization scales not general. mu2=Q2 is hardwired here!
 
     """
     # 1. Alpha-strong ratio.
     # When m.p=1 (NLO), LO part of the evolution operator
     # will still be multiplied by ratio of alpha_strongs
     # evaluated at NLO, as it should.
-    asmuf2 = qcd.as2pf(m.p, m.nf, Q2, m.asp[m.p], m.r20)
+    asmuf2 = qcd.as2pf(m.p, m.nf, Q2/m.rf2, m.asp[m.p], m.r20)
     asQ02 = qcd.as2pf(m.p, m.nf, m.Q02, m.asp[m.p], m.r20)
     R = asmuf2/asQ02
 
@@ -303,7 +302,7 @@ def evolopns(m, j, Q2: float, process_class: str, evolobj: str = 'GPD') -> np.nd
     Args:
          m: instance of the model
          j: MB contour points (overrides m.jpoints)
-         Q2: final evolution momentum squared
+         Q2: default endpoint of evolution (can be changed with m.rf2)
          process_class: DIS, DVCS or DVMP
          evolobj: GPD or DA  (object of evolution)
 
@@ -323,11 +322,12 @@ def evolopns(m, j, Q2: float, process_class: str, evolobj: str = 'GPD') -> np.nd
     # When m.p=1 (NLO), LO part of the evolution operator
     # will still be multiplied by ratio of alpha_strongs
     # evaluated at NLO, as it should.
-    asmuf2 = qcd.as2pf(m.p, m.nf, Q2, m.asp[m.p], m.r20)
     if evolobj == 'DA':
         asQ02 = qcd.as2pf(m.p, m.nf, m.daQ02, m.asp[m.p], m.r20)
-    else:
+        asmuf2 = qcd.as2pf(m.p, m.nf, Q2/m.rdaf2, m.asp[m.p], m.r20)
+    else:  # GPD
         asQ02 = qcd.as2pf(m.p, m.nf, m.Q02, m.asp[m.p], m.r20)
+        asmuf2 = qcd.as2pf(m.p, m.nf, Q2/m.rf2, m.asp[m.p], m.r20)
     R = asmuf2/asQ02
 
     # 2. mu-indep. part

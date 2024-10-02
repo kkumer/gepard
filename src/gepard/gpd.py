@@ -295,7 +295,7 @@ class GPD(model.ParameterModel):
         self.asp = kwargs.setdefault('asp', np.array([0.0606, 0.0518, 0.0488]))
         self.residualt = kwargs.setdefault('residualt', 'dipole')
         # scales
-        self.rf2 = 1     # ratio of Q2/GPD fact. scale sq.
+        self.rf2 = kwargs.setdefault('rf2', 1) # ratio Q2/(GPD fact. scale squared)
         #
         # Model parameters
         all_pars = [
