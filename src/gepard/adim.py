@@ -16,7 +16,7 @@ from .special import (S1, S2, S3, MellinF2, S2_prime, S2_tilde, S3_prime, poch,
                       psi, zeta)
 
 
-def non_singlet_LO(n: complex, nf: int, prty: int = 1) -> complex:
+def non_singlet_LO(n: np.ndarray, nf: int, prty: int = 1) -> complex:
     """Non-singlet LO anomalous dimension.
 
     Args:
@@ -31,7 +31,7 @@ def non_singlet_LO(n: complex, nf: int, prty: int = 1) -> complex:
     return CF*(-3.0-2.0/(n*(1.0+n))+4.0*S1(n))
 
 
-def singlet_LO(n: complex, nf: int, prty: int = 1) -> np.ndarray:
+def singlet_LO(n: np.ndarray, nf: int, prty: int = 1) -> np.ndarray:
     """Singlet LO anomalous dimensions.
 
     Args:
@@ -49,8 +49,10 @@ def singlet_LO(n: complex, nf: int, prty: int = 1) -> np.ndarray:
     gq0 = (-2.0*CF*(2.0+n+n*n))/((-1.0+n)*n*(1.0+n))
     gg0 = (-22*CA/3.-8.0*CA*(1/((-1.0+n)*n)+1/((1.0+n)*(2.0+n))-S1(n))+8*nf*TF/3.)/2.
 
-    return np.array([[qq0, qg0],
-                     [gq0, gg0]])
+    arr = np.array([[qq0, qg0],
+                    [gq0, gg0]])
+    # before returning transpose array so that flavor indices are at the end:
+    return np.transpose(arr, axes=(*range(2, arr.ndim), 0, 1))
 
 
 def non_singlet_NLO(n: complex, nf: int, prty: int) -> complex:
@@ -138,8 +140,11 @@ def singlet_NLO(n: complex, nf: int, prty: int = 1) -> np.ndarray:
               32*(S1(n)/n**2-(5/8)*zeta(3)+MellinF2(n) -
                   zeta(2)*(-psi(n/2)+psi((1+n)/2))/2)))/4
 
-    return np.array([[qq1, qg1],
-                     [gq1, gg1]])
+    arr = np.array([[qq1, qg1],
+                    [gq1, gg1]])
+
+    # before returning transpose array so that flavor indices are at the end:
+    return np.transpose(arr, axes=(*range(2, arr.ndim), 0, 1))
 
 
 def block(n: complex, nf: int) -> np.ndarray:
@@ -161,24 +166,21 @@ def block(n: complex, nf: int) -> np.ndarray:
             ( 0,  0,   0, NS-))
 
     """
-    lo_SI = np.atleast_3d(singlet_LO(n, nf)).transpose((2, 0, 1))
-    lo_NS = np.atleast_3d(non_singlet_LO(n, nf)).transpose((1, 2, 0))
+    lo_SI = singlet_LO(n, nf)
+    lo_NS = non_singlet_LO(n, nf)
 
-    nlo_SI = np.atleast_3d(singlet_NLO(n, nf)).transpose((2, 0, 1))
-    nlo_plus_NS = np.atleast_3d(non_singlet_NLO(n, nf, prty=1)).transpose((1, 2, 0))
-    nlo_minus_NS = np.atleast_3d(non_singlet_NLO(n, nf, prty=-1)).transpose((1, 2, 0))
+    nlo_SI = singlet_NLO(n, nf)
+    nlo_plus_NS = non_singlet_NLO(n, nf, prty=1)
+    nlo_minus_NS = non_singlet_NLO(n, nf, prty=-1)
 
-    zero_SI = np.zeros_like(lo_SI)
-    zero_NS = np.zeros_like(lo_NS)
+    res = np.zeros(n.shape + (2, 4, 4), dtype=lo_NS.dtype)
 
-    lo_NS_block = np.block([[lo_NS, zero_NS],
-                            [zero_NS, lo_NS]])
-    lo_block = np.block([[lo_SI, zero_SI],
-                         [zero_SI, lo_NS_block]])
+    res[..., 0, :2, :2] = lo_SI
+    res[..., 0, 2, 2] = lo_NS
+    res[..., 0, 3, 3] = lo_NS
 
-    nlo_NS_block = np.block([[nlo_plus_NS, zero_NS],
-                            [zero_NS, nlo_minus_NS]])
-    nlo_block = np.block([[nlo_SI, zero_SI],
-                         [zero_SI, nlo_NS_block]])
+    res[..., 1, :2, :2] = nlo_SI
+    res[..., 1, 2, 2] = nlo_plus_NS
+    res[..., 1, 3, 3] = nlo_minus_NS
 
-    return np.stack([lo_block, nlo_block], axis=1)
+    return res

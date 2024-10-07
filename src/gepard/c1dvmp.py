@@ -64,7 +64,7 @@ def c1dvmp(m, sgntr: int, j: complex, k: int) -> Tuple[complex, complex, complex
 
     ptyk = parity(k)
 
-    gamGQ = adim.singlet_LO(j+1, m.nf, ptyk)[1, 0]
+    gamGQ = adim.singlet_LO(j+1, m.nf, ptyk)[..., 1, 0]
 
     gamGGCA = 4*S1(j+1) - 12/j/(j+3) + 4/(j+1)/(j+2)
     gamQQCF = 4*S1(k+1) - 3 - 2/poch(k+1, 2)

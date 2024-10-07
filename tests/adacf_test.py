@@ -4,7 +4,7 @@ import gepard as g
 import numpy as np
 from pytest import approx
 
-n_test = 1.11 + 1.7j
+n_test = np.array([1.11 + 1.7j])
 
 #  -- Testing anomalous dimensions --
 
