@@ -19,6 +19,7 @@ Todo:
 
 from typing import Tuple
 
+import copy
 import numpy as np
 
 from . import adim, constants, evolution, qcd, quadrature, special
@@ -293,6 +294,17 @@ def evolop(m, R: float, process_class: str) -> np.ndarray:
                 tginvc = ephnd.conjugate()/np.tan(np.pi*znd.conjugate()/2)
                 cb1f = cb1(m, R, zj + znd + 2, zj)
                 cb1fc = cb1(m, R, zj + znd.conjugate() + 2, zj)
+                if process_class == 'DVMP':
+                    Vdvmp = np.zeros_like(cb1f)
+                    Vdvmp[..., 0, 0] = np.ones_like(zj+znd)
+                    Vdvmp[..., 1, 1] =  (zj+3)/(zj+znd+5)
+                    cb1f = np.einsum('sknab,sknbc->sknac', Vdvmp, cb1f)
+                    # Vdvmpc = copy.deepcopy(Vdvmp)  # maybe faster?
+                    # Vdvmpc[..., 1, 1] =  (zj+3)/(zj+znd.conjugate()+5)
+                    Vdvmpc = np.zeros_like(cb1fc)
+                    Vdvmpc[..., 0, 0] = np.ones_like(zj+znd)
+                    Vdvmpc[..., 1, 1] =  (zj+3)/(zj+znd.conjugate()+5)
+                    cb1fc = np.einsum('sknab,sknbc->sknac', Vdvmpc, cb1fc)
                 ndint = np.einsum('n,sknij,kn->skij', wgnd, cb1f, tginv)
                 ndint -= np.einsum('n,sknij,kn->skij', wgnd, cb1fc, tginvc)
                 ndint = ndint * 0.25j

@@ -90,5 +90,7 @@ def test_CDKP23():
     # The number below is slightly different than what would one get
     # with Gepard version used for published paper. This is because
     # published paper did not use NLO evolution of DA, but only of GPDs.
+    #  ... maybe 21.08276?
+    # Using DVCS-like CB1 gives 20.794072378937106
     # This number will again change a bit when NLO ND evolution of DA will be included.
-    assert res == approx(20.794072378937106)
+    assert res == approx(21.053726408845694)
