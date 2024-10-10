@@ -29,12 +29,14 @@ class MyTheory(g.ConformalSpaceGPD, g.MellinBarnesCFF):
         return g.gpd.ansatz07_fixed(self.jpoints, t, self.type).transpose()
 
 th_ns = MyTheory('hardNS', p=1, scheme='msbar')
+th_ns.evolution_basis = ['NSP']
 qns = 1/6
 th_ns.dvcs_charges = (0, 0, qns)   # NS part only
 
 th_si = MyTheory('hard', p=1, scheme='msbar')
+th_si.evolution_basis = ['Q', 'G', 'NSP']
 qs = 5/18
-th_si.dvcs_charges = (qs, qs, 0)   # NS part only
+th_si.dvcs_charges = (qs, qs, 0)   # SI part only
 
 
 def DeltaK(th, xi, Q2):
@@ -50,7 +52,7 @@ def test_TWDdvcs_Fig8_NLO_MS_NS():
     """Calculate evolved MS-bar NLO NS CFF."""
     reslo = DeltaK(th_ns, 0.01, 10)
     reshi = DeltaK(th_ns, 0.5, 10)
-    # following agrees with DM to best than percent
+    # the following agrees with DM to better than percent
     assert reslo == approx(-0.5478313, rel=1e-7)
     assert reshi == approx(-11.37569, rel=1e-7)
 
@@ -60,6 +62,6 @@ def test_TWDdvcs_Fig10_NLO_MS_SI():
     """Calculate evolved MS-bar NLO SI CFF."""
     reslo = DeltaK(th_si, 1e-5, 5)
     reshi = DeltaK(th_si, 0.5, 5)
-    # following agrees with DM to best than percent
+    # the following agrees with DM to better than percent
     assert reslo == approx(59.09931981765, rel=1e-7)
     assert reshi == approx(2.787284080654, rel=1e-7)

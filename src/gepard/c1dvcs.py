@@ -15,7 +15,7 @@ def c1_F2(n: complex, nf: int) -> np.ndarray:
     NSM = NSP
     Q = NSP
     G = nf*(n**(-2)+4/(1+n)-4/(2+n)-((1+S1(n))*(2+n+n**2))/(n*(1+n)*(2+n)))
-    return np.array((Q, G, NSP, NSM)).transpose()
+    return np.array((Q, G, NSP, NSM)).transpose((1, 2, 0))
 
 
 def c1_FL(n: complex, nf: int) -> np.ndarray:
@@ -24,7 +24,7 @@ def c1_FL(n: complex, nf: int) -> np.ndarray:
     NSM = NSP
     Q = NSP
     G = (4*nf)/((1+n)*(2+n))
-    return np.array((Q, G, NSP, NSM)).transpose()
+    return np.array((Q, G, NSP, NSM)).transpose((1, 2, 0))
 
 
 def c1_F1(n: complex, nf: int) -> np.ndarray:
@@ -43,10 +43,10 @@ def c1_V(j: np.ndarray, nf: int) -> np.ndarray:
     # Eq. (129)
     G = - nf*((4+3*j+j**2)*(S1(j)+S1(j+2)) +
               2+3*j+j**2) / ((j+1)*(j+2)*(j+3))
-    return np.array((Q, G, NSP, NSM)).transpose()
+    return np.array((Q, G, NSP, NSM)).transpose((1, 2, 0))
 
 
-def shift1(m, j: np.ndarray, process_class: str) -> np.ndarray:
+def shift1(m, process_class: str) -> np.ndarray:
     """Calculate NLO shift coeff s_1.
 
     Args:
@@ -55,9 +55,10 @@ def shift1(m, j: np.ndarray, process_class: str) -> np.ndarray:
         process_class: 'DVCS' or 'DIS'
 
     Returns:
-        NLO shift coefficient s_1.
+        NLO shift coefficient s_1[npws, npts].
 
     """
+    j = m.jpoints_pws
     LRF2 = math.log(m.rf2)
     if process_class == 'DIS':
         s1 = - LRF2*np.ones_like(j)
@@ -69,7 +70,7 @@ def shift1(m, j: np.ndarray, process_class: str) -> np.ndarray:
     return s1
 
 
-def C1(m, j: np.ndarray, process_class: str) -> np.ndarray:
+def C1(m, process_class: str) -> np.ndarray:
     """Calculate NLO Wilson coeff C_1 for DVCS or DIS.
 
     Args:
@@ -81,14 +82,15 @@ def C1(m, j: np.ndarray, process_class: str) -> np.ndarray:
         "Big C" from eqs. (91) and (101) from "Towards ... DVCS." paper
 
     """
+    j = m.jpoints_pws
     c0 = np.array([1, 0, 1, 1])  # LO, valid for DIS and DVCS
 
     if ((process_class == 'DIS') or (m.scheme == 'csbar')):
-        shift = np.einsum('k,i,kij->kj', shift1(m, j, process_class), c0,
-                          adim.block(j+1, m.nf)[:, 0, :, :])/2
+        shift = np.einsum('sk,a,skab->skb', shift1(m, process_class), c0,
+                          adim.block(j+1, m.nf)[..., 0, :, :])/2
     elif m.scheme == 'msbar':
-        shift = - np.einsum('i,kij->kj', c0,
-                            adim.block(j+1, m.nf)[:, 0, :, :])*math.log(m.rf2)/2
+        shift = - np.einsum('a,skab->skb', c0,
+                            adim.block(j+1, m.nf)[..., 0, :, :])*math.log(m.rf2)/2
     else:
         raise Exception('Scheme {} is neither msbar nor csbar!'.format(m.scheme))
 

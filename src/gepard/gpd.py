@@ -359,13 +359,19 @@ class ConformalSpaceGPD(GPD, mellin.MellinBarnes):
 
     """
     def __init__(self, **kwargs) -> None:
+        self.npws = kwargs.setdefault('npws', 3)  # number of SO(3) partial waves
+        # If you need singlet Q and G they need to be first:
+        self.evolution_basis = ['Q', 'G', 'NSP']
         self.c = kwargs.setdefault('c', 0.35)
         self.phi = kwargs.setdefault('phi', 1.57079632)
         npoints, weights = quadrature.mellin_barnes(self.c, self.phi)
+        self.wg = weights  # Gauss integration weights
         self.npts = len(npoints)
         self.npoints = npoints
-        self.jpoints = npoints - 1
-        self.wg = weights  # Gauss integration weights
+        self.jpoints = npoints - 1   # MB contour points
+        # shifted MB contours for PWs, shape=[npws, npts]:
+        self.jpoints_pws = np.add.outer(np.arange(0, 2*self.npws, 2),
+                                       self.jpoints)
         # Initial parameters:
         self.add_parameters({'ns': 2./3. - 0.4,
                              'al0s': 1.1,  'Eal0s': 1.1,
