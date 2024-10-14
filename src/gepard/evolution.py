@@ -347,14 +347,13 @@ def evolop_da(m, R: float, prty=+1) -> np.ndarray:
           prty: C parity of DA
 
     Returns:
-         evola_da[g, k, p]
+         evola_da[g, p]
          -  g is DA Gegenbauer index in m.gpoints
-         -  k is index of point on MB contour,
          -  p is pQCD order (0=LO, 1=NLO)
 
     Todo:
         Merge this with evolop for GPDs. Ugly code duplication of the most
-        complex part of the Gepard code (when ND evol will be included)!
+        complex part of the evolution code.
 
     """
 
@@ -371,7 +370,18 @@ def evolop_da(m, R: float, prty=+1) -> np.ndarray:
         aux1 = - (1 - 1 / R) * r1  # Cf. eq. (117), but with opposite sign
         evola[:, 1] = aux1 * R**(-gam0/b0)
         if m.scheme == 'msbar':
-            # FIXME: not yet implemented !!!
-            pass
+            zj = m.gpoints[:, np.newaxis]
+            znd, wgnd = quadrature.nd_mellin_barnes()
+            znd = znd[np.newaxis, :]
+            ndphij = 1.57j
+            ephnd = np.exp(ndphij)
+            tginv = ephnd/np.tan(np.pi*znd/2)
+            tginvc = ephnd.conjugate()/np.tan(np.pi*znd.conjugate()/2)
+            cb1f = cb1ns(m, R, zj + znd + 2, zj)
+            cb1fc = cb1ns(m, R, zj + znd.conjugate() + 2, zj)
+            ndint = np.einsum('n,kn,kn->k', wgnd, cb1f, tginv)
+            ndint -= np.einsum('n,kn,kn->k', wgnd, cb1fc, tginvc)
+            ndint = ndint * 0.25j
+            evola[:, 1] += ndint
 
     return evola

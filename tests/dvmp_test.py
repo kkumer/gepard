@@ -110,9 +110,9 @@ def test_dvmp_TFFs_NLO_evol(th_nlo):
     tffs = th_nlo.tff(pt.xi, pt.t, pt.Q2)
     reh, imh = tffs[0], tffs[1]
     # obtained by running the 611460a+stash version of Gepard
-    #assert reh == approx(-2356.175913, rel=1e-5)
+    assert reh == approx(-2356.175913, rel=1e-5)
     # obtained by excluding NLO ND DA evolution (belive it was included,
     #   but in a wrong way above)
     # Using DVCS-like CB1: -2330.50823028075
-    assert reh == approx(-2360.717623135553)
+    #assert reh == approx(-2360.717623135553)
     #assert imh == approx(402.2373650793147, rel=1e-5)
