@@ -155,18 +155,18 @@ def test_GPDzero():
     """Calculate GPDs on forward trajectory eta=0."""
     gpd = g.gpd.PWNormGPD(residualt='exp')
     gpd.parameters.update(par_DM12)
-    assert gpd.Hx(ptzero) == approx(
+    assert gpd.Hx(ptzero.x, ptzero.eta, ptzero.t, ptzero.Q2) == approx(
             np.array([1836.47, 6.9642, 0]), rel=1e-5)
-    assert gpd.Ex(ptzero) == approx(
+    assert gpd.Ex(ptzero.x, ptzero.eta, ptzero.t, ptzero.Q2) == approx(
             np.array([3098.61, 0.0756646, 0]), rel=1e-5)
 
 def test_GPDtraj():
     """Calculate GPDs on border/cross-over trajectory eta=x."""
     gpd = g.gpd.PWNormGPD(residualt='exp')
     gpd.parameters.update(par_DM12)
-    assert gpd.Hx(pttraj) == approx(
+    assert gpd.Hx(pttraj.x, pttraj.eta, pttraj.t, pttraj.Q2) == approx(
             np.array([1344.02, 2.6866, 0]), rel=1e-5)
-    assert gpd.Ex(pttraj) == approx(
+    assert gpd.Ex(pttraj.x, pttraj.eta, pttraj.t, pttraj.Q2) == approx(
             np.array([1980.69, 0.0358365, 0]), rel=1e-5)
 
 @mark.slow
@@ -174,7 +174,7 @@ def test_loNLO_GPDzero_noevol():
     """Calculate NLO-lPW GPDs on forward trajectory eta=0 (no evol)."""
     gpd = g.gpd.PWNormGPD(p=1, residualt='dipole', scheme='msbar')
     gpd.parameters.update(par_loNLOMS)
-    assert gpd.Hx(ptzero0) == approx(
+    assert gpd.Hx(ptzero0.x, ptzero0.eta, ptzero0.t, ptzero0.Q2) == approx(
             np.array([2494.65, 4.57403, 0]), rel=1e-5)
 
 @mark.slow
@@ -182,7 +182,7 @@ def test_loNLO_GPDtraj_noevol():
     """Calculate NLO-lPW GPDs on border/cross-over trajectory eta=x (no evol)."""
     gpd = g.gpd.PWNormGPD(p=1, residualt='dipole', scheme='msbar')
     gpd.parameters.update(par_loNLOMS)
-    assert gpd.Hx(pttraj0) == approx(
+    assert gpd.Hx(pttraj0.x, pttraj0.eta, pttraj0.t, pttraj0.Q2) == approx(
             np.array([3990.54, 4.64348, 0]), rel=1e-5)
 
 @mark.slow
@@ -190,7 +190,7 @@ def test_loNLO_GPDzero():
     """Calculate NLO-lPW GPDs on forward trajectory eta=0."""
     gpd = g.gpd.PWNormGPD(p=1, residualt='dipole', scheme='msbar')
     gpd.parameters.update(par_loNLOMS)
-    assert gpd.Hx(ptzero8) == approx(
+    assert gpd.Hx(ptzero8.x, ptzero8.eta, ptzero8.t, ptzero8.Q2) == approx(
             np.array([3258.91, 7.11361, 0]), rel=1e-5)
 
 @mark.slow
@@ -198,5 +198,5 @@ def test_loNLO_GPDtraj():
     """Calculate NLO-lPW GPDs on border/cross-over trajectory eta=x."""
     gpd = g.gpd.PWNormGPD(p=1, residualt='dipole', scheme='msbar')
     gpd.parameters.update(par_loNLOMS)
-    assert gpd.Hx(pttraj8) == approx(
+    assert gpd.Hx(pttraj8.x, pttraj8.eta, pttraj8.t, pttraj8.Q2) == approx(
             np.array([5537.6, 7.35669, 0]), rel=1e-5)

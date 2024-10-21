@@ -25,7 +25,7 @@ from typing import Tuple
 import numpy as np
 from scipy.special import loggamma  # type: ignore
 
-from . import constants, data, mellin, model, quadrature, special, wilson
+from . import constants, data, mellin, model, quadrature, special, wilson, gegenbauer
 
 #  ---- Building block - j-dependence ----
 
@@ -417,11 +417,11 @@ class ConformalSpaceGPD(GPD, mellin.MellinBarnes):
         """Return (npts, 4) array E_j^a for all j-points and 4 flavors."""
         return np.zeros((self.npts, 4), dtype=complex)
 
-    def Hx(self, pt: data.DataPoint) -> np.ndarray:
+    def Hx(self, x: float, eta: float, t: float, Q2: float = 4.0) -> np.ndarray:
         """Return x-space GPD H.
 
         Args:
-            pt: datapoint with kinematics info
+            x, eta, t, Q2:  kinematics info
 
         Returns:
             x-space GPD. 3-dim vector (singlet quark, gluon, non-singlet quark)
@@ -432,12 +432,52 @@ class ConformalSpaceGPD(GPD, mellin.MellinBarnes):
             normalization/symmetrization first.
 
         """
-        # get "Wilson" coef., first PW is the only relevant one
-        wce_j2x = wilson.calc_j2x(self, pt.x, pt.eta, pt.Q2)
-        gpd_prerot = self.H(pt.eta, pt.t)
+        wce_j2x = wilson.calc_j2x(self, x, eta, Q2)
+        gpd_prerot = self.H(eta, t)
         gpd = np.einsum('fa,ja->jf', self.frot_j2x, gpd_prerot)
-        mb_int_flav = self._j2x_mellin_barnes_integral(pt.x, pt.eta, wce_j2x, gpd)
-        return mb_int_flav / np.pi
+        mb_int_flav = self._j2x_mellin_barnes_integral(x, eta, wce_j2x, gpd)
+        return mb_int_flav
+
+    def Ex(self, x: float, eta: float, t: float, Q2: float = 4.0) -> np.ndarray:
+        """Return x-space GPD E.
+
+        Args:
+            x, eta, t, Q2:  kinematics info
+
+        Returns:
+            x-space GPD. 3-dim vector (singlet quark, gluon, non-singlet quark)
+            is returned by transforming original conformal moment space (j-space) model.
+
+        Todo:
+            Code duplication. Merge with Hx
+
+        """
+        wce_j2x = wilson.calc_j2x(self, x, eta, Q2)
+        gpd_prerot = self.E(eta, t)
+        gpd = np.einsum('fa,ja->jf', self.frot_j2x, gpd_prerot)
+        mb_int_flav = self._j2x_mellin_barnes_integral_E(x, eta, wce_j2x, gpd)
+        return mb_int_flav
+
+    def Hxoff(self, x: float, eta: float, t: float, Q2: float = 4.0) -> np.ndarray:
+        """Return x-space GPD H for general x!=eta.
+
+        Args:
+            x, eta, t, Q2:  kinematics info
+
+        Todo:
+            Obsolete, only for testing Hx.
+
+        """
+        j = self.jpoints
+        pjQp = gegenbauer.p_j(j, x, eta, 3/2)
+        # pjQm = gegenbauer.p_j(j, -x, eta, 3/2)
+        pjG = gegenbauer.p_j(j-1, x, eta, 5/2)
+        pj = np.stack([pjQp, -pjG, pjQp], axis=1)  # FIXME: sign?!
+        gpd_prerot = self.H(eta, t)
+        gpd = np.einsum('fa,ja->jf', self.frot_j2x, gpd_prerot)
+        return np.einsum('jax...,ja...,j->ax...', pj, gpd,
+                         self.wg/np.sin(np.pi * (j + 1.))).real
+
 
     def skewness_Hx(self, pt: data.DataPoint) -> np.ndarray:
         """Return skewness of GPD H.
@@ -467,28 +507,6 @@ class ConformalSpaceGPD(GPD, mellin.MellinBarnes):
             ptz = pt.copy()
             ptz.eta = 0
         return self.Hx(ptt)[:2] / self.Hx(ptz)[:2]
-
-    def Ex(self, pt: data.DataPoint) -> np.ndarray:
-        """Return x-space GPD E.
-
-        Args:
-            pt: datapoint with kinematics info
-
-        Returns:
-            x-space GPD. 3-dim vector (singlet quark, gluon, non-singlet quark)
-            is returned by transforming original conformal moment space (j-space) model.
-
-        Todo:
-            Non-singlet component is set to zero. We need to check
-            normalization/symmetrization first.
-
-        """
-        # get "Wilson" coef., first PW is the only relevant one
-        wce_j2x = wilson.calc_j2x(self, pt.x, pt.eta, pt.Q2)
-        gpd_prerot = self.E(pt.eta, pt.t)
-        gpd = np.einsum('fa,ja->jf', self.frot_j2x, gpd_prerot)
-        mb_int_flav = self._j2x_mellin_barnes_integral_E(pt.x, pt.eta, wce_j2x, gpd)
-        return mb_int_flav / np.pi
 
 
 class TestGPD(ConformalSpaceGPD):

@@ -102,7 +102,7 @@ Here the residual :math:`t` dependence is additional to the dependence
 Parameters of this model are described in the above paper.
 
 For a given j-space model, you can evaluate also standard GPDs
-in the x-space (presently only for :math:`\eta=0`
+in the x-space (tested only for :math:`\eta=0`
 or :math:`\eta=x`), using method ``th.Hx``,
 which returns the triplet [singlet/sea quark, gluon,
 non-singlet/valence quark] GPDs (the third one is not implemented yet
@@ -111,16 +111,12 @@ and is set to zero):
 .. code-block:: python
 
    >>> pt = g.DataPoint(x=0.01, eta=0, t=0, Q2=8)
-   >>> th.Hx(pt)   # should be equal to PDFs
+   >>> th.Hx(pt.x, pt.eta, pt.t, pt.Q2)   # should be equal to PDFs
    array([279.30501299,   3.94405629,   0.        ])
    >>> pt = g.DataPoint(x=0.01, eta=0.01, t=-0.2, Q2=4)
-   >>> th.Hx(pt)
+   >>> th.Hx(pt.x, pt.eta, pt.t, pt.Q2)
    array([267.91985614,   2.13496561,   0.        ])
    >>> pt.eta = 0.3
-   >>> th.Hx(pt)   # doesn't work yet for arbitrary eta!
-   Traceback (most recent call last):
-   ...
-   Exception: eta has to be either 0 or equal to x
 
 
 CFFs

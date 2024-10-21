@@ -56,7 +56,7 @@ class MellinBarnes(object):
         """Return convolution of j->x coef, evolution operator and GPD."""
         # difference wrt above integrations is that here we do NOT sum over flavors
         eph = np.exp(self.phi*1j)
-        cfacj = eph * np.exp((self.jpoints + 1) * log(1/x))  # eph/x**(j+1)
+        cfacj = eph * np.exp((self.jpoints + 1) * log(1/x)) / np.pi  # eph/x**(j+1)/pi
         if eta < 1e-8:
             # forward limit, PDF-like, so only zero-th PW is taken
             cch = np.einsum('j,jab,jb->ja', cfacj, wce[0, :, :, :], gpd)
@@ -65,28 +65,27 @@ class MellinBarnes(object):
             cch = np.einsum('j,sa,sjab,jb->ja', cfacj,
                             self.pw_strengths(), wce, gpd)
         else:
-            raise Exception('eta has to be either 0 or equal to x')
+            cch = eph * np.einsum('sa,sjab,jb->ja',
+                            self.pw_strengths(), wce, gpd)
+            #raise Exception('eta has to be either 0 or equal to x')
         mb_int_flav = np.dot(self.wg, cch.imag)
         return mb_int_flav
 
     def _j2x_mellin_barnes_integral_E(self, x, eta, wce, gpd):
-        """Return convolution of j->x coef, evolution operator and GPD E.
-
-        Notes:
-            Not tested at all!
-
-        """
+        """Return convolution of j->x coef, evolution operator and GPD."""
         # difference wrt above integrations is that here we do NOT sum over flavors
         eph = np.exp(self.phi*1j)
-        cfacj = eph * np.exp((self.jpoints + 1) * log(1/x))  # eph/x**(j+1)
+        cfacj = eph * np.exp((self.jpoints + 1) * log(1/x)) / np.pi  # eph/x**(j+1)/pi
         if eta < 1e-8:
             # forward limit, PDF-like, so only zero-th PW is taken
-            cch = np.einsum('j,jab,jb->jb', cfacj, wce[0, :, :, :], gpd)
+            cch = np.einsum('j,jab,jb->ja', cfacj, wce[0, :, :, :], gpd)
         elif abs(eta-x) < 1e-8:
             # cross-over, border eta=x limit
             cch = np.einsum('j,sa,sjab,jb->ja', cfacj,
                             self.pw_strengths_E(), wce, gpd)
         else:
-            raise Exception('eta has to be either 0 or equal to x')
+            cch = eph * np.einsum('sa,sjab,jb->ja',
+                            self.pw_strengths_E(), wce, gpd)
+            #raise Exception('eta has to be either 0 or equal to x')
         mb_int_flav = np.dot(self.wg, cch.imag)
         return mb_int_flav

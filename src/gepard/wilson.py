@@ -3,7 +3,7 @@
 import numpy as np
 from scipy.special import loggamma  # type: ignore
 
-from . import adim, c1dvcs, c1dvmp, constants, evolution, qcd, theory
+from . import adim, c1dvcs, c1dvmp, constants, evolution, qcd, theory, gegenbauer
 
 
 def _fshu(j: np.ndarray) -> np.ndarray:
@@ -79,6 +79,27 @@ def calc_wc_dvmp(m: theory.Theory, g: int):
         wc[:, :, 1, 1] = gluon_norm * g1  # Q
         wc[:, :, 1, 2] = quark_norm * nsp1 # NSP ?!
     return wc
+
+
+def calc_pj(m: theory.Theory, x: float, eta: float):
+    """Calculate gegenbauer p_j to transform GPD from j to x space.
+
+    Args:
+        m: instance of the Theory class
+        x, eta: GPD kinematical variables
+
+    Returns:
+        wc[s, k, a]: s in range(npws), k in range(npts),
+                     a in [Q, G, NSP]
+
+    """
+    # FIXME: vectorize p_j more universally so this looping is not needed
+    pj = []
+    for j in m.jpoints_pws:
+        pjQ = gegenbauer.p_j(j, x, eta, 3/2)
+        pjG = - gegenbauer.p_j(j-1, x, eta, 5/2)  # FIXME: sign?!
+        pj.append(np.stack([pjQ, pjG, pjQ], axis=1))
+    return np.stack(pj, axis=0)
 
 
 def calc_wce(m: theory.Theory, Q2: float, process_class: str):
@@ -196,7 +217,10 @@ def calc_j2x(m: theory.Theory, x: float, eta: float, Q2: float):
         # NSP is left to be zero before normalization can be checked!
         evola = evolution.evolop(m, R, 'DVCS')
     else:
-        raise Exception('eta has to be either 0 or equal to x')
+        pj = calc_pj(m, x, eta)
+        wc[:, :, 0, :] = np.einsum('sja,sj->sja', np.squeeze(pj),
+                                   1 / np.sin(np.pi * (m.jpoints_pws + 1)))
+        evola = evolution.evolop(m, R, 'DVCS')
     
     p_mat = np.array([[1,],])  # LO
     if m.p == 1:
