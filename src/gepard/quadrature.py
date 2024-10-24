@@ -33,7 +33,7 @@ def mellin_barnes(c, phi, accuracy: int = 3) -> Tuple[np.ndarray, np.ndarray]:
         (complex coordinates of MB contour, integration weighths)
 
     """
-    c = 0.35
+    # c = 0.35
     phij = phi*1j
     roots, weights = p_roots(2**accuracy)
     division = np.array([0., 0.01, 0.08, 0.15, 0.3, 0.5, 1.0,
