@@ -20,7 +20,7 @@ class MellinBarnes(object):
     def _mellin_barnes_integral(self, xi, wce, gpd):
         """Return convolution of evolved Wilson coefs and GPDs."""
         eph = np.exp(self.phi*1j)
-        cfacj = eph * np.exp((self.jpoints + 1) * log(1/xi))  # eph/xi**(j+1)
+        cfacj = eph * xi**(-self.jpoints-1)
         cch = np.einsum('j,sa,sja,ja->j', cfacj,
                         self.pw_strengths(), wce, gpd)
         imh = np.dot(self.wg, cch.imag)
@@ -31,7 +31,7 @@ class MellinBarnes(object):
     def _mellin_barnes_integral_HE(self, xi, wce, H, E):
         """Return convolution of evolved Wilson coefs and GPDs H and E."""
         eph = np.exp(self.phi*1j)
-        cfacj = eph * np.exp((self.jpoints + 1) * log(1/xi))  # eph/xi**(j+1)
+        cfacj = eph * xi**(-self.jpoints-1)
         cch_H = np.einsum('j,sa,sja,ja->j', cfacj,
                           self.pw_strengths(), wce, H)
         cch_E = np.einsum('j,sa,sja,ja->j', cfacj,
@@ -56,13 +56,13 @@ class MellinBarnes(object):
         """Return convolution of j->x coef, evolution operator and GPD."""
         # difference wrt above integrations is that here we do NOT sum over flavors
         eph = np.exp(self.phi*1j)
-        cfacj = eph * np.exp((self.jpoints + 1) * log(1/x)) / np.pi  # eph/x**(j+1)/pi
-        if eta < 1e-8:
+        cfacj = eph * x**(-self.jpoints-1) /  np.pi
+        if eta < 1e-8 and x>0:
             # forward limit, PDF-like, so only zero-th PW is taken
             cch = np.einsum('k,ia,kab,kb->ki', cfacj, self.antifrot_pdf, wce[0, :, :, :], gpd)
             # in evol basis:
             # cch = np.einsum('j,jab,jb->ja', cfacj, wce[0, :, :, :], gpd)
-        elif abs(eta-x) < 1e-8:
+        elif abs(eta-x) < 1e-8 and x>0:
             # cross-over, border eta=x limit
             cch = np.einsum('j,sa,sjab,jb->ja', cfacj,
                             self.pw_strengths(), wce, gpd)
@@ -80,11 +80,11 @@ class MellinBarnes(object):
         """Return convolution of j->x coef, evolution operator and GPD."""
         # difference wrt above integrations is that here we do NOT sum over flavors
         eph = np.exp(self.phi*1j)
-        cfacj = eph * np.exp((self.jpoints + 1) * log(1/x)) / np.pi  # eph/x**(j+1)/pi
-        if eta < 1e-8:
+        cfacj = eph * x**(-self.jpoints-1) /  np.pi
+        if eta < 1e-8 and x>0:
             # forward limit, PDF-like, so only zero-th PW is taken
             cch = np.einsum('j,jab,jb->ja', cfacj, wce[0, :, :, :], gpd)
-        elif abs(eta-x) < 1e-8:
+        elif abs(eta-x) < 1e-8 and x>0:
             # cross-over, border eta=x limit
             cch = np.einsum('j,sa,sjab,jb->ja', cfacj,
                             self.pw_strengths_E(), wce, gpd)
