@@ -326,6 +326,9 @@ class GPD(model.ParameterModel):
         self.frot_pdf = np.array([[1, 0, 0, 0],
                                   [0, 1, 0, 0],
                                   [0, 0, 0, 0]])
+        self.antifrot_pdf = np.array([[1, 0, 0],
+                                      [0, 1, 0],
+                                      [0, 0, 0]])
         # For DVMP
         self.frot_rho0_4 = np.array([[1, 0, 1, 1],
                                     [0, 1, 0, 0],
@@ -364,7 +367,10 @@ class ConformalSpaceGPD(GPD, mellin.MellinBarnes):
         self.evolution_basis = ['Q', 'G', 'NSP']
         self.c = kwargs.setdefault('c', 0.35)
         self.phi = kwargs.setdefault('phi', 1.57079632)
-        npoints, weights = quadrature.mellin_barnes(self.c, self.phi)
+        self.accuracy = kwargs.setdefault('accuracy', 3)
+        self.extended = kwargs.setdefault('extended', False)
+        npoints, weights = quadrature.mellin_barnes(self.c, self.phi,
+                                                    self.accuracy, self.extended)
         self.wg = weights  # Gauss integration weights
         self.npts = len(npoints)
         self.npoints = npoints

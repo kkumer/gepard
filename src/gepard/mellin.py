@@ -59,14 +59,19 @@ class MellinBarnes(object):
         cfacj = eph * np.exp((self.jpoints + 1) * log(1/x)) / np.pi  # eph/x**(j+1)/pi
         if eta < 1e-8:
             # forward limit, PDF-like, so only zero-th PW is taken
-            cch = np.einsum('j,jab,jb->ja', cfacj, wce[0, :, :, :], gpd)
+            cch = np.einsum('k,ia,kab,kb->ki', cfacj, self.antifrot_pdf, wce[0, :, :, :], gpd)
+            # in evol basis:
+            # cch = np.einsum('j,jab,jb->ja', cfacj, wce[0, :, :, :], gpd)
         elif abs(eta-x) < 1e-8:
             # cross-over, border eta=x limit
             cch = np.einsum('j,sa,sjab,jb->ja', cfacj,
                             self.pw_strengths(), wce, gpd)
         else:
-            cch = eph * np.einsum('sa,sjab,jb->ja',
-                            self.pw_strengths(), wce, gpd)
+            cch = eph * np.einsum('si,ia,skab,kb->ki', self.pw_strengths(),
+                                  self.antifrot_pdf, wce, gpd)
+            # If you want result in evolution basis:
+            # cch = eph * np.einsum('sa,skab,kb->ka', self.pw_strengths(),
+                                  # wce, gpd)
             #raise Exception('eta has to be either 0 or equal to x')
         mb_int_flav = np.dot(self.wg, cch.imag)
         return mb_int_flav

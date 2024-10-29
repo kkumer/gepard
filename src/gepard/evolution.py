@@ -267,7 +267,7 @@ def evolop(m, R: float, process_class: str) -> np.ndarray:
     evola = np.zeros((m.npws, m.npts, m.p + 1, ndim, ndim), dtype=complex)
     b0 = qcd.beta(0, m.nf)
 
-    rest_ebas = 0  # remaining items in evolution basis
+    rest_ebas = 0  # index of next item in evolution basis
     if (ndim > 1) and (m.evolution_basis[1] == 'G'):
         # we need singlet flavor-mixing part first
         # eigenvalues, projectors, projected mu-indep. part
@@ -312,7 +312,8 @@ def evolop(m, R: float, process_class: str) -> np.ndarray:
         rest_ebas = 2  # we processed 2 items of evolution basis
     rest_of_basis = m.evolution_basis[rest_ebas:]  # may be empty if only SI neded
     for count, item in enumerate(rest_of_basis):
-        prty = {'NSP':1, 'NSM':-1}[item]
+        prty = {'NSP':1, 'NSM':-1, 'V':-1, 'V3p':1, 'V3m':-1, 'V8p':1,
+                'V8m':-1, 'V15p':+1, 'V15m':-1}[item]
         gam0, r1 = rnlonsf(m, prty)
         aux0 = np.ones_like(r1)
         evola[:, :, 0, rest_ebas+count, rest_ebas+count] = aux0 * R**(-gam0/b0)  

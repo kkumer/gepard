@@ -21,7 +21,7 @@ roots35, weights35 = p_roots(35)
 roots81, weights81 = p_roots(81)
 
 
-def mellin_barnes(c, phi, accuracy: int = 3) -> Tuple[np.ndarray, np.ndarray]:
+def mellin_barnes(c, phi, accuracy: int = 3, extended: bool = False) -> Tuple[np.ndarray, np.ndarray]:
     """Construct basic MB array.
 
     Args:
@@ -36,8 +36,13 @@ def mellin_barnes(c, phi, accuracy: int = 3) -> Tuple[np.ndarray, np.ndarray]:
     # c = 0.35
     phij = phi*1j
     roots, weights = p_roots(2**accuracy)
-    division = np.array([0., 0.01, 0.08, 0.15, 0.3, 0.5, 1.0,
-                         1.5, 2.0, 4.0, 6.0, 8.0, 10.0])
+    if extended:
+        division = np.array([0., 0.01, 0.08, 0.15, 0.3, 0.5, 1.0,
+                             1.5, 2.0, 4.0, 6.0, 8.0, 10.0,
+                             20, 50, 200, 1000])
+    else:
+        division = np.array([0., 0.01, 0.08, 0.15, 0.3, 0.5, 1.0,
+                             1.5, 2.0, 4.0, 6.0, 8.0, 10.0])
     summ = division[1:] + division[:-1]
     diff = division[1:] - division[:-1]
     x = []

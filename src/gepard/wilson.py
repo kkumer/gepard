@@ -89,16 +89,28 @@ def calc_pj(m: theory.Theory, x: float, eta: float):
         x, eta: GPD kinematical variables
 
     Returns:
-        wc[s, k, a]: s in range(npws), k in range(npts),
-                     a in [Q, G, NSP]
+        p_j[s, k, a]: s in range(npws), k in range(npts),
+                     a in [Q, G, ...] i.e. m.evolution_basis
+
+    Todo:
+        Check conventions for various quark combinations.
 
     """
     # FIXME: vectorize p_j more universally so this looping is not needed
     pj = []
     for j in m.jpoints_pws:
+        pjf = []
+        rest_ebas = 0  # index of next item in evolution basis
         pjQ = gegenbauer.p_j(j, x, eta, 3/2)
-        pjG = - gegenbauer.p_j(j-1, x, eta, 5/2)  # FIXME: sign?!
-        pj.append(np.stack([pjQ, pjG, pjQ], axis=1))
+        if 'G' in m.evolution_basis:
+            pjG = - gegenbauer.p_j(j-1, x, eta, 5/2)  # FIXME: sign?!
+            pjf.append(pjQ)
+            pjf.append(pjG)
+            rest_ebas = 2  # we processed first two items
+        rest_of_basis = m.evolution_basis[rest_ebas:]  # may be empty if only SI neded
+        for k, item in enumerate(rest_of_basis):
+            pjf.append(pjQ)
+        pj.append(np.stack(pjf, axis=1))
     return np.stack(pj, axis=0)
 
 
@@ -204,9 +216,15 @@ def calc_j2x(m: theory.Theory, x: float, eta: float, Q2: float):
     wc = np.zeros((m.npws, m.npts, m.p + 1, nebas), dtype=complex)
     if eta < 1e-8:
         # forward limit, PDF-like
-        wc[:, :, 0, 0] = np.ones_like(wc[:, :, 0, 0])  # Q
-        wc[:, :, 0, 1] = x * np.ones_like(wc[:, :, 0, 1])  # G
-        # NSP is left to be zero before normalization can be checked!
+        one = np.ones_like(wc[:, :, 0, 0])
+        rest_ebas = 0
+        if 'G' in m.evolution_basis:
+            wc[:, :, 0, 0] =  one     # Q
+            wc[:, :, 0, 1] = x * one  # G
+            rest_ebas = 2
+        rest_of_basis = m.evolution_basis[rest_ebas:]
+        for k, item in enumerate(rest_of_basis):
+            wc[:, :, 0, rest_ebas + k] = one     # NS
         evola = evolution.evolop(m, R, 'DIS')
     elif abs(eta-x) < 1e-8:
         # cross-over, border eta=x limit
