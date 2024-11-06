@@ -76,7 +76,7 @@ class GoloskokovKrollCFF(cff.DispersionCFF):
         if x >= eta:
             return self._intsea(x, eta, alt, j)
         elif -eta < x < eta:
-            return (self._intsea(self, x, eta, alt, j, zero=True)
+            return (self._intsea(x, eta, alt, j, zero=True)
                     - DMKILL*self._intsea(-x, eta, alt, j, zero=True))
         else:
             return -DMKILL*self._intsea(-x, eta, alt, j)  # x < -eta

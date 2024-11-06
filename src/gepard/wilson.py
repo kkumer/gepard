@@ -235,9 +235,13 @@ def calc_j2x(m: theory.Theory, x: float, eta: float, Q2: float):
         # NSP is left to be zero before normalization can be checked!
         evola = evolution.evolop(m, R, 'DVCS')
     else:
-        pj = calc_pj(m, x, eta)
-        wc[:, :, 0, :] = np.einsum('sja,sj->sja', np.squeeze(pj),
-                                   1 / np.sin(np.pi * (m.jpoints_pws + 1)))
+        # FIXME: a bit of a kludge follows
+        pj = np.squeeze(calc_pj(m, x, eta))
+        if pj.ndim == 2:
+            wc[:, :, 0, 0] =  pj / np.sin(np.pi * (m.jpoints_pws + 1))
+        else:
+            wc[:, :, 0, :] = np.einsum('sja,sj->sja', pj,
+                                       1 / np.sin(np.pi * (m.jpoints_pws + 1)))
         evola = evolution.evolop(m, R, 'DVCS')
     
     p_mat = np.array([[1,],])  # LO

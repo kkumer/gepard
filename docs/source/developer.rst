@@ -82,3 +82,17 @@ letter.
 If variable corresponds to a squared quantity, like mass squared ``Mp2``, 
 this is signfied by ``2`` at the *very end* of the variable name. Not somewhere
 in the middle, and not by ``sq``.
+
+
+Building this documentation site
+--------------------------------
+
+The core Gepard code documentation is built automatically from the comments
+in the code and some structured documentation pages that can
+be found in the ``docs`` subdirectory of the Gepard source git repository.
+
+The complete Gepard site (the one you are reading now) , has some additional
+documentation about available datasets, publications and GPD server. These
+additions are covered by separate git repository
+`gepard-site <https://github.com/kkumer/gepard-site>`_ and README there
+explains how to build the whole site.
