@@ -455,17 +455,7 @@ class DataSet(list):
                 desctpl = tuple([s.strip() for s in dataFileLine.split("=")])
                 desc[desctpl[0]] = desctpl[1]
             if re.match(r'([ \t]*[-\.\d]+[ \t\r]+)+', dataFileLine):
-                # FIXME: TAB-delimited columns are not handled! Only spaces are OK.
-                snumbers = re.findall(r'[-\.\d]+', dataFileLine)
-                numbers = []
-                for s in snumbers:
-                    f = float(s)
-                    if (f - int(f)) == 0:  # we have integer
-                        numbers.append(int(f))
-                    else:
-                        numbers.append(f)
-                # data.append(list(map(float, numbers)))
-                data.append(numbers)
+                data.append([float(num) for num in dataFileLine.split()])
 
         return desc, data
 
