@@ -1657,7 +1657,7 @@ def jbod(path=None, fmt='png', **kwargs):
     """
     title = 'just-a-bunch-of-data'
     fig = plt.figure()
-    fig.suptitle(title)
+    # fig.suptitle(title)
     ax = fig.add_subplot(1, 1, 1)
     n = 1
     if isinstance(kwargs['points'], data.DataSet):

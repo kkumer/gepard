@@ -9,7 +9,7 @@ editor1 = DM
 
 ### Experiment
 
-collaboration = CLAS_KK
+collaboration = CLAS
 process = ep2epgamma
 exptype = fixed target
 year = 2007
