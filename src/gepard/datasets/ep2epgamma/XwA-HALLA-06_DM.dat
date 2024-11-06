@@ -9,7 +9,7 @@ editor1 = DM
 
 ### Experiment
 
-collaboration = HALLA_DM
+collaboration = HALLA
 process = ep2epgamma
 exptype = fixed target
 year = 2006
