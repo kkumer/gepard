@@ -464,7 +464,8 @@ class DataSet(list):
                         numbers.append(int(f))
                     else:
                         numbers.append(f)
-                data.append(list(map(float, numbers)))
+                # data.append(list(map(float, numbers)))
+                data.append(numbers)
 
         return desc, data
 

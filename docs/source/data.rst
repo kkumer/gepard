@@ -127,9 +127,9 @@ of given ``DataSet``:
    >>> g.describe_data(g.dset[52])
    npt x obs     collab  FTn    id  ref.        
    ----------------------------------------------
-   12 x TSA     HERMES  -1.0   52  arXiv:1004.0177v1
-   12 x TSA     HERMES  -2.0   52  arXiv:1004.0177v1
-   12 x TSA     HERMES  -3.0   52  arXiv:1004.0177v1
+   12 x TSA     HERMES  -1     52  arXiv:1004.0177v1
+   12 x TSA     HERMES  -2     52  arXiv:1004.0177v1
+   12 x TSA     HERMES  -3     52  arXiv:1004.0177v1
    ----------------------------------------------
    TOTAL = 36
 
