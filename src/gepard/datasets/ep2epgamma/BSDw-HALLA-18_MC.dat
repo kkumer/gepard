@@ -9,8 +9,8 @@ collaboration = HALLA
 process = ep2epgamma
 exptype = fixed target
 year = 2018
-#reference = 
 inspiretex = Georges:2018kyi
+reference = Georges:2018kyi
 reference2 = FT analysis with MC error propagation by MC
 
 

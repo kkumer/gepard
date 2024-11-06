@@ -10,7 +10,8 @@ exptype = fixed target
 year = 2018
 #reference =  doi:10.1038/s41567-019-0774-3
 inspiretex = Georges:2018kyi
-reference2 = Table 1.1
+reference = Georges:2018kyi
+reference2 = Appendix D
 
 
 ### Scattering Process
