@@ -101,15 +101,18 @@ def calc_pj(m: theory.Theory, x: float, eta: float):
     for j in m.jpoints_pws:
         pjf = []
         rest_ebas = 0  # index of next item in evolution basis
-        pjQ = gegenbauer.p_j(j, x, eta, 3/2)
+        pjQp = gegenbauer.p_j(j, x, eta, 3/2)
         if 'G' in m.evolution_basis:
-            pjG = - gegenbauer.p_j(j-1, x, eta, 5/2)  # FIXME: sign?!
-            pjf.append(pjQ)
+            pjQm = gegenbauer.p_j(j, -x, eta, 3/2)
+            pjGp =  gegenbauer.p_j(j-1, x, eta, 5/2)
+            pjGm =  gegenbauer.p_j(j-1, -x, eta, 5/2)
+            pjG = -(pjGp+pjGm)  # MS06 (B.14)
+            pjf.append(pjQp+pjQm)
             pjf.append(pjG)
             rest_ebas = 2  # we processed first two items
         rest_of_basis = m.evolution_basis[rest_ebas:]  # may be empty if only SI neded
         for k, item in enumerate(rest_of_basis):
-            pjf.append(pjQ)
+            pjf.append(pjQp)
         pj.append(np.stack(pjf, axis=1))
     return np.stack(pj, axis=0)
 
