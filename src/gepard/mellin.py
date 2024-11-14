@@ -67,11 +67,11 @@ class MellinBarnes(object):
             # cch = eph * np.einsum('jab,jb->ja', wce[0, :, :, :], gpd)
         elif abs(eta-x) < 1e-8 and x>0:
             # cross-over, border eta=x limit
-            cch = eph * np.einsum('sa,sjab,jb->ja',
-                            self.pw_strengths(), wce, gpd)
+            cch = eph * np.einsum('sa,jab,sjb->ja',
+                                  self.pw_strengths(), wce[0, :, :, :], gpds)
         else:
-            cch = eph * np.einsum('si,ia,skab,kb->ki', self.pw_strengths(),
-                                  self.antifrot_pdf, wce, gpd)
+            cch = eph * np.einsum('si,ia,kab,skb->ki', self.pw_strengths(),
+                                  self.antifrot_pdf, wce[0, :, :, :], gpds)
             # If you want result in evolution basis:
             # cch = eph * np.einsum('sa,skab,kb->ka', self.pw_strengths(),
                                   # wce, gpd)
