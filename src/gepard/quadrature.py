@@ -39,7 +39,7 @@ def mellin_barnes(c, phi, accuracy: int = 3, extended: bool = False) -> Tuple[np
     if extended:
         division = np.array([0., 0.01, 0.08, 0.15, 0.3, 0.5, 1.0,
                              1.5, 2.0, 4.0, 6.0, 8.0, 10.0,
-                             20, 50, 200, 1000])
+                             20, 50, 100, 200])
     else:
         division = np.array([0., 0.01, 0.08, 0.15, 0.3, 0.5, 1.0,
                              1.5, 2.0, 4.0, 6.0, 8.0, 10.0])

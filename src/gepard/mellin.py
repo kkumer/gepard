@@ -56,15 +56,18 @@ class MellinBarnes(object):
         """Return convolution of j->x coef, evolution operator and GPD."""
         # difference wrt above integrations is that here we do NOT sum over flavors
         eph = np.exp(self.phi*1j)
-        cfacj = eph * x**(-self.jpoints-1) /  np.pi
+        print('eph = {}'.format(eph))
+        print('wce = {}'.format(wce[0,0,0,0], wce[0,-1,0,0]))
+        print('gpd = {}'.format(gpd[0,0], gpd[-1,0]))
+        gpds = np.array([eta**(k) * gpd for k in range(0, 2*self.npws, 2)])
         if eta < 1e-8 and x>0:
             # forward limit, PDF-like, so only zero-th PW is taken
-            cch = np.einsum('k,ia,kab,kb->ki', cfacj, self.antifrot_pdf, wce[0, :, :, :], gpd)
+            cch = eph * np.einsum('ia,kab,kb->ki', self.antifrot_pdf, wce[0, :, :, :], gpd)
             # in evol basis:
-            # cch = np.einsum('j,jab,jb->ja', cfacj, wce[0, :, :, :], gpd)
+            # cch = eph * np.einsum('jab,jb->ja', wce[0, :, :, :], gpd)
         elif abs(eta-x) < 1e-8 and x>0:
             # cross-over, border eta=x limit
-            cch = np.einsum('j,sa,sjab,jb->ja', cfacj,
+            cch = eph * np.einsum('sa,sjab,jb->ja',
                             self.pw_strengths(), wce, gpd)
         else:
             cch = eph * np.einsum('si,ia,skab,kb->ki', self.pw_strengths(),
@@ -80,13 +83,12 @@ class MellinBarnes(object):
         """Return convolution of j->x coef, evolution operator and GPD."""
         # difference wrt above integrations is that here we do NOT sum over flavors
         eph = np.exp(self.phi*1j)
-        cfacj = eph * x**(-self.jpoints-1) /  np.pi
         if eta < 1e-8 and x>0:
             # forward limit, PDF-like, so only zero-th PW is taken
-            cch = np.einsum('j,jab,jb->ja', cfacj, wce[0, :, :, :], gpd)
+            cch = eph * np.einsum('jab,jb->ja', wce[0, :, :, :], gpd)
         elif abs(eta-x) < 1e-8 and x>0:
             # cross-over, border eta=x limit
-            cch = np.einsum('j,sa,sjab,jb->ja', cfacj,
+            cch = eph * np.einsum('sa,sjab,jb->ja',
                             self.pw_strengths_E(), wce, gpd)
         else:
             cch = eph * np.einsum('sa,sjab,jb->ja',

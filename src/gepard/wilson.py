@@ -107,7 +107,7 @@ def calc_pj(m: theory.Theory, x: float, eta: float):
             pjGp =  gegenbauer.p_j(j-1, x, eta, 5/2)
             pjGm =  gegenbauer.p_j(j-1, -x, eta, 5/2)
             pjG = -(pjGp+pjGm)  # MS06 (B.14)
-            pjf.append(pjQp+pjQm)
+            pjf.append(pjQp-pjQm)
             pjf.append(pjG)
             rest_ebas = 2  # we processed first two items
         rest_of_basis = m.evolution_basis[rest_ebas:]  # may be empty if only SI neded
@@ -217,9 +217,10 @@ def calc_j2x(m: theory.Theory, x: float, eta: float, Q2: float):
     R = asmuf2/asQ02
     nebas = len(m.evolution_basis)
     wc = np.zeros((m.npws, m.npts, m.p + 1, nebas), dtype=complex)
+    j = m.jpoints_pws
     if eta < 1e-8:
         # forward limit, PDF-like
-        one = np.ones_like(wc[:, :, 0, 0])
+        one = np.ones_like(wc[:, :, 0, 0]) * x**(-j-1)/np.pi
         rest_ebas = 0
         if 'G' in m.evolution_basis:
             wc[:, :, 0, 0] =  one     # Q
@@ -229,22 +230,26 @@ def calc_j2x(m: theory.Theory, x: float, eta: float, Q2: float):
         for k, item in enumerate(rest_of_basis):
             wc[:, :, 0, rest_ebas + k] = one     # NS
         evola = evolution.evolop(m, R, 'DIS')
-    elif abs(eta-x) < 1e-8:
+    elif abs(eta-x) < 1e-8 and x>0:
         # cross-over, border eta=x limit
-        j = m.jpoints_pws
-        fshu = _fshu(j)
-        wc[:, :, 0, 0] = fshu  # Q
-        wc[:, :, 0, 1] = fshu*2*x/(3+j) # G
-        # NSP is left to be zero before normalization can be checked!
+        fac = _fshu(j) * x**(-j-1)/np.pi
+        rest_ebas = 0
+        if 'G' in m.evolution_basis:
+            wc[:, :, 0, 0] = fac  # Q
+            wc[:, :, 0, 1] = fac * 2*x/(3+j) # G
+            rest_ebas = 2
+        rest_of_basis = m.evolution_basis[rest_ebas:]
+        for k, item in enumerate(rest_of_basis):
+            wc[:, :, 0, rest_ebas + k] = 0     # NS # WRONG!
         evola = evolution.evolop(m, R, 'DVCS')
     else:
         # FIXME: a bit of a kludge follows
         pj = np.squeeze(calc_pj(m, x, eta))
         if pj.ndim == 2:
-            wc[:, :, 0, 0] =  pj / np.sin(np.pi * (m.jpoints_pws + 1))
+            wc[:, :, 0, 0] = - pj / np.sin(np.pi * j )
         else:
-            wc[:, :, 0, :] = np.einsum('sja,sj->sja', pj,
-                                       1 / np.sin(np.pi * (m.jpoints_pws + 1)))
+            wc[:, :, 0, :] = - np.einsum('sja,sj->sja', pj,
+                                       1 / np.sin(np.pi * j))
         evola = evolution.evolop(m, R, 'DVCS')
     
     p_mat = np.array([[1,],])  # LO

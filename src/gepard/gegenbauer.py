@@ -10,6 +10,8 @@ from scipy.special import gamma
 ## research seminar in 2023, using algorithm from Numerical Recipes.
 ## Some vectorization by ChatGPT
 
+rkh_default = 0.1
+
 def runge_kutta4(x0, y0, x, h, aa, bb, cc, z0, dz):
     # Count number of iterations using step size or
     # step height h
@@ -29,7 +31,7 @@ def runge_kutta4(x0, y0, x, h, aa, bb, cc, z0, dz):
         x0 += h
     return y
 
-def hypgeo(a, b, c, z):
+def hypgeo(a, b, c, z, rkh=rkh_default):
     ans, y = 0j, [0. + 0.0j, 0. + 0.0j]
     kmax=0
     if z.real * z.real + z.imag * z.imag <= 0.25:
@@ -48,7 +50,7 @@ def hypgeo(a, b, c, z):
     dz = z - z0
     y[0], y[1] = hypser(aa, bb, cc, z0, y[0], y[1])
     # odeint(yy,4,0.0,1.0,EPS,0.1,0.0001,&nok,&nbad,hypdrv,bsstep)
-    yy = runge_kutta4(0.0, np.array([y[0], y[1]]), 1.0, 0.1, aa, bb, cc, z0, dz)
+    yy = runge_kutta4(0.0, np.array([y[0], y[1]]), 1.0, rkh, aa, bb, cc, z0, dz)
     # The arguments to odeint are the vector of independent variables, its length, the starting
     # and ending values of the dependent variable, the accuracy parameter, an initial guess for
     # stepsize, a minimum stepsize, the (returned) number of good and bad steps taken, and the
@@ -89,25 +91,23 @@ def heaviside_theta(cond):
         return True
     return False
 
-# def P_j(j, x):
-    # fac1 = np.power(2., j + 1.) * gamma(5./2. + j)
-    # fac2 = gamma(0.5) * gamma(1. + j)
-    # return fac1/fac2 * (1. + x) * hypgeo(-j - 1., j + 2., 2, (1. + x)/2.)
+def heaviside_theta_eq(cond):
+    if cond >= 0.:
+        return True
+    return False
 
-# def Q_j(j, x):
-    # fac1 = np.sin(np.pi * j)/np.pi * np.power(x, -j - 1.)
-    # return -fac1 * hypgeo((j + 1.)/2., (j + 2.)/2., 2.5 + j, 1 / (x ** 2))
 
-def P_j(j, x, lam):
+def P_j(j, x, lam, rkh=rkh_default):
     fac1 = np.power(2., j + lam - 0.5) * gamma(1 + lam + j)
     fac2 = gamma(0.5) * gamma(1. + j) * gamma(lam+0.5)
-    return fac1/fac2 * (1. + x) * hypgeo(-j - lam + 0.5, j + lam + 0.5, lam + 0.5, (1. + x)/2.)
+    return fac1/fac2 * (1. + x)**(lam-0.5) * hypgeo(-j - lam + 0.5, j + lam + 0.5,
+                                                    lam + 0.5, (1. + x)/2., rkh)
 
-def Q_j(j, x, lam):
+def Q_j(j, x, lam, rkh=rkh_default):
     fac1 = np.sin(np.pi * j)/np.pi * np.power(x, -j - 1.)
-    return -fac1 * hypgeo((j + 1.)/2., (j + 2.)/2., lam + 1 + j, 1 / (x ** 2))
+    return -fac1 * hypgeo((j + 1.)/2., (j + 2.)/2., lam + 1 + j, 1 / (x ** 2), rkh)
 
-def p_j1D(j, x, eta, lam):
+def p_j1D(j, x, eta, lam, rkh=rkh_default):
     # Handle case where x is an array
     if isinstance(x, (list, tuple, np.ndarray)):
         res = np.zeros((len(x), len(j)), dtype=complex)
@@ -124,11 +124,9 @@ def p_j1D(j, x, eta, lam):
         for k, x_val in enumerate(x):
             eta_ratio = x_val / eta
             if heaviside_theta(eta - np.abs(x_val)):
-                if x_val == 0.01:
-                    print(j_val, x_val, eta, P_j(j_val, eta_ratio, lam))
-                p_j_matrix[k, i] = P_j(j_val, eta_ratio, lam)
-            if heaviside_theta(x_val - eta):
-                q_j_matrix[k, i] = Q_j(j_val, eta_ratio, lam)
+                p_j_matrix[k, i] = P_j(j_val, eta_ratio, lam, rkh)
+            if heaviside_theta_eq(x_val - eta):
+                q_j_matrix[k, i] = Q_j(j_val, eta_ratio, lam, rkh)
 
     # Compute the result using broadcasting
     res += power_matrix.T * p_j_matrix
@@ -136,7 +134,7 @@ def p_j1D(j, x, eta, lam):
 
     return res
 
-def p_j2D(j, x, eta, lam):
+def p_j2D(j, x, eta, lam, rkh=rkh_default):
     # Initialize result matrix
     res = np.zeros((len(x), len(eta), len(j)), dtype=complex)
 
@@ -148,12 +146,10 @@ def p_j2D(j, x, eta, lam):
                 power_term = np.power(eta_val, -j_val - 1)
 
                 if heaviside_theta(eta_val - np.abs(x_val)):
-                    if eta_val == 0.1 and x_val == 0.01:
-                        print(j_val, P_j(j_val, eta_ratio, lam))
-                    res[k, l, i] += power_term * P_j(j_val, eta_ratio, lam)
+                    res[k, l, i] += power_term * P_j(j_val, eta_ratio, lam, rkh)
                 
-                if heaviside_theta(x_val - eta_val):
-                    res[k, l, i] += power_term * Q_j(j_val, eta_ratio, lam)
+                if heaviside_theta_eq(x_val - eta_val):
+                    res[k, l, i] += power_term * Q_j(j_val, eta_ratio, lam, rkh)
 
     return res
     
@@ -163,11 +159,12 @@ def ensure_array(x):
     return np.asarray(x)
 
 
-def p_j(j, x, eta, lam):
+def p_j_fb(j, x, eta, lam, rkh=rkh_default):
     j = ensure_array(j)
     x = ensure_array(x)
     # Handle 2D case when eta is an array, else handle 1D case
     if isinstance(eta, (list, tuple, np.ndarray)):
-        return np.moveaxis(p_j2D(j, x, eta, lam), -1, 0)
-    return np.moveaxis(p_j1D(j, x, eta, lam), -1, 0)
+        return np.moveaxis(p_j2D(j, x, eta, lam, rkh), -1, 0)
+    return np.moveaxis(p_j1D(j, x, eta, lam, rkh), -1, 0)
 
+p_j = p_j_fb
