@@ -10,7 +10,7 @@ from scipy.special import gamma
 ## research seminar in 2023, using algorithm from Numerical Recipes.
 ## Some vectorization by ChatGPT
 
-rkh_default = 0.1
+rkh_default = 0.1  # Runge-Kutta step, increase for complicated functions
 
 def runge_kutta4(x0, y0, x, h, aa, bb, cc, z0, dz):
     # Count number of iterations using step size or
