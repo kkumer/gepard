@@ -114,7 +114,7 @@ def calc_pj(m: theory.Theory, x: float, eta: float):
         for k, item in enumerate(rest_of_basis):
             pjf.append(pjQp)
         pj.append(np.stack(pjf, axis=1))
-    return np.stack(pj, axis=0)
+    return np.stack(pj, axis=0)[...,0]
 
 
 def calc_wce(m: theory.Theory, Q2: float, process_class: str):
@@ -241,18 +241,13 @@ def calc_j2x(m: theory.Theory, x: float, eta: float, Q2: float):
             rest_ebas = 2
         rest_of_basis = m.evolution_basis[rest_ebas:]
         for k, item in enumerate(rest_of_basis):
-            wc[:, :, 0, rest_ebas + k] = facnu     # NS # WRONG!
+            wc[:, :, 0, rest_ebas + k] = facnu     # CHECK!?
         evola = evolution.evolop(m, R, 'DVCS')
     else:
-        # FIXME: a bit of a kludge follows
-        pj = np.squeeze(calc_pj(m, x, eta))
+        pj = calc_pj(m, x, eta)
         eta2nu = eta**np.arange(0, 2*m.npws, 2)
-        if pj.ndim == 2:
-            wc[:, :, 0, 0] = - np.einsum('s,sj,sj->sj', eta2nu, pj,
-                                       1 / np.sin(np.pi * j))
-        else:
-            wc[:, :, 0, :] = - np.einsum('s,sja,sj->sja', eta2nu, pj,
-                                       1 / np.sin(np.pi * j))
+        wc[:, :, 0, :] = - np.einsum('s,sja,sj->sja', eta2nu, pj,
+                                   1 / np.sin(np.pi * j))
         evola = evolution.evolop(m, R, 'DVCS')
     
     p_mat = np.array([[1,],])  # LO
