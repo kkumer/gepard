@@ -15,7 +15,7 @@ from .quadrature import bquadrature
 class GoloskokovKrollCFF(cff.DispersionCFF):
     """Goloskokov-Kroll GPD/CFF model.
 
-    From [arXiv:1210.6975], Kroll:2012sm
+    Mostly from [arXiv:1210.6975], Kroll:2012sm
     Real part of CFFs is obtained using dispersion relations.
 
     """
@@ -70,18 +70,20 @@ class GoloskokovKrollCFF(cff.DispersionCFF):
         else:
             return 0
 
-    def _sea(self, x, eta, alt, j):
+    def _sea(self, x, eta, alt, j, glue=-1):
         DMKILL = 1  # Set to 0 to agree with DM
         assert eta >= 0
         if x >= eta:
             return self._intsea(x, eta, alt, j)
         elif -eta < x < eta:
             return (self._intsea(x, eta, alt, j, zero=True)
-                    - DMKILL*self._intsea(-x, eta, alt, j, zero=True))
+                    + glue * DMKILL * self._intsea(-x, eta, alt, j, zero=True))
         else:
-            return -DMKILL*self._intsea(-x, eta, alt, j)  # x < -eta
+            return glue * DMKILL * self._intsea(-x, eta, alt, j)  # x < -eta
 
     #   ######  GPDs  #########
+
+    #   ===  GPD H  ===
 
     def Huval(self, x, eta, t, Q2):
         """GK12 model for H^u_val GPD."""
@@ -104,7 +106,7 @@ class GoloskokovKrollCFF(cff.DispersionCFF):
         return npsum(cdval*xs)
 
     def Hs(self, x, eta, t, Q2):
-        """GK12 model for strange sea GPD."""
+        """GK12 model for strange sea GPD H."""
         Q02 = 4.
         Mp2 = 0.9383**2
         L = log(Q2/Q02)
@@ -116,18 +118,32 @@ class GoloskokovKrollCFF(cff.DispersionCFF):
         return exp(b*t) * npsum(cs*xs)
 
     def Hudsea(self, x, eta, t, Q2):
-        """GK12 model for u or d sea GPDs."""
+        """GK12 model for u or d sea contribution to GPD H."""
         Q02 = 4.
         kaps = 1.+0.68/(1.+0.52*log(Q2/Q02))
         return kaps * self.Hs(x, eta, t, Q2)
 
     def Hu(self, x, eta, t, Q2):
-        """Up quark GPD."""
+        """GK12 model for u-quark GPD H."""
         return self.Huval(x, eta, t, Q2) + self.Hudsea(x, eta, t, Q2)
 
     def Hd(self, x, eta, t, Q2):
-        """Down quark GPD."""
+        """GK12 model for d-quark GPD H."""
         return self.Hdval(x, eta, t, Q2) + self.Hudsea(x, eta, t, Q2)
+
+    def Hg(self, x, eta, t, Q2):
+        """GK12 model for gluon GPD H."""
+        Q02 = 4.
+        Mp2 = 0.9383**2
+        L = log(Q2/Q02)
+        cs = array([2.23+0.362*L, 5.43-7.0*L, -34+22.5*L, 40.6-21.6*L])
+        al0, alp = (1.10+0.06*L-0.0027*L**2, 0.15)
+        alt = al0 + alp*t - 1
+        xs = array([self._sea(x, eta, alt, j, glue=+1) for j in range(4)])
+        b = 2.58 + 0.25*log(Mp2/(Q2+Mp2))
+        return exp(b*t) * sum(cs*xs)
+
+    #   ===  GPD H tilde  ===
 
     def _invAq(self, al, cs):
         coefs = [1, (1-al)/(5-al), (2-al)*(1-al)/(6-al)/(5-al)]
@@ -155,6 +171,28 @@ class GoloskokovKrollCFF(cff.DispersionCFF):
         xs = array([self._val(x, eta, alt, j) for j in [0, 2, 4]])
         return -0.341*npsum(ctuval*xs)/self._invAq(al0, ctuval)
 
+    Htu = Htuval
+    Htd = Htdval
+
+    def Hts(self, x, eta, t, Q2):
+        """GK12 model for Ht^s GPD."""
+        return 0.
+
+    def Htg(self, x, eta, t, Q2):
+        """GK12 model for gluon GPD Htilde."""
+        # Coeffs are from hep-ph/0501242
+        Q02 = 4.
+        Mp2 = 0.9383**2
+        L = log(Q2/Q02)
+        cs = array([3.39-0.864*L, 1.73+0.24*L-0.17*L**2, 0.42-0.115*L-0.069*L**2])
+        al0, alp = (0.22+0.17*L, 0.15)
+        alt = al0 + alp*t - 1
+        xs = array([self._sea(x, eta, alt, j, glue=-1) for j in range(3)])
+        b = 2.58 + 0.25*log(Mp2/(Q2+Mp2))
+        return exp(b*t) * sum(cs*xs)
+
+    #   ===  GPD E ===
+
     def Euval(self, x, eta, t, Q2):
         """GK12 model for E^u_val GPD."""
         ceuval = array([1, -1])  # (1-rho)
@@ -162,7 +200,8 @@ class GoloskokovKrollCFF(cff.DispersionCFF):
         alt = al0 + alp*t
         # val() expects series in beta^(j/2), so 0,2 -> 0,1
         xs = array([self._val(x, eta, alt, j) for j in [0, 2]])
-        return 1.67*npsum(ceuval*xs)/beta(1-al0, 5)
+        # prefactor to get agreement by PARTONS' GPDGK11.cpp
+        return 1.67013027*npsum(ceuval*xs)/beta(1-al0, 5)
 
     def Edval(self, x, eta, t, Q2, DMbeta=False):
         """GK12 model for E^d_val GPD."""
@@ -175,6 +214,7 @@ class GoloskokovKrollCFF(cff.DispersionCFF):
         else:
             # GK choice
             betd = 5.6
+            # PARTONS don't use the last term below
             cedval = array([1, -2.6, 2.08, -0.416, -0.0416, -0.011648, -0.0046592,
                             -0.00226304, -0.001244672])
             bmax = 8
@@ -182,7 +222,8 @@ class GoloskokovKrollCFF(cff.DispersionCFF):
         alt = al0 + alp*t
         # val() expects series in beta^(j/2)
         xs = array([self._val(x, eta, alt, j) for j in range(0, 2*bmax+1, 2)])
-        return -2.03*npsum(cedval*xs)/beta(1-al0, 1+betd)
+        # -2.03 -> 2.029 for better agreement with PARTONS
+        return -2.029*npsum(cedval*xs)/beta(1-al0, 1+betd)
 
     def Esea(self, x, eta, t, Q2):
         """GK12 model for strange sea GPD."""
@@ -193,13 +234,36 @@ class GoloskokovKrollCFF(cff.DispersionCFF):
         al0, alp = (1.10+0.06*L-0.0027*L**2, 0.15)
         alt = al0 + alp*t
         xs = array([self._sea(x, eta, alt, j) for j in range(0, 5, 2)])
-        b = 0.9*(2.58 + 0.25*log(Mp2/(Q2+Mp2)))
+        b = 2.58 + 0.25*log(Mp2/(Q2+Mp2))
         # Note that opposite sign is also possible:
         return -0.155*exp(b*t) * npsum(ces*xs)
 
     def Eu(self, x, eta, t, Q2):
         """Up quark GPD E."""
         return self.Euval(x, eta, t, Q2) + self.Esea(x, eta, t, Q2)
+
+    def Ed(self, x, eta, t, Q2):
+        """Down quark GPD E."""
+        return self.Edval(x, eta, t, Q2) + self.Esea(x, eta, t, Q2)
+
+    def Es(self, x, eta, t, Q2):
+        """Strange quark GPD E."""
+        return self.Esea(x, eta, t, Q2)
+
+    def Eg(self, x, eta, t, Q2):
+        """GK12 model for gluon GPD E."""
+        Q02 = 4.
+        Mp2 = 0.9383**2
+        L = log(Q2/Q02)
+        al0, alp = (1.10+0.06*L-0.0027*L**2, 0.15)
+        alt = al0 + alp*t - 1
+        ces = array([1, -1])
+        bmax = 2
+        xs = array([self._sea(x, eta, alt, j, glue=True) for j in [0, 2]])
+        b = (2.58 + 0.25*log(Mp2/(Q2+Mp2)))
+        return 0.779*exp(b*t) * sum(ces*xs)
+
+    #   ===  GPD E tilde ===
 
     def Etuval(self, x, eta, t, Q2):
         """GK12 model for Et^u GPD (non-pole part)."""
@@ -219,28 +283,55 @@ class GoloskokovKrollCFF(cff.DispersionCFF):
         b = 0.9
         return 4.*exp(b*t) * npsum(ces*xs)
 
-    def _gegen32(self, x):
-        return 15.*x**2/2 - 3./2
+    def Etupole(self, x, eta, t, Q2, cff=False):
+        """Implementantion following PARTONS GPDGK16."""
+        # Note that only asymptotic part of pion DA is used
+        # FIXME: if-then logic not nice below
+        res = 0
+        
+        Mp = 0.938272013
+        mpi2 = 0.1349766**2
+        gpiNN = 13.4
+        f_pi = 0.131
+        Lambda_N2 = 0.51 ** 2
 
-    def _phi(self, u, a2=0.22):
-        return 6*u*(1-u)*(1+a2*self._gegen32(2*u+1))
+        xbj = 2.0 * eta / (eta - t/Q2 * (eta-0.5) + 1.0)
+        eps = 2.0 * xbj * Mp / sqrt(Q2)
+        eps2 = eps ** 2
 
-    def Etupole(self, x, eta, t, Q2):
-        """Pion pole contribution to E tilde - u quark."""
-        if -eta < x < eta:
-            Mp2 = 0.938272013**2
-            gA0 = 1.267
-            LAM2 = 0.44**2
-            mpi2 = 0.1396**2
-            numer = Mp2 * gA0 * (LAM2 - mpi2)
-            denom = (mpi2-t)*(LAM2-t)
-            return numer*self._phi((x+eta)/2/eta)/denom/eta
+        if eps < 1 and (4.0 * xbj * (1.0 - xbj) + eps2) != 0:
+            tmin = -Q2 * (2.0 * (1.0 - xbj) * (1 - sqrt(1.0 + eps2)) + eps2) \
+                   / (4.0 * xbj * (1.0 - xbj) + eps2)
+            FpiNN = (Lambda_N2 - mpi2) / (Lambda_N2 - (t - tmin))
+            Fp = -Mp * f_pi * (2.0 * sqrt(2.0) * gpiNN * FpiNN) \
+                 / (t - mpi2)
+            if t < tmin: 
+                res = (Fp / 4.0 / eta) * 6.0 
+        if cff:
+            # already integrated over LO hard-scattering amplitude
+            return res
         else:
-            return 0
+            if x < eta and x > -eta:
+                y = (x + eta) / (2.0 * eta)
+                res = res * y * (1.0 - y)
+            else:
+                res = 0
+            return res 
 
     def Etdpole(self, x, eta, t, Q2):
         """Pion pole contribution to E tilde - d quark."""
         return - self.Etupole(x, eta, t, Q2)
+
+    def Etu(self, x, eta, t, Q2): 
+        return self.Etuval(x, eta, t, Q2) + self.Etupole(x, eta, t, Q2)
+        
+    def Etd(self, x, eta, t, Q2): 
+        return self.Etdval(x, eta, t, Q2) + self.Etdpole(x, eta, t, Q2)
+
+    def Etg(self, x, eta, t, Q2):
+        """GK12 model for gluon GPD E-tilde."""
+        return 0.
+
 
     #  ######  CFFs  #########
 
@@ -268,15 +359,6 @@ class GoloskokovKrollCFF(cff.DispersionCFF):
         else:
             return array(res)
 
-    # def ImHalt(self, pt):
-        # """GK12 model for Im(CFFH) (alternative expression)."""
-        # x = pt.xi
-        # t = pt.t
-        # Q2 = pt.Q2
-        # assert x>0
-        # return pi*(  (4./9)*(self.Huval(x, x, t, Q2) +2*self.Hudsea(x, x, t, Q2))
-        #       # +(1./9)*(self.Hdval(x, x, t, Q2)+2*self.Hudsea(x, x, t, Q2))
-        #       # +(1./9)*(2*self.Hs(x, x, t, Q2)) )
 
     def ImHt(self, pt, xi=0):
         """GK12 model for Im(CFFHt)."""
@@ -352,25 +434,14 @@ class GoloskokovKrollCFF(cff.DispersionCFF):
         else:
             return array(res)
 
-    def ReEtpole(self, pt):
-        """Pion pole contribution to ReEt."""
-        Mp2 = 0.938272013**2
-        gA0 = 1.267
-        LAM2 = 0.44**2
-        mpi2 = 0.1396**2
-        numer = Mp2 * gA0 * (LAM2 - mpi2)
-        denom = (mpi2-pt.t)*(LAM2-pt.t)
-        green = numer/denom
-        a2 = 0.22
-        return 2*(1+a2)*green/pt.xi
-
     def ReEtnonpole(self, pt):
         """Contribution to ReEt extra to pion pole."""
         return cff.DispersionCFF.ReEt(self, pt)
 
     def ReEt(self, pt):
         """Total ReEt pole+nonpole."""
-        return self.ReEtpole(pt) + self.ReEtnonpole(pt)
+        # (4/9 Etu_pole + 1/9 Etdpole) = 1/3 Etu_pole
+        return self.ReEtnonpole(pt) + self.Etupole(pt.xi, pt.xi, pt.t, pt.Q2, cff=True)/3.
 
     def _GKaux(self, x, ds, Q2=4.):
         """Auxilliary integrand that accepts ndarray."""

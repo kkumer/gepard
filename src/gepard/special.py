@@ -135,7 +135,7 @@ def deldelS2(j: Union[complex, np.ndarray], k: int) -> Union[complex, np.ndarray
         Note halving of the argument.
 
     """
-    if j == k:
+    if not isinstance(j, np.ndarray) and j == k:
         return -(S3(k) - S3(k-1/2)) / 2 / (4*k + 1)
     else:
         return (delS2(j) - delS2(k)) / (4*(j-k)*(2*j+2*k+1))
