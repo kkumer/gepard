@@ -1084,9 +1084,9 @@ def HallAFT(path=None, fmt='png', **kwargs):
         panel(ax, points=subsets[npanel], xaxis='tm', **kwargs)
         ax.set_ylabel('%s' % ylabels[npanel-1], fontsize=16)
         if npanel != 4:
-            ax.text(-0.31, 0.017, '$Q^2\\!= %s\\,{\\rm GeV}^2$' % Qs[npanel-1], fontsize=12)
+            ax.text(-0.31, 0.017, r'$Q^2\!= %s\,{\rm GeV}^2$' % Qs[npanel-1], fontsize=12)
         else:
-            ax.text(-0.31, 0.065, '$Q^2\\!= %s\\,{\\rm GeV}^2$' % Qs[npanel-1], fontsize=12)
+            ax.text(-0.31, 0.065, r'$Q^2\!= %s\,{\rm GeV}^2$' % Qs[npanel-1], fontsize=12)
         ax.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.1))
     fig.subplots_adjust(wspace=0.7)
     if path:
