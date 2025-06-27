@@ -26,7 +26,7 @@ to sources will be immediately visible.
 Testing and benchmarking
 ------------------------
 
-Fast testing the code:
+Fast testing the code (you need ``pytest`` Python package):
 
 .. code-block:: bash
 
@@ -47,7 +47,7 @@ Thorough testing everything
    pytest -q --runslow --doctest-glob="*.rst"
 
 
-Checking test coverage
+Checking test coverage (you need ``pytest-cov`` Python package):
 
 .. code-block:: bash
 

@@ -10,7 +10,8 @@ together with the required dependencies by simply issuing
 
    pip install gepard
 
-Of course, you should have Python first (version 3.7 at the least), 
+Of course, you should have Python first (version 3.7 should be fine,
+but testing is done for versions 3.11 and newer), 
 as well as ``pip``, which
 all major Linux distributions have as a standard package.
 (If you want to install Gepard in the virtual Python environment,
@@ -55,7 +56,7 @@ changes to the sources will be immediately active.
 Requirements
 ------------
 
-- Python >= 3.7
+- Python >= 3.11
 - Numpy
 - Scipy
 - importlib-resources and importlib-metadata Python packages
