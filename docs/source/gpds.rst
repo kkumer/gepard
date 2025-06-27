@@ -169,6 +169,7 @@ class like this:
 This is now a complete object and CFFs can be evaluated for some kinematics:
 
 .. code-block:: python
+   :options: +TOLERANCE=1e-6
 
    >>> cff.ReH(g.DataPoint(xB=0.1, t=-0.3, Q2=6))
    np.float64(13.448510742222517)

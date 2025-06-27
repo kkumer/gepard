@@ -82,15 +82,17 @@ like this
 and then used to calculate theory prediction for a given datapoint
 
 .. code-block:: python
+   :options: +TOLERANCE=1e-6
 
    >>> th_KM15.predict(pt)
-   0.02344956
+   0.023449564143725128
 
 Method ``predict`` of the ``Theory`` object will by default calculate 
 observable specified in ``observable`` attribute of ``pt``.
 User can also calculate other observables, like beam charge asymmetry
 
 .. code-block:: python
+   :options: +TOLERANCE=1e-6
 
    >>> th_KM15.AC(pt)
    np.float64(0.1380493081710745)
@@ -102,6 +104,7 @@ Furthermore, values of Compton Form Factors are available, for
 example :math:`\mathfrak{Im}\mathcal{H}`
 
 .. code-block:: python
+   :options: +TOLERANCE=1e-6
 
    >>> th_KM15.ImH(pt)
    np.float64(2.807544271408012)
@@ -111,6 +114,7 @@ example :math:`\mathfrak{Im}\mathcal{H}`
    Presently, you cannot calculate observable or form factor by directly specifying kinematics, like
 
    .. code-block:: python
+   :options: +TOLERANCE=1e-6
 
    >>> # This will NOT work
    >>> th_KM15.ImH(x=0.348, t=-0.3, Q2=3)  # doctest: +SKIP
