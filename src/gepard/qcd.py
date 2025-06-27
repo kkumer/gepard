@@ -51,12 +51,12 @@ def beta(p: int, nf: int) -> float:
         beta = - B00 - B01 * nf
     elif p == 1:
         beta = - B10 - B11 * nf
-    elif p == 2:
-        beta = - 1428.50 + 279.611 * nf - 6.01852 * nf**2
-    elif p == 3:
-        beta = - 29243.0 + 6946.30 * nf - 405.089 * nf**2 - 1.49931 * nf**3
+#     elif p == 2:
+#         beta = - 1428.50 + 279.611 * nf - 6.01852 * nf**2
+#     elif p == 3:
+#         beta = - 29243.0 + 6946.30 * nf - 405.089 * nf**2 - 1.49931 * nf**3
     else:
-        raise ValueError('NNNNLO not yet implemented :-)')
+        raise ValueError('Only LO and NLO implemented!')
 
     return beta
 

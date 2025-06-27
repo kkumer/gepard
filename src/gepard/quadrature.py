@@ -6,7 +6,7 @@ Also numerical derivative routine.
 from typing import Tuple
 
 import numpy as np
-from scipy.special.orthogonal import p_roots
+from scipy.special import p_roots
 
 roots4, weights4 = p_roots(4)  # roots and weigths for 4-th order quadrature
 

@@ -93,7 +93,7 @@ User can also calculate other observables, like beam charge asymmetry
 .. code-block:: python
 
    >>> th_KM15.AC(pt)
-   0.138049
+   np.float64(0.1380493081710745)
 
 All implemented observables are listed :ref:`here<tab-observables>`.
 
@@ -104,7 +104,7 @@ example :math:`\mathfrak{Im}\mathcal{H}`
 .. code-block:: python
 
    >>> th_KM15.ImH(pt)
-   2.80754427
+   np.float64(2.807544271408012)
 
 
 .. note::
@@ -119,6 +119,6 @@ example :math:`\mathfrak{Im}\mathcal{H}`
 
    >>> pt = g.DataPoint(xB=0.348, t=-0.3, Q2=3)
    >>> th_KM15.ImH(pt)  # This will work
-   2.8075
+   np.float64(2.807544271408012)
    
 

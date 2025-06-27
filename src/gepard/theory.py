@@ -144,9 +144,9 @@ class Theory(object):
                     var += (dfdp[p]*self.parameters_errors[p])**2
             else:
                 print('Theory has neither covariance matrix, nor parameters_errors.')
-            result = (fun(pt), sqrt(var))
+            result = (float(fun(pt)), float(sqrt(var)))
         else:
-            result = fun(pt)
+            result = float(fun(pt))
 
         if 'parameters' in kwargs:
             # restore old values
